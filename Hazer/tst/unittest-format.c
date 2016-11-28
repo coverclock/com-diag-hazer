@@ -68,7 +68,7 @@ int main(void)
 
     for (degrees = 0.00; degrees < 360.00; degrees += 0.01) {
         nanodegrees = degrees * 1000000000.0;
-        name = hazer_format_nanodegrees2compass(nanodegrees);
+        name = hazer_format_nanodegrees2compass32(nanodegrees);
         millidegrees = degrees * 1000.0;
         for (index = 0; index < (sizeof(POINT) / sizeof(POINT[0])); ++index) {
             if (index == 0) {

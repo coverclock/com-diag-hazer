@@ -660,7 +660,7 @@ void hazer_format_nanodegrees2position(int64_t nanodegrees, int * degreesp, int 
     *hundredthsp = (nanodegrees * 360000LL) / 1000000000LL;
 }
 
-const char * hazer_format_nanodegrees2compass(int64_t nanodegrees)
+const char * hazer_format_nanodegrees2compass32(int64_t nanodegrees)
 {
     static const char * COMPASS[] = {
         "N", "NbE", "NNE", "NEbN", "NE", "NEbE", "ENE", "EbN",
@@ -679,6 +679,24 @@ const char * hazer_format_nanodegrees2compass(int64_t nanodegrees)
 
     return COMPASS[index];
 }
+
+const char * hazer_format_nanodegrees2compass8(int64_t nanodegrees)
+{
+    static const char * COMPASS[] = {
+        "N", "NE", "E", "SE", "S", "SW", "W", "NW"
+    };
+    static const int DIVISION = 360000 / (sizeof(COMPASS) / sizeof(COMPASS[0]));
+    unsigned long index = 0;
+
+    index = nanodegrees / 1000000LL;
+    index += DIVISION / 2;
+    index %= 360000;
+    if (index < 0) { index += 360000; }
+    index /= DIVISION;
+
+    return COMPASS[index];
+}
+
 
 /******************************************************************************
  *

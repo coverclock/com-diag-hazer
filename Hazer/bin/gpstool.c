@@ -125,7 +125,8 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     fprintf(fp, " %.2lf'", pp->alt_millimeters * 3.2808 / 1000.0);
 
     assert((0LL <= pp->cog_nanodegrees) && (pp->cog_nanodegrees <= 360000000000LL));
-    compass = hazer_format_nanodegrees2compass(pp->cog_nanodegrees);
+
+    compass = hazer_format_nanodegrees2compass8(pp->cog_nanodegrees);
     assert(compass != (const char *)0);
     assert(strlen(compass) <= 4);
     fprintf(fp, " %s", compass);

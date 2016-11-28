@@ -5,4 +5,5 @@ GPS=${1:-"/dev/ttyUSB0"}
 GPSSPEED=${2:-"4800"}
 TTY=${3:-"/dev/ttyS0"}
 TTYSPEED=${4:-"115200"}
+sleep 10
 serialtool -D ${GPS} -b ${GPSSPEED} -8 -1 -n -l | gpstool | serialtool -D ${TTY} -b ${TTYSPEED} -8 -n -1 -l
