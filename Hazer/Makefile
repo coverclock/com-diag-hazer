@@ -99,7 +99,7 @@ GITURL				:=	https://github.com/coverclock/com-diag-$(PROJECT).git
 GENERATED			:=	vintage setup generate
 SYNTHESIZED			:=	$(PROJECT)_release.h $(PROJECT)_vintage.h $(PROJECT)_revision.h
 
-ALIASES				:=	hex oct ntohs htons ntohl htonl
+ALIASES				:=	
 
 NEW					:=	dummy
 OLD					:=	dummy
@@ -411,8 +411,6 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
 	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
 	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_platform.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_platform.h"' >> $@
 	echo '#include <stdio.h>' >> $@
 	echo '#include <assert.h>' >> $@
 	echo 'static const char METADATA[] =' >> $@
@@ -427,7 +425,6 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    "License=\"$(LICENSE)\"\n"' >> $@
 	echo '    "Modified=\"$(MODIFIED)\"\n"' >> $@
 	echo '    "Os=\"$(OS)\"\n"' >> $@
-	echo '    "Platform=\"" COM_DIAG_$(SYMBOL)_PLATFORM "\"\n"' >> $@
 	echo '    "Release=\"" COM_DIAG_$(SYMBOL)_RELEASE "\"\n"' >> $@
 	echo '    "Revision=\"" COM_DIAG_$(SYMBOL)_REVISION "\"\n"' >> $@
 	echo '    "Root=\"$(ROOT)\"\n"' >> $@
@@ -443,8 +440,6 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo 'extern const char * COM_DIAG_$(SYMBOL)_VINTAGE_VALUE;' >> $@
 	echo 'extern const char COM_DIAG_$(SYMBOL)_REVISION_KEYWORD[];' >> $@
 	echo 'extern const char * COM_DIAG_$(SYMBOL)_REVISION_VALUE;' >> $@
-	echo 'extern const char COM_DIAG_$(SYMBOL)_PLATFORM_KEYWORD[];' >> $@
-	echo 'extern const char * COM_DIAG_$(SYMBOL)_PLATFORM_VALUE;' >> $@
 	echo 'int main(void) {' >> $@
 	echo '    const char * release_keyword = (const char *)0;' >> $@
 	echo '    const char * release_value = (const char *)0;' >> $@
@@ -452,8 +447,6 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    const char * vintage_value = (const char *)0;' >> $@
 	echo '    const char * revision_keyword = (const char *)0;' >> $@
 	echo '    const char * revision_value = (const char *)0;' >> $@
-	echo '    const char * platform_keyword = (const char *)0;' >> $@
-	echo '    const char * platform_value = (const char *)0;' >> $@
 	echo '    fputs(METADATA, stdout);' >> $@
 	echo '    fputs("$(MAJOR).$(MINOR).$(BUILD)\n", stderr);' >> $@
 	echo '    release_keyword = COM_DIAG_$(SYMBOL)_RELEASE_KEYWORD;' >> $@
@@ -462,16 +455,12 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    vintage_value = COM_DIAG_$(SYMBOL)_VINTAGE_VALUE;' >> $@
 	echo '    revision_keyword = COM_DIAG_$(SYMBOL)_REVISION_KEYWORD;' >> $@
 	echo '    revision_value = COM_DIAG_$(SYMBOL)_REVISION_VALUE;' >> $@
-	echo '    platform_keyword = COM_DIAG_$(SYMBOL)_PLATFORM_KEYWORD;' >> $@
-	echo '    platform_value = COM_DIAG_$(SYMBOL)_PLATFORM_VALUE;' >> $@
 	echo '    assert(release_keyword != (const char *)0);' >> $@
 	echo '    assert(release_value != (const char *)0);' >> $@
 	echo '    assert(vintage_keyword != (const char *)0);' >> $@
 	echo '    assert(vintage_value != (const char *)0);' >> $@
 	echo '    assert(release_keyword != (const char *)0);' >> $@
 	echo '    assert(release_value != (const char *)0);' >> $@
-	echo '    assert(platform_keyword != (const char *)0);' >> $@
-	echo '    assert(platform_value != (const char *)0);' >> $@
 	echo '    return 0;' >> $@
 	echo '}' >> $@
 
@@ -489,8 +478,6 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
 	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
 	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_platform.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_platform.h"' >> $@
 	echo '#include <stdio.h>' >> $@
 	echo '#include <assert.h>' >> $@
 	echo 'static const char METADATA[] =' >> $@
@@ -505,7 +492,6 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    "License=\\"$(LICENSE)\\"\\n"' >> $@
 	echo '    "Modified=\\"$(MODIFIED)\\"\\n"' >> $@
 	echo '    "Os=\\"$(OS)\\"\\n"' >> $@
-	echo '    "Platform=\\"" COM_DIAG_$(SYMBOL)_PLATFORM "\\"\\n"' >> $@
 	echo '    "Release=\\"" COM_DIAG_$(SYMBOL)_RELEASE "\\"\\n"' >> $@
 	echo '    "Revision=\\"" COM_DIAG_$(SYMBOL)_REVISION "\\"\\n"' >> $@
 	echo '    "Root=\\"$(ROOT)\\"\\n"' >> $@
@@ -521,8 +507,6 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo 'extern const char * COM_DIAG_$(SYMBOL)_VINTAGE_VALUE;' >> $@
 	echo 'extern const char COM_DIAG_$(SYMBOL)_REVISION_KEYWORD[];' >> $@
 	echo 'extern const char * COM_DIAG_$(SYMBOL)_REVISION_VALUE;' >> $@
-	echo 'extern const char COM_DIAG_$(SYMBOL)_PLATFORM_KEYWORD[];' >> $@
-	echo 'extern const char * COM_DIAG_$(SYMBOL)_PLATFORM_VALUE;' >> $@
 	echo 'int main(void) {' >> $@
 	echo '    const char * release_keyword = (const char *)0;' >> $@
 	echo '    const char * release_value = (const char *)0;' >> $@
@@ -530,8 +514,6 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    const char * vintage_value = (const char *)0;' >> $@
 	echo '    const char * revision_keyword = (const char *)0;' >> $@
 	echo '    const char * revision_value = (const char *)0;' >> $@
-	echo '    const char * platform_keyword = (const char *)0;' >> $@
-	echo '    const char * platform_value = (const char *)0;' >> $@
 	echo '    fputs(METADATA, stdout);' >> $@
 	echo '    fputs("$(MAJOR).$(MINOR).$(BUILD)\\n", stderr);' >> $@
 	echo '    release_keyword = COM_DIAG_$(SYMBOL)_RELEASE_KEYWORD;' >> $@
@@ -540,16 +522,12 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    vintage_value = COM_DIAG_$(SYMBOL)_VINTAGE_VALUE;' >> $@
 	echo '    revision_keyword = COM_DIAG_$(SYMBOL)_REVISION_KEYWORD;' >> $@
 	echo '    revision_value = COM_DIAG_$(SYMBOL)_REVISION_VALUE;' >> $@
-	echo '    platform_keyword = COM_DIAG_$(SYMBOL)_PLATFORM_KEYWORD;' >> $@
-	echo '    platform_value = COM_DIAG_$(SYMBOL)_PLATFORM_VALUE;' >> $@
 	echo '    assert(release_keyword != (const char *)0);' >> $@
 	echo '    assert(release_value != (const char *)0);' >> $@
 	echo '    assert(vintage_keyword != (const char *)0);' >> $@
 	echo '    assert(vintage_value != (const char *)0);' >> $@
 	echo '    assert(revision_keyword != (const char *)0);' >> $@
 	echo '    assert(revision_value != (const char *)0);' >> $@
-	echo '    assert(platform_keyword != (const char *)0);' >> $@
-	echo '    assert(platform_value != (const char *)0);' >> $@
 	echo '    return 0;' >> $@
 	echo '}' >> $@
 
