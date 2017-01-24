@@ -115,7 +115,6 @@ TARBALL				:=	$(OUT)/$(TGZ_DIR)/$(PROJECT)
 SO					:=	so
 
 A2SOARCH			:=	-shared -Wl,-soname,lib$(PROJECT).$(SO).$(MAJOR).$(MINOR)
-A2SOXXARCH			:=	-shared -Wl,-soname,lib$(PROJECT)xx.$(SO).$(MAJOR).$(MINOR)
 
 ########## Configuration Makefile
 
@@ -141,14 +140,11 @@ DIMINUTO_LDFLAGS	:=	-L$(DIMINUTO_LIBRARIES) -l$(DIMINUTO_PROJECT) -lpthread -lrt
 ########## Commands and Option Flags
 
 PROJECT_A			:=	lib$(PROJECT).a
-PROJECTXX_A			:=	lib$(PROJECT)xx.a
 PROJECT_SO			:=	lib$(PROJECT).$(SO)
-PROJECTXX_SO		:=	lib$(PROJECT)xx.$(SO)
 
 CROSS_COMPILE		:=	$(TOOLCHAIN)
 
 CC					:=	$(CROSS_COMPILE)gcc
-CXX					:=	$(CROSS_COMPILE)g++
 AR					:=	$(CROSS_COMPILE)ar
 RANLIB				:=	$(CROSS_COMPILE)ranlib
 STRIP				:=	$(CROSS_COMPILE)strip
@@ -161,17 +157,11 @@ CPPFLAGS			:=	$(CDEFINES) -iquote $(SRC_DIR) -iquote $(INC_DIR) -iquote $(OUT)/$
 CFLAGS				:=	$(CARCH) -g
 #CFLAGS				:=	$(CARCH) -g -fprofile-arcs -ftest-coverage
 #CFLAGS				:=	$(CARCH) -O3
-CXXFLAGS			:=	$(CXXARCH) -g
-#CXXFLAGS			:=	$(CXXARCH) -g -fprofile-arcs -ftest-coverage
-#CXXFLAGS			:=	$(CXXARCH) -O3
 CPFLAGS				:=	-i
 MVFLAGS				:=	-i
 LDFLAGS				:=	$(LDARCH) -l$(PROJECT) $(LDLIBRARIES) $(DIMINUTO_LDFLAGS)
-LDXXFLAGS			:=	$(LDARCH) -l$(PROJECT)xx -l$(PROJECT) $(LDXXLIBRARIES)
 MOFLAGS				:=	$(MOARCH) -l$(PROJECT) $(LDLIBRARIES)
-MOXXFLAGS			:=	$(MOARCH) -l$(PROJECT)xx -l$(PROJECT) $(LDXXLIBRARIES)
 SOFLAGS				:=	$(SOARCH) $(LDLIBRARIES)
-SOXXFLAGS			:=	$(SOXXARCH) $(LDXXLIBRARIES)
 
 #BROWSER			:=	firefox
 #BROWSER			:=	epiphany
@@ -180,8 +170,6 @@ BROWSER				:=	evince
 ########## Build Artifacts
 
 TARGETOBJECTS		:=	$(addprefix $(OUT)/$(OBC_DIR)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.c))))
-TARGETOBJECTSXX		:=	$(addprefix $(OUT)/$(OBP_DIR)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.cpp))))
-TARGETMODULES		:=	$(addprefix $(OUT)/,$(addsuffix .$(SO),$(basename $(wildcard $(MOD_DIR)/*.c))))
 TARGETSCRIPTS		:=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.sh)))
 TARGETBINARIES		:=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.c)))
 TARGETGENERATED		:=	$(addprefix $(OUT)/$(BIN_DIR)/,$(GENERATED))
@@ -189,22 +177,16 @@ TARGETSYNTHESIZED	:=	$(addprefix $(OUT)/$(INC_DIR)/com/diag/$(PROJECT)/,$(SYNTHE
 
 TARGETALIASES		:=	$(addprefix $(OUT)/$(BIN_DIR)/,$(ALIASES))
 TARGETUNITTESTS		:=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.c)))
-TARGETUNITTESTS		+=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.cpp)))
 TARGETUNITTESTS		+=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.sh)))
 
 TARGETARCHIVE		:=	$(OUT)/$(ARC_DIR)/$(PROJECT_A)
-TARGETARCHIVEXX		:=	$(OUT)/$(ARC_DIR)/$(PROJECTXX_A)
 TARGETSHARED		:=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO).$(MAJOR).$(MINOR)
 TARGETSHARED		+=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO).$(MAJOR)
 TARGETSHARED		+=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO)
-TARGETSHAREDXX		:=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR).$(MINOR)
-TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR)
-TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO)
 
 TARGETLIBRARIES		:=	$(TARGETARCHIVE) $(TARGETSHARED)
-TARGETLIBRARIESXX	:=	$(TARGETARCHIVEXX) $(TARGETSHAREDXX)
 TARGETPROGRAMS		:=	$(TARGETBINARIES) $(TARGETALIASES) $(TARGETUNITTESTS) $(TARGETGENERATED) $(TARGETSCRIPTS)
-TARGETALL		:=	$(TARGETLIBRARIES) $(TARGETLIBRARIESXX) $(TARGETPROGRAMS)
+TARGETALL			:=	$(TARGETLIBRARIES) $(TARGETPROGRAMS)
 TARGETMOST			:=	$(TARGETALL) $(TARGETMODULES)
 TARGETPLUS			:=	$(TARGETMOST) $(TARGETDRIVERS)
 
@@ -301,32 +283,11 @@ $(OUT)/$(LIB_DIR)/lib$(PROJECT).$(SO).$(MAJOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT).
 $(OUT)/$(LIB_DIR)/lib$(PROJECT).$(SO):	$(OUT)/$(LIB_DIR)/lib$(PROJECT).$(SO).$(MAJOR)
 	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
 
-########## Target C++ Libraries
-
-$(OUT)/$(ARC_DIR)/$(PROJECTXX_A):	$(TARGETOBJECTSXX)
-	D=`dirname $@`; mkdir -p $$D
-	$(AR) $(ARFLAGS) $@ $^
-	$(RANLIB) $@
-
-$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.$(SO).$(MAJOR).$(MINOR):	$(TARGETOBJECTSXX) $(OUT)/$(LIB_DIR)/lib$(PROJECT).$(SO).$(MAJOR).$(MINOR)
-	D=`dirname $@`; mkdir -p $$D
-	$(CXX) $(CXXFLAGS) $(A2SOXXARCH) -o $@ $(SOXXFLAGS) $(TARGETOBJECTSXX)
-
-$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.$(SO).$(MAJOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.$(SO).$(MAJOR).$(MINOR)
-	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
-
-$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.$(SO):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.$(SO).$(MAJOR)
-	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
-
 ########## Target Unstripped Binaries
 
 $(OUT)/$(SYM_DIR)/%:	$(OUT)/$(OBC_DIR)/$(BIN_DIR)/%.o $(TARGETLIBRARIES)
 	D=`dirname $@`; mkdir -p $$D
 	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
-
-$(OUT)/$(SYM_DIR)/%:	$(OUT)/$(OBP_DIR)/$(BIN_DIR)/%.o $(TARGETLIBRARIESXX) $(TARGETLIBRARIES)
-	D=`dirname $@`; mkdir -p $$D
-	$(CXX) $(CXXFLAGS) -o $@ $< $(LDXXFLAGS)
 
 ########## Target Aliases
 
@@ -371,10 +332,6 @@ $(OUT)/$(BIN_DIR)/hex $(OUT)/$(BIN_DIR)/oct $(OUT)/$(BIN_DIR)/ntohs $(OUT)/$(BIN
 $(OUT)/$(TST_DIR)/%:	$(OUT)/$(OBC_DIR)/$(TST_DIR)/%.o $(TARGETLIBRARIES)
 	D=`dirname $@`; mkdir -p $$D
 	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
-	
-$(OUT)/$(TST_DIR)/%:	$(OUT)/$(OBP_DIR)/$(TST_DIR)/%.o $(TARGETLIBRARIESXX) $(TARGETLIBRARIES)
-	D=`dirname $@`; mkdir -p $$D
-	$(CXX) $(CXXFLAGS) -o $@ $< $(LDXXFLAGS)
 
 ########## Generated Source Files
 
@@ -628,10 +585,6 @@ $(OUT)/$(MOD_DIR)/%.$(SO):	$(MOD_DIR)/%.c
 	D=`dirname $@`; mkdir -p $$D
 	$(CC) $(CPPFLAGS) $(CFLAGS) -shared -o $@ $< $(MOFLAGS) -Wl,--whole-archive $(LDWHOLEARCHIVES) -Wl,--no-whole-archive
 
-$(OUT)/$(MOD_DIR)/%.$(SO):	$(MOD_DIR)/%.cpp
-	D=`dirname $@`; mkdir -p $$D
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -o $@ $< $(MOXXFLAGS) -Wl,--whole-archive $(LDWHOLEARCHIVES) -Wl,--no-whole-archive
-
 ########## Helpers
 
 .PHONY:	makeversion gccversion implicit defines iquotes isystems
@@ -704,14 +657,6 @@ patch:	$(OLD) $(NEW)
 
 ########## Rules
 
-$(OUT)/$(OBP_DIR)/%.txt:	%.cpp $(TARGETSYNTHESIZED)
-	D=`dirname $@`; mkdir -p $$D
-	$(CXX) -E $(CPPFLAGS) -c $< > $@
-
-$(OUT)/$(OBP_DIR)/%.o:	%.cpp $(TARGETSYNTHESIZED)
-	D=`dirname $@`; mkdir -p $$D
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ -c $<
-
 $(OUT)/$(OBC_DIR)/%.txt:	%.c $(TARGETSYNTHESIZED)
 	D=`dirname $@`; mkdir -p $$D
 	$(CC) -E $(CPPFLAGS) -c $< > $@
@@ -747,17 +692,6 @@ depend:	$(TARGETSYNTHESIZED)
 				T=`mktemp "$(TEMP_DIR)/$(PROJECT).XXXXXXXXXX"`; \
 				echo -n "$(OUT)/$(OBC_DIR)/$$D/" > $$T; \
 				$(CC) $(CPPFLAGS) -MM -MG $$F >> $$T && cat $$T >> $(DEPENDENCIES); \
-				rm -f $$T; \
-			done; \
-		fi; \
-	done
-	for S in $(SRC_DIR) $(TST_DIR); do \
-		if [ -d $$S ]; then \
-			for F in $$S/*.cpp; do \
-				D=`dirname $$F`; \
-				T=`mktemp "$(TEMP_DIR)/$(PROJECT).XXXXXXXXXX"`; \
-				echo -n "$(OUT)/$(OBP_DIR)/$$D/" > $$T; \
-				$(CXX) $(CPPFLAGS) -MM -MG $$F >> $$T && cat $$T >> $(DEPENDENCIES); \
 				rm -f $$T; \
 			done; \
 		fi; \

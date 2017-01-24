@@ -1,6 +1,6 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 #ifndef _H_COM_DIAG_HAZER_
-#define _H_COM_DIAG_HAZER
+#define _H_COM_DIAG_HAZER_
 
 /**
  * @file
@@ -32,5 +32,13 @@
  * "NMEA 0183 Standard for Interfacing Marine Electronic Devices", version 4.10,
  * NMEA 0183, National Marine Electronics Association, 2012-06
  */
+
+#include <stdio.h>
+
+typedef char (hazer_buffer_t)[83]; /* NMEA 3.0, 5.3, p. 11: ('$'|'!') + [79] + '\r' + '\n' + '\0' */
+
+extern FILE * hazer_debug(FILE *now);
+
+extern ssize_t hazer_sentence_read(FILE *fp, void * buffer, size_t size);
 
 #endif
