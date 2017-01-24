@@ -1,2 +1,48 @@
-# com-diag-hazer
-Parsing NMEA strings from the USGlobalSat BU-353S4 GPS device
+com-diag-hazer
+=================
+
+Copyright 2017 by the Digital Aggregates Corporation, Colorado, USA.
+
+LICENSE
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+Alternative commercial licensing terms are available from the copyright
+holder. Contact Digital Aggregates Corporation for more information.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, contact
+
+    Free Software Foundation, Inc.
+    59 Temple Place, Suite 330
+    Boston MA 02111-1307 USA
+    http://www.gnu.org/copyleft/lesser.txt
+
+ABSTRACT
+
+This file is part of the Digital Aggregates Corporation Hazer package. Hazer is
+a simple C-based parser of the National Marine Electronics Association (NMEA)
+strings produced by the USGlobalSat BU-353S4 Global Positioning System (GPS)
+device, a tiny little external GPS receiver that emits NMEA strings over its
+built-in USB-to-serial adaptor. The BU-353S4 is based on the SiRF Star IV
+chipset. If you want to futz around with satellite geolocation, the BU-353S4
+is a cheap and easy way to do it.
+
+This software is an original work of its author(s).
+
+Contact:
+
+    Chip Overclock
+    Digital Aggregates Corporation
+    3440 Youngfield Street, Suite 209
+    Wheat Ridge CO 80033 USA
+    http://www.diag.com
+    mailto:coverclock@diag.com
