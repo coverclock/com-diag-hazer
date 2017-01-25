@@ -35,7 +35,108 @@
 
 #include <stdio.h>
 
-typedef char (hazer_buffer_t)[83]; /* NMEA 3.0, 5.3, p. 11: ('$'|'!') + [79] + '\r' + '\n' + '\0' */
+/*******************************************************************************
+ * Types
+ ******************************************************************************/
+
+/**
+ * NMEA 0183 4.10, 5.3, p. 11
+ */
+typedef char (hazer_buffer_t)[82 + 1]; /* plus NUL */
+
+/**
+ * NMEA 0183 4.10, GGA, Global Positioning System Fix Data, p. 86-87
+ */
+typedef struct HazerNmeaGga {
+    char        gga_name[3 + 1];
+    float       gga_utc;
+    float       gga_latitude;
+    float       gga_longitude;
+    float       gga_altitude;
+    float       gga_hdop;
+    float       gga_geoidal;
+    float       gga_geoidal_units;
+    float       gga_age;
+    uint16_t    gga_station;
+    uint8_t     gga_satellites;
+    char        gga_quality;
+    char        gga_altitude_units;
+} hazer_nmea_gga_t;
+
+/**
+ * NMEA 0183 4.10, GGL, Geographic Position Latitude/Longitude, p. 87
+ */
+typedef struct HazerNmeaGll {
+    char        ggl_name[3 + 1];
+    float       ggl_latitude;
+    float       ggl_longitude;
+    float       ggl_utc;
+    char        ggl_status;
+    char        ggl_mode;
+} hazer_nmea_gll_t;
+
+/**
+ * NMEA 0183 4.10, GSA, GNSS DOP and Active Satellites, p. 94-95
+ */
+typedef struct HazerNmeaGsa {
+    char        gsa_name[3 + 1];
+    float       gsa_pdop;
+    float       gsa_hdop;
+    float       gsa_vdop;
+    uint8_t     gsa_satellites[12];
+    uint8_t     gsa_system;
+    char        gsa_mode;
+    char        gsa_dimensionality;
+} hazer_nmea_gsa_t;
+
+/**
+ * NMEA 0183 4.10, GSV, GNSS Satellites In View, p. 96-97
+ */
+typedef struct HazerNmeaGsv {
+    char        gsv_name[3 + 1];
+    uint8_t     gsv_sentences;
+    uint8_t     gsv_sentence;
+    uint8_t     gsv_satellites;
+    struct {
+        uint8_t gsv_satellite;
+        uint8_t gsv_elevation;
+        uint8_t gsv_azimuth;
+        uint8_t gsv_snr;
+    } gsv_sv[4];
+} hazer_nmea_gsv_t;
+
+/**
+ * NMEA 0183 4.10, RMC, Recommended Minimum Specific GNSS Data, p. 113-114
+ */
+typedef struct HazerNmeaRmc {
+    char        rmc_name[3 + 1];
+    float       rmc_utc;
+    float       rmc_latitude;
+    float       rmc_longitude;
+    float       rmc_speed;
+    float       rmc_course;
+    float       rmc_date;
+    float       rmc_variation;  
+    char        rmc_status;
+    char        rmc_mode;
+    char        rmc_navigational;
+} hazer_nmea_rmc_t;
+
+/**
+ * NMEA 0183 4.10, VTG, Course Over Ground and Ground Speed, p. 127-128
+ */
+typedef struct HazerNmeaVtg {
+    char        vtg_name[3 + 1];
+    float       vtg_course_true;
+    float       vtg_course_magnetic;
+    float       vtg_speed_knots;
+    float       vtg_speed_kph;
+    char        vtg_mode;
+} hazer_nmea_vtg_t;
+
+/*******************************************************************************
+ * Functions
+ ******************************************************************************/
 
 extern FILE * hazer_debug(FILE *now);
 

@@ -175,8 +175,12 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
 
     do {
 
-        if (eff < 11) {
-            DEBUG("SHORT?\n");
+        /*
+         * Ignore the terminating NUL if it exists.
+         */
+
+        if (eff == 0) {
+            DEBUG("ZERO?\n");
             break;
         }
 
@@ -185,11 +189,33 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
             eff -= 1;
         }
 
+        /*
+         * Check length.
+         */
+
+        if (eff < HAZER_NMEA_LENGTH_MINIMUM) {
+            DEBUG("SHORT?\n");
+            break;
+        }
+
+        if (eff > (sizeof(hazer_buffer_t) - 1)) {
+            DEBUG("LONG?\n");
+            break;
+        }
+
+        /*
+         * Check for '$' or '!'.
+         */
+
         ss = 0;
         if ((bb[ss] != HAZER_NMEA_SENTENCE_START) && (bb[ss] != HAZER_NMEA_SENTENCE_ENCAPSULATE)) {
             DEBUG("START 0x%x?\n", bb[ss]);
             break;
         }
+
+        /*
+         * Check for 'G' and 'P' talker and ','.
+         */
 
         ss = 1;
         if (bb[ss] != HAZER_NMEA_TALKER_GPS[0]) {
@@ -203,11 +229,25 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
             break;
         }
 
+        ss = 6;
+        if (bb[ss] != HAZER_NMEA_SENTENCE_DELIMITER) {
+            DEBUG("DELIM 0x%x?\n", bb[ss]);
+            break;
+        }
+
+        /*
+         * Check for '*'.
+         */
+
         ss = eff - 5;
         if (bb[ss] != HAZER_NMEA_SENTENCE_CHECKSUM) {
             DEBUG("STAR 0x%x?\n", bb[ss]);
             break;
         }
+
+        /*
+         * Check for [0-9A-F][0-9A-F].
+         */
 
         ss = eff - 4;
         if (('0' <= bb[ss]) && (bb[ss] <= '9')) {
@@ -235,6 +275,10 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
 
         DEBUG("CK 0x%x.\n", ck);
 
+        /*
+         * Compute checksum.
+         */
+
         ss = 1;
         ch = bb[ss];
         cs = ch;
@@ -255,17 +299,29 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
             break;
         }
 
+        /*
+         * Check for penultimate '\r'.
+         */
+
         ss = eff - 2;
         if (bb[ss] != HAZER_NMEA_SENTENCE_CR) {
             DEBUG("CR 0x%x?\n", bb[ss]);
             break;
         }
 
+        /*
+         * Check for final '\n'.
+         */
+
         ss = eff - 1;
         if (bb[ss] != HAZER_NMEA_SENTENCE_LF) {
             DEBUG("LF 0x%x?\n", bb[ss]);
             break;
         }
+
+        /*
+         * Okay.
+         */
 
         ss = size;
 
