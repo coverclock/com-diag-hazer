@@ -27,6 +27,7 @@ int main(int argc, char * argv[])
     ssize_t ss = 0;
     size_t current = 0;
     int end = 0;
+    ssize_t check = 0;
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
@@ -35,7 +36,9 @@ int main(int argc, char * argv[])
     }
 
     while (!0) {
+
         size = hazer_sentence_read(stdin, buffer, sizeof(buffer));
+
         if (size < 0) {
             fprintf(stderr, "%s: ERR\n", program);
             return 1;
@@ -45,10 +48,14 @@ int main(int argc, char * argv[])
         } else {
             /* Do nothing. */
         }
+
+        check = hazer_sentence_check(buffer, size);
+
         for (bb = buffer, ss = size; ss > 0; --ss) {
             diminuto_phex_emit(stderr, *(bb++), ~0, 0, 0, 0, &current, &end, 0);
         }
-        fputc('\n', stderr);
+
+        fprintf(stderr, "[%lu](%lu) %s\n", size, check, (check == size) ? "OK" : "BAD");
     }
 
     return 0;

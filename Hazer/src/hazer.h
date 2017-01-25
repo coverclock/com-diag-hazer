@@ -17,14 +17,17 @@
  * NMEA 3.0, 6.1.1, Table 3
  */
 
-static const int HAZER_NMEA_SENTENCE_CR            = '\r';
-static const int HAZER_NMEA_SENTENCE_LF            = '\n';
-static const int HAZER_NMEA_SENTENCE_START         = '$';
-static const int HAZER_NMEA_SENTENCE_CHECKSUM      = '*';
-static const int HAZER_NMEA_SENTENCE_DELIMITER     = ',';
-static const int HAZER_NMEA_SENTENCE_ENCAPSULATION = '!';
-static const int HAZER_NMEA_SENTENCE_TAG           = '\\';
-static const int HAZER_NMEA_SENTENCE_HEX           = '^';
+static const int HAZER_NMEA_SENTENCE_CR             = '\r';
+static const int HAZER_NMEA_SENTENCE_LF             = '\n';
+static const int HAZER_NMEA_SENTENCE_START          = '$';
+static const int HAZER_NMEA_SENTENCE_CHECKSUM       = '*';
+static const int HAZER_NMEA_SENTENCE_DELIMITER      = ',';
+static const int HAZER_NMEA_SENTENCE_ENCAPSULATE    = '!';
+static const int HAZER_NMEA_SENTENCE_TAG            = '\\';
+static const int HAZER_NMEA_SENTENCE_HEXADECIMAL    = '^';
+static const int HAZER_NMEA_SENTENCE_MINIMUM        = ' ';
+static const int HAZER_NMEA_SENTENCE_MAXIMUM        = '}';
+/*               HAZER_NMEA_SENTENCE_RESERVED       = '~'; */
 
 /*
  * NMEA 3.0, 6.1.4, Table 6

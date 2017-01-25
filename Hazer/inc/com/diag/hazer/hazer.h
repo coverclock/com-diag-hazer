@@ -41,4 +41,6 @@ extern FILE * hazer_debug(FILE *now);
 
 extern ssize_t hazer_sentence_read(FILE *fp, void * buffer, size_t size);
 
+extern ssize_t hazer_sentence_check(const void * buffer, size_t size);
+
 #endif
