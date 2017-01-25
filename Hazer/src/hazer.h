@@ -95,32 +95,32 @@ static const char HAZER_NMEA_TALKER_GPS[]   = "GP";
  ******************************************************************************/
 
 /**
- * GP-2106, 2.1, Table 2-1
+ * GP-2106, 2.1, Table 2-1, Global positioning system fixed data
  */
 static const char HAZER_NMEA_MESSAGE_GGA[]  = "GGA";
 
 /**
- * GP-2106, 2.1, Table 2-1
+ * GP-2106, 2.1, Table 2-1, Geographic position latitude / longitude
  */
 static const char HAZER_NMEA_MESSAGE_GLL[]  = "GLL";
 
 /**
- * GP-2106, 2.1, Table 2-1
+ * GP-2106, 2.1, Table 2-1, GNSS DOP and active satellites
  */
 static const char HAZER_NMEA_MESSAGE_GSA[]  = "GSA";
 
 /**
- * GP-2106, 2.1, Table 2-1
+ * GP-2106, 2.1, Table 2-1, GNSS satellites in view
  */
 static const char HAZER_NMEA_MESSAGE_GSV[]  = "GSV";
 
 /**
- * GP-2106, 2.1, Table 2-1
+ * GP-2106, 2.1, Table 2-1, Recommended minimum specific GNSS data
  */
 static const char HAZER_NMEA_MESSAGE_RMC[]  = "RMC";
 
 /**
- * GP-2106, 2.1, Table 2-1
+ * GP-2106, 2.1, Table 2-1, Course over ground and ground speed
  */
 static const char HAZER_NMEA_MESSAGE_VTG[]  = "VTG";
 

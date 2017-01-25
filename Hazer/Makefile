@@ -75,7 +75,6 @@ INC_DIR				:=	inc# Header files
 LIB_DIR				:=	lib# Shared objects for dynamic linking
 MOD_DIR				:=	mod# Loadable user modules
 OBC_DIR				:=	obc# C object modules
-OBP_DIR				:=	obp# C++ object modules
 OUT_DIR				:=	out# Build artifacts
 SRC_DIR				:=	src# Library source files
 SYM_DIR				:=	sym# Unstripped executable binaries
