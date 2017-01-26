@@ -282,14 +282,29 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
 ssize_t hazer_nmea_read(FILE *fp, void * buffer, size_t size)
 {
     hazer_state_t state = HAZER_STATE_START;
+    hazer_state_t next = HAZER_STATE_START;
     char * bb = (char *)0;
     size_t ss = 0;
     int ch = EOF;
+    int error = 0;
 
-    do {
+    while (!0) {
         ch = fgetc(fp);
-        state = hazer_nmea_machine(state, ch, buffer, size, &bb, &ss);
-    } while ((state != HAZER_STATE_END) && (HAZER_STATE_EOF));
+        next = hazer_nmea_machine(state, ch, buffer, size, &bb, &ss);
+        if (next == HAZER_STATE_END) {
+            break;
+        } else if  (next == HAZER_STATE_EOF) {
+            fprintf(stderr, "hazer_nmea_read: eof\n");
+            ss = 0;
+            break;
+        } else if ((!error) && (next == HAZER_STATE_START) && (state != next)) {
+            fprintf(stderr, "hazer_nmea_read: resyncing\n");
+            error = !0;
+        } else {
+            /* Do nothing. */
+        }
+        state = next;
+    }
 
     return ss;
 }
@@ -299,9 +314,9 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
     const char * bb = (const char *)buffer;
     size_t eff = size;
     size_t ss = 0;
-    uint8_t ch = 0;
+    uint8_t ch = '\0';
     uint8_t cs = 0;
-    uint8_t ck = 0;
+    uint8_t ck = ~0;
 
     do {
 
@@ -448,10 +463,35 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
     return ss;
 }
 
-size_t hazer_sentence_tokenize(hazer_vector_t vector, void * buffer, size_t size)
+ssize_t hazer_nmea_tokenize(char * vector[], size_t count, void * buffer, size_t size)
 {
-    char * bb = buffer;
     char ** vv = vector;
-    size_t nn = 0;
+    char * bb = buffer;
 
+    if ((count--) > 0) {
+        *vv = bb;
+        while ((size--) > 0) {
+            if (*bb == ',') {
+                *(bb++) = '\0';
+                DEBUG("TOK \"%s\"\n", *vv);
+                if ((count--) <= 0) {
+                    break;
+                }
+                *(++vv) = bb;
+            } else if (*bb == '*') {
+                *(bb++) = '\0';
+                DEBUG("TOK \"%s\"\n", *vv);
+                if ((count--) <= 0) {
+                    break;
+                }
+                *(++vv) = (char *)0;
+                DEBUG("TOK 0x0\n");
+                break;
+            } else {
+                ++bb;
+            }
+        }
+    }
+
+    return (vv - vector);
 }

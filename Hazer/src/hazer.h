@@ -9,13 +9,8 @@
  * Licensed under the terms in README.h<BR>
  * Chip Overclock <coverclock@diag.com><BR>
  * http://www.diag.com/navigation/downloads/Hazer.html<BR>
+ * These are the private definitions for the hazer API.
  */
-
-#include <stddef.h>
-
-/*******************************************************************************
- * Enumerations
- ******************************************************************************/
 
 /**
  * NMEA 0183 4.10, 6.1.1, Table 3
@@ -45,44 +40,5 @@ typedef enum HazerAction {
     HAZER_ACTION_SAVESPECIAL,
     HAZER_ACTION_TERMINATE,
 } hazer_action_t;
-
-/*******************************************************************************
- * Constants
- ******************************************************************************/
-
-/**
- * NMEA 0183 4.10, 6.1.4, Table 6
- */
-static const char HAZER_NMEA_TALKER_GPS[]   = "GP";
-
-/**
- * GP-2106, 2.1, Table 2-1, Global positioning system fixed data
- */
-static const char HAZER_NMEA_MESSAGE_GGA[]  = "GGA";
-
-/**
- * GP-2106, 2.1, Table 2-1, Geographic position latitude / longitude
- */
-static const char HAZER_NMEA_MESSAGE_GLL[]  = "GLL";
-
-/**
- * GP-2106, 2.1, Table 2-1, GNSS DOP and active satellites
- */
-static const char HAZER_NMEA_MESSAGE_GSA[]  = "GSA";
-
-/**
- * GP-2106, 2.1, Table 2-1, GNSS satellites in view
- */
-static const char HAZER_NMEA_MESSAGE_GSV[]  = "GSV";
-
-/**
- * GP-2106, 2.1, Table 2-1, Recommended minimum specific GNSS data
- */
-static const char HAZER_NMEA_MESSAGE_RMC[]  = "RMC";
-
-/**
- * GP-2106, 2.1, Table 2-1, Course over ground and ground speed
- */
-static const char HAZER_NMEA_MESSAGE_VTG[]  = "VTG";
 
 #endif
