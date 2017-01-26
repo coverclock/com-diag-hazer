@@ -32,139 +32,269 @@ FILE * hazer_debug(FILE * now)
     return was;
 }
 
-ssize_t hazer_sentence_read(FILE *fp, void * buffer, size_t size)
+hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp)
 {
-    char * bb;
-    size_t ss;
-    int ch;
+    int done = !0;
+    hazer_action_t action = HAZER_ACTION_SKIP;
 
-    while (!0) {
+    /*
+     * Short circuit state machine for certain characters.
+     */
 
-        /*
-         * Initialize.
-         */
+    switch (ch) {
 
-        bb = (char *)buffer;
-        ss = size;
+    case EOF:
+        DEBUG("EOF %d!\n", ch);
+        state = HAZER_STATE_EOF;
+        break;
 
-        DEBUG("BEGIN.\n");
+    case HAZER_NMEA_CHARACTER_START:
+        DEBUG("STARTING '%c'?\n", ch);
+        state = HAZER_STATE_START;
+        break;
 
-        /*
-         * Find '$' or '!' start character.
-         */
+    case HAZER_NMEA_CHARACTER_ENCAPSULATION:
+        DEBUG("STARTING '%c'?\n", ch);
+        state = HAZER_STATE_START;
+        break;
 
-        while (!0) {
+    case HAZER_NMEA_CHARACTER_CR:
+        /* Do nothing. */
+        break;
 
-            if ((ch = fgetc(fp)) == EOF) {
-                DEBUG("EOF 0x%x!\n", ch);
-                return 0;
-            }
+    case HAZER_NMEA_CHARACTER_LF:
+        /* Do nothing. */
+        break;
 
-            if (ch == HAZER_NMEA_SENTENCE_START) {
-                DEBUG("START '%c.'\n", ch);
-                break;
-            }
-
-            if (ch == HAZER_NMEA_SENTENCE_ENCAPSULATE) {
-                DEBUG("ENCAPSULATE '%c'.\n", ch);
-                break;
-            }
-
-            DEBUG("SKIP 0x%x.\n", ch);
-
+    default:
+        if (!((HAZER_NMEA_CHARACTER_MINIMUM <= ch) && (ch <= HAZER_NMEA_CHARACTER_MAXIMUM))) {
+            DEBUG("STARTING 0x%x!\n", ch);
+            state = HAZER_STATE_START;
         }
-
-        if (ss == 0) {
-            DEBUG("LONG?\n");
-            continue;
-        }
-
-        *(bb++) = ch;
-        --ss;
-
-        /*
-         * Find '\r' penultimate character.
-         */
-
-        while (!0) {
-
-            if ((ch = fgetc(fp)) == EOF) {
-                DEBUG("EOF 0x%x!\n", ch);
-                return 0;
-            }
-
-            if (ss == 0) {
-                DEBUG("LONG?\n");
-                break;
-            }
-
-            *(bb++) = ch;
-            --ss;
-
-            if (ch == HAZER_NMEA_SENTENCE_CR) {
-                DEBUG("CR 0x%x.\n", ch);
-                break;
-            }
-
-            DEBUG("SAVE '%c'.\n", ch);
-
-        }
-
-        if (ss == 0) {
-            continue;
-        }
-
-        /*
-         * Check for '\n' final character.
-         */
-
-        if ((ch = fgetc(fp)) == EOF) {
-            DEBUG("EOF 0x%x!\n", ch);
-            return 0;
-        }
-
-        if (ch != HAZER_NMEA_SENTENCE_LF) {
-            DEBUG("LF 0x%x?\n", ch);
-            continue;
-        }
-
-        DEBUG("LF 0x%x.\n", ch);
-
-        if (ss == 0) {
-            DEBUG("LONG?\n");
-            continue;
-        }
-
-        *(bb++) = ch;
-        --ss;
-
-        /*
-         * Provide '\0' terminator.
-         */
-
-        if (ss == 0) {
-            DEBUG("LONG?\n");
-            continue;
-        }
-
-        DEBUG("NUL.\n");
-
-        *(bb++) = '\0';
-        --ss;
-
-        /*
-         * Done.
-         */
-
-        DEBUG("END.\n");
         break;
 
     }
 
-    return (size - ss);
+    /*
+     * Advance state machine based on stimulus.
+     */
+
+    switch (state) {
+
+    case HAZER_STATE_EOF:
+        *bp = (char *)buffer;
+        *sp = 0;
+        break;
+
+    case HAZER_STATE_START:
+        if (ch == HAZER_NMEA_CHARACTER_START) {
+            DEBUG("START '%c'.\n", ch);
+            state = HAZER_STATE_TALKER_1;
+            action = HAZER_ACTION_SAVE;
+            *bp = (char *)buffer;
+            *sp = size;
+        } else if (ch == HAZER_NMEA_CHARACTER_ENCAPSULATION) {
+            DEBUG("ENCAPSULATE '%c'.\n", ch);
+            state = HAZER_STATE_CHECKSUM;
+            action = HAZER_ACTION_SAVE;
+            *bp = (char *)buffer;
+            *sp = size;
+        } else {
+            /* Do nothing. */
+        }
+        break;
+
+    case HAZER_STATE_TALKER_1:
+        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+            DEBUG("STARTING '%c'!\n", ch);
+            state = HAZER_STATE_START;
+        } else {
+            state = HAZER_STATE_TALKER_2;
+            action = HAZER_ACTION_SAVE;
+        }
+        break;
+
+    case HAZER_STATE_TALKER_2:
+        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+            DEBUG("STARTING '%c'!\n", ch);
+            state = HAZER_STATE_START;
+        } else {
+            state = HAZER_STATE_MESSAGE_1;
+            action = HAZER_ACTION_SAVE;
+        }
+        break;
+
+    case HAZER_STATE_MESSAGE_1:
+        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+            DEBUG("STARTING '%c'!\n", ch);
+            state = HAZER_STATE_START;
+        } else {
+            state = HAZER_STATE_MESSAGE_2;
+            action = HAZER_ACTION_SAVE;
+        }
+        break;
+
+    case HAZER_STATE_MESSAGE_2:
+        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+            DEBUG("STARTING '%c'!\n", ch);
+            state = HAZER_STATE_START;
+        } else {
+            state = HAZER_STATE_MESSAGE_3;
+            action = HAZER_ACTION_SAVE;
+        }
+        break;
+
+    case HAZER_STATE_MESSAGE_3:
+        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+            DEBUG("STARTING '%c'!\n", ch);
+            state = HAZER_STATE_START;
+        } else {
+            state = HAZER_STATE_DELIMITER;
+            action = HAZER_ACTION_SAVE;
+        }
+        break;
+
+    case HAZER_STATE_DELIMITER:
+        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+            state = HAZER_STATE_CHECKSUM;
+            action = HAZER_ACTION_SAVE;
+        } else {
+            DEBUG("STARTING 0x%x!\n", ch);
+            state = HAZER_STATE_START;
+        }
+        break;
+
+    case HAZER_STATE_CHECKSUM:
+        if (ch == HAZER_NMEA_CHARACTER_CHECKSUM) {
+            state = HAZER_STATE_CHECKSUM_1;
+        }
+        action = HAZER_ACTION_SAVE;
+        break;
+
+    case HAZER_STATE_CHECKSUM_1:
+        if ((HAZER_NMEA_CHARACTER_DECMIN <= ch) && (ch <= HAZER_NMEA_CHARACTER_DECMAX)) {
+            state = HAZER_STATE_CHECKSUM_2;
+            action = HAZER_ACTION_SAVE;
+        } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= ch) && (ch <= HAZER_NMEA_CHARACTER_HEXMAX)) {
+            state = HAZER_STATE_CHECKSUM_2;
+            action = HAZER_ACTION_SAVE;
+        } else {
+            DEBUG("STARTING 0x%x!\n", ch);
+            state = HAZER_STATE_START;
+        }
+        break;
+
+    case HAZER_STATE_CHECKSUM_2:
+        if ((HAZER_NMEA_CHARACTER_DECMIN <= ch) && (ch <= HAZER_NMEA_CHARACTER_DECMAX)) {
+            state = HAZER_STATE_CR;
+            action = HAZER_ACTION_SAVE;
+        } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= ch) && (ch <= HAZER_NMEA_CHARACTER_HEXMAX)) {
+            state = HAZER_STATE_CR;
+            action = HAZER_ACTION_SAVE;
+        } else {
+            DEBUG("STARTING 0x%x!\n", ch);
+            state = HAZER_STATE_START;
+        }
+        break;
+
+    case HAZER_STATE_CR:
+        if (ch == HAZER_NMEA_CHARACTER_CR) {
+            state = HAZER_STATE_LF;
+            action = HAZER_ACTION_SAVESPECIAL;
+        } else {
+            DEBUG("STARTING 0x%x!\n", ch);
+            state = HAZER_STATE_START;
+        }
+        break;
+
+    case HAZER_STATE_LF:
+        if (ch == HAZER_NMEA_CHARACTER_LF) {
+            state = HAZER_STATE_END;
+            action = HAZER_ACTION_TERMINATE;
+        } else {
+            DEBUG("STARTING 0x%x!\n", ch);
+            state = HAZER_STATE_START;
+        }
+        break;
+
+    case HAZER_STATE_END:
+        DEBUG("END 0x%x!\n", ch);
+        break;
+
+    }
+
+    /*
+     * Perform associated action.
+     */
+
+    switch (action) {
+
+    case HAZER_ACTION_SKIP:
+        DEBUG("SKIP 0x%x?\n", ch);
+        break;
+
+    case HAZER_ACTION_SAVE:
+        if ((*sp) > 0) {
+            *((*bp)++) = ch;
+            (*sp) -= 1;
+            DEBUG("SAVE '%c'.\n", ch);
+        } else {
+            state = HAZER_STATE_START;
+            DEBUG("LONG!\n");
+        }
+        break;
+
+    case HAZER_ACTION_SAVESPECIAL:
+        if ((*sp) > 0) {
+            *((*bp)++) = ch;
+            (*sp) -= 1;
+            DEBUG("SAVE 0x%x.\n", ch);
+        } else {
+            state = HAZER_STATE_START;
+            DEBUG("LONG!\n");
+        }
+        break;
+
+    case HAZER_ACTION_TERMINATE:
+        if ((*sp) > 1) {
+            *((*bp)++) = ch;
+            (*sp) -= 1;
+            DEBUG("SAVE 0x%x.\n", ch);
+            *((*bp)++) = '\0';
+            (*sp) -= 1;
+            DEBUG("SAVE 0x%x.\n", '\0');
+            (*sp) = size - (*sp);
+        } else {
+            state = HAZER_STATE_START;
+            DEBUG("LONG!\n");
+        }
+        break;
+
+    }
+
+    /*
+     * Done.
+     */
+
+    return state;
 }
 
-ssize_t hazer_sentence_check(const void * buffer, size_t size)
+ssize_t hazer_nmea_read(FILE *fp, void * buffer, size_t size)
+{
+    hazer_state_t state = HAZER_STATE_START;
+    char * bb = (char *)0;
+    size_t ss = 0;
+    int ch = EOF;
+
+    do {
+        ch = fgetc(fp);
+        state = hazer_nmea_machine(state, ch, buffer, size, &bb, &ss);
+    } while ((state != HAZER_STATE_END) && (HAZER_STATE_EOF));
+
+    return ss;
+}
+
+ssize_t hazer_nmea_check(const void * buffer, size_t size)
 {
     const char * bb = (const char *)buffer;
     size_t eff = size;
@@ -193,7 +323,7 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
          * Check length.
          */
 
-        if (eff < HAZER_NMEA_LENGTH_MINIMUM) {
+        if (eff < HAZER_NMEA_CONSTANT_SHORTEST) {
             DEBUG("SHORT?\n");
             break;
         }
@@ -208,7 +338,7 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
          */
 
         ss = 0;
-        if ((bb[ss] != HAZER_NMEA_SENTENCE_START) && (bb[ss] != HAZER_NMEA_SENTENCE_ENCAPSULATE)) {
+        if ((bb[ss] != HAZER_NMEA_CHARACTER_START) && (bb[ss] != HAZER_NMEA_CHARACTER_ENCAPSULATION)) {
             DEBUG("START 0x%x?\n", bb[ss]);
             break;
         }
@@ -230,7 +360,7 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
         }
 
         ss = 6;
-        if (bb[ss] != HAZER_NMEA_SENTENCE_DELIMITER) {
+        if (bb[ss] != HAZER_NMEA_CHARACTER_DELIMITER) {
             DEBUG("DELIM 0x%x?\n", bb[ss]);
             break;
         }
@@ -240,7 +370,7 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
          */
 
         ss = eff - 5;
-        if (bb[ss] != HAZER_NMEA_SENTENCE_CHECKSUM) {
+        if (bb[ss] != HAZER_NMEA_CHARACTER_CHECKSUM) {
             DEBUG("STAR 0x%x?\n", bb[ss]);
             break;
         }
@@ -250,24 +380,24 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
          */
 
         ss = eff - 4;
-        if (('0' <= bb[ss]) && (bb[ss] <= '9')) {
+        if ((HAZER_NMEA_CHARACTER_DECMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_DECMAX)) {
             DEBUG("MOST '%c'.\n", bb[ss]);
-            ck = (bb[ss] - '0' + 0) << 4;
-        } else if (('A' <= bb[ss]) && (bb[ss] <= 'F')) {
+            ck = (bb[ss] - HAZER_NMEA_CHARACTER_DECMIN + 0) << 4;
+        } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_HEXMAX)) {
             DEBUG("MOST '%c'.\n", bb[ss]);
-            ck = (bb[ss] - 'A' + 10) << 4;
+            ck = (bb[ss] - HAZER_NMEA_CHARACTER_HEXMIN + 10) << 4;
         } else { 
             DEBUG("MOST 0x%x?\n", bb[ss]);
             break;
         }
 
         ss = eff - 3; 
-        if (('0' <= bb[ss]) && (bb[ss] <= '9')) {
+        if ((HAZER_NMEA_CHARACTER_DECMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_DECMAX)) {
             DEBUG("LEAST '%c'.\n", bb[ss]);
-            ck |= (bb[ss] - '0' + 0);
-        } else if (('A' <= bb[ss]) && (bb[ss] <= 'F')) {
+            ck |= (bb[ss] - HAZER_NMEA_CHARACTER_DECMIN + 0);
+        } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_HEXMAX)) {
             DEBUG("LEAST '%c'.\n", bb[ss]);
-            ck |= (bb[ss]- 'A' + 10);
+            ck |= (bb[ss]- HAZER_NMEA_CHARACTER_HEXMIN + 10);
         } else { 
             DEBUG("LEAST 0x%x?\n", bb[ss]);
             break;
@@ -283,8 +413,8 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
         ch = bb[ss];
         cs = ch;
         ++ss;
-        while (bb[ss] != HAZER_NMEA_SENTENCE_CHECKSUM) {
-            if (!((HAZER_NMEA_SENTENCE_MINIMUM <= bb[ss]) && (bb[ss] <= HAZER_NMEA_SENTENCE_MAXIMUM))) {
+        while (bb[ss] != HAZER_NMEA_CHARACTER_CHECKSUM) {
+            if (!((HAZER_NMEA_CHARACTER_MINIMUM <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_MAXIMUM))) {
                 DEBUG("BAD 0x%x?\n", bb[ss]);
                 break;
             }
@@ -304,7 +434,7 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
          */
 
         ss = eff - 2;
-        if (bb[ss] != HAZER_NMEA_SENTENCE_CR) {
+        if (bb[ss] != HAZER_NMEA_CHARACTER_CR) {
             DEBUG("CR 0x%x?\n", bb[ss]);
             break;
         }
@@ -314,7 +444,7 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
          */
 
         ss = eff - 1;
-        if (bb[ss] != HAZER_NMEA_SENTENCE_LF) {
+        if (bb[ss] != HAZER_NMEA_CHARACTER_LF) {
             DEBUG("LF 0x%x?\n", bb[ss]);
             break;
         }
@@ -328,4 +458,12 @@ ssize_t hazer_sentence_check(const void * buffer, size_t size)
     } while (0);
 
     return ss;
+}
+
+size_t hazer_sentence_tokenize(hazer_vector_t vector, void * buffer, size_t size)
+{
+    char * bb = buffer;
+    char ** vv = vector;
+    size_t nn = 0;
+
 }

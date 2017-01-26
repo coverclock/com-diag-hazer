@@ -14,85 +14,46 @@
 #include <stddef.h>
 
 /*******************************************************************************
- * Lengths
- ******************************************************************************/
-
-/**
- * NMEA 0183 4.10, 5.3.3.1, Table 1
- */
-static size_t HAZER_NMEA_LENGTH_MINIMUM = 11;
-
-/*******************************************************************************
- * Characters
+ * Enumerations
  ******************************************************************************/
 
 /**
  * NMEA 0183 4.10, 6.1.1, Table 3
  */
-static const int HAZER_NMEA_SENTENCE_CR             = '\r';
+enum HazerNmeaCharacter {
+    HAZER_NMEA_CHARACTER_MINIMUM        = ' ',
+    HAZER_NMEA_CHARACTER_START          = '$',
+    HAZER_NMEA_CHARACTER_ENCAPSULATION  = '!',
+    HAZER_NMEA_CHARACTER_GNSS           = 'G',
+    HAZER_NMEA_CHARACTER_DELIMITER      = ',',
+    HAZER_NMEA_CHARACTER_TAG            = '\\',
+    HAZER_NMEA_CHARACTER_HEXADECIMAL    = '^',
+    HAZER_NMEA_CHARACTER_CHECKSUM       = '*',
+    HAZER_NMEA_CHARACTER_DECMIN         = '0',
+    HAZER_NMEA_CHARACTER_DECMAX         = '9',
+    HAZER_NMEA_CHARACTER_HEXMIN         = 'A',
+    HAZER_NMEA_CHARACTER_HEXMAX         = 'F',
+    HAZER_NMEA_CHARACTER_CR             = '\r',
+    HAZER_NMEA_CHARACTER_LF             = '\n',
+    HAZER_NMEA_CHARACTER_MAXIMUM        = '}',
+    HAZER_NMEA_CHARACTER_RESERVERED     = '~',
+};
 
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_LF             = '\n';
-
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_START          = '$';
-
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_CHECKSUM       = '*';
-
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_DELIMITER      = ',';
-
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_ENCAPSULATE    = '!';
-
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_TAG            = '\\';
-
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_HEXADECIMAL    = '^';
-
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_MINIMUM        = ' ';
-
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_MAXIMUM        = '}';
-
-/**
- * NMEA 0183 4.10, 6.1.1, Table 3
- */
-static const int HAZER_NMEA_SENTENCE_RESERVERD      = '~';
+typedef enum HazerAction {
+    HAZER_ACTION_SKIP           = 0,
+    HAZER_ACTION_SAVE,
+    HAZER_ACTION_SAVESPECIAL,
+    HAZER_ACTION_TERMINATE,
+} hazer_action_t;
 
 /*******************************************************************************
- * Talkers
+ * Constants
  ******************************************************************************/
 
 /**
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
 static const char HAZER_NMEA_TALKER_GPS[]   = "GP";
-
-/*******************************************************************************
- * Messages
- ******************************************************************************/
 
 /**
  * GP-2106, 2.1, Table 2-1, Global positioning system fixed data

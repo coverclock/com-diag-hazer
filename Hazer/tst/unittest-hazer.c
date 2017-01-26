@@ -47,7 +47,7 @@ int main(int argc, char * argv[])
 
     while (!0) {
 
-        size = hazer_sentence_read(stdin, buffer, sizeof(buffer));
+        size = hazer_nmea_read(stdin, buffer, sizeof(buffer));
 
         if (size < 0) {
             fprintf(stderr, "%s: ERR\n", program);
@@ -59,7 +59,7 @@ int main(int argc, char * argv[])
             return 0;
         }
 
-        check = hazer_sentence_check(buffer, size);
+        check = hazer_nmea_check(buffer, size);
 
         if (check != size) {
             type = "BAD";

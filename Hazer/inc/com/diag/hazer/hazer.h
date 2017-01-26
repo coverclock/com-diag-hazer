@@ -39,21 +39,53 @@
 #include <stdio.h>
 
 /*******************************************************************************
+ * Enumerations
+ ******************************************************************************/
+
+/**
+ * NMEA 0183 4.10, 5.3.3.1, Table 1
+ * NMEA 0183 4.10, 5.3
+ */
+enum HazerNmeaConstant {
+    HAZER_NMEA_CONSTANT_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
+    HAZER_NMEA_CONSTANT_LONGEST     = 82,
+    HAZER_NMEA_CONSTANT_TALKER      = sizeof("GP") - 1,
+    HAZER_NMEA_CONSTANT_MESSAGE     = sizeof("GGA") - 1,
+};
+
+/*******************************************************************************
  * Types
  ******************************************************************************/
+
+typedef enum HazerState {
+    HAZER_STATE_EOF         = -1,
+    HAZER_STATE_START       = 0,
+    HAZER_STATE_TALKER_1,
+    HAZER_STATE_TALKER_2,
+    HAZER_STATE_MESSAGE_1,
+    HAZER_STATE_MESSAGE_2,
+    HAZER_STATE_MESSAGE_3,
+    HAZER_STATE_DELIMITER,
+    HAZER_STATE_CHECKSUM,
+    HAZER_STATE_CHECKSUM_1,
+    HAZER_STATE_CHECKSUM_2,
+    HAZER_STATE_CR,
+    HAZER_STATE_LF,
+    HAZER_STATE_END,
+} hazer_state_t;
 
 /**
  * NMEA 0183 4.10, 5.3, p. 11
  */
-typedef char (hazer_buffer_t)[82 + 1]; /* plus NUL */
+typedef char (hazer_buffer_t)[HAZER_NMEA_CONSTANT_LONGEST + 1]; /* plus NUL */
 
-typedef char * (hazer_vector_t)[82 - 11 + 1];
+typedef char * (hazer_vector_t)[HAZER_NMEA_CONSTANT_LONGEST - HAZER_NMEA_CONSTANT_SHORTEST + 1]; /* plus NUL */
 
 /**
  * NMEA 0183 4.10, GGA, Global Positioning System Fix Data, p. 86-87
  */
 typedef struct HazerNmeaGga {
-    char        gga_name[3 + 1];        /* "GGA" */
+    char        gga_name[HAZER_NMEA_CONSTANT_MESSAGE + 1]; /* "GGA" */
     float       gga_utc;                /* UTC of position fix */
     float       gga_latitude;           /* Latitude (N+, S-) hhmmss.ss */
     float       gga_longitude;          /* Longitude (E+, W-) hhmmss.ss */
@@ -70,7 +102,7 @@ typedef struct HazerNmeaGga {
  * NMEA 0183 4.10, GGL, Geographic Position Latitude/Longitude, p. 87
  */
 typedef struct HazerNmeaGll {
-    char        ggl_name[3 + 1];        /* "GLL" */
+    char        ggl_name[HAZER_NMEA_CONSTANT_MESSAGE + 1]; /* "GLL" */
     float       ggl_latitude;           /* Latitude (N+, S-)  */
     float       ggl_longitude;          /* Longitude (E+, W-) */
     float       ggl_utc;                /* UTC of position fix */
@@ -82,7 +114,7 @@ typedef struct HazerNmeaGll {
  * NMEA 0183 4.10, GSA, GNSS DOP and Active Satellites, p. 94-95
  */
 typedef struct HazerNmeaGsa {
-    char        gsa_name[3 + 1];        /* "GSA" */
+    char        gsa_name[HAZER_NMEA_CONSTANT_MESSAGE + 1]; /* "GSA" */
     float       gsa_pdop;               /* position dilution of precision */
     float       gsa_hdop;               /* horizontal dilution of precision */
     float       gsa_vdop;               /* vertical dilution of precision */
@@ -96,7 +128,7 @@ typedef struct HazerNmeaGsa {
  * NMEA 0183 4.10, GSV, GNSS Satellites In View, p. 96-97
  */
 typedef struct HazerNmeaGsv {
-    char        gsv_name[3 + 1];        /* "GSV" */
+    char        gsv_name[HAZER_NMEA_CONSTANT_MESSAGE + 1]; /* "GSV" */
     uint8_t     gsv_sentences;          /* Total number of sentences */
     uint8_t     gsv_sentence;           /* Sentence number */
     uint8_t     gsv_satellites;         /* Total satellites in view */
@@ -112,7 +144,7 @@ typedef struct HazerNmeaGsv {
  * NMEA 0183 4.10, RMC, Recommended Minimum Specific GNSS Data, p. 113-114
  */
 typedef struct HazerNmeaRmc {
-    char        rmc_name[3 + 1];        /* "RMC" */
+    char        rmc_name[HAZER_NMEA_CONSTANT_MESSAGE + 1]; /* "RMC" */
     float       rmc_utc;                /* UTC of position fix */
     float       rmc_latitude;           /* Latitude (N+, S-) */
     float       rmc_longitude;          /* Longitude (E+, W-) */
@@ -129,7 +161,7 @@ typedef struct HazerNmeaRmc {
  * NMEA 0183 4.10, VTG, Course Over Ground and Ground Speed, p. 127-128
  */
 typedef struct HazerNmeaVtg {
-    char        vtg_name[3 + 1];        /* "VTG" */
+    char        vtg_name[HAZER_NMEA_CONSTANT_MESSAGE + 1]; /* "VTG" */
     float       vtg_course_true;        /* Course over ground degrees true */
     float       vtg_course_magnetic;    /* Course over ground degrees magnetic */
     float       vtg_speed_knots;        /* Speed over ground knots */
@@ -143,8 +175,10 @@ typedef struct HazerNmeaVtg {
 
 extern FILE * hazer_debug(FILE *now);
 
-extern ssize_t hazer_sentence_read(FILE *fp, void * buffer, size_t size);
+extern hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp);
 
-extern ssize_t hazer_sentence_check(const void * buffer, size_t size);
+extern ssize_t hazer_nmea_read(FILE *fp, void * buffer, size_t size);
+
+extern ssize_t hazer_nmea_check(const void * buffer, size_t size);
 
 #endif
