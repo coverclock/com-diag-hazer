@@ -344,20 +344,8 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
         }
 
         /*
-         * Check for 'G' and 'P' talker and ','.
+         * Check for ','.
          */
-
-        ss = 1;
-        if (bb[ss] != HAZER_NMEA_TALKER_GPS[0]) {
-            DEBUG("TALKER 0x%x?\n", bb[ss]);
-            break;
-        }
-
-        ss = 2;
-        if (bb[ss] != HAZER_NMEA_TALKER_GPS[1]) {
-            DEBUG("TALKER 0x%x?\n", bb[ss]);
-            break;
-        }
 
         ss = 6;
         if (bb[ss] != HAZER_NMEA_CHARACTER_DELIMITER) {
@@ -381,25 +369,25 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
 
         ss = eff - 4;
         if ((HAZER_NMEA_CHARACTER_DECMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_DECMAX)) {
-            DEBUG("MOST '%c'.\n", bb[ss]);
+            DEBUG("MSN '%c'.\n", bb[ss]);
             ck = (bb[ss] - HAZER_NMEA_CHARACTER_DECMIN + 0) << 4;
         } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_HEXMAX)) {
-            DEBUG("MOST '%c'.\n", bb[ss]);
+            DEBUG("MSN '%c'.\n", bb[ss]);
             ck = (bb[ss] - HAZER_NMEA_CHARACTER_HEXMIN + 10) << 4;
         } else { 
-            DEBUG("MOST 0x%x?\n", bb[ss]);
+            DEBUG("MSN 0x%x!\n", bb[ss]);
             break;
         }
 
         ss = eff - 3; 
         if ((HAZER_NMEA_CHARACTER_DECMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_DECMAX)) {
-            DEBUG("LEAST '%c'.\n", bb[ss]);
+            DEBUG("LSN '%c'.\n", bb[ss]);
             ck |= (bb[ss] - HAZER_NMEA_CHARACTER_DECMIN + 0);
         } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_HEXMAX)) {
-            DEBUG("LEAST '%c'.\n", bb[ss]);
+            DEBUG("LSN '%c'.\n", bb[ss]);
             ck |= (bb[ss]- HAZER_NMEA_CHARACTER_HEXMIN + 10);
         } else { 
-            DEBUG("LEAST 0x%x?\n", bb[ss]);
+            DEBUG("LSN 0x%x!\n", bb[ss]);
             break;
         }
 
