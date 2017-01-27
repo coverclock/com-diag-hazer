@@ -20,17 +20,20 @@
  *
  * REFERENCES
  *
+ * "NMEA 0183 Standard for Interfacing Marine Electronic Devices", version 4.10,
+ * NMEA 0183, National Marine Electronics Association, 2012-06
+ *
  * "BU-353S4 GPS Receiver Data Sheet", BU353S4-DS08212013B, USGLobalSat Inc.,
  * 2013
  *
- * "GP-2106 SiRF Star IV GPS module with antenna", version 0.2, ADH Technology
- * Co. Ltd., 2010-12-08
+ * "NMEA Reference Manual", Revision 2.2, 1050-0042, SiRF Technology, Inc.,
+ * 2008-11
  *
  * "SiRF Binary Protocol Reference Manual", revision 2.4, 1040-0041, SiRF
  * Technology, Inc., 2008-11
  *
- * "NMEA 0183 Standard for Interfacing Marine Electronic Devices", version 4.10,
- * NMEA 0183, National Marine Electronics Association, 2012-06
+ * "GP-2106 SiRF Star IV GPS module with antenna", version 0.2, ADH Technology
+ * Co. Ltd., 2010-12-08
  *
  * Electronic Doberman, "Modern GPS Teardown - GlobalSat BU-353S4 SiRF Star
  * IV USB GPS", https://www.youtube.com/watch?v=8xn8FspJDnY
@@ -43,12 +46,15 @@
 /**
  * NMEA 0183 4.10, 5.3.3.1, Table 1
  * NMEA 0183 4.10, 5.3
+ * N.B. SiRF NMEA, p. 2-2 has an example which appears to violate the
+ * NMEA spec as to the length of the message ID.
  */
 enum HazerNmeaConstant {
     HAZER_NMEA_CONSTANT_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
     HAZER_NMEA_CONSTANT_LONGEST     = 82,
     HAZER_NMEA_CONSTANT_TALKER      = sizeof("GP") - 1,
     HAZER_NMEA_CONSTANT_MESSAGE     = sizeof("GGA") - 1,
+    HAZER_NMEA_CONSTANT_ID          = sizeof("$GPGGA") - 1,
 };
 
 /**
@@ -86,7 +92,7 @@ typedef char * (hazer_vector_t)[HAZER_NMEA_CONSTANT_LONGEST - HAZER_NMEA_CONSTAN
 /*
  * As a long time embedded developer, I really dislike using floating
  * point below. A double precision variable is needed since a four byte
- * IEEE float as about five significant digits of precision.
+ * IEEE float has only about five significant digits of precision.
  */
 
 /**
@@ -188,6 +194,21 @@ typedef struct HazerNmeaVtg {
     double      vtg_speed_kph;          /* Speed over ground kilometers/hour */
 } hazer_nmea_vtg_t;
 
+typedef struct HazerNmeaBase {
+    uint64_t    base_ticks;
+    char        base_name[HAZER_NMEA_CONSTANT_MESSAGE + 1]; 
+} hazer_nmea_base_t;
+
+typedef union HazerNmea {
+    hazer_nmea_base_t   base;
+    hazer_nmea_gga_t    gga;
+    hazer_nmea_gll_t    gll;
+    hazer_nmea_gsa_t    gsa;
+    hazer_nmea_gsv_t    gsv;
+    hazer_nmea_rmc_t    rmc;
+    hazer_nmea_vtg_t    vtg;
+} hazer_nmea_t;
+
 /**
  * Sets the debug file pointer. If the pointer is non-null, debugging
  * information is emitted to it. The prior debug file pointer is returned.
@@ -204,7 +225,8 @@ extern FILE * hazer_debug(FILE *now);
  * itself. The function returns the new state, which must be used in the
  * subsequent call. The initial state should be the START state. Of interest
  * to the application are the EOF and END staes. The EOF state indicates
- * that the input stream has ended. The END state indicates that a complete
+ * that the input stream has ended, detected by virtue of the stimulus character
+ * being equal to the standard I/O EOF. The END state indicates that a complete
  * NMEA sentence resides in the buffer; the pointer state variable points
  * past the end of the NUL-terminated sentence, and the size state variable
  * contrains the size of the sentence including the terminating NUL.
@@ -228,6 +250,34 @@ extern hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buff
 extern ssize_t hazer_nmea_read(FILE *fp, void * buffer, size_t size);
 
 /**
+ * Compute the checksum of an NMEA sentence. If the first character is the
+ * start character, it is skipped. The message is checked for legal characters.
+ * The computation stops when the checksum character is encountered.
+ * @param buffer points to the beginning of the output buffer.
+ * @param size is the size of the output buffer in bytes.
+ * @return the checksum.
+ */
+extern uint8_t hazer_nmea_checksum(const void * buffer, size_t size);
+
+/**
+ * Given two checksum characters, convert to an eight-bit checksum.
+ * @param msn is the character representing the most significant nibble.
+ * @param lsn is the character representing the least significant nibble.
+ * @param ckp points to a variable in which the checksum is stored.
+ * @return 0 for success, <0 if an error occurred.
+ */
+extern int hazer_nmea_characters2checksum(char msn, char lsn, uint8_t * ckp);
+
+/**
+ * Given an eight-bit checksum, concert into the two checksum characters.
+ * @param ck is the checksum.
+ * @param mnsp points where the most significant character is stored.
+ * @param lnsp points where the least significant character is stored.
+ * @return 0 for success, <0 if an error occurred.
+ */
+extern int hazer_nmea_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
+
+/**
  * Check the contents of a single NMEA sentence. Some basic sanity checks
  * are done in addition to computing and verifying the checksum.
  * @param buffer points to the beginning of the sentence buffer.
@@ -247,6 +297,8 @@ extern ssize_t hazer_nmea_check(const void * buffer, size_t size);
  * @param size is the size of the sentence in bytes.
  * @return the number of arguments including the final null pointer.
  */
-ssize_t hazer_nmea_tokenize(char * vector[], size_t count, void * buffer, size_t size);
+extern ssize_t hazer_nmea_tokenize(char * vector[], size_t count, void * buffer, size_t size);
+
+extern int hazer_nmea_parse(hazer_nmea_t * datum, char * vector[], size_t count);
 
 #endif

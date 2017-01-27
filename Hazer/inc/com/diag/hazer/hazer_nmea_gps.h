@@ -12,38 +12,63 @@
  */
 
 /**
+ * @def HAZER_NMEA_SENTENCE_START
+ * NMEA 0183 4.10, 5.3.3.1, Table 1
+ */
+#define HAZER_NMEA_SENTENCE_START "$"
+
+/**
+ * @def HAZER_NMEA_GPS_TALKER
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
-static const char HAZER_NMEA_GPS_TALKER[]   = "GP";
+#define HAZER_NMEA_GPS_TALKER "GP"
 
 /**
- * GP-2106, 2.1, Table 2-1, Global positioning system fixed data
+ * @def HAZER_NMEA_GPS_MESSAGE_GGA
+ * SiRF NMEA, Table 1-2, Time, position, and fix type data
  */
-static const char HAZER_NMEA_GPS_MESSAGE_GGA[]  = "GGA";
+#define HAZER_NMEA_GPS_MESSAGE_GGA "GGA"
 
 /**
- * GP-2106, 2.1, Table 2-1, Geographic position latitude / longitude
+ * @def HAZER_NMEA_GPS_MESSAGE_GLL
+ * SiRF NMEA, Table 1-2, Latitude, longitude, UTC time of position fix and status
  */
-static const char HAZER_NMEA_GPS_MESSAGE_GLL[]  = "GLL";
+#define HAZER_NMEA_GPS_MESSAGE_GLL "GLL"
 
 /**
- * GP-2106, 2.1, Table 2-1, GNSS DOP and active satellites
+ * @def HAZER_NMEA_GPS_MESSAGE_GSA
+ * SiRF NMEA, Table 1-2, GPS receiver operating mode, satellites used, DOP values
  */
-static const char HAZER_NMEA_GPS_MESSAGE_GSA[]  = "GSA";
+#define HAZER_NMEA_GPS_MESSAGE_GSA "GSA"
 
 /**
- * GP-2106, 2.1, Table 2-1, GNSS satellites in view
+ * @def HAZER_NMEA_GPS_MESSAGE_GSV
+ * SiRF NMEA, Table 1-2, Number of satellites in view, satellites used, DOP values
  */
-static const char HAZER_NMEA_GPS_MESSAGE_GSV[]  = "GSV";
+#define HAZER_NMEA_GPS_MESSAGE_GSV "GSV"
 
 /**
- * GP-2106, 2.1, Table 2-1, Recommended minimum specific GNSS data
+ * @def HAZER_NMEA_GPS_MESSAGE_MSS
+ * SiRF NMEA, Table 1-2, SNR, signal strength, frequency, bit rate from beacon
  */
-static const char HAZER_NMEA_GPS_MESSAGE_RMC[]  = "RMC";
+#define HAZER_NMEA_GPS_MESSAGE_MSS "MSS"
 
 /**
- * GP-2106, 2.1, Table 2-1, Course over ground and ground speed
+ * @def HAZER_NMEA_GPS_MESSAGE_RMC
+ * SiRF NMEA, Table 1-2, Time, date position, course, and speed data
  */
-static const char HAZER_NMEA_GPS_MESSAGE_VTG[]  = "VTG";
+#define HAZER_NMEA_GPS_MESSAGE_RMC "RMC"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_VTG
+ * SiRF NMEA, Table 1-2, Course and speed relative to ground
+ */
+#define HAZER_NMEA_GPS_MESSAGE_VTG "VTG"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_ZDA
+ * SiRF NMEA, Table 1-2, PPS timing message
+ */
+#define HAZER_NMEA_GPS_MESSAGE_ZDA "ZDA"
 
 #endif

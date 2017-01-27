@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include "hazer.h"
 #include "com/diag/hazer/hazer.h"
+#include "com/diag/hazer/hazer_nmea_gps.h"
 
 static FILE * debug  = (FILE *)0;
 
@@ -309,6 +310,99 @@ ssize_t hazer_nmea_read(FILE *fp, void * buffer, size_t size)
     return ss;
 }
 
+uint8_t hazer_nmea_checksum(const void * buffer, size_t size)
+{
+    uint8_t cs = 0;
+    const char * bb = (const char *)buffer;
+    size_t ss = size;
+    uint8_t ch = '\0';
+
+    do {
+
+        if (ss == 0) {
+            break;
+        }
+
+        if (*bb == HAZER_NMEA_CHARACTER_START) {
+            ++bb;
+            --ss;
+        }
+
+        if (ss == 0) {
+            break;
+        }
+
+        ch = *(bb++);
+        cs = ch;
+        --ss;
+
+        while ((ss > 0) && (*bb != HAZER_NMEA_CHARACTER_CHECKSUM)) {
+            if (!((HAZER_NMEA_CHARACTER_MINIMUM <= *bb) && (*bb <= HAZER_NMEA_CHARACTER_MAXIMUM))) {
+                DEBUG("BAD 0x%x?\n", *bb);
+                break;
+            }
+            ch = *(bb++);
+            cs ^= ch;
+            --ss;
+        }
+
+    } while (0);
+
+    return cs;
+}
+
+int hazer_nmea_characters2checksum(char msn, char lsn, uint8_t * ckp)
+{
+    int rc = 0;
+
+    if ((HAZER_NMEA_CHARACTER_DECMIN <= msn) && (msn <= HAZER_NMEA_CHARACTER_DECMAX)) {
+        *ckp = (msn - HAZER_NMEA_CHARACTER_DECMIN + 0) << 4;
+    } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= msn) && (msn <= HAZER_NMEA_CHARACTER_HEXMAX)) {
+        *ckp = (msn - HAZER_NMEA_CHARACTER_HEXMIN + 10) << 4;
+    } else { 
+        rc = -1;
+    }
+
+    if ((HAZER_NMEA_CHARACTER_DECMIN <= lsn) && (lsn <= HAZER_NMEA_CHARACTER_DECMAX)) {
+        *ckp |= (lsn - HAZER_NMEA_CHARACTER_DECMIN + 0);
+    } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= lsn) && (lsn <= HAZER_NMEA_CHARACTER_HEXMAX)) {
+        *ckp |= (lsn- HAZER_NMEA_CHARACTER_HEXMIN + 10);
+    } else { 
+        rc = -1;
+    }
+
+    return rc;
+}
+
+int hazer_nmea_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
+{
+    int rc = 0;
+    uint8_t msn = 0;
+    uint8_t lsn = 0;
+
+    msn = ck >> 4;
+
+    if ((0x0 <= msn) && (msn <= 0x9)) {
+        *msnp = '0' + msn;
+    } else if ((0xa <= msn) && (msn <= 0xf)) {
+        *msnp = 'A' + msn;
+    } else {
+        rc = -1;
+    }
+
+    lsn = ck & 0xf;
+
+    if ((0x0 <= lsn) && (lsn <= 0x9)) {
+        *lsnp = '0' + lsn;
+    } else if ((0xa <= lsn) && (lsn <= 0xf)) {
+        *lsnp = 'A' + lsn;
+    } else {
+        rc = -1;
+    }
+
+    return rc;
+}
+
 ssize_t hazer_nmea_check(const void * buffer, size_t size)
 {
     const char * bb = (const char *)buffer;
@@ -317,6 +411,7 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
     uint8_t ch = '\0';
     uint8_t cs = 0;
     uint8_t ck = ~0;
+    int rc = 0;
 
     do {
 
@@ -379,56 +474,29 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
         }
 
         /*
-         * Check for [0-9A-F][0-9A-F].
+         * Extract the checksum.
          */
 
         ss = eff - 4;
-        if ((HAZER_NMEA_CHARACTER_DECMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_DECMAX)) {
-            DEBUG("MSN '%c'.\n", bb[ss]);
-            ck = (bb[ss] - HAZER_NMEA_CHARACTER_DECMIN + 0) << 4;
-        } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_HEXMAX)) {
-            DEBUG("MSN '%c'.\n", bb[ss]);
-            ck = (bb[ss] - HAZER_NMEA_CHARACTER_HEXMIN + 10) << 4;
-        } else { 
-            DEBUG("MSN 0x%x!\n", bb[ss]);
-            break;
-        }
-
-        ss = eff - 3; 
-        if ((HAZER_NMEA_CHARACTER_DECMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_DECMAX)) {
-            DEBUG("LSN '%c'.\n", bb[ss]);
-            ck |= (bb[ss] - HAZER_NMEA_CHARACTER_DECMIN + 0);
-        } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_HEXMAX)) {
-            DEBUG("LSN '%c'.\n", bb[ss]);
-            ck |= (bb[ss]- HAZER_NMEA_CHARACTER_HEXMIN + 10);
-        } else { 
-            DEBUG("LSN 0x%x!\n", bb[ss]);
+        rc = hazer_nmea_characters2checksum(bb[ss], bb[ss + 1], &ck);
+        if (rc < 0) {
+            DEBUG("CK 0x%x 0x%x!\n", bb[ss], bb[ss + 1]);
             break;
         }
 
         DEBUG("CK 0x%x.\n", ck);
 
         /*
-         * Compute checksum.
+         * Compute the checksum.
          */
 
         ss = 1;
-        ch = bb[ss];
-        cs = ch;
-        ++ss;
-        while (bb[ss] != HAZER_NMEA_CHARACTER_CHECKSUM) {
-            if (!((HAZER_NMEA_CHARACTER_MINIMUM <= bb[ss]) && (bb[ss] <= HAZER_NMEA_CHARACTER_MAXIMUM))) {
-                DEBUG("BAD 0x%x?\n", bb[ss]);
-                break;
-            }
-            ch = bb[ss];
-            cs ^= ch;
-            ++ss;
-        }
+        cs = hazer_nmea_checksum(buffer, size);
 
         DEBUG("CS 0x%x.\n", cs);
 
         if (cs != ck) {
+            DEBUG("CHECKSUM?\n");
             break;
         }
 
@@ -473,19 +541,19 @@ ssize_t hazer_nmea_tokenize(char * vector[], size_t count, void * buffer, size_t
         while ((size--) > 0) {
             if (*bb == ',') {
                 *(bb++) = '\0';
-                DEBUG("TOK \"%s\"\n", *vv);
+                DEBUG("TOK \"%s\".\n", *vv);
                 if ((count--) <= 0) {
                     break;
                 }
                 *(++vv) = bb;
             } else if (*bb == '*') {
                 *(bb++) = '\0';
-                DEBUG("TOK \"%s\"\n", *vv);
+                DEBUG("TOK \"%s\".\n", *vv);
                 if ((count--) <= 0) {
                     break;
                 }
                 *(++vv) = (char *)0;
-                DEBUG("TOK 0x0\n");
+                DEBUG("TOK 0x0.\n");
                 break;
             } else {
                 ++bb;
@@ -494,4 +562,37 @@ ssize_t hazer_nmea_tokenize(char * vector[], size_t count, void * buffer, size_t
     }
 
     return (vv - vector);
+}
+
+static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
+
+static const char GSA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSA;
+
+static const char GSV[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSV;
+
+static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;
+
+int hazer_nmea_parse(hazer_nmea_t * datum, char * vector[], size_t count)
+{
+    int rc = 0;
+    
+    if (count <= 0) {
+
+        rc = -1;
+
+    } else if (strncmp(vector[0], GGA, sizeof(GGA) - 1) == 0) {
+
+    } else if (strncmp(vector[0], GSA, sizeof(GSA) - 1) == 0) {
+
+    } else if (strncmp(vector[0], GSV, sizeof(GSV) - 1) == 0) {
+
+    } else if (strncmp(vector[0], RMC, sizeof(RMC) - 1) == 0) {
+
+    } else {
+
+        /* Do nothing. */
+
+    }
+
+    return rc;
 }
