@@ -366,7 +366,7 @@ int hazer_nmea_characters2checksum(char msn, char lsn, uint8_t * ckp)
     if ((HAZER_NMEA_CHARACTER_DECMIN <= lsn) && (lsn <= HAZER_NMEA_CHARACTER_DECMAX)) {
         *ckp |= (lsn - HAZER_NMEA_CHARACTER_DECMIN + 0);
     } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= lsn) && (lsn <= HAZER_NMEA_CHARACTER_HEXMAX)) {
-        *ckp |= (lsn- HAZER_NMEA_CHARACTER_HEXMIN + 10);
+        *ckp |= (lsn - HAZER_NMEA_CHARACTER_HEXMIN + 10);
     } else { 
         rc = -1;
     }
@@ -385,7 +385,7 @@ int hazer_nmea_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     if ((0x0 <= msn) && (msn <= 0x9)) {
         *msnp = '0' + msn;
     } else if ((0xa <= msn) && (msn <= 0xf)) {
-        *msnp = 'A' + msn;
+        *msnp = 'A' + msn - 10;
     } else {
         rc = -1;
     }
@@ -395,7 +395,7 @@ int hazer_nmea_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     if ((0x0 <= lsn) && (lsn <= 0x9)) {
         *lsnp = '0' + lsn;
     } else if ((0xa <= lsn) && (lsn <= 0xf)) {
-        *lsnp = 'A' + lsn;
+        *lsnp = 'A' + lsn - 10;
     } else {
         rc = -1;
     }
