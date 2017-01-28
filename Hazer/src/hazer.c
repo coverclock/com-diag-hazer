@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include "hazer.h"
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/hazer_nmea_gps.h"
 
@@ -33,7 +32,7 @@ FILE * hazer_debug(FILE * now)
     return was;
 }
 
-hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp)
+hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp)
 {
     int done = !0;
     hazer_action_t action = HAZER_ACTION_SKIP;
@@ -49,26 +48,26 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         state = HAZER_STATE_EOF;
         break;
 
-    case HAZER_NMEA_CHARACTER_START:
+    case HAZER_STIMULUS_START:
         DEBUG("STARTING '%c'?\n", ch);
         state = HAZER_STATE_START;
         break;
 
-    case HAZER_NMEA_CHARACTER_ENCAPSULATION:
+    case HAZER_STIMULUS_ENCAPSULATION:
         DEBUG("STARTING '%c'?\n", ch);
         state = HAZER_STATE_START;
         break;
 
-    case HAZER_NMEA_CHARACTER_CR:
+    case HAZER_STIMULUS_CR:
         /* Do nothing. */
         break;
 
-    case HAZER_NMEA_CHARACTER_LF:
+    case HAZER_STIMULUS_LF:
         /* Do nothing. */
         break;
 
     default:
-        if (!((HAZER_NMEA_CHARACTER_MINIMUM <= ch) && (ch <= HAZER_NMEA_CHARACTER_MAXIMUM))) {
+        if (!((HAZER_STIMULUS_MINIMUM <= ch) && (ch <= HAZER_STIMULUS_MAXIMUM))) {
             DEBUG("STARTING 0x%x!\n", ch);
             state = HAZER_STATE_START;
         }
@@ -88,13 +87,13 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_START:
-        if (ch == HAZER_NMEA_CHARACTER_START) {
+        if (ch == HAZER_STIMULUS_START) {
             DEBUG("START '%c'.\n", ch);
             state = HAZER_STATE_TALKER_1;
             action = HAZER_ACTION_SAVE;
             *bp = (char *)buffer;
             *sp = size;
-        } else if (ch == HAZER_NMEA_CHARACTER_ENCAPSULATION) {
+        } else if (ch == HAZER_STIMULUS_ENCAPSULATION) {
             DEBUG("ENCAPSULATE '%c'.\n", ch);
             state = HAZER_STATE_CHECKSUM;
             action = HAZER_ACTION_SAVE;
@@ -106,7 +105,7 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_TALKER_1:
-        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+        if (ch == HAZER_STIMULUS_DELIMITER) {
             DEBUG("STARTING '%c'!\n", ch);
             state = HAZER_STATE_START;
         } else {
@@ -116,7 +115,7 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_TALKER_2:
-        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+        if (ch == HAZER_STIMULUS_DELIMITER) {
             DEBUG("STARTING '%c'!\n", ch);
             state = HAZER_STATE_START;
         } else {
@@ -126,7 +125,7 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_MESSAGE_1:
-        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+        if (ch == HAZER_STIMULUS_DELIMITER) {
             DEBUG("STARTING '%c'!\n", ch);
             state = HAZER_STATE_START;
         } else {
@@ -136,7 +135,7 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_MESSAGE_2:
-        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+        if (ch == HAZER_STIMULUS_DELIMITER) {
             DEBUG("STARTING '%c'!\n", ch);
             state = HAZER_STATE_START;
         } else {
@@ -146,7 +145,7 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_MESSAGE_3:
-        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+        if (ch == HAZER_STIMULUS_DELIMITER) {
             DEBUG("STARTING '%c'!\n", ch);
             state = HAZER_STATE_START;
         } else {
@@ -156,7 +155,7 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_DELIMITER:
-        if (ch == HAZER_NMEA_CHARACTER_DELIMITER) {
+        if (ch == HAZER_STIMULUS_DELIMITER) {
             state = HAZER_STATE_CHECKSUM;
             action = HAZER_ACTION_SAVE;
         } else {
@@ -166,17 +165,17 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_CHECKSUM:
-        if (ch == HAZER_NMEA_CHARACTER_CHECKSUM) {
+        if (ch == HAZER_STIMULUS_CHECKSUM) {
             state = HAZER_STATE_CHECKSUM_1;
         }
         action = HAZER_ACTION_SAVE;
         break;
 
     case HAZER_STATE_CHECKSUM_1:
-        if ((HAZER_NMEA_CHARACTER_DECMIN <= ch) && (ch <= HAZER_NMEA_CHARACTER_DECMAX)) {
+        if ((HAZER_STIMULUS_DECMIN <= ch) && (ch <= HAZER_STIMULUS_DECMAX)) {
             state = HAZER_STATE_CHECKSUM_2;
             action = HAZER_ACTION_SAVE;
-        } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= ch) && (ch <= HAZER_NMEA_CHARACTER_HEXMAX)) {
+        } else if ((HAZER_STIMULUS_HEXMIN <= ch) && (ch <= HAZER_STIMULUS_HEXMAX)) {
             state = HAZER_STATE_CHECKSUM_2;
             action = HAZER_ACTION_SAVE;
         } else {
@@ -186,10 +185,10 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_CHECKSUM_2:
-        if ((HAZER_NMEA_CHARACTER_DECMIN <= ch) && (ch <= HAZER_NMEA_CHARACTER_DECMAX)) {
+        if ((HAZER_STIMULUS_DECMIN <= ch) && (ch <= HAZER_STIMULUS_DECMAX)) {
             state = HAZER_STATE_CR;
             action = HAZER_ACTION_SAVE;
-        } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= ch) && (ch <= HAZER_NMEA_CHARACTER_HEXMAX)) {
+        } else if ((HAZER_STIMULUS_HEXMIN <= ch) && (ch <= HAZER_STIMULUS_HEXMAX)) {
             state = HAZER_STATE_CR;
             action = HAZER_ACTION_SAVE;
         } else {
@@ -199,7 +198,7 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_CR:
-        if (ch == HAZER_NMEA_CHARACTER_CR) {
+        if (ch == HAZER_STIMULUS_CR) {
             state = HAZER_STATE_LF;
             action = HAZER_ACTION_SAVESPECIAL;
         } else {
@@ -209,7 +208,7 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
         break;
 
     case HAZER_STATE_LF:
-        if (ch == HAZER_NMEA_CHARACTER_LF) {
+        if (ch == HAZER_STIMULUS_LF) {
             state = HAZER_STATE_END;
             action = HAZER_ACTION_TERMINATE;
         } else {
@@ -280,37 +279,7 @@ hazer_state_t hazer_nmea_machine(hazer_state_t state, int ch, void * buffer, siz
     return state;
 }
 
-ssize_t hazer_nmea_read(FILE *fp, void * buffer, size_t size)
-{
-    hazer_state_t state = HAZER_STATE_START;
-    hazer_state_t next = HAZER_STATE_START;
-    char * bb = (char *)0;
-    size_t ss = 0;
-    int ch = EOF;
-    int error = 0;
-
-    while (!0) {
-        ch = fgetc(fp);
-        next = hazer_nmea_machine(state, ch, buffer, size, &bb, &ss);
-        if (next == HAZER_STATE_END) {
-            break;
-        } else if  (next == HAZER_STATE_EOF) {
-            fprintf(stderr, "hazer_nmea_read: eof\n");
-            ss = 0;
-            break;
-        } else if ((!error) && (next == HAZER_STATE_START) && (state != next)) {
-            fprintf(stderr, "hazer_nmea_read: resyncing\n");
-            error = !0;
-        } else {
-            /* Do nothing. */
-        }
-        state = next;
-    }
-
-    return ss;
-}
-
-uint8_t hazer_nmea_checksum(const void * buffer, size_t size)
+uint8_t hazer_checksum(const void * buffer, size_t size)
 {
     uint8_t cs = 0;
     const char * bb = (const char *)buffer;
@@ -323,7 +292,7 @@ uint8_t hazer_nmea_checksum(const void * buffer, size_t size)
             break;
         }
 
-        if (*bb == HAZER_NMEA_CHARACTER_START) {
+        if (*bb == HAZER_STIMULUS_START) {
             ++bb;
             --ss;
         }
@@ -336,8 +305,8 @@ uint8_t hazer_nmea_checksum(const void * buffer, size_t size)
         cs = ch;
         --ss;
 
-        while ((ss > 0) && (*bb != HAZER_NMEA_CHARACTER_CHECKSUM)) {
-            if (!((HAZER_NMEA_CHARACTER_MINIMUM <= *bb) && (*bb <= HAZER_NMEA_CHARACTER_MAXIMUM))) {
+        while ((ss > 0) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
+            if (!((HAZER_STIMULUS_MINIMUM <= *bb) && (*bb <= HAZER_STIMULUS_MAXIMUM))) {
                 DEBUG("BAD 0x%x?\n", *bb);
                 break;
             }
@@ -351,22 +320,22 @@ uint8_t hazer_nmea_checksum(const void * buffer, size_t size)
     return cs;
 }
 
-int hazer_nmea_characters2checksum(char msn, char lsn, uint8_t * ckp)
+int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp)
 {
     int rc = 0;
 
-    if ((HAZER_NMEA_CHARACTER_DECMIN <= msn) && (msn <= HAZER_NMEA_CHARACTER_DECMAX)) {
-        *ckp = (msn - HAZER_NMEA_CHARACTER_DECMIN + 0) << 4;
-    } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= msn) && (msn <= HAZER_NMEA_CHARACTER_HEXMAX)) {
-        *ckp = (msn - HAZER_NMEA_CHARACTER_HEXMIN + 10) << 4;
+    if ((HAZER_STIMULUS_DECMIN <= msn) && (msn <= HAZER_STIMULUS_DECMAX)) {
+        *ckp = (msn - HAZER_STIMULUS_DECMIN + 0) << 4;
+    } else if ((HAZER_STIMULUS_HEXMIN <= msn) && (msn <= HAZER_STIMULUS_HEXMAX)) {
+        *ckp = (msn - HAZER_STIMULUS_HEXMIN + 10) << 4;
     } else { 
         rc = -1;
     }
 
-    if ((HAZER_NMEA_CHARACTER_DECMIN <= lsn) && (lsn <= HAZER_NMEA_CHARACTER_DECMAX)) {
-        *ckp |= (lsn - HAZER_NMEA_CHARACTER_DECMIN + 0);
-    } else if ((HAZER_NMEA_CHARACTER_HEXMIN <= lsn) && (lsn <= HAZER_NMEA_CHARACTER_HEXMAX)) {
-        *ckp |= (lsn - HAZER_NMEA_CHARACTER_HEXMIN + 10);
+    if ((HAZER_STIMULUS_DECMIN <= lsn) && (lsn <= HAZER_STIMULUS_DECMAX)) {
+        *ckp |= (lsn - HAZER_STIMULUS_DECMIN + 0);
+    } else if ((HAZER_STIMULUS_HEXMIN <= lsn) && (lsn <= HAZER_STIMULUS_HEXMAX)) {
+        *ckp |= (lsn - HAZER_STIMULUS_HEXMIN + 10);
     } else { 
         rc = -1;
     }
@@ -374,7 +343,7 @@ int hazer_nmea_characters2checksum(char msn, char lsn, uint8_t * ckp)
     return rc;
 }
 
-int hazer_nmea_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
+int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
 {
     int rc = 0;
     uint8_t msn = 0;
@@ -403,7 +372,7 @@ int hazer_nmea_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     return rc;
 }
 
-ssize_t hazer_nmea_check(const void * buffer, size_t size)
+ssize_t hazer_check(const void * buffer, size_t size)
 {
     const char * bb = (const char *)buffer;
     size_t eff = size;
@@ -448,7 +417,7 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
          */
 
         ss = 0;
-        if ((bb[ss] != HAZER_NMEA_CHARACTER_START) && (bb[ss] != HAZER_NMEA_CHARACTER_ENCAPSULATION)) {
+        if ((bb[ss] != HAZER_STIMULUS_START) && (bb[ss] != HAZER_STIMULUS_ENCAPSULATION)) {
             DEBUG("START 0x%x?\n", bb[ss]);
             break;
         }
@@ -458,7 +427,7 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
          */
 
         ss = 6;
-        if (bb[ss] != HAZER_NMEA_CHARACTER_DELIMITER) {
+        if (bb[ss] != HAZER_STIMULUS_DELIMITER) {
             DEBUG("DELIM 0x%x?\n", bb[ss]);
             break;
         }
@@ -468,7 +437,7 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
          */
 
         ss = eff - 5;
-        if (bb[ss] != HAZER_NMEA_CHARACTER_CHECKSUM) {
+        if (bb[ss] != HAZER_STIMULUS_CHECKSUM) {
             DEBUG("STAR 0x%x?\n", bb[ss]);
             break;
         }
@@ -478,7 +447,7 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
          */
 
         ss = eff - 4;
-        rc = hazer_nmea_characters2checksum(bb[ss], bb[ss + 1], &ck);
+        rc = hazer_characters2checksum(bb[ss], bb[ss + 1], &ck);
         if (rc < 0) {
             DEBUG("CK 0x%x 0x%x!\n", bb[ss], bb[ss + 1]);
             break;
@@ -491,7 +460,7 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
          */
 
         ss = 1;
-        cs = hazer_nmea_checksum(buffer, size);
+        cs = hazer_checksum(buffer, size);
 
         DEBUG("CS 0x%x.\n", cs);
 
@@ -505,7 +474,7 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
          */
 
         ss = eff - 2;
-        if (bb[ss] != HAZER_NMEA_CHARACTER_CR) {
+        if (bb[ss] != HAZER_STIMULUS_CR) {
             DEBUG("CR 0x%x?\n", bb[ss]);
             break;
         }
@@ -515,7 +484,7 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
          */
 
         ss = eff - 1;
-        if (bb[ss] != HAZER_NMEA_CHARACTER_LF) {
+        if (bb[ss] != HAZER_STIMULUS_LF) {
             DEBUG("LF 0x%x?\n", bb[ss]);
             break;
         }
@@ -531,7 +500,7 @@ ssize_t hazer_nmea_check(const void * buffer, size_t size)
     return ss;
 }
 
-ssize_t hazer_nmea_tokenize(char * vector[], size_t count, void * buffer, size_t size)
+ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size)
 {
     char ** vv = vector;
     char * bb = buffer;
@@ -564,6 +533,23 @@ ssize_t hazer_nmea_tokenize(char * vector[], size_t count, void * buffer, size_t
     return (vv - vector);
 }
 
+uint32_t hazer_fraction(char * string, uint32_t * denominatorp)
+{
+    unsigned long numerator = 0;
+    unsigned long denominator = 1;
+    char * end = (char *)0;
+    size_t length = 0;
+
+    numerator = strtoul(string, &end, 10);
+    length = end - string;
+    while ((length--) > 0) {
+        denominator = denominator * 10;
+    }
+    *denominatorp = denominator;
+
+    return numerator;
+}
+
 static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
 
 static const char GSA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSA;
@@ -572,7 +558,7 @@ static const char GSV[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_
 
 static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;
 
-int hazer_nmea_parse(hazer_nmea_t * datum, char * vector[], size_t count)
+static int hazer_parse(void * datum, char * vector[], size_t count)
 {
     int rc = 0;
     

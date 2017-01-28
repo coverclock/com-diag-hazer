@@ -23,7 +23,9 @@
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
-	hazer_buffer_t buffer = { 0 };
+    hazer_state_t state = HAZER_STATE_EOF;
+    int ch = EOF;
+    hazer_buffer_t buffer = { 0 };
     char * bb = (char *)0;
     ssize_t size = 0;
     ssize_t ss = 0;
@@ -49,25 +51,39 @@ int main(int argc, char * argv[])
 
     while (!0) {
 
-        size = hazer_nmea_read(stdin, buffer, sizeof(buffer));
+        state = HAZER_STATE_START;
+
+        while (!0) {
+            ch = fgetc(stdin);
+            state = hazer_machine(state, ch, buffer, sizeof(buffer), &bb, &ss);
+            if (state == HAZER_STATE_END) {
+                break;
+            } else if  (state == HAZER_STATE_EOF) {
+                fprintf(stderr, "%s: EOF\n", program);
+                break;
+            } else {
+                /* Do nothing. */
+            }
+        }
+
+        size = ss;
         assert(size >= 0);
 
         if (size == 0) {
-            fprintf(stderr, "%s: EOF\n", program);
             return 0;
         }
 
         sp = index(buffer, '*');
         assert(sp != (const char *)0);
-        rc = hazer_nmea_characters2checksum(sp[1], sp[2], &ck);
+        rc = hazer_characters2checksum(sp[1], sp[2], &ck);
         assert(rc >= 0);
-        cs = hazer_nmea_checksum(buffer, size);
+        cs = hazer_checksum(buffer, size);
         assert(cs == ck);
-        rc = hazer_nmea_checksum2characters(cs, &msn, &lsn);
+        rc = hazer_checksum2characters(cs, &msn, &lsn);
         assert(rc >= 0);
         assert(msn == sp[1]);
         assert(lsn == sp[2]);
-        rc = hazer_nmea_characters2checksum(msn, lsn, &ck);
+        rc = hazer_characters2checksum(msn, lsn, &ck);
         assert(rc >= 0);
         assert(ck == cs);
 
@@ -76,10 +92,10 @@ int main(int argc, char * argv[])
         }
         fprintf(stderr, "[%ld] 0x%x %c%c 0x%x\n", size, cs, msn, lsn, ck);
 
-        check = hazer_nmea_check(buffer, size);
+        check = hazer_check(buffer, size);
         assert(check == size);
 
-        tokens = hazer_nmea_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
+        tokens = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(tokens >= 0);
 
         for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
