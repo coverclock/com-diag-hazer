@@ -97,6 +97,8 @@ int main(int argc, char * argv[])
 
         tokens = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(tokens >= 0);
+        assert(vector[tokens] == (char *)0);
+        assert(tokens < (sizeof(vector) / sizeof(vector[0])));
 
         for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
             fputs(*vv, stdout);
