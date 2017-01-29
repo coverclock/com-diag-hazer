@@ -48,6 +48,11 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         state = HAZER_STATE_EOF;
         break;
 
+    case HAZER_STIMULUS_NUL:
+        DEBUG("STARTING '%c'?\n", ch);
+        state = HAZER_STATE_START;
+        break;
+
     case HAZER_STIMULUS_START:
         DEBUG("STARTING '%c'?\n", ch);
         state = HAZER_STATE_START;
@@ -370,134 +375,6 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     }
 
     return rc;
-}
-
-ssize_t hazer_check(const void * buffer, size_t size)
-{
-    const char * bb = (const char *)buffer;
-    size_t eff = size;
-    size_t ss = 0;
-    uint8_t ch = '\0';
-    uint8_t cs = 0;
-    uint8_t ck = ~0;
-    int rc = 0;
-
-    do {
-
-        /*
-         * Ignore the terminating NUL if it exists.
-         */
-
-        if (eff == 0) {
-            DEBUG("ZERO?\n");
-            break;
-        }
-
-        ss = eff - 1;
-        if (bb[ss] == '\0') {
-            eff -= 1;
-        }
-
-        /*
-         * Check length.
-         */
-
-        if (eff < HAZER_NMEA_CONSTANT_SHORTEST) {
-            DEBUG("SHORT?\n");
-            break;
-        }
-
-        if (eff > (sizeof(hazer_buffer_t) - 1)) {
-            DEBUG("LONG?\n");
-            break;
-        }
-
-        /*
-         * Check for '$' or '!'.
-         */
-
-        ss = 0;
-        if ((bb[ss] != HAZER_STIMULUS_START) && (bb[ss] != HAZER_STIMULUS_ENCAPSULATION)) {
-            DEBUG("START 0x%x?\n", bb[ss]);
-            break;
-        }
-
-        /*
-         * Check for ','.
-         */
-
-        ss = 6;
-        if (bb[ss] != HAZER_STIMULUS_DELIMITER) {
-            DEBUG("DELIM 0x%x?\n", bb[ss]);
-            break;
-        }
-
-        /*
-         * Check for '*'.
-         */
-
-        ss = eff - 5;
-        if (bb[ss] != HAZER_STIMULUS_CHECKSUM) {
-            DEBUG("STAR 0x%x?\n", bb[ss]);
-            break;
-        }
-
-        /*
-         * Extract the checksum.
-         */
-
-        ss = eff - 4;
-        rc = hazer_characters2checksum(bb[ss], bb[ss + 1], &ck);
-        if (rc < 0) {
-            DEBUG("CK 0x%x 0x%x!\n", bb[ss], bb[ss + 1]);
-            break;
-        }
-
-        DEBUG("CK 0x%x.\n", ck);
-
-        /*
-         * Compute the checksum.
-         */
-
-        ss = 1;
-        cs = hazer_checksum(buffer, size);
-
-        DEBUG("CS 0x%x.\n", cs);
-
-        if (cs != ck) {
-            DEBUG("CHECKSUM?\n");
-            break;
-        }
-
-        /*
-         * Check for penultimate '\r'.
-         */
-
-        ss = eff - 2;
-        if (bb[ss] != HAZER_STIMULUS_CR) {
-            DEBUG("CR 0x%x?\n", bb[ss]);
-            break;
-        }
-
-        /*
-         * Check for final '\n'.
-         */
-
-        ss = eff - 1;
-        if (bb[ss] != HAZER_STIMULUS_LF) {
-            DEBUG("LF 0x%x?\n", bb[ss]);
-            break;
-        }
-
-        /*
-         * Okay.
-         */
-
-        ss = size;
-
-    } while (0);
-
-    return ss;
 }
 
 ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size)

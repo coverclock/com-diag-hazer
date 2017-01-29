@@ -41,7 +41,6 @@ int main(int argc, char * argv[])
     uint8_t ck = 0;
     char msn = '\0';
     char lsn = '\0';
-    const char * sp = (const char *)0;
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
@@ -67,22 +66,25 @@ int main(int argc, char * argv[])
         }
 
         size = ss;
-        assert(size >= 0);
+        assert(size > 0);
 
-        if (size == 0) {
-            return 0;
-        }
+        assert(buffer[0] == '$');
+        assert(buffer[size - 1] == '\0');
+        assert(buffer[size - 2] == '\n');
+        assert(buffer[size - 3] == '\r');
+        assert(buffer[size - 6] == '*');
 
-        sp = index(buffer, '*');
-        assert(sp != (const char *)0);
-        rc = hazer_characters2checksum(sp[1], sp[2], &ck);
-        assert(rc >= 0);
         cs = hazer_checksum(buffer, size);
-        assert(cs == ck);
-        rc = hazer_checksum2characters(cs, &msn, &lsn);
+
+        rc = hazer_characters2checksum(buffer[size - 5], buffer[size - 4], &ck);
         assert(rc >= 0);
-        assert(msn == sp[1]);
-        assert(lsn == sp[2]);
+        assert(ck == cs);
+
+        rc = hazer_checksum2characters(ck, &msn, &lsn);
+        assert(rc >= 0);
+        assert(msn == buffer[size - 5]);
+        assert(lsn == buffer[size - 4]);
+
         rc = hazer_characters2checksum(msn, lsn, &ck);
         assert(rc >= 0);
         assert(ck == cs);
@@ -91,9 +93,6 @@ int main(int argc, char * argv[])
             diminuto_phex_emit(stderr, *(bb++), ~0, 0, 0, 0, &current, &end, 0);
         }
         fprintf(stderr, "[%ld] 0x%x %c%c 0x%x\n", size, cs, msn, lsn, ck);
-
-        check = hazer_check(buffer, size);
-        assert(check == size);
 
         tokens = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(tokens >= 0);

@@ -74,8 +74,8 @@ extern FILE * hazer_debug(FILE *now);
  * failed; that might be of interest to the application.
  */
 typedef enum HazerState {
-    HAZER_STATE_EOF         = -1,
-    HAZER_STATE_START       = 0,
+    HAZER_STATE_EOF                 = -1,
+    HAZER_STATE_START               = 0,
     HAZER_STATE_TALKER_1,
     HAZER_STATE_TALKER_2,
     HAZER_STATE_MESSAGE_1,
@@ -92,33 +92,35 @@ typedef enum HazerState {
 
 /**
  * NMEA state machine stimuli. This is just the special characters that
- * the state machine is concerned about, not all possible characters.
+ * the state machine must take different action on, not all possible
+ * characters that may be in an NMEA sentence.
  * NMEA 0183 4.10, 6.1.1, Table 3
  */
 enum HazerStimulus {
-    HAZER_STIMULUS_MINIMUM        = ' ',
-    HAZER_STIMULUS_START          = '$',
-    HAZER_STIMULUS_ENCAPSULATION  = '!',
-    HAZER_STIMULUS_GNSS           = 'G',
-    HAZER_STIMULUS_DELIMITER      = ',',
-    HAZER_STIMULUS_TAG            = '\\',
-    HAZER_STIMULUS_HEXADECIMAL    = '^',
-    HAZER_STIMULUS_CHECKSUM       = '*',
-    HAZER_STIMULUS_DECMIN         = '0',
-    HAZER_STIMULUS_DECMAX         = '9',
-    HAZER_STIMULUS_HEXMIN         = 'A',
-    HAZER_STIMULUS_HEXMAX         = 'F',
-    HAZER_STIMULUS_CR             = '\r',
-    HAZER_STIMULUS_LF             = '\n',
-    HAZER_STIMULUS_MAXIMUM        = '}',
-    HAZER_STIMULUS_RESERVERED     = '~',
+    HAZER_STIMULUS_NUL              = '\0',
+    HAZER_STIMULUS_MINIMUM          = ' ',
+    HAZER_STIMULUS_START            = '$',
+    HAZER_STIMULUS_ENCAPSULATION    = '!',
+    HAZER_STIMULUS_GNSS             = 'G',
+    HAZER_STIMULUS_DELIMITER        = ',',
+    HAZER_STIMULUS_TAG              = '\\',
+    HAZER_STIMULUS_HEXADECIMAL      = '^',
+    HAZER_STIMULUS_CHECKSUM         = '*',
+    HAZER_STIMULUS_DECMIN           = '0',
+    HAZER_STIMULUS_DECMAX           = '9',
+    HAZER_STIMULUS_HEXMIN           = 'A',
+    HAZER_STIMULUS_HEXMAX           = 'F',
+    HAZER_STIMULUS_CR               = '\r',
+    HAZER_STIMULUS_LF               = '\n',
+    HAZER_STIMULUS_MAXIMUM          = '}',
+    HAZER_STIMULUS_RESERVERED       = '~',
 };
 
 /**
  * NMEA state machine actions.
  */
 typedef enum HazerAction {
-    HAZER_ACTION_SKIP           = 0,
+    HAZER_ACTION_SKIP               = 0,
     HAZER_ACTION_SAVE,
     HAZER_ACTION_SAVESPECIAL,
     HAZER_ACTION_TERMINATE,
@@ -183,15 +185,6 @@ extern int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp);
 extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
 
 /**
- * Check the contents of a single NMEA sentence. Some basic sanity checks
- * are done in addition to computing and verifying the checksum.
- * @param buffer points to the beginning of the sentence buffer.
- * @param size is the size of the sentence in bytes.
- * @return the location where the check failed or size of no error occurred.
- */
-extern ssize_t hazer_check(const void * buffer, size_t size);
-
-/**
  * THis is an argument vector big enough to hold all possible sentences no
  * larger than those that can fit in the buffer type, plus a NULL pointer in
  * the last position.
@@ -214,6 +207,9 @@ extern ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size
 extern uint32_t hazer_fraction(char * string, uint32_t * denominator);
 
 typedef struct HazerPosition {
+    uint64_t utc_nanoseconds;
+    double lat_degrees;
+    double lon_degrees;
 } hazer_position_t;
 
 #endif
