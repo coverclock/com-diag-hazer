@@ -455,7 +455,7 @@ uint64_t hazer_parse_utc(const char * string)
     return nanoseconds;
 }
 
-double hazer_parse_latlon(const char * string)
+double hazer_parse_latlon(const char * string, char direction)
 {
     double latlon = 0.0;
     double temp = 0.0;
@@ -479,6 +479,18 @@ double hazer_parse_latlon(const char * string)
         latlon += temp;
     }
 
+    switch (direction) {
+    case HAZER_STIMULUS_NORTH:
+    case HAZER_STIMULUS_EAST:
+        break;
+    case HAZER_STIMULUS_SOUTH:
+    case HAZER_STIMULUS_WEST:
+        latlon = -latlon;
+        break;
+    default:
+        break;
+    }
+
     return latlon; 
 }
 
@@ -490,7 +502,7 @@ static const char GSV[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_
 
 static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;
 
-static int hazer_parse(void * datum, char * vector[], size_t count)
+static int hazer_parse(hazer_position_t * datap, char * vector[], size_t count)
 {
     int rc = 0;
     

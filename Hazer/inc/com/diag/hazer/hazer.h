@@ -6,9 +6,9 @@
  * @file
  *
  * Copyright 2017 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
+ * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock <coverclock@diag.com><BR>
- * http://www.diag.com/navigation/downloads/Hazer.html<BR>
+ * https://github.com/coverclock/com-diag-hazer<BR>
  *
  * This file is part of the Digital Aggregates Corporation Hazer package.
  * Hazer is a simple C-based parser of the National Marine Electronics
@@ -42,6 +42,9 @@
  *
  * E. Kaplan, ed., UNDERSTANDING GPS PRINCIPLES AND APPLICATIONS, Artech House,
  * 1996
+ *
+ * "Geographic coordinate system", Wikipedia,
+ * https://en.wikipedia.org/wiki/Geographic_coordinate_system, 2017-01-24
  */
 
 #include <stdio.h>
@@ -116,6 +119,10 @@ enum HazerStimulus {
     HAZER_STIMULUS_HEXMIN           = 'A',
     HAZER_STIMULUS_HEXMAX           = 'F',
     HAZER_STIMULUS_GNSS             = 'G',
+    HAZER_STIMULUS_EAST             = 'E',
+    HAZER_STIMULUS_WEST             = 'W',
+    HAZER_STIMULUS_NORTH            = 'N',
+    HAZER_STIMULUS_SOUTH            = 'S',
     HAZER_STIMULUS_CR               = '\r',
     HAZER_STIMULUS_LF               = '\n',
     HAZER_STIMULUS_MAXIMUM          = '}',
@@ -214,7 +221,7 @@ extern uint64_t hazer_parse_fraction(const char * string, uint64_t * denominator
 
 extern uint64_t hazer_parse_utc(const char * string);
 
-extern double hazer_parse_latlon(const char * string);
+extern double hazer_parse_latlon(const char * string, char direction);
 
 typedef struct HazerPosition {
     uint64_t utc_nanoseconds;

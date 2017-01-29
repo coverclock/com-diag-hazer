@@ -68,23 +68,71 @@ int main(void)
     nanoseconds = hazer_parse_utc("235959.125");
     assert(nanoseconds == 86399125000000ULL);
 
-    latlon = hazer_parse_latlon("0000");
+    latlon = hazer_parse_latlon("00000", 'E');
     assert(latlon == 0.0);
 
-    latlon = hazer_parse_latlon("00000");
+    latlon = hazer_parse_latlon("00000", 'S');
     assert(latlon == 0.0);
 
-    latlon = hazer_parse_latlon("18000");
+    latlon = hazer_parse_latlon("18000", 'E');
     assert(latlon == 180.0);
 
-    latlon = hazer_parse_latlon("18030");
+    latlon = hazer_parse_latlon("18000", 'S');
+    assert(latlon == -180.0);
+
+    latlon = hazer_parse_latlon("18030", 'E');
     assert(latlon == 180.5);
 
-    latlon = hazer_parse_latlon("18030.");
+    latlon = hazer_parse_latlon("18030", 'S');
+    assert(latlon == -180.5);
+
+    latlon = hazer_parse_latlon("18030.", 'E');
     assert(latlon == 180.5);
 
-    latlon = hazer_parse_latlon("18030.60");
+    latlon = hazer_parse_latlon("18030.", 'W');
+    assert(latlon == -180.5);
+
+    latlon = hazer_parse_latlon("18030.60", 'E');
     assert(latlon == 180.51);
+
+    latlon = hazer_parse_latlon("18030.60", 'W');
+    assert(latlon == -180.51);
+
+    latlon = hazer_parse_latlon("0000", 'N');
+    assert(latlon == 0.0);
+
+    latlon = hazer_parse_latlon("0000", 'S');
+    assert(latlon == 0.0);
+
+    latlon = hazer_parse_latlon("9000", 'N');
+    assert(latlon == 90.0);
+
+    latlon = hazer_parse_latlon("9000", 'S');
+    assert(latlon == -90.0);
+
+    latlon = hazer_parse_latlon("9030", 'N');
+    assert(latlon == 90.5);
+
+    latlon = hazer_parse_latlon("9030", 'S');
+    assert(latlon == -90.5);
+
+    latlon = hazer_parse_latlon("9030.", 'N');
+    assert(latlon == 90.5);
+
+    latlon = hazer_parse_latlon("9030.", 'S');
+    assert(latlon == -90.5);
+
+    latlon = hazer_parse_latlon("9030.0", 'N');
+    assert(latlon == 90.5);
+
+    latlon = hazer_parse_latlon("9030.0", 'S');
+    assert(latlon == -90.5);
+
+    latlon = hazer_parse_latlon("9030.60", 'N');
+    assert(latlon == 90.51);
+
+    latlon = hazer_parse_latlon("9030.60", 'S');
+    assert(latlon == -90.51);
 
     return 0;
 }
