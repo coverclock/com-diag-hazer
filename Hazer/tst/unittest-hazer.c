@@ -16,7 +16,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
-#include "com/diag/diminuto/diminuto_phex.h"
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/hazer_nmea_gps.h"
 
@@ -88,11 +87,6 @@ int main(int argc, char * argv[])
         rc = hazer_characters2checksum(msn, lsn, &ck);
         assert(rc >= 0);
         assert(ck == cs);
-
-        for (bb = buffer, ss = size; ss > 0; --ss) {
-            diminuto_phex_emit(stderr, *(bb++), ~0, 0, 0, 0, &current, &end, 0);
-        }
-        fprintf(stderr, "[%ld] 0x%x %c%c 0x%x\n", size, cs, msn, lsn, ck);
 
         tokens = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(tokens >= 0);

@@ -17,6 +17,8 @@
  * emits NMEA strings over its built-in USB-to-serial adaptor. The BU-353S4
  * is based on the SiRF Star IV chipset. If you want to futz around with
  * satellite geolocation, the BU-353S4 is a cheap and easy way to do it.
+ * Hazer may be useful with other GPS devices that produce NMEA sentences,
+ * but the BU-353S4 is what it was tested with.
  *
  * REFERENCES
  *
@@ -37,6 +39,9 @@
  *
  * Electronic Doberman, "Modern GPS Teardown - GlobalSat BU-353S4 SiRF Star
  * IV USB GPS", https://www.youtube.com/watch?v=8xn8FspJDnY
+ *
+ * E. Kaplan, ed., UNDERSTANDING GPS PRINCIPLES AND APPLICATIONS, Artech House,
+ * 1996
  */
 
 #include <stdio.h>
@@ -99,21 +104,22 @@ typedef enum HazerState {
 enum HazerStimulus {
     HAZER_STIMULUS_NUL              = '\0',
     HAZER_STIMULUS_MINIMUM          = ' ',
-    HAZER_STIMULUS_START            = '$',
     HAZER_STIMULUS_ENCAPSULATION    = '!',
-    HAZER_STIMULUS_GNSS             = 'G',
+    HAZER_STIMULUS_START            = '$',
     HAZER_STIMULUS_DELIMITER        = ',',
     HAZER_STIMULUS_TAG              = '\\',
     HAZER_STIMULUS_HEXADECIMAL      = '^',
+    HAZER_STIMULUS_DECIMAL          = '.',
     HAZER_STIMULUS_CHECKSUM         = '*',
     HAZER_STIMULUS_DECMIN           = '0',
     HAZER_STIMULUS_DECMAX           = '9',
     HAZER_STIMULUS_HEXMIN           = 'A',
     HAZER_STIMULUS_HEXMAX           = 'F',
+    HAZER_STIMULUS_GNSS             = 'G',
     HAZER_STIMULUS_CR               = '\r',
     HAZER_STIMULUS_LF               = '\n',
     HAZER_STIMULUS_MAXIMUM          = '}',
-    HAZER_STIMULUS_RESERVERED       = '~',
+    HAZER_STIMULUS_RESERVED         = '~',
 };
 
 /**
@@ -204,7 +210,11 @@ typedef char * (hazer_vector_t)[HAZER_NMEA_CONSTANT_LONGEST - HAZER_NMEA_CONSTAN
  */
 extern ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size);
 
-extern uint32_t hazer_fraction(char * string, uint32_t * denominator);
+extern uint64_t hazer_parse_fraction(const char * string, uint64_t * denominator);
+
+extern uint64_t hazer_parse_utc(const char * string);
+
+extern double hazer_parse_latlon(const char * string);
 
 typedef struct HazerPosition {
     uint64_t utc_nanoseconds;

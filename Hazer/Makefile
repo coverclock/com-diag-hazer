@@ -121,21 +121,6 @@ TARGETMAKEFILE		:= $(CFG_DIR)/$(TARGET).mk
 
 include $(TARGETMAKEFILE)
 
-########## Diminuto Configuration
-
-DIMINUTO_TITLE		:=	Diminuto
-
-DIMINUTO_PROJECT	:=	$(shell echo $(DIMINUTO_TITLE) | tr '[A-Z]' '[a-z]')
-DIMINUTO_SYMBOL		:=	$(shell echo $(DIMINUTO_TITLE) | tr '[a-z]' '[A-Z]')
-
-DIMINUTO_ROOT		:=	$(HOME)/src/com-diag-$(DIMINUTO_PROJECT)/$(DIMINUTO_TITLE)
-DIMINUTO_HEADERS	:=	$(DIMINUTO_ROOT)/$(INC_DIR)
-DIMINUTO_LIBRARIES	:=	$(DIMINUTO_ROOT)/$(OUT)/$(LIB_DIR)
-
-DIMINUTO_CPPFLAGS	:=	-iquote $(DIMINUTO_HEADERS)
-DIMINUTO_LDFLAGS	:=	-L$(DIMINUTO_LIBRARIES) -l$(DIMINUTO_PROJECT) -lpthread -lrt -ldl -lm
-
-
 ########## Commands and Option Flags
 
 PROJECT_A			:=	lib$(PROJECT).a
@@ -152,13 +137,13 @@ CDEFINES			:=
 
 ARFLAGS				:=	crsv
 #CPPFLAGS			:=	$(CDEFINES) -I $(SRC_DIR) -I $(INC_DIR) -I $(OUT)/$(INC_DIR) $(CPPARCH)
-CPPFLAGS			:=	$(CDEFINES) -iquote $(SRC_DIR) -iquote $(INC_DIR) -iquote $(OUT)/$(INC_DIR) $(DIMINUTO_CPPFLAGS) $(CPPARCH)
+CPPFLAGS			:=	$(CDEFINES) -iquote $(SRC_DIR) -iquote $(INC_DIR) -iquote $(OUT)/$(INC_DIR) $(CPPARCH)
 CFLAGS				:=	$(CARCH) -g
 #CFLAGS				:=	$(CARCH) -g -fprofile-arcs -ftest-coverage
 #CFLAGS				:=	$(CARCH) -O3
 CPFLAGS				:=	-i
 MVFLAGS				:=	-i
-LDFLAGS				:=	$(LDARCH) -l$(PROJECT) $(LDLIBRARIES) $(DIMINUTO_LDFLAGS)
+LDFLAGS				:=	$(LDARCH) -l$(PROJECT) $(LDLIBRARIES)
 MOFLAGS				:=	$(MOARCH) -l$(PROJECT) $(LDLIBRARIES)
 SOFLAGS				:=	$(SOARCH) $(LDLIBRARIES)
 
@@ -294,39 +279,6 @@ $(OUT)/$(BIN_DIR)/hex $(OUT)/$(BIN_DIR)/oct $(OUT)/$(BIN_DIR)/ntohs $(OUT)/$(BIN
 	ln -f $< $@
 
 ########## Unit Tests
-
-# Hazer uses the Diminuto logging system.
-#
-# Generally if the unit tests work they exit with an exit code of zero;
-# otherwise they exit with something else (or core dump). But left to their
-# own devices, the unit tests aren't very chatty. If you want to see more log
-# output from them, you can tune the logging using the environmental variable
-# COM_DIAG_DIMINUTO_LOG_MASK. For example, this bash command turns on
-# everything.
-#
-#	export COM_DIAG_DIMINUTO_LOG_MASK=0xffff
-#
-# The Diminuto logging system sends log messages to the system log (syslog)
-# when the emitter is a kernel-space module or the emitting process is a child
-# of process 1 (that is, the emitting process is a daemon). Unfortunately
-# different GNU/Linux distributions write syslog messages to different places.
-# My current Ubuntu server uses "/var/log/syslog". Your mileage may vary.
-#
-# Some platforms may route syslog messages from processes to the kernel log
-# buffer in memory by writing them to "/dev/kmesg". You can adjust the level of
-# logging used by the kernel. Level 8 means "everything".
-#
-#	echo 8 > /proc/sys/kernel/printk
-#
-# The kernel log memory buffer can be displayed by using the "dmesg" utility.
-#
-# Even though the Android bionic library supports the openlog(3) and syslog(3)
-# functions, syslog appears to be broken in the CyanogenMod 10.2 that I use.
-# The library expects to send the log message as a datagram to a UNIX domain
-# socket at "/dev/kmsg". But since that's a character device driver as described
-# above, any attempt to connect(2) to it results in the connection being refused
-# (you can use strace(1) to see this). This smells like a BSD (bionic) versus
-# Linux (kernel) incompatibility.
 
 $(OUT)/$(TST_DIR)/%:	$(OUT)/$(OBC_DIR)/$(TST_DIR)/%.o $(TARGETLIBRARIES)
 	D=`dirname $@`; mkdir -p $$D
@@ -541,7 +493,6 @@ $(OUT)/$(BIN_DIR)/setup:	Makefile
 	echo 'export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
 	echo 'export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
 	echo 'export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
-	echo 'export COM_DIAG_DIMINUTO_LOG_MASK=0xffff' >> $@
 	chmod 644 $@
 
 $(OUT)/$(SYM_DIR)/setup:	Makefile
@@ -551,7 +502,6 @@ $(OUT)/$(SYM_DIR)/setup:	Makefile
 	echo 'export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
 	echo 'export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
 	echo 'export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
-	echo 'export COM_DIAG_DIMINUTO_LOG_MASK=0xffff' >> $@
 	chmod 644 $@
 
 # For generating a setup script for a bash shell (for example, "bash generate > setup").
@@ -563,7 +513,6 @@ $(OUT)/$(BIN_DIR)/generate:	Makefile
 	echo 'echo export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
 	echo 'echo export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
 	echo 'echo export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
-	echo 'echo export COM_DIAG_DIMINUTO_LOG_MASK=0xffff' >> $@
 	chmod 755 $@
 
 $(OUT)/$(SYM_DIR)/generate:	Makefile
@@ -573,7 +522,6 @@ $(OUT)/$(SYM_DIR)/generate:	Makefile
 	echo 'echo export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
 	echo 'echo export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
 	echo 'echo export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
-	echo 'echo export COM_DIAG_DIMINUTO_LOG_MASK=0xffff' >> $@
 	chmod 755 $@
 
 ########## User-Space Loadable Modules

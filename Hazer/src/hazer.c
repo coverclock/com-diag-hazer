@@ -410,14 +410,14 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     return (vv - vector);
 }
 
-uint32_t hazer_fraction(char * string, uint32_t * denominatorp)
+uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp)
 {
-    unsigned long numerator = 0;
-    unsigned long denominator = 1;
+    unsigned long long numerator = 0;
+    unsigned long long denominator = 1;
     char * end = (char *)0;
     size_t length = 0;
 
-    numerator = strtoul(string, &end, 10);
+    numerator = strtoull(string, &end, 10);
     length = end - string;
     while ((length--) > 0) {
         denominator = denominator * 10;
@@ -425,6 +425,61 @@ uint32_t hazer_fraction(char * string, uint32_t * denominatorp)
     *denominatorp = denominator;
 
     return numerator;
+}
+
+uint64_t hazer_parse_utc(const char * string)
+{
+    uint64_t nanoseconds = 0;
+    uint64_t numerator = 0;
+    uint64_t denominator = 1;
+    unsigned long hhmmss = 0;
+    char * end = (char *)0;
+
+    hhmmss = strtoul(string, &end, 10);
+    nanoseconds = hhmmss / 10000;
+    nanoseconds *= 60;
+    hhmmss %= 10000;
+    nanoseconds += hhmmss / 100;
+    nanoseconds *= 60;
+    hhmmss %= 100;
+    nanoseconds += hhmmss;
+    nanoseconds *= 1000000000;
+
+    if (*end == HAZER_STIMULUS_DECIMAL) {
+        numerator = hazer_parse_fraction(end + 1, &denominator);
+        numerator *= 1000000000;
+        numerator /= denominator;
+        nanoseconds += numerator;
+    }
+
+    return nanoseconds;
+}
+
+double hazer_parse_latlon(const char * string)
+{
+    double latlon = 0.0;
+    double temp = 0.0;
+    uint64_t numerator = 0;
+    uint64_t denominator = 1;
+    unsigned long dddmm = 0;
+    char * end = (char *)0;
+
+    dddmm = strtoul(string, &end, 10);
+    latlon = dddmm / 100;
+    dddmm %= 100;
+    temp = dddmm;
+    temp /= 60;
+    latlon += temp;
+   
+    if (*end == HAZER_STIMULUS_DECIMAL) {
+        numerator = hazer_parse_fraction(end + 1, &denominator);
+        temp = numerator;
+        temp /= 60;
+        temp /= denominator;
+        latlon += temp;
+    }
+
+    return latlon; 
 }
 
 static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
