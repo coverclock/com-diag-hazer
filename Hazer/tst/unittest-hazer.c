@@ -12,27 +12,98 @@
  * serialtool -D /dev/ttyUSB0 -b 4800 -8 -1 -n -l | unittest-hazer
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <assert.h>
+#include <time.h>
+#include <math.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/hazer_nmea_gps.h"
+
+void print(const hazer_position_t * pp)
+{
+    uint64_t nanoseconds = 0;
+    struct tm datetime = { 0 };
+    struct tm * dtp = (struct tm *)0;
+    time_t zulu = 0;
+    double integral = 0.0;
+    double fraction = 0.0;
+    uint32_t degrees = 0;
+    uint32_t minutes = 0;
+    uint32_t seconds = 0;
+    char direction = '\0';
+
+    nanoseconds = pp->dmy_nanoseconds;
+    nanoseconds += pp->utc_nanoseconds;
+
+    zulu = nanoseconds / 1000000000ULL;
+    nanoseconds %= 1000000000ULL;
+
+    dtp = gmtime_r(&zulu, &datetime);
+    assert(dtp != (struct tm *)0);
+
+    fprintf(stderr, "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", dtp->tm_year, dtp->tm_mon, dtp->tm_mday, dtp->tm_hour, dtp->tm_min, dtp->tm_sec, nanoseconds);
+    fputc(' ', stderr);
+
+    fprintf(stderr, "%lf", pp->lat_degrees);
+    fputc(' ', stderr);
+
+    fraction = modf(pp->lat_degrees, &integral);
+
+    degrees = trunc(integral);
+    minutes = trunc(fraction * 60.0);
+    fraction -= minutes / 60.0;
+    seconds = trunc(fraction * 3600.0);
+
+    fprintf(stderr, "%u:%u:%u", degrees, minutes, seconds);
+    fputc(' ', stderr);
+
+    fprintf(stderr, "%lf", pp->lon_degrees);
+    fputc(' ', stderr);
+
+    fraction = modf(pp->lon_degrees, &integral);
+
+    degrees = trunc(integral);
+    minutes = trunc(fraction * 60.0);
+    fraction -= minutes / 60.0;
+    seconds = trunc(fraction * 3600.0);
+
+    fprintf(stderr, "%u:%u:%u", degrees, minutes, seconds);
+    fputc(' ', stderr);
+
+    fprintf(stderr, "%lf", pp->sog_knots);
+    fputc(' ', stderr);
+
+    fprintf(stderr, "%lf", pp->cog_degrees);
+    fputc(' ', stderr);
+
+    fraction = modf(pp->cog_degrees, &integral);
+
+    degrees = trunc(integral);
+    minutes = trunc(fraction * 60.0);
+    fraction -= minutes / 60.0;
+    seconds = trunc(fraction * 3600.0);
+
+    fprintf(stderr, "%u:%u:%u", degrees, minutes, seconds);
+    fputc(' ', stderr);
+}
 
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
     hazer_state_t state = HAZER_STATE_EOF;
-    int ch = EOF;
     hazer_buffer_t buffer = { 0 };
+    hazer_vector_t vector = { 0 };
+    hazer_position_t position = { 0 };
+    int ch = EOF;
     char * bb = (char *)0;
     ssize_t size = 0;
     ssize_t ss = 0;
     size_t current = 0;
     int end = 0;
     ssize_t check = 0;
-    hazer_vector_t vector = { 0 };
-    ssize_t tokens = 0;
+    ssize_t count = 0;
     char ** vv = (char **)0;
     int tt = 0;
     int rc = 0;
@@ -88,17 +159,24 @@ int main(int argc, char * argv[])
         assert(rc >= 0);
         assert(ck == cs);
 
-        tokens = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
-        assert(tokens >= 0);
-        assert(vector[tokens] == (char *)0);
-        assert(tokens < (sizeof(vector) / sizeof(vector[0])));
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
+        assert(count >= 0);
+        assert(vector[count] == (char *)0);
+        assert(count < (sizeof(vector) / sizeof(vector[0])));
 
         for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
             fputs(*vv, stdout);
-            fputc((tt == tokens) ? '\n' : ',', stdout);
+            fputc((tt == count) ? '\n' : ',', stdout);
         }
         fflush(stdout);
 
+        if (hazer_parse_gga(&position, vector, count)) {
+            print(&position);
+        } else if (hazer_parse_rmc(&position, vector, count)) {
+            print(&position);
+        } else {
+            /* Do nothing. */
+        }
     }
 
     return 0;

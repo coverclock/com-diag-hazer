@@ -45,6 +45,9 @@
  *
  * "Geographic coordinate system", Wikipedia,
  * https://en.wikipedia.org/wiki/Geographic_coordinate_system, 2017-01-24
+ *
+ * "Decimal degrees", Wikipedia,
+ * https://en.wikipedia.org/wiki/Decimal_degrees, 2016-11-04
  */
 
 #include <stdio.h>
@@ -221,12 +224,26 @@ extern uint64_t hazer_parse_fraction(const char * string, uint64_t * denominator
 
 extern uint64_t hazer_parse_utc(const char * string);
 
+extern uint64_t hazer_parse_dmy(const char * string);
+
+extern double hazer_parse_number(const char * string);
+
 extern double hazer_parse_latlon(const char * string, char direction);
+
+extern double hazer_parse_alt(const char * string, char units);
 
 typedef struct HazerPosition {
     uint64_t utc_nanoseconds;
+    uint64_t dmy_nanoseconds;
     double lat_degrees;
     double lon_degrees;
+    double alt_meters;
+    double sog_knots;
+    double cog_degrees;
 } hazer_position_t;
+
+extern int hazer_parse_gga(hazer_position_t *datep, const char * vector[], size_t count);
+
+extern int hazer_parse_rmc(hazer_position_t *datep, const char * vector[], size_t count);
 
 #endif

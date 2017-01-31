@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <time.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/hazer_nmea_gps.h"
 
@@ -443,11 +444,11 @@ uint64_t hazer_parse_utc(const char * string)
     nanoseconds *= 60;
     hhmmss %= 100;
     nanoseconds += hhmmss;
-    nanoseconds *= 1000000000;
+    nanoseconds *= 1000000000ULL;
 
     if (*end == HAZER_STIMULUS_DECIMAL) {
         numerator = hazer_parse_fraction(end + 1, &denominator);
-        numerator *= 1000000000;
+        numerator *= 1000000000ULL;
         numerator /= denominator;
         nanoseconds += numerator;
     }
@@ -455,10 +456,34 @@ uint64_t hazer_parse_utc(const char * string)
     return nanoseconds;
 }
 
+uint64_t hazer_parse_dmy(const char * string)
+{
+    uint64_t nanoseconds = 0;
+    unsigned long ddmmyy = 0;
+    struct tm datetime = { 0 };
+    extern long timezone;
+
+    ddmmyy = strtoul(string, (char **)0, 10);
+
+    datetime.tm_year = ddmmyy % 100;
+    if (datetime.tm_year < 93) {  datetime.tm_year += 100; }
+    datetime.tm_mon = ((ddmmyy % 10000) / 100) - 1;
+    datetime.tm_mday = ddmmyy / 10000;
+
+    nanoseconds = mktime(&datetime); 
+
+    tzset(); /* In my glibc this is an expensive operation the first time. */
+    nanoseconds -= timezone;
+
+    nanoseconds *= 1000000000ULL;
+
+    return nanoseconds;
+}
+
 double hazer_parse_latlon(const char * string, char direction)
 {
     double latlon = 0.0;
-    double temp = 0.0;
+    double fraction = 0.0;
     uint64_t numerator = 0;
     uint64_t denominator = 1;
     unsigned long dddmm = 0;
@@ -467,16 +492,16 @@ double hazer_parse_latlon(const char * string, char direction)
     dddmm = strtoul(string, &end, 10);
     latlon = dddmm / 100;
     dddmm %= 100;
-    temp = dddmm;
-    temp /= 60;
-    latlon += temp;
+    fraction = dddmm;
+    fraction /= 60;
+    latlon += fraction;
    
     if (*end == HAZER_STIMULUS_DECIMAL) {
         numerator = hazer_parse_fraction(end + 1, &denominator);
-        temp = numerator;
-        temp /= 60;
-        temp /= denominator;
-        latlon += temp;
+        fraction = numerator;
+        fraction /= 60;
+        fraction /= denominator;
+        latlon += fraction;
     }
 
     switch (direction) {
@@ -494,34 +519,72 @@ double hazer_parse_latlon(const char * string, char direction)
     return latlon; 
 }
 
-static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
+double hazer_parse_number(const char * string)
+{
+    double num = 0.0;
+    double fraction = 0;
+    uint64_t numerator = 0;
+    uint64_t denominator = 0;
+    char * end = (char *)0;
 
-static const char GSA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSA;
+    num = strtoul(string, &end, 10);
 
-static const char GSV[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSV;
+    if (*end == HAZER_STIMULUS_DECIMAL) {
+        numerator = hazer_parse_fraction(end + 1, &denominator);
+        fraction = numerator;
+        fraction /= denominator;
+        num += fraction;
+    }
 
-static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;
+    return num;
+}
 
-static int hazer_parse(hazer_position_t * datap, char * vector[], size_t count)
+double hazer_parse_alt(const char * string, char units)
+{
+    return hazer_parse_number(string);
+}
+
+int hazer_parse_gga(hazer_position_t * datap, const char * vector[], size_t count)
 {
     int rc = 0;
+    static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
     
-    if (count <= 0) {
-
-        rc = -1;
-
-    } else if (strncmp(vector[0], GGA, sizeof(GGA) - 1) == 0) {
-
-    } else if (strncmp(vector[0], GSA, sizeof(GSA) - 1) == 0) {
-
-    } else if (strncmp(vector[0], GSV, sizeof(GSV) - 1) == 0) {
-
-    } else if (strncmp(vector[0], RMC, sizeof(RMC) - 1) == 0) {
-
-    } else {
-
+    if (count < 11) { 
         /* Do nothing. */
+    } else if (strncmp(vector[0], GGA, sizeof(GGA) - 1) != 0) {
+        /* Do nothing. */
+    } else if (*vector[6] == '0') {
+        /* Do nothing. */
+    } else {
+        datap->utc_nanoseconds = hazer_parse_utc(vector[1]);
+        datap->lat_degrees = hazer_parse_latlon(vector[2], *(vector[3]));
+        datap->lon_degrees = hazer_parse_latlon(vector[4], *(vector[5]));
+        datap->alt_meters = hazer_parse_alt(vector[9], *(vector[10]));
+        rc = !0;
+    }
 
+    return rc;
+}
+
+int hazer_parse_rmc(hazer_position_t * datap, const char * vector[], size_t count)
+{
+    int rc = 0;
+    static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;
+    
+    if (count < 10) { 
+        /* Do nothing. */
+    } else if (strncmp(vector[0], RMC, sizeof(RMC) - 1) != 0) {
+        /* Do nothing. */
+    } else if (*vector[2] != 'A') {
+        /* Do nothing. */
+    } else {
+        datap->utc_nanoseconds = hazer_parse_utc(vector[1]);
+        datap->lat_degrees = hazer_parse_latlon(vector[3], *(vector[4]));
+        datap->lon_degrees = hazer_parse_latlon(vector[5], *(vector[6]));
+        datap->sog_knots = hazer_parse_number(vector[7]);
+        datap->cog_degrees = hazer_parse_number(vector[8]);
+        datap->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
+        rc = !0;
     }
 
     return rc;
