@@ -43,7 +43,7 @@ void print(const hazer_position_t * pp)
     dtp = gmtime_r(&zulu, &datetime);
     assert(dtp != (struct tm *)0);
 
-    fprintf(stderr, "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", dtp->tm_year, dtp->tm_mon, dtp->tm_mday, dtp->tm_hour, dtp->tm_min, dtp->tm_sec, nanoseconds);
+    fprintf(stderr, "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", dtp->tm_year + 1900, dtp->tm_mon + 1, dtp->tm_mday, dtp->tm_hour, dtp->tm_min, dtp->tm_sec, nanoseconds);
     fputc(' ', stderr);
 
     fprintf(stderr, "%lf", pp->lat_degrees);
