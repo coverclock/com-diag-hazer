@@ -43,14 +43,14 @@ static void print(FILE * fp, const char * id, const hazer_position_t * pp)
     fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
 
     hazer_format_degrees2position(pp->lat_degrees, &degrees, &minutes, &seconds, &direction);
-    fprintf(fp, " %u:%02u:%02u%c", degrees, minutes, seconds, direction < 0 ? 'S' : 'N');
+    fprintf(fp, " %do%02d'%02d\"%c", degrees, minutes, seconds, direction < 0 ? 'S' : 'N');
 
     hazer_format_degrees2position(pp->lon_degrees, &degrees, &minutes, &seconds, &direction);
-    fprintf(fp, " %u:%02u:%02u%c", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
+    fprintf(fp, " %do%02d'%02d\"%c", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
 
     fprintf(fp, " %.2lf'", pp->alt_meters * 3.2808);
 
-    fprintf(fp, " %.2lfdeg", pp->cog_degrees);
+    fprintf(fp, " %.2lfo", pp->cog_degrees);
 
     fprintf(fp, " %.2lfmph", pp->sog_knots * 1.150779);
 
@@ -84,9 +84,6 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    rc = hazer_initialize();
-    assert(rc == 0);
-
     if (argc <= 1) {
         /* Do nothing. */
     } else if (strcmp(argv[1], "-d") == 0) {
@@ -100,6 +97,9 @@ int main(int argc, char * argv[])
     if (debug) {
         hazer_debug(stderr);
     }
+
+    rc = hazer_initialize();
+    assert(rc == 0);
 
     while (!0) {
 
@@ -155,9 +155,9 @@ int main(int argc, char * argv[])
             fflush(stderr);
         }
 
-        if (hazer_parse_gga(&position, vector, count)) {
+        if (hazer_parse_gga(&position, vector, count) == 0) {
             print(stdout, "GGA",  &position);
-        } else if (hazer_parse_rmc(&position, vector, count)) {
+        } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             print(stdout, "RMC", &position);
         } else {
             /* Do nothing. */
@@ -165,6 +165,9 @@ int main(int argc, char * argv[])
         fflush(stdout);
 
     }
+
+    rc = hazer_finalize();
+    assert(rc == 0);
 
     return 0;
 }

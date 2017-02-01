@@ -40,6 +40,11 @@ int hazer_initialize(void)
     return 0;
 }
 
+int hazer_finalize(void)
+{
+    return 0;
+}
+
 hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp)
 {
     int done = !0;
@@ -595,7 +600,7 @@ double hazer_parse_alt(const char * string, char units)
 
 int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
 {
-    int rc = 0;
+    int rc = -1;
     static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
     
     if (count < 11) { 
@@ -609,7 +614,7 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
         datap->lat_degrees = hazer_parse_latlon(vector[2], *(vector[3]));
         datap->lon_degrees = hazer_parse_latlon(vector[4], *(vector[5]));
         datap->alt_meters = hazer_parse_alt(vector[9], *(vector[10]));
-        rc = !0;
+        rc = 0;
     }
 
     return rc;
@@ -617,7 +622,7 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
 
 int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
 {
-    int rc = 0;
+    int rc = -1;
     static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;
     
     if (count < 10) { 
@@ -633,7 +638,7 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
         datap->sog_knots = hazer_parse_number(vector[7]);
         datap->cog_degrees = hazer_parse_number(vector[8]);
         datap->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
-        rc = !0;
+        rc = 0;
     }
 
     return rc;

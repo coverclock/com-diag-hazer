@@ -54,6 +54,34 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/*********************************************************************************
+ *
+ ********************************************************************************/
+
+/**
+ * Sets the debug file pointer. If the pointer is non-null, debugging
+ * information is emitted to it. The prior debug file pointer is returned.
+ * @param now is the new file pointer used for debugging, or NULL.
+ * @return the prior debug file pointer (which may be NULL).
+ */
+extern FILE * hazer_debug(FILE *now);
+
+/**
+ * Perform any necessary initialization.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_initialize(void);
+
+/**
+ * Perform any necessary finalization.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_finalize(void);
+
+/*********************************************************************************
+ *
+ ********************************************************************************/
+
 /**
  * NMEA 0183 4.10, 5.3.3.1, Table 1
  * NMEA 0183 4.10, 5.3
@@ -67,16 +95,6 @@ enum HazerConstant {
     HAZER_NMEA_CONSTANT_MESSAGE     = sizeof("GGA") - 1,
     HAZER_NMEA_CONSTANT_ID          = sizeof("$GPGGA") - 1,
 };
-
-extern int hazer_initialize(void);
-
-/**
- * Sets the debug file pointer. If the pointer is non-null, debugging
- * information is emitted to it. The prior debug file pointer is returned.
- * @param now is the new file pointer used for debugging, or NULL.
- * @return the prior debug file pointer (which may be NULL).
- */
-extern FILE * hazer_debug(FILE *now);
 
 /**
  * NMEA state machine states. The only states the application needs
@@ -202,6 +220,10 @@ extern int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp);
  */
 extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
 
+/*********************************************************************************
+ *
+ ********************************************************************************/
+
 /**
  * THis is an argument vector big enough to hold all possible sentences no
  * larger than those that can fit in the buffer type, plus a NULL pointer in
@@ -222,22 +244,72 @@ typedef char * (hazer_vector_t)[HAZER_NMEA_CONSTANT_LONGEST - HAZER_NMEA_CONSTAN
  */
 extern ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size);
 
-extern uint64_t hazer_parse_fraction(const char * string, uint64_t * denominator);
+/*********************************************************************************
+ *
+ ********************************************************************************/
 
+/**
+ * Parse a string containing an integer representing the fractional portion of
+ * a floating point value into a numerator representing the magnitude and a
+ * denominator that will be a power of ten. This is done to defer the floating
+ * point conversion.
+ * @param string points to the string (just past the decimal point).
+ * @param denominatorp points to where the denominator is stored.
+ * @return the numerator.
+ */
+extern uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp);
+
+/**
+ * Parse a string containing the time in UTC in NMEA format into an integer
+ * number of nanoseconds since the start of the day.
+ * @param string points to the string.
+ * @return an integer number of nanoseconds.
+ */
 extern uint64_t hazer_parse_utc(const char * string);
 
+/**
+ * Parse a string containing the date in NMEA format into an integer
+ * number of nanoseconds since the start of the POSIX epoch.
+ * @param string points to the string.
+ * @return an integer number of microseconds.
+ */
 extern uint64_t hazer_parse_dmy(const char * string);
 
-extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp);
-
+/**
+ * Parse a string containing the latitude or longitude in NMEA format into
+ * a double precision floating point value in units of decimal degrees.
+ * @param string points to the string.
+ * @param direction is the NMEA direction: N, S, E, W.
+ * @return degrees in double precision floating point decimal.
+ */
 extern double hazer_parse_latlon(const char * string, char direction);
 
-extern void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * directionp);
-
+/**
+ * Parse any decimal number with or without a fractional part into a
+ * double precision floating point value.
+ * @param string points the string.
+ * @return a double precision floating point value.
+ */
 extern double hazer_parse_number(const char * string);
 
+/**
+ * Parse a decimal number representing altitude above Mean Sea Level (MSL)
+ * into a douple precision floating point value. (Currently the units field
+ * is ignored and the units are assumed to be meters.)
+ * @param string points to the string.
+ * @param units is the units ('M' for meters).
+ * @return a double precision floating point value.
+ */
 extern double hazer_parse_alt(const char * string, char units);
 
+/*********************************************************************************
+ *
+ ********************************************************************************/
+
+/**
+ * THis structure maintains the time, position, altitude, speed, and bearing
+ * derived from the NMEA stream.
+ */
 typedef struct HazerPosition {
     uint64_t utc_nanoseconds;
     uint64_t dmy_nanoseconds;
@@ -248,8 +320,49 @@ typedef struct HazerPosition {
     double cog_degrees;
 } hazer_position_t;
 
-extern int hazer_parse_gga(hazer_position_t *datep, char * vector[], size_t count);
+/**
+ * Parse a GGA NMEA sentence, updating the position.
+ * @param datap points to the position structure.
+ * @Param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_parse_gga(hazer_position_t *datap, char * vector[], size_t count);
 
-extern int hazer_parse_rmc(hazer_position_t *datep, char * vector[], size_t count);
+/**
+ * Parse a RMC NMEA sentence, updating the position.
+ * @param datap points to the position structure.
+ * @Param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_parse_rmc(hazer_position_t *datap, char * vector[], size_t count);
+
+/*********************************************************************************
+ *
+ ********************************************************************************/
+
+/**
+ * Format nanoseconds (the sum of the UTC and DMY fields) in to separate values.
+ * @param nanoseconds is the total nanoseconds since the POSIX epoch.
+ * @param yearp points to where the year (e.g. 2017) is stored.
+ * @param monthp points to where the month (1..12) is stored.
+ * @param dayp points to where the day of the month (1..31) is stored.
+ * @param hourp points to where the hour (0..23) is stored.
+ * @param minutep points to where the minute (0..59) is stored.
+ * @param secondp points to where the second (0..59) is stored.
+ * @param nanosecondsp points to where the fractional nanoseconds is stored.
+ */
+extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp);
+
+/**
+ * Format decimal degrees into separate values.
+ * @param degrees is a longitude or latitude in decimal degrees.
+ * @param degreesp points to where the integral degrees (e.g. 180) is stored.
+ * @param minutesp points to where the minutes (0..59) are stored.
+ * @param secondsp points to where the seconds (0..59) are stored.
+ * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
+ */
+extern void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * directionp);
 
 #endif
