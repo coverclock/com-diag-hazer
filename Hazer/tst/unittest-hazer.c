@@ -19,7 +19,7 @@
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/hazer_nmea_gps.h"
 
-void print(const hazer_position_t * pp)
+static void print(FILE * fp, const char * id, const hazer_position_t * pp)
 {
     uint64_t nanoseconds = 0;
     int year = 0;
@@ -35,31 +35,33 @@ void print(const hazer_position_t * pp)
 
     nanoseconds = pp->dmy_nanoseconds;
     if (nanoseconds == 0) { return; }
+
+    fputs(id, fp);
+
     nanoseconds += pp->utc_nanoseconds;
     hazer_format_nanoseconds2timestamp(nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
-    fprintf(stderr, "%04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
-    fputc(' ', stderr);
+    fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
 
     hazer_format_degrees2position(pp->lat_degrees, &degrees, &minutes, &seconds, &direction);
-    fprintf(stderr, "%u:%02u:%02u%c", degrees, minutes, seconds, direction < 0 ? 'S' : 'N');
-    fputc(' ', stderr);
+    fprintf(fp, " %u:%02u:%02u%c", degrees, minutes, seconds, direction < 0 ? 'S' : 'N');
 
     hazer_format_degrees2position(pp->lon_degrees, &degrees, &minutes, &seconds, &direction);
-    fprintf(stderr, "%u:%02u:%02u%c", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
-    fputc(' ', stderr);
+    fprintf(fp, " %u:%02u:%02u%c", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
 
-    fprintf(stderr, "%lf", pp->sog_knots);
-    fputc(' ', stderr);
+    fprintf(fp, " %.2lf'", pp->alt_meters * 3.2808);
 
-    fprintf(stderr, "%lf", pp->cog_degrees);
-    fputc(' ', stderr);
+    fprintf(fp, " %.2lfdeg", pp->cog_degrees);
 
-    fputc('\n', stderr);
+    fprintf(fp, " %.2lfmph", pp->sog_knots * 1.150779);
+
+    fputc('\n', fp);
 }
 
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
+    int debug = 0;
+    int verbose = 0;
     hazer_state_t state = HAZER_STATE_EOF;
     hazer_buffer_t buffer = { 0 };
     hazer_vector_t vector = { 0 };
@@ -85,7 +87,17 @@ int main(int argc, char * argv[])
     rc = hazer_initialize();
     assert(rc == 0);
 
-    if (argc > 1) {
+    if (argc <= 1) {
+        /* Do nothing. */
+    } else if (strcmp(argv[1], "-d") == 0) {
+        debug = !0;
+    } else if (strcmp(argv[1], "-v") == 0) {
+        verbose = !0;
+    } else {
+        /* Do nothing. */
+    }
+
+    if (debug) {
         hazer_debug(stderr);
     }
 
@@ -135,19 +147,23 @@ int main(int argc, char * argv[])
         assert(vector[count] == (char *)0);
         assert(count < (sizeof(vector) / sizeof(vector[0])));
 
-        for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
-            fputs(*vv, stdout);
-            fputc((tt == count) ? '\n' : ',', stdout);
+        if (verbose) {
+            for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
+                fputs(*vv, stderr);
+                fputc((tt == count) ? '\n' : ',', stderr);
+            }
+            fflush(stderr);
         }
-        fflush(stdout);
 
         if (hazer_parse_gga(&position, vector, count)) {
-            print(&position);
+            print(stdout, "GGA",  &position);
         } else if (hazer_parse_rmc(&position, vector, count)) {
-            print(&position);
+            print(stdout, "RMC", &position);
         } else {
             /* Do nothing. */
         }
+        fflush(stdout);
+
     }
 
     return 0;
