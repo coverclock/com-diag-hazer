@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <time.h>
+#include <math.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/hazer_nmea_gps.h"
 
@@ -485,6 +486,25 @@ uint64_t hazer_parse_dmy(const char * string)
     return nanoseconds;
 }
 
+void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp)
+{
+    struct tm datetime = { 0 };
+    struct tm * dtp = (struct tm *)0;
+    time_t zulu = 0;
+
+    zulu = nanoseconds / 1000000000ULL;
+
+    dtp = gmtime_r(&zulu, &datetime);
+
+    *yearp = dtp->tm_year + 1900;
+    *monthp = dtp->tm_mon + 1;
+    *dayp = dtp->tm_mday;
+    *hourp = dtp->tm_hour;
+    *minutep = dtp->tm_min;
+    *secondp = dtp->tm_sec;
+    *nanosecondsp = nanoseconds % 1000000000ULL;
+}
+
 double hazer_parse_latlon(const char * string, char direction)
 {
     double latlon = 0.0;
@@ -524,6 +544,30 @@ double hazer_parse_latlon(const char * string, char direction)
     return latlon; 
 }
 
+void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * directionp)
+{
+    char direction = '\0';
+    double integral = 0.0;
+    double fraction = 0.0;
+
+    if (degrees < 0) {
+        degrees = -degrees;
+        *directionp = -1;
+    } else {
+        degrees = degrees;
+        *directionp = 1;
+    }
+
+    fraction = modf(degrees, &integral);
+
+    *degreesp = trunc(integral);
+    *minutesp = trunc(fraction * 60.0);
+    fraction -= *minutesp / 60.0;
+    *secondsp = trunc(fraction * 3600.0);
+
+    return direction;
+}
+
 double hazer_parse_number(const char * string)
 {
     double num = 0.0;
@@ -549,7 +593,7 @@ double hazer_parse_alt(const char * string, char units)
     return hazer_parse_number(string);
 }
 
-int hazer_parse_gga(hazer_position_t * datap, const char * vector[], size_t count)
+int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
 {
     int rc = 0;
     static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
@@ -571,7 +615,7 @@ int hazer_parse_gga(hazer_position_t * datap, const char * vector[], size_t coun
     return rc;
 }
 
-int hazer_parse_rmc(hazer_position_t * datap, const char * vector[], size_t count)
+int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
 {
     int rc = 0;
     static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;

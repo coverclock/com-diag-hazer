@@ -228,9 +228,13 @@ extern uint64_t hazer_parse_utc(const char * string);
 
 extern uint64_t hazer_parse_dmy(const char * string);
 
-extern double hazer_parse_number(const char * string);
+extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp);
 
 extern double hazer_parse_latlon(const char * string, char direction);
+
+extern void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * directionp);
+
+extern double hazer_parse_number(const char * string);
 
 extern double hazer_parse_alt(const char * string, char units);
 
@@ -244,8 +248,8 @@ typedef struct HazerPosition {
     double cog_degrees;
 } hazer_position_t;
 
-extern int hazer_parse_gga(hazer_position_t *datep, const char * vector[], size_t count);
+extern int hazer_parse_gga(hazer_position_t *datep, char * vector[], size_t count);
 
-extern int hazer_parse_rmc(hazer_position_t *datep, const char * vector[], size_t count);
+extern int hazer_parse_rmc(hazer_position_t *datep, char * vector[], size_t count);
 
 #endif

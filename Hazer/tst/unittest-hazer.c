@@ -16,55 +16,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <time.h>
-#include <math.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/hazer_nmea_gps.h"
-
-static void timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * fractionp)
-{
-    struct tm datetime = { 0 };
-    struct tm * dtp = (struct tm *)0;
-    time_t zulu = 0;
-
-    zulu = nanoseconds / 1000000000ULL;
-    nanoseconds %= 1000000000ULL;
-
-    dtp = gmtime_r(&zulu, &datetime);
-    assert(dtp != (struct tm *)0);
-
-    *yearp = dtp->tm_year + 1900;
-    *monthp = dtp->tm_mon + 1;
-    *dayp = dtp->tm_mday;
-    *hourp = dtp->tm_hour;
-    *minutep = dtp->tm_min;
-    *secondp = dtp->tm_sec;
-    *fractionp = nanoseconds;
-}
-
-static void position(double decimal, int * degreesp, int * minutesp, int * secondsp, char * directionp)
-{
-    char direction = '\0';
-    double integral = 0.0;
-    double fraction = 0.0;
-
-    if (decimal < 0) {
-        decimal = -decimal;
-        *directionp = 'W';
-    } else {
-        decimal = decimal;
-        *directionp = 'E';
-    }
-
-    fraction = modf(decimal, &integral);
-
-    *degreesp = trunc(integral);
-    *minutesp = trunc(fraction * 60.0);
-    fraction -= *minutesp / 60.0;
-    *secondsp = trunc(fraction * 3600.0);
-
-    return direction;
-}
 
 void print(const hazer_position_t * pp)
 {
@@ -78,21 +31,21 @@ void print(const hazer_position_t * pp)
     int degrees = 0;
     int minutes = 0;
     int seconds = 0;
-    char direction = '\0';
+    int direction = 0;
 
     nanoseconds = pp->dmy_nanoseconds;
     if (nanoseconds == 0) { return; }
     nanoseconds += pp->utc_nanoseconds;
-    timestamp(nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
-    fprintf(stderr, "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", year, month, day, hour, minute, second, nanoseconds);
+    hazer_format_nanoseconds2timestamp(nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
+    fprintf(stderr, "%04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
     fputc(' ', stderr);
 
-    position(pp->lat_degrees, &degrees, &minutes, &seconds, &direction);
-    fprintf(stderr, "%u:%02u:%02u%c", degrees, minutes, seconds, direction);
+    hazer_format_degrees2position(pp->lat_degrees, &degrees, &minutes, &seconds, &direction);
+    fprintf(stderr, "%u:%02u:%02u%c", degrees, minutes, seconds, direction < 0 ? 'S' : 'N');
     fputc(' ', stderr);
 
-    position(pp->lon_degrees, &degrees, &minutes, &seconds, &direction);
-    fprintf(stderr, "%u:%02u:%02u%c", degrees, minutes, seconds, direction);
+    hazer_format_degrees2position(pp->lon_degrees, &degrees, &minutes, &seconds, &direction);
+    fprintf(stderr, "%u:%02u:%02u%c", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
     fputc(' ', stderr);
 
     fprintf(stderr, "%lf", pp->sog_knots);
