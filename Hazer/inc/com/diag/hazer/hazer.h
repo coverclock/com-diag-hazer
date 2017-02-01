@@ -68,6 +68,8 @@ enum HazerConstant {
     HAZER_NMEA_CONSTANT_ID          = sizeof("$GPGGA") - 1,
 };
 
+extern int hazer_initialize(void);
+
 /**
  * Sets the debug file pointer. If the pointer is non-null, debugging
  * information is emitted to it. The prior debug file pointer is returned.

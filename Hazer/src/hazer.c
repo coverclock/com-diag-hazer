@@ -33,6 +33,12 @@ FILE * hazer_debug(FILE * now)
     return was;
 }
 
+int hazer_initialize(void)
+{
+    tzset(); /* In my glibc this is an expensive operation the first time. */
+    return 0;
+}
+
 hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp)
 {
     int done = !0;
@@ -472,7 +478,6 @@ uint64_t hazer_parse_dmy(const char * string)
 
     nanoseconds = mktime(&datetime); 
 
-    tzset(); /* In my glibc this is an expensive operation the first time. */
     nanoseconds -= timezone;
 
     nanoseconds *= 1000000000ULL;
