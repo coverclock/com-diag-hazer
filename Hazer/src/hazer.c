@@ -569,8 +569,6 @@ void hazer_format_degrees2position(double degrees, int * degreesp, int * minutes
     *minutesp = trunc(fraction * 60.0);
     fraction -= *minutesp / 60.0;
     *secondsp = trunc(fraction * 3600.0);
-
-    return direction;
 }
 
 double hazer_parse_number(const char * string)
