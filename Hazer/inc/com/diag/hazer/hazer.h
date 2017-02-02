@@ -99,6 +99,8 @@ enum HazerConstant {
     HAZER_CONSTANT_NMEA_MESSAGE     = sizeof("GGA") - 1,
     HAZER_CONSTANT_NMEA_ID          = sizeof("$GPGGA") - 1,
     HAZER_CONSTANT_GPS_CHANNELS     = 48,
+    HAZER_CONSTANT_GPS_VIEWS        = 4,
+    HAZER_CONSTANT_GPS_SATELLITES   = 12,
 };
 
 /**
@@ -198,9 +200,7 @@ typedef char (hazer_buffer_t)[HAZER_CONSTANT_NMEA_LONGEST + 1]; /* plus NUL */
 extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp);
 
 /**
- * Compute the checksum of an NMEA sentence. If the first character is the
- * start character, it is skipped. The message is checked for legal characters.
- * The computation stops when the checksum character is encountered.
+ * Compute the checksum of an NMEA sentence.
  * @param buffer points to the beginning of the output buffer.
  * @param size is the size of the output buffer in bytes.
  * @return the checksum.
@@ -308,7 +308,7 @@ extern double hazer_parse_number(const char * string);
 extern double hazer_parse_alt(const char * string, char units);
 
 /*********************************************************************************
- * PARSING AN ENTIRE SENTENCE AND EXTRACTING ITS MEANING
+ * PARSING POSITION, HEADING, AND VELOCITY SENTENCES
  ********************************************************************************/
 
 /**
@@ -343,6 +343,14 @@ extern int hazer_parse_gga(hazer_position_t *datap, char * vector[], size_t coun
  */
 extern int hazer_parse_rmc(hazer_position_t *datap, char * vector[], size_t count);
 
+/*********************************************************************************
+ * PARSING SATELLITE ELEVATION, AZIMUTH, AND SIGNAL STRENGTH SENTENCES
+ ********************************************************************************/
+
+/**
+ * This structure maintains the elevation, azimuth, and signal strength of a
+ * single satellite.
+ */
 typedef struct HazerSatellite {
     uint16_t elv_degrees;
     uint16_t azm_degrees;
@@ -350,11 +358,36 @@ typedef struct HazerSatellite {
     uint8_t snr_dbhz;
 } hazer_satellite_t;
 
+/**
+ * This structure maintains the information on as many satellites as we
+ * have channels configured.
+ */
 typedef struct HazerConstellation {
+    double pdop;
+    double hdop;
+    double vdop;
+    uint8_t id[HAZER_CONSTANT_GPS_SATELLITES];
+    uint8_t channels;
     hazer_satellite_t sat[HAZER_CONSTANT_GPS_CHANNELS];
 } hazer_constellation_t;
 
+/**
+ * Parse a GSV NMEA sentence, updating the constellation.
+ * @param datap points to the constellation structure.
+ * @Param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success on final update of group, 1 for success, <0 otherwise.
+ */
 extern int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count);
+
+/**
+ * Parse a GSA NMEA sentence, updating the constellation.
+ * @param datap points to the constellation structure.
+ * @Param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count);
 
 /*********************************************************************************
  * FORMATTING DATA FOR OUTPUT

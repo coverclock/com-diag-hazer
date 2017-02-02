@@ -20,11 +20,27 @@
 
 static void print_constellation(FILE *fp, const char * name, const hazer_constellation_t * cp)
 {
+    static const int IDS = sizeof(cp->id) / sizeof(cp->id[0]);
+    static const int CHANNELS = sizeof(cp->sat) / sizeof(cp->sat[0]);
     int channel = 0;
+    int channels = 0;
+    int limit = 0;
 
-    for (channel = 0; channel < (sizeof(cp->sat) / sizeof(cp->sat[0])); ++channel) {
+    fprintf(fp, "%s {", name);
+    for (channel = 0; channel < IDS; ++channel) {
+        if (cp->id[channel] != 0) {
+            fprintf(fp, " %u", cp->id[channel]);
+            ++channels;
+        }
+    }
+    fprintf(fp, " } [%d] %.2lf %.2lf %.2lf\n", channels, cp->pdop, cp->hdop, cp->vdop);
+
+    channels = cp->channels;
+    limit = (channels > CHANNELS) ? CHANNELS : channels;
+
+    for (channel = 0; channel < limit; ++channel) {
         if (cp->sat[channel].id != 0) {
-            fprintf(fp, "%s %d %u %uo %uo %udBHz\n", name, channel, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
+            fprintf(fp, "%s %d/%d/%d %u %uo %uo %udBHz\n", name, channel + 1, channels, CHANNELS, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
         }
     }
 }
@@ -73,6 +89,7 @@ int main(int argc, char * argv[])
     int debug = 0;
     int verbose = 0;
     hazer_state_t state = HAZER_STATE_EOF;
+    hazer_state_t prior = HAZER_STATE_START;
     hazer_buffer_t buffer = { 0 };
     hazer_vector_t vector = { 0 };
     hazer_position_t position = { 0 };
@@ -119,16 +136,26 @@ int main(int argc, char * argv[])
 
         while (!0) {
             ch = fgetc(fp);
+            prior = state;
             state = hazer_machine(state, ch, buffer, sizeof(buffer), &bb, &ss);
             if (state == HAZER_STATE_END) {
                 break;
             } else if  (state == HAZER_STATE_EOF) {
-                fprintf(stderr, "%s: EOF\n", program);
                 break;
+            } else if ((prior != HAZER_STATE_START) && (state == HAZER_STATE_START)) {
+                /* State machine restarted. */
+                fprintf(stderr, "%s: ERR\n", program);
             } else {
                 /* Do nothing. */
             }
         }
+
+        if (state == HAZER_STATE_EOF) {
+            fprintf(stderr, "%s: EOF\n", program);
+            break;
+        }
+
+        assert(state == HAZER_STATE_END);
 
         size = ss;
         assert(size > 0);
@@ -143,7 +170,12 @@ int main(int argc, char * argv[])
 
         rc = hazer_characters2checksum(buffer[size - 5], buffer[size - 4], &ck);
         assert(rc >= 0);
-        assert(ck == cs);
+
+        if (ck != cs) {
+            /* Checksum failed. */
+            fprintf(stderr, "%s: BAD 0x%02x 0x%02x\n", program, cs, ck);
+            continue;
+        }
 
         rc = hazer_checksum2characters(ck, &msn, &lsn);
         assert(rc >= 0);
@@ -171,6 +203,8 @@ int main(int argc, char * argv[])
             print_position(stdout, "GGA",  &position);
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             print_position(stdout, "RMC", &position);
+        } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
+            print_constellation(stdout, "GSA", &constellation);
         } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
             print_constellation(stdout, "GSV", &constellation);
         } else {

@@ -322,10 +322,8 @@ uint8_t hazer_checksum(const void * buffer, size_t size)
             break;
         }
 
-        if (*bb == HAZER_STIMULUS_START) {
-            ++bb;
-            --ss;
-        }
+        ++bb;
+        --ss;
 
         if (ss == 0) {
             break;
@@ -336,10 +334,6 @@ uint8_t hazer_checksum(const void * buffer, size_t size)
         --ss;
 
         while ((ss > 0) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
-            if (!((HAZER_STIMULUS_MINIMUM <= *bb) && (*bb <= HAZER_STIMULUS_MAXIMUM))) {
-                DEBUG("BAD 0x%x?\n", *bb);
-                break;
-            }
             ch = *(bb++);
             cs ^= ch;
             --ss;
@@ -593,22 +587,22 @@ void hazer_format_degrees2position(double degrees, int * degreesp, int * minutes
 
 double hazer_parse_number(const char * string)
 {
-    double num = 0.0;
+    double number = 0.0;
     double fraction = 0;
     uint64_t numerator = 0;
     uint64_t denominator = 0;
     char * end = (char *)0;
 
-    num = strtoul(string, &end, 10);
+    number = strtoul(string, &end, 10);
 
     if (*end == HAZER_STIMULUS_DECIMAL) {
         numerator = hazer_parse_fraction(end + 1, &denominator);
         fraction = numerator;
         fraction /= denominator;
-        num += fraction;
+        number += fraction;
     }
 
-    return num;
+    return number;
 }
 
 double hazer_parse_alt(const char * string, char units)
@@ -666,6 +660,10 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
     return rc;
 }
 
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count)
 {
     int rc = -1;
@@ -673,10 +671,11 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
     int messages = 0;
     int message = 0;
     int start = 0;
-    int index = 0;
+    int index = 4;
     int slot = 0;
     int channel = 0;
     int satellites = 0;
+    int limit = sizeof(datap->sat) / sizeof(datap->sat[0]);
     unsigned int id = 0;
     
     if (count < 11) { 
@@ -691,12 +690,11 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
         } else if (message > messages) {
             /* Do nothing. */
         } else {
-            channel = (message - 1) * 4;
+            channel = (message - 1) * HAZER_CONSTANT_GPS_VIEWS;
             satellites = strtol(vector[3], (char **)0, 10);
-            index = 4;
-            for (slot = 0; slot < 4; ++slot) {
+            for (slot = 0; slot < HAZER_CONSTANT_GPS_VIEWS; ++slot) {
                 if (channel >= satellites) { break; }
-                if (channel > (sizeof(datap->sat)/sizeof(datap->sat[0]))) { break; }
+                if (channel > limit) { break; }
                 id = strtol(vector[index++], (char **)0, 10);
                 if (id <= 0) { break; }
                 datap->sat[channel].id = id;
@@ -704,9 +702,43 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
                 datap->sat[channel].azm_degrees = strtoul(vector[index++], (char **)0, 10);
                 datap->sat[channel].snr_dbhz = strtoul(vector[index++], (char **)0, 10);
                 ++channel;
+                datap->channels = channel;
+                rc = 1;
+            }
+            if (rc < 0) {
+                /* Do nothing. */
+            } else if (message < messages) {
+                /* Do nothing. */
+            } else {
                 rc = 0;
             }
         }
+    }
+
+    return rc;
+}
+
+int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count)
+{
+    int rc = -1;
+    int index = 3;
+    int slot = 0;
+    static const char GSA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSA;
+    int limit = sizeof(datap->id) / sizeof(datap->id[0]);
+
+    if (count < 18) {
+    } else if (strncmp(vector[0], GSA, sizeof(GSA) - 1) != 0) {
+        /* Do nothing. */
+    } else if (*vector[2] == '1') {
+        /* Do nothing. */
+    } else {
+        for (slot = 0; slot < limit; ++slot) {
+            datap->id[slot] = strtol(vector[index++], (char **)0, 10);
+        }
+        datap->pdop = hazer_parse_number(vector[15]);
+        datap->hdop = hazer_parse_number(vector[16]);
+        datap->vdop = hazer_parse_number(vector[17]);
+        rc = 0;
     }
 
     return rc;
