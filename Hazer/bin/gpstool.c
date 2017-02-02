@@ -18,7 +18,18 @@
 #include <stdint.h>
 #include "com/diag/hazer/hazer.h"
 
-static void print_position(FILE * fp, const char * id, const hazer_position_t * pp)
+static void print_constellation(FILE *fp, const char * name, const hazer_constellation_t * cp)
+{
+    int channel = 0;
+
+    for (channel = 0; channel < (sizeof(cp->sat) / sizeof(cp->sat[0])); ++channel) {
+        if (cp->sat[channel].id != 0) {
+            fprintf(fp, "%s %d %u %uo %uo %udBHz\n", name, channel, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
+        }
+    }
+}
+
+static void print_position(FILE * fp, const char * name, const hazer_position_t * pp)
 {
     uint64_t nanoseconds = 0;
     int year = 0;
@@ -35,7 +46,7 @@ static void print_position(FILE * fp, const char * id, const hazer_position_t * 
     nanoseconds = pp->dmy_nanoseconds;
     if (nanoseconds == 0) { return; }
 
-    fputs(id, fp);
+    fputs(name, fp);
 
     nanoseconds += pp->utc_nanoseconds;
     hazer_format_nanoseconds2timestamp(nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
@@ -161,7 +172,7 @@ int main(int argc, char * argv[])
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             print_position(stdout, "RMC", &position);
         } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
-            // print_position(stdout, "RMC", &position);
+            print_constellation(stdout, "GSV", &constellation);
         } else {
             /* Do nothing. */
         }
