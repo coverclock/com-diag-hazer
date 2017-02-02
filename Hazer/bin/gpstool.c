@@ -72,17 +72,32 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
 
     nanoseconds += pp->utc_nanoseconds;
     hazer_format_nanoseconds2timestamp(nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
+    assert((1 <= month) && (month <= 12));
+    assert((1 <= day) && (day <= 31));
+    assert((0 <= hour) && (hour <= 23));
+    assert((0 <= minute) && (minute <= 59));
+    assert((0 <= second) && (second <= 59));
+    assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
     fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
 
+    /* Latitude and longitude are printed in a format maps.google.com kinda likes. */
+
     hazer_format_degrees2position(pp->lat_degrees, &degrees, &minutes, &seconds, &direction);
-    fprintf(fp, " %do%02d'%02d\"%c", degrees, minutes, seconds, direction < 0 ? 'S' : 'N');
+    assert((0 <= degrees) && (degrees <= 90));
+    assert((0 <= minutes) && (minutes <= 59));
+    assert((0 <= seconds) && (seconds <= 59));
+    fprintf(fp, " { %d %02d' %02d\"%c", degrees, minutes, seconds, direction < 0 ? 'S' : 'N');
 
     hazer_format_degrees2position(pp->lon_degrees, &degrees, &minutes, &seconds, &direction);
-    fprintf(fp, " %do%02d'%02d\"%c", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
+    assert((0 <= degrees) && (degrees <= 180));
+    assert((0 <= minutes) && (minutes <= 59));
+    assert((0 <= seconds) && (seconds <= 59));
+    fprintf(fp, " %d %02d'%02d\"%c }", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
 
     fprintf(fp, " %.2lf'", pp->alt_meters * 3.2808);
 
-    fprintf(fp, " %.2lfo", pp->cog_degrees);
+    fprintf(fp, " %.2lf", pp->cog_degrees);
+    assert((0.0 <= pp->cog_degrees) && (pp->cog_degrees <= 360.0));
 
     fprintf(fp, " %.2lfmph", pp->sog_knots * 1.150779);
 
