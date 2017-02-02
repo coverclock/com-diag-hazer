@@ -96,7 +96,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
 
     fprintf(fp, " %.2lf'", pp->alt_meters * 3.2808);
 
-    fprintf(fp, " %.2lf", pp->cog_degrees);
+    fprintf(fp, " %.2lftrue", pp->cog_degrees);
     assert((0.0 <= pp->cog_degrees) && (pp->cog_degrees <= 360.0));
 
     fprintf(fp, " %.2lfmph", pp->sog_knots * 1.150779);
