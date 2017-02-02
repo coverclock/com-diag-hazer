@@ -13,6 +13,7 @@
  */
 
 #include <assert.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -109,6 +110,7 @@ int main(int argc, char * argv[])
     const char * program = (const char *)0;
     int debug = 0;
     int verbose = 0;
+    int escape = 0;
     hazer_state_t state = HAZER_STATE_EOF;
     hazer_state_t prior = HAZER_STATE_START;
     hazer_buffer_t buffer = { 0 };
@@ -131,17 +133,33 @@ int main(int argc, char * argv[])
     uint8_t ck = 0;
     char msn = '\0';
     char lsn = '\0';
+    char opt = '\0';
+    extern char * optarg;
+    extern int optind;
+    extern int opterr;
+    extern int optopt;
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    if (argc <= 1) {
-        /* Do nothing. */
-    } else if (strcmp(argv[1], "-d") == 0) {
-        debug = !0;
-    } else if (strcmp(argv[1], "-v") == 0) {
-        verbose = !0;
-    } else {
-        /* Do nothing. */
+    while ((opt = getopt(argc, argv, "dev")) >= 0) {
+        switch (opt) {
+        case 'd':
+            debug = !0;
+            break;
+        case 'e':
+            escape = !0;
+            break;
+        case 'v':
+            verbose = !0;
+            break;
+        case '?':
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -e ]\n", program);
+            fprintf(stderr, "       -d      Display debug output to standard error.\n");
+            fprintf(stderr, "       -v      Display verbose output to standard error.\n");
+            fprintf(stderr, "       -e      Use ANSI escape sequences to control display.\n");
+            return 1;
+            break;
+        }
     }
 
     if (debug) {
@@ -150,6 +168,8 @@ int main(int argc, char * argv[])
 
     rc = hazer_initialize();
     assert(rc == 0);
+
+    if (escape) { fputs("\033[1;1H\033[0J", stdout); }
 
     while (!0) {
 
@@ -221,12 +241,16 @@ int main(int argc, char * argv[])
         }
 
         if (hazer_parse_gga(&position, vector, count) == 0) {
+            if (escape) { fputs("\033[1;1H\033[0K", stdout); }
             print_position(stdout, "GGA",  &position);
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
+            if (escape) { fputs("\033[1;1H\033[0K", stdout); }
             print_position(stdout, "RMC", &position);
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
+            if (escape) { fputs("\033[2;1H\033[0K", stdout); }
             print_constellation(stdout, "GSA", &constellation, 0);
         } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
+            if (escape) { fputs("\033[2;1H\033[0J", stdout); }
             print_constellation(stdout, "GSV", &constellation, !0);
         } else {
             /* Do nothing. */
