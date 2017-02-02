@@ -12,40 +12,64 @@
  * These are the private definitions for the hazer API.
  */
 
-#include <stdint.h>
+/**
+ * @def HAZER_NMEA_SENTENCE_START
+ * NMEA 0183 4.10, 5.3.3.1, Table 1
+ */
+#define HAZER_NMEA_SENTENCE_START "$"
 
 /**
- * NMEA 0183 4.10, 6.1.1, Table 3
+ * @def HAZER_NMEA_GPS_TALKER
+ * NMEA 0183 4.10, 6.1.4, Table 6
  */
-typedef enum HazerStimulus {
-    HAZER_STIMULUS_MINIMUM        = ' ',
-    HAZER_STIMULUS_START          = '$',
-    HAZER_STIMULUS_ENCAPSULATION  = '!',
-    HAZER_STIMULUS_GNSS           = 'G',
-    HAZER_STIMULUS_DELIMITER      = ',',
-    HAZER_STIMULUS_TAG            = '\\',
-    HAZER_STIMULUS_HEXADECIMAL    = '^',
-    HAZER_STIMULUS_CHECKSUM       = '*',
-    HAZER_STIMULUS_DECMIN         = '0',
-    HAZER_STIMULUS_DECMAX         = '9',
-    HAZER_STIMULUS_HEXMIN         = 'A',
-    HAZER_STIMULUS_HEXMAX         = 'F',
-    HAZER_STIMULUS_CR             = '\r',
-    HAZER_STIMULUS_LF             = '\n',
-    HAZER_STIMULUS_MAXIMUM        = '}',
-    HAZER_STIMULUS_RESERVERED     = '~',
-} hazer_stimulus_t;
+#define HAZER_NMEA_GPS_TALKER "GP"
 
 /**
- * State machine actions
+ * @def HAZER_NMEA_GPS_MESSAGE_GGA
+ * SiRF NMEA, Table 1-2, Time, position, and fix type data
  */
-typedef enum HazerAction {
-    HAZER_ACTION_SKIP           = 0,
-    HAZER_ACTION_SAVE,
-    HAZER_ACTION_SAVESPECIAL,
-    HAZER_ACTION_TERMINATE,
-} hazer_action_t;
+#define HAZER_NMEA_GPS_MESSAGE_GGA "GGA"
 
-extern uint32_t hazer_fraction(char * string, uint32_t * numeratorp);
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_GLL
+ * SiRF NMEA, Table 1-2, Latitude, longitude, UTC time of position fix and status
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GLL "GLL"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_GSA
+ * SiRF NMEA, Table 1-2, GPS receiver operating mode, satellites used, DOP values
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GSA "GSA"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_GSV
+ * SiRF NMEA, Table 1-2, Number of satellites in view, satellites used, DOP values
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GSV "GSV"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_MSS
+ * SiRF NMEA, Table 1-2, SNR, signal strength, frequency, bit rate from beacon
+ */
+#define HAZER_NMEA_GPS_MESSAGE_MSS "MSS"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_RMC
+ * SiRF NMEA, Table 1-2, Time, date position, course, and speed data
+ */
+#define HAZER_NMEA_GPS_MESSAGE_RMC "RMC"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_VTG
+ * SiRF NMEA, Table 1-2, Course and speed relative to ground
+ */
+#define HAZER_NMEA_GPS_MESSAGE_VTG "VTG"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_ZDA
+ * SiRF NMEA, Table 1-2, PPS timing message
+ */
+#define HAZER_NMEA_GPS_MESSAGE_ZDA "ZDA"
 
 #endif

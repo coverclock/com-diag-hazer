@@ -14,7 +14,11 @@
 #include <time.h>
 #include <math.h>
 #include "com/diag/hazer/hazer.h"
-#include "com/diag/hazer/hazer_nmea_gps.h"
+#include "../src/hazer.h"
+
+/******************************************************************************
+ *
+ ******************************************************************************/
 
 static FILE * debug  = (FILE *)0;
 
@@ -34,6 +38,10 @@ FILE * hazer_debug(FILE * now)
     return was;
 }
 
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 int hazer_initialize(void)
 {
     tzset(); /* In my glibc this is an expensive operation the first time. */
@@ -44,6 +52,10 @@ int hazer_finalize(void)
 {
     return 0;
 }
+
+/******************************************************************************
+ *
+ ******************************************************************************/
 
 hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp)
 {
@@ -390,6 +402,10 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     return rc;
 }
 
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size)
 {
     char ** vv = vector;
@@ -422,6 +438,10 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
 
     return (vv - vector);
 }
+
+/******************************************************************************
+ *
+ ******************************************************************************/
 
 uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp)
 {
@@ -596,6 +616,10 @@ double hazer_parse_alt(const char * string, char units)
     return hazer_parse_number(string);
 }
 
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
 {
     int rc = -1;
@@ -637,6 +661,52 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
         datap->cog_degrees = hazer_parse_number(vector[8]);
         datap->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
         rc = 0;
+    }
+
+    return rc;
+}
+
+int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count)
+{
+    int rc = -1;
+    static const char GSV[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSV;
+    int messages = 0;
+    int message = 0;
+    int start = 0;
+    int index = 0;
+    int slot = 0;
+    int channel = 0;
+    int satellites = 0;
+    unsigned int id = 0;
+    
+    if (count < 11) { 
+        /* Do nothing. */
+    } else if (strncmp(vector[0], GSV, sizeof(GSV) - 1) != 0) {
+        /* Do nothing. */
+    } else {
+        messages = strtol(vector[1], (char **)0, 10);
+        message = strtol(vector[2], (char **)0, 10);
+        if (message <= 0) {
+            /* Do nothing. */
+        } else if (message > messages) {
+            /* Do nothing. */
+        } else {
+            channel = (message - 1) * 4;
+            satellites = strtol(vector[3], (char **)0, 10);
+            index = 4;
+            for (slot = 0; slot < 4; ++slot) {
+                if (channel >= satellites) { break; }
+                if (channel > (sizeof(datap->sat)/sizeof(datap->sat[0]))) { break; }
+                id = strtol(vector[index++], (char **)0, 10);
+                if (id <= 0) { break; }
+                datap->sat[channel].id = id;
+                datap->sat[channel].elv_degrees = strtoul(vector[index++], (char **)0, 10);
+                datap->sat[channel].azm_degrees = strtoul(vector[index++], (char **)0, 10);
+                datap->sat[channel].snr_dbhz = strtoul(vector[index++], (char **)0, 10);
+                ++channel;
+                rc = 0;
+            }
+        }
     }
 
     return rc;

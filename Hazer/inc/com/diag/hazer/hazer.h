@@ -55,7 +55,7 @@
 #include <stdint.h>
 
 /*********************************************************************************
- *
+ * DEBUGGING
  ********************************************************************************/
 
 /**
@@ -65,6 +65,10 @@
  * @return the prior debug file pointer (which may be NULL).
  */
 extern FILE * hazer_debug(FILE *now);
+
+/*********************************************************************************
+ * STARTING UP AND SHUTTING DOWN
+ ********************************************************************************/
 
 /**
  * Perform any necessary initialization.
@@ -79,7 +83,7 @@ extern int hazer_initialize(void);
 extern int hazer_finalize(void);
 
 /*********************************************************************************
- *
+ * COLLECTING AN NMEA SENTENCE
  ********************************************************************************/
 
 /**
@@ -89,11 +93,12 @@ extern int hazer_finalize(void);
  * NMEA spec as to the length of the message ID.
  */
 enum HazerConstant {
-    HAZER_NMEA_CONSTANT_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
-    HAZER_NMEA_CONSTANT_LONGEST     = 82,
-    HAZER_NMEA_CONSTANT_TALKER      = sizeof("GP") - 1,
-    HAZER_NMEA_CONSTANT_MESSAGE     = sizeof("GGA") - 1,
-    HAZER_NMEA_CONSTANT_ID          = sizeof("$GPGGA") - 1,
+    HAZER_CONSTANT_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
+    HAZER_CONSTANT_NMEA_LONGEST     = 82,
+    HAZER_CONSTANT_NMEA_TALKER      = sizeof("GP") - 1,
+    HAZER_CONSTANT_NMEA_MESSAGE     = sizeof("GGA") - 1,
+    HAZER_CONSTANT_NMEA_ID          = sizeof("$GPGGA") - 1,
+    HAZER_CONSTANT_GPS_CHANNELS     = 48,
 };
 
 /**
@@ -167,7 +172,7 @@ typedef enum HazerAction {
  * according to the NMEA spec, plus a trailing NUL.
  * NMEA 0183 4.10, 5.3, p. 11
  */
-typedef char (hazer_buffer_t)[HAZER_NMEA_CONSTANT_LONGEST + 1]; /* plus NUL */
+typedef char (hazer_buffer_t)[HAZER_CONSTANT_NMEA_LONGEST + 1]; /* plus NUL */
 
 /**
  * Process a single character of stimulus for the state machine that is
@@ -221,7 +226,7 @@ extern int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp);
 extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
 
 /*********************************************************************************
- *
+ * BREAKING UP AN NMEA SENTENCE INTO FIELDS
  ********************************************************************************/
 
 /**
@@ -229,7 +234,7 @@ extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
  * larger than those that can fit in the buffer type, plus a NULL pointer in
  * the last position.
  */
-typedef char * (hazer_vector_t)[HAZER_NMEA_CONSTANT_LONGEST - HAZER_NMEA_CONSTANT_SHORTEST + 1]; /* plus NULL */
+typedef char * (hazer_vector_t)[HAZER_CONSTANT_NMEA_LONGEST - HAZER_CONSTANT_NMEA_SHORTEST + 1]; /* plus NULL */
 
 /**
  * Tokenize an NMEA sentence by splitting it into substrings whose pointers
@@ -245,7 +250,7 @@ typedef char * (hazer_vector_t)[HAZER_NMEA_CONSTANT_LONGEST - HAZER_NMEA_CONSTAN
 extern ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size);
 
 /*********************************************************************************
- *
+ * PARSING INDIVIDUAL FIELDS IN AN NMEA SENTENCE
  ********************************************************************************/
 
 /**
@@ -303,7 +308,7 @@ extern double hazer_parse_number(const char * string);
 extern double hazer_parse_alt(const char * string, char units);
 
 /*********************************************************************************
- *
+ * PARSING AN ENTIRE SENTENCE AND EXTRACTING ITS MEANING
  ********************************************************************************/
 
 /**
@@ -338,8 +343,21 @@ extern int hazer_parse_gga(hazer_position_t *datap, char * vector[], size_t coun
  */
 extern int hazer_parse_rmc(hazer_position_t *datap, char * vector[], size_t count);
 
+typedef struct HazerSatellite {
+    uint16_t elv_degrees;
+    uint16_t azm_degrees;
+    uint8_t id;
+    uint8_t snr_dbhz;
+} hazer_satellite_t;
+
+typedef struct HazerConstellation {
+    hazer_satellite_t sat[HAZER_CONSTANT_GPS_CHANNELS];
+} hazer_constellation_t;
+
+extern int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count);
+
 /*********************************************************************************
- *
+ * FORMATTING DATA FOR OUTPUT
  ********************************************************************************/
 
 /**

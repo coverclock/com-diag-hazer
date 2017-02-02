@@ -9,7 +9,7 @@
  *
  * EXAMPLE
  *
- * serialtool -D /dev/ttyUSB0 -b 4800 -8 -1 -n -l | unittest-hazer
+ * gpstool [ -d ] [ -v ]
  */
 
 #include <assert.h>
@@ -17,9 +17,8 @@
 #include <string.h>
 #include <stdint.h>
 #include "com/diag/hazer/hazer.h"
-#include "com/diag/hazer/hazer_nmea_gps.h"
 
-static void print(FILE * fp, const char * id, const hazer_position_t * pp)
+static void print_position(FILE * fp, const char * id, const hazer_position_t * pp)
 {
     uint64_t nanoseconds = 0;
     int year = 0;
@@ -66,6 +65,8 @@ int main(int argc, char * argv[])
     hazer_buffer_t buffer = { 0 };
     hazer_vector_t vector = { 0 };
     hazer_position_t position = { 0 };
+    hazer_constellation_t constellation = { 0 };
+    FILE * fp = stdin;
     int rc = 0;
     int ch = EOF;
     char * bb = (char *)0;
@@ -106,7 +107,7 @@ int main(int argc, char * argv[])
         state = HAZER_STATE_START;
 
         while (!0) {
-            ch = fgetc(stdin);
+            ch = fgetc(fp);
             state = hazer_machine(state, ch, buffer, sizeof(buffer), &bb, &ss);
             if (state == HAZER_STATE_END) {
                 break;
@@ -156,9 +157,11 @@ int main(int argc, char * argv[])
         }
 
         if (hazer_parse_gga(&position, vector, count) == 0) {
-            print(stdout, "GGA",  &position);
+            print_position(stdout, "GGA",  &position);
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
-            print(stdout, "RMC", &position);
+            print_position(stdout, "RMC", &position);
+        } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
+            // print_position(stdout, "RMC", &position);
         } else {
             /* Do nothing. */
         }
