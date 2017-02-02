@@ -18,29 +18,35 @@
 #include <stdint.h>
 #include "com/diag/hazer/hazer.h"
 
-static void print_constellation(FILE *fp, const char * name, const hazer_constellation_t * cp)
+static void print_constellation(FILE *fp, const char * name, const hazer_constellation_t * cp, int full)
 {
-    static const int IDS = sizeof(cp->id) / sizeof(cp->id[0]);
+    static const int SATELLITES = sizeof(cp->id) / sizeof(cp->id[0]);
     static const int CHANNELS = sizeof(cp->sat) / sizeof(cp->sat[0]);
     int channel = 0;
     int channels = 0;
     int limit = 0;
 
+    channels = cp->satellites;
+    limit = (channels > SATELLITES) ? SATELLITES : channels;
+
     fprintf(fp, "%s {", name);
-    for (channel = 0; channel < IDS; ++channel) {
+    for (channel = 0; channel < limit; ++channel) {
         if (cp->id[channel] != 0) {
             fprintf(fp, " %u", cp->id[channel]);
-            ++channels;
         }
     }
-    fprintf(fp, " } [%d] %.2lf %.2lf %.2lf\n", channels, cp->pdop, cp->hdop, cp->vdop);
+    fprintf(fp, " } [%d/%d] %.2lf %.2lf %.2lf\n", channels, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
+
+    if (!full) {
+        return;
+    }
 
     channels = cp->channels;
     limit = (channels > CHANNELS) ? CHANNELS : channels;
 
     for (channel = 0; channel < limit; ++channel) {
         if (cp->sat[channel].id != 0) {
-            fprintf(fp, "%s %d/%d/%d %u %uo %uo %udBHz\n", name, channel + 1, channels, CHANNELS, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
+            fprintf(fp, "%s [%d/%d/%d] %u %uo %uo %udBHz\n", name, channel + 1, channels, CHANNELS, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
         }
     }
 }
@@ -204,9 +210,9 @@ int main(int argc, char * argv[])
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             print_position(stdout, "RMC", &position);
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
-            print_constellation(stdout, "GSA", &constellation);
+            print_constellation(stdout, "GSA", &constellation, 0);
         } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
-            print_constellation(stdout, "GSV", &constellation);
+            print_constellation(stdout, "GSV", &constellation, !0);
         } else {
             /* Do nothing. */
         }

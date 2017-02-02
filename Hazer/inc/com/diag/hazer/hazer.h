@@ -366,6 +366,7 @@ typedef struct HazerConstellation {
     double pdop;
     double hdop;
     double vdop;
+    uint8_t satellites;
     uint8_t id[HAZER_CONSTANT_GPS_SATELLITES];
     uint8_t channels;
     hazer_satellite_t sat[HAZER_CONSTANT_GPS_CHANNELS];

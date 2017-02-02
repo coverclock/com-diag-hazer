@@ -723,6 +723,8 @@ int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count
     int rc = -1;
     int index = 3;
     int slot = 0;
+    int id = 0;
+    int satellites = 0;
     static const char GSA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSA;
     int limit = sizeof(datap->id) / sizeof(datap->id[0]);
 
@@ -733,8 +735,12 @@ int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count
         /* Do nothing. */
     } else {
         for (slot = 0; slot < limit; ++slot) {
-            datap->id[slot] = strtol(vector[index++], (char **)0, 10);
+            id = strtol(vector[index++], (char **)0, 10);
+            if (id <= 0) { break; }
+            datap->id[slot] = id;
+            ++satellites;
         }
+        datap->satellites = satellites;
         datap->pdop = hazer_parse_number(vector[15]);
         datap->hdop = hazer_parse_number(vector[16]);
         datap->vdop = hazer_parse_number(vector[17]);
