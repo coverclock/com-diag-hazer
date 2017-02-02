@@ -92,7 +92,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     assert((0 <= degrees) && (degrees <= 180));
     assert((0 <= minutes) && (minutes <= 59));
     assert((0 <= seconds) && (seconds <= 59));
-    fprintf(fp, " %d %02d'%02d\"%c }", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
+    fprintf(fp, " %d %02d' %02d\"%c }", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
 
     fprintf(fp, " %.2lf'", pp->alt_meters * 3.2808);
 
