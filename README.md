@@ -34,7 +34,9 @@ strings produced by the USGlobalSat BU-353S4 Global Positioning System (GPS)
 device, a tiny little external GPS receiver that emits NMEA strings over its
 built-in USB-to-serial adaptor. The BU-353S4 is based on the SiRF Star IV
 chipset. If you want to futz around with satellite geolocation, the BU-353S4
-is a cheap and easy way to do it.
+is a cheap and easy way to do it. Hazer parses GGA, GSA, GSV, and RMC sentences
+produced by the GPS "talker". While I used the BU-353S4 to test the software,
+it is likely usable for any GPS receiver that conforms to NMEA 0183 4.10.
 
 This software is an original work of its author(s).
 
