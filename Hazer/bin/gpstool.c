@@ -146,7 +146,7 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    while ((opt = getopt(argc, argv, "derv")) >= 0) {
+    while ((opt = getopt(argc, argv, "derv?")) >= 0) {
         switch (opt) {
         case 'd':
             debug = !0;
