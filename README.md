@@ -48,6 +48,22 @@ Example:
 
     serialtool -D /dev/ttyUSB0 -b 4800 -8 -1 -n -l | gpstool -e
 
+    $GPRMC,162135.000,A,3947.6521,N,10509.2024,W,0.00,109.12,030217,,,D
+    RMC 2017-02-03T16:21:35Z { 39 47' 39.12"N 105 09' 12.14"W } 5623.29' 109.12true 0.00mph
+    GSA { 32 10 14 18 24  8 11 21 31 27  1 } [11/12] pdop 1.30 hdop 0.80 vdop 1.10
+    GSV [01/12/48] sat 32 elv 78 azm 281 snr 38dBHz
+    GSV [02/12/48] sat 10 elv 68 azm  51 snr 38dBHz
+    GSV [03/12/48] sat 14 elv 54 azm 242 snr 40dBHz
+    GSV [04/12/48] sat 18 elv 43 azm  91 snr 39dBHz
+    GSV [05/12/48] sat 24 elv 22 azm  46 snr 33dBHz
+    GSV [06/12/48] sat  8 elv 19 azm 275 snr 36dBHz
+    GSV [07/12/48] sat 11 elv 18 azm 312 snr 31dBHz
+    GSV [08/12/48] sat 21 elv 17 azm 156 snr 41dBHz
+    GSV [09/12/48] sat 31 elv 16 azm 181 snr 43dBHz
+    GSV [10/12/48] sat 27 elv 16 azm 236 snr 31dBHz
+    GSV [11/12/48] sat  1 elv  6 azm 320 snr 24dBHz
+    GSV [12/12/48] sat 51 elv 43 azm 183 snr 45dBHz
+
 This software is an original work of its author(s).
 
 Contact:
