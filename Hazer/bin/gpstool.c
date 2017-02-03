@@ -138,7 +138,7 @@ int main(int argc, char * argv[])
     uint8_t ck = 0;
     char msn = '\0';
     char lsn = '\0';
-    char opt = '\0';
+    int opt = -1;
     extern char * optarg;
     extern int optind;
     extern int opterr;
