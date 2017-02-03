@@ -38,7 +38,7 @@ is a inexpensive  and easy way to do it. Hazer parses GGA, GSA, GSV, and RMC
 sentences produced by a GPS "talker". While I used the BU-353S4 to test the
 software, it is likely usable for any GPS receiver that conforms to NMEA 0183
 4.10. Unlike the Drover project, Hazer does its own NMEA parsing. It includes
-a gpstool to display processed GPS data. Hazer accepts NMEA sentences from
+a gpstool to display processed GPS data. gpstool accepts NMEA sentences from
 standard input. The serialtool in the Diminuto project is a useful way to
 read data from serial-attached GPS devices like the BU-353S4.
 
