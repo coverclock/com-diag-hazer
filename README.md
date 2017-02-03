@@ -32,11 +32,21 @@ This file is part of the Digital Aggregates Corporation Hazer package. Hazer is
 a simple C-based parser of the National Marine Electronics Association (NMEA)
 strings produced by the USGlobalSat BU-353S4 Global Positioning System (GPS)
 device, a tiny little external GPS receiver that emits NMEA strings over its
-built-in USB-to-serial adaptor. The BU-353S4 is based on the SiRF Star IV
+built-in serial-to-USB adaptor. The BU-353S4 is based on the SiRF Star IV
 chipset. If you want to futz around with satellite geolocation, the BU-353S4
-is a cheap and easy way to do it. Hazer parses GGA, GSA, GSV, and RMC sentences
-produced by the GPS "talker". While I used the BU-353S4 to test the software,
-it is likely usable for any GPS receiver that conforms to NMEA 0183 4.10.
+is a inexpensive  and easy way to do it. Hazer parses GGA, GSA, GSV, and RMC
+sentences produced by a GPS "talker". While I used the BU-353S4 to test the
+software, it is likely usable for any GPS receiver that conforms to NMEA 0183
+4.10. Unlike the Drover project, Hazer does its own NMEA parsing. It includes
+a gpstool to display processed GPS data. Hazer accepts NMEA sentences from
+standard input. The serialtool in the Diminuto project is a useful way to
+read data from serial-attached GPS devices like the BU-353S4.
+
+    https://github.com/coverclock/com-diag-diminuto
+
+Example:
+
+    serialtool -D /dev/ttyUSB0 -b 4800 -8 -1 -n -l | gpstool -e
 
 This software is an original work of its author(s).
 
