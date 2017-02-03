@@ -33,10 +33,10 @@ static void print_constellation(FILE *fp, const char * name, const hazer_constel
     fprintf(fp, "%s {", name);
     for (channel = 0; channel < limit; ++channel) {
         if (cp->id[channel] != 0) {
-            fprintf(fp, " %u", cp->id[channel]);
+            fprintf(fp, " %2u", cp->id[channel]);
         }
     }
-    fprintf(fp, " } [%d/%d] %.2lf %.2lf %.2lf\n", channels, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
+    fprintf(fp, " } [%02d/%02d] pdop %.2lf hdop %.2lf vdop %.2lf\n", channels, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
 
     if (!full) {
         return;
@@ -47,7 +47,7 @@ static void print_constellation(FILE *fp, const char * name, const hazer_constel
 
     for (channel = 0; channel < limit; ++channel) {
         if (cp->sat[channel].id != 0) {
-            fprintf(fp, "%s [%d/%d/%d] %u %uo %uo %udBHz\n", name, channel + 1, channels, CHANNELS, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
+            fprintf(fp, "%s [%02d/%02d/%02d] sat %2u elv %2u azm %3u snr %2udBHz\n", name, channel + 1, channels, CHANNELS, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
         }
     }
 }
@@ -228,6 +228,11 @@ int main(int argc, char * argv[])
             continue;
         }
 
+        if (verbose) {
+            fputs(buffer, errfp);
+            fflush(errfp);
+        }
+
         rc = hazer_checksum2characters(ck, &msn, &lsn);
         assert(rc >= 0);
         assert(msn == buffer[size - 5]);
@@ -242,29 +247,28 @@ int main(int argc, char * argv[])
         assert(vector[count] == (char *)0);
         assert(count < (sizeof(vector) / sizeof(vector[0])));
 
-        if (verbose) {
-            for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
-                fputs(*vv, errfp);
-                fputc((tt == count) ? '\n' : ',', errfp);
-            }
-            fflush(errfp);
+        if (escape) { fputs("\033[1;1H\033[0K", outfp); }
+        for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
+            fputs(*vv, outfp);
+            fputc((tt == count) ? '\n' : ',', outfp);
         }
 
         if (hazer_parse_gga(&position, vector, count) == 0) {
-            if (escape) { fputs("\033[1;1H\033[0K", outfp); }
+            if (escape) { fputs("\033[2;1H\033[0K", outfp); }
             print_position(outfp, "GGA",  &position);
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
-            if (escape) { fputs("\033[1;1H\033[0K", outfp); }
+            if (escape) { fputs("\033[2;1H\033[0K", outfp); }
             print_position(outfp, "RMC", &position);
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
-            if (escape) { fputs("\033[2;1H\033[0K", outfp); }
+            if (escape) { fputs("\033[3;1H\033[0K", outfp); }
             print_constellation(outfp, "GSA", &constellation, 0);
         } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
-            if (escape) { fputs("\033[2;1H\033[0J", outfp); }
+            if (escape) { fputs("\033[3;1H\033[0J", outfp); }
             print_constellation(outfp, "GSV", &constellation, !0);
         } else {
             /* Do nothing. */
         }
+
         fflush(outfp);
 
     }
