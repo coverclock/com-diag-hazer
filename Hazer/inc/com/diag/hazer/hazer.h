@@ -285,9 +285,10 @@ extern uint64_t hazer_parse_dmy(const char * string);
  * a double precision floating point value in units of decimal degrees.
  * @param string points to the string.
  * @param direction is the NMEA direction: N, S, E, W.
+ * @param digitsp points to where the number of digits is stored.
  * @return degrees in double precision floating point decimal.
  */
-extern double hazer_parse_latlon(const char * string, char direction);
+extern double hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp);
 
 /**
  * Parse any decimal number with or without a fractional part into a
@@ -323,6 +324,8 @@ typedef struct HazerPosition {
     double alt_meters;
     double sog_knots;
     double cog_degrees;
+    uint8_t lat_digits;
+    uint8_t lon_digits;
 } hazer_position_t;
 
 /**
@@ -413,8 +416,9 @@ extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp
  * @param degreesp points to where the integral degrees (e.g. 180) is stored.
  * @param minutesp points to where the minutes (0..59) are stored.
  * @param secondsp points to where the seconds (0..59) are stored.
+ * @param hundredsthp points to there the fractional seconds (0..99) are stored.
  * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
  */
-extern void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * directionp);
+extern void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * hundredsthp, int * directionp);
 
 #endif

@@ -64,6 +64,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     int degrees = 0;
     int minutes = 0;
     int seconds = 0;
+    int hundredths = 0;
     int direction = 0;
 
     nanoseconds = pp->dmy_nanoseconds;
@@ -83,17 +84,19 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
 
     /* Latitude and longitude are printed in a format maps.google.com kinda likes. */
 
-    hazer_format_degrees2position(pp->lat_degrees, &degrees, &minutes, &seconds, &direction);
+    hazer_format_degrees2position(pp->lat_degrees, &degrees, &minutes, &seconds, &hundredths, &direction);
     assert((0 <= degrees) && (degrees <= 90));
     assert((0 <= minutes) && (minutes <= 59));
     assert((0 <= seconds) && (seconds <= 59));
-    fprintf(fp, " { %d %02d' %02d\"%c", degrees, minutes, seconds, direction < 0 ? 'S' : 'N');
+    assert((0 <= hundredths) && (hundredths <= 99));
+    fprintf(fp, " { %d %02d' %02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
 
-    hazer_format_degrees2position(pp->lon_degrees, &degrees, &minutes, &seconds, &direction);
+    hazer_format_degrees2position(pp->lon_degrees, &degrees, &minutes, &seconds, &hundredths, &direction);
     assert((0 <= degrees) && (degrees <= 180));
     assert((0 <= minutes) && (minutes <= 59));
     assert((0 <= seconds) && (seconds <= 59));
-    fprintf(fp, " %d %02d' %02d\"%c }", degrees, minutes, seconds, direction < 0 ? 'W' : 'E');
+    assert((0 <= hundredths) && (hundredths <= 99));
+    fprintf(fp, " %d %02d' %02d.%02d\"%c }", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
     fprintf(fp, " %.2lf'", pp->alt_meters * 3.2808);
 
@@ -117,7 +120,9 @@ int main(int argc, char * argv[])
     hazer_vector_t vector = { 0 };
     hazer_position_t position = { 0 };
     hazer_constellation_t constellation = { 0 };
-    FILE * fp = stdin;
+    FILE * infp = stdin;
+    FILE * outfp = stdout;
+    FILE * errfp = stderr;
     int rc = 0;
     int ch = EOF;
     char * bb = (char *)0;
@@ -141,7 +146,7 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    while ((opt = getopt(argc, argv, "dev")) >= 0) {
+    while ((opt = getopt(argc, argv, "derv")) >= 0) {
         switch (opt) {
         case 'd':
             debug = !0;
@@ -149,14 +154,19 @@ int main(int argc, char * argv[])
         case 'e':
             escape = !0;
             break;
+        case 'r':
+            outfp = stderr;
+            errfp = stdout;
+            break;
         case 'v':
             verbose = !0;
             break;
         case '?':
             fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -e ]\n", program);
             fprintf(stderr, "       -d      Display debug output to standard error.\n");
-            fprintf(stderr, "       -v      Display verbose output to standard error.\n");
             fprintf(stderr, "       -e      Use ANSI escape sequences to control display.\n");
+            fprintf(stderr, "       -r      Reverse use of standard output and error.\n");
+            fprintf(stderr, "       -v      Display verbose output to standard error.\n");
             return 1;
             break;
         }
@@ -169,14 +179,14 @@ int main(int argc, char * argv[])
     rc = hazer_initialize();
     assert(rc == 0);
 
-    if (escape) { fputs("\033[1;1H\033[0J", stdout); }
+    if (escape) { fputs("\033[1;1H\033[0J", outfp); }
 
     while (!0) {
 
         state = HAZER_STATE_START;
 
         while (!0) {
-            ch = fgetc(fp);
+            ch = fgetc(infp);
             prior = state;
             state = hazer_machine(state, ch, buffer, sizeof(buffer), &bb, &ss);
             if (state == HAZER_STATE_END) {
@@ -214,7 +224,7 @@ int main(int argc, char * argv[])
 
         if (ck != cs) {
             /* Checksum failed. */
-            fprintf(stderr, "%s: BAD 0x%02x 0x%02x\n", program, cs, ck);
+            fprintf(stderr, "%s: SUM 0x%02x 0x%02x\n", program, cs, ck);
             continue;
         }
 
@@ -234,28 +244,28 @@ int main(int argc, char * argv[])
 
         if (verbose) {
             for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
-                fputs(*vv, stderr);
-                fputc((tt == count) ? '\n' : ',', stderr);
+                fputs(*vv, errfp);
+                fputc((tt == count) ? '\n' : ',', errfp);
             }
-            fflush(stderr);
+            fflush(errfp);
         }
 
         if (hazer_parse_gga(&position, vector, count) == 0) {
-            if (escape) { fputs("\033[1;1H\033[0K", stdout); }
-            print_position(stdout, "GGA",  &position);
+            if (escape) { fputs("\033[1;1H\033[0K", outfp); }
+            print_position(outfp, "GGA",  &position);
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
-            if (escape) { fputs("\033[1;1H\033[0K", stdout); }
-            print_position(stdout, "RMC", &position);
+            if (escape) { fputs("\033[1;1H\033[0K", outfp); }
+            print_position(outfp, "RMC", &position);
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
-            if (escape) { fputs("\033[2;1H\033[0K", stdout); }
-            print_constellation(stdout, "GSA", &constellation, 0);
+            if (escape) { fputs("\033[2;1H\033[0K", outfp); }
+            print_constellation(outfp, "GSA", &constellation, 0);
         } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
-            if (escape) { fputs("\033[2;1H\033[0J", stdout); }
-            print_constellation(stdout, "GSV", &constellation, !0);
+            if (escape) { fputs("\033[2;1H\033[0J", outfp); }
+            print_constellation(outfp, "GSV", &constellation, !0);
         } else {
             /* Do nothing. */
         }
-        fflush(stdout);
+        fflush(outfp);
 
     }
 

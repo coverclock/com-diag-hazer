@@ -20,6 +20,7 @@ int main(void)
     uint64_t denominator = 0;
     double value = 0;
     uint64_t number = 0;
+    uint8_t digits = 0;
 
     numerator = hazer_parse_fraction("", &denominator);
     assert(numerator == 0);
@@ -68,71 +69,93 @@ int main(void)
     number = hazer_parse_utc("235959.125");
     assert(number == 86399125000000ULL);
 
-    value = hazer_parse_latlon("00000", 'E');
+    value = hazer_parse_latlon("00000", 'E', &digits);
     assert(value == 0.0);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("00000", 'S');
+    value = hazer_parse_latlon("00000", 'S', &digits);
     assert(value == 0.0);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("18000", 'E');
+    value = hazer_parse_latlon("18000", 'E', &digits);
     assert(value == 180.0);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("18000", 'S');
+    value = hazer_parse_latlon("18000", 'S', &digits);
     assert(value == -180.0);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("18030", 'E');
+    value = hazer_parse_latlon("18030", 'E', &digits);
     assert(value == 180.5);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("18030", 'S');
+    value = hazer_parse_latlon("18030", 'S', &digits);
     assert(value == -180.5);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("18030.", 'E');
+    value = hazer_parse_latlon("18030.", 'E', &digits);
     assert(value == 180.5);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("18030.", 'W');
+    value = hazer_parse_latlon("18030.", 'W', &digits);
     assert(value == -180.5);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("18030.60", 'E');
+    value = hazer_parse_latlon("18030.60", 'E', &digits);
     assert(value == 180.51);
+    assert(digits == 7);
 
-    value = hazer_parse_latlon("18030.60", 'W');
+    value = hazer_parse_latlon("18030.60", 'W', &digits);
     assert(value == -180.51);
+    assert(digits == 7);
 
-    value = hazer_parse_latlon("0000", 'N');
+    value = hazer_parse_latlon("0000", 'N', &digits);
     assert(value == 0.0);
+    assert(digits == 4);
 
-    value = hazer_parse_latlon("0000", 'S');
+    value = hazer_parse_latlon("0000", 'S', &digits);
     assert(value == 0.0);
+    assert(digits == 4);
 
-    value = hazer_parse_latlon("9000", 'N');
+    value = hazer_parse_latlon("9000", 'N', &digits);
     assert(value == 90.0);
+    assert(digits == 4);
 
-    value = hazer_parse_latlon("9000", 'S');
+    value = hazer_parse_latlon("9000", 'S', &digits);
     assert(value == -90.0);
+    assert(digits == 4);
 
-    value = hazer_parse_latlon("9030", 'N');
+    value = hazer_parse_latlon("9030", 'N', &digits);
     assert(value == 90.5);
+    assert(digits == 4);
 
-    value = hazer_parse_latlon("9030", 'S');
+    value = hazer_parse_latlon("9030", 'S', &digits);
     assert(value == -90.5);
+    assert(digits == 4);
 
-    value = hazer_parse_latlon("9030.", 'N');
+    value = hazer_parse_latlon("9030.", 'N', &digits);
     assert(value == 90.5);
+    assert(digits == 4);
 
-    value = hazer_parse_latlon("9030.", 'S');
+    value = hazer_parse_latlon("9030.", 'S', &digits);
     assert(value == -90.5);
+    assert(digits == 4);
 
-    value = hazer_parse_latlon("9030.0", 'N');
+    value = hazer_parse_latlon("9030.0", 'N', &digits);
     assert(value == 90.5);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("9030.0", 'S');
+    value = hazer_parse_latlon("9030.0", 'S', &digits);
     assert(value == -90.5);
+    assert(digits == 5);
 
-    value = hazer_parse_latlon("9030.60", 'N');
+    value = hazer_parse_latlon("9030.60", 'N', &digits);
     assert(value == 90.51);
+    assert(digits == 6);
 
-    value = hazer_parse_latlon("9030.60", 'S');
+    value = hazer_parse_latlon("9030.60", 'S', &digits);
     assert(value == -90.51);
+    assert(digits == 6);
 
     value = hazer_parse_number("");
     assert(value == 0.0);

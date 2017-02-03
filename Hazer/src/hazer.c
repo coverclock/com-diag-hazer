@@ -524,7 +524,7 @@ void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int *
     *nanosecondsp = nanoseconds % 1000000000ULL;
 }
 
-double hazer_parse_latlon(const char * string, char direction)
+double hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp)
 {
     double latlon = 0.0;
     double fraction = 0.0;
@@ -532,11 +532,13 @@ double hazer_parse_latlon(const char * string, char direction)
     uint64_t denominator = 1;
     unsigned long dddmm = 0;
     char * end = (char *)0;
+    uint8_t digits = 0;
+
+    digits = strlen(string);
 
     dddmm = strtoul(string, &end, 10);
     latlon = dddmm / 100;
-    dddmm %= 100;
-    fraction = dddmm;
+    fraction = dddmm % 100;
     fraction /= 60;
     latlon += fraction;
    
@@ -546,6 +548,7 @@ double hazer_parse_latlon(const char * string, char direction)
         fraction /= 60;
         fraction /= denominator;
         latlon += fraction;
+        --digits;
     }
 
     switch (direction) {
@@ -560,10 +563,12 @@ double hazer_parse_latlon(const char * string, char direction)
         break;
     }
 
+    *digitsp = digits;
+
     return latlon; 
 }
 
-void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * directionp)
+void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * hundredthsp, int * directionp)
 {
     char direction = '\0';
     double integral = 0.0;
@@ -578,11 +583,12 @@ void hazer_format_degrees2position(double degrees, int * degreesp, int * minutes
     }
 
     fraction = modf(degrees, &integral);
-
-    *degreesp = trunc(integral);
-    *minutesp = trunc(fraction * 60.0);
+    *degreesp = integral;
+    *minutesp = fraction * 60.0;
     fraction -= *minutesp / 60.0;
-    *secondsp = trunc(fraction * 3600.0);
+    *secondsp = fraction * 3600.0;
+    fraction -= *secondsp / 3600.0;
+    *hundredthsp = fraction * 360000.0;
 }
 
 double hazer_parse_number(const char * string)
@@ -627,8 +633,8 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
         /* Do nothing. */
     } else {
         datap->utc_nanoseconds = hazer_parse_utc(vector[1]);
-        datap->lat_degrees = hazer_parse_latlon(vector[2], *(vector[3]));
-        datap->lon_degrees = hazer_parse_latlon(vector[4], *(vector[5]));
+        datap->lat_degrees = hazer_parse_latlon(vector[2], *(vector[3]), &datap->lat_digits);
+        datap->lon_degrees = hazer_parse_latlon(vector[4], *(vector[5]), &datap->lon_digits);
         datap->alt_meters = hazer_parse_alt(vector[9], *(vector[10]));
         rc = 0;
     }
@@ -649,8 +655,8 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
         /* Do nothing. */
     } else {
         datap->utc_nanoseconds = hazer_parse_utc(vector[1]);
-        datap->lat_degrees = hazer_parse_latlon(vector[3], *(vector[4]));
-        datap->lon_degrees = hazer_parse_latlon(vector[5], *(vector[6]));
+        datap->lat_degrees = hazer_parse_latlon(vector[3], *(vector[4]), &datap->lat_digits);
+        datap->lon_degrees = hazer_parse_latlon(vector[5], *(vector[6]), &datap->lon_digits);
         datap->sog_knots = hazer_parse_number(vector[7]);
         datap->cog_degrees = hazer_parse_number(vector[8]);
         datap->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
