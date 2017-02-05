@@ -66,6 +66,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     int seconds = 0;
     int hundredths = 0;
     int direction = 0;
+    const char * compass = (const char *)0;
 
     nanoseconds = pp->dmy_nanoseconds;
     if (nanoseconds == 0) { return; }
@@ -100,8 +101,11 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
 
     fprintf(fp, " %.2lf'", pp->alt_meters * 3.2808);
 
-    fprintf(fp, " %.2lftrue", pp->cog_degrees);
     assert((0.0 <= pp->cog_degrees) && (pp->cog_degrees <= 360.0));
+    compass = hazer_format_degrees2compass(pp->cog_degrees);
+    assert(compass != (const char *)0);
+    assert(strlen(compass) <= 4);
+    fprintf(fp, " %s", compass);
 
     fprintf(fp, " %.2lfmph", pp->sog_knots * 1.150779);
 
@@ -232,15 +236,6 @@ int main(int argc, char * argv[])
             fputs(buffer, errfp);
             fflush(errfp);
         }
-
-        rc = hazer_checksum2characters(ck, &msn, &lsn);
-        assert(rc >= 0);
-        assert(msn == buffer[size - 5]);
-        assert(lsn == buffer[size - 4]);
-
-        rc = hazer_characters2checksum(msn, lsn, &ck);
-        assert(rc >= 0);
-        assert(ck == cs);
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(count >= 0);

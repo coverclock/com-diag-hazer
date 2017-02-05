@@ -505,25 +505,6 @@ uint64_t hazer_parse_dmy(const char * string)
     return nanoseconds;
 }
 
-void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp)
-{
-    struct tm datetime = { 0 };
-    struct tm * dtp = (struct tm *)0;
-    time_t zulu = 0;
-
-    zulu = nanoseconds / 1000000000ULL;
-
-    dtp = gmtime_r(&zulu, &datetime);
-
-    *yearp = dtp->tm_year + 1900;
-    *monthp = dtp->tm_mon + 1;
-    *dayp = dtp->tm_mday;
-    *hourp = dtp->tm_hour;
-    *minutep = dtp->tm_min;
-    *secondp = dtp->tm_sec;
-    *nanosecondsp = nanoseconds % 1000000000ULL;
-}
-
 double hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp)
 {
     double latlon = 0.0;
@@ -568,6 +549,56 @@ double hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp
     return latlon; 
 }
 
+double hazer_parse_number(const char * string)
+{
+    double number = 0.0;
+    double fraction = 0;
+    uint64_t numerator = 0;
+    uint64_t denominator = 0;
+    char * end = (char *)0;
+
+    number = strtoul(string, &end, 10);
+
+    if (*end == HAZER_STIMULUS_DECIMAL) {
+        numerator = hazer_parse_fraction(end + 1, &denominator);
+        fraction = numerator;
+        fraction /= denominator;
+        number += fraction;
+    }
+
+    return number;
+}
+
+
+
+double hazer_parse_alt(const char * string, char units)
+{
+    return hazer_parse_number(string);
+}
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
+void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp)
+{
+    struct tm datetime = { 0 };
+    struct tm * dtp = (struct tm *)0;
+    time_t zulu = 0;
+
+    zulu = nanoseconds / 1000000000ULL;
+
+    dtp = gmtime_r(&zulu, &datetime);
+
+    *yearp = dtp->tm_year + 1900;
+    *monthp = dtp->tm_mon + 1;
+    *dayp = dtp->tm_mday;
+    *hourp = dtp->tm_hour;
+    *minutep = dtp->tm_min;
+    *secondp = dtp->tm_sec;
+    *nanosecondsp = nanoseconds % 1000000000ULL;
+}
+
 void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * hundredthsp, int * directionp)
 {
     char direction = '\0';
@@ -591,29 +622,22 @@ void hazer_format_degrees2position(double degrees, int * degreesp, int * minutes
     *hundredthsp = fraction * 360000.0;
 }
 
-double hazer_parse_number(const char * string)
+const char * hazer_format_degrees2compass(double degrees)
 {
-    double number = 0.0;
-    double fraction = 0;
-    uint64_t numerator = 0;
-    uint64_t denominator = 0;
-    char * end = (char *)0;
+    static const char * COMPASS[] = {
+        "N", "NbE", "NNE", "NEbN", "NE", "NEbE", "ENE", "EbN",
+        "E", "EbS", "ESE", "SEbE", "SE", "SEbS", "SSE", "SbE",
+        "S", "SbW", "SSW", "SWbS", "SW", "SWbW", "WSW", "WbS",
+        "W", "WbN", "WNW", "NWbW", "NW", "NWbN", "NNW", "NbW",
+    };
+    unsigned long index = 0;
 
-    number = strtoul(string, &end, 10);
+    index = truncf(degrees);
+    index %= 360;
+    if (index < 0) { index += 360; }
+    index /= 360 / (sizeof(COMPASS) / sizeof(COMPASS[0]));
 
-    if (*end == HAZER_STIMULUS_DECIMAL) {
-        numerator = hazer_parse_fraction(end + 1, &denominator);
-        fraction = numerator;
-        fraction /= denominator;
-        number += fraction;
-    }
-
-    return number;
-}
-
-double hazer_parse_alt(const char * string, char units)
-{
-    return hazer_parse_number(string);
+    return COMPASS[index];
 }
 
 /******************************************************************************

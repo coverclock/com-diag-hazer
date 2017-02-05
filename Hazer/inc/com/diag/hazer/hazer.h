@@ -48,6 +48,9 @@
  *
  * "Decimal degrees", Wikipedia,
  * https://en.wikipedia.org/wiki/Decimal_degrees, 2016-11-04
+ *
+ * "Points of the compass", Wikipedia,
+ * https://en.wikipedia.org/wiki/Points_of_the_compass, 2017-01-17
  */
 
 #include <stdio.h>
@@ -411,7 +414,7 @@ extern int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_
 extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp);
 
 /**
- * Format decimal degrees into separate values.
+ * Format decimal degrees of latitude or longitude into separate values.
  * @param degrees is a longitude or latitude in decimal degrees.
  * @param degreesp points to where the integral degrees (e.g. 180) is stored.
  * @param minutesp points to where the minutes (0..59) are stored.
@@ -420,5 +423,13 @@ extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp
  * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
  */
 extern void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * hundredsthp, int * directionp);
+
+/**
+ * Format decimal degrees of compass bearing in a pointer to a name of a
+ * compass point on a thirty-two point compass.
+ * @param degrees is a bearing or heading in compass degrees.
+ * @return a compass point string in upper case.
+ */
+extern const char * hazer_format_degrees2compass(double degrees);
 
 #endif
