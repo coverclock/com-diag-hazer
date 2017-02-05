@@ -14,6 +14,11 @@
 #include <assert.h>
 #include "com/diag/hazer/hazer.h"
 
+/**
+ * Deriged from "Points of the compass" in Wikipedia except that, remarkably, I don't think
+ * it's correct. The "32 cardinal points" table needs to have three fractional digits to be
+ * accurate.
+ */
 static struct {
     const char name[8];
     unsigned int minimum;
