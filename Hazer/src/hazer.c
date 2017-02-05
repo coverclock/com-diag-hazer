@@ -630,12 +630,14 @@ const char * hazer_format_degrees2compass(double degrees)
         "S", "SbW", "SSW", "SWbS", "SW", "SWbW", "WSW", "WbS",
         "W", "WbN", "WNW", "NWbW", "NW", "NWbN", "NNW", "NbW",
     };
+    static const int INCREMENT = 360000 / (sizeof(COMPASS) / sizeof(COMPASS[0]));
     unsigned long index = 0;
 
-    index = truncf(degrees);
-    index %= 360;
-    if (index < 0) { index += 360; }
-    index /= 360 / (sizeof(COMPASS) / sizeof(COMPASS[0]));
+    index = degrees * 1000.0;
+    index += INCREMENT / 2;
+    index %= 360000;
+    if (index < 0) { index += 360000; }
+    index /= INCREMENT;
 
     return COMPASS[index];
 }
