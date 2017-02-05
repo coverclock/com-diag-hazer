@@ -19,28 +19,31 @@
 #include <stdint.h>
 #include "com/diag/hazer/hazer.h"
 
-static void print_constellation(FILE *fp, const char * name, const hazer_constellation_t * cp, int full)
+static void print_solution(FILE *fp, const char * name, const hazer_constellation_t * cp)
 {
     static const int SATELLITES = sizeof(cp->id) / sizeof(cp->id[0]);
+    int satellite = 0;
+    int satellites = 0;
+    int limit = 0;
+
+    satellites = cp->satellites;
+    limit = (satellites > SATELLITES) ? SATELLITES : satellites;
+
+    fprintf(fp, "%s {", name);
+    for (satellite = 0; satellite < limit; ++satellite) {
+        if (cp->id[satellite] != 0) {
+            fprintf(fp, " %2u", cp->id[satellite]);
+        }
+    }
+    fprintf(fp, " } [%02d/%02d] pdop %.2lf hdop %.2lf vdop %.2lf\n", satellites, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
+}
+
+static void print_constellation(FILE *fp, const char * name, const hazer_constellation_t * cp)
+{
     static const int CHANNELS = sizeof(cp->sat) / sizeof(cp->sat[0]);
     int channel = 0;
     int channels = 0;
     int limit = 0;
-
-    channels = cp->satellites;
-    limit = (channels > SATELLITES) ? SATELLITES : channels;
-
-    fprintf(fp, "%s {", name);
-    for (channel = 0; channel < limit; ++channel) {
-        if (cp->id[channel] != 0) {
-            fprintf(fp, " %2u", cp->id[channel]);
-        }
-    }
-    fprintf(fp, " } [%02d/%02d] pdop %.2lf hdop %.2lf vdop %.2lf\n", channels, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
-
-    if (!full) {
-        return;
-    }
 
     channels = cp->channels;
     limit = (channels > CHANNELS) ? CHANNELS : channels;
@@ -256,10 +259,10 @@ int main(int argc, char * argv[])
             print_position(outfp, "RMC", &position);
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            print_constellation(outfp, "GSA", &constellation, 0);
+            print_solution(outfp, "GSA", &constellation);
         } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
-            if (escape) { fputs("\033[3;1H\033[0J", outfp); }
-            print_constellation(outfp, "GSV", &constellation, !0);
+            if (escape) { fputs("\033[4;1H\033[0J", outfp); }
+            print_constellation(outfp, "GSV", &constellation);
         } else {
             /* Do nothing. */
         }
