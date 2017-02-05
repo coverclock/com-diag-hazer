@@ -19,7 +19,26 @@
 #include <stdint.h>
 #include "com/diag/hazer/hazer.h"
 
-static void print_solution(FILE *fp, const char * name, const hazer_constellation_t * cp)
+static int send_sentence(FILE * fp, const char * data)
+{
+    int rc = -1;
+    uint8_t cs = 0;
+    char msn = '\0';
+    char lsn = '\0';
+
+    do {
+        cs = hazer_checksum(data, strlen(data));
+        if (hazer_checksum2characters(cs, &msn, &lsn) < 0) { break; }
+        if (fprintf(fp, "%s%c%c%c\r\n", data, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) { break; }
+        if (fflush(fp) == EOF) { break; }
+        rc = 0;
+
+    } while (0);
+
+    return rc;
+}
+
+static void print_solution(FILE * fp, const char * name, const hazer_constellation_t * cp)
 {
     static const int SATELLITES = sizeof(cp->id) / sizeof(cp->id[0]);
     int satellite = 0;
@@ -153,7 +172,7 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    while ((opt = getopt(argc, argv, "derv?")) >= 0) {
+    while ((opt = getopt(argc, argv, "dervw:?")) >= 0) {
         switch (opt) {
         case 'd':
             debug = !0;
@@ -168,12 +187,16 @@ int main(int argc, char * argv[])
         case 'v':
             verbose = !0;
             break;
+        case 'w':
+            return send_sentence(outfp, optarg) < 0 ? 1 : 0;
+            break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -e ]\n", program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -e ] [ -w S ]\n", program);
             fprintf(stderr, "       -d      Display debug output to standard error.\n");
             fprintf(stderr, "       -e      Use ANSI escape sequences to control display.\n");
             fprintf(stderr, "       -r      Reverse use of standard output and error.\n");
             fprintf(stderr, "       -v      Display verbose output to standard error.\n");
+            fprintf(stderr, "       -w S    Append * and checksum to S and write to standard output.\n");
             return 1;
             break;
         }

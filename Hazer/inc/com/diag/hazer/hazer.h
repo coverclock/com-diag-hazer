@@ -92,15 +92,20 @@ extern int hazer_finalize(void);
 /**
  * NMEA 0183 4.10, 5.3.3.1, Table 1
  * NMEA 0183 4.10, 5.3
- * N.B. SiRF NMEA, p. 2-2 has an example which appears to violate the
+ *
+ * SiRF NMEA, p. 2-2 has an example which appears to violate the
  * NMEA spec as to the length of the message ID.
+ *
+ * The USGlobalSat ND-105C routinely violates the NMEA spec as to
+ * the maximum message length of 79 characters between the initial
+ * '$' and the terminating \r\n by (so far) one character.
  */
 enum HazerConstant {
     HAZER_CONSTANT_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
-    HAZER_CONSTANT_NMEA_LONGEST     = 82,
+    HAZER_CONSTANT_NMEA_LONGEST     = 83, /* Adjusted. */
     HAZER_CONSTANT_NMEA_TALKER      = sizeof("GP") - 1,
-    HAZER_CONSTANT_NMEA_MESSAGE     = sizeof("GGA") - 1,
-    HAZER_CONSTANT_NMEA_ID          = sizeof("$GPGGA") - 1,
+    HAZER_CONSTANT_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
+    HAZER_CONSTANT_NMEA_ID          = sizeof("$GPGGAXX") - 1, /* Adjusted. */
     HAZER_CONSTANT_GPS_CHANNELS     = 48,
     HAZER_CONSTANT_GPS_VIEWS        = 4,
     HAZER_CONSTANT_GPS_SATELLITES   = 12,

@@ -1,4 +1,6 @@
 #!/bin/bash
 stty sane
 clear
-serialtool -D /dev/ttyUSB0 -b 4800 -8 -1 -n -l | gpstool  -e
+DEVICE=${1:-"/dev/ttyUSB0"}
+SPEED=${2:-"4800"}
+serialtool -D ${DEVICE} -b ${SPEED} -8 -1 -n -l | gpstool  -e

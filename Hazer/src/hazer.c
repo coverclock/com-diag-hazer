@@ -333,7 +333,7 @@ uint8_t hazer_checksum(const void * buffer, size_t size)
         cs = ch;
         --ss;
 
-        while ((ss > 0) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
+        while ((ss > 0) && (*bb != HAZER_STIMULUS_CHECKSUM) && (*bb != '\0')) {
             ch = *(bb++);
             cs ^= ch;
             --ss;
@@ -380,7 +380,7 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     } else if ((0xa <= msn) && (msn <= 0xf)) {
         *msnp = 'A' + msn - 10;
     } else {
-        rc = -1;
+        rc = -1; /* Impossible. */
     }
 
     lsn = ck & 0xf;
@@ -390,7 +390,7 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     } else if ((0xa <= lsn) && (lsn <= 0xf)) {
         *lsnp = 'A' + lsn - 10;
     } else {
-        rc = -1;
+        rc = -1; /* Impossible. */
     }
 
     return rc;
