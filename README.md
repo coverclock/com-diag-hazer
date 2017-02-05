@@ -64,6 +64,11 @@ Example:
     GSV [11/12/48] sat  1 elv  6 azm 320 snr 24dBHz
     GSV [12/12/48] sat 51 elv 43 azm 183 snr 45dBHz
 
+Hazer has been successfully tested with the following devices.
+
+	USGlobalSat BU-535S4
+	USGlobalSat ND-105C
+
 This software is an original work of its author(s).
 
 Contact:
