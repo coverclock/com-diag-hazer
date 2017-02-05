@@ -19,38 +19,38 @@ static struct {
     unsigned int minimum;
     unsigned int maximum;
 } POINT[] = {
-    { "N", 354380, 5630 },
-    { "NbE", 5630, 16880 },
-    { "NNE", 16880, 28130 },
-    { "NEbN", 28130, 39380 },
-    { "NE", 39380, 50630 },
-    { "NEbE", 50630, 61880 },
-    { "ENE", 61880, 73130 },
-    { "EbN", 73130, 84380 },
-    { "E", 84380, 95630 },
-    { "EbS", 95630, 106880 },
-    { "ESE", 106880, 118130 },
-    { "SEbE", 118130, 129380 },
-    { "SE", 129380, 140630 },
-    { "SEbS", 140630, 151880 },
-    { "SSE", 151880, 163130 },
-    { "SbE", 163130, 174380 },
-    { "S", 174380, 185630 },
-    { "SbW", 185630, 196880 },
-    { "SSW", 196880, 208130 },
-    { "SWbS", 208130, 219380 },
-    { "SW", 219380, 230630 },
-    { "SWbW", 230630, 241880 },
-    { "WSW", 241880, 253130 },
-    { "WbS", 253130, 264380 },
-    { "W", 264380, 275630 },
-    { "WbN", 275630, 286880 },
-    { "WNW", 286880, 298130 },
-    { "NWbW", 298130, 309380 },
-    { "NW", 309380, 320630 },
-    { "NWbN", 320630, 331880 },
-    { "NNW", 331880, 343130 },
-    { "NbW", 343130, 354380 },
+    { "N", 354375, 5625 },
+    { "NbE", 5625, 16875 },
+    { "NNE", 16875, 28125 },
+    { "NEbN", 28125, 39375 },
+    { "NE", 39375, 50625 },
+    { "NEbE", 50625, 61875 },
+    { "ENE", 61875, 73125 },
+    { "EbN", 73125, 84375 },
+    { "E", 84375, 95625 },
+    { "EbS", 95625, 106875 },
+    { "ESE", 106875, 118125 },
+    { "SEbE", 118125, 129375 },
+    { "SE", 129375, 140625 },
+    { "SEbS", 140625, 151875 },
+    { "SSE", 151875, 163125 },
+    { "SbE", 163125, 174375 },
+    { "S", 174375, 185625 },
+    { "SbW", 185625, 196875 },
+    { "SSW", 196875, 208125 },
+    { "SWbS", 208125, 219375 },
+    { "SW", 219375, 230625 },
+    { "SWbW", 230625, 241875 },
+    { "WSW", 241875, 253125 },
+    { "WbS", 253125, 264375 },
+    { "W", 264375, 275625 },
+    { "WbN", 275625, 286875 },
+    { "WNW", 286875, 298125 },
+    { "NWbW", 298125, 309375 },
+    { "NW", 309375, 320625 },
+    { "NWbN", 320625, 331875 },
+    { "NNW", 331875, 343125 },
+    { "NbW", 343125, 354375 },
 };
 
 int main(void)
@@ -66,22 +66,18 @@ int main(void)
         for (index = 0; index < (sizeof(POINT) / sizeof(POINT[0])); ++index) {
             if (index == 0) {
                 if ((POINT[index].minimum <= millidegrees) && (millidegrees < 360000)) {
-                    printf("%.2lf %s %d (%.2lf <= %.2lf < %.2lf) %s\n", degrees, name, index, POINT[index].minimum / 1000.0, degrees, 360.00,  POINT[index].name);
                     break;
                 }
                 if ((0 <= millidegrees) && (millidegrees < POINT[index].maximum)) {
-                    printf("%.2lf %s %d (%.2lf <= %.2lf < %.2lf) %s\n", degrees, name, index, 0.00, degrees, POINT[index].maximum / 1000.0, POINT[index].name);
                     break;
                 }
             } else {
                 if ((POINT[index].minimum <= millidegrees) && (millidegrees < POINT[index].maximum)) {
-                    printf("%.2lf %s %d (%.2lf <= %.2lf < %.2lf) %s\n", degrees, name, index, POINT[index].minimum / 1000.0, degrees, POINT[index].maximum / 1000.0, POINT[index].name);
                     break;
                 }
             }
         }
-        if (index >= (sizeof(POINT) / sizeof(POINT[0]))) {
-            printf("%.2lf %s\n", degrees, name);
-        }
+        assert(index < (sizeof(POINT) / sizeof(POINT[0])));
+        assert(strcmp(name, POINT[index].name) == 0);
     }
 }
