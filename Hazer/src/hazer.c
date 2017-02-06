@@ -119,13 +119,13 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
     case HAZER_STATE_START:
         if (ch == HAZER_STIMULUS_START) {
             DEBUG("START '%c'.\n", ch);
-            state = HAZER_STATE_TALKER_1;
+            state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
             *bp = (char *)buffer;
             *sp = size;
         } else if (ch == HAZER_STIMULUS_ENCAPSULATION) {
             DEBUG("ENCAPSULATE '%c'.\n", ch);
-            state = HAZER_STATE_CHECKSUM;
+            state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
             *bp = (char *)buffer;
             *sp = size;
@@ -134,79 +134,19 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         }
         break;
 
-    case HAZER_STATE_TALKER_1:
-        if (ch == HAZER_STIMULUS_DELIMITER) {
-            DEBUG("STARTING '%c'!\n", ch);
-            state = HAZER_STATE_START;
-        } else {
-            state = HAZER_STATE_TALKER_2;
-            action = HAZER_ACTION_SAVE;
-        }
-        break;
-
-    case HAZER_STATE_TALKER_2:
-        if (ch == HAZER_STIMULUS_DELIMITER) {
-            DEBUG("STARTING '%c'!\n", ch);
-            state = HAZER_STATE_START;
-        } else {
-            state = HAZER_STATE_MESSAGE_1;
-            action = HAZER_ACTION_SAVE;
-        }
-        break;
-
-    case HAZER_STATE_MESSAGE_1:
-        if (ch == HAZER_STIMULUS_DELIMITER) {
-            DEBUG("STARTING '%c'!\n", ch);
-            state = HAZER_STATE_START;
-        } else {
-            state = HAZER_STATE_MESSAGE_2;
-            action = HAZER_ACTION_SAVE;
-        }
-        break;
-
-    case HAZER_STATE_MESSAGE_2:
-        if (ch == HAZER_STIMULUS_DELIMITER) {
-            DEBUG("STARTING '%c'!\n", ch);
-            state = HAZER_STATE_START;
-        } else {
-            state = HAZER_STATE_MESSAGE_3;
-            action = HAZER_ACTION_SAVE;
-        }
-        break;
-
-    case HAZER_STATE_MESSAGE_3:
-        if (ch == HAZER_STIMULUS_DELIMITER) {
-            DEBUG("STARTING '%c'!\n", ch);
-            state = HAZER_STATE_START;
-        } else {
-            state = HAZER_STATE_DELIMITER;
-            action = HAZER_ACTION_SAVE;
-        }
-        break;
-
-    case HAZER_STATE_DELIMITER:
-        if (ch == HAZER_STIMULUS_DELIMITER) {
-            state = HAZER_STATE_CHECKSUM;
-            action = HAZER_ACTION_SAVE;
-        } else {
-            DEBUG("STARTING 0x%x!\n", ch);
-            state = HAZER_STATE_START;
-        }
-        break;
-
-    case HAZER_STATE_CHECKSUM:
+    case HAZER_STATE_BODY:
         if (ch == HAZER_STIMULUS_CHECKSUM) {
-            state = HAZER_STATE_CHECKSUM_1;
+            state = HAZER_STATE_MSN;
         }
         action = HAZER_ACTION_SAVE;
         break;
 
-    case HAZER_STATE_CHECKSUM_1:
+    case HAZER_STATE_MSN:
         if ((HAZER_STIMULUS_DECMIN <= ch) && (ch <= HAZER_STIMULUS_DECMAX)) {
-            state = HAZER_STATE_CHECKSUM_2;
+            state = HAZER_STATE_LSN;
             action = HAZER_ACTION_SAVE;
         } else if ((HAZER_STIMULUS_HEXMIN <= ch) && (ch <= HAZER_STIMULUS_HEXMAX)) {
-            state = HAZER_STATE_CHECKSUM_2;
+            state = HAZER_STATE_LSN;
             action = HAZER_ACTION_SAVE;
         } else {
             DEBUG("STARTING 0x%x!\n", ch);
@@ -214,7 +154,7 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         }
         break;
 
-    case HAZER_STATE_CHECKSUM_2:
+    case HAZER_STATE_LSN:
         if ((HAZER_STIMULUS_DECMIN <= ch) && (ch <= HAZER_STIMULUS_DECMAX)) {
             state = HAZER_STATE_CR;
             action = HAZER_ACTION_SAVE;
