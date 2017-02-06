@@ -66,8 +66,8 @@ Example:
 
 Hazer has been successfully tested with the following devices.
 
-	USGlobalSat BU-535S4
-	USGlobalSat ND-105C
+	USGlobalSat BU-535S4 (SiRF Star IV chipset)
+	USGlobalSat ND-105C (SiRF Star III chipset)
 
 This software is an original work of its author(s).
 
