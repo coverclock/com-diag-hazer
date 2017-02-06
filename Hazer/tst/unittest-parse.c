@@ -242,11 +242,11 @@ int main(void)
     assert(digits == 2);
 
     millimeters = hazer_parse_alt("521.125", 'M', &digits);
-    assert(millimeters == 521125000ULL);
+    assert(millimeters == 521125ULL);
     assert(digits == 6);
 
     millimeters = hazer_parse_alt("-521.125", 'M', &digits);
-    assert(millimeters == -521125000ULL);
+    assert(millimeters == -521125ULL);
     assert(digits == 6);
 
     /**************************************************************************/

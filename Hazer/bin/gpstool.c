@@ -156,6 +156,8 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     decimal /= 1000000.0;
     fprintf(fp, " %.3lf", decimal);
 
+    fprintf(fp, " %d %d %d %d %d", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->sog_digits);
+
     fputc('\n', fp);
 }
 
