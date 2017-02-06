@@ -569,7 +569,7 @@ int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp)
     digits = strlen(string);
 
     millimeters = strtol(string, &end, 10);
-    millimeters *= 1000000LL;
+    millimeters *= 1000LL;
 
     if (millimeters < 0) {
         --digits;
@@ -577,7 +577,7 @@ int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp)
 
     if (*end == HAZER_STIMULUS_DECIMAL) {
         fraction = hazer_parse_fraction(end + 1, &denominator);
-        fraction *= 1000000;
+        fraction *= 1000;
         fraction /= denominator;
         if (millimeters < 0) {
             millimeters -= fraction;

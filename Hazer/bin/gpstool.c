@@ -89,6 +89,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     int hundredths = 0;
     int direction = 0;
     const char * compass = (const char *)0;
+    double decimal = 0.0;
 
     nanoseconds = pp->dmy_nanoseconds;
     if (nanoseconds == 0) { return; }
@@ -121,7 +122,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     assert((0 <= hundredths) && (hundredths <= 99));
     fprintf(fp, " %d %02d' %02d.%02d\"%c }", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
-    fprintf(fp, " %.2lf'", pp->alt_millimeters * 3.2808 / 1000000.0);
+    fprintf(fp, " %.2lf'", pp->alt_millimeters * 3.2808 / 1000.0);
 
     assert((0LL <= pp->cog_nanodegrees) && (pp->cog_nanodegrees <= 360000000000LL));
     compass = hazer_format_nanodegrees2compass(pp->cog_nanodegrees);
@@ -130,6 +131,30 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     fprintf(fp, " %s", compass);
 
     fprintf(fp, " %.2lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
+
+    fputc('\n', fp);
+
+    fputs("MAP", fp);
+
+    decimal = pp->lat_nanodegrees;
+    decimal /= 1000000000.0;
+    fprintf(fp, " { %.6lf", decimal);
+
+    decimal = pp->lon_nanodegrees;
+    decimal /= 1000000000.0;
+    fprintf(fp, ",%.6lf }", decimal);
+
+    decimal = pp->alt_millimeters;
+    decimal /= 1000.0;
+    fprintf(fp, " %.3lf", decimal);
+
+    decimal = pp->cog_nanodegrees;
+    decimal /= 1000000000.0;
+    fprintf(fp, " %.3lf", decimal);
+
+    decimal = pp->sog_microknots;
+    decimal /= 1000000.0;
+    fprintf(fp, " %.3lf", decimal);
 
     fputc('\n', fp);
 }
@@ -281,10 +306,10 @@ int main(int argc, char * argv[])
             if (escape) { fputs("\033[2;1H\033[0K", outfp); }
             print_position(outfp, "RMC", &position);
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
-            if (escape) { fputs("\033[3;1H\033[0K", outfp); }
+            if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             print_solution(outfp, "GSA", &constellation);
         } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
-            if (escape) { fputs("\033[4;1H\033[0J", outfp); }
+            if (escape) { fputs("\033[5;1H\033[0J", outfp); }
             print_constellation(outfp, "GSV", &constellation);
         } else {
             /* Do nothing. */
