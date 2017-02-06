@@ -12,13 +12,14 @@
  *
  * This file is part of the Digital Aggregates Corporation Hazer package.
  * Hazer is a simple C-based parser of the National Marine Electronics
- * Association (NMEA) strings produced by the USGlobalSat BU-353S4 Global
- * Positioning System (GPS) device, a tiny little external GPS receiver that
- * emits NMEA strings over its built-in USB-to-serial adaptor. The BU-353S4
- * is based on the SiRF Star IV chipset. If you want to futz around with
- * satellite geolocation, the BU-353S4 is a cheap and easy way to do it.
- * Hazer may be useful with other GPS devices that produce NMEA sentences,
- * but the BU-353S4 is what it was tested with.
+ * Association (NMEA) strings produced by typical consumer GPS devices.
+ *
+ * This code deliberately tries to avoid using floating poing arithmetic.
+ * Some of the smaller embedded platforms I work on don't have floating
+ * point hardware, relying instead on library-based software emulation
+ * with a significant performance impact. Also, most of the time it just
+ * isn't necessary. If the calling application wants to use floating point,
+ * I'm okay with that.
  *
  * REFERENCES
  *
@@ -284,13 +285,42 @@ extern uint64_t hazer_parse_dmy(const char * string);
 
 /**
  * Parse a string containing the latitude or longitude in NMEA format into
- * a double precision floating point value in units of decimal degrees.
+ * a signed integer number of nanodegrees.
  * @param string points to the string.
- * @param direction is the NMEA direction: N, S, E, W.
+ * @param direction is the NMEA direction: 'N', 'S', 'E', or 'W'.
  * @param digitsp points to where the number of digits is stored.
- * @return degrees in double precision floating point decimal.
+ * @return nanodegrees.
  */
-extern double hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp);
+extern int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp);
+
+/**
+ * Parse a string containing a heading (bearing) in degrees in NMEA format
+ * into a signed integer number of nanodegrees.
+ * @param string points to the string.
+ * @param digitsp points to where the number of digits is stored.
+ * @return nanodegrees.
+ */
+extern int64_t hazer_parse_cog(const char * string, uint8_t * digitsp);
+
+/**
+ * Parse a string containing a speed in knots in NMEA format into a
+ * signed integer number of microknots.
+ * @param string points to the string.
+ * @param digitsp points to where the number of digits is stored.
+ * @return microknots.
+ */
+extern int64_t hazer_parse_sog(const char * string, uint8_t * digitsp);
+
+/**
+ * Parse a decimal number representing altitude above Mean Sea Level (MSL)
+ * into integer millimeters. (Currently the units field is ignored and the
+ * units are assumed to be meters.)
+ * @param string points to the string.
+ * @param units is the units ('M' for meters).
+ * @param digitsp points to where the number of digits is stored.
+ * @return millimeters.
+ */
+extern int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp);
 
 /**
  * Parse any decimal number with or without a fractional part into a
@@ -298,17 +328,7 @@ extern double hazer_parse_latlon(const char * string, char direction, uint8_t * 
  * @param string points the string.
  * @return a double precision floating point value.
  */
-extern double hazer_parse_number(const char * string);
-
-/**
- * Parse a decimal number representing altitude above Mean Sea Level (MSL)
- * into a douple precision floating point value. (Currently the units field
- * is ignored and the units are assumed to be meters.)
- * @param string points to the string.
- * @param units is the units ('M' for meters).
- * @return a double precision floating point value.
- */
-extern double hazer_parse_alt(const char * string, char units);
+extern double hazer_parse_num(const char * string);
 
 /*********************************************************************************
  * PARSING POSITION, HEADING, AND VELOCITY SENTENCES
@@ -319,15 +339,19 @@ extern double hazer_parse_alt(const char * string, char units);
  * derived from the NMEA stream.
  */
 typedef struct HazerPosition {
-    uint64_t utc_nanoseconds;
-    uint64_t dmy_nanoseconds;
-    double lat_degrees;
-    double lon_degrees;
-    double alt_meters;
-    double sog_knots;
-    double cog_degrees;
-    uint8_t lat_digits;
-    uint8_t lon_digits;
+    uint64_t utc_nanoseconds;   /* Time in nanoseconds since 00:00 UTC. */
+    uint64_t dmy_nanoseconds;   /* Date in nanoseconds since POSIX epoch. */
+    int64_t lat_nanodegrees;    /* Latitude in nanodegrees. */
+    int64_t lon_nanodegrees;    /* Longitude in nanodegrees. */
+    int64_t alt_millimeters;    /* Altitude in millimeters. */
+    int64_t sog_microknots;     /* Speed On Ground in microknots. */
+    int64_t cog_nanodegrees;    /* Course On Ground in nanodegrees. */
+    uint8_t lat_digits;         /* Significant digiits of latitude. */
+    uint8_t lon_digits;         /* Signficant digits of longitute. */
+    uint8_t alt_digits;         /* Significant digits of altitude. */
+    uint8_t sog_digits;         /* Signficant digits of Speed On Ground. */
+    uint8_t cog_digits;         /* Signficant digits of Course On Ground. */
+    uint8_t unused[3];          /* Unused. */
 } hazer_position_t;
 
 /**
@@ -357,10 +381,11 @@ extern int hazer_parse_rmc(hazer_position_t *datap, char * vector[], size_t coun
  * single satellite.
  */
 typedef struct HazerSatellite {
-    uint16_t elv_degrees;
-    uint16_t azm_degrees;
-    uint8_t id;
-    uint8_t snr_dbhz;
+    uint16_t elv_degrees;       /* Elevation in whole dregrees. */
+    uint16_t azm_degrees;       /* Azimuth in whole degrees. */
+    uint8_t id;                 /* Satellite IDentifier. */
+    uint8_t snr_dbhz;           /* Signal/Noise Ratio in dBHz. */
+    uint8_t unused[2];          /* Unused. */
 } hazer_satellite_t;
 
 /**
@@ -368,13 +393,14 @@ typedef struct HazerSatellite {
  * have channels configured.
  */
 typedef struct HazerConstellation {
-    double pdop;
-    double hdop;
-    double vdop;
-    uint8_t satellites;
-    uint8_t id[HAZER_CONSTANT_GPS_SATELLITES];
-    uint8_t channels;
-    hazer_satellite_t sat[HAZER_CONSTANT_GPS_CHANNELS];
+    double pdop;                /* Position Dilution Of Precision. */
+    double hdop;                /* Horizontal Dilution Of Precisioin. */
+    double vdop;                /* Vertical Diilution Of Precisioin. */
+    uint8_t satellites;         /* Number of satellites used in soluton. */
+    uint8_t id[HAZER_CONSTANT_GPS_SATELLITES];  /* Satellite IDentifiers. */
+    uint8_t channels;           /* Number of channels used in view. */
+    uint8_t unused[2];          /* Unused. */
+    hazer_satellite_t sat[HAZER_CONSTANT_GPS_CHANNELS]; /* Satellites viewed. */
 } hazer_constellation_t;
 
 /**
@@ -413,22 +439,22 @@ extern int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_
 extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp);
 
 /**
- * Format decimal degrees of latitude or longitude into separate values.
- * @param degrees is a longitude or latitude in decimal degrees.
+ * Format nanodegrees of latitude or longitude into separate values.
+ * @param nanodegrees is a longitude or latitude in nanodegrees.
  * @param degreesp points to where the integral degrees (e.g. 180) is stored.
  * @param minutesp points to where the minutes (0..59) are stored.
  * @param secondsp points to where the seconds (0..59) are stored.
  * @param hundredsthp points to there the fractional seconds (0..99) are stored.
  * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
  */
-extern void hazer_format_degrees2position(double degrees, int * degreesp, int * minutesp, int * secondsp, int * hundredsthp, int * directionp);
+extern void hazer_format_nanodegrees2position(int64_t nanodegrees, int * degreesp, int * minutesp, int * secondsp, int * hundredsthp, int * directionp);
 
 /**
- * Format decimal degrees of compass bearing in a pointer to a name of a
+ * Format nanodegrees of compass bearing in a pointer to a name of a
  * compass point on a thirty-two point compass.
- * @param degrees is a bearing or heading in compass degrees.
+ * @param nanodegrees is a bearing or heading in compass nanodegrees.
  * @return a compass point string in upper case.
  */
-extern const char * hazer_format_degrees2compass(double degrees);
+extern const char * hazer_format_nanodegrees2compass(int64_t nanodegrees);
 
 #endif

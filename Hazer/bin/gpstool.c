@@ -107,29 +107,29 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
 
     /* Latitude and longitude are printed in a format maps.google.com kinda likes. */
 
-    hazer_format_degrees2position(pp->lat_degrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+    hazer_format_nanodegrees2position(pp->lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
     assert((0 <= degrees) && (degrees <= 90));
     assert((0 <= minutes) && (minutes <= 59));
     assert((0 <= seconds) && (seconds <= 59));
     assert((0 <= hundredths) && (hundredths <= 99));
     fprintf(fp, " { %d %02d' %02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
 
-    hazer_format_degrees2position(pp->lon_degrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+    hazer_format_nanodegrees2position(pp->lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
     assert((0 <= degrees) && (degrees <= 180));
     assert((0 <= minutes) && (minutes <= 59));
     assert((0 <= seconds) && (seconds <= 59));
     assert((0 <= hundredths) && (hundredths <= 99));
     fprintf(fp, " %d %02d' %02d.%02d\"%c }", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
-    fprintf(fp, " %.2lf'", pp->alt_meters * 3.2808);
+    fprintf(fp, " %.2lf'", pp->alt_millimeters * 3.2808 / 1000000.0);
 
-    assert((0.0 <= pp->cog_degrees) && (pp->cog_degrees <= 360.0));
-    compass = hazer_format_degrees2compass(pp->cog_degrees);
+    assert((0LL <= pp->cog_nanodegrees) && (pp->cog_nanodegrees <= 360000000000LL));
+    compass = hazer_format_nanodegrees2compass(pp->cog_nanodegrees);
     assert(compass != (const char *)0);
     assert(strlen(compass) <= 4);
     fprintf(fp, " %s", compass);
 
-    fprintf(fp, " %.2lfmph", pp->sog_knots * 1.150779);
+    fprintf(fp, " %.2lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
 
     fputc('\n', fp);
 }
