@@ -748,7 +748,7 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
     int limit = sizeof(datap->sat) / sizeof(datap->sat[0]);
     unsigned int id = 0;
     
-    if (count < 11) { 
+    if (count < 5) {
         /* Do nothing. */
     } else if (strncmp(vector[0], GSV, sizeof(GSV) - 1) != 0) {
         /* Do nothing. */
