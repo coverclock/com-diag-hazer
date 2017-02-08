@@ -23,6 +23,10 @@
 #include <errno.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/diminuto/diminuto_serial.h"
+#include "com/diag/diminuto/diminuto_ipc4.h"
+#include "com/diag/diminuto/diminuto_ipc6.h"
+
+typedef enum Protocol { IPV4 = 4, IPV6 = 6, } protocol_t;
 
 static int send_sentence(FILE * fp, const char * data)
 {
@@ -167,6 +171,35 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     fputc('\n', fp);
 }
 
+static void send_position(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, diminuto_ipv6_t * ipv6p, diminuto_port_t port,  const hazer_position_t * pp)
+{
+    uint64_t nanoseconds = 0;
+    uint8_t datagram[(sizeof("-9223372036854775808") * 6) + sizeof("\r\n")] = { '\0' };
+    int length = 0;
+    int rc = -1;
+
+    if (pp->dmy_nanoseconds == 0) { return; }
+
+    nanoseconds = pp->dmy_nanoseconds + pp->utc_nanoseconds;
+
+    length = snprintf(datagram, sizeof(datagram), "%llu %lld %lld %lld %lld %lld\r\n", nanoseconds, pp->lat_nanodegrees, pp->lon_nanodegrees, pp->alt_millimeters, pp->cog_nanodegrees, pp->sog_microknots);
+    datagram[sizeof(datagram) - 1] = '\0';
+
+    switch (protocol) {
+    case IPV4:
+        rc = diminuto_ipc4_datagram_send(sock, datagram, length, *ipv4p, port);
+        if (rc < 0) { perror("diminuto_ipc4_datagram_send"); }
+        break;
+    case IPV6:
+        rc = diminuto_ipc6_datagram_send(sock, datagram, length, *ipv6p, port);
+        if (rc < 0) { perror("diminuto_ipc6_datagram_send"); }
+        break;
+    default:
+        break;
+    }
+
+}
+
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
@@ -183,6 +216,7 @@ int main(int argc, char * argv[])
     FILE * outfp = stdout;
     FILE * errfp = stderr;
     int fd = STDIN_FILENO;
+    int sock = -1;
     int rc = 0;
     int ch = EOF;
     char * bb = (char *)0;
@@ -199,14 +233,19 @@ int main(int argc, char * argv[])
     char msn = '\0';
     char lsn = '\0';
     int opt = -1;
-    int stopbits = 1;
-    int databits = 8;
+    const char * device = (const char *)0;
     int bitspersecond = 4800;
+    int databits = 8;
     int paritybit = 0;
+    int stopbits = 1;
     int rtscts = 0;
     int xonxoff = 0;
-    int protocol = 4;
-    const char * device = (const char *)0;
+    protocol_t protocol = IPV4;
+    const char * host = "127.0.0.1";
+    const char * service = (const char *)0;
+    diminuto_ipv4_t ipv4 = 0;
+    diminuto_ipv6_t ipv6 = { 0 };
+    diminuto_port_t port = 0;
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -214,7 +253,7 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    while ((opt = getopt(argc, argv, "124678D:Eb:dehnorsvw:?")) >= 0) {
+    while ((opt = getopt(argc, argv, "124678A:D:EP:b:dehnorsvw:?")) >= 0) {
         switch (opt) {
         case '1':
             stopbits = 1;
@@ -223,10 +262,10 @@ int main(int argc, char * argv[])
             stopbits = 2;
             break;
         case '4':
-            protocol = 4;
+            protocol = IPV4;
             break;
         case '6':
-            protocol = 6;
+            protocol = IPV6;
             break;
         case '7':
             databits = 7;
@@ -234,11 +273,17 @@ int main(int argc, char * argv[])
         case '8':
             databits = 8;
             break;
+        case 'A':
+            host = optarg;
+            break;
         case 'D':
             device = optarg;
             break;
         case 'E':
             escape = !0;
+            break;
+        case 'P':
+            service = optarg;
             break;
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
@@ -279,7 +324,9 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -6          IPv6.\n");
             fprintf(stderr, "       -7          Seven data bits.\n");
             fprintf(stderr, "       -8          Eight data bits.\n");
+            fprintf(stderr, "       -A ADDRESS  Send to ADDRESS.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE.\n");
+            fprintf(stderr, "       -P PORT     Send to PORT.\n");
             fprintf(stderr, "       -E          Use ANSI escape sequences to control display.\n");
             fprintf(stderr, "       -b BPS      Bits per second.\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
@@ -307,6 +354,33 @@ int main(int argc, char * argv[])
         infp = fdopen(fd, "a+");
         if (infp == (FILE *)0) { perror(device); }
         assert(infp != (FILE *)0);
+    }
+
+    if (service != (const char *)0) {
+        switch (protocol) {
+        case IPV4:
+            ipv4 = diminuto_ipc4_address(host);
+            if (diminuto_ipc4_is_unspecified(&ipv4)) { perror(host); break; }
+            port = diminuto_ipc4_port(service, "udp");
+            if (port == 0) { perror(service); break; }
+            sock = diminuto_ipc4_datagram_peer(0);
+            if (sock < 0) { perror(service); }
+            break;
+        case IPV6:
+            ipv6 = diminuto_ipc6_address(host);
+            if (diminuto_ipc6_is_unspecified(&ipv6)) { perror(host); break; }
+            port = diminuto_ipc6_port(service, "udp");
+            if (port == 0) { perror(service); break; }
+            sock = diminuto_ipc6_datagram_peer(0);
+            if (sock < 0) { perror(service); }
+            break;
+        default:
+            break;
+        }
+        assert(sock >= 0);
+        rc = diminuto_ipc_set_nonblocking(sock, !0);
+        if (rc < 0) { perror(service); }
+        assert(rc >= 0);
     }
 
     if (debug) {
@@ -384,9 +458,11 @@ int main(int argc, char * argv[])
         if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[2;1H\033[0K", outfp); }
             print_position(outfp, "GGA",  &position);
+            if (sock >= 0) { send_position(sock, protocol, &ipv4, &ipv6, port, &position); }
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             if (escape) { fputs("\033[2;1H\033[0K", outfp); }
             print_position(outfp, "RMC", &position);
+            if (sock >= 0) { send_position(sock, protocol, &ipv4, &ipv6, port, &position); }
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             print_solution(outfp, "GSA", &constellation);
@@ -404,6 +480,7 @@ int main(int argc, char * argv[])
     rc = hazer_finalize();
     assert(rc == 0);
 
+    if (sock >= 0) { diminuto_ipc_close(sock); }
     fclose(infp);
     fclose(outfp);
     fclose(errfp);
