@@ -49,9 +49,12 @@ some minor Makefile hacking might be required.
 
     https://github.com/coverclock/com-diag-diminuto
 
-Example:
+Here is an example of using gpstool to read an NMEA sentence stream from a
+serial device at 4800 8n1, display the data using ANSI escape sequences to
+control the output terminal, and send the raw parsed time and position data
+in a printable form to a remote server via UDP port 5555.
 
-    gpstool -D /dev/ttyUSB0 -b 4800 -8 -1 -n -E
+    > gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E -P 5555
 
     $GPRMC,162135.000,A,3947.6521,N,10509.2024,W,0.00,109.12,030217,,,D
     RMC 2017-02-03T16:21:35Z { 39 47' 39.12"N 105 09' 12.14"W } 5623.29' 109.12true 0.00mph
@@ -69,10 +72,26 @@ Example:
     GSV [11/12/48] sat  1 elv  6 azm 320 snr 24dBHz
     GSV [12/12/48] sat 51 elv 43 azm 183 snr 45dBHz
 
+The following command is useful for testing the reception of the UDP datagrams.
+
+    > socat UDP-RECVFROM:5555,reuseaddr,fork STDOUT
+
+    1486579223000000000 39794206666 -105153371666 1713600 225890000000 0
+    1486579223000000000 39794206666 -105153371666 1713600 225890000000 0
+    1486579224000000000 39794206666 -105153371666 1713600 225890000000 0
+    1486579224000000000 39794206666 -105153371666 1713600 225890000000 0
+    1486579225000000000 39794206666 -105153371666 1713600 225890000000 0
+
+The datagram fields are POSIX time in nanoseconds, latitude in nanodegrees,
+longitude in nanodegrees, altitude in millimeters, course in nanodegrees, and
+speed in microknots. The weird units are to preserve as many significant digits
+as possible, support a wide dynamic range, eliminate any losses due to unit
+conversions, and defer any use of floating point to the application.
+
 Hazer has been successfully tested with the following devices.
 
-	USGlobalSat BU-535S4 (SiRF Star IV chipset)
-	USGlobalSat ND-105C (SiRF Star III chipset)
+    USGlobalSat BU-535S4 (SiRF Star IV chipset)
+    USGlobalSat ND-105C (SiRF Star III chipset)
 
 This software is an original work of its author(s).
 
