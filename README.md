@@ -51,10 +51,9 @@ some minor Makefile hacking might be required.
 
 Here is an example of using gpstool to read an NMEA sentence stream from a
 serial device at 4800 8n1, display the data using ANSI escape sequences to
-control the output terminal, and send the raw parsed time and position data
-in a printable form to a remote server via UDP port 5555.
+control the output terminal, and forwards NMEA sentences to a remote server.
 
-    > gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E -P 5555
+    > gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E -6 -A ::1 -P 5555
 
     $GPRMC,205040.400,A,3947.6529,N,10509.2027,W,0.17,252.01,080217,,,D
     RMC 2017-02-08T20:50:40Z { 39 47' 39.17"N 105 09' 12.16"W } 5636.41' W 0.20mph
@@ -76,18 +75,6 @@ in a printable form to a remote server via UDP port 5555.
 The following command is useful for testing the reception of the UDP datagrams.
 
     > socat UDP-RECVFROM:5555,reuseaddr,fork STDOUT
-
-    1486579223000000000 39794206666 -105153371666 1713600 225890000000 0
-    1486579223000000000 39794206666 -105153371666 1713600 225890000000 0
-    1486579224000000000 39794206666 -105153371666 1713600 225890000000 0
-    1486579224000000000 39794206666 -105153371666 1713600 225890000000 0
-    1486579225000000000 39794206666 -105153371666 1713600 225890000000 0
-
-The datagram fields are POSIX time in nanoseconds, latitude in nanodegrees,
-longitude in nanodegrees, altitude in millimeters, course in nanodegrees, and
-speed in microknots. The weird units are to preserve as many significant digits
-as possible, support a wide dynamic range, eliminate any losses due to unit
-conversions, and defer any use of floating point to the application.
 
 Hazer has been successfully tested with the following devices.
 

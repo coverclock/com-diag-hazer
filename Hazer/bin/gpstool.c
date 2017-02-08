@@ -26,9 +26,11 @@
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 
+typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
+
 typedef enum Protocol { IPV4 = 4, IPV6 = 6, } protocol_t;
 
-static int send_sentence(FILE * fp, const char * data)
+static int emit_sentence(FILE * fp, const char * data)
 {
     int rc = -1;
     uint8_t cs = 0;
@@ -36,15 +38,77 @@ static int send_sentence(FILE * fp, const char * data)
     char lsn = '\0';
 
     do {
+
         cs = hazer_checksum(data, strlen(data));
         if (hazer_checksum2characters(cs, &msn, &lsn) < 0) { break; }
+
         if (fprintf(fp, "%s%c%c%c\r\n", data, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) { break; }
         if (fflush(fp) == EOF) { break; }
+
         rc = 0;
 
     } while (0);
 
     return rc;
+}
+
+static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, diminuto_ipv6_t * ipv6p, diminuto_port_t port, char * vector[], size_t count)
+{
+    int rc = 0;
+    char ** vv = vector;
+    int cc = 0;
+    hazer_buffer_t buffer = { '\0' };
+    size_t size = sizeof(buffer);
+    size_t ss = 0;
+    char * bb = buffer;
+    uint8_t cs = 0;
+    char msn = '\0';
+    char lsn = '\0';
+
+    do {
+
+        for (cc = count - 1; (*vv != (char *)0) && (size > 0) ; ++vv, --cc) {
+            ss = strlen(*vv);
+            if (size < ss) { size = 0; break; }
+            strncpy(bb, *vv, size);
+            bb += ss;
+            size -= ss;
+            if (size < 1) { break; }
+            if (cc == 0) {
+                *(bb++) = HAZER_STIMULUS_CHECKSUM;
+            } else {
+                *(bb++) = HAZER_STIMULUS_DELIMITER;
+            }
+            --size;
+        }
+
+        if (size < 4) { break; }
+
+        size = bb - buffer;
+
+        cs = hazer_checksum(buffer, size);
+        hazer_checksum2characters(cs, &msn, &lsn);
+        *(bb++) = msn;
+        *(bb++) = lsn;
+        *(bb++) = '\r';
+        *(bb++) = '\n';
+        size += 4;
+
+        switch (protocol) {
+        case IPV4:
+            rc = diminuto_ipc4_datagram_send(sock, buffer, size, *ipv4p, port);
+            if (rc < 0) { perror("diminuto_ipc4_datagram_send"); }
+            break;
+        case IPV6:
+            rc = diminuto_ipc6_datagram_send(sock, buffer, size, *ipv6p, port);
+            if (rc < 0) { perror("diminuto_ipc6_datagram_send"); }
+            break;
+        default:
+            break;
+        }
+
+    } while (0);
+
 }
 
 static void print_solution(FILE * fp, const char * name, const hazer_constellation_t * cp)
@@ -173,35 +237,6 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     fputc('\n', fp);
 }
 
-static void send_position(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, diminuto_ipv6_t * ipv6p, diminuto_port_t port,  const hazer_position_t * pp)
-{
-    uint64_t nanoseconds = 0;
-    uint8_t datagram[(sizeof("-9223372036854775808") * 6) + sizeof("\r\n")] = { '\0' };
-    int length = 0;
-    int rc = -1;
-
-    if (pp->dmy_nanoseconds == 0) { return; }
-
-    nanoseconds = pp->dmy_nanoseconds + pp->utc_nanoseconds;
-
-    length = snprintf(datagram, sizeof(datagram), "%llu %lld %lld %lld %lld %lld\r\n", nanoseconds, pp->lat_nanodegrees, pp->lon_nanodegrees, pp->alt_millimeters, pp->cog_nanodegrees, pp->sog_microknots);
-    datagram[sizeof(datagram) - 1] = '\0';
-
-    switch (protocol) {
-    case IPV4:
-        rc = diminuto_ipc4_datagram_send(sock, datagram, length, *ipv4p, port);
-        if (rc < 0) { perror("diminuto_ipc4_datagram_send"); }
-        break;
-    case IPV6:
-        rc = diminuto_ipc6_datagram_send(sock, datagram, length, *ipv6p, port);
-        if (rc < 0) { perror("diminuto_ipc6_datagram_send"); }
-        break;
-    default:
-        break;
-    }
-
-}
-
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
@@ -242,8 +277,9 @@ int main(int argc, char * argv[])
     int stopbits = 1;
     int rtscts = 0;
     int xonxoff = 0;
+    role_t role = NONE;
     protocol_t protocol = IPV4;
-    const char * host = "localhost";
+    const char * host = (const char *)0;
     const char * service = (const char *)0;
     diminuto_ipv4_t ipv4 = 0;
     diminuto_ipv6_t ipv6 = { 0 };
@@ -316,7 +352,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case 'w':
-            return send_sentence(outfp, optarg) < 0 ? 1 : 0;
+            return emit_sentence(outfp, optarg) < 0 ? 1 : 0;
             break;
         case '?':
             fprintf(stderr, "usage: %s [ -1 | -2 ] [ -4 | -6 ] [ -7 | -8 ] [ -D DEVICE ] [ -b BPS ] [ -d ] [ -e | -o | -n ] [ -h ] [ -s ] [ -v ] [ -E ] [ -w NMEA ]\n", program);
@@ -328,7 +364,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -8          Eight data bits.\n");
             fprintf(stderr, "       -A ADDRESS  Send to ADDRESS.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE.\n");
-            fprintf(stderr, "       -P PORT     Send to PORT.\n");
+            fprintf(stderr, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(stderr, "       -E          Use ANSI escape sequences to control display.\n");
             fprintf(stderr, "       -b BPS      Bits per second.\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
@@ -358,7 +394,36 @@ int main(int argc, char * argv[])
         assert(infp != (FILE *)0);
     }
 
-    if (service != (const char *)0) {
+
+    if (service == (const char *)0) {
+        /* Do nothing. */
+    } else if (host == (const char *)0) {
+        switch (protocol) {
+        case IPV4:
+            ipv4 = diminuto_ipc4_address(host);
+            if (diminuto_ipc4_is_unspecified(&ipv4)) { perror(host); break; }
+            port = diminuto_ipc4_port(service, "udp");
+            if (port == 0) { perror(service); break; }
+            sock = diminuto_ipc4_datagram_peer(port);
+            if (sock < 0) { perror(service); }
+            break;
+        case IPV6:
+            ipv6 = diminuto_ipc6_address(host);
+            if (diminuto_ipc6_is_unspecified(&ipv6)) { perror(host); break; }
+            port = diminuto_ipc6_port(service, "udp");
+            if (port == 0) { perror(service); break; }
+            sock = diminuto_ipc6_datagram_peer(port);
+            if (sock < 0) { perror(service); }
+            break;
+        default:
+            break;
+        }
+        assert(sock >= 0);
+        rc = diminuto_ipc_set_nonblocking(sock, !0);
+        if (rc < 0) { perror(service); }
+        assert(rc >= 0);
+        role = CONSUMER;
+    } else {
         switch (protocol) {
         case IPV4:
             ipv4 = diminuto_ipc4_address(host);
@@ -383,6 +448,10 @@ int main(int argc, char * argv[])
         rc = diminuto_ipc_set_nonblocking(sock, !0);
         if (rc < 0) { perror(service); }
         assert(rc >= 0);
+        role = PRODUCER;
+    }
+
+    if (service != (const char *)0) {
     }
 
     if (debug) {
@@ -460,17 +529,19 @@ int main(int argc, char * argv[])
         if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[2;1H\033[0K", outfp); }
             print_position(outfp, "GGA",  &position);
-            if (sock >= 0) { send_position(sock, protocol, &ipv4, &ipv6, port, &position); }
+            if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count); }
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             if (escape) { fputs("\033[2;1H\033[0K", outfp); }
             print_position(outfp, "RMC", &position);
-            if (sock >= 0) { send_position(sock, protocol, &ipv4, &ipv6, port, &position); }
+            if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count); }
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             print_solution(outfp, "GSA", &constellation);
+            if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count); }
         } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
             if (escape) { fputs("\033[5;1H\033[0J", outfp); }
             print_constellation(outfp, "GSV", &constellation);
+            if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count); }
         } else {
             /* Do nothing. */
         }
