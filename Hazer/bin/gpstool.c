@@ -529,21 +529,21 @@ int main(int argc, char * argv[])
         if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[2;1H\033[0K", outfp); }
             print_position(outfp, "GGA",  &position);
-            if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count); }
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             if (escape) { fputs("\033[2;1H\033[0K", outfp); }
             print_position(outfp, "RMC", &position);
-            if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count); }
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             print_solution(outfp, "GSA", &constellation);
-            if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count); }
-        } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
+        } else if ((rc = hazer_parse_gsv(&constellation, vector, count)) == 0) {
             if (escape) { fputs("\033[5;1H\033[0J", outfp); }
             print_constellation(outfp, "GSV", &constellation);
-            if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count); }
         } else {
             /* Do nothing. */
+        }
+
+        if (role == PRODUCER) {
+            send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count);
         }
 
         fflush(outfp);
