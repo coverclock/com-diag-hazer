@@ -8,7 +8,6 @@
 # "Digital Aggregates Corporation" is a registered trademark.
 #
 #	make all TARGET=<target>		# Build libraries, unit tests, executable programs.
-#	make most TARGET=<target>		# Build all plus user-space loadable modules.
 #
 #	. out/host/bin/setup			# Sets up PATH and LD_LIBRARY_PATH after build.
 #
@@ -121,6 +120,20 @@ TARGETMAKEFILE		:= $(CFG_DIR)/$(TARGET).mk
 
 include $(TARGETMAKEFILE)
 
+########## Diminuto Configuration
+
+DIMINUTO_TITLE		:=	Diminuto
+
+DIMINUTO_PROJECT	:=	$(shell echo $(DIMINUTO_TITLE) | tr '[A-Z]' '[a-z]')
+DIMINUTO_SYMBOL		:=	$(shell echo $(DIMINUTO_TITLE) | tr '[a-z]' '[A-Z]')
+
+DIMINUTO_ROOT		:=	$(HOME)/src/com-diag-$(DIMINUTO_PROJECT)/$(DIMINUTO_TITLE)
+DIMINUTO_HEADERS	:=	$(DIMINUTO_ROOT)/$(INC_DIR)
+DIMINUTO_LIBRARIES	:=	$(DIMINUTO_ROOT)/$(OUT)/$(LIB_DIR)
+
+DIMINUTO_CPPFLAGS	:=	-iquote $(DIMINUTO_HEADERS)
+DIMINUTO_LDFLAGS	:=	-L$(DIMINUTO_LIBRARIES) -l$(DIMINUTO_PROJECT) -lpthread -lrt -ldl
+
 ########## Commands and Option Flags
 
 PROJECT_A			:=	lib$(PROJECT).a
@@ -136,14 +149,11 @@ STRIP				:=	$(CROSS_COMPILE)strip
 CDEFINES			:=
 
 ARFLAGS				:=	crsv
-#CPPFLAGS			:=	$(CDEFINES) -I $(SRC_DIR) -I $(INC_DIR) -I $(OUT)/$(INC_DIR) $(CPPARCH)
-CPPFLAGS			:=	$(CDEFINES) -iquote $(SRC_DIR) -iquote $(INC_DIR) -iquote $(OUT)/$(INC_DIR) $(CPPARCH)
+CPPFLAGS			:=	$(CDEFINES) -iquote $(SRC_DIR) -iquote $(INC_DIR) -iquote $(OUT)/$(INC_DIR) $(DIMINUTO_CPPFLAGS) $(CPPARCH)
 CFLAGS				:=	$(CARCH) -g
-#CFLAGS				:=	$(CARCH) -g -fprofile-arcs -ftest-coverage
-#CFLAGS				:=	$(CARCH) -O3
 CPFLAGS				:=	-i
 MVFLAGS				:=	-i
-LDFLAGS				:=	$(LDARCH) -l$(PROJECT) $(LDLIBRARIES)
+LDFLAGS				:=	$(LDARCH) -l$(PROJECT) $(LDLIBRARIES) $(DIMINUTO_LDFLAGS)
 MOFLAGS				:=	$(MOARCH) -l$(PROJECT) $(LDLIBRARIES)
 SOFLAGS				:=	$(SOARCH) $(LDLIBRARIES)
 
@@ -171,18 +181,12 @@ TARGETSHARED		+=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO)
 TARGETLIBRARIES		:=	$(TARGETARCHIVE) $(TARGETSHARED)
 TARGETPROGRAMS		:=	$(TARGETBINARIES) $(TARGETALIASES) $(TARGETUNITTESTS) $(TARGETGENERATED) $(TARGETSCRIPTS)
 TARGETALL			:=	$(TARGETLIBRARIES) $(TARGETPROGRAMS)
-TARGETMOST			:=	$(TARGETALL) $(TARGETMODULES)
-TARGETPLUS			:=	$(TARGETMOST) $(TARGETDRIVERS)
 
 ########## Main Entry Points
 
-.PHONY:	all most plus dist clean pristine clobber
+.PHONY:	all dist clean pristine clobber
 
 all:	$(TARGETALL)
-
-most:	$(TARGETMOST)
-
-plus:	$(TARGETPLUS)
 
 dist:	distribution
 
@@ -489,19 +493,17 @@ $(OUT)/$(SYM_DIR)/vintage:	$(OUT)/$(GEN_DIR)/vintage.c
 $(OUT)/$(BIN_DIR)/setup:	Makefile
 	D=`dirname $@`; mkdir -p $$D
 	echo 'COM_DIAG_$(SYMBOL)_PATH=`dirname $${BASH_ARGV[0]}`; COM_DIAG_$(SYMBOL)_ROOT=`cd $$COM_DIAG_$(SYMBOL)_PATH; pwd`' > $@
-	echo 'export PATH=$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../sym:$$COM_DIAG_$(SYMBOL)_ROOT/../bin:$$COM_DIAG_$(SYMBOL)_ROOT/../tst' >> $@
-	echo 'export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
+	echo 'export PATH=$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../bin:$$COM_DIAG_$(SYMBOL)_ROOT/../tst' >> $@
 	echo 'export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
-	echo 'export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
+	echo '. $(DIMINUTO_ROOT)/$(OUT)/$(BIN_DIR)/setup' >> $@
 	chmod 644 $@
 
 $(OUT)/$(SYM_DIR)/setup:	Makefile
 	D=`dirname $@`; mkdir -p $$D
 	echo 'COM_DIAG_$(SYMBOL)_PATH=`dirname $${BASH_ARGV[0]}`; COM_DIAG_$(SYMBOL)_ROOT=`cd $$COM_DIAG_$(SYMBOL)_PATH; pwd`' > $@
 	echo 'export PATH=$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../sym:$$COM_DIAG_$(SYMBOL)_ROOT/../tst' >> $@
-	echo 'export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
 	echo 'export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
-	echo 'export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
+	echo '. $(DIMINUTO_ROOT)/$(OUT)/$(SYM_DIR)/setup' >> $@
 	chmod 644 $@
 
 # For generating a setup script for a bash shell (for example, "bash generate > setup").
@@ -509,19 +511,17 @@ $(OUT)/$(SYM_DIR)/setup:	Makefile
 $(OUT)/$(BIN_DIR)/generate:	Makefile
 	D=`dirname $@`; mkdir -p $$D
 	echo 'COM_DIAG_$(SYMBOL)_PATH=`dirname $$0`; COM_DIAG_$(SYMBOL)_ROOT=`cd $$COM_DIAG_$(SYMBOL)_PATH; pwd`' > $@
-	echo 'echo export PATH=$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../sym:$$COM_DIAG_$(SYMBOL)_ROOT/../bin:$$COM_DIAG_$(SYMBOL)_ROOT/../tst' >> $@
-	echo 'echo export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
+	echo 'echo export PATH=$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../bin:$$COM_DIAG_$(SYMBOL)_ROOT/../tst' >> $@
 	echo 'echo export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
-	echo 'echo export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
+	echo 'echo . $(DIMINUTO_ROOT)/$(OUT)/$(BIN_DIR)/setup' >> $@
 	chmod 755 $@
 
 $(OUT)/$(SYM_DIR)/generate:	Makefile
 	D=`dirname $@`; mkdir -p $$D
 	echo 'COM_DIAG_$(SYMBOL)_PATH=`dirname $$0`; COM_DIAG_$(SYMBOL)_ROOT=`cd $$COM_DIAG_$(SYMBOL)_PATH; pwd`' > $@
 	echo 'echo export PATH=$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../sym:$$COM_DIAG_$(SYMBOL)_ROOT/../tst' >> $@
-	echo 'echo export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
 	echo 'echo export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
-	echo 'echo export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
+	echo 'echo . $(DIMINUTO_ROOT)/$(OUT)/$(SYM_DIR)/setup' >> $@
 	chmod 755 $@
 
 ########## User-Space Loadable Modules
