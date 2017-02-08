@@ -346,12 +346,13 @@ typedef struct HazerPosition {
     int64_t alt_millimeters;    /* Altitude in millimeters. */
     int64_t sog_microknots;     /* Speed On Ground in microknots. */
     int64_t cog_nanodegrees;    /* Course On Ground in nanodegrees. */
+    uint8_t sat_used;           /* Number of satellites used. */
     uint8_t lat_digits;         /* Significant digiits of latitude. */
     uint8_t lon_digits;         /* Signficant digits of longitute. */
     uint8_t alt_digits;         /* Significant digits of altitude. */
     uint8_t sog_digits;         /* Signficant digits of Speed On Ground. */
     uint8_t cog_digits;         /* Signficant digits of Course On Ground. */
-    uint8_t unused[3];          /* Unused. */
+    uint8_t unused[2];          /* Unused. */
 } hazer_position_t;
 
 /**
@@ -396,10 +397,11 @@ typedef struct HazerConstellation {
     double pdop;                /* Position Dilution Of Precision. */
     double hdop;                /* Horizontal Dilution Of Precisioin. */
     double vdop;                /* Vertical Diilution Of Precisioin. */
-    uint8_t satellites;         /* Number of satellites used in soluton. */
+    uint8_t sat_active;         /* Number of satellites active. */
+    uint8_t sat_view;           /* Number of satellites in view. */
     uint8_t id[HAZER_CONSTANT_GPS_SATELLITES];  /* Satellite IDentifiers. */
     uint8_t channels;           /* Number of channels used in view. */
-    uint8_t unused[2];          /* Unused. */
+    uint8_t unused[1];          /* Unused. */
     hazer_satellite_t sat[HAZER_CONSTANT_GPS_CHANNELS]; /* Satellites viewed. */
 } hazer_constellation_t;
 

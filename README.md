@@ -90,8 +90,9 @@ conversions, and defer any use of floating point to the application.
 
 Hazer has been successfully tested with the following devices.
 
-    USGlobalSat BU-535S4 (SiRF Star IV chipset)
-    USGlobalSat ND-105C (SiRF Star III chipset)
+    USGlobalSat BU-535S4 (SiRF Star IV chipset, 4800 bps)
+    USGlobalSat ND-105C (SiRF Star III chipset, 4800 bps)
+    USGlobalSat BU-353S4-5hz (SiRF Star IV chipset, 115200 bps)
 
 This software is an original work of its author(s).
 

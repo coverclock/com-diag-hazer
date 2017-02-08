@@ -717,6 +717,7 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
         datap->utc_nanoseconds = hazer_parse_utc(vector[1]);
         datap->lat_nanodegrees = hazer_parse_latlon(vector[2], *(vector[3]), &datap->lat_digits);
         datap->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &datap->lon_digits);
+        datap->sat_used = strtol(vector[7], (char **)0, 10);
         datap->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &datap->alt_digits);
         rc = 0;
     }
@@ -790,9 +791,10 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
                 datap->sat[channel].azm_degrees = strtoul(vector[index++], (char **)0, 10);
                 datap->sat[channel].snr_dbhz = strtoul(vector[index++], (char **)0, 10);
                 ++channel;
-                datap->channels = channel;
                 rc = 1;
             }
+            datap->channels = channel;
+            datap->sat_view = satellites;
             if (rc < 0) {
                 /* Do nothing. */
             } else if (message < messages) {
@@ -817,6 +819,7 @@ int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count
     int limit = sizeof(datap->id) / sizeof(datap->id[0]);
 
     if (count < 18) {
+        /* Do nothing. */
     } else if (strncmp(vector[0], GSA, sizeof(GSA) - 1) != 0) {
         /* Do nothing. */
     } else if (*vector[2] == '1') {
@@ -828,7 +831,7 @@ int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count
             datap->id[slot] = id;
             ++satellites;
         }
-        datap->satellites = satellites;
+        datap->sat_active = satellites;
         datap->pdop = hazer_parse_num(vector[15]);
         datap->hdop = hazer_parse_num(vector[16]);
         datap->vdop = hazer_parse_num(vector[17]);

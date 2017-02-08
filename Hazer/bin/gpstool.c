@@ -54,7 +54,7 @@ static void print_solution(FILE * fp, const char * name, const hazer_constellati
     int satellites = 0;
     int limit = 0;
 
-    satellites = cp->satellites;
+    satellites = cp->sat_active;
     limit = (satellites > SATELLITES) ? SATELLITES : satellites;
 
     fprintf(fp, "%s {", name);
@@ -63,7 +63,7 @@ static void print_solution(FILE * fp, const char * name, const hazer_constellati
             fprintf(fp, " %2u", cp->id[satellite]);
         }
     }
-    fprintf(fp, " } [%02d/%02d] pdop %.2lf hdop %.2lf vdop %.2lf\n", satellites, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
+    fprintf(fp, " } [%02d/%02d/%02d] pdop %.2lf hdop %.2lf vdop %.2lf\n", cp->sat_active, cp->sat_view, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
 }
 
 static void print_constellation(FILE *fp, const char * name, const hazer_constellation_t * cp)
@@ -166,6 +166,8 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     decimal /= 1000000.0;
     fprintf(fp, " %.3lf", decimal);
 
+    fprintf(fp, " [%d]", pp->sat_used);
+
     fprintf(fp, " %d %d %d %d %d", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->sog_digits);
 
     fputc('\n', fp);
@@ -241,7 +243,7 @@ int main(int argc, char * argv[])
     int rtscts = 0;
     int xonxoff = 0;
     protocol_t protocol = IPV4;
-    const char * host = "127.0.0.1";
+    const char * host = "localhost";
     const char * service = (const char *)0;
     diminuto_ipv4_t ipv4 = 0;
     diminuto_ipv6_t ipv6 = { 0 };
