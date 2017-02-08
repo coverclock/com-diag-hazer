@@ -39,14 +39,19 @@ sentences produced by a GPS "talker". While I used the BU-353S4 to test the
 software, it is likely usable for any GPS receiver that conforms to NMEA 0183
 4.10. Unlike the Drover project, Hazer does its own NMEA parsing. It includes
 a gpstool to display processed GPS data. gpstool accepts NMEA sentences from
-standard input. The serialtool in the Diminuto project is a useful way to
-read data from serial-attached GPS devices like the BU-353S4.
+standard input or from a serial(ish) device.
+
+This library is built on top of the Digital Aggretates Corporation Diminuto
+package. Diminuto is a general purpose C-based systems programming library that
+supports serial port configuration, socket-based communication, and a passle
+of other stuff. If you don't build Diminuto where the Makefile expects it,
+some minor Makefile hacking might be required.
 
     https://github.com/coverclock/com-diag-diminuto
 
 Example:
 
-    serialtool -D /dev/ttyUSB0 -b 4800 -8 -1 -n -l | gpstool -e
+    gpstool -D /dev/ttyUSB0 -b 4800 -8 -1 -n -E
 
     $GPRMC,162135.000,A,3947.6521,N,10509.2024,W,0.00,109.12,030217,,,D
     RMC 2017-02-03T16:21:35Z { 39 47' 39.12"N 105 09' 12.14"W } 5623.29' 109.12true 0.00mph
