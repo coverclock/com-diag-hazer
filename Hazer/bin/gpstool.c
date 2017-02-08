@@ -17,7 +17,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 #include "com/diag/hazer/hazer.h"
+#include "com/diag/diminuto/diminuto_serial.h"
 
 static int send_sentence(FILE * fp, const char * data)
 {
@@ -177,6 +182,7 @@ int main(int argc, char * argv[])
     FILE * infp = stdin;
     FILE * outfp = stdout;
     FILE * errfp = stderr;
+    int fd = STDIN_FILENO;
     int rc = 0;
     int ch = EOF;
     char * bb = (char *)0;
@@ -193,6 +199,14 @@ int main(int argc, char * argv[])
     char msn = '\0';
     char lsn = '\0';
     int opt = -1;
+    int stopbits = 1;
+    int databits = 8;
+    int bitspersecond = 4800;
+    int paritybit = 0;
+    int rtscts = 0;
+    int xonxoff = 0;
+    int protocol = 4;
+    const char * device = (const char *)0;
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -200,17 +214,56 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    while ((opt = getopt(argc, argv, "dervw:?")) >= 0) {
+    while ((opt = getopt(argc, argv, "124678D:Eb:dehnorsvw:?")) >= 0) {
         switch (opt) {
+        case '1':
+            stopbits = 1;
+            break;
+        case '2':
+            stopbits = 2;
+            break;
+        case '4':
+            protocol = 4;
+            break;
+        case '6':
+            protocol = 6;
+            break;
+        case '7':
+            databits = 7;
+            break;
+        case '8':
+            databits = 8;
+            break;
+        case 'D':
+            device = optarg;
+            break;
+        case 'E':
+            escape = !0;
+            break;
+        case 'b':
+            bitspersecond = strtoul(optarg, (char **)0, 0);
+            break;
         case 'd':
             debug = !0;
             break;
         case 'e':
-            escape = !0;
+            paritybit = 2;
+            break;
+        case 'h':
+            rtscts = !0;
+            break;
+        case 'n':
+            paritybit = 0;
+            break;
+        case 'o':
+            paritybit = 1;
             break;
         case 'r':
             outfp = stderr;
             errfp = stdout;
+            break;
+        case 's':
+            xonxoff = !0;
             break;
         case 'v':
             verbose = !0;
@@ -219,15 +272,41 @@ int main(int argc, char * argv[])
             return send_sentence(outfp, optarg) < 0 ? 1 : 0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -e ] [ -w S ]\n", program);
-            fprintf(stderr, "       -d      Display debug output to standard error.\n");
-            fprintf(stderr, "       -e      Use ANSI escape sequences to control display.\n");
-            fprintf(stderr, "       -r      Reverse use of standard output and error.\n");
-            fprintf(stderr, "       -v      Display verbose output to standard error.\n");
-            fprintf(stderr, "       -w S    Append * and checksum to S and write to standard output.\n");
+            fprintf(stderr, "usage: %s [ -1 | -2 ] [ -4 | -6 ] [ -7 | -8 ] [ -D DEVICE ] [ -b BPS ] [ -d ] [ -e | -o | -n ] [ -h ] [ -s ] [ -v ] [ -E ] [ -w NMEA ]\n", program);
+            fprintf(stderr, "       -1          One stop bit.\n");
+            fprintf(stderr, "       -2          Two stop bits.\n");
+            fprintf(stderr, "       -4          IPv4.\n");
+            fprintf(stderr, "       -6          IPv6.\n");
+            fprintf(stderr, "       -7          Seven data bits.\n");
+            fprintf(stderr, "       -8          Eight data bits.\n");
+            fprintf(stderr, "       -D DEVICE   Use DEVICE.\n");
+            fprintf(stderr, "       -E          Use ANSI escape sequences to control display.\n");
+            fprintf(stderr, "       -b BPS      Bits per second.\n");
+            fprintf(stderr, "       -d          Display debug output on standard error.\n");
+            fprintf(stderr, "       -e          Even parity.\n");
+            fprintf(stderr, "       -o          Odd parity.\n");
+            fprintf(stderr, "       -n          No parity.\n");
+            fprintf(stderr, "       -h          Hardware flow control (RTS/CTS).\n");
+            fprintf(stderr, "       -r          Reverse use of standard output and error.\n");
+            fprintf(stderr, "       -s          Software flow control (XON/XOFF).\n");
+            fprintf(stderr, "       -v          Display verbose output on standard error.\n");
+            fprintf(stderr, "       -w NMEA     Append * and checksum and write to standard output.\n");
             return 1;
             break;
         }
+    }
+
+    if (device != (const char *)0) {
+        fd = open(device, O_RDWR);
+        if (fd < 0) { perror(device); }
+        assert(fd >= 0);
+        rc = diminuto_serial_set(fd, bitspersecond, databits, paritybit, stopbits, 0, xonxoff, rtscts);
+        assert(rc == 0);
+        rc = diminuto_serial_raw(fd);
+        assert(rc == 0);
+        infp = fdopen(fd, "a+");
+        if (infp == (FILE *)0) { perror(device); }
+        assert(infp != (FILE *)0);
     }
 
     if (debug) {
@@ -324,6 +403,10 @@ int main(int argc, char * argv[])
 
     rc = hazer_finalize();
     assert(rc == 0);
+
+    fclose(infp);
+    fclose(outfp);
+    fclose(errfp);
 
     return 0;
 }
