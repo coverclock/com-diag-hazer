@@ -352,7 +352,8 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case 'w':
-            return emit_sentence(outfp, optarg) < 0 ? 1 : 0;
+            rc = emit_sentence(outfp, optarg);
+            if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
             break;
         case '?':
             fprintf(stderr, "usage: %s [ -1 | -2 ] [ -4 | -6 ] [ -7 | -8 ] [ -D DEVICE ] [ -b BPS ] [ -d ] [ -e | -o | -n ] [ -h ] [ -s ] [ -v ] [ -E ] [ -w NMEA ]\n", program);
@@ -489,15 +490,15 @@ int main(int argc, char * argv[])
                 }
             }
 
-            assert(state == HAZER_STATE_END);
-
-            size = ss;
-            assert(size > 0);
-
             if (state == HAZER_STATE_EOF) {
                 fprintf(stderr, "%s: EOF\n", program);
                 break;
             }
+
+            assert(state == HAZER_STATE_END);
+
+            size = ss;
+            assert(size > 0);
 
         } else if (protocol == IPV4) {
 
@@ -544,6 +545,10 @@ int main(int argc, char * argv[])
         assert(vector[count] == (char *)0);
         assert(count < (sizeof(vector) / sizeof(vector[0])));
 
+        if (role == PRODUCER) {
+            send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count);
+        }
+
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
         for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
             fputs(*vv, outfp);
@@ -564,10 +569,6 @@ int main(int argc, char * argv[])
             print_constellation(outfp, "GSV", &constellation);
         } else {
             /* Do nothing. */
-        }
-
-        if (role == PRODUCER) {
-            send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count);
         }
 
         fflush(outfp);
