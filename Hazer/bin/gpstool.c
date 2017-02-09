@@ -382,34 +382,38 @@ int main(int argc, char * argv[])
     }
 
     if (device != (const char *)0) {
+
         fd = open(device, O_RDWR);
         if (fd < 0) { perror(device); }
         assert(fd >= 0);
+
         rc = diminuto_serial_set(fd, bitspersecond, databits, paritybit, stopbits, 0, xonxoff, rtscts);
         assert(rc == 0);
+
         rc = diminuto_serial_raw(fd);
         assert(rc == 0);
+
         infp = fdopen(fd, "a+");
         if (infp == (FILE *)0) { perror(device); }
         assert(infp != (FILE *)0);
+
     }
 
 
     if (service == (const char *)0) {
-        /* Do nothing. */
+
+        role = NONE;
+
     } else if (host == (const char *)0) {
+
         switch (protocol) {
         case IPV4:
-            ipv4 = diminuto_ipc4_address(host);
-            if (diminuto_ipc4_is_unspecified(&ipv4)) { perror(host); break; }
             port = diminuto_ipc4_port(service, "udp");
             if (port == 0) { perror(service); break; }
             sock = diminuto_ipc4_datagram_peer(port);
             if (sock < 0) { perror(service); }
             break;
         case IPV6:
-            ipv6 = diminuto_ipc6_address(host);
-            if (diminuto_ipc6_is_unspecified(&ipv6)) { perror(host); break; }
             port = diminuto_ipc6_port(service, "udp");
             if (port == 0) { perror(service); break; }
             sock = diminuto_ipc6_datagram_peer(port);
@@ -419,11 +423,11 @@ int main(int argc, char * argv[])
             break;
         }
         assert(sock >= 0);
-        rc = diminuto_ipc_set_nonblocking(sock, !0);
-        if (rc < 0) { perror(service); }
-        assert(rc >= 0);
+
         role = CONSUMER;
+
     } else {
+
         switch (protocol) {
         case IPV4:
             ipv4 = diminuto_ipc4_address(host);
@@ -445,13 +449,13 @@ int main(int argc, char * argv[])
             break;
         }
         assert(sock >= 0);
+
         rc = diminuto_ipc_set_nonblocking(sock, !0);
         if (rc < 0) { perror(service); }
         assert(rc >= 0);
-        role = PRODUCER;
-    }
 
-    if (service != (const char *)0) {
+        role = PRODUCER;
+
     }
 
     if (debug) {
@@ -467,31 +471,51 @@ int main(int argc, char * argv[])
 
         state = HAZER_STATE_START;
 
-        while (!0) {
-            ch = fgetc(infp);
-            prior = state;
-            state = hazer_machine(state, ch, buffer, sizeof(buffer), &bb, &ss);
-            if (state == HAZER_STATE_END) {
-                break;
-            } else if  (state == HAZER_STATE_EOF) {
-                break;
-            } else if ((prior != HAZER_STATE_START) && (state == HAZER_STATE_START)) {
-                /* State machine restarted. */
-                fprintf(stderr, "%s: ERR\n", program);
-            } else {
-                /* Do nothing. */
+        if (role != CONSUMER) {
+
+            while (!0) {
+                ch = fgetc(infp);
+                prior = state;
+                state = hazer_machine(state, ch, buffer, sizeof(buffer), &bb, &ss);
+                if (state == HAZER_STATE_END) {
+                    break;
+                } else if  (state == HAZER_STATE_EOF) {
+                    break;
+                } else if ((prior != HAZER_STATE_START) && (state == HAZER_STATE_START)) {
+                    /* State machine restarted. */
+                    fprintf(stderr, "%s: ERR\n", program);
+                } else {
+                    /* Do nothing. */
+                }
             }
+
+            assert(state == HAZER_STATE_END);
+
+            size = ss;
+            assert(size > 0);
+
+            if (state == HAZER_STATE_EOF) {
+                fprintf(stderr, "%s: EOF\n", program);
+                break;
+            }
+
+        } else if (protocol == IPV4) {
+
+            size = diminuto_ipc4_datagram_receive(sock, buffer, sizeof(buffer) - 1);
+            assert(size > 0);
+            buffer[size++] = '\0';
+
+        } else if (protocol == IPV6) {
+
+            size = diminuto_ipc6_datagram_receive(sock, buffer, sizeof(buffer) - 1);
+            assert(size > 0);
+            buffer[size++] = '\0';
+
+        } else {
+
+            assert(0);
+
         }
-
-        if (state == HAZER_STATE_EOF) {
-            fprintf(stderr, "%s: EOF\n", program);
-            break;
-        }
-
-        assert(state == HAZER_STATE_END);
-
-        size = ss;
-        assert(size > 0);
 
         assert(buffer[0] == '$');
         assert(buffer[size - 1] == '\0');
