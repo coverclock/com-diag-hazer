@@ -125,7 +125,7 @@ the UDP socket on port 5555.
 You can also use the socat utility, available for most Linux/GNU/POSIX
 flavored systems, to capture the NMEA stream on the UDP port.
 
-    > socat UDP-RECVFROM:5555,reuseaddr,fork STDOUT
+    > socat UDP6-RECVFROM:5555,reuseaddr,fork STDOUT
 
     $GPGGA,160753.800,3947.6463,N,10509.2027,W,2,11,0.8,1727.3,M,-20.8,M,2.8,0000*7C
     $GPGSA,M,3,32,10,14,18,31,11,24,08,21,27,01,,1.3,0.8,1.1*33
