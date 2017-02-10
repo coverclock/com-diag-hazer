@@ -556,7 +556,8 @@ int main(int argc, char * argv[])
             if (escape) { fputs("\033[6;1H\033[0J", outfp); }
             print_constellation(outfp, "GSV", &constellation);
         } else {
-            /* Do nothing. */
+            if (escape) { fputs("\033[4;1H\033[0K", outfp); }
+            fputs("NUL\r\n", outfp);
         }
         fflush(outfp);
 
