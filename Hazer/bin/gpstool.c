@@ -86,6 +86,8 @@ static void print_sentence(FILE *fp, const void * buffer, size_t size)
     for (bb = buffer; size > 0; --size) {
         diminuto_phex_emit(fp, *(bb++), ~(size_t)0, 0, 0, 0, &current, &end, 0);
     }
+    fputc('\r', fp);
+    fputc('\n', fp);
 
     fflush(fp);
 }
@@ -533,12 +535,6 @@ int main(int argc, char * argv[])
 
         bb = datagram;
         for (vv = vector, tt = 1; (*vv != (char *)0); ++vv, ++tt) {
-            if (verbose) {
-                fputs(*vv, errfp);
-                fputc('\r', errfp);
-                fputc('\n', errfp);
-                fflush(errfp);
-            }
             ss = strlen(*vv);
             strncpy(bb, *vv, size);
             bb += ss;
