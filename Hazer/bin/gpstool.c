@@ -7,9 +7,13 @@
  * Chip Overclock (coverclock@diag.com)<BR>
  * http://www.diag.com/navigation/downloads/Assay.html<BR>
  *
- * EXAMPLE
+ * EXAMPLES
  *
- * gpstool [ -d ] [ -v ]
+ * gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E -6 -A ::1 -P 5555
+ *
+ * gpstool -6 -P 5555 -E
+ *
+ * gpstool -d -v
  */
 
 #include <assert.h>
@@ -52,62 +56,23 @@ static int emit_sentence(FILE * fp, const char * data)
     return rc;
 }
 
-static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, diminuto_ipv6_t * ipv6p, diminuto_port_t port, char * vector[], size_t count)
+static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
 {
     int rc = 0;
-    char ** vv = vector;
-    int cc = 0;
-    hazer_buffer_t buffer = { '\0' };
-    size_t size = sizeof(buffer);
-    size_t ss = 0;
-    char * bb = buffer;
-    uint8_t cs = 0;
-    char msn = '\0';
-    char lsn = '\0';
 
-    do {
-
-        for (cc = count - 1; (*vv != (char *)0) && (size > 0) ; ++vv, --cc) {
-            ss = strlen(*vv);
-            if (size < ss) { size = 0; break; }
-            strncpy(bb, *vv, size);
-            bb += ss;
-            size -= ss;
-            if (size < 1) { break; }
-            if (cc == 0) {
-                *(bb++) = HAZER_STIMULUS_CHECKSUM;
-            } else {
-                *(bb++) = HAZER_STIMULUS_DELIMITER;
-            }
-            --size;
-        }
-
-        if (size < 4) { break; }
-
-        size = bb - buffer;
-
-        cs = hazer_checksum(buffer, size);
-        hazer_checksum2characters(cs, &msn, &lsn);
-        *(bb++) = msn;
-        *(bb++) = lsn;
-        *(bb++) = '\r';
-        *(bb++) = '\n';
-        size += 4;
-
-        switch (protocol) {
-        case IPV4:
-            rc = diminuto_ipc4_datagram_send(sock, buffer, size, *ipv4p, port);
-            if (rc < 0) { perror("diminuto_ipc4_datagram_send"); }
-            break;
-        case IPV6:
-            rc = diminuto_ipc6_datagram_send(sock, buffer, size, *ipv6p, port);
-            if (rc < 0) { perror("diminuto_ipc6_datagram_send"); }
-            break;
-        default:
-            break;
-        }
-
-    } while (0);
+    switch (protocol) {
+    case IPV4:
+        rc = diminuto_ipc4_datagram_send(sock, buffer, size, *ipv4p, port);
+        if (rc < 0) { perror("diminuto_ipc4_datagram_send"); }
+        break;
+    case IPV6:
+        rc = diminuto_ipc6_datagram_send(sock, buffer, size, *ipv6p, port);
+        if (rc < 0) { perror("diminuto_ipc6_datagram_send"); }
+        break;
+    default:
+        assert(0);
+        break;
+    }
 
 }
 
@@ -162,7 +127,6 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     int hundredths = 0;
     int direction = 0;
     const char * compass = (const char *)0;
-    double decimal = 0.0;
 
     nanoseconds = pp->dmy_nanoseconds;
     if (nanoseconds == 0) { return; }
@@ -207,8 +171,12 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     fprintf(fp, " %.2lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
 
     fputc('\n', fp);
+}
 
-    fputs("MAP", fp);
+static void print_datum(FILE * fp, const char * name, const hazer_position_t * pp) {
+    double decimal = 0.0;
+
+    fputs(name, fp);
 
     decimal = pp->lat_nanodegrees;
     decimal /= 1000000000.0;
@@ -246,6 +214,7 @@ int main(int argc, char * argv[])
     hazer_state_t state = HAZER_STATE_EOF;
     hazer_state_t prior = HAZER_STATE_START;
     hazer_buffer_t buffer = { 0 };
+    hazer_buffer_t datagram = { 0 };
     hazer_vector_t vector = { 0 };
     hazer_position_t position = { 0 };
     hazer_constellation_t constellation = { 0 };
@@ -540,37 +509,55 @@ int main(int argc, char * argv[])
             fflush(errfp);
         }
 
+        if (escape) { fputs("\033[1;1H\033[0K", outfp); }
+        fputs(buffer, outfp);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(count >= 0);
         assert(vector[count] == (char *)0);
         assert(count < (sizeof(vector) / sizeof(vector[0])));
 
-        if (role == PRODUCER) {
-            send_sentence(sock, protocol, &ipv4, &ipv6, port, vector, count);
+        bb = datagram;
+        for (vv = vector, tt = 1; (*vv != (char *)0); ++vv, ++tt) {
+            ss = strlen(*vv);
+            strncpy(bb, *vv, size);
+            bb += ss;
+            *(bb++) = (tt < count) ? HAZER_STIMULUS_DELIMITER : HAZER_STIMULUS_CHECKSUM;
         }
+        cs = hazer_checksum(datagram, bb - datagram);
+        hazer_checksum2characters(cs, &msn, &lsn);
+        *(bb++) = msn;
+        *(bb++) = lsn;
+        *(bb++) = '\r';
+        *(bb++) = '\n';
+        *(bb++) = '\0';
+        size = bb - datagram;
+        assert(size <= sizeof(datagram));
 
-        if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        for (vv = vector, tt = 1; *vv != (char *)0; ++vv, ++tt) {
-            fputs(*vv, outfp);
-            fputc((tt == count) ? '\n' : ',', outfp);
+        if (escape) { fputs("\033[2;1H\033[0K", outfp); }
+        fputs(datagram, outfp);
+
+        if (role == PRODUCER) {
+            send_sentence(sock, protocol, &ipv4, &ipv6, port, datagram, size - 1);
         }
 
         if (hazer_parse_gga(&position, vector, count) == 0) {
-            if (escape) { fputs("\033[2;1H\033[0K", outfp); }
+            if (escape) { fputs("\033[3;1H\033[0K", outfp); }
             print_position(outfp, "GGA",  &position);
+            print_datum(outfp, "MAP",  &position);
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
-            if (escape) { fputs("\033[2;1H\033[0K", outfp); }
+            if (escape) { fputs("\033[3;1H\033[0K", outfp); }
             print_position(outfp, "RMC", &position);
+            print_datum(outfp, "MAP",  &position);
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
-            if (escape) { fputs("\033[4;1H\033[0K", outfp); }
+            if (escape) { fputs("\033[5;1H\033[0K", outfp); }
             print_solution(outfp, "GSA", &constellation);
         } else if ((rc = hazer_parse_gsv(&constellation, vector, count)) == 0) {
-            if (escape) { fputs("\033[5;1H\033[0J", outfp); }
+            if (escape) { fputs("\033[6;1H\033[0J", outfp); }
             print_constellation(outfp, "GSV", &constellation);
         } else {
             /* Do nothing. */
         }
-
         fflush(outfp);
 
     }
