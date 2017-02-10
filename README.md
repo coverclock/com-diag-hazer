@@ -134,9 +134,11 @@ flavored systems, to capture the NMEA stream on the UDP port.
     $GPGSV,3,3,12,21,13,156,39,27,13,233,33,01,09,320,20,51,43,183,42*72
     $GPRMC,160753.800,A,3947.6463,N,10509.2027,W,0.30,206.04,090217,,,D*7D
 
-You can also dispense with gpstool entirely (which really only exists
-to test the Hazer library) and use socat to forward NMEA strings to a
-remote site..
+You might be tempted to dispense with gpstool entirely (which really only
+exists to test the Hazer library) and use socat to forward NMEA strings
+to a remote site. This works, but if you pipe the result into gpstool,
+it gets upset because each datagram isn't a fully formed NMEA sentence;
+using gpstool to send on the far end addresses this.
 
     > socat OPEN:/dev/ttyUSB0,b115200 UDP6-SENDTO:[::1]:5555
 
