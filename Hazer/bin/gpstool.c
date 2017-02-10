@@ -536,7 +536,7 @@ int main(int argc, char * argv[])
         bb = datagram;
         for (vv = vector, tt = 1; (*vv != (char *)0); ++vv, ++tt) {
             ss = strlen(*vv);
-            strncpy(bb, *vv, size);
+            strcpy(bb, *vv);
             bb += ss;
             *(bb++) = (tt < count) ? HAZER_STIMULUS_DELIMITER : HAZER_STIMULUS_CHECKSUM;
         }
