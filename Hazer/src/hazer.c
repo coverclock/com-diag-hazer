@@ -707,9 +707,11 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
     int rc = -1;
     static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
     
-    if (count < 11) { 
+    if (count < 1) { 
         /* Do nothing. */
     } else if (strncmp(vector[0], GGA, sizeof(GGA) - 1) != 0) {
+        /* Do nothing. */
+    } else if (count < 11) { 
         /* Do nothing. */
     } else if (*vector[6] == '0') {
         /* Do nothing. */
@@ -730,9 +732,11 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
     int rc = -1;
     static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;
     
-    if (count < 10) { 
+    if (count < 1) { 
         /* Do nothing. */
     } else if (strncmp(vector[0], RMC, sizeof(RMC) - 1) != 0) {
+        /* Do nothing. */
+    } else if (count < 10) { 
         /* Do nothing. */
     } else if (*vector[2] != 'A') {
         /* Do nothing. */
@@ -749,10 +753,6 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
     return rc;
 }
 
-/******************************************************************************
- *
- ******************************************************************************/
-
 int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count)
 {
     int rc = -1;
@@ -767,9 +767,11 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
     int limit = sizeof(datap->sat) / sizeof(datap->sat[0]);
     unsigned int id = 0;
     
-    if (count < 5) {
+    if (count < 1) {
         /* Do nothing. */
     } else if (strncmp(vector[0], GSV, sizeof(GSV) - 1) != 0) {
+        /* Do nothing. */
+    } else if (count < 5) {
         /* Do nothing. */
     } else {
         messages = strtol(vector[1], (char **)0, 10);
@@ -818,9 +820,11 @@ int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count
     static const char GSA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSA;
     int limit = sizeof(datap->id) / sizeof(datap->id[0]);
 
-    if (count < 18) {
+    if (count < 1) {
         /* Do nothing. */
     } else if (strncmp(vector[0], GSA, sizeof(GSA) - 1) != 0) {
+        /* Do nothing. */
+    } else if (count < 18) {
         /* Do nothing. */
     } else if (*vector[2] == '1') {
         /* Do nothing. */
