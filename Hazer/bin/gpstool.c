@@ -29,12 +29,13 @@
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
+#include "com/diag/diminuto/diminuto_phex.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
 typedef enum Protocol { IPV4 = 4, IPV6 = 6, } protocol_t;
 
-static int emit_sentence(FILE * fp, const char * data)
+static int emit_sentence(FILE * fp, const char * string)
 {
     int rc = -1;
     uint8_t cs = 0;
@@ -43,10 +44,10 @@ static int emit_sentence(FILE * fp, const char * data)
 
     do {
 
-        cs = hazer_checksum(data, strlen(data));
+        cs = hazer_checksum(string, strlen(string));
         if (hazer_checksum2characters(cs, &msn, &lsn) < 0) { break; }
 
-        if (fprintf(fp, "%s%c%c%c\r\n", data, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) { break; }
+        if (fprintf(fp, "%s%c%c%c\r\n", string, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) { break; }
         if (fflush(fp) == EOF) { break; }
 
         rc = 0;
@@ -74,6 +75,19 @@ static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p
         break;
     }
 
+}
+
+static void print_sentence(FILE *fp, const void * buffer, size_t size)
+{
+    const char * bb = (const char *)0;
+    size_t current = 0;
+    int end = 0;
+
+    for (bb = buffer; size > 0; --size) {
+        diminuto_phex_emit(fp, *(bb++), ~(size_t)0, 0, 0, 0, &current, &end, 0);
+    }
+
+    fflush(fp);
 }
 
 static void print_solution(FILE * fp, const char * name, const hazer_constellation_t * cp)
@@ -510,7 +524,7 @@ int main(int argc, char * argv[])
         }
 
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        fputs(buffer, outfp);
+        print_sentence(outfp, buffer, size - 1);
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(count >= 0);
@@ -519,6 +533,12 @@ int main(int argc, char * argv[])
 
         bb = datagram;
         for (vv = vector, tt = 1; (*vv != (char *)0); ++vv, ++tt) {
+            if (verbose) {
+                fputs(*vv, errfp);
+                fputc('\r', errfp);
+                fputc('\n', errfp);
+                fflush(errfp);
+            }
             ss = strlen(*vv);
             strncpy(bb, *vv, size);
             bb += ss;
@@ -535,7 +555,7 @@ int main(int argc, char * argv[])
         assert(size <= sizeof(datagram));
 
         if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-        fputs(datagram, outfp);
+        print_sentence(outfp, datagram, size - 1);
 
         if (role == PRODUCER) {
             send_sentence(sock, protocol, &ipv4, &ipv6, port, datagram, size - 1);
@@ -543,12 +563,12 @@ int main(int argc, char * argv[])
 
         if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            print_position(outfp, "GGA",  &position);
-            print_datum(outfp, "MAP",  &position);
+            print_position(outfp, "MAP",  &position);
+            print_datum(outfp, "GGA",  &position);
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            print_position(outfp, "RMC", &position);
-            print_datum(outfp, "MAP",  &position);
+            print_position(outfp, "MAP", &position);
+            print_datum(outfp, "RMC",  &position);
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
             if (escape) { fputs("\033[5;1H\033[0K", outfp); }
             print_solution(outfp, "GSA", &constellation);
@@ -556,8 +576,7 @@ int main(int argc, char * argv[])
             if (escape) { fputs("\033[6;1H\033[0J", outfp); }
             print_constellation(outfp, "GSV", &constellation);
         } else {
-            if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-            fputs("NUL\r\n", outfp);
+            /* Do nothing. */
         }
         fflush(outfp);
 
