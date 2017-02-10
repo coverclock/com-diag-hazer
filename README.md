@@ -134,6 +134,12 @@ flavored systems, to capture the NMEA stream on the UDP port.
     $GPGSV,3,3,12,21,13,156,39,27,13,233,33,01,09,320,20,51,43,183,42*72
     $GPRMC,160753.800,A,3947.6463,N,10509.2027,W,0.30,206.04,090217,,,D*7D
 
+You can also dispense with gpstool entirely (which really only exists
+to test the Hazer library) and use socat to forward NMEA strings to a
+remote site..
+
+    > socat OPEN:/dev/ttyUSB0,b115200 UDP6-SENDTO:[::1]:5555
+
 Hazer has been successfully tested with the following devices.
 
     USGlobalSat BU-535S4 (SiRF Star IV, 4800 8N1, ttyUSB)
