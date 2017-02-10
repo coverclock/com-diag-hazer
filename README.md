@@ -83,7 +83,7 @@ serial device at 4800 8n1, display the data using ANSI escape sequences to
 control the output terminal, and forwards NMEA sentences to a remote
 instance of itself listing on port 5555.
 
-    > gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E -6 -A ::1 -P 5555
+    > gpstool -D /dev/ttyUSB0 -b 115200 -8 -n -1 -E -6 -A lead -P 5555
 
     $GPRMC,144706.200,A,3947.6533,N,10509.2013,W,0.25,305.51,090217,,,D
     RMC 2017-02-09T14:47:06Z { 39 47' 39.19"N 105 09' 12.07"W } 5641.99' NW 0.29mph
