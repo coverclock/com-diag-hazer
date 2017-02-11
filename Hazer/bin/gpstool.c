@@ -267,6 +267,7 @@ int main(int argc, char * argv[])
     diminuto_ipv4_t ipv4 = 0;
     diminuto_ipv6_t ipv6 = { 0 };
     diminuto_port_t port = 0;
+    uint64_t nanoseconds = 0;
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -575,6 +576,9 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         }
         fflush(outfp);
+
+        assert(position.tot_nanoseconds >= nanoseconds);
+        nanoseconds = position.tot_nanoseconds;
 
     }
 
