@@ -706,6 +706,8 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
 {
     int rc = -1;
     static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
+    uint64_t utc_nanoseconds = 0;
+    uint64_t tot_nanoseconds = 0;
     
     if (count < 1) { 
         /* Do nothing. */
@@ -716,12 +718,19 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
     } else if (*vector[6] == '0') {
         /* Do nothing. */
     } else {
-        datap->utc_nanoseconds = hazer_parse_utc(vector[1]);
-        datap->lat_nanodegrees = hazer_parse_latlon(vector[2], *(vector[3]), &datap->lat_digits);
-        datap->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &datap->lon_digits);
-        datap->sat_used = strtol(vector[7], (char **)0, 10);
-        datap->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &datap->alt_digits);
-        rc = 0;
+        utc_nanoseconds = hazer_parse_utc(vector[1]);
+        tot_nanoseconds = utc_nanoseconds + datap->dmy_nanoseconds;
+        if (tot_nanoseconds >= datap->tot_nanoseconds) {
+            datap->tot_nanoseconds = tot_nanoseconds;
+            datap->utc_nanoseconds = utc_nanoseconds;
+            datap->lat_nanodegrees = hazer_parse_latlon(vector[2], *(vector[3]), &datap->lat_digits);
+            datap->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &datap->lon_digits);
+            datap->sat_used = strtol(vector[7], (char **)0, 10);
+            datap->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &datap->alt_digits);
+            rc = 0;
+        } else {
+            DEBUG("TIME?\n");
+        }
     }
 
     return rc;
@@ -731,6 +740,9 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
 {
     int rc = -1;
     static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;
+    uint64_t utc_nanoseconds = 0;
+    uint64_t dmy_nanoseconds = 0;
+    uint64_t tot_nanoseconds = 0;
     
     if (count < 1) { 
         /* Do nothing. */
@@ -741,13 +753,21 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
     } else if (*vector[2] != 'A') {
         /* Do nothing. */
     } else {
-        datap->utc_nanoseconds = hazer_parse_utc(vector[1]);
-        datap->lat_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &datap->lat_digits);
-        datap->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &datap->lon_digits);
-        datap->sog_microknots = hazer_parse_sog(vector[7], &datap->sog_digits);
-        datap->cog_nanodegrees = hazer_parse_cog(vector[8], &datap->cog_digits);
-        datap->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
-        rc = 0;
+        utc_nanoseconds = hazer_parse_utc(vector[1]);
+        dmy_nanoseconds = hazer_parse_dmy(vector[9]);
+        tot_nanoseconds = utc_nanoseconds + dmy_nanoseconds;
+        if (tot_nanoseconds >= datap->tot_nanoseconds) {
+            datap->tot_nanoseconds = tot_nanoseconds;
+            datap->utc_nanoseconds = utc_nanoseconds;
+            datap->dmy_nanoseconds = dmy_nanoseconds;
+            datap->lat_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &datap->lat_digits);
+            datap->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &datap->lon_digits);
+            datap->sog_microknots = hazer_parse_sog(vector[7], &datap->sog_digits);
+            datap->cog_nanodegrees = hazer_parse_cog(vector[8], &datap->cog_digits);
+            rc = 0;
+        } else {
+            DEBUG("TIME?\n");
+        }
     }
 
     return rc;

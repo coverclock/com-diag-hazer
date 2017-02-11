@@ -146,6 +146,12 @@ gpstool can recover from this.
 
     > socat OPEN:/dev/ttyUSB0,b115200 UDP6-SENDTO:[::1]:5555
 
+The RMC and GGA sentences contain UTC timestamps (and the RMC contains
+a DMY datestamp). Hazer rejects sentences for which time runs backwards.
+Although this should be impossible for the sentences in the stream from
+a GPS device, it is entirely possible for the UDP stream from a Hazer
+producer, since UDP packet ordering is not guaranteed.
+
 Hazer has been successfully tested with the following devices.
 
     USGlobalSat BU-535S4 (SiRF Star IV, 4800 8N1, ttyUSB)

@@ -336,9 +336,11 @@ extern double hazer_parse_num(const char * string);
 
 /**
  * THis structure maintains the time, position, altitude, speed, and bearing
- * derived from the NMEA stream.
+ * derived from the NMEA stream. THIS OBJECT  SHOULD BE INITIALIZED TO ALL
+ * ZEROS.
  */
 typedef struct HazerPosition {
+    uint64_t tot_nanoseconds;   /* Total nanoseconds. */
     uint64_t utc_nanoseconds;   /* Time in nanoseconds since 00:00 UTC. */
     uint64_t dmy_nanoseconds;   /* Date in nanoseconds since POSIX epoch. */
     int64_t lat_nanodegrees;    /* Latitude in nanodegrees. */
@@ -357,7 +359,7 @@ typedef struct HazerPosition {
 
 /**
  * Parse a GGA NMEA sentence, updating the position.
- * @param datap points to the position structure.
+ * @param datap points to the position structure (initialized to zeros).
  * @Param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
@@ -366,7 +368,7 @@ extern int hazer_parse_gga(hazer_position_t *datap, char * vector[], size_t coun
 
 /**
  * Parse a RMC NMEA sentence, updating the position.
- * @param datap points to the position structure.
+ * @param datap points to the position structure (initialized to zeros).
  * @Param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
@@ -391,7 +393,7 @@ typedef struct HazerSatellite {
 
 /**
  * This structure maintains the information on as many satellites as we
- * have channels configured.
+ * have channels configured. THIS OBJECT SHOULD BE INITIALIZED TO ALL ZEROS.
  */
 typedef struct HazerConstellation {
     double pdop;                /* Position Dilution Of Precision. */
@@ -407,7 +409,7 @@ typedef struct HazerConstellation {
 
 /**
  * Parse a GSV NMEA sentence, updating the constellation.
- * @param datap points to the constellation structure.
+ * @param datap points to the constellation structure (initialized to zeros).
  * @Param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.
@@ -416,7 +418,7 @@ extern int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_
 
 /**
  * Parse a GSA NMEA sentence, updating the constellation.
- * @param datap points to the constellation structure.
+ * @param datap points to the constellation structure (initialized to zeros).
  * @Param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
