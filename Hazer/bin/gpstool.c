@@ -92,9 +92,9 @@ static void print_sentence(FILE *fp, const void * buffer, size_t size)
     fflush(fp);
 }
 
-static void print_solution(FILE * fp, const char * name, const hazer_constellation_t * cp)
+static void print_active(FILE * fp, const char * name, const hazer_constellation_t * cp)
 {
-    static const int SATELLITES = sizeof(cp->id) / sizeof(cp->id[0]);
+    static const unsigned int SATELLITES = sizeof(cp->id) / sizeof(cp->id[0]);
     int satellite = 0;
     int satellites = 0;
     int limit = 0;
@@ -108,10 +108,10 @@ static void print_solution(FILE * fp, const char * name, const hazer_constellati
             fprintf(fp, " %2u", cp->id[satellite]);
         }
     }
-    fprintf(fp, " } [%02d/%02d/%02d] pdop %.2lf hdop %.2lf vdop %.2lf\n", cp->sat_active, cp->sat_view, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
+    fprintf(fp, " } [%02u/%02u/%02u] pdop %.2lf hdop %.2lf vdop %.2lf\n", cp->sat_active, cp->sat_view, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
 }
 
-static void print_constellation(FILE *fp, const char * name, const hazer_constellation_t * cp)
+static void print_view(FILE *fp, const char * name, const hazer_constellation_t * cp)
 {
     static const int CHANNELS = sizeof(cp->sat) / sizeof(cp->sat[0]);
     int channel = 0;
@@ -144,13 +144,11 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     int direction = 0;
     const char * compass = (const char *)0;
 
-    nanoseconds = pp->dmy_nanoseconds;
-    if (nanoseconds == 0) { return; }
+    if (pp->dmy_nanoseconds == 0) { return; }
 
     fputs(name, fp);
 
-    nanoseconds += pp->utc_nanoseconds;
-    hazer_format_nanoseconds2timestamp(nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
+    hazer_format_nanoseconds2timestamp(pp->tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
     assert((1 <= month) && (month <= 12));
     assert((1 <= day) && (day <= 31));
     assert((0 <= hour) && (hour <= 23));
@@ -214,7 +212,7 @@ static void print_datum(FILE * fp, const char * name, const hazer_position_t * p
     decimal /= 1000000.0;
     fprintf(fp, " %.3lf", decimal);
 
-    fprintf(fp, " [%d]", pp->sat_used);
+    fprintf(fp, " [%02u]", pp->sat_used);
 
     fprintf(fp, " %d %d %d %d %d", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->sog_digits);
 
@@ -560,17 +558,19 @@ int main(int argc, char * argv[])
         if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
             print_position(outfp, "MAP",  &position);
+            if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             print_datum(outfp, "GGA",  &position);
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
             print_position(outfp, "MAP", &position);
+            if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             print_datum(outfp, "RMC",  &position);
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
             if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-            print_solution(outfp, "GSA", &constellation);
+            print_active(outfp, "GSA", &constellation);
         } else if ((rc = hazer_parse_gsv(&constellation, vector, count)) == 0) {
             if (escape) { fputs("\033[6;1H\033[0J", outfp); }
-            print_constellation(outfp, "GSV", &constellation);
+            print_view(outfp, "GSV", &constellation);
         } else {
             /* Do nothing. */
         }

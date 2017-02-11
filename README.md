@@ -137,7 +137,7 @@ flavored systems, to capture the NMEA stream on the UDP port.
 You can dispense with gpstool entirely (which really only exists to test
 the Hazer library) and use socat to forward NMEA strings to a remote site.
 Be aware that when used in UDP consumer mode, gpstool expects every UDP
-datagramto be a fully formed NMEA sentence, because that's how it sends
+datagram to be a fully formed NMEA sentence, because that's how it sends
 them in UDP producer mode. socat isn't so polite. Since the occasional
 UDP packet will inevitably be lost, if the output of socat is piped into
 gpstool, it will see a lot of corruption in the input stream. Using
@@ -151,6 +151,15 @@ a DMY datestamp). Hazer rejects sentences for which time runs backwards.
 Although this should be impossible for the sentences in the stream from
 a GPS device, it is entirely possible for the UDP stream from a Hazer
 producer, since UDP packet ordering is not guaranteed.
+
+You might be tempted to use TCP instead of UDP. That sounds like a good
+idea: guaranteed delivery, packets always in order. However, this can
+introduce a lot of lantency in the NMEA stream. The result is the NMEA
+stream received by the consumer may lag signficantly behind real-time,
+and that lag increases the longer the system runs. So over time it
+diverges more and more with reality.  It is better to lose an NMEA
+sentence than have it delayed. After all, another sentence is on the
+way right behind it.
 
 Hazer has been successfully tested with the following devices.
 
