@@ -157,8 +157,6 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
     fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
 
-    /* Latitude and longitude are printed in a format maps.google.com kinda likes. */
-
     hazer_format_nanodegrees2position(pp->lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
     assert((0 <= degrees) && (degrees <= 90));
     assert((0 <= minutes) && (minutes <= 59));
@@ -171,7 +169,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     assert((0 <= minutes) && (minutes <= 59));
     assert((0 <= seconds) && (seconds <= 59));
     assert((0 <= hundredths) && (hundredths <= 99));
-    fprintf(fp, " %3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
+    fprintf(fp, ",%3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
     fprintf(fp, " %8.2lf'", pp->alt_millimeters * 3.2808 / 1000.0);
 
