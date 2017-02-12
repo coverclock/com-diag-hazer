@@ -55,8 +55,9 @@ serial(ish) device, or from a UDP socket.
            -8          Eight data bits.
            -A ADDRESS  Send to ADDRESS.
            -D DEVICE   Use DEVICE.
+           -E          Like -R but use ANSI escape sequences.
            -P PORT     Send to or receive from PORT.
-           -E          Use ANSI escape sequences to control display.
+           -R          Print a report on standard output.
            -b BPS      Bits per second.
            -d          Display debug output on standard error.
            -e          Even parity.

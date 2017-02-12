@@ -108,7 +108,7 @@ static void print_active(FILE * fp, const char * name, const hazer_constellation
             fprintf(fp, " %2u", cp->id[satellite]);
         }
     }
-    fprintf(fp, " } [%02u/%02u/%02u] pdop %.2lf hdop %.2lf vdop %.2lf\n", cp->sat_active, cp->sat_view, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
+    fprintf(fp, " } [%02u/%02u/%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", cp->sat_active, cp->sat_view, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
 }
 
 static void print_view(FILE *fp, const char * name, const hazer_constellation_t * cp)
@@ -164,16 +164,16 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     assert((0 <= minutes) && (minutes <= 59));
     assert((0 <= seconds) && (seconds <= 59));
     assert((0 <= hundredths) && (hundredths <= 99));
-    fprintf(fp, " { %d %02d' %02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
+    fprintf(fp, " %2d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
 
     hazer_format_nanodegrees2position(pp->lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
     assert((0 <= degrees) && (degrees <= 180));
     assert((0 <= minutes) && (minutes <= 59));
     assert((0 <= seconds) && (seconds <= 59));
     assert((0 <= hundredths) && (hundredths <= 99));
-    fprintf(fp, " %d %02d' %02d.%02d\"%c }", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
+    fprintf(fp, " %3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
-    fprintf(fp, " %.2lf'", pp->alt_millimeters * 3.2808 / 1000.0);
+    fprintf(fp, " %8.2lf'", pp->alt_millimeters * 3.2808 / 1000.0);
 
     assert((0LL <= pp->cog_nanodegrees) && (pp->cog_nanodegrees <= 360000000000LL));
 
@@ -182,7 +182,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     assert(strlen(compass) <= 4);
     fprintf(fp, " %s", compass);
 
-    fprintf(fp, " %.2lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
+    fprintf(fp, " %8.3lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
 
     fputc('\n', fp);
 }
@@ -194,23 +194,23 @@ static void print_datum(FILE * fp, const char * name, const hazer_position_t * p
 
     decimal = pp->lat_nanodegrees;
     decimal /= 1000000000.0;
-    fprintf(fp, " { %.6lf", decimal);
+    fprintf(fp, " %9.6lf", decimal);
 
     decimal = pp->lon_nanodegrees;
     decimal /= 1000000000.0;
-    fprintf(fp, ",%.6lf }", decimal);
+    fprintf(fp, ",%10.6lf", decimal);
 
     decimal = pp->alt_millimeters;
     decimal /= 1000.0;
-    fprintf(fp, " %.3lf", decimal);
+    fprintf(fp, " %9.3lfm", decimal);
 
     decimal = pp->cog_nanodegrees;
     decimal /= 1000000000.0;
-    fprintf(fp, " %.3lf", decimal);
+    fprintf(fp, " %7.3lftrue", decimal);
 
     decimal = pp->sog_microknots;
     decimal /= 1000000.0;
-    fprintf(fp, " %.3lf", decimal);
+    fprintf(fp, " %8.3lfknots", decimal);
 
     fprintf(fp, " [%02u]", pp->sat_used);
 
@@ -225,6 +225,7 @@ int main(int argc, char * argv[])
     int debug = 0;
     int verbose = 0;
     int escape = 0;
+    int report = 0;
     hazer_state_t state = HAZER_STATE_EOF;
     hazer_state_t prior = HAZER_STATE_START;
     hazer_buffer_t buffer = { 0 };
@@ -275,7 +276,7 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    while ((opt = getopt(argc, argv, "124678A:D:EP:b:dehnorsvw:?")) >= 0) {
+    while ((opt = getopt(argc, argv, "124678A:D:EP:Rb:dehnorsvw:?")) >= 0) {
         switch (opt) {
         case '1':
             stopbits = 1;
@@ -302,10 +303,14 @@ int main(int argc, char * argv[])
             device = optarg;
             break;
         case 'E':
+            report = !0;
             escape = !0;
             break;
         case 'P':
             service = optarg;
+            break;
+        case 'R':
+            report = !0;
             break;
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
@@ -349,8 +354,9 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -8          Eight data bits.\n");
             fprintf(stderr, "       -A ADDRESS  Send to ADDRESS.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE.\n");
+            fprintf(stderr, "       -E          Like -R but use ANSI escape sequences.\n");
             fprintf(stderr, "       -P PORT     Send to or receive from PORT.\n");
-            fprintf(stderr, "       -E          Use ANSI escape sequences to control display.\n");
+            fprintf(stderr, "       -R          Print a report on standard output.\n");
             fprintf(stderr, "       -b BPS      Bits per second.\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
             fprintf(stderr, "       -e          Even parity.\n");
@@ -525,7 +531,7 @@ int main(int argc, char * argv[])
         }
 
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        print_sentence(outfp, buffer, size - 1);
+        if (report) { print_sentence(outfp, buffer, size - 1); }
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(count >= 0);
@@ -550,13 +556,15 @@ int main(int argc, char * argv[])
         assert(size <= sizeof(datagram));
 
         if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-        print_sentence(outfp, datagram, size - 1);
+        if (report) { print_sentence(outfp, datagram, size - 1); }
 
         if (role == PRODUCER) {
             send_sentence(sock, protocol, &ipv4, &ipv6, port, datagram, size - 1);
         }
 
-        if (hazer_parse_gga(&position, vector, count) == 0) {
+        if (!report) {
+            /* Do nothing. */
+        } else if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
             print_position(outfp, "MAP",  &position);
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
@@ -575,7 +583,7 @@ int main(int argc, char * argv[])
         } else {
             /* Do nothing. */
         }
-        fflush(outfp);
+        if (report) { fflush(outfp); }
 
         assert(position.tot_nanoseconds >= nanoseconds);
         nanoseconds = position.tot_nanoseconds;
