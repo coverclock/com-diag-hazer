@@ -178,7 +178,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     compass = hazer_format_nanodegrees2compass8(pp->cog_nanodegrees);
     assert(compass != (const char *)0);
     assert(strlen(compass) <= 4);
-    fprintf(fp, " %s", compass);
+    fprintf(fp, " %-2s", compass);
 
     fprintf(fp, " %8.3lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
 
