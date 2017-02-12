@@ -204,7 +204,7 @@ static void print_datum(FILE * fp, const char * name, const hazer_position_t * p
 
     decimal = pp->cog_nanodegrees;
     decimal /= 1000000000.0;
-    fprintf(fp, " %7.3lftrue", decimal);
+    fprintf(fp, " %7.3lf*", decimal);
 
     decimal = pp->sog_microknots;
     decimal /= 1000000.0;
