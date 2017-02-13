@@ -46,28 +46,29 @@ serial(ish) device, or from a UDP socket.
 
     > gpstool -?
 
-    usage: gpstool [ -1 | -2 ] [ -4 | -6 ] [ -7 | -8 ] [ -D DEVICE ] [ -b BPS ] [ -d ] [ -e | -o | -n ] [ -h ] [ -s ] [ -v ] [ -E ] [ -w NMEA ]
-           -1          One stop bit.
-           -2          Two stop bits.
-           -4          IPv4.
-           -6          IPv6.
-           -7          Seven data bits.
-           -8          Eight data bits.
-           -A ADDRESS  Send to ADDRESS.
+    usage: gpstool [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -h ] [ -s ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]
+           -1          Use one stop bit for DEVICE.
+           -2          Use two stop bits for DEVICE.
+           -4          Use IPv4 for ADDRESS, PORT.
+           -6          Use IPv6 for ADDRESS, PORT.
+           -7          Use seven data bits for DEVICE.
+           -8          Use eight data bits for DEVICE.
+           -A ADDRESS  Send sentences to ADDRESS.
            -D DEVICE   Use DEVICE.
            -E          Like -R but use ANSI escape sequences.
+           -O          Write sentences to DEVICE.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
-           -b BPS      Bits per second.
+           -W NMEA     Append * and checksum to NMEA and emit to DEVICE.
+           -b BPS      Use BPS bits per second for DEVICE.
            -d          Display debug output on standard error.
-           -e          Even parity.
-           -o          Odd parity.
-           -n          No parity.
-           -h          Hardware flow control (RTS/CTS).
+           -e          Use even parity for DEVICE.
+           -o          Use odd parity for DEVICE.
+           -n          Use no parity for DEVICE.
+           -h          Use RTS/CTS for DEVICE.
            -r          Reverse use of standard output and error.
-           -s          Software flow control (XON/XOFF).
+           -s          Use XON/XOFF for DEVICE.
            -v          Display verbose output on standard error.
-           -w NMEA     Append * and checksum and write to standard output.
 
 The Hazer library itself is standlone other than the usual standard
 C and POSIX libraries. But the gpstool is also built on top of the
