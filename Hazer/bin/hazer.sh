@@ -4,7 +4,7 @@ export PATH=${PATH}:${HOME}/src/com-diag-diminuto/Diminuto/out/host/bin/../sym:$
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HOME}/src/com-diag-diminuto/Diminuto/out/host/bin/../lib:${HOME}/src/com-diag-hazer/Hazer/out/host/bin/../lib
 
 DEVICE=${1:-"/dev/ttyUSB0"}
-SPEED=${2:-"115200"}
+SPEED=${2:-"4800"}
 
 stty sane
 clear

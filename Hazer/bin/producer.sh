@@ -6,6 +6,6 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HOME}/src/com-diag-diminuto/Diminuto
 HOST=${1:-"consumer"}
 PORT=${2:-"5555"}
 DEVICE=${3:-"/dev/ttyUSB0"}
-SPEED=${4:-"115200"}
+SPEED=${4:-"4800"}
 
 exec gpstool -D ${DEVICE} -b ${SPEED} -8 -n -1 -E -6 -A ${HOST} -P ${PORT}
