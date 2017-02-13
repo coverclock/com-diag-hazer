@@ -266,6 +266,8 @@ int main(int argc, char * argv[])
     diminuto_ipv4_t ipv4 = 0;
     diminuto_ipv6_t ipv6 = { 0 };
     diminuto_port_t port = 0;
+    int output = 0;
+    int emit = 0;
     uint64_t nanoseconds = 0;
     extern char * optarg;
     extern int optind;
@@ -274,7 +276,7 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    while ((opt = getopt(argc, argv, "124678A:D:EP:Rb:dehnorsvw:?")) >= 0) {
+    while ((opt = getopt(argc, argv, "124678A:D:EOP:RW:b:dehnorsv?")) >= 0) {
         switch (opt) {
         case '1':
             stopbits = 1;
@@ -304,11 +306,17 @@ int main(int argc, char * argv[])
             report = !0;
             escape = !0;
             break;
+        case 'O':
+            output = !0;
+            break;
         case 'P':
             service = optarg;
             break;
         case 'R':
             report = !0;
+            break;
+        case 'W':
+            emit = !0;
             break;
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
@@ -338,12 +346,8 @@ int main(int argc, char * argv[])
         case 'v':
             verbose = !0;
             break;
-        case 'w':
-            rc = emit_sentence(outfp, optarg);
-            if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
-            break;
         case '?':
-            fprintf(stderr, "usage: %s [ -1 | -2 ] [ -4 | -6 ] [ -7 | -8 ] [ -D DEVICE ] [ -b BPS ] [ -d ] [ -e | -o | -n ] [ -h ] [ -s ] [ -v ] [ -E ] [ -w NMEA ]\n", program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -h ] [ -s ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
             fprintf(stderr, "       -1          One stop bit.\n");
             fprintf(stderr, "       -2          Two stop bits.\n");
             fprintf(stderr, "       -4          IPv4.\n");
@@ -353,8 +357,10 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -A ADDRESS  Send to ADDRESS.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI escape sequences.\n");
+            fprintf(stderr, "       -O          Emit to DEVICE.\n");
             fprintf(stderr, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(stderr, "       -R          Print a report on standard output.\n");
+            fprintf(stderr, "       -W NMEA     Append * and checksum and emit to DEVICE.\n");
             fprintf(stderr, "       -b BPS      Bits per second.\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
             fprintf(stderr, "       -e          Even parity.\n");
@@ -364,7 +370,6 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -r          Reverse use of standard output and error.\n");
             fprintf(stderr, "       -s          Software flow control (XON/XOFF).\n");
             fprintf(stderr, "       -v          Display verbose output on standard error.\n");
-            fprintf(stderr, "       -w NMEA     Append * and checksum and write to standard output.\n");
             return 1;
             break;
         }
@@ -386,7 +391,17 @@ int main(int argc, char * argv[])
         if (infp == (FILE *)0) { perror(device); }
         assert(infp != (FILE *)0);
 
+        if (emit) {
+            while ((opt = getopt(argc, argv, "124678A:D:EOP:RW:b:dehnorsv?")) >= 0) {
+                if (opt == 'W') {
+                    rc = emit_sentence(outfp, optarg);
+                    if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
+                }
+            }
+        }
+
     }
+
 
 
     if (service == (const char *)0) {
@@ -526,6 +541,15 @@ int main(int argc, char * argv[])
         if (verbose) {
             fputs(buffer, errfp);
             fflush(errfp);
+        }
+
+        if (!output) {
+            /* Do nothing. */
+        } else if (device == (const char *)0) {
+            /* Do nothing. */
+        } else {
+            fputs(buffer, infp);
+            fflush(infp);
         }
 
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
