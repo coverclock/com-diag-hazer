@@ -345,29 +345,32 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     char ** vv = vector;
     char * bb = buffer;
 
-    if ((count--) > 0) {
-        *vv = bb;
+    if (count > 1) {
+        *(vv++) = bb;
+        --count;
         while ((size--) > 0) {
             if (*bb == ',') {
                 *(bb++) = '\0';
                 DEBUG("TOK \"%s\".\n", *vv);
-                if ((count--) <= 0) {
+                if (count <= 1) {
                     break;
                 }
-                *(++vv) = bb;
+                *(vv++) = bb;
+                --count;
             } else if (*bb == '*') {
                 *(bb++) = '\0';
                 DEBUG("TOK \"%s\".\n", *vv);
-                if ((count--) <= 0) {
-                    break;
-                }
-                *(++vv) = (char *)0;
-                DEBUG("TOK 0x0.\n");
                 break;
             } else {
                 ++bb;
             }
         }
+    }
+
+    if (count > 0) {
+        *(vv++) = (char *)0;
+        DEBUG("TOK 0x0.\n");
+        --count;
     }
 
     return (vv - vector);
@@ -379,29 +382,33 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
     char ** vv = vector;
     ssize_t ss = 0;
 
-    while ((count > 0) && (*vv != (char *)0)) {
+    while ((count > 1) && (*vv != (char *)0)) {
         ss = strlen(*vv);
         if (size < (ss + 2)) {
             break;
         }
         strcpy(bb, *vv);
+        DEBUG("STR \"%s\".\n", *vv);
         bb += ss;
         size -= ss;
         if (size < 2) {
             break;
         }
-        --count;
-        if (count > 0) {
+        if (count > 2) {
             *(bb++) = HAZER_STIMULUS_DELIMITER;
+            DEBUG("CHR \"%c\".\n", HAZER_STIMULUS_DELIMITER);
         } else {
             *(bb++) = HAZER_STIMULUS_CHECKSUM;
+            DEBUG("CHR \"%c\".\n", HAZER_STIMULUS_CHECKSUM);
         }
+        --count;
         --size;
         ++vv;
     }
 
     if (size > 0) {
         *(bb++) = '\0';
+        DEBUG("CHR 0x0.\n");
         --size;
     }
 
