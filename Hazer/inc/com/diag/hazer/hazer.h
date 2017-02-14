@@ -252,6 +252,18 @@ typedef char * (hazer_vector_t)[HAZER_CONSTANT_NMEA_LONGEST - HAZER_CONSTANT_NME
  */
 extern ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size);
 
+/**
+ * Serialize an NMEA sentence by copying the fields from an argument vector
+ * into a buffer. The buffer will be terminated with the '*' checksum field
+ * prefix and a NUL character.
+ * @param buffer points to the beginning of the sentence buffer.
+ * @param size is the size of the buffer in bytes.
+ * @param vector is an argument vector.
+ * @param count is the size of the argument vector in array positions.
+ * @return the number of bytes in the buffer including the final NUL character.
+ */ 
+extern ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t count);
+
 /*********************************************************************************
  * PARSING INDIVIDUAL FIELDS IN AN NMEA SENTENCE
  ********************************************************************************/

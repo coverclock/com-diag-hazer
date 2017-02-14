@@ -373,6 +373,41 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     return (vv - vector);
 }
 
+ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t count)
+{
+    char * bb = buffer;
+    char ** vv = vector;
+    ssize_t ss = 0;
+
+    while ((count > 0) && (*vv != (char *)0)) {
+        ss = strlen(*vv);
+        if (size < (ss + 2)) {
+            break;
+        }
+        strcpy(bb, *vv);
+        bb += ss;
+        size -= ss;
+        if (size < 2) {
+            break;
+        }
+        --count;
+        if (count > 0) {
+            *(bb++) = HAZER_STIMULUS_DELIMITER;
+        } else {
+            *(bb++) = HAZER_STIMULUS_CHECKSUM;
+        }
+        --size;
+        ++vv;
+    }
+
+    if (size > 0) {
+        *(bb++) = '\0';
+        --size;
+    }
+
+    return (bb - (char *)buffer);
+}
+
 /******************************************************************************
  *
  ******************************************************************************/

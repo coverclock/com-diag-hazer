@@ -234,6 +234,7 @@ int main(int argc, char * argv[])
     FILE * infp = stdin;
     FILE * outfp = stdout;
     FILE * errfp = stderr;
+    FILE * devfp = stdout;
     int fd = STDIN_FILENO;
     int sock = -1;
     int rc = 0;
@@ -246,7 +247,6 @@ int main(int argc, char * argv[])
     ssize_t check = 0;
     ssize_t count = 0;
     char ** vv = (char **)0;
-    int tt = 0;
     uint8_t cs = 0;
     uint8_t ck = 0;
     char msn = '\0';
@@ -357,10 +357,10 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -A ADDRESS  Send sentences to ADDRESS.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI escape sequences.\n");
-            fprintf(stderr, "       -O          Write sentences to DEVICE.\n");
+            fprintf(stderr, "       -O          Output sentences to DEVICE.\n");
             fprintf(stderr, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(stderr, "       -R          Print a report on standard output.\n");
-            fprintf(stderr, "       -W NMEA     Append * and checksum to NMEA and emit to DEVICE.\n");
+            fprintf(stderr, "       -W NMEA     Append * and checksum to NMEA and write to DEVICE.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
             fprintf(stderr, "       -e          Use even parity for DEVICE.\n");
@@ -387,14 +387,15 @@ int main(int argc, char * argv[])
         rc = diminuto_serial_raw(fd);
         assert(rc == 0);
 
-        infp = fdopen(fd, "a+");
-        if (infp == (FILE *)0) { perror(device); }
-        assert(infp != (FILE *)0);
+        devfp = fdopen(fd, "a+");
+        if (devfp == (FILE *)0) { perror(device); }
+        assert(devfp != (FILE *)0);
+        infp = devfp;
 
         if (emit) {
             while ((opt = getopt(argc, argv, "124678A:D:EOP:RW:b:dehnorsv?")) >= 0) {
                 if (opt == 'W') {
-                    rc = emit_sentence(outfp, optarg);
+                    rc = emit_sentence(devfp, optarg);
                     if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
                 }
             }
@@ -543,72 +544,69 @@ int main(int argc, char * argv[])
             fflush(errfp);
         }
 
-        if (!output) {
-            /* Do nothing. */
-        } else if (device == (const char *)0) {
-            /* Do nothing. */
-        } else {
-            fputs(buffer, infp);
-            fflush(infp);
-        }
-
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
         if (report) { print_sentence(outfp, buffer, size - 1); }
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(count >= 0);
         assert(vector[count] == (char *)0);
-        assert(count < (sizeof(vector) / sizeof(vector[0])));
+        assert(count <= (sizeof(vector) / sizeof(vector[0])));
 
-        bb = datagram;
-        for (vv = vector, tt = 1; (*vv != (char *)0); ++vv, ++tt) {
-            ss = strlen(*vv);
-            strcpy(bb, *vv);
-            bb += ss;
-            *(bb++) = (tt < count) ? HAZER_STIMULUS_DELIMITER : HAZER_STIMULUS_CHECKSUM;
-        }
-        cs = hazer_checksum(datagram, bb - datagram);
+        size = hazer_serialize(datagram, sizeof(datagram), vector, count);
+        assert(size <= (sizeof(datagram) - 4));
+        assert(datagram[size - 1] == '\0');
+        assert(datagram[size - 2] == '*');
+        cs = hazer_checksum(datagram, size);
         hazer_checksum2characters(cs, &msn, &lsn);
+        bb = &datagram[size - 1];
         *(bb++) = msn;
         *(bb++) = lsn;
         *(bb++) = '\r';
         *(bb++) = '\n';
         *(bb++) = '\0';
-        size = bb - datagram;
+        size += 4;
         assert(size <= sizeof(datagram));
-
-        if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-        if (report) { print_sentence(outfp, datagram, size - 1); }
 
         if (role == PRODUCER) {
             send_sentence(sock, protocol, &ipv4, &ipv6, port, datagram, size - 1);
         }
 
-        if (!report) {
-            /* Do nothing. */
-        } else if (hazer_parse_gga(&position, vector, count) == 0) {
+        if (escape) { fputs("\033[2;1H\033[0K", outfp); }
+        if (report) { print_sentence(outfp, datagram, size - 1); }
+
+        if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            print_position(outfp, "MAP",  &position);
+            if (report) { print_position(outfp, "MAP",  &position); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-            print_datum(outfp, "GGA",  &position);
+            if (report) { print_datum(outfp, "GGA",  &position); }
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            print_position(outfp, "MAP", &position);
+            if (report) { print_position(outfp, "MAP", &position); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-            print_datum(outfp, "RMC",  &position);
+            if (report) { print_datum(outfp, "RMC",  &position); }
         } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
             if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-            print_active(outfp, "GSA", &constellation);
-        } else if ((rc = hazer_parse_gsv(&constellation, vector, count)) == 0) {
+            if (report) { print_active(outfp, "GSA", &constellation); }
+        } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
             if (escape) { fputs("\033[6;1H\033[0J", outfp); }
-            print_view(outfp, "GSV", &constellation);
+            if (report) { print_view(outfp, "GSV", &constellation); }
         } else {
             /* Do nothing. */
         }
+
         if (report) { fflush(outfp); }
 
         assert(position.tot_nanoseconds >= nanoseconds);
         nanoseconds = position.tot_nanoseconds;
+
+        if (!output) {
+            /* Do nothing. */
+        } else if (position.dmy_nanoseconds == 0) {
+            /* Do nothing (confuses Google Earth). */
+        } else {
+            fputs(buffer, devfp);
+            fflush(devfp);
+        }
 
     }
 
