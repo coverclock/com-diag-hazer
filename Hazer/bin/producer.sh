@@ -8,4 +8,7 @@ PORT=${2:-"5555"}
 DEVICE=${3:-"/dev/ttyUSB0"}
 SPEED=${4:-"4800"}
 
+stty sane
+clear
+
 exec gpstool -D ${DEVICE} -b ${SPEED} -8 -n -1 -E -6 -A ${HOST} -P ${PORT}
