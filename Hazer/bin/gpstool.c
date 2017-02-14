@@ -604,7 +604,7 @@ int main(int argc, char * argv[])
         } else if (position.dmy_nanoseconds == 0) {
             /* Do nothing (confuses Google Earth). */
         } else {
-            fputs(buffer, devfp);
+            fputs(datagram, devfp);
             fflush(devfp);
         }
 
