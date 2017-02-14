@@ -549,7 +549,7 @@ int main(int argc, char * argv[])
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
         assert(count >= 0);
-        assert(vector[count] == (char *)0);
+        assert(vector[count - 1] == (char *)0);
         assert(count <= (sizeof(vector) / sizeof(vector[0])));
 
         size = hazer_serialize(datagram, sizeof(datagram), vector, count);
