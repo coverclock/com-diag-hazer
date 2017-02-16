@@ -124,27 +124,36 @@ the UDP socket on port 5555.
     GSV [10/11/48] sat 20 elv  5 azm  90 snr 22dBHz
     GSV [11/11/48] sat 51 elv 43 azm 183 snr 42dBHz
 
-You can also use the socat utility, available for most Linux/GNU/POSIX
-flavored systems, to capture the NMEA stream on the UDP port.
+You can use the socat utility, available for Linux/GNU and MacOS flavored
+systems, to capture the NMEA stream on the UDP port.
 
     > socat UDP6-RECVFROM:5555,reuseaddr,fork STDOUT
 
-    $GPGGA,160753.800,3947.6463,N,10509.2027,W,2,11,0.8,1727.3,M,-20.8,M,2.8,0000*7C
     $GPGSA,M,3,32,10,14,18,31,11,24,08,21,27,01,,1.3,0.8,1.1*33
     $GPGSV,3,1,12,32,79,305,39,10,66,062,41,14,58,247,35,18,40,095,34*72
     $GPGSV,3,2,12,31,21,180,45,11,20,309,27,24,19,044,30,08,17,271,31*7A
     $GPGSV,3,3,12,21,13,156,39,27,13,233,33,01,09,320,20,51,43,183,42*72
-    $GPRMC,160753.800,A,3947.6463,N,10509.2027,W,0.30,206.04,090217,,,D*7D
 
-You can dispense with gpstool entirely (which really only exists to test
-the Hazer library) and use socat to forward NMEA strings to a remote site.
-Be aware that when used in UDP consumer mode, gpstool expects every UDP
-datagram to be a fully formed NMEA sentence, because that's how it sends
-them in UDP producer mode. socat isn't so polite. Since the occasional
-UDP packet will inevitably be lost, if the output of socat is piped into
-gpstool, it will see a lot of corruption in the input stream. Using
-gpstool on both ends means only entire NMEA sentences are lost, and
-gpstool can recover from this.
+You can use the screen utility, also available for MacOS and Linux/GNU,
+to capture the NMEA stream on a serial port.
+
+    > screen /dev/tty.usbserial-FT98KOIH 4800 8n1
+
+    $GPGSA,M,3,32,10,14,18,24,08,21,11,27,31,01,51,1.3,0.8,1.1*37
+    $GPGSA,M,3,32,10,14,18,24,08,21,27,31,,,,1.7,1.0,1.3*3D
+    $GPGSV,3,1,12,32,77,276,37,10,69,048,31,14,53,241,37,18,44,090,23*7F
+    $GPGSV,3,2,12,24,23,047,28,08,19,276,33,21,19,156,32,11,17,312,23*79
+    $GPGSV,3,3,12,27,16,237,32,31,15,181,39,01,05,321,23,51,43,183,42*71
+
+You may be tempted (I was) to dispense with gpstool entirely and use
+socat to forward NMEA strings to a remote site.  Be aware that when
+used in UDP consumer mode, gpstool expects every UDP datagram to be
+a fully formed NMEA sentence, because that's how it sends them in UDP
+producer mode. socat isn't so polite. Since the occasional UDP packet
+will inevitably be lost, if the output of socat is piped into gpstool,
+it will see a lot of corruption in the input stream. Using gpstool on
+both ends means only entire NMEA sentences are lost, and gpstool can
+recover from this.
 
     > socat OPEN:/dev/ttyUSB0,b115200 UDP6-SENDTO:[::1]:5555
 
