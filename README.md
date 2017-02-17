@@ -182,7 +182,7 @@ Hazer has been successfully tested with the following devices.
 
 This software is an original work of its author(s).
 
-Contact:
+CONTACT
 
     Chip Overclock
     Digital Aggregates Corporation
