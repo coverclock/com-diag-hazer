@@ -172,16 +172,20 @@ diverges more and more with reality.  It is better to lose an NMEA
 sentence than have it delayed. After all, another sentence is on the
 way right behind it.
 
+This software is an original work of its author(s).
+
 Hazer has been successfully tested with the following devices.
 
-    USGlobalSat BU-535S4 (SiRF Star IV, 4800 8N1, ttyUSB, 1Hz)
+    USGlobalSat BU-535S4 (SiRF Star IV, 4800 8N1, ttyUSB, 1Hz) [1]
     USGlobalSat ND-105C (SiRF Star III, 4800 8N1, ttyUSB, 1Hz)
     USGlobalSat BU-353S4-5Hz (SiRF Star IV, 115200 8N1, ttyUSB, 5Hz)
-    Stratux Vk-162 (u-blox 7, 9600 8N1, ttyACM, 1Hz)
-    Eleduino Gmouse (u-blox 7, 9600 8N1, ttyACM, 1Hz)
-    Pharos-360 (SiRF Star II, 4800 8N1, ttyUSB, 1Hz)
+    Stratux Vk-162 (u-blox 7, 9600 8N1, ttyACM, 1Hz) [2]
+    Eleduino Gmouse (u-blox 7, 9600 8N1, ttyACM, 1Hz) [2]
+    Pharos-360 (SiRF Star II, 4800 8N1, ttyUSB, 1Hz) [3]
 
-This software is an original work of its author(s).
+[1] My favorite unit so far, all things considered; also my first.
+[2] u-blox 7 chipsets emit all sorts of interesting stuff in $GPTXT sentences.
+[3] Pharos-360 takes many seconds to start emitting sentences.
 
 CONTACT
 
