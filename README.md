@@ -174,11 +174,12 @@ way right behind it.
 
 Hazer has been successfully tested with the following devices.
 
-    USGlobalSat BU-535S4 (SiRF Star IV, 4800 8N1, ttyUSB)
-    USGlobalSat ND-105C (SiRF Star III, 4800 8N1, ttyUSB)
-    USGlobalSat BU-353S4-5Hz (SiRF Star IV, 115200 8N1, ttyUSB)
-    Stratux Vk-162 (u-blox 7, 9600 8N1, ttyACM)
-    Eleduino Gmouse (u-blox 7, 9600 8N1, ttyACM)
+    USGlobalSat BU-535S4 (SiRF Star IV, 4800 8N1, ttyUSB, 1Hz)
+    USGlobalSat ND-105C (SiRF Star III, 4800 8N1, ttyUSB, 1Hz)
+    USGlobalSat BU-353S4-5Hz (SiRF Star IV, 115200 8N1, ttyUSB, 5Hz)
+    Stratux Vk-162 (u-blox 7, 9600 8N1, ttyACM, 1Hz)
+    Eleduino Gmouse (u-blox 7, 9600 8N1, ttyACM, 1Hz)
+    Pharos-360 (SiRF Star II, 4800 8N1, ttyUSB, 1Hz)
 
 This software is an original work of its author(s).
 

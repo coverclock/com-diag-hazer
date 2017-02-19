@@ -105,7 +105,7 @@ static void print_active(FILE * fp, const char * name, const hazer_constellation
     fprintf(fp, "%s {", name);
     for (satellite = 0; satellite < limit; ++satellite) {
         if (cp->id[satellite] != 0) {
-            fprintf(fp, " %2u", cp->id[satellite]);
+            fprintf(fp, " %3u", cp->id[satellite]);
         }
     }
     fprintf(fp, " } [%02u/%02u/%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", cp->sat_active, cp->sat_view, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
@@ -123,7 +123,7 @@ static void print_view(FILE *fp, const char * name, const hazer_constellation_t 
 
     for (channel = 0; channel < limit; ++channel) {
         if (cp->sat[channel].id != 0) {
-            fprintf(fp, "%s [%02d/%02d/%02d] sat %2u elv %2u azm %3u snr %2udBHz\n", name, channel + 1, channels, CHANNELS, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
+            fprintf(fp, "%s [%02d/%02d/%02d] sat %3u elv %2u azm %3u snr %2udBHz\n", name, channel + 1, channels, CHANNELS, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
         }
     }
 }
