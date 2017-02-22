@@ -46,7 +46,7 @@ serial(ish) device, or from a UDP socket.
 
     > gpstool -?
 
-    usage: gpstool [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -h ] [ -s ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]
+    usage: gpstool [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -63,6 +63,8 @@ serial(ish) device, or from a UDP socket.
            -b BPS      Use BPS bits per second for DEVICE.
            -d          Display debug output on standard error.
            -e          Use even parity for DEVICE.
+           -l          Use local control for DEVICE.
+           -m          Use modem control for DEVICE.
            -o          Use odd parity for DEVICE.
            -n          Use no parity for DEVICE.
            -h          Use RTS/CTS for DEVICE.
