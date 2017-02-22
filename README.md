@@ -181,11 +181,17 @@ Hazer has been successfully tested with the following devices.
     USGlobalSat BU-353S4-5Hz (SiRF Star IV, 115200 8N1, ttyUSB, 5Hz)
     Stratux Vk-162 (u-blox 7, 9600 8N1, ttyACM, 1Hz) [2]
     Eleduino Gmouse (u-blox 7, 9600 8N1, ttyACM, 1Hz) [2]
-    Pharos-360 (SiRF Star II, 4800 8N1, ttyUSB, 1Hz) [3]
+    Gmouse Generic (u-blox 7, 9600 8N1, ttyACM, 1Hz) [2]
+
+Hazer has been unsuccessfully tested with the following devices.
+
+    Pharos GPS-360 (SiRF Star II, 4800 8N1, ttyUSB, 1Hz) [3]
+    Pharos GPS-500 (SiRF Star III, 4800 8N1, ttyUSB, 1Hz) [4]
 
 [1] My favorite unit so far, all things considered; also my first.
 [2] u-blox 7 chipsets emit all sorts of interesting stuff in $GPTXT sentences.
-[3] Pharos-360 takes many seconds to start emitting sentences.
+[3] Works intermittently.
+[4] Has never worked.
 
 CONTACT
 

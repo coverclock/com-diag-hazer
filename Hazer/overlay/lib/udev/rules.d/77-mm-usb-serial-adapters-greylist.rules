@@ -1,0 +1,1 @@
+ATTRS{idVendor}=="067b", ATTRS{idProduct}=="aaa0", ENV{ID_MM_DEVICE_MANUAL_SCAN_ONLY}="1"

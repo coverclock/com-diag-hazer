@@ -257,8 +257,10 @@ int main(int argc, char * argv[])
     int databits = 8;
     int paritybit = 0;
     int stopbits = 1;
+    int modemcontrol = 0;
     int rtscts = 0;
     int xonxoff = 0;
+    int readonly = !0;
     role_t role = NONE;
     protocol_t protocol = IPV4;
     const char * host = (const char *)0;
@@ -269,6 +271,7 @@ int main(int argc, char * argv[])
     int output = 0;
     int emit = 0;
     uint64_t nanoseconds = 0;
+    static const char OPTIONS[] = "124678A:D:EOP:RW:b:dehlmnorsv?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -276,7 +279,7 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    while ((opt = getopt(argc, argv, "124678A:D:EOP:RW:b:dehnorsv?")) >= 0) {
+    while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
         case '1':
             stopbits = 1;
@@ -316,6 +319,7 @@ int main(int argc, char * argv[])
             report = !0;
             break;
         case 'W':
+            readonly = 0;
             emit = !0;
             break;
         case 'b':
@@ -329,6 +333,12 @@ int main(int argc, char * argv[])
             break;
         case 'h':
             rtscts = !0;
+            break;
+        case 'l':
+            modemcontrol = 0;
+            break;
+        case 'm':
+            modemcontrol = !0;
             break;
         case 'n':
             paritybit = 0;
@@ -347,7 +357,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -h ] [ -s ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(stderr, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -364,6 +374,8 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
             fprintf(stderr, "       -e          Use even parity for DEVICE.\n");
+            fprintf(stderr, "       -l          Use local control for DEVICE.\n");
+            fprintf(stderr, "       -m          Use modem control for DEVICE.\n");
             fprintf(stderr, "       -o          Use odd parity for DEVICE.\n");
             fprintf(stderr, "       -n          Use no parity for DEVICE.\n");
             fprintf(stderr, "       -h          Use RTS/CTS for DEVICE.\n");
@@ -377,11 +389,11 @@ int main(int argc, char * argv[])
 
     if (device != (const char *)0) {
 
-        fd = open(device, O_RDWR);
+        fd = open(device, readonly ? O_RDONLY : O_RDWR);
         if (fd < 0) { perror(device); }
         assert(fd >= 0);
 
-        rc = diminuto_serial_set(fd, bitspersecond, databits, paritybit, stopbits, 0, xonxoff, rtscts);
+        rc = diminuto_serial_set(fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
         assert(rc == 0);
 
         rc = diminuto_serial_raw(fd);
@@ -393,7 +405,7 @@ int main(int argc, char * argv[])
         infp = devfp;
 
         if (emit) {
-            while ((opt = getopt(argc, argv, "124678A:D:EOP:RW:b:dehnorsv?")) >= 0) {
+            while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
                 if (opt == 'W') {
                     rc = emit_sentence(devfp, optarg);
                     if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
