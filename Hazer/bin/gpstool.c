@@ -399,7 +399,7 @@ int main(int argc, char * argv[])
         rc = diminuto_serial_raw(fd);
         assert(rc == 0);
 
-        devfp = fdopen(fd, "a+");
+        devfp = fdopen(fd, readonly ? "r" : "a+");
         if (devfp == (FILE *)0) { perror(device); }
         assert(devfp != (FILE *)0);
         infp = devfp;
