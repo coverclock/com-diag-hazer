@@ -184,16 +184,12 @@ Hazer has been successfully tested with the following devices.
     Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
     Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
     Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
-
-Hazer has been unsuccessfully tested with the following devices.
-
     Pharos GPS-360 (SiRF Star II/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
-    Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [4]
+    Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
 
 [1] My favorite unit so far, all things considered; also my first.
 [2] U-Blox 7 chipsets emit all sorts of interesting stuff in $GPTXT sentences.
-[3] Works intermittently.
-[4] Has never worked.
+[3] Install udev rules in overlay to prevent ModemManager from toying with Pharos.
 
 CONTACT
 
