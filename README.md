@@ -186,6 +186,7 @@ Hazer has been successfully tested with the following devices.
     Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
     Pharos GPS-360 (SiRF Star II/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
     Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
+    Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]
 
 [1] My favorite unit so far, all things considered; also my first.
 [2] U-Blox 7 chipsets emit all sorts of interesting stuff in $GPTXT sentences.
