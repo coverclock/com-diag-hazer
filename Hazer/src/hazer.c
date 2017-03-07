@@ -794,7 +794,7 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXRMC")) != (sizeof("$XXRMC") - 1)) {
         /* Do nothing. */
-    } else if (*vector[0] != HAZER_NMEA_SENTENCE_START) {
+    } else if (*vector[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, RMC, sizeof(RMC) - 1) != 0) {
         /* Do nothing. */
@@ -841,7 +841,7 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXGSV")) != (sizeof("$XXGSV") - 1)) {
         /* Do nothing. */
-    } else if (*vector[0] != HAZER_NMEA_SENTENCE_START) {
+    } else if (*vector[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, GSV, sizeof(GSV) - 1) != 0) {
         /* Do nothing. */
@@ -898,7 +898,7 @@ int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
         /* Do nothing. */
-    } else if (*vector[0] != HAZER_NMEA_SENTENCE_START) {
+    } else if (*vector[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, GSA, sizeof(GSA) - 1) != 0) {
         /* Do nothing. */

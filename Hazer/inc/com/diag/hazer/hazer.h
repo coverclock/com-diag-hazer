@@ -343,16 +343,6 @@ extern int64_t hazer_parse_alt(const char * string, char units, uint8_t * digits
 extern double hazer_parse_num(const char * string);
 
 /*********************************************************************************
- * IDENTIFYING SPECIFIC TOKENS
- ********************************************************************************/
-
-/**
- * @def HAZER_NMEA_SENTENCE_START
- * NMEA 0183 4.10, 5.3.3.1, Table 1
- */
-#define HAZER_NMEA_SENTENCE_START "$"
-
-/*********************************************************************************
  * IDENTIFYING SPECIFIC TALKERS
  ********************************************************************************/
 
