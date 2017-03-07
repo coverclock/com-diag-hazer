@@ -363,10 +363,10 @@ extern double hazer_parse_num(const char * string);
 #define HAZER_NMEA_GALILEO_TALKER "GA"
 
 /**
- * @def HAZER_NMEA_GLOSNASS_TALKER
+ * @def HAZER_NMEA_GLONASS_TALKER
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
-#define HAZER_NMEA_GLOSNASS_TALKER "GL"
+#define HAZER_NMEA_GLONASS_TALKER "GL"
 
 /**
  * @def HAZER_NMEA_GNSS_TALKER

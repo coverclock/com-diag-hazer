@@ -591,7 +591,7 @@ int main(int argc, char * argv[])
             talker = HAZER_NMEA_GPS_TALKER;
         } else if (strncmp(vector[0], HAZER_NMEA_GNSS_TALKER, sizeof(HAZER_NMEA_GNSS_TALKER) - 1) == 0) {
             talker = HAZER_NMEA_GNSS_TALKER;
-        } else if (strncmp(vector[0], HAZER_NMEA_GLOSNASS_TALKER, sizeof(HAZER_NMEA_GLOSNASS_TALKER) - 1) == 0) {
+        } else if (strncmp(vector[0], HAZER_NMEA_GLONASS_TALKER, sizeof(HAZER_NMEA_GLONASS_TALKER) - 1) == 0) {
             talker = HAZER_NMEA_GLONASS_TALKER;
         } else if (strncmp(vector[0], HAZER_NMEA_GALILEO_TALKER, sizeof(HAZER_NMEA_GALILEO_TALKER) - 1) == 0) {
             talker = HAZER_NMEA_GALILEO_TALKER;
