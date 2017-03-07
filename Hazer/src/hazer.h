@@ -19,6 +19,24 @@
 #define HAZER_NMEA_SENTENCE_START "$"
 
 /**
+ * @def HAZER_NMEA_GALILEO_TALKER
+ * NMEA 0183 4.10, 6.1.4, Table 6
+ */
+#define HAZER_NMEA_GALILEO_TALKER "GA"
+
+/**
+ * @def HAZER_NMEA_GLOSNASS_TALKER
+ * NMEA 0183 4.10, 6.1.4, Table 6
+ */
+#define HAZER_NMEA_GLOSNASS_TALKER "GL"
+
+/**
+ * @def HAZER_NMEA_GNSS_TALKER
+ * NMEA 0183 4.10, 6.1.4, Table 6
+ */
+#define HAZER_NMEA_GNSS_TALKER "GN"
+
+/**
  * @def HAZER_NMEA_GPS_TALKER
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
