@@ -789,7 +789,7 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
     uint64_t utc_nanoseconds = 0;
     uint64_t dmy_nanoseconds = 0;
     uint64_t tot_nanoseconds = 0;
-    
+
     if (count < 1) { 
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXRMC")) != (sizeof("$XXRMC") - 1)) {
