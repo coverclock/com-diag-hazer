@@ -747,13 +747,17 @@ const char * hazer_format_nanodegrees2compass8(int64_t nanodegrees)
 int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char GGA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GGA;
+    static const char GGA[] = HAZER_NMEA_GPS_MESSAGE_GGA;
     uint64_t utc_nanoseconds = 0;
     uint64_t tot_nanoseconds = 0;
     
     if (count < 1) { 
         /* Do nothing. */
-    } else if (strncmp(vector[0], GGA, sizeof(GGA) - 1) != 0) {
+    } else if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
+        /* Do nothing. */
+    } else if (*vector[0] != HAZER_STIMULUS_START) {
+        /* Do nothing. */
+    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GGA, sizeof(GGA) - 1) != 0) {
         /* Do nothing. */
     } else if (count < 11) { 
         /* Do nothing. */
@@ -781,14 +785,18 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
 int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char RMC[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_RMC;
+    static const char RMC[] = HAZER_NMEA_GPS_MESSAGE_RMC;
     uint64_t utc_nanoseconds = 0;
     uint64_t dmy_nanoseconds = 0;
     uint64_t tot_nanoseconds = 0;
     
     if (count < 1) { 
         /* Do nothing. */
-    } else if (strncmp(vector[0], RMC, sizeof(RMC) - 1) != 0) {
+    } else if (strnlen(vector[0], sizeof("$XXRMC")) != (sizeof("$XXRMC") - 1)) {
+        /* Do nothing. */
+    } else if (*vector[0] != HAZER_NMEA_SENTENCE_START) {
+        /* Do nothing. */
+    } else if (strncmp(vector[0] + sizeof("$XX") - 1, RMC, sizeof(RMC) - 1) != 0) {
         /* Do nothing. */
     } else if (count < 10) { 
         /* Do nothing. */
@@ -818,7 +826,7 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
 int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char GSV[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSV;
+    static const char GSV[] = HAZER_NMEA_GPS_MESSAGE_GSV;
     int messages = 0;
     int message = 0;
     int start = 0;
@@ -831,7 +839,11 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
     
     if (count < 1) {
         /* Do nothing. */
-    } else if (strncmp(vector[0], GSV, sizeof(GSV) - 1) != 0) {
+    } else if (strnlen(vector[0], sizeof("$XXGSV")) != (sizeof("$XXGSV") - 1)) {
+        /* Do nothing. */
+    } else if (*vector[0] != HAZER_NMEA_SENTENCE_START) {
+        /* Do nothing. */
+    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GSV, sizeof(GSV) - 1) != 0) {
         /* Do nothing. */
     } else if (count < 5) {
         /* Do nothing. */
@@ -879,12 +891,16 @@ int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count
     int slot = 0;
     int id = 0;
     int satellites = 0;
-    static const char GSA[] = HAZER_NMEA_SENTENCE_START HAZER_NMEA_GPS_TALKER HAZER_NMEA_GPS_MESSAGE_GSA;
+    static const char GSA[] = HAZER_NMEA_GPS_MESSAGE_GSA;
     int limit = sizeof(datap->id) / sizeof(datap->id[0]);
 
     if (count < 1) {
         /* Do nothing. */
-    } else if (strncmp(vector[0], GSA, sizeof(GSA) - 1) != 0) {
+    } else if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
+        /* Do nothing. */
+    } else if (*vector[0] != HAZER_NMEA_SENTENCE_START) {
+        /* Do nothing. */
+    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GSA, sizeof(GSA) - 1) != 0) {
         /* Do nothing. */
     } else if (count < 18) {
         /* Do nothing. */

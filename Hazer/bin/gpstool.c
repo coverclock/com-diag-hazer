@@ -251,6 +251,7 @@ int main(int argc, char * argv[])
     uint8_t ck = 0;
     char msn = '\0';
     char lsn = '\0';
+    const char * talker = (const char *)0;
     int opt = -1;
     const char * device = (const char *)0;
     int bitspersecond = 4800;
@@ -586,7 +587,21 @@ int main(int argc, char * argv[])
         if (escape) { fputs("\033[2;1H\033[0K", outfp); }
         if (report) { print_sentence(outfp, datagram, size - 1); }
 
-        if (hazer_parse_gga(&position, vector, count) == 0) {
+        if (strncmp(vector[0], HAZER_NMEA_GPS_TALKER, sizeof(HAZER_NMEA_GPS_TALKER) - 1) == 0) {
+            talker = HAZER_NMEA_GPS_TALKER;
+        } else if (strncmp(vector[0], HAZER_NMEA_GNSS_TALKER, sizeof(HAZER_NMEA_GNSS_TALKER) - 1) == 0) {
+            talker = HAZER_NMEA_GNSS_TALKER;
+        } else if (strncmp(vector[0], HAZER_NMEA_GLOSNASS_TALKER, sizeof(HAZER_NMEA_GLOSNASS_TALKER) - 1) == 0) {
+            talker = HAZER_NMEA_GLONASS_TALKER;
+        } else if (strncmp(vector[0], HAZER_NMEA_GALILEO_TALKER, sizeof(HAZER_NMEA_GALILEO_TALKER) - 1) == 0) {
+            talker = HAZER_NMEA_GALILEO_TALKER;
+        } else {
+            talker = (const char *)0;
+        }
+
+        if (talker == (const char *)0) {
+            /* Do nothing. */
+        } else if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
             if (report) { print_position(outfp, "MAP",  &position); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
