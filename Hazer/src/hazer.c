@@ -749,7 +749,7 @@ const char * hazer_parse_talker(char * vector[], size_t count)
 
     if (count < 1) { 
         /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XX")) != (sizeof("$XX") - 1)) {
+    } else if (strnlen(vector[0], sizeof("$XX")) < (sizeof("$XX") - 1)) {
         /* Do nothing. */
     } else if (*vector[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
