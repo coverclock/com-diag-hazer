@@ -739,6 +739,34 @@ const char * hazer_format_nanodegrees2compass8(int64_t nanodegrees)
     return COMPASS[index];
 }
 
+/******************************************************************************
+ *
+ ******************************************************************************/
+
+const char * hazer_parse_talker(char * vector[], size_t count)
+{
+    const char * talker = (const char *)0;
+
+    if (count < 1) { 
+        /* Do nothing. */
+    } else if (strnlen(vector[0], sizeof("$XX")) != (sizeof("$XX") - 1)) {
+        /* Do nothing. */
+    } else if (*vector[0] != HAZER_STIMULUS_START) {
+        /* Do nothing. */
+    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GPS_TALKER, sizeof(HAZER_NMEA_GPS_TALKER) - 1) == 0) {
+        talker = HAZER_NMEA_GPS_TALKER;
+    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GNSS_TALKER, sizeof(HAZER_NMEA_GNSS_TALKER) - 1) == 0) {
+        talker = HAZER_NMEA_GNSS_TALKER;
+    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GLONASS_TALKER, sizeof(HAZER_NMEA_GLONASS_TALKER) - 1) == 0) {
+        talker = HAZER_NMEA_GLONASS_TALKER;
+    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GALILEO_TALKER, sizeof(HAZER_NMEA_GALILEO_TALKER) - 1) == 0) {
+        talker = HAZER_NMEA_GALILEO_TALKER;
+    } else {
+        /* Do nothing. */
+    }
+
+    return talker;
+}
 
 /******************************************************************************
  *

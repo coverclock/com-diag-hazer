@@ -587,19 +587,7 @@ int main(int argc, char * argv[])
         if (escape) { fputs("\033[2;1H\033[0K", outfp); }
         if (report) { print_sentence(outfp, datagram, size - 1); }
 
-        if (strncmp(vector[0] + 1, HAZER_NMEA_GPS_TALKER, sizeof(HAZER_NMEA_GPS_TALKER) - 1) == 0) {
-            talker = HAZER_NMEA_GPS_TALKER;
-        } else if (strncmp(vector[0] + 1, HAZER_NMEA_GNSS_TALKER, sizeof(HAZER_NMEA_GNSS_TALKER) - 1) == 0) {
-            talker = HAZER_NMEA_GNSS_TALKER;
-        } else if (strncmp(vector[0] + 1, HAZER_NMEA_GLONASS_TALKER, sizeof(HAZER_NMEA_GLONASS_TALKER) - 1) == 0) {
-            talker = HAZER_NMEA_GLONASS_TALKER;
-        } else if (strncmp(vector[0] + 1, HAZER_NMEA_GALILEO_TALKER, sizeof(HAZER_NMEA_GALILEO_TALKER) - 1) == 0) {
-            talker = HAZER_NMEA_GALILEO_TALKER;
-        } else {
-            talker = (const char *)0;
-        }
-
-        if (talker == (const char *)0) {
+        if ((talker = hazer_parse_talker(vector, count)) == (const char *)0) {
             /* Do nothing. */
         } else if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }

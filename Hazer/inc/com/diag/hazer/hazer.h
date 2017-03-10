@@ -58,9 +58,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/*********************************************************************************
+/******************************************************************************
  * DEBUGGING
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * Sets the debug file pointer. If the pointer is non-null, debugging
@@ -70,9 +70,9 @@
  */
 extern FILE * hazer_debug(FILE *now);
 
-/*********************************************************************************
+/*******************************************************************************
  * STARTING UP AND SHUTTING DOWN
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * Perform any necessary initialization.
@@ -86,9 +86,9 @@ extern int hazer_initialize(void);
  */
 extern int hazer_finalize(void);
 
-/*********************************************************************************
+/*******************************************************************************
  * COLLECTING AN NMEA SENTENCE
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * NMEA 0183 4.10, 5.3.3.1, Table 1
@@ -228,9 +228,9 @@ extern int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp);
  */
 extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
 
-/*********************************************************************************
+/*******************************************************************************
  * BREAKING UP AN NMEA SENTENCE INTO FIELDS
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * THis is an argument vector big enough to hold all possible sentences no
@@ -264,9 +264,9 @@ extern ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size
  */ 
 extern ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t count);
 
-/*********************************************************************************
+/*******************************************************************************
  * PARSING INDIVIDUAL FIELDS IN AN NMEA SENTENCE
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * Parse a string containing an integer representing the fractional portion of
@@ -342,9 +342,9 @@ extern int64_t hazer_parse_alt(const char * string, char units, uint8_t * digits
  */
 extern double hazer_parse_num(const char * string);
 
-/*********************************************************************************
+/*******************************************************************************
  * IDENTIFYING SPECIFIC TALKERS
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * @def HAZER_NMEA_GALILEO_TALKER
@@ -370,9 +370,9 @@ extern double hazer_parse_num(const char * string);
  */
 #define HAZER_NMEA_GPS_TALKER "GP"
 
-/*********************************************************************************
+/*******************************************************************************
  * IDENTIFYING SPECIFIC SENTENCES
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * @def HAZER_NMEA_GPS_MESSAGE_GGA
@@ -422,9 +422,22 @@ extern double hazer_parse_num(const char * string);
  */
 #define HAZER_NMEA_GPS_MESSAGE_ZDA "ZDA"
 
-/*********************************************************************************
+/*******************************************************************************
+ * DETERMINING TALKER
+ ******************************************************************************/
+
+/**
+ * Determine if the talker is one in which we are interested. Return its
+ * name if it is, NULL otherwise. We are only interested in certain talkers.
+ * @Param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return the name of the talker, or NULL.
+ */
+const char * hazer_parse_talker(char * vector[], size_t count);
+
+/*******************************************************************************
  * PARSING POSITION, HEADING, AND VELOCITY SENTENCES
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * THis structure maintains the time, position, altitude, speed, and bearing
@@ -467,9 +480,9 @@ extern int hazer_parse_gga(hazer_position_t *datap, char * vector[], size_t coun
  */
 extern int hazer_parse_rmc(hazer_position_t *datap, char * vector[], size_t count);
 
-/*********************************************************************************
+/*******************************************************************************
  * PARSING SATELLITE ELEVATION, AZIMUTH, AND SIGNAL STRENGTH SENTENCES
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * This structure maintains the elevation, azimuth, and signal strength of a
@@ -517,9 +530,9 @@ extern int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_
  */
 extern int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count);
 
-/*********************************************************************************
+/*******************************************************************************
  * FORMATTING DATA FOR OUTPUT
- ********************************************************************************/
+ ******************************************************************************/
 
 /**
  * Format nanoseconds (the sum of the UTC and DMY fields) in to separate values.
