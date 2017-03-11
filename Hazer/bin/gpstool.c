@@ -125,7 +125,7 @@ static void print_view(FILE *fp, const char * name, const hazer_constellation_t 
         if (limit > LIMIT) { limit = LIMIT; }
         for (satellite = 0; satellite < limit; ++satellite) {
             if (cp[constellation].sat[satellite].id != 0) {
-                fprintf(fp, "%s [%02d] sat %3u elv %2u azm %3u snr %2udBHz\n", name, ++channel, cp[constellation].sat[satellite].id, cp[constellation].sat[satellite].elv_degrees, cp[constellation].sat[satellite].azm_degrees, cp[constellation].sat[satellite].snr_dbhz);
+                fprintf(fp, "%s [%02d] sat %3u elv %2u azm %3u snr %2udBHz con %s\n", name, ++channel, cp[constellation].sat[satellite].id, cp[constellation].sat[satellite].elv_degrees, cp[constellation].sat[satellite].azm_degrees, cp[constellation].sat[satellite].snr_dbhz, HAZER_TALKER_NAME[constellation]);
             }
         }
     }

@@ -185,6 +185,11 @@ typedef enum HazerTalker {
 } hazer_talker_t;
 
 /**
+ * Array of TALKER names indexed by talker enumeration.
+ */
+extern const char * HAZER_TALKER_NAME[];
+
+/**
  * This buffer is large enough to contain the largest NMEA sentence,
  * according to the NMEA spec, plus a trailing NUL.
  * NMEA 0183 4.10, 5.3, p. 11
