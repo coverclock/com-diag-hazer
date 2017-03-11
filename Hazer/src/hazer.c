@@ -743,9 +743,9 @@ const char * hazer_format_nanodegrees2compass8(int64_t nanodegrees)
  *
  ******************************************************************************/
 
-const char * hazer_parse_talker(char * vector[], size_t count)
+hazer_talker_t hazer_parse_talker(char * vector[], size_t count)
 {
-    const char * talker = (const char *)0;
+    hazer_talker_t talker = HAZER_TALKER_NA;
 
     if (count < 1) { 
         /* Do nothing. */
@@ -753,14 +753,14 @@ const char * hazer_parse_talker(char * vector[], size_t count)
         /* Do nothing. */
     } else if (*vector[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
-    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GPS_TALKER, sizeof(HAZER_NMEA_GPS_TALKER) - 1) == 0) {
-        talker = HAZER_NMEA_GPS_TALKER;
     } else if (strncmp(vector[0] + 1, HAZER_NMEA_GNSS_TALKER, sizeof(HAZER_NMEA_GNSS_TALKER) - 1) == 0) {
-        talker = HAZER_NMEA_GNSS_TALKER;
+        talker = HAZER_TALKER_GNSS;
+    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GPS_TALKER, sizeof(HAZER_NMEA_GPS_TALKER) - 1) == 0) {
+        talker = HAZER_TALKER_GPS;
     } else if (strncmp(vector[0] + 1, HAZER_NMEA_GLONASS_TALKER, sizeof(HAZER_NMEA_GLONASS_TALKER) - 1) == 0) {
-        talker = HAZER_NMEA_GLONASS_TALKER;
+        talker = HAZER_TALKER_GLONASS;
     } else if (strncmp(vector[0] + 1, HAZER_NMEA_GALILEO_TALKER, sizeof(HAZER_NMEA_GALILEO_TALKER) - 1) == 0) {
-        talker = HAZER_NMEA_GALILEO_TALKER;
+        talker = HAZER_TALKER_GALILEO;
     } else {
         /* Do nothing. */
     }
@@ -898,7 +898,7 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
                 rc = 1;
             }
             datap->channels = channel;
-            datap->sat_view = satellites;
+            datap->view = satellites;
             if (rc < 0) {
                 /* Do nothing. */
             } else if (message < messages) {
@@ -912,7 +912,7 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
     return rc;
 }
 
-int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count)
+int hazer_parse_gsa(hazer_solution_t * datap, char * vector[], size_t count)
 {
     int rc = -1;
     int index = 3;
@@ -941,7 +941,7 @@ int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count
             datap->id[slot] = id;
             ++satellites;
         }
-        datap->sat_active = satellites;
+        datap->active = satellites;
         datap->pdop = hazer_parse_num(vector[15]);
         datap->hdop = hazer_parse_num(vector[16]);
         datap->vdop = hazer_parse_num(vector[17]);

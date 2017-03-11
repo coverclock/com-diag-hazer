@@ -173,6 +173,18 @@ typedef enum HazerAction {
 } hazer_action_t;
 
 /**
+ * GNSS talkers.
+ */
+typedef enum HazerTalker {
+    HAZER_TALKER_NA                 = -1,
+    HAZER_TALKER_GALILEO            = 0,
+    HAZER_TALKER_GLONASS,
+    HAZER_TALKER_GNSS,
+    HAZER_TALKER_GPS,
+    HAZER_TALKER_TOTAL,
+} hazer_talker_t;
+
+/**
  * This buffer is large enough to contain the largest NMEA sentence,
  * according to the NMEA spec, plus a trailing NUL.
  * NMEA 0183 4.10, 5.3, p. 11
@@ -428,12 +440,13 @@ extern double hazer_parse_num(const char * string);
 
 /**
  * Determine if the talker is one in which we are interested. Return its
- * name if it is, NULL otherwise. We are only interested in certain talkers.
- * @Param vector contains the words in the NMEA sentence.
+ * index if it is, <0 otherwise. We are only interested in certain talkers,
+ * and even among those, only certain talkers are constellations.
+ * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
- * @return the name of the talker, or NULL.
+ * @return the index of the talker, or NULL.
  */
-const char * hazer_parse_talker(char * vector[], size_t count);
+extern hazer_talker_t hazer_parse_talker(char * vector[], size_t count);
 
 /*******************************************************************************
  * PARSING POSITION, HEADING, AND VELOCITY SENTENCES
@@ -465,7 +478,7 @@ typedef struct HazerPosition {
 /**
  * Parse a GGA NMEA sentence, updating the position.
  * @param datap points to the position structure (initialized to zeros).
- * @Param vector contains the words in the NMEA sentence.
+ * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
  */
@@ -474,7 +487,7 @@ extern int hazer_parse_gga(hazer_position_t *datap, char * vector[], size_t coun
 /**
  * Parse a RMC NMEA sentence, updating the position.
  * @param datap points to the position structure (initialized to zeros).
- * @Param vector contains the words in the NMEA sentence.
+ * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
  */
@@ -483,6 +496,29 @@ extern int hazer_parse_rmc(hazer_position_t *datap, char * vector[], size_t coun
 /*******************************************************************************
  * PARSING SATELLITE ELEVATION, AZIMUTH, AND SIGNAL STRENGTH SENTENCES
  ******************************************************************************/
+
+/**
+ * This structure maintains the information on the satellites in any
+ * constellation that were used in the position solution. THIS OBJECT
+ * SHOULD BE INITIALIZED TO ALL ZEROS.
+ */
+typedef struct HazerSolution {
+    double pdop;                /* Position Dilution Of Precision. */
+    double hdop;                /* Horizontal Dilution Of Precisioin. */
+    double vdop;                /* Vertical Diilution Of Precisioin. */
+    uint8_t active;             /* Number of satellites active. */
+    uint8_t id[HAZER_CONSTANT_GPS_SATELLITES];  /* Satellite IDentifiers. */
+    uint8_t unused[3];          /* Unused. */
+} hazer_solution_t;
+
+/**
+ * Parse a GSA NMEA sentence, updating the constellation.
+ * @param datap points to the solution structure (initialized to zeros).
+ * @param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_parse_gsa(hazer_solution_t * datap, char * vector[], size_t count);
 
 /**
  * This structure maintains the elevation, azimuth, and signal strength of a
@@ -501,34 +537,20 @@ typedef struct HazerSatellite {
  * have channels configured. THIS OBJECT SHOULD BE INITIALIZED TO ALL ZEROS.
  */
 typedef struct HazerConstellation {
-    double pdop;                /* Position Dilution Of Precision. */
-    double hdop;                /* Horizontal Dilution Of Precisioin. */
-    double vdop;                /* Vertical Diilution Of Precisioin. */
-    uint8_t sat_active;         /* Number of satellites active. */
-    uint8_t sat_view;           /* Number of satellites in view. */
-    uint8_t id[HAZER_CONSTANT_GPS_SATELLITES];  /* Satellite IDentifiers. */
-    uint8_t channels;           /* Number of channels used in view. */
-    uint8_t unused[1];          /* Unused. */
     hazer_satellite_t sat[HAZER_CONSTANT_GPS_CHANNELS]; /* Satellites viewed. */
+    uint8_t view;               /* Number of satellites in view. */
+    uint8_t channels;           /* Number of channels used in view. */
+    uint8_t unused[6];          /* Unused. */
 } hazer_constellation_t;
 
 /**
  * Parse a GSV NMEA sentence, updating the constellation.
  * @param datap points to the constellation structure (initialized to zeros).
- * @Param vector contains the words in the NMEA sentence.
+ * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.
  */
 extern int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count);
-
-/**
- * Parse a GSA NMEA sentence, updating the constellation.
- * @param datap points to the constellation structure (initialized to zeros).
- * @Param vector contains the words in the NMEA sentence.
- * @param count is size of the vector in slots including the null pointer.
- * @return 0 for success, <0 otherwise.
- */
-extern int hazer_parse_gsa(hazer_constellation_t * datap, char * vector[], size_t count);
 
 /*******************************************************************************
  * FORMATTING DATA FOR OUTPUT

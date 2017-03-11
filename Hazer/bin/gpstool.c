@@ -92,38 +92,41 @@ static void print_sentence(FILE *fp, const void * buffer, size_t size)
     fflush(fp);
 }
 
-static void print_active(FILE * fp, const char * name, const hazer_constellation_t * cp)
+static void print_active(FILE * fp, const char * name, const hazer_solution_t * sp)
 {
-    static const unsigned int SATELLITES = sizeof(cp->id) / sizeof(cp->id[0]);
+    static const unsigned int SATELLITES = sizeof(sp->id) / sizeof(sp->id[0]);
     int satellite = 0;
     int satellites = 0;
     int limit = 0;
 
-    satellites = cp->sat_active;
+    satellites = sp->active;
     limit = (satellites > SATELLITES) ? SATELLITES : satellites;
 
     fprintf(fp, "%s {", name);
     for (satellite = 0; satellite < limit; ++satellite) {
-        if (cp->id[satellite] != 0) {
-            fprintf(fp, " %3u", cp->id[satellite]);
+        if (sp->id[satellite] != 0) {
+            fprintf(fp, " %3u", sp->id[satellite]);
         }
     }
-    fprintf(fp, " } [%02u/%02u/%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", cp->sat_active, cp->sat_view, SATELLITES, cp->pdop, cp->hdop, cp->vdop);
+    fprintf(fp, " } [%02u%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", sp->active, SATELLITES, sp->pdop, sp->hdop, sp->vdop);
 }
 
-static void print_view(FILE *fp, const char * name, const hazer_constellation_t * cp)
+static void print_view(FILE *fp, const char * name, const hazer_constellation_t cp[])
 {
-    static const int CHANNELS = sizeof(cp->sat) / sizeof(cp->sat[0]);
+    static const int LIMIT = sizeof(cp[0].sat) / sizeof(cp[0].sat[0]);
     int channel = 0;
-    int channels = 0;
+    int constellation = 0;
+    int satellite = 0;
     int limit = 0;
 
-    channels = cp->channels;
-    limit = (channels > CHANNELS) ? CHANNELS : channels;
-
-    for (channel = 0; channel < limit; ++channel) {
-        if (cp->sat[channel].id != 0) {
-            fprintf(fp, "%s [%02d/%02d/%02d] sat %3u elv %2u azm %3u snr %2udBHz\n", name, channel + 1, channels, CHANNELS, cp->sat[channel].id, cp->sat[channel].elv_degrees, cp->sat[channel].azm_degrees, cp->sat[channel].snr_dbhz);
+    for (constellation = 0; constellation < HAZER_TALKER_TOTAL; ++constellation) {
+        limit = cp[constellation].channels;
+        if (limit > cp[constellation].view) { limit = cp[constellation].view; }
+        if (limit > LIMIT) { limit = LIMIT; }
+        for (satellite = 0; satellite < limit; ++satellite) {
+            if (cp[constellation].sat[satellite].id != 0) {
+                fprintf(fp, "%s [%02d] sat %3u elv %2u azm %3u snr %2udBHz\n", name, ++channel, cp[constellation].sat[satellite].id, cp[constellation].sat[satellite].elv_degrees, cp[constellation].sat[satellite].azm_degrees, cp[constellation].sat[satellite].snr_dbhz);
+            }
         }
     }
 }
@@ -230,7 +233,8 @@ int main(int argc, char * argv[])
     hazer_buffer_t datagram = { 0 };
     hazer_vector_t vector = { 0 };
     hazer_position_t position = { 0 };
-    hazer_constellation_t constellation = { 0 };
+    hazer_solution_t solution = { 0 };
+    hazer_constellation_t constellation[HAZER_TALKER_TOTAL] = { {  0 } };
     FILE * infp = stdin;
     FILE * outfp = stdout;
     FILE * errfp = stderr;
@@ -251,7 +255,7 @@ int main(int argc, char * argv[])
     uint8_t ck = 0;
     char msn = '\0';
     char lsn = '\0';
-    const char * talker = (const char *)0;
+    hazer_talker_t talker = HAZER_TALKER_NA;
     int opt = -1;
     const char * device = (const char *)0;
     int bitspersecond = 4800;
@@ -587,7 +591,7 @@ int main(int argc, char * argv[])
         if (escape) { fputs("\033[2;1H\033[0K", outfp); }
         if (report) { print_sentence(outfp, datagram, size - 1); }
 
-        if ((talker = hazer_parse_talker(vector, count)) == (const char *)0) {
+        if ((talker = hazer_parse_talker(vector, count)) == HAZER_TALKER_NA) {
             /* Do nothing. */
         } else if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
@@ -599,12 +603,12 @@ int main(int argc, char * argv[])
             if (report) { print_position(outfp, "MAP", &position); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             if (report) { print_datum(outfp, "RMC",  &position); }
-        } else if (hazer_parse_gsa(&constellation, vector, count) == 0) {
+        } else if (hazer_parse_gsa(&solution, vector, count) == 0) {
             if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-            if (report) { print_active(outfp, "GSA", &constellation); }
-        } else if (hazer_parse_gsv(&constellation, vector, count) == 0) {
+            if (report) { print_active(outfp, "GSA", &solution); }
+        } else if (hazer_parse_gsv(&constellation[talker], vector, count) == 0) {
             if (escape) { fputs("\033[6;1H\033[0J", outfp); }
-            if (report) { print_view(outfp, "GSV", &constellation); }
+            if (report) { print_view(outfp, "GSV", constellation); }
         } else {
             /* Do nothing. */
         }
