@@ -177,10 +177,10 @@ typedef enum HazerAction {
  */
 typedef enum HazerTalker {
     HAZER_TALKER_NA                 = -1,
-    HAZER_TALKER_GALILEO            = 0,
+    HAZER_TALKER_GPS                = 0,
     HAZER_TALKER_GLONASS,
+    HAZER_TALKER_GALILEO,
     HAZER_TALKER_GNSS,
-    HAZER_TALKER_GPS,
     HAZER_TALKER_TOTAL,
 } hazer_talker_t;
 
