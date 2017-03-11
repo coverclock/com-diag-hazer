@@ -96,11 +96,10 @@ static void print_active(FILE * fp, const char * name, const hazer_solution_t * 
 {
     static const unsigned int SATELLITES = sizeof(sp->id) / sizeof(sp->id[0]);
     int satellite = 0;
-    int satellites = 0;
     int limit = 0;
 
-    satellites = sp->active;
-    limit = (satellites > SATELLITES) ? SATELLITES : satellites;
+    limit = sp->active;
+    if (limit > SATELLITES) { limit = SATELLITES; }
 
     fprintf(fp, "%s {", name);
     for (satellite = 0; satellite < limit; ++satellite) {
@@ -108,7 +107,7 @@ static void print_active(FILE * fp, const char * name, const hazer_solution_t * 
             fprintf(fp, " %3u", sp->id[satellite]);
         }
     }
-    fprintf(fp, " } [%02u%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", sp->active, SATELLITES, sp->pdop, sp->hdop, sp->vdop);
+    fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", sp->active, sp->pdop, sp->hdop, sp->vdop);
 }
 
 static void print_view(FILE *fp, const char * name, const hazer_constellation_t cp[])
