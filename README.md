@@ -176,7 +176,16 @@ way right behind it.
 
 This software is an original work of its author(s).
 
-Hazer has been successfully tested with the following devices.
+Hazer has been successfully tested with the following GPS chipsets.
+
+    SiRF Star II/Prolific
+    SiRF Star III/Prolific
+    SiRF Star IV/Prolific
+    U-Blox 7
+    U-Blox M8
+    U-Blox LEA-6T
+
+Hazer has been successfully tested with the following devices that use those chipsets.
 
     USGlobalSat BU-535S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]
     USGlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)
