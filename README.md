@@ -42,9 +42,9 @@ This software is an original work of its author(s).
 
 Hazer has been successfully tested with the following GPS chipsets.
 
-    SiRF Star II/Prolific
-    SiRF Star III/Prolific
-    SiRF Star IV/Prolific
+    SiRF Star II
+    SiRF Star III
+    SiRF Star IV
     U-Blox 7
     U-Blox M8
     U-Blox LEA-6T
@@ -76,7 +76,23 @@ Hazer has been successfully tested with the following devices that use those chi
 [4] Quectel chipset emits all sorts of interesting stuff in $GPTXT sentences.    
 [5] Receives multiple (non-GPS) GNSS constellations.    
 [6] Bluetooth GPS unit    
-    
+
+Hazer has been tested on the following targets and platforms.
+
+    "Mercury"
+    Dell OptiPlex 7040
+    Intel Core i7-6700T @ 2.8GHz x 8
+    Ubuntu 14.04.4
+    Linux 4.2.0
+    gcc 4.8.4
+
+    "Nickel"
+    Intel NUC5i7RYH
+    Intel Core i7-5557U @ 3.10GHz x 8
+    Ubuntu 16.04.2
+    Linux 4.10.0
+    gcc 5.4.0
+
 # Contact
 
     Chip Overclock
