@@ -273,8 +273,7 @@ excellent Linux open source GPS stack. Here is just a simple example of
 stopping the GPS daemon if it has already been started (make sure you
 are not going to break something doing this), restarting it in non-deamon
 debug mode, and running a client against it. In this example, I use the
-Garmin GLO Bluetooth device I have already set up, and using the X11
-GPS client.
+Garmin GLO Bluetooth device I have already set up, and the X11 GPS client.
 
     > sudo service stop gps
     > gpsd -N /dev/rfcomm0 &
