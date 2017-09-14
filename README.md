@@ -54,7 +54,7 @@ Hazer has been successfully tested with the following serial-to-USB chipsets.
     Prolific
     FTDI
 
-Hazer has been successfully tested with the following devices that use those chipsets.
+Hazer has been successfully tested with the following GPS devices.
 
     USGlobalSat BU-535S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]
     USGlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)
