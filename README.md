@@ -1,9 +1,11 @@
 com-diag-hazer
-=================
+==============
+
+# Copyright
 
 Copyright 2017 by the Digital Aggregates Corporation, Colorado, USA.
 
-LICENSE
+# License
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -26,23 +28,65 @@ License along with this library; if not, contact
     Boston MA 02111-1307 USA
     http://www.gnu.org/copyleft/lesser.txt
 
-ABSTRACT
+# Abstract
 
 This file is part of the Digital Aggregates Corporation Hazer
 package. Hazer is a simple C-based parser of the National Marine
-Electronics Association (NMEA) strings produced by the USGlobalSat
-BU-353S4 Global Positioning System (GPS) device, a tiny little external
-GPS receiver that emits NMEA strings over its built-in serial-to-USB
-adaptor. The BU-353S4 is based on the SiRF Star IV chipset. If you want
-to futz around with satellite geolocation, the BU-353S4 is a inexpensive
-and easy way to do it. Hazer parses GGA, GSA, GSV, and RMC sentences
-produced by a GPS "talker". While I used the BU-353S4 to test the
-software, it is likely usable for any GPS receiver that conforms to NMEA
-0183 4.10. Unlike the Drover project, Hazer does its own NMEA parsing.
+Electronics Association (NMEA 0183 4.10) strings produced most Global
+Positioning System (GPS) devices.  Unlike the Drover project, Hazer does
+its own NMEA parsing.  Hazer includes a gpstool utility to display the
+interpreted GPS data. gpstool accepts NMEA sentences from standard input,
+from a serial(ish) device, or from a UDP socket.
 
-Hazer includes a gpstool utility to display the interpreted GPS
-data. gpstool accepts NMEA sentences from standard input, from a
-serial(ish) device, or from a UDP socket.
+This software is an original work of its author(s).
+
+Hazer has been successfully tested with the following GPS chipsets.
+
+    SiRF Star II/Prolific
+    SiRF Star III/Prolific
+    SiRF Star IV/Prolific
+    U-Blox 7
+    U-Blox M8
+    U-Blox LEA-6T
+
+Hazer has been successfully tested with the following serial-to-USB chipsets.
+
+    Prolific
+    FTDI
+
+Hazer has been successfully tested with the following devices that use those chipsets.
+
+    USGlobalSat BU-535S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]
+    USGlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)
+    USGlobalSat BU-353S4-5Hz (SiRF Star IV/Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)
+    Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
+    Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
+    Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
+    Pharos GPS-360 (SiRF Star II/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
+    Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
+    MakerFocus USB-Port-GPS (Quectel L80-R, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [4]
+    Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]
+    Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox M8, 9600 8n1, N/A, 1Hz) [5]
+    Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, ttyACM, 1Hz)
+    Garmin GLO [5] [6]
+
+[1] My favorite unit so far, all things considered; also my first.    
+[2] U-Blox 7 chipsets emit all sorts of interesting stuff in $GPTXT sentences.    
+[3] Install udev rules in overlay to prevent ModemManager from toying with Pharos.    
+[4] Quectel chipset emits all sorts of interesting stuff in $GPTXT sentences.    
+[5] Receives multiple (non-GPS) GNSS constellations.    
+[6] Bluetooth GPS unit    
+    
+# Contact
+
+    Chip Overclock
+    Digital Aggregates Corporation
+    3440 Youngfield Street, Suite 209
+    Wheat Ridge CO 80033 USA
+    http://www.diag.com
+    mailto:coverclock@diag.com
+
+# Notes
 
     > gpstool -?
 
@@ -171,46 +215,38 @@ introduce a lot of lantency in the NMEA stream. The result is the NMEA
 stream received by the consumer may lag signficantly behind real-time,
 and that lag increases the longer the system runs. So over time it
 diverges more and more with reality.  It is better to lose an NMEA
-sentence than have it delayed. After all, another sentence is on the
-way right behind it.
+sentence than have it delayed. After all, another more up-to-date sentence
+is on the way right behind it.
 
-This software is an original work of its author(s).
+You can use gpstool with Bluetooth GPS units like the Garmin GLO.
 
-Hazer has been successfully tested with the following GPS chipsets.
+    > sudo bluetoothctl
+    power on
+    agent on
+    scan on
+    ....
+    scan off
+    pair 01:23:45:67:89:AB
+    quit
+    > sudo rfcomm bind 0 01:23:45:67:89:AB 1
+    > sudo chmod 666 /dev/rfcomm0
+    > gpstool -D /dev/rfcomm0 -E
 
-    SiRF Star II/Prolific
-    SiRF Star III/Prolific
-    SiRF Star IV/Prolific
-    U-Blox 7
-    U-Blox M8
-    U-Blox LEA-6T
-
-Hazer has been successfully tested with the following devices that use those chipsets.
-
-    USGlobalSat BU-535S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]
-    USGlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)
-    USGlobalSat BU-353S4-5Hz (SiRF Star IV/Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)
-    Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
-    Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
-    Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
-    Pharos GPS-360 (SiRF Star II/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
-    Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
-    MakerFocus USB-Port-GPS (Quectel L80-R, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [4]
-    Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]
-    Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox M8, 9600 8n1, N/A, 1Hz) [5]
-    Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, ttyACM, 1Hz)
-
-[1] My favorite unit so far, all things considered; also my first.
-[2] U-Blox 7 chipsets emit all sorts of interesting stuff in $GPTXT sentences.
-[3] Install udev rules in overlay to prevent ModemManager from toying with Pharos.
-[4] Quectel chipset emits all sorts of interesting stuff in $GPTXT sentences.
-[5] Receives multiple (non-GPS) GNSS constellations.
-
-CONTACT
-
-    Chip Overclock
-    Digital Aggregates Corporation
-    3440 Youngfield Street, Suite 209
-    Wheat Ridge CO 80033 USA
-    http://www.diag.com
-    mailto:coverclock@diag.com
+    $GPVTG,350.4,T,341.6,M,000.08,N,0000.15,K,D*18\r\n
+    $GPVTG,350.4,T,341.6,M,000.08,N,0000.15,K,D*18\r\n
+    MAP 2017-09-14T14:22:05Z 39*47'39.20"N,105*09'12.13"W  5613.45' N     0.092mph
+    GGA 39.794223,-105.153371  1711.000m 350.400*    0.080knots [12] 10 11 5 4 5
+    GSA {  30  28  84   2  19   6  91  24  12  22  72   3 } [12] pdop 1.20 hdop 0.70 vdop 1.00
+    GSV [01] sat  51 elv 43 azm 182 snr 45dBHz con GPS
+    GSV [02] sat  30 elv  4 azm 161 snr 31dBHz con GPS
+    GSV [03] sat  28 elv 35 azm 105 snr 22dBHz con GPS
+    GSV [04] sat  84 elv 45 azm 245 snr 37dBHz con GPS
+    GSV [05] sat   2 elv 21 azm 204 snr 36dBHz con GPS
+    GSV [06] sat  19 elv 74 azm 346 snr 42dBHz con GPS
+    GSV [07] sat   6 elv 56 azm 175 snr 45dBHz con GPS
+    GSV [08] sat  91 elv 66 azm   5 snr 25dBHz con GPS
+    GSV [09] sat  24 elv 36 azm 301 snr 26dBHz con GPS
+    GSV [10] sat  12 elv 13 azm 304 snr 32dBHz con GPS
+    GSV [11] sat  22 elv  7 azm  46 snr 24dBHz con GPS
+    GSV [12] sat  72 elv 39 azm 326 snr 30dBHz con GPS
+    GSV [13] sat   3 elv 14 azm  67 snr 27dBHz con GPS
