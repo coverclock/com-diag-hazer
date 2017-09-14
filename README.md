@@ -267,3 +267,16 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     GSV [11] sat  22 elv  7 azm  46 snr 24dBHz con GPS
     GSV [12] sat  72 elv 39 azm 326 snr 30dBHz con GPS
     GSV [13] sat   3 elv 14 azm  67 snr 27dBHz con GPS
+
+You can test GPS devices independently of this software using the
+excellent Linux open source GPS stack. Here is just a simple example of
+stopping the GPS daemon if it has already been started (make sure you
+are not going to break something doing this), restarting it in non-deamon
+debug mode, and running a client against it. In this example, I use the
+Garmin GLO Bluetooth device I have already set up, and using the X11
+GPS client.
+
+    > sudo service stop gps
+    > gpsd -N /dev/rfcomm0 &
+    > xgps
+
