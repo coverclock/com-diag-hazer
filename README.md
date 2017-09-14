@@ -75,7 +75,7 @@ Hazer has been successfully tested with the following devices that use those chi
 [3] Install udev rules in overlay to prevent ModemManager from toying with Pharos.    
 [4] Quectel chipset emits all sorts of interesting stuff in $GPTXT sentences.    
 [5] Receives multiple (non-GPS) GNSS constellations.    
-[6] Bluetooth GPS unit    
+[6] Bluetooth GPS unit.    
 
 Hazer has been tested on the following targets and platforms.
 
