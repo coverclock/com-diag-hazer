@@ -42,12 +42,13 @@ This software is an original work of its author(s).
 
 Hazer has been successfully tested with the following GPS chipsets.
 
+    Quectel L80-R
     SiRF Star II
     SiRF Star III
     SiRF Star IV
     U-Blox 7
-    U-Blox M8
     U-Blox LEA-6T
+    U-Blox M8
 
 Hazer has been successfully tested with the following serial-to-USB chipsets.
 
@@ -68,7 +69,7 @@ Hazer has been successfully tested with the following GPS devices.
     Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]
     Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox M8, 9600 8n1, N/A, 1Hz) [5]
     Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, ttyACM, 1Hz)
-    Garmin GLO [5] [6]
+    Garmin GLO (?) [5] [6]
 
 [1] My favorite unit so far, all things considered; also my first.    
 [2] U-Blox 7 chipsets emit all sorts of interesting stuff in $GPTXT sentences.    
