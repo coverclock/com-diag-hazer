@@ -103,6 +103,14 @@ Hazer has been tested on the following targets and platforms.
     http://www.diag.com
     mailto:coverclock@diag.com
 
+# Links
+
+<https://github.com/coverclock/com-diag-hazer>
+
+<http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
+
+<https://www.flickr.com/photos/johnlsloan/albums/72157678580152480>
+
 # Notes
 
     > gpstool -?
