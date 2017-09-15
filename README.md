@@ -65,18 +65,16 @@ Hazer has been successfully tested with the following GPS devices.
     Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
     Pharos GPS-360 (SiRF Star II/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
     Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
-    MakerFocus USB-Port-GPS (Quectel L80-R, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [4]
+    MakerFocus USB-Port-GPS (Quectel L80-R, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2]
     Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]
-    Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox M8, 9600 8n1, N/A, 1Hz) [5]
-    Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, ttyACM, 1Hz)
-    Garmin GLO (?) [5] [6]
+    Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox M8, 9600 8n1, N/A, ttyAMA, 1Hz) [4]
+    Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)
+    Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]
 
 [1] My favorite unit so far, all things considered; also my first.    
-[2] U-Blox 7 chipsets emit all sorts of interesting stuff in $GPTXT sentences.    
-[3] Install udev rules in overlay to prevent ModemManager from toying with Pharos.    
-[4] Quectel chipset emits all sorts of interesting stuff in $GPTXT sentences.    
-[5] Receives multiple (non-GPS) GNSS constellations.    
-[6] Bluetooth GPS unit.    
+[2] Emits all sorts of interesting stuff in $GPTXT sentences.    
+[3] Install udev rules in overlay to prevent ModemManager from toying with device.    
+[4] Receives GPS (U.S., formerly "Navstar")  and GLONASS (Russian) constellations.    
 
 Hazer has been tested on the following targets and platforms.
 
@@ -249,7 +247,7 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     power on
     agent on
     scan on
-    ....
+    ...
     scan off
     pair 01:23:45:67:89:AB
     quit
@@ -276,6 +274,11 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     GSV [12] sat  72 elv 39 azm 326 snr 30dBHz con GPS
     GSV [13] sat   3 elv 14 azm  67 snr 27dBHz con GPS
 
+    > sudo rfcomm release 0
+    > sudo bluetoothctl
+    power off
+    quit
+
 You can test GPS devices independently of this software using the
 excellent Linux open source GPS stack. Here is just a simple example of
 stopping the GPS daemon if it has already been started (make sure you
@@ -283,7 +286,10 @@ are not going to break something doing this), restarting it in non-deamon
 debug mode, and running a client against it. In this example, I use the
 Garmin GLO Bluetooth device I have already set up, and the X11 GPS client.
 
-    > sudo service stop gps
+    > sudo service gpsd stop
     > gpsd -N /dev/rfcomm0 &
     > xgps
+    ...
+    > kill %+
+    > sudo service start gpsd
 
