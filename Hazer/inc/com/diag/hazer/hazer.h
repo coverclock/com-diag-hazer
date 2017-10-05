@@ -181,6 +181,7 @@ typedef enum HazerTalker {
     HAZER_TALKER_GLONASS,
     HAZER_TALKER_GALILEO,
     HAZER_TALKER_GNSS,
+    HAZER_TALKER_RADIO,
     HAZER_TALKER_TOTAL,
 } hazer_talker_t;
 
@@ -386,6 +387,12 @@ extern double hazer_parse_num(const char * string);
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
 #define HAZER_NMEA_GPS_TALKER "GP"
+
+/**
+ * @def HAZER_NMEA_GPS_TALKER
+ * NMEA 0183 4.10, 6.1.4, Table 6
+ */
+#define HAZER_NMEA_RADIO_TALKER "ZV"
 
 /*******************************************************************************
  * IDENTIFYING SPECIFIC SENTENCES

@@ -44,6 +44,7 @@ const char * HAZER_TALKER_NAME[] = {
     "GLONASS",
     "GALILEO",
     "GNSS",
+    "RADIO",
 };
 
 /******************************************************************************
@@ -769,6 +770,8 @@ hazer_talker_t hazer_parse_talker(char * vector[], size_t count)
         talker = HAZER_TALKER_GLONASS;
     } else if (strncmp(vector[0] + 1, HAZER_NMEA_GALILEO_TALKER, sizeof(HAZER_NMEA_GALILEO_TALKER) - 1) == 0) {
         talker = HAZER_TALKER_GALILEO;
+    } else if (strncmp(vector[0] + 1, HAZER_NMEA_RADIO_TALKER, sizeof(HAZER_NMEA_RADIO_TALKER) - 1) == 0) {
+        talker = HAZER_TALKER_RADIO;
     } else {
         /* Do nothing. */
     }
