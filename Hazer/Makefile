@@ -671,7 +671,7 @@ install-lib:
 		( cd $(INSTALL_LIB); ln -s -f $$O.$(MAJOR).$(MINOR) $$O.$(MAJOR) ); \
 		( cd $(INSTALL_LIB); ln -s -f $$O.$(MAJOR) $$O ); \
 	done
-	ldconfig -n $(INSTALL_LIB)
+	ldconfig -v $(INSTALL_LIB)
 
 install-include:
 	mkdir -p $(INSTALL_INC)
