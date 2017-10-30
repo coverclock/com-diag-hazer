@@ -109,6 +109,19 @@ Hazer has been tested on the following targets and platforms.
 
 <https://www.flickr.com/photos/johnlsloan/albums/72157678580152480>
 
+# Build
+
+Clone, build, and install Hazer in /usr/local.
+
+    cd ~
+    mkdir -p src
+    cd src
+    git clone https://github.com/coverclock/com-diag-hazer
+    cd com-diag-hazer/Hazer
+    make pristine all
+    sudo make install
+
+
 # Notes
 
     > gpstool -?
