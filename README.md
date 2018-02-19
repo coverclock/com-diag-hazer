@@ -57,7 +57,7 @@ Hazer has been successfully tested with the following serial-to-USB chipsets.
 
 Hazer has been successfully tested with the following GPS devices.
 
-    USGlobalSat BU-535S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]
+    USGlobalSat BU-353S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]
     USGlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)
     USGlobalSat BU-353S4-5Hz (SiRF Star IV/Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)
     Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
