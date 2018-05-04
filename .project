@@ -3,6 +3,7 @@
 	<name>com-diag-hazer</name>
 	<comment></comment>
 	<projects>
+		<project>com-diag-diminuto</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

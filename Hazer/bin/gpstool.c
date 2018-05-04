@@ -131,7 +131,7 @@ static void print_view(FILE *fp, const char * name, const hazer_constellation_t 
     }
 }
 
-static void print_position(FILE * fp, const char * name, const hazer_position_t * pp)
+static void print_position(FILE * fp, const char * name, const hazer_position_t * pp, int pps)
 {
     uint64_t nanoseconds = 0;
     int year = 0;
@@ -184,6 +184,8 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     fprintf(fp, " %-2s", compass);
 
     fprintf(fp, " %8.3lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
+
+    if (pps) { fprintf(fp, " 1PPS"); }
 
     fputc('\n', fp);
 }
@@ -266,6 +268,7 @@ int main(int argc, char * argv[])
     int rtscts = 0;
     int xonxoff = 0;
     int readonly = !0;
+    int carrierdetect = 0;
     role_t role = NONE;
     protocol_t protocol = IPV4;
     const char * host = (const char *)0;
@@ -275,8 +278,9 @@ int main(int argc, char * argv[])
     diminuto_port_t port = 0;
     int output = 0;
     int emit = 0;
+    int pps = 0;
     uint64_t nanoseconds = 0;
-    static const char OPTIONS[] = "124678A:D:EOP:RW:b:dehlmnorsv?";
+    static const char OPTIONS[] = "124678A:D:EOP:RW:b:cdehlmnorsv?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -330,6 +334,10 @@ int main(int argc, char * argv[])
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
             break;
+        case 'c':
+        	modemcontrol = !0;
+        	carrierdetect = !0;
+        	break;
         case 'd':
             debug = !0;
             break;
@@ -362,7 +370,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -c ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(stderr, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -377,6 +385,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -R          Print a report on standard output.\n");
             fprintf(stderr, "       -W NMEA     Append * and checksum to NMEA and write to DEVICE.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
+            fprintf(stderr, "       -c          Wait for DCD to be asserted (implies -m).\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
             fprintf(stderr, "       -e          Use even parity for DEVICE.\n");
             fprintf(stderr, "       -l          Use local control for DEVICE.\n");
@@ -495,6 +504,21 @@ int main(int argc, char * argv[])
 
         if (role != CONSUMER) {
 
+        	pps = 0;
+        	if (!modemcontrol) {
+        		/* Do nothing. */
+        	} else if (!carrierdetect) {
+        		/* Do nothing. */
+        	} else if (state != HAZER_STATE_START) {
+        		/* Do nothing. */
+        	} else if (diminuto_serial_available(fd) > 0) {
+        		/* Do nothing. */
+        	} else {
+        		rc = diminuto_serial_wait(fd);
+        		assert(rc >= 0);
+        		pps = 1;
+        	}
+
             while (!0) {
                 ch = fgetc(infp);
                 prior = state;
@@ -595,12 +619,12 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            if (report) { print_position(outfp, "MAP",  &position); }
+            if (report) { print_position(outfp, "MAP",  &position, pps); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             if (report) { print_datum(outfp, "GGA",  &position); }
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            if (report) { print_position(outfp, "MAP", &position); }
+            if (report) { print_position(outfp, "MAP", &position, pps); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             if (report) { print_datum(outfp, "RMC",  &position); }
         } else if (hazer_parse_gsa(&solution, vector, count) == 0) {
