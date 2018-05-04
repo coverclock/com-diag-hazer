@@ -312,3 +312,31 @@ Garmin GLO Bluetooth device I have already set up, and the X11 GPS client.
     > kill %+
     > sudo service start gpsd
 
+You can test GPS devices like the NaviSys GR-701W that support One
+Pulse Per Second (1PPS) by toggling the Data Carrier Detect (DCD) modem
+control line. This includes devices that have a USB serial interface. Such
+devices can be used for precision timing applications. (Note the addition
+of the -c flag.)
+
+    > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -c
+    
+    $GPRMC,174227.00,A,3947.65321,N,10509.20367,W,0.027,,040518,,,D*68\r\n
+    $GPRMC,174227.00,A,3947.65321,N,10509.20367,W,0.027,,040518,,,D*68\r\n
+    MAP 2018-05-04T17:42:27Z 39*47'39.19"N,105*09'12.22"W  5600.00' N     0.031mph 1PPS
+    RMC 39.794220,-105.153395  1706.900m   0.000*    0.027knots [10] 9 10 5 0 4
+    GSA {   9   7   8  30  51  27  23  48  28  11 } [10] pdop 2.13 hdop 1.01 vdop 1.88
+    GSV [01] sat   5 elv 10 azm 297 snr 22dBHz con GPS
+    GSV [02] sat   7 elv 72 azm 348 snr 31dBHz con GPS
+    GSV [03] sat   8 elv 56 azm  92 snr 23dBHz con GPS
+    GSV [04] sat   9 elv 52 azm 187 snr 36dBHz con GPS
+    GSV [05] sat  11 elv 18 azm 143 snr 34dBHz con GPS
+    GSV [06] sat  16 elv  1 azm  55 snr  0dBHz con GPS
+    GSV [07] sat  18 elv  4 azm 125 snr 27dBHz con GPS
+    GSV [08] sat  23 elv 18 azm 161 snr 43dBHz con GPS
+    GSV [09] sat  27 elv 29 azm  48 snr 31dBHz con GPS
+    GSV [10] sat  28 elv 35 azm 246 snr 32dBHz con GPS
+    GSV [11] sat  30 elv 48 azm 307 snr 35dBHz con GPS
+    GSV [12] sat  46 elv 38 azm 215 snr 43dBHz con GPS
+    GSV [13] sat  48 elv 36 azm 220 snr 42dBHz con GPS
+    GSV [14] sat  51 elv 44 azm 183 snr 37dBHz con GPS
+
