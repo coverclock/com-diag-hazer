@@ -72,11 +72,14 @@ Hazer has been successfully tested with the following GPS devices.
     Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox M8, 9600 8n1, N/A, ttyAMA, 1Hz) [4]
     Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)
     Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]
+    NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [6]
 
 [1] My favorite unit so far, all things considered; also my first.    
 [2] Emits all sorts of interesting stuff in $GPTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
 [4] Receives GPS (U.S., formerly "Navstar")  and GLONASS (Russian) constellations.    
+[5] Receives GPS (U.S.), GLONASS (Russian), and QZSS (Japanese) constellations.    
+[6] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
 
 Hazer has been tested on the following targets and platforms.
 
@@ -143,6 +146,7 @@ Clone, build, and install Hazer in /usr/local.
            -R          Print a report on standard output.
            -W NMEA     Append * and checksum to NMEA and emit to DEVICE.
            -b BPS      Use BPS bits per second for DEVICE.
+           -c          Wait for DCD to be asserted (implies -m).
            -d          Display debug output on standard error.
            -e          Use even parity for DEVICE.
            -l          Use local control for DEVICE.
