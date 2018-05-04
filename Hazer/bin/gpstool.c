@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2017 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2017-2018 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-hazer
@@ -31,6 +31,7 @@
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_phex.h"
+#include "com/diag/diminuto/diminuto_pin.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
@@ -241,6 +242,7 @@ int main(int argc, char * argv[])
     FILE * outfp = stdout;
     FILE * errfp = stderr;
     FILE * devfp = stdout;
+    FILE * pinfp = (FILE *)0;
     int fd = STDIN_FILENO;
     int sock = -1;
     int rc = 0;
@@ -260,6 +262,7 @@ int main(int argc, char * argv[])
     hazer_talker_t talker = HAZER_TALKER_NA;
     int opt = -1;
     const char * device = (const char *)0;
+    const char * pins = (const char *)0;
     int bitspersecond = 4800;
     int databits = 8;
     int paritybit = 0;
@@ -269,6 +272,7 @@ int main(int argc, char * argv[])
     int xonxoff = 0;
     int readonly = !0;
     int carrierdetect = 0;
+    int pin = -1;
     role_t role = NONE;
     protocol_t protocol = IPV4;
     const char * host = (const char *)0;
@@ -280,7 +284,7 @@ int main(int argc, char * argv[])
     int emit = 0;
     int pps = 0;
     uint64_t nanoseconds = 0;
-    static const char OPTIONS[] = "124678A:D:EOP:RW:b:cdehlmnorsv?";
+    static const char OPTIONS[] = "124678A:D:EOP:RW:b:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -359,6 +363,9 @@ int main(int argc, char * argv[])
         case 'o':
             paritybit = 1;
             break;
+        case 'p':
+        	pins = optarg;
+        	break;
         case 'r':
             outfp = stderr;
             errfp = stdout;
@@ -370,7 +377,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -c ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -c [ -p PIN ] ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(stderr, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -391,6 +398,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -l          Use local control for DEVICE.\n");
             fprintf(stderr, "       -m          Use modem control for DEVICE.\n");
             fprintf(stderr, "       -o          Use odd parity for DEVICE.\n");
+            fprintf(stderr, "       -p PIN      Assert GPIO PIN with 1PPS (requires -c).\n");
             fprintf(stderr, "       -n          Use no parity for DEVICE.\n");
             fprintf(stderr, "       -h          Use RTS/CTS for DEVICE.\n");
             fprintf(stderr, "       -r          Reverse use of standard output and error.\n");
@@ -489,6 +497,23 @@ int main(int argc, char * argv[])
 
     }
 
+    if (pins != (const char *)0) {
+    	pin = strtol(pins, (char **)0, 0);
+    	if (pin >= 0) {
+    		pinfp = diminuto_pin_input(pin);
+    		if (pinfp == (FILE *)0) {
+    			perror(pins);
+        		assert(pinfp != (FILE *)0);
+    		} else {
+    			rc = diminuto_pin_clear(pinfp);
+    			if (rc < 0) {
+    				perror(pins);
+        			assert(rc >= 0);
+    			}
+    		}
+    	}
+    }
+
     if (debug) {
         hazer_debug(stderr);
     }
@@ -504,7 +529,7 @@ int main(int argc, char * argv[])
 
         if (role != CONSUMER) {
 
-        	pps = 0;
+    		pps = 0;
         	if (!modemcontrol) {
         		/* Do nothing. */
         	} else if (!carrierdetect) {
@@ -514,9 +539,19 @@ int main(int argc, char * argv[])
         	} else if (diminuto_serial_available(fd) > 0) {
         		/* Do nothing. */
         	} else {
+        		if (pinfp != (FILE *)0) {
+        			rc = diminuto_pin_clear(pinfp);
+        			if (rc < 0) { perror(pins); }
+        			assert(rc >= 0);
+        		}
         		rc = diminuto_serial_wait(fd);
         		assert(rc >= 0);
         		pps = 1;
+        		if (pinfp != (FILE *)0) {
+        			rc = diminuto_pin_set(pinfp);
+        			if (rc < 0) { perror(pins); }
+        			assert(rc >= 0);
+        		}
         	}
 
             while (!0) {
@@ -655,6 +690,13 @@ int main(int argc, char * argv[])
 
     rc = hazer_finalize();
     assert(rc == 0);
+
+    if (pinfp != (FILE *)0) {
+    	pinfp = diminuto_pin_unused(pinfp, pin);
+    	if (pinfp != (FILE *)0) {
+    		perror(pins);
+    	}
+    }
 
     if (sock >= 0) { diminuto_ipc_close(sock); }
     fclose(infp);

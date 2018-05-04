@@ -131,7 +131,7 @@ Clone, build, and install Hazer in /usr/local.
 
     > gpstool -?
 
-    usage: gpstool [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]
+    usage: gpstool [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -c [ -p PIN ] ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -152,6 +152,7 @@ Clone, build, and install Hazer in /usr/local.
            -l          Use local control for DEVICE.
            -m          Use modem control for DEVICE.
            -o          Use odd parity for DEVICE.
+           -p PIN      Assert GPIO PIN with 1PPS (requires -c).
            -n          Use no parity for DEVICE.
            -h          Use RTS/CTS for DEVICE.
            -r          Reverse use of standard output and error.
