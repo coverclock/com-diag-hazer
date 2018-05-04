@@ -42,37 +42,37 @@ This software is an original work of its author(s).
 
 Hazer has been successfully tested with the following GPS chipsets.
 
-    Quectel L80-R
-    SiRF Star II
-    SiRF Star III
-    SiRF Star IV
-    U-Blox 7
-    U-Blox LEA-6T
-    U-Blox M8
+Quectel L80-R    
+SiRF Star II    
+SiRF Star III    
+SiRF Star IV    
+U-Blox 7    
+U-Blox LEA-6T    
+U-Blox M8    
 
 Hazer has been successfully tested with the following serial-to-USB chipsets.
 
-    Cygnal Integrated Products
-    FTDI
-    Prolific
-    U-Blox (probably integrated into the GPS chip itself)
+Cygnal Integrated Products    
+FTDI    
+Prolific    
+U-Blox (probably integrated into the GPS chip itself)    
 
 Hazer has been successfully tested with the following GPS devices.
 
-    USGlobalSat BU-353S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]
-    USGlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)
-    USGlobalSat BU-353S4-5Hz (SiRF Star IV/Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)
-    Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
-    Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
-    Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]
-    Pharos GPS-360 (SiRF Star II/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
-    Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]
-    MakerFocus USB-Port-GPS (Quectel L80-R/Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2]
-    Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]
-    Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox M8, 9600 8n1, N/A, ttyAMA, 1Hz) [4]
-    Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)
-    Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]
-    NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [6]
+USGlobalSat BU-353S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]    
+USGlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
+USGlobalSat BU-353S4-5Hz (SiRF Star IV/Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
+Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
+Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
+Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
+Pharos GPS-360 (SiRF Star II/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
+Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
+MakerFocus USB-Port-GPS (Quectel L80-R/Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2]    
+Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]    
+Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox M8, 9600 8n1, N/A, ttyAMA, 1Hz) [4]    
+Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
+Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
+NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [6]    
 
 [1] My favorite unit so far, all things considered; also my first.    
 [2] Emits all sorts of interesting stuff in $GPTXT sentences.    
@@ -83,28 +83,35 @@ Hazer has been successfully tested with the following GPS devices.
 
 Hazer has been tested on the following targets and platforms.
 
-    "Mercury"
-    Dell OptiPlex 7040
-    Intel Core i7-6700T @ 2.8GHz x 8
-    Ubuntu 14.04.4
-    Linux 4.2.0
-    gcc 4.8.4
+"Mercury"    
+Dell OptiPlex 7040    
+Intel Core i7-6700T @ 2.8GHz x 8    
+Ubuntu 14.04.4    
+Linux 4.2.0    
+gcc 4.8.4    
 
-    "Nickel"
-    Intel NUC5i7RYH
-    Intel Core i7-5557U @ 3.10GHz x 8
-    Ubuntu 16.04.2
-    Linux 4.10.0
-    gcc 5.4.0
+"Nickel"    
+Intel NUC5i7RYH    
+Intel Core i7-5557U @ 3.10GHz x 8    
+Ubuntu 16.04.2    
+Linux 4.10.0    
+gcc 5.4.0    
+
+"Zinc"    
+Raspberry Pi 3 Model B    
+Broadcom BCM2837 Cortex-A53 ARMv7 @ 1.2GHz x 4    
+Raspbian GNU/Linux 8.0    
+Linux 4.4.34    
+gcc 4.9.2    
 
 # Contact
 
-    Chip Overclock
-    Digital Aggregates Corporation
-    3440 Youngfield Street, Suite 209
-    Wheat Ridge CO 80033 USA
-    http://www.diag.com
-    mailto:coverclock@diag.com
+Chip Overclock    
+Digital Aggregates Corporation    
+3440 Youngfield Street, Suite 209    
+Wheat Ridge CO 80033 USA    
+http://www.diag.com    
+mailto:coverclock@diag.com    
 
 # Links
 
@@ -340,4 +347,14 @@ of the -c flag.)
     GSV [12] sat  46 elv 38 azm 215 snr 43dBHz con GPS
     GSV [13] sat  48 elv 36 azm 220 snr 42dBHz con GPS
     GSV [14] sat  51 elv 44 azm 183 snr 37dBHz con GPS
+
+If the platform on which you are running Hazer supports GPIO, you can
+assert an output pin in time with the DCD signal to provide a 1PPS strobe.
+This example (which I've run on a Raspberry Pi) uses pin 16. Note that
+you may have to run gpstool as root to access the GPIO pins. Also, if
+gpstool exits ungracefully (which will typically be the case), you may
+have to use Diminuto's pintool to deallocate the GPIO pin, as shown below.
+
+    # pintool -p 16 -n
+    # gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -c -p 16
 

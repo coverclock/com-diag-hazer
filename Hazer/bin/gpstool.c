@@ -500,7 +500,7 @@ int main(int argc, char * argv[])
     if (pins != (const char *)0) {
     	pin = strtol(pins, (char **)0, 0);
     	if (pin >= 0) {
-    		pinfp = diminuto_pin_input(pin);
+    		pinfp = diminuto_pin_output(pin);
     		if (pinfp == (FILE *)0) {
     			perror(pins);
         		assert(pinfp != (FILE *)0);
