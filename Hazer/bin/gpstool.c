@@ -507,25 +507,36 @@ int main(int argc, char * argv[])
 
     }
 
-    if (pps != (const char *)0) {
+    do {
+    	if (pps == (const char *)0) {
+    		break;
+    	}
     	ppspin = strtol(pps, (char **)0, 0);
     	if (ppspin < 0) {
     		errno = EINVAL;
     		diminuto_perror(pps);
-    	} else {
-    		ppsfp = diminuto_pin_input(ppspin);
-    		if (ppsfp != (FILE *)0) {
-    			rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_RISING);
-    			if (rc < 0) {
-    				ppsfp = diminuto_pin_unused(ppsfp, ppspin);
-    			} else {
-    				ppsfd = fileno(ppsfp);
-    				diminuto_mux_init(&mux);
-    				diminuto_mux_register_interrupt(&mux, ppsfd);
-    			}
-    		}
+    		break;
     	}
-    }
+    	rc = diminuto_pin_direction(ppspin, 0);
+    	if (rc < 0) {
+    		break;
+    	}
+    	rc = diminuto_pin_active(ppspin, !0);
+    	if (rc < 0) {
+    		break;
+    	}
+    	rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_RISING);
+    	if (rc < 0) {
+    		break;
+    	}
+    	ppsfp = diminuto_pin_open(ppspin);
+    	if (ppsfp == (FILE *)0) {
+    		break;
+    	}
+    	ppsfd = fileno(ppsfp);
+    	diminuto_mux_init(&mux);
+    	diminuto_mux_register_interrupt(&mux, ppsfd);
+    } while (0);
 
     if (strobe != (const char *)0) {
     	strobepin = strtol(strobe, (char **)0, 0);
