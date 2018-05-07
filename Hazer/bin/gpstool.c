@@ -331,8 +331,8 @@ int main(int argc, char * argv[])
             escape = !0;
             break;
         case 'I':
-        	pps = optarg;
-        	break;
+            pps = optarg;
+            break;
         case 'O':
             output = !0;
             break;
@@ -350,9 +350,9 @@ int main(int argc, char * argv[])
             bitspersecond = strtoul(optarg, (char **)0, 0);
             break;
         case 'c':
-        	modemcontrol = !0;
-        	carrierdetect = !0;
-        	break;
+            modemcontrol = !0;
+            carrierdetect = !0;
+            break;
         case 'd':
             debug = !0;
             break;
@@ -375,8 +375,8 @@ int main(int argc, char * argv[])
             paritybit = 1;
             break;
         case 'p':
-        	strobe = optarg;
-        	break;
+            strobe = optarg;
+            break;
         case 'r':
             outfp = stderr;
             errfp = stdout;
@@ -508,47 +508,51 @@ int main(int argc, char * argv[])
     }
 
     do {
-    	if (pps == (const char *)0) {
-    		break;
-    	}
-    	ppspin = strtol(pps, (char **)0, 0);
-    	if (ppspin < 0) {
-    		errno = EINVAL;
-    		diminuto_perror(pps);
-    		break;
-    	}
-    	rc = diminuto_pin_direction(ppspin, 0);
-    	if (rc < 0) {
-    		break;
-    	}
-    	rc = diminuto_pin_active(ppspin, !0);
-    	if (rc < 0) {
-    		break;
-    	}
-    	rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_RISING);
-    	if (rc < 0) {
-    		break;
-    	}
-    	ppsfp = diminuto_pin_open(ppspin);
-    	if (ppsfp == (FILE *)0) {
-    		break;
-    	}
-    	ppsfd = fileno(ppsfp);
-    	diminuto_mux_init(&mux);
-    	diminuto_mux_register_interrupt(&mux, ppsfd);
+        if (pps == (const char *)0) {
+            break;
+        }
+        ppspin = strtol(pps, (char **)0, 0);
+        if (ppspin < 0) {
+            errno = EINVAL;
+            diminuto_perror(pps);
+            break;
+        }
+        rc = diminuto_pin_export(ppspin);
+        if (rc < 0) {
+            break;
+        }
+        rc = diminuto_pin_direction(ppspin, 0);
+        if (rc < 0) {
+            break;
+        }
+        rc = diminuto_pin_active(ppspin, !0);
+        if (rc < 0) {
+            break;
+        }
+        rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_RISING);
+        if (rc < 0) {
+            break;
+        }
+        ppsfp = diminuto_pin_open(ppspin);
+        if (ppsfp == (FILE *)0) {
+            break;
+        }
+        ppsfd = fileno(ppsfp);
+        diminuto_mux_init(&mux);
+        diminuto_mux_register_interrupt(&mux, ppsfd);
     } while (0);
 
     if (strobe != (const char *)0) {
-    	strobepin = strtol(strobe, (char **)0, 0);
-    	if (strobepin < 0) {
-    		errno = EINVAL;
-    		diminuto_perror(strobe);
-    	} else {
-    		strobefp = diminuto_pin_output(strobepin);
-    		if (strobefp != (FILE *)0) {
-    			diminuto_pin_clear(strobefp);
-    		}
-    	}
+        strobepin = strtol(strobe, (char **)0, 0);
+        if (strobepin < 0) {
+            errno = EINVAL;
+            diminuto_perror(strobe);
+        } else {
+            strobefp = diminuto_pin_output(strobepin);
+            if (strobefp != (FILE *)0) {
+                diminuto_pin_clear(strobefp);
+            }
+        }
     }
 
     diminuto_terminator_install(0);
@@ -568,43 +572,46 @@ int main(int argc, char * argv[])
 
         if (role != CONSUMER) {
 
-        	if (ppsfd < 0) {
-        		/* Do nothing. */
-        	} else if (devfd < 0) {
-        		/* Do nothing. */
-        	} else if (state != HAZER_STATE_START) {
-        		onepps = 0;
-        	} else if (diminuto_serial_available(devfd) > 0) {
-        		onepps = 0;
-        	} else {
-        		if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
-        		rc = diminuto_mux_wait(&mux, -1);
-        		if (rc < 0) { break; }
-        		rc = diminuto_mux_ready_interrupt(&mux);
-        		if (rc != ppsfd) { break; }
-        		if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
-        		onepps = 1;
-        	}
+            if (ppsfd < 0) {
+                /* Do nothing. */
+            } else if (devfd < 0) {
+                /* Do nothing. */
+            } else if (state != HAZER_STATE_START) {
+                onepps = 0;
+            } else if (diminuto_serial_available(devfd) > 0) {
+                onepps = 0;
+            } else {
+                onepps = 0;
+                if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
+                rc = diminuto_mux_wait(&mux, -1);
+                if (rc < 0) { break; }
+                rc = diminuto_mux_ready_interrupt(&mux);
+                if (rc != ppsfd) { break; }
+                rc = diminuto_pin_get(ppsfp);
+                if (rc < 0) { break; }
+                if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
+                onepps = 1;
+            }
 
-        	if (ppsfd >= 0) {
-        		/* Do nothing. */
-        	} else if (devfd < 0) {
-        		/* Do nothing. */
-        	} else if (!modemcontrol) {
-        		/* Do nothing. */
-        	} else if (!carrierdetect) {
-        		/* Do nothing. */
-        	} else if (state != HAZER_STATE_START) {
-        		onepps = 0;
-        	} else if (diminuto_serial_available(devfd) > 0) {
-        		onepps = 0;
-        	} else {
-        		if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
-        		rc = diminuto_serial_wait(devfd);
-        		if (rc < 0) { break; }
-        		if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
-        		onepps = 1;
-        	}
+            if (ppsfd >= 0) {
+                /* Do nothing. */
+            } else if (devfd < 0) {
+                /* Do nothing. */
+            } else if (!modemcontrol) {
+                /* Do nothing. */
+            } else if (!carrierdetect) {
+                /* Do nothing. */
+            } else if (state != HAZER_STATE_START) {
+                onepps = 0;
+            } else if (diminuto_serial_available(devfd) > 0) {
+                onepps = 0;
+            } else {
+                if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
+                rc = diminuto_serial_wait(devfd);
+                if (rc < 0) { break; }
+                if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
+                onepps = 1;
+            }
 
             while (!0) {
                 ch = fgetc(infp);
@@ -744,17 +751,17 @@ int main(int argc, char * argv[])
     assert(rc >= 0);
 
     if (ppsfp != (FILE *)0) {
-    	diminuto_mux_unregister_interrupt(&mux, ppsfd);
-    	diminuto_mux_fini(&mux);
-    	diminuto_pin_unused(ppsfp, ppspin);
+        diminuto_mux_unregister_interrupt(&mux, ppsfd);
+        diminuto_mux_fini(&mux);
+        diminuto_pin_unused(ppsfp, ppspin);
     }
 
     if (strobefp != (FILE *)0) {
-    	diminuto_pin_unused(strobefp, strobepin);
+        diminuto_pin_unused(strobefp, strobepin);
     }
 
     if (sock >= 0) {
-    	diminuto_ipc_close(sock);
+        diminuto_ipc_close(sock);
     }
 
     fclose(infp);
