@@ -32,6 +32,9 @@
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_phex.h"
 #include "com/diag/diminuto/diminuto_pin.h"
+#include "com/diag/diminuto/diminuto_mux.h"
+#include "com/diag/diminuto/diminuto_terminator.h"
+#include "com/diag/diminuto/diminuto_log.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
@@ -66,11 +69,11 @@ static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p
     switch (protocol) {
     case IPV4:
         rc = diminuto_ipc4_datagram_send(sock, buffer, size, *ipv4p, port);
-        if (rc < 0) { perror("diminuto_ipc4_datagram_send"); }
+        if (rc < 0) { diminuto_perror("diminuto_ipc4_datagram_send"); }
         break;
     case IPV6:
         rc = diminuto_ipc6_datagram_send(sock, buffer, size, *ipv6p, port);
-        if (rc < 0) { perror("diminuto_ipc6_datagram_send"); }
+        if (rc < 0) { diminuto_perror("diminuto_ipc6_datagram_send"); }
         break;
     default:
         assert(0);
@@ -132,7 +135,7 @@ static void print_view(FILE *fp, const char * name, const hazer_constellation_t 
     }
 }
 
-static void print_position(FILE * fp, const char * name, const hazer_position_t * pp, int pps)
+static void print_position(FILE * fp, const char * name, const hazer_position_t * pp, int onepps)
 {
     uint64_t nanoseconds = 0;
     int year = 0;
@@ -186,7 +189,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
 
     fprintf(fp, " %8.3lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
 
-    if (pps) { fprintf(fp, " 1PPS"); }
+    if (onepps) { fprintf(fp, " 1PPS"); }
 
     fputc('\n', fp);
 }
@@ -242,8 +245,10 @@ int main(int argc, char * argv[])
     FILE * outfp = stdout;
     FILE * errfp = stderr;
     FILE * devfp = stdout;
-    FILE * pinfp = (FILE *)0;
-    int fd = STDIN_FILENO;
+    FILE * strobefp = (FILE *)0;
+    FILE * ppsfp = (FILE *)0;
+    int devfd = -1;
+    int ppsfd = -1;
     int sock = -1;
     int rc = 0;
     int ch = EOF;
@@ -262,7 +267,8 @@ int main(int argc, char * argv[])
     hazer_talker_t talker = HAZER_TALKER_NA;
     int opt = -1;
     const char * device = (const char *)0;
-    const char * pins = (const char *)0;
+    const char * strobe = (const char *)0;
+    const char * pps = (const char *)0;
     int bitspersecond = 4800;
     int databits = 8;
     int paritybit = 0;
@@ -272,7 +278,8 @@ int main(int argc, char * argv[])
     int xonxoff = 0;
     int readonly = !0;
     int carrierdetect = 0;
-    int pin = -1;
+    int strobepin = -1;
+    int ppspin = -1;
     role_t role = NONE;
     protocol_t protocol = IPV4;
     const char * host = (const char *)0;
@@ -282,9 +289,10 @@ int main(int argc, char * argv[])
     diminuto_port_t port = 0;
     int output = 0;
     int emit = 0;
-    int pps = 0;
+    int onepps = 0;
     uint64_t nanoseconds = 0;
-    static const char OPTIONS[] = "124678A:D:EOP:RW:b:cdehlmnop:rsv?";
+    diminuto_mux_t mux = { 0 };
+    static const char OPTIONS[] = "124678A:D:EI:OP:RW:b:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -322,6 +330,9 @@ int main(int argc, char * argv[])
             report = !0;
             escape = !0;
             break;
+        case 'I':
+        	pps = optarg;
+        	break;
         case 'O':
             output = !0;
             break;
@@ -364,7 +375,7 @@ int main(int argc, char * argv[])
             paritybit = 1;
             break;
         case 'p':
-        	pins = optarg;
+        	strobe = optarg;
         	break;
         case 'r':
             outfp = stderr;
@@ -377,7 +388,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -c [ -p PIN ] ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(stderr, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -387,18 +398,19 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -A ADDRESS  Send sentences to ADDRESS.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI escape sequences.\n");
+            fprintf(stderr, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
             fprintf(stderr, "       -O          Output sentences to DEVICE.\n");
             fprintf(stderr, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(stderr, "       -R          Print a report on standard output.\n");
             fprintf(stderr, "       -W NMEA     Append * and checksum to NMEA and write to DEVICE.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
-            fprintf(stderr, "       -c          Wait for DCD to be asserted (implies -m).\n");
+            fprintf(stderr, "       -c          Wait for DCD to be asserted (requires -D and implies -m).\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
             fprintf(stderr, "       -e          Use even parity for DEVICE.\n");
             fprintf(stderr, "       -l          Use local control for DEVICE.\n");
             fprintf(stderr, "       -m          Use modem control for DEVICE.\n");
             fprintf(stderr, "       -o          Use odd parity for DEVICE.\n");
-            fprintf(stderr, "       -p PIN      Assert GPIO PIN with 1PPS (requires -c).\n");
+            fprintf(stderr, "       -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).\n");
             fprintf(stderr, "       -n          Use no parity for DEVICE.\n");
             fprintf(stderr, "       -h          Use RTS/CTS for DEVICE.\n");
             fprintf(stderr, "       -r          Reverse use of standard output and error.\n");
@@ -411,18 +423,18 @@ int main(int argc, char * argv[])
 
     if (device != (const char *)0) {
 
-        fd = open(device, readonly ? O_RDONLY : O_RDWR);
-        if (fd < 0) { perror(device); }
-        assert(fd >= 0);
+        devfd = open(device, readonly ? O_RDONLY : O_RDWR);
+        if (devfd < 0) { diminuto_perror(device); }
+        assert(devfd >= 0);
 
-        rc = diminuto_serial_set(fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
+        rc = diminuto_serial_set(devfd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
         assert(rc == 0);
 
-        rc = diminuto_serial_raw(fd);
+        rc = diminuto_serial_raw(devfd);
         assert(rc == 0);
 
-        devfp = fdopen(fd, readonly ? "r" : "a+");
-        if (devfp == (FILE *)0) { perror(device); }
+        devfp = fdopen(devfd, readonly ? "r" : "a+");
+        if (devfp == (FILE *)0) { diminuto_perror(device); }
         assert(devfp != (FILE *)0);
         infp = devfp;
 
@@ -437,8 +449,6 @@ int main(int argc, char * argv[])
 
     }
 
-
-
     if (service == (const char *)0) {
 
         role = NONE;
@@ -448,15 +458,15 @@ int main(int argc, char * argv[])
         switch (protocol) {
         case IPV4:
             port = diminuto_ipc4_port(service, "udp");
-            if (port == 0) { perror(service); break; }
+            if (port == 0) { diminuto_perror(service); break; }
             sock = diminuto_ipc4_datagram_peer(port);
-            if (sock < 0) { perror(service); }
+            if (sock < 0) { diminuto_perror(service); }
             break;
         case IPV6:
             port = diminuto_ipc6_port(service, "udp");
-            if (port == 0) { perror(service); break; }
+            if (port == 0) { diminuto_perror(service); break; }
             sock = diminuto_ipc6_datagram_peer(port);
-            if (sock < 0) { perror(service); }
+            if (sock < 0) { diminuto_perror(service); }
             break;
         default:
             break;
@@ -470,19 +480,19 @@ int main(int argc, char * argv[])
         switch (protocol) {
         case IPV4:
             ipv4 = diminuto_ipc4_address(host);
-            if (diminuto_ipc4_is_unspecified(&ipv4)) { perror(host); break; }
+            if (diminuto_ipc4_is_unspecified(&ipv4)) { diminuto_perror(host); break; }
             port = diminuto_ipc4_port(service, "udp");
-            if (port == 0) { perror(service); break; }
+            if (port == 0) { diminuto_perror(service); break; }
             sock = diminuto_ipc4_datagram_peer(0);
-            if (sock < 0) { perror(service); }
+            if (sock < 0) { diminuto_perror(service); }
             break;
         case IPV6:
             ipv6 = diminuto_ipc6_address(host);
-            if (diminuto_ipc6_is_unspecified(&ipv6)) { perror(host); break; }
+            if (diminuto_ipc6_is_unspecified(&ipv6)) { diminuto_perror(host); break; }
             port = diminuto_ipc6_port(service, "udp");
-            if (port == 0) { perror(service); break; }
+            if (port == 0) { diminuto_perror(service); break; }
             sock = diminuto_ipc6_datagram_peer(0);
-            if (sock < 0) { perror(service); }
+            if (sock < 0) { diminuto_perror(service); }
             break;
         default:
             break;
@@ -490,29 +500,47 @@ int main(int argc, char * argv[])
         assert(sock >= 0);
 
         rc = diminuto_ipc_set_nonblocking(sock, !0);
-        if (rc < 0) { perror(service); }
+        if (rc < 0) { diminuto_perror(service); }
         assert(rc >= 0);
 
         role = PRODUCER;
 
     }
 
-    if (pins != (const char *)0) {
-    	pin = strtol(pins, (char **)0, 0);
-    	if (pin >= 0) {
-    		pinfp = diminuto_pin_output(pin);
-    		if (pinfp == (FILE *)0) {
-    			perror(pins);
-        		assert(pinfp != (FILE *)0);
-    		} else {
-    			rc = diminuto_pin_clear(pinfp);
+    if (pps != (const char *)0) {
+    	ppspin = strtol(pps, (char **)0, 0);
+    	if (ppspin < 0) {
+    		errno = EINVAL;
+    		diminuto_perror(pps);
+    	} else {
+    		ppsfp = diminuto_pin_input(ppspin);
+    		if (ppsfp != (FILE *)0) {
+    			rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_RISING);
     			if (rc < 0) {
-    				perror(pins);
-        			assert(rc >= 0);
+    				ppsfp = diminuto_pin_unused(ppsfp, ppspin);
+    			} else {
+    				ppsfd = fileno(ppsfp);
+    				diminuto_mux_init(&mux);
+    				diminuto_mux_register_interrupt(&mux, ppsfd);
     			}
     		}
     	}
     }
+
+    if (strobe != (const char *)0) {
+    	strobepin = strtol(strobe, (char **)0, 0);
+    	if (strobepin < 0) {
+    		errno = EINVAL;
+    		diminuto_perror(strobe);
+    	} else {
+    		strobefp = diminuto_pin_output(strobepin);
+    		if (strobefp != (FILE *)0) {
+    			diminuto_pin_clear(strobefp);
+    		}
+    	}
+    }
+
+    diminuto_terminator_install(0);
 
     if (debug) {
         hazer_debug(stderr);
@@ -523,35 +551,48 @@ int main(int argc, char * argv[])
 
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
 
-    while (!0) {
+    while (!diminuto_terminator_check()) {
 
         state = HAZER_STATE_START;
 
         if (role != CONSUMER) {
 
-    		pps = 0;
-        	if (!modemcontrol) {
+        	if (ppsfd < 0) {
+        		/* Do nothing. */
+        	} else if (devfd < 0) {
+        		/* Do nothing. */
+        	} else if (state != HAZER_STATE_START) {
+        		onepps = 0;
+        	} else if (diminuto_serial_available(devfd) > 0) {
+        		onepps = 0;
+        	} else {
+        		if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
+        		rc = diminuto_mux_wait(&mux, -1);
+        		if (rc < 0) { break; }
+        		rc = diminuto_mux_ready_interrupt(&mux);
+        		if (rc != ppsfd) { break; }
+        		if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
+        		onepps = 1;
+        	}
+
+        	if (ppsfd >= 0) {
+        		/* Do nothing. */
+        	} else if (devfd < 0) {
+        		/* Do nothing. */
+        	} else if (!modemcontrol) {
         		/* Do nothing. */
         	} else if (!carrierdetect) {
         		/* Do nothing. */
         	} else if (state != HAZER_STATE_START) {
-        		/* Do nothing. */
-        	} else if (diminuto_serial_available(fd) > 0) {
-        		/* Do nothing. */
+        		onepps = 0;
+        	} else if (diminuto_serial_available(devfd) > 0) {
+        		onepps = 0;
         	} else {
-        		if (pinfp != (FILE *)0) {
-        			rc = diminuto_pin_clear(pinfp);
-        			if (rc < 0) { perror(pins); }
-        			assert(rc >= 0);
-        		}
-        		rc = diminuto_serial_wait(fd);
-        		assert(rc >= 0);
-        		pps = 1;
-        		if (pinfp != (FILE *)0) {
-        			rc = diminuto_pin_set(pinfp);
-        			if (rc < 0) { perror(pins); }
-        			assert(rc >= 0);
-        		}
+        		if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
+        		rc = diminuto_serial_wait(devfd);
+        		if (rc < 0) { break; }
+        		if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
+        		onepps = 1;
         	}
 
             while (!0) {
@@ -583,13 +624,13 @@ int main(int argc, char * argv[])
         } else if (protocol == IPV4) {
 
             size = diminuto_ipc4_datagram_receive(sock, buffer, sizeof(buffer) - 1);
-            assert(size > 0);
+            if (size <= 0) { break; }
             buffer[size++] = '\0';
 
         } else if (protocol == IPV6) {
 
             size = diminuto_ipc6_datagram_receive(sock, buffer, sizeof(buffer) - 1);
-            assert(size > 0);
+            if (size <= 0) { break; }
             buffer[size++] = '\0';
 
         } else {
@@ -654,12 +695,12 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            if (report) { print_position(outfp, "MAP",  &position, pps); }
+            if (report) { print_position(outfp, "MAP",  &position, onepps); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             if (report) { print_datum(outfp, "GGA",  &position); }
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            if (report) { print_position(outfp, "MAP", &position, pps); }
+            if (report) { print_position(outfp, "MAP", &position, onepps); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             if (report) { print_datum(outfp, "RMC",  &position); }
         } else if (hazer_parse_gsa(&solution, vector, count) == 0) {
@@ -689,18 +730,26 @@ int main(int argc, char * argv[])
     }
 
     rc = hazer_finalize();
-    assert(rc == 0);
+    assert(rc >= 0);
 
-    if (pinfp != (FILE *)0) {
-    	pinfp = diminuto_pin_unused(pinfp, pin);
-    	if (pinfp != (FILE *)0) {
-    		perror(pins);
-    	}
+    if (ppsfp != (FILE *)0) {
+    	diminuto_mux_unregister_interrupt(&mux, ppsfd);
+    	diminuto_mux_fini(&mux);
+    	diminuto_pin_unused(ppsfp, ppspin);
     }
 
-    if (sock >= 0) { diminuto_ipc_close(sock); }
+    if (strobefp != (FILE *)0) {
+    	diminuto_pin_unused(strobefp, strobepin);
+    }
+
+    if (sock >= 0) {
+    	diminuto_ipc_close(sock);
+    }
+
     fclose(infp);
+
     fclose(outfp);
+
     fclose(errfp);
 
     return 0;
