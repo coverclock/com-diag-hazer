@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <signal.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
@@ -33,7 +34,6 @@
 #include "com/diag/diminuto/diminuto_phex.h"
 #include "com/diag/diminuto/diminuto_pin.h"
 #include "com/diag/diminuto/diminuto_mux.h"
-#include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_log.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
@@ -226,6 +226,12 @@ static void print_datum(FILE * fp, const char * name, const hazer_position_t * p
     fputc('\n', fp);
 }
 
+static int done = 0;
+
+static void handler(int signum /* unused */) {
+	done = !0;
+}
+
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
@@ -290,8 +296,11 @@ int main(int argc, char * argv[])
     int output = 0;
     int emit = 0;
     int onepps = 0;
+    int nowpps = 0;
+    int waspps = 0;
     uint64_t nanoseconds = 0;
     diminuto_mux_t mux = { 0 };
+    struct sigaction action = { 0 };
     static const char OPTIONS[] = "124678A:D:EI:OP:RW:b:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
@@ -529,7 +538,7 @@ int main(int argc, char * argv[])
         if (rc < 0) {
             break;
         }
-        rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_RISING);
+        rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_BOTH);
         if (rc < 0) {
             break;
         }
@@ -537,6 +546,12 @@ int main(int argc, char * argv[])
         if (ppsfp == (FILE *)0) {
             break;
         }
+        rc = diminuto_pin_get(ppsfp);
+        if (rc < 0) {
+        	break;
+        }
+        nowpps = !!rc;
+        waspps = nowpps;
         ppsfd = fileno(ppsfp);
         diminuto_mux_init(&mux);
         diminuto_mux_register_interrupt(&mux, ppsfd);
@@ -555,7 +570,11 @@ int main(int argc, char * argv[])
         }
     }
 
-    diminuto_terminator_install(0);
+    action.sa_handler = handler;
+    rc = sigaction(SIGINT, &action, (struct sigaction *)0);
+    if (rc < 0) {
+    	diminuto_perror("sigaction");
+    }
 
     if (debug) {
         hazer_debug(stderr);
@@ -566,32 +585,47 @@ int main(int argc, char * argv[])
 
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
 
-    while (!diminuto_terminator_check()) {
+    while (!done) {
 
         state = HAZER_STATE_START;
 
         if (role != CONSUMER) {
 
+        	/*
+        	 * If we get 1PPS from General Purpose I/O, see if it has changed.
+        	 */
+
             if (ppsfd < 0) {
                 /* Do nothing. */
             } else if (devfd < 0) {
                 /* Do nothing. */
-            } else if (state != HAZER_STATE_START) {
-                onepps = 0;
-            } else if (diminuto_serial_available(devfd) > 0) {
-                onepps = 0;
             } else {
-                onepps = 0;
-                if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
                 rc = diminuto_mux_wait(&mux, -1);
                 if (rc < 0) { break; }
-                rc = diminuto_mux_ready_interrupt(&mux);
-                if (rc != ppsfd) { break; }
-                rc = diminuto_pin_get(ppsfp);
-                if (rc < 0) { break; }
-                if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
-                onepps = 1;
+                if (rc > 0) {
+                	rc = diminuto_mux_ready_interrupt(&mux);
+                	if (rc == ppsfd) {
+						rc = diminuto_pin_get(ppsfp);
+						if (rc < 0) { break; }
+						nowpps = !!rc;
+						if (nowpps == waspps) {
+							/* Do nothing. */
+						} else if (nowpps) {
+							onepps = 1;
+							if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
+							waspps = nowpps;
+						} else {
+							onepps = 0;
+							if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
+							waspps = nowpps;
+						}
+					}
+                }
             }
+
+            /*
+             * If we get 1PPS from Data Carrier Detect, block until DCD asserted.
+             */
 
             if (ppsfd >= 0) {
                 /* Do nothing. */
@@ -620,9 +654,9 @@ int main(int argc, char * argv[])
                 if (state == HAZER_STATE_END) {
                     break;
                 } else if  (state == HAZER_STATE_EOF) {
+                    fprintf(stderr, "%s: EOF\n", program);
                     break;
                 } else if ((prior != HAZER_STATE_START) && (state == HAZER_STATE_START)) {
-                    /* State machine restarted. */
                     fprintf(stderr, "%s: ERR\n", program);
                 } else {
                     /* Do nothing. */
@@ -630,7 +664,6 @@ int main(int argc, char * argv[])
             }
 
             if (state == HAZER_STATE_EOF) {
-                fprintf(stderr, "%s: EOF\n", program);
                 break;
             }
 
