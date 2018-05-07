@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <signal.h>
+#include <pthread.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
@@ -232,6 +233,49 @@ static void handler(int signum /* unused */) {
 	done = !0;
 }
 
+struct context {
+	int * donep;
+	diminuto_mux_t * muxp;
+	FILE * ppsfp;
+	FILE * strobefp;
+	int * oneppsp;
+};
+
+static void * body(void * argp) {
+	struct context * ctxp = (struct context *)0;
+	int rc = -1;
+	int nowpps = 0;
+	int waspps = 0;
+
+	ctxp = (struct context *)argp;
+
+	while (!*(ctxp->donep)) {
+		rc = diminuto_mux_wait(ctxp->muxp, -1);
+		if (rc < 0) { break; }
+		if (rc > 0) {
+			rc = diminuto_mux_ready_interrupt(ctxp->muxp);
+			if (rc == fileno(ctxp->ppsfp)) {
+				rc = diminuto_pin_get(ctxp->ppsfp);
+				if (rc < 0) { break; }
+				nowpps = !!rc;
+				if (nowpps == waspps) {
+					/* Do nothing. */
+				} else if (nowpps) {
+					*(ctxp->oneppsp) = 1;
+					if (ctxp->strobefp != (FILE *)0) { diminuto_pin_set(ctxp->strobefp); }
+					waspps = nowpps;
+				} else {
+					*(ctxp->oneppsp) = 0;
+					if (ctxp->strobefp != (FILE *)0) { diminuto_pin_clear(ctxp->strobefp); }
+					waspps = nowpps;
+				}
+			}
+		}
+	}
+
+	return (void *)0;
+}
+
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
@@ -301,6 +345,9 @@ int main(int argc, char * argv[])
     uint64_t nanoseconds = 0;
     diminuto_mux_t mux = { 0 };
     struct sigaction action = { 0 };
+    struct context ctx = { 0 };
+    void * result = (void *)0;
+    pthread_t thread;
     static const char OPTIONS[] = "124678A:D:EI:OP:RW:b:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
@@ -308,6 +355,12 @@ int main(int argc, char * argv[])
     extern int optopt;
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
+
+    action.sa_handler = handler;
+    rc = sigaction(SIGINT, &action, (struct sigaction *)0);
+    if (rc < 0) {
+    	diminuto_perror("sigaction");
+    }
 
     while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
@@ -516,6 +569,26 @@ int main(int argc, char * argv[])
 
     }
 
+    if (strobe != (const char *)0) {
+        strobepin = strtol(strobe, (char **)0, 0);
+        if (strobepin < 0) {
+            errno = EINVAL;
+            diminuto_perror(strobe);
+        } else {
+            strobefp = diminuto_pin_output(strobepin);
+            if (strobefp != (FILE *)0) {
+                diminuto_pin_clear(strobefp);
+            }
+        }
+    }
+
+    /*
+	 * Handle 1PPS from General Purpose Input/Output (GPIO) pin
+	 * by polling until it has changed. The GPIO output of the
+	 * USB-Port-GPS doesn't appear to correlate with its serial
+	 * output in any way.
+	 */
+
     do {
         if (pps == (const char *)0) {
             break;
@@ -555,26 +628,13 @@ int main(int argc, char * argv[])
         ppsfd = fileno(ppsfp);
         diminuto_mux_init(&mux);
         diminuto_mux_register_interrupt(&mux, ppsfd);
+        ctx.donep = &done;
+        ctx.muxp = &mux;
+        ctx.ppsfp = ppsfp;
+        ctx.strobefp = strobefp;
+        ctx.oneppsp = &onepps;
+        rc = pthread_create(&thread, 0, body, &ctx);
     } while (0);
-
-    if (strobe != (const char *)0) {
-        strobepin = strtol(strobe, (char **)0, 0);
-        if (strobepin < 0) {
-            errno = EINVAL;
-            diminuto_perror(strobe);
-        } else {
-            strobefp = diminuto_pin_output(strobepin);
-            if (strobefp != (FILE *)0) {
-                diminuto_pin_clear(strobefp);
-            }
-        }
-    }
-
-    action.sa_handler = handler;
-    rc = sigaction(SIGINT, &action, (struct sigaction *)0);
-    if (rc < 0) {
-    	diminuto_perror("sigaction");
-    }
 
     if (debug) {
         hazer_debug(stderr);
@@ -591,43 +651,14 @@ int main(int argc, char * argv[])
 
         if (role != CONSUMER) {
 
-        	/*
-        	 * If we get 1PPS from General Purpose I/O, see if it has changed.
-        	 */
-
-            if (ppsfd < 0) {
-                /* Do nothing. */
-            } else if (devfd < 0) {
-                /* Do nothing. */
-            } else {
-                rc = diminuto_mux_wait(&mux, -1);
-                if (rc < 0) { break; }
-                if (rc > 0) {
-                	rc = diminuto_mux_ready_interrupt(&mux);
-                	if (rc == ppsfd) {
-						rc = diminuto_pin_get(ppsfp);
-						if (rc < 0) { break; }
-						nowpps = !!rc;
-						if (nowpps == waspps) {
-							/* Do nothing. */
-						} else if (nowpps) {
-							onepps = 1;
-							if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
-							waspps = nowpps;
-						} else {
-							onepps = 0;
-							if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
-							waspps = nowpps;
-						}
-					}
-                }
-            }
-
             /*
-             * If we get 1PPS from Data Carrier Detect, block until DCD asserted.
+             * Handle 1PPS from Data Carrier Detect (DCD) serial line by
+             * blocking until it is asserted. The GR-701W asserts DCD just
+             * before it unloads a block of sentences. The leading edge of DCD
+             * indicates 1PPS. It then appears to deassert DCD afterwards.
              */
 
-            if (ppsfd >= 0) {
+            if (ppsfp != (FILE *)0) {
                 /* Do nothing. */
             } else if (devfd < 0) {
                 /* Do nothing. */
@@ -780,10 +811,13 @@ int main(int argc, char * argv[])
 
     }
 
+    done = !0;
+
     rc = hazer_finalize();
     assert(rc >= 0);
 
     if (ppsfp != (FILE *)0) {
+    	pthread_join(thread, &result);
         diminuto_mux_unregister_interrupt(&mux, ppsfd);
         diminuto_mux_fini(&mux);
         diminuto_pin_unused(ppsfp, ppspin);
