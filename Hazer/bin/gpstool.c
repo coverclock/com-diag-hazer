@@ -37,6 +37,7 @@
 #include "com/diag/diminuto/diminuto_mux.h"
 #include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_coherentsection.h"
+#include "com/diag/diminuto/diminuto_criticalsection.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
@@ -246,6 +247,8 @@ struct context {
 	int * oneppsp;
 };
 
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 static void * poller(void * argp) {
 	void * xc = (void *)1;
 	struct context * ctxp = (struct context *)0;
@@ -265,26 +268,27 @@ static void * poller(void * argp) {
 			break;
 		}
 		rc = diminuto_mux_wait(ctxp->muxp, -1);
+		if (rc < 0) { break; }
 		assert(rc > 0);
 		rc = diminuto_mux_ready_interrupt(ctxp->muxp);
 		assert(rc == fileno(ctxp->ppsfp));
 		rc = diminuto_pin_get(ctxp->ppsfp);
-		assert(rc >= 0);
+		if (rc < 0) { break; }
 		nowpps = !!rc;
 		if (nowpps == waspps) {
 			/* Do nothing. */
 		} else if (nowpps) {
 			if (ctxp->strobefp != (FILE *)0) {
 				rc = diminuto_pin_set(ctxp->strobefp);
-				assert(rc >= 0);
+				if (rc < 0) { break; }
 			}
-			DIMINUTO_COHERENT_SECTION_BEGIN;
+			DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 				*(ctxp->oneppsp) = !0;
-			DIMINUTO_COHERENT_SECTION_END;
+			DIMINUTO_CRITICAL_SECTION_END;
 		} else {
 			if (ctxp->strobefp != (FILE *)0) {
 				rc = diminuto_pin_clear(ctxp->strobefp);
-				assert(rc >= 0);
+				if (rc < 0) { break; }
 			}
 		}
 		waspps = nowpps;
@@ -357,8 +361,6 @@ int main(int argc, char * argv[])
     int output = 0;
     int emit = 0;
     int onepps = 0;
-    int nowpps = 0;
-    int waspps = 0;
     int tmppps = 0;
     uint64_t nanoseconds = 0;
     diminuto_mux_t mux = { 0 };
@@ -627,8 +629,6 @@ int main(int argc, char * argv[])
         assert (ppsfp != (FILE *)0);
         rc = diminuto_pin_get(ppsfp);
         assert(rc >= 0);
-        nowpps = !!rc;
-        waspps = nowpps;
         ppsfd = fileno(ppsfp);
         diminuto_mux_init(&mux);
         rc = diminuto_mux_register_interrupt(&mux, ppsfd);
@@ -687,11 +687,6 @@ int main(int argc, char * argv[])
                 if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
                 onepps = !0;
             }
-
-            DIMINUTO_COHERENT_SECTION_BEGIN;
-            	tmppps = onepps;
-            	onepps = 0;
-            DIMINUTO_COHERENT_SECTION_END;
 
             while (!0) {
                 ch = fgetc(infp);
@@ -791,11 +786,19 @@ int main(int argc, char * argv[])
         if ((talker = hazer_parse_talker(vector, count)) == HAZER_TALKER_NA) {
             /* Do nothing. */
         } else if (hazer_parse_gga(&position, vector, count) == 0) {
+            DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+            	tmppps = onepps;
+            	onepps = 0;
+            DIMINUTO_CRITICAL_SECTION_END;
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
             if (report) { print_position(outfp, "MAP",  &position, tmppps); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             if (report) { print_datum(outfp, "GGA",  &position); }
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
+            DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+            	tmppps = onepps;
+            	onepps = 0;
+            DIMINUTO_CRITICAL_SECTION_END;
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
             if (report) { print_position(outfp, "MAP", &position, tmppps); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
