@@ -36,6 +36,7 @@
 #include "com/diag/diminuto/diminuto_pin.h"
 #include "com/diag/diminuto/diminuto_mux.h"
 #include "com/diag/diminuto/diminuto_log.h"
+#include "com/diag/diminuto/diminuto_coherentsection.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
@@ -136,7 +137,7 @@ static void print_view(FILE *fp, const char * name, const hazer_constellation_t 
     }
 }
 
-static void print_position(FILE * fp, const char * name, const hazer_position_t * pp, int onepps)
+static void print_position(FILE * fp, const char * name, const hazer_position_t * pp, int pps)
 {
     uint64_t nanoseconds = 0;
     int year = 0;
@@ -190,12 +191,13 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
 
     fprintf(fp, " %8.3lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
 
-    if (onepps) { fprintf(fp, " 1PPS"); }
+    fprintf(fp, " PPS %c", pps ? '1' : '0');
 
     fputc('\n', fp);
 }
 
-static void print_datum(FILE * fp, const char * name, const hazer_position_t * pp) {
+static void print_datum(FILE * fp, const char * name, const hazer_position_t * pp)
+{
     double decimal = 0.0;
 
     fputs(name, fp);
@@ -229,8 +231,11 @@ static void print_datum(FILE * fp, const char * name, const hazer_position_t * p
 
 static int done = 0;
 
-static void handler(int signum /* unused */) {
-	done = !0;
+static void handler(int signum /* unused */)
+{
+	DIMINUTO_COHERENT_SECTION_BEGIN;
+		done = !0;
+	DIMINUTO_COHERENT_SECTION_END;
 }
 
 struct context {
@@ -241,39 +246,51 @@ struct context {
 	int * oneppsp;
 };
 
-static void * body(void * argp) {
+static void * poller(void * argp) {
+	void * xc = (void *)1;
 	struct context * ctxp = (struct context *)0;
+	int done = 0;
 	int rc = -1;
 	int nowpps = 0;
 	int waspps = 0;
 
 	ctxp = (struct context *)argp;
 
-	while (!*(ctxp->donep)) {
+	while (!0) {
+		DIMINUTO_COHERENT_SECTION_BEGIN;
+			done = *(ctxp->donep);
+		DIMINUTO_COHERENT_SECTION_END;
+		if (done) {
+			xc = (void *)0;
+			break;
+		}
 		rc = diminuto_mux_wait(ctxp->muxp, -1);
-		if (rc < 0) { break; }
-		if (rc > 0) {
-			rc = diminuto_mux_ready_interrupt(ctxp->muxp);
-			if (rc == fileno(ctxp->ppsfp)) {
-				rc = diminuto_pin_get(ctxp->ppsfp);
-				if (rc < 0) { break; }
-				nowpps = !!rc;
-				if (nowpps == waspps) {
-					/* Do nothing. */
-				} else if (nowpps) {
-					*(ctxp->oneppsp) = 1;
-					if (ctxp->strobefp != (FILE *)0) { diminuto_pin_set(ctxp->strobefp); }
-					waspps = nowpps;
-				} else {
-					*(ctxp->oneppsp) = 0;
-					if (ctxp->strobefp != (FILE *)0) { diminuto_pin_clear(ctxp->strobefp); }
-					waspps = nowpps;
-				}
+		assert(rc > 0);
+		rc = diminuto_mux_ready_interrupt(ctxp->muxp);
+		assert(rc == fileno(ctxp->ppsfp));
+		rc = diminuto_pin_get(ctxp->ppsfp);
+		assert(rc >= 0);
+		nowpps = !!rc;
+		if (nowpps == waspps) {
+			/* Do nothing. */
+		} else if (nowpps) {
+			if (ctxp->strobefp != (FILE *)0) {
+				rc = diminuto_pin_set(ctxp->strobefp);
+				assert(rc >= 0);
+			}
+			DIMINUTO_COHERENT_SECTION_BEGIN;
+				*(ctxp->oneppsp) = !0;
+			DIMINUTO_COHERENT_SECTION_END;
+		} else {
+			if (ctxp->strobefp != (FILE *)0) {
+				rc = diminuto_pin_clear(ctxp->strobefp);
+				assert(rc >= 0);
 			}
 		}
+		waspps = nowpps;
 	}
 
-	return (void *)0;
+	return xc;
 }
 
 int main(int argc, char * argv[])
@@ -342,6 +359,7 @@ int main(int argc, char * argv[])
     int onepps = 0;
     int nowpps = 0;
     int waspps = 0;
+    int tmppps = 0;
     uint64_t nanoseconds = 0;
     diminuto_mux_t mux = { 0 };
     struct sigaction action = { 0 };
@@ -522,17 +540,18 @@ int main(int argc, char * argv[])
             port = diminuto_ipc4_port(service, "udp");
             if (port == 0) { diminuto_perror(service); break; }
             sock = diminuto_ipc4_datagram_peer(port);
-            if (sock < 0) { diminuto_perror(service); }
+            if (sock < 0) { diminuto_perror(service); break; }
             break;
         case IPV6:
             port = diminuto_ipc6_port(service, "udp");
             if (port == 0) { diminuto_perror(service); break; }
             sock = diminuto_ipc6_datagram_peer(port);
-            if (sock < 0) { diminuto_perror(service); }
+            if (sock < 0) { diminuto_perror(service); break; }
             break;
         default:
             break;
         }
+        assert(port > 0);
         assert(sock >= 0);
 
         role = CONSUMER;
@@ -546,7 +565,7 @@ int main(int argc, char * argv[])
             port = diminuto_ipc4_port(service, "udp");
             if (port == 0) { diminuto_perror(service); break; }
             sock = diminuto_ipc4_datagram_peer(0);
-            if (sock < 0) { diminuto_perror(service); }
+            if (sock < 0) { diminuto_perror(service); break; }
             break;
         case IPV6:
             ipv6 = diminuto_ipc6_address(host);
@@ -554,11 +573,12 @@ int main(int argc, char * argv[])
             port = diminuto_ipc6_port(service, "udp");
             if (port == 0) { diminuto_perror(service); break; }
             sock = diminuto_ipc6_datagram_peer(0);
-            if (sock < 0) { diminuto_perror(service); }
+            if (sock < 0) { diminuto_perror(service); break; }
             break;
         default:
             break;
         }
+        assert(port > 0);
         assert(sock >= 0);
 
         rc = diminuto_ipc_set_nonblocking(sock, !0);
@@ -571,10 +591,7 @@ int main(int argc, char * argv[])
 
     if (strobe != (const char *)0) {
         strobepin = strtol(strobe, (char **)0, 0);
-        if (strobepin < 0) {
-            errno = EINVAL;
-            diminuto_perror(strobe);
-        } else {
+        if (strobepin >= 0) {
             strobefp = diminuto_pin_output(strobepin);
             if (strobefp != (FILE *)0) {
                 diminuto_pin_clear(strobefp);
@@ -586,7 +603,8 @@ int main(int argc, char * argv[])
 	 * Handle 1PPS from General Purpose Input/Output (GPIO) pin
 	 * by polling until it has changed. The GPIO output of the
 	 * USB-Port-GPS doesn't appear to correlate with its serial
-	 * output in any way.
+	 * output in any way, nor is polling it when we do character
+	 * I/O sufficient. So it's interrogated in a separate thread.
 	 */
 
     do {
@@ -595,45 +613,37 @@ int main(int argc, char * argv[])
         }
         ppspin = strtol(pps, (char **)0, 0);
         if (ppspin < 0) {
-            errno = EINVAL;
-            diminuto_perror(pps);
             break;
         }
         rc = diminuto_pin_export(ppspin);
-        if (rc < 0) {
-            break;
-        }
+        assert(rc >= 0);
         rc = diminuto_pin_direction(ppspin, 0);
-        if (rc < 0) {
-            break;
-        }
+        assert(rc >= 0);
         rc = diminuto_pin_active(ppspin, !0);
-        if (rc < 0) {
-            break;
-        }
+        assert(rc >= 0);
         rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_BOTH);
-        if (rc < 0) {
-            break;
-        }
+        assert(rc >= 0);
         ppsfp = diminuto_pin_open(ppspin);
-        if (ppsfp == (FILE *)0) {
-            break;
-        }
+        assert (ppsfp != (FILE *)0);
         rc = diminuto_pin_get(ppsfp);
-        if (rc < 0) {
-        	break;
-        }
+        assert(rc >= 0);
         nowpps = !!rc;
         waspps = nowpps;
         ppsfd = fileno(ppsfp);
         diminuto_mux_init(&mux);
-        diminuto_mux_register_interrupt(&mux, ppsfd);
+        rc = diminuto_mux_register_interrupt(&mux, ppsfd);
+        assert(rc >= 0);
         ctx.donep = &done;
         ctx.muxp = &mux;
         ctx.ppsfp = ppsfp;
         ctx.strobefp = strobefp;
         ctx.oneppsp = &onepps;
-        rc = pthread_create(&thread, 0, body, &ctx);
+        rc = pthread_create(&thread, 0, poller, &ctx);
+        if (rc != 0) {
+        	errno = rc;
+        	diminuto_perror("pthread_create");
+        }
+        assert(rc == 0);
     } while (0);
 
     if (debug) {
@@ -667,16 +677,21 @@ int main(int argc, char * argv[])
             } else if (!carrierdetect) {
                 /* Do nothing. */
             } else if (state != HAZER_STATE_START) {
-                onepps = 0;
+                /* Do nothing. */
             } else if (diminuto_serial_available(devfd) > 0) {
-                onepps = 0;
+                /* Do nothing. */
             } else {
                 if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
                 rc = diminuto_serial_wait(devfd);
                 if (rc < 0) { break; }
                 if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
-                onepps = 1;
+                onepps = !0;
             }
+
+            DIMINUTO_COHERENT_SECTION_BEGIN;
+            	tmppps = onepps;
+            	onepps = 0;
+            DIMINUTO_COHERENT_SECTION_END;
 
             while (!0) {
                 ch = fgetc(infp);
@@ -777,12 +792,12 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (hazer_parse_gga(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            if (report) { print_position(outfp, "MAP",  &position, onepps); }
+            if (report) { print_position(outfp, "MAP",  &position, tmppps); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             if (report) { print_datum(outfp, "GGA",  &position); }
         } else if (hazer_parse_rmc(&position, vector, count) == 0) {
             if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            if (report) { print_position(outfp, "MAP", &position, onepps); }
+            if (report) { print_position(outfp, "MAP", &position, tmppps); }
             if (escape) { fputs("\033[4;1H\033[0K", outfp); }
             if (report) { print_datum(outfp, "RMC",  &position); }
         } else if (hazer_parse_gsa(&solution, vector, count) == 0) {
@@ -817,25 +832,29 @@ int main(int argc, char * argv[])
     assert(rc >= 0);
 
     if (ppsfp != (FILE *)0) {
-    	pthread_join(thread, &result);
-        diminuto_mux_unregister_interrupt(&mux, ppsfd);
+    	rc = pthread_join(thread, &result);
+    	if (rc != 0) {
+    		errno = rc;
+    		diminuto_perror("pthread_join");
+    	}
+        (void)diminuto_mux_unregister_interrupt(&mux, ppsfd);
         diminuto_mux_fini(&mux);
-        diminuto_pin_unused(ppsfp, ppspin);
+        (void)diminuto_pin_unused(ppsfp, ppspin);
     }
 
     if (strobefp != (FILE *)0) {
-        diminuto_pin_unused(strobefp, strobepin);
+        (void)diminuto_pin_unused(strobefp, strobepin);
     }
 
     if (sock >= 0) {
         diminuto_ipc_close(sock);
     }
 
-    fclose(infp);
+    (void)fclose(infp);
 
-    fclose(outfp);
+    (void)fclose(outfp);
 
-    fclose(errfp);
+    (void)fclose(errfp);
 
     return 0;
 }

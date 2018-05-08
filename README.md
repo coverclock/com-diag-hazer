@@ -3,7 +3,7 @@ com-diag-hazer
 
 # Copyright
 
-Copyright 2017 by the Digital Aggregates Corporation, Colorado, USA.
+Copyright 2017-2018 by the Digital Aggregates Corporation, Colorado, USA.
 
 # License
 
@@ -320,11 +320,16 @@ Garmin GLO Bluetooth device I have already set up, and the X11 GPS client.
     > kill %+
     > sudo service start gpsd
 
-You can test GPS devices like the NaviSys GR-701W that support One
-Pulse Per Second (1PPS) by toggling the Data Carrier Detect (DCD) modem
-control line. This includes devices that have a USB serial interface. Such
-devices can be used for precision timing applications. (Note the addition
-of the -c flag.)
+Some GPS devices provide a 1Hz One Pulse Per Second (1PPS) signal that is, if
+implemented correctly, closely phase locked to GPS time. Hazer and its
+gpstool utility are user-space software running on a non-real-time operating
+system, so any periodic action by Hazer is at best approximate in terms of
+period. But handling 1PPS even with some jitter is useful for casual testing
+of GPS devices.
+
+You can test GPS devices like the NaviSys GR-701W that provide 1PPS by toggling
+the Data Carrier Detect (DCD) modem control line. This includes devices that
+have a USB serial interface. Note the addition of the -c flag.
 
     > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -c
     
@@ -348,13 +353,40 @@ of the -c flag.)
     GSV [13] sat  48 elv 36 azm 220 snr 42dBHz con GPS
     GSV [14] sat  51 elv 44 azm 183 snr 37dBHz con GPS
 
-If the platform on which you are running Hazer supports GPIO, you can
-assert an output pin in time with the DCD signal to provide a 1PPS strobe.
-This example (which I've run on a Raspberry Pi) uses pin 16. Note that
-you may have to run gpstool as root to access the GPIO pins. Also, if
-gpstool exits ungracefully (which will typically be the case), you may
-have to use Diminuto's pintool to deallocate the GPIO pin, as shown below.
+You can also test GPS devices like the MakerFocus USB-Port-GPS that provide
+1PPS by toggling a General Purpose I/O (GPIO) pin. This example (which I've run
+on a Raspberry Pi) uses pin 18. Note the addition of the -I flag. (You may have
+to run gpstool as root to access the GPIO pins.)
 
-    # pintool -p 16 -n
+    # gpstool -D /dev/ttyUSB1 -b 9600 -8 -n -1 -I 18 -E
+    
+    $GPGSV,3,1,11,23,85,357,39,16,62,069,40,09,45,311,37,51,43,183,43*75\r\n
+    $GPGSV,3,1,11,23,85,357,39,16,62,069,40,09,45,311,37,51,43,183,43*75\r\n
+    MAP 2018-05-08T14:50:25Z 39*47'39.17"N,105*09'12.19"W  5588.51' N     0.000mph
+    GGA 39.794215,-105.153387  1703.400m   0.000*    0.000knots [09] 8 9 5 3 3
+    GSA {   8   7  22  26  23   9   3  16  27 } [09] pdop 1.94 hdop 1.03 vdop 1.64
+    GSV [01] sat  23 elv 85 azm 357 snr 39dBHz con GPS
+    GSV [02] sat  16 elv 62 azm  69 snr 40dBHz con GPS
+    GSV [03] sat   9 elv 45 azm 311 snr 37dBHz con GPS
+    GSV [04] sat  51 elv 43 azm 183 snr 44dBHz con GPS
+    GSV [05] sat  26 elv 34 azm  48 snr 28dBHz con GPS
+    GSV [06] sat   3 elv 33 azm 200 snr 44dBHz con GPS
+    GSV [07] sat   7 elv 23 azm 268 snr 28dBHz con GPS
+    GSV [08] sat  27 elv 20 azm 126 snr 36dBHz con GPS
+    GSV [09] sat  22 elv 16 azm 183 snr 42dBHz con GPS
+    GSV [10] sat   8 elv  5 azm 160 snr 34dBHz con GPS
+    GSV [11] sat  31 elv  2 azm  73 snr  0dBHz con GPS
+
+gpstool can assert an output GPIO pin in approximate time with the 1PPS signal
+derived from either DCD or GPIO. This example (which I've run on a Raspberry Pi
+with the GR-701W) uses pin 16. Note the addition of the -p flag. (Again, you
+may have to run gpstool as root to access the GPIO pins.)
+
     # gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -c -p 16
 
+The GPIO functions implemented in Diminuto and used by gpstool may get confused
+if gpstool exits ungracefully leaving GPIO pins configured. If necessary, you
+can deconfigure GPIO pins using the Diminuto pintool utility
+
+    # pintool -p 18 -n
+    # pintool -p 16 -n
