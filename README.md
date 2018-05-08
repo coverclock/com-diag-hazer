@@ -67,19 +67,20 @@ Hazer has been successfully tested with the following GPS devices.
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Pharos GPS-360 (SiRF Star II/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
 * Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
-* MakerFocus USB-Port-GPS (Quectel L80-R/Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2]    
+* MakerFocus USB-Port-GPS (Quectel L80-R/Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2] [6]    
 * Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]    
 * Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox M8, 9600 8n1, N/A, ttyAMA, 1Hz) [4]    
 * Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
-* NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [6]    
+* NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7]    
 
 [1] My favorite unit so far, all things considered; also my first.    
 [2] Emits all sorts of interesting stuff in $GPTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
 [4] Receives GPS (U.S., formerly "Navstar")  and GLONASS (Russian) constellations.    
 [5] Receives GPS (U.S.), GLONASS (Russian), and QZSS (Japanese) constellations.    
-[6] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
+[6] Supports One Pulse Per Second (1PPS) by toggling digital output pin.    
+[7] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
 
 Hazer has been tested on the following targets and platforms.
 
