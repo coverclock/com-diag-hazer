@@ -138,8 +138,8 @@ Clone, build, and install Hazer in /usr/local.
 # Notes
 
     > gpstool -?
-
-    usage: gpstool [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -c [ -p PIN ] ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]
+    
+    usage: gpstool [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -149,18 +149,19 @@ Clone, build, and install Hazer in /usr/local.
            -A ADDRESS  Send sentences to ADDRESS.
            -D DEVICE   Use DEVICE.
            -E          Like -R but use ANSI escape sequences.
-           -O          Write sentences to DEVICE.
+           -I PIN      Take 1PPS from GPIO input PIN (requires -D).
+           -O          Output sentences to DEVICE.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
-           -W NMEA     Append * and checksum to NMEA and emit to DEVICE.
+           -W NMEA     Append * and checksum to NMEA and write to DEVICE.
            -b BPS      Use BPS bits per second for DEVICE.
-           -c          Wait for DCD to be asserted (implies -m).
+           -c          Wait for DCD to be asserted (requires -D and implies -m).
            -d          Display debug output on standard error.
            -e          Use even parity for DEVICE.
            -l          Use local control for DEVICE.
            -m          Use modem control for DEVICE.
            -o          Use odd parity for DEVICE.
-           -p PIN      Assert GPIO PIN with 1PPS (requires -c).
+           -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).
            -n          Use no parity for DEVICE.
            -h          Use RTS/CTS for DEVICE.
            -r          Reverse use of standard output and error.
