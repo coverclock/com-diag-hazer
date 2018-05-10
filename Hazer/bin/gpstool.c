@@ -38,6 +38,7 @@
 #include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_coherentsection.h"
 #include "com/diag/diminuto/diminuto_criticalsection.h"
+#include "com/diag/diminuto/diminuto_interrupter.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
@@ -230,17 +231,8 @@ static void print_datum(FILE * fp, const char * name, const hazer_position_t * p
     fputc('\n', fp);
 }
 
-static int done = 0;
-
-static void handler(int signum /* unused */)
-{
-	DIMINUTO_COHERENT_SECTION_BEGIN;
-		done = !0;
-	DIMINUTO_COHERENT_SECTION_END;
-}
-
 struct context {
-	int * donep;
+	int done;
 	diminuto_mux_t * muxp;
 	FILE * ppsfp;
 	FILE * strobefp;
@@ -261,7 +253,7 @@ static void * poller(void * argp) {
 
 	while (!0) {
 		DIMINUTO_COHERENT_SECTION_BEGIN;
-			done = *(ctxp->donep);
+			done = ctxp->done;
 		DIMINUTO_COHERENT_SECTION_END;
 		if (done) {
 			xc = (void *)0;
@@ -364,7 +356,6 @@ int main(int argc, char * argv[])
     int tmppps = 0;
     uint64_t nanoseconds = 0;
     diminuto_mux_t mux = { 0 };
-    struct sigaction action = { 0 };
     struct context ctx = { 0 };
     void * result = (void *)0;
     pthread_t thread;
@@ -376,11 +367,8 @@ int main(int argc, char * argv[])
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    action.sa_handler = handler;
-    rc = sigaction(SIGINT, &action, (struct sigaction *)0);
-    if (rc < 0) {
-    	diminuto_perror("sigaction");
-    }
+    rc = diminuto_interrupter_install(0);
+    assert(rc >= 0);
 
     while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
@@ -633,7 +621,7 @@ int main(int argc, char * argv[])
         diminuto_mux_init(&mux);
         rc = diminuto_mux_register_interrupt(&mux, ppsfd);
         assert(rc >= 0);
-        ctx.donep = &done;
+        ctx.done = 0;
         ctx.muxp = &mux;
         ctx.ppsfp = ppsfp;
         ctx.strobefp = strobefp;
@@ -655,7 +643,7 @@ int main(int argc, char * argv[])
 
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
 
-    while (!done) {
+    while (!diminuto_interrupter_check()) {
 
         state = HAZER_STATE_START;
 
@@ -829,7 +817,9 @@ int main(int argc, char * argv[])
 
     }
 
-    done = !0;
+    DIMINUTO_COHERENT_SECTION_BEGIN;
+    	ctx.done = !0;
+    DIMINUTO_COHERENT_SECTION_END;
 
     rc = hazer_finalize();
     assert(rc >= 0);
