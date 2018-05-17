@@ -241,7 +241,54 @@ struct context {
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static void * poller(void * argp) {
+static void * dcdpoller(void * argp)
+{
+	void * xc = (void *)1;
+	struct context * ctxp = (struct context *)0;
+	int done = 0;
+	int rc = -1;
+	int nowpps = 0;
+	int waspps = 0;
+
+	ctxp = (struct context *)argp;
+
+	while (!0) {
+		DIMINUTO_COHERENT_SECTION_BEGIN;
+			done = ctxp->done;
+		DIMINUTO_COHERENT_SECTION_END;
+		if (done) {
+			xc = (void *)0;
+			break;
+		}
+		rc = diminuto_serial_wait(fileno(ctxp->ppsfp));
+		if (rc < 0) { break; }
+		rc = diminuto_serial_status(fileno(ctxp->ppsfp));
+		if (rc < 0) { break; }
+		nowpps = !!rc;
+		if (nowpps == waspps) {
+			/* Do nothing. */
+		} else if (nowpps) {
+			if (ctxp->strobefp != (FILE *)0) {
+				rc = diminuto_pin_set(ctxp->strobefp);
+				if (rc < 0) { break; }
+			}
+			DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+				*(ctxp->oneppsp) = !0;
+			DIMINUTO_CRITICAL_SECTION_END;
+		} else {
+			if (ctxp->strobefp != (FILE *)0) {
+				rc = diminuto_pin_clear(ctxp->strobefp);
+				if (rc < 0) { break; }
+			}
+		}
+		waspps = nowpps;
+	}
+
+	return xc;
+}
+
+static void * gpiopoller(void * argp)
+{
 	void * xc = (void *)1;
 	struct context * ctxp = (struct context *)0;
 	int done = 0;
@@ -261,7 +308,7 @@ static void * poller(void * argp) {
 		}
 		rc = diminuto_mux_wait(ctxp->muxp, -1);
 		if (rc < 0) { break; }
-		assert(rc > 0);
+		if (rc == 0) { continue; }
 		rc = diminuto_mux_ready_interrupt(ctxp->muxp);
 		assert(rc == fileno(ctxp->ppsfp));
 		rc = diminuto_pin_get(ctxp->ppsfp);
@@ -626,7 +673,37 @@ int main(int argc, char * argv[])
         ctx.ppsfp = ppsfp;
         ctx.strobefp = strobefp;
         ctx.oneppsp = &onepps;
-        rc = pthread_create(&thread, 0, poller, &ctx);
+        rc = pthread_create(&thread, 0, gpiopoller, &ctx);
+        if (rc != 0) {
+        	errno = rc;
+        	diminuto_perror("pthread_create");
+        }
+        assert(rc == 0);
+    } while (0);
+
+    /*
+     * Handle 1PPS from Data Carrier Detect (DCD) serial line by
+     * blocking until it is asserted. The GR-701W asserts DCD just
+     * before it unloads a block of sentences. The leading edge of DCD
+     * indicates 1PPS. We interrogate DCD in a separate thread to decouple
+     * it from our serial input.
+     */
+
+    do {
+		if (devfp == (FILE *)0) {
+			break;
+		}
+		if (!modemcontrol) {
+			break;
+		}
+		if (!carrierdetect) {
+			break;
+		}
+        ctx.done = 0;
+        ctx.ppsfp = devfp;
+        ctx.strobefp = strobefp;
+        ctx.oneppsp = &onepps;
+        rc = pthread_create(&thread, 0, dcdpoller, &ctx);
         if (rc != 0) {
         	errno = rc;
         	diminuto_perror("pthread_create");
@@ -648,33 +725,6 @@ int main(int argc, char * argv[])
         state = HAZER_STATE_START;
 
         if (role != CONSUMER) {
-
-            /*
-             * Handle 1PPS from Data Carrier Detect (DCD) serial line by
-             * blocking until it is asserted. The GR-701W asserts DCD just
-             * before it unloads a block of sentences. The leading edge of DCD
-             * indicates 1PPS. It then appears to deassert DCD afterwards.
-             */
-
-            if (ppsfp != (FILE *)0) {
-                /* Do nothing. */
-            } else if (devfd < 0) {
-                /* Do nothing. */
-            } else if (!modemcontrol) {
-                /* Do nothing. */
-            } else if (!carrierdetect) {
-                /* Do nothing. */
-            } else if (state != HAZER_STATE_START) {
-                /* Do nothing. */
-            } else if (diminuto_serial_available(devfd) > 0) {
-                /* Do nothing. */
-            } else {
-                if (strobefp != (FILE *)0) { diminuto_pin_clear(strobefp); }
-                rc = diminuto_serial_wait(devfd);
-                if (rc < 0) { break; }
-                if (strobefp != (FILE *)0) { diminuto_pin_set(strobefp); }
-                onepps = !0;
-            }
 
             while (!0) {
                 ch = fgetc(infp);
