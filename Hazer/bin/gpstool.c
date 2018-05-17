@@ -868,9 +868,10 @@ int main(int argc, char * argv[])
 
     }
 
+    fprintf(stderr, "%s: END\n", program);
+
     rc = hazer_finalize();
     assert(rc >= 0);
-
 
     if (pthreadrc == 0) {
     	DIMINUTO_COHERENT_SECTION_BEGIN;
