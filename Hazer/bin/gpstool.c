@@ -406,6 +406,7 @@ int main(int argc, char * argv[])
     struct context ctx = { 0 };
     void * result = (void *)0;
     pthread_t thread;
+    int pthreadrc = -1;
     static const char OPTIONS[] = "124678A:D:EI:OP:RW:b:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
@@ -673,9 +674,9 @@ int main(int argc, char * argv[])
         ctx.ppsfp = ppsfp;
         ctx.strobefp = strobefp;
         ctx.oneppsp = &onepps;
-        rc = pthread_create(&thread, 0, gpiopoller, &ctx);
-        if (rc != 0) {
-        	errno = rc;
+        pthreadrc = pthread_create(&thread, 0, gpiopoller, &ctx);
+        if (pthreadrc != 0) {
+        	errno = pthreadrc;
         	diminuto_perror("pthread_create");
         }
         assert(rc == 0);
@@ -703,9 +704,9 @@ int main(int argc, char * argv[])
         ctx.ppsfp = devfp;
         ctx.strobefp = strobefp;
         ctx.oneppsp = &onepps;
-        rc = pthread_create(&thread, 0, dcdpoller, &ctx);
-        if (rc != 0) {
-        	errno = rc;
+        pthreadrc = pthread_create(&thread, 0, dcdpoller, &ctx);
+        if (pthreadrc != 0) {
+        	errno = pthreadrc;
         	diminuto_perror("pthread_create");
         }
         assert(rc == 0);
@@ -867,26 +868,29 @@ int main(int argc, char * argv[])
 
     }
 
-    DIMINUTO_COHERENT_SECTION_BEGIN;
-    	ctx.done = !0;
-    DIMINUTO_COHERENT_SECTION_END;
-
     rc = hazer_finalize();
     assert(rc >= 0);
 
-    if (ppsfp != (FILE *)0) {
-    	rc = pthread_join(thread, &result);
-    	if (rc != 0) {
-    		errno = rc;
+
+    if (pthreadrc == 0) {
+    	DIMINUTO_COHERENT_SECTION_BEGIN;
+    		ctx.done = !0;
+    	DIMINUTO_COHERENT_SECTION_END;
+    	pthreadrc = pthread_join(thread, &result);
+    	if (pthreadrc != 0) {
+    		errno = pthreadrc;
     		diminuto_perror("pthread_join");
     	}
-        (void)diminuto_mux_unregister_interrupt(&mux, ppsfd);
+    }
+
+    if (ppsfp != (FILE *)0) {
+        rc = diminuto_mux_unregister_interrupt(&mux, ppsfd);
         diminuto_mux_fini(&mux);
-        (void)diminuto_pin_unused(ppsfp, ppspin);
+        ppsfp = diminuto_pin_unused(ppsfp, ppspin);
     }
 
     if (strobefp != (FILE *)0) {
-        (void)diminuto_pin_unused(strobefp, strobepin);
+    	strobefp = diminuto_pin_unused(strobefp, strobepin);
     }
 
     if (sock >= 0) {
