@@ -679,7 +679,7 @@ int main(int argc, char * argv[])
         	errno = pthreadrc;
         	diminuto_perror("pthread_create");
         }
-        assert(rc == 0);
+        assert(pthreadrc == 0);
     } while (0);
 
     /*
@@ -709,7 +709,7 @@ int main(int argc, char * argv[])
         	errno = pthreadrc;
         	diminuto_perror("pthread_create");
         }
-        assert(rc == 0);
+        assert(pthreadrc == 0);
     } while (0);
 
     if (debug) {
