@@ -336,6 +336,11 @@ static void * gpiopoller(void * argp)
 	return xc;
 }
 
+struct String {
+    struct String * next;
+    const char * payload;
+};
+
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
@@ -398,7 +403,9 @@ int main(int argc, char * argv[])
     diminuto_ipv6_t ipv6 = { 0 };
     diminuto_port_t port = 0;
     int output = 0;
-    int emit = 0;
+    struct String * string = (struct String *)0;
+    struct String * first = (struct String *)0;
+    struct String * last = (struct String *)0;
     int onepps = 0;
     int tmppps = 0;
     uint64_t nanoseconds = 0;
@@ -462,7 +469,15 @@ int main(int argc, char * argv[])
             break;
         case 'W':
             readonly = 0;
-            emit = !0;
+            string = (struct String *)malloc(sizeof(struct String));
+            string->next = (struct String *)0;
+            string->payload = optarg;
+            if (first == (struct String *)0) {
+                first = string;
+            } else {
+                last->next = string;
+            }
+            last = string;
             break;
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
@@ -556,13 +571,13 @@ int main(int argc, char * argv[])
         assert(devfp != (FILE *)0);
         infp = devfp;
 
-        if (emit) {
-            while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
-                if (opt == 'W') {
-                    rc = emit_sentence(devfp, optarg);
-                    if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
-                }
-            }
+        string = first;
+        while (string != (struct String *)0) {
+            rc = emit_sentence(devfp, string->payload);
+            if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
+            last = string;
+            string = last->next;
+            free(last);
         }
 
     }
