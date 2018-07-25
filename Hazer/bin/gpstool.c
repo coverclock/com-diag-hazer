@@ -39,6 +39,7 @@
 #include "com/diag/diminuto/diminuto_coherentsection.h"
 #include "com/diag/diminuto/diminuto_criticalsection.h"
 #include "com/diag/diminuto/diminuto_interrupter.h"
+#include "com/diag/diminuto/diminuto_escape.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
@@ -338,7 +339,7 @@ static void * gpiopoller(void * argp)
 
 struct String {
     struct String * next;
-    const char * payload;
+    char * payload;
 };
 
 int main(int argc, char * argv[])
@@ -573,6 +574,7 @@ int main(int argc, char * argv[])
 
         string = first;
         while (string != (struct String *)0) {
+            diminuto_escape_collapse(string->payload, string->payload, strlen(string->payload) + 1);
             rc = emit_sentence(devfp, string->payload);
             if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
             last = string;

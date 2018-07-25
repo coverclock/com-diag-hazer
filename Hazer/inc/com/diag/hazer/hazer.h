@@ -100,10 +100,13 @@ extern int hazer_finalize(void);
  * The USGlobalSat ND-105C routinely violates the NMEA spec as to
  * the maximum message length of 79 characters between the initial
  * '$' and the terminating \r\n by (so far) one character.
+ *
+ * The NaviSys GR-701W with the uBlox-7 chipset emits proprietary
+ * messages longer than the NMEA spec.
  */
 enum HazerConstant {
     HAZER_CONSTANT_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
-    HAZER_CONSTANT_NMEA_LONGEST     = 85, /* Adjusted. */
+    HAZER_CONSTANT_NMEA_LONGEST     = 1024, /* Adjusted. */
     HAZER_CONSTANT_NMEA_TALKER      = sizeof("GP") - 1,
     HAZER_CONSTANT_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
     HAZER_CONSTANT_NMEA_ID          = sizeof("$GPGGAXX") - 1, /* Adjusted. */
