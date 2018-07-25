@@ -16,4 +16,4 @@ RATE=${2:-9600}
 MESSAGE1="\$PUBX,00"
 MESSAGE2="\$PUBX,03"
 MESSAGE3="\\x24PUBX,04"
-gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v -W "${MESSAGE1}" -W "${MESSAGE2}" -W "${MESSAGE3}" 2>&1 | grep "PUBX"
+gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v -W "${MESSAGE1}" -W "${MESSAGE2}" -W "${MESSAGE3}"
