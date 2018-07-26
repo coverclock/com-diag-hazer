@@ -9,7 +9,7 @@
  *
  * EXAMPLES
  *
- * gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E -6 -A ::1 -P 5555
+ * gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -6 -A ::1 -P 5555
  *
  * gpstool -6 -P 5555 -E
  *
@@ -356,7 +356,7 @@ int main(int argc, char * argv[])
     hazer_vector_t vector = { 0 };
     hazer_position_t position = { 0 };
     hazer_solution_t solution = { 0 };
-    hazer_constellation_t constellation[HAZER_TALKER_TOTAL] = { {  0 } };
+    hazer_constellation_t constellation[HAZER_SYSTEM_TOTAL] = { {  0 } };
     FILE * infp = stdin;
     FILE * outfp = stdout;
     FILE * errfp = stderr;
@@ -380,12 +380,13 @@ int main(int argc, char * argv[])
     uint8_t ck = 0;
     char msn = '\0';
     char lsn = '\0';
-    hazer_talker_t talker = HAZER_TALKER_NA;
+    hazer_talker_t talker = HAZER_TALKER_TOTAL;
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
     int opt = -1;
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
-    int bitspersecond = 4800;
+    int bitspersecond = 9600;
     int databits = 8;
     int paritybit = 0;
     int stopbits = 1;
@@ -536,7 +537,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -O          Output sentences to DEVICE.\n");
             fprintf(stderr, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(stderr, "       -R          Print a report on standard output.\n");
-            fprintf(stderr, "       -W NMEA     Append * and checksum to NMEA and write to DEVICE.\n");
+            fprintf(stderr, "       -W NMEA     Collapse escapes, append * and checksum, and write NMEA to DEVICE.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -c          Wait for DCD to be asserted (requires -D and implies -m).\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
@@ -839,7 +840,9 @@ int main(int argc, char * argv[])
         if (escape) { fputs("\033[2;1H\033[0K", outfp); }
         if (report) { print_sentence(outfp, datagram, size - 1); }
 
-        if ((talker = hazer_parse_talker(vector, count)) == HAZER_TALKER_NA) {
+        if ((talker = hazer_parse_talker(vector, count)) >= HAZER_TALKER_TOTAL) {
+            /* Do nothing. */
+        } else if ((system = hazer_parse_system(talker)) >= HAZER_SYSTEM_TOTAL) {
             /* Do nothing. */
         } else if (hazer_parse_gga(&position, vector, count) == 0) {
             DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
@@ -862,7 +865,7 @@ int main(int argc, char * argv[])
         } else if (hazer_parse_gsa(&solution, vector, count) == 0) {
             if (escape) { fputs("\033[5;1H\033[0K", outfp); }
             if (report) { print_active(outfp, "GSA", &solution); }
-        } else if (hazer_parse_gsv(&constellation[talker], vector, count) == 0) {
+        } else if (hazer_parse_gsv(&constellation[system], vector, count) == 0) {
             if (escape) { fputs("\033[6;1H\033[0J", outfp); }
             if (report) { print_view(outfp, "GSV", constellation); }
         } else {

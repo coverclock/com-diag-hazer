@@ -5,7 +5,7 @@
 /**
  * @file
  *
- * Copyright 2017 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2017-2018 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock <coverclock@diag.com><BR>
  * https://github.com/coverclock/com-diag-hazer<BR>
@@ -34,6 +34,12 @@
  *
  * "SiRF Binary Protocol Reference Manual", revision 2.4, 1040-0041, SiRF
  * Technology, Inc., 2008-11
+ *
+ * Eric S. Raymond, "NMEA Revealed", 2.21, http://www.catb.org/gpsd/NMEA.html,
+ * 2016-01
+ *
+ * "u-blox 7 Receiver Description Including Protocol Specification V14",
+ * GPS.G7-SW-12001-B, ublox AG, 2013
  *
  * "GP-2106 SiRF Star IV GPS module with antenna", version 0.2, ADH Technology
  * Co. Ltd., 2010-12-08
@@ -106,7 +112,7 @@ extern int hazer_finalize(void);
  */
 enum HazerConstant {
     HAZER_CONSTANT_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
-    HAZER_CONSTANT_NMEA_LONGEST     = 1024, /* Adjusted. */
+    HAZER_CONSTANT_NMEA_LONGEST     = 512, /* Adjusted. */
     HAZER_CONSTANT_NMEA_TALKER      = sizeof("GP") - 1,
     HAZER_CONSTANT_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
     HAZER_CONSTANT_NMEA_ID          = sizeof("$GPGGAXX") - 1, /* Adjusted. */
@@ -132,6 +138,16 @@ typedef enum HazerState {
     HAZER_STATE_CR,
     HAZER_STATE_LF,
     HAZER_STATE_END,
+#if 0
+	HAZER_STATE_UBLOX_SYNC_2,
+	HAZER_STATE_UBLOX_CLASS,
+	HAZER_STATE_UBLOX_ID,
+	HAZER_STATE_UBLOX_LENGTH_1,
+	HAZER_STATE_UBLOX_LENGTH_2,
+	HAZER_STATE_UBLOX_PAYLOAD,
+	HAZER_STATE_UBLOX_CK_A,
+	HAZER_STATE_UBLOX_CK_B,
+#endif
 } hazer_state_t;
 
 /**
@@ -179,23 +195,40 @@ typedef enum HazerAction {
  * GNSS talkers.
  */
 typedef enum HazerTalker {
-    HAZER_TALKER_NA                 = -1,
-    HAZER_TALKER_GPS                = 0,
+    HAZER_TALKER_GPS				= 0,
     HAZER_TALKER_GLONASS,
     HAZER_TALKER_GALILEO,
     HAZER_TALKER_GNSS,
     HAZER_TALKER_RADIO,
+	HAZER_TALKER_PUBX,
+	HAZER_TALKER_UBX,
     HAZER_TALKER_TOTAL,
 } hazer_talker_t;
 
 /**
+ * GNSS systems.
+ */
+typedef enum HazerSystem {
+    HAZER_SYSTEM_GPS				= 0,
+    HAZER_SYSTEM_GLONASS,
+    HAZER_SYSTEM_GALILEO,
+    HAZER_SYSTEM_GNSS,
+    HAZER_SYSTEM_TOTAL,
+} hazer_system_t;
+
+/**
  * Array of TALKER names indexed by talker enumeration.
  */
-extern const char * HAZER_TALKER_NAME[];
+extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
+
+/**
+ * Array of SYSTEM names indexed by system enumeration.
+ */
+extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
 
 /**
  * This buffer is large enough to contain the largest NMEA sentence,
- * according to the NMEA spec, plus a trailing NUL.
+ * according to the NMEA spec, plus a trailing NUL (and then some).
  * NMEA 0183 4.10, 5.3, p. 11
  */
 typedef char (hazer_buffer_t)[HAZER_CONSTANT_NMEA_LONGEST + 1]; /* plus NUL */
@@ -368,86 +401,156 @@ extern double hazer_parse_num(const char * string);
  ******************************************************************************/
 
 /**
- * @def HAZER_NMEA_GALILEO_TALKER
+ * @def HAZER_NMEA_TALKER_GALILEO
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
-#define HAZER_NMEA_GALILEO_TALKER "GA"
+#define HAZER_NMEA_TALKER_GALILEO "GA"
 
 /**
- * @def HAZER_NMEA_GLONASS_TALKER
+ * @def HAZER_NMEA_TALKER_GLONASS
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
-#define HAZER_NMEA_GLONASS_TALKER "GL"
+#define HAZER_NMEA_TALKER_GLONASS "GL"
 
 /**
- * @def HAZER_NMEA_GNSS_TALKER
+ * @def HAZER_NMEA_TALKER_GNSS
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
-#define HAZER_NMEA_GNSS_TALKER "GN"
+#define HAZER_NMEA_TALKER_GNSS "GN"
 
 /**
- * @def HAZER_NMEA_GPS_TALKER
+ * @def HAZER_NMEA_TALKER_GPS
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
-#define HAZER_NMEA_GPS_TALKER "GP"
+#define HAZER_NMEA_TALKER_GPS "GP"
 
 /**
- * @def HAZER_NMEA_GPS_TALKER
+ * @def HAZER_NMEA_TALKER_RADIO
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
-#define HAZER_NMEA_RADIO_TALKER "ZV"
+#define HAZER_NMEA_TALKER_RADIO "ZV"
 
 /*******************************************************************************
  * IDENTIFYING SPECIFIC SENTENCES
  ******************************************************************************/
 
 /**
+ * @def HAZER_NMEA_GPS_MESSAGE_DTM
+ * ublox7 Protocol Reference, p. vi, datum reference
+ */
+#define HAZER_NMEA_GPS_MESSAGE_DTM "DTM"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_GBS
+ * ublox7 Protocol Reference, p. vi, GNSS fault detection
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GBS "GBS"
+
+/**
  * @def HAZER_NMEA_GPS_MESSAGE_GGA
- * SiRF NMEA, Table 1-2, Time, position, and fix type data
+ * SiRF NMEA, Table 1-2, GPS fix data
  */
 #define HAZER_NMEA_GPS_MESSAGE_GGA "GGA"
 
 /**
  * @def HAZER_NMEA_GPS_MESSAGE_GLL
- * SiRF NMEA, Table 1-2, Latitude, longitude, UTC time of position fix and status
+ * SiRF NMEA, Table 1-2, geographic position latitude/longitude
  */
 #define HAZER_NMEA_GPS_MESSAGE_GLL "GLL"
 
 /**
+ * @def HAZER_NMEA_GPS_MESSAGE_GLQ
+ * ublox7 Protocol Reference, p. vi, poll a standard message for talker GL
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GLQ "GLQ"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_GNQ
+ * ublox7 Protocol Reference, p. vi, poll a standard message for talker GN
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GNQ "GNQ"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_GNS
+ * ublox7 Protocol Reference, p. vi, GNSS fix data
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GNS "GNS"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_GPQ
+ * ublox7 Protocol Reference, p. vi, poll a standard message for talker GP
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GPQ "GPQ"
+
+/**
+ * @def HAZER_NMEA_GPS_MESSAGE_GRS
+ * ublox7 Protocol Reference, p. vi, GNSS range residuals
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GRS "GRS"
+
+/**
  * @def HAZER_NMEA_GPS_MESSAGE_GSA
- * SiRF NMEA, Table 1-2, GPS receiver operating mode, satellites used, DOP values
+ * SiRF NMEA, Table 1-2, GPS DOP and active satellites
  */
 #define HAZER_NMEA_GPS_MESSAGE_GSA "GSA"
 
 /**
+ * @def HAZER_NMEA_GPS_MESSAGE_GST
+ * ublox7 Protocol Reference, p. vi, GNSS pseudo range error statistics
+ */
+#define HAZER_NMEA_GPS_MESSAGE_GRT "GST"
+
+/**
  * @def HAZER_NMEA_GPS_MESSAGE_GSV
- * SiRF NMEA, Table 1-2, Number of satellites in view, satellites used, DOP values
+ * SiRF NMEA, Table 1-2, GPS satellites in view
  */
 #define HAZER_NMEA_GPS_MESSAGE_GSV "GSV"
 
 /**
  * @def HAZER_NMEA_GPS_MESSAGE_MSS
- * SiRF NMEA, Table 1-2, SNR, signal strength, frequency, bit rate from beacon
+ * SiRF NMEA, Table 1-2, beacon receiver status
  */
 #define HAZER_NMEA_GPS_MESSAGE_MSS "MSS"
 
 /**
  * @def HAZER_NMEA_GPS_MESSAGE_RMC
- * SiRF NMEA, Table 1-2, Time, date position, course, and speed data
+ * SiRF NMEA, Table 1-2, recommended minimum navigation information message C
  */
 #define HAZER_NMEA_GPS_MESSAGE_RMC "RMC"
 
 /**
+ * @def HAZER_NMEA_GPS_MESSAGE_TXT
+ * ublox7 Protocol Reference, p. vi, text
+ */
+#define HAZER_NMEA_GPS_MESSAGE_TXT "TXT"
+
+/**
  * @def HAZER_NMEA_GPS_MESSAGE_VTG
- * SiRF NMEA, Table 1-2, Course and speed relative to ground
+ * SiRF NMEA, Table 1-2, track made good and ground speed
  */
 #define HAZER_NMEA_GPS_MESSAGE_VTG "VTG"
 
 /**
  * @def HAZER_NMEA_GPS_MESSAGE_ZDA
- * SiRF NMEA, Table 1-2, PPS timing message
+ * SiRF NMEA, Table 1-2, time & date
  */
 #define HAZER_NMEA_GPS_MESSAGE_ZDA "ZDA"
+
+/*******************************************************************************
+ * IDENTIFYING PROPRIETARY SENTENCES
+ ******************************************************************************/
+
+/**
+ * @def HAZER_NMEA_GPS_PROPRIETARY_PUBX
+ * ublox7 Protocol Reference, p. vi, PUBX
+ */
+#define HAZER_PROPRIETARY_GPS_PUBX "PUBX"
+
+/**
+ * @def HAZER_NMEA_GPS_PROPRIETARY_UBX
+ * ublox7 Protocol Reference, p. 73, UBX
+ */
+#define HAZER_PROPRIETARY_GPS_UBX "\xb5\x62"
 
 /*******************************************************************************
  * DETERMINING TALKER
@@ -459,9 +562,18 @@ extern double hazer_parse_num(const char * string);
  * and even among those, only certain talkers are constellations.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
- * @return the index of the talker, or NULL.
+ * @return the index of the talker or TALKER TOTAL if N/A.
  */
 extern hazer_talker_t hazer_parse_talker(char * vector[], size_t count);
+
+/**
+ * Return a system given a talker. Only some talkers are associated with
+ * systems, or constellations, of satellites. Some talkers are devices other
+ * than GNSS, some are specific to a particular GNSS receiver.
+ * @param talker is talker index.
+ * @return the index of the system or SYSTEM TOTAL if N/A.
+ */
+extern hazer_system_t hazer_parse_system(hazer_talker_t talker);
 
 /*******************************************************************************
  * PARSING POSITION, HEADING, AND VELOCITY SENTENCES

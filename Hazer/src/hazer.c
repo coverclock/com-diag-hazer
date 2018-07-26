@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2017 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2017-2018 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-hazer
@@ -40,11 +40,24 @@ FILE * hazer_debug(FILE * now)
 }
 
 const char * HAZER_TALKER_NAME[] = {
-    "GPS",
-    "GLONASS",
-    "GALILEO",
-    "GNSS",
-    "RADIO",
+    "GPS",				/* [HAZER_TALKER_GPS] */
+    "GLONASS",			/* [HAZER_TALKER_GLONASS] */
+    "GALILEO",			/* [HAZER_TALKER_GALILEO] */
+    "GNSS",				/* [HAZER_TALKER_GNSS] */
+    "RADIO",			/* [HAZER_TALKER_RADIO] */
+	"PUBX",				/* [HAZER_TALKER_PUBX] */
+	"UBX",				/* [HAZER_TALKER_UBX] */
+	"N/A",				/* [HAZER_TALKER_TOTAL] */
+	(const char *)0,
+};
+
+const char * HAZER_SYSTEM_NAME[] = {
+    "GPS",				/* [HAZER_SYSTEM_GPS] */
+    "GLONASS",			/* [HAZER_SYSTEM_GLONASS] */
+    "GALILEO",			/* [HAZER_SYSTEM_GALILEO] */
+    "GNSS",				/* [HAZER_SYSTEM_GNSS] */
+	"N/A",				/* [HAZER_SYSTEM_TOTAL] */
+	(const char *)0,
 };
 
 /******************************************************************************
@@ -70,6 +83,76 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
 {
     int done = !0;
     hazer_action_t action = HAZER_ACTION_SKIP;
+
+#if 0
+    /*
+     * Handle special case of UBlox binary packets.
+     */
+
+    switch (state) {
+
+    case HAZER_STATE_START:
+    	if (ch == HAZER_PROPRIETARY_GPS_UBX[0]) {
+            DEBUG("UBLOX 0x%x.!\n", ch);
+    		state = HAZER_STATE_UBLOX_SYNC_2;
+    		action = HAZER_ACTION_SAVE;
+    	}
+    	break;
+
+    case HAZER_STATE_UBLOX_SYNC_2:
+    	if (ch == HAZER_PROPRIETARY_GPS_UBX[1]) {
+            DEBUG("UBLOX 0x%x.!\n", ch);
+    		state = HAZER_STATE_UBLOX_CLASS;
+    	}
+    	break;
+
+    case HAZER_STATE_UBLOX_CLASS:
+    	break;
+
+    case HAZER_STATE_UBLOX_ID:
+    	break;
+
+    case HAZER_STATE_UBLOX_LENGTH_1:
+    	break;
+
+    case HAZER_STATE_UBLOX_LENGTH_2:
+    	break;
+
+    case HAZER_STATE_UBLOX_PAYLOAD:
+    	break;
+
+    case HAZER_STATE_UBLOX_CK_A:
+        if ((HAZER_STIMULUS_DECMIN <= ch) && (ch <= HAZER_STIMULUS_DECMAX)) {
+            state = HAZER_STATE_UBLOX_CK_B;
+            action = HAZER_ACTION_SAVE;
+        } else if ((HAZER_STIMULUS_HEXMIN <= ch) && (ch <= HAZER_STIMULUS_HEXMAX)) {
+            state = HAZER_STATE_UBLOX_CK_B;
+            action = HAZER_ACTION_SAVE;
+        } else {
+            DEBUG("STARTING 0x%x!\n", ch);
+            state = HAZER_STATE_START;
+        }
+     	break;
+
+    case HAZER_STATE_UBLOX_CK_B:
+        if ((HAZER_STIMULUS_DECMIN <= ch) && (ch <= HAZER_STIMULUS_DECMAX)) {
+            state = HAZER_STATE_CR;
+            action = HAZER_ACTION_SAVE;
+        } else if ((HAZER_STIMULUS_HEXMIN <= ch) && (ch <= HAZER_STIMULUS_HEXMAX)) {
+            state = HAZER_STATE_CR;
+            action = HAZER_ACTION_SAVE;
+        } else {
+            DEBUG("STARTING 0x%x!\n", ch);
+            state = HAZER_STATE_START;
+        }
+    	break;
+
+    default:
+    	/* Do nothing. */
+    	break;
+
+    }
+#endif
 
     /*
      * Short circuit state machine for certain characters.
@@ -754,29 +837,67 @@ const char * hazer_format_nanodegrees2compass8(int64_t nanodegrees)
 
 hazer_talker_t hazer_parse_talker(char * vector[], size_t count)
 {
-    hazer_talker_t talker = HAZER_TALKER_NA;
+    hazer_talker_t talker = HAZER_TALKER_TOTAL;
+    char * string = (char *)0;
 
     if (count < 1) { 
         /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XX")) < (sizeof("$XX") - 1)) {
+    } else if ((string = vector[0])[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
-    } else if (*vector[0] != HAZER_STIMULUS_START) {
+    } else if (strnlen(string, sizeof("$XX")) < (sizeof("$XX") - 1)) {
         /* Do nothing. */
-    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GNSS_TALKER, sizeof(HAZER_NMEA_GNSS_TALKER) - 1) == 0) {
+    } else if (strncmp(++string, HAZER_NMEA_TALKER_GNSS, sizeof(HAZER_NMEA_TALKER_GNSS) - 1) == 0) {
         talker = HAZER_TALKER_GNSS;
-    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GPS_TALKER, sizeof(HAZER_NMEA_GPS_TALKER) - 1) == 0) {
+    } else if (strncmp(string, HAZER_NMEA_TALKER_GPS, sizeof(HAZER_NMEA_TALKER_GPS) - 1) == 0) {
         talker = HAZER_TALKER_GPS;
-    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GLONASS_TALKER, sizeof(HAZER_NMEA_GLONASS_TALKER) - 1) == 0) {
+    } else if (strncmp(string, HAZER_NMEA_TALKER_GLONASS, sizeof(HAZER_NMEA_TALKER_GLONASS) - 1) == 0) {
         talker = HAZER_TALKER_GLONASS;
-    } else if (strncmp(vector[0] + 1, HAZER_NMEA_GALILEO_TALKER, sizeof(HAZER_NMEA_GALILEO_TALKER) - 1) == 0) {
+    } else if (strncmp(string, HAZER_NMEA_TALKER_GALILEO, sizeof(HAZER_NMEA_TALKER_GALILEO) - 1) == 0) {
         talker = HAZER_TALKER_GALILEO;
-    } else if (strncmp(vector[0] + 1, HAZER_NMEA_RADIO_TALKER, sizeof(HAZER_NMEA_RADIO_TALKER) - 1) == 0) {
+    } else if (strncmp(string, HAZER_NMEA_TALKER_RADIO, sizeof(HAZER_NMEA_TALKER_RADIO) - 1) == 0) {
         talker = HAZER_TALKER_RADIO;
+    } else if (strncmp(string, HAZER_PROPRIETARY_GPS_PUBX, sizeof(HAZER_PROPRIETARY_GPS_PUBX) - 1) == 0) {
+        talker = HAZER_TALKER_PUBX;
     } else {
         /* Do nothing. */
     }
 
+    if (talker < HAZER_TALKER_TOTAL) {
+    	/* Do nothing. */
+    } else if (((string = vector[0])[0]) != HAZER_PROPRIETARY_GPS_UBX[0]) {
+    	/* Do nothing. */
+    } else if (string[1] != HAZER_PROPRIETARY_GPS_UBX[1]) {
+    	/* Do nothing. */
+    } else {
+        talker = HAZER_TALKER_UBX;
+    }
+
     return talker;
+}
+
+hazer_system_t hazer_parse_system(hazer_talker_t talker)
+{
+	hazer_system_t system = HAZER_SYSTEM_TOTAL;
+
+	switch (talker) {
+	case HAZER_TALKER_GPS:
+		system = HAZER_SYSTEM_GPS;
+		break;
+	case HAZER_TALKER_GLONASS:
+		system = HAZER_SYSTEM_GLONASS;
+		break;
+	case HAZER_TALKER_GALILEO:
+		system = HAZER_TALKER_GALILEO;
+		break;
+	case HAZER_TALKER_GNSS:
+		system = HAZER_TALKER_GNSS;
+		break;
+	default:
+		/* Do nothing. */
+		break;
+	}
+
+	return system;
 }
 
 /******************************************************************************
