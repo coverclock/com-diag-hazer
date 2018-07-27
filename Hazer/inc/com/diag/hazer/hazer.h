@@ -140,8 +140,8 @@ enum HazerxConstantUblox {
 	HAZER_CONSTANT_UBLOX_CK_A		= 6,	/* Only if no LENGTH == 0. */
 	HAZER_CONSTANT_UBLOX_CK_B		= 7,	/* Only if no LENGTH == 0. */
 	HAZER_CONSTANT_UBLOX_SHORTEST	= 8,
+	HAZER_CONSTANT_UBLOX_UNSUMMED	= 2,	/* SYNC1[1], SYNC2[1], */
 	HAZER_CONSTANT_UBLOX_SUMMED		= 4,	/* CLASS[1], ID[1], LENGTH[2], ... */
-	HAZER_CONSTANT_UBLOX_UNSUMMED	= 4,	/* SYNC1[1], SYNC2[1], CK_A[1], CK_B[1] */
 };
 
 /**
@@ -234,6 +234,11 @@ typedef enum HazerTalker {
 
 /**
  * GNSS systems.
+ *
+ * N.B. Because the uBlox 7 receiver has only a single RF front-end, it cannot
+ * track multiple systems (constellations) concurrently. Other inexpensive GPS
+ * receivers I've used can routinely do this (but those receivers don't support
+ * 1PPS like the uBlox 7-based GR-701W does).
  */
 typedef enum HazerSystem {
     HAZER_SYSTEM_GPS				= 0,

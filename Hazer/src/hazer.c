@@ -296,7 +296,11 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
     switch (action) {
 
     case HAZER_ACTION_SKIP:
-        DEBUG("SKIP 0x%x?\n", ch);
+    	if ((' ' <= ch) && (ch <= '~')) {
+    		DEBUG("SKIP '%c'?\n", ch);
+    	} else {
+    		DEBUG("SKIP 0x%x?\n", ch);
+    	}
         break;
 
     case HAZER_ACTION_SAVE:
@@ -462,12 +466,10 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
 const void * hazer_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
 {
 	const void * result = (void *)0;
-	const uint8_t * bp = (const uint8_t *)0;
+	const uint8_t * bp = (const uint8_t *)buffer;
 	uint8_t ck_a = 0;
 	uint8_t ck_b = 0;
 	uint16_t length = 0;
-
-	bp = (const uint8_t *)buffer;
 
 	/*
 	 * The portion of the buffer being summed includes the length, but we have
@@ -512,7 +514,7 @@ int hazer_validate(const void * buffer, size_t size)
 	bp = (uint8_t *)hazer_fletcher(buffer, size, &ck_a, &ck_b);
 	if (bp == (uint8_t *)0) {
 		/* Do nothing. */
-	} else if ((ck_a != bp[0]) || (ck_b == bp[1])) {
+	} else if ((ck_a != bp[0]) || (ck_b != bp[1])) {
 		/* Do nothing. */
 	} else {
 		rc = 0;
@@ -528,7 +530,7 @@ int hazer_validate(const void * buffer, size_t size)
 ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size)
 {
     char ** vv = vector;
-    char * bb = buffer;
+    char * bb = (char *)buffer;
 
     if (count > 1) {
         *(vv++) = bb;
@@ -563,7 +565,7 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
 
 ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t count)
 {
-    char * bb = buffer;
+    char * bb = (char *)buffer;
     char ** vv = vector;
     ssize_t ss = 0;
 

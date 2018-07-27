@@ -74,13 +74,15 @@ static int emit_packet(FILE * fp, const void * packet, size_t size)
     const void * bp = (const void *)0;
     uint8_t ck_a = 0;
     uint8_t ck_b = 0;
+    size_t length = 0;
 
     do {
 
         bp = hazer_fletcher(packet, size, &ck_a, &ck_b);
         if (bp == (void *)0) { break; }
+        length = (const char *)bp - (const char *)packet;
 
-        if (fwrite(packet, (const char *)bp - (const char *)packet, 1, fp) < 1) { break; }
+        if (fwrite(packet, length, 1, fp) < 1) { break; }
         if (fwrite(&ck_a, sizeof(ck_a), 1, fp) < 1) { break; }
         if (fwrite(&ck_b, sizeof(ck_b), 1, fp) < 1) { break; }
         if (fflush(fp) == EOF) { break; }
@@ -112,7 +114,7 @@ static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p
 
 }
 
-static void print_sentence(FILE *fp, const void * buffer, size_t size)
+static void print_sentence(FILE * fp, const void * buffer, size_t size)
 {
     const char * bb = (const char *)0;
     size_t current = 0;
@@ -600,17 +602,6 @@ int main(int argc, char * argv[])
         assert(devfp != (FILE *)0);
         infp = devfp;
 
-        string = first;
-        while (string != (struct String *)0) {
-        	length = strlen(string->payload);
-            size = diminuto_escape_collapse(string->payload, string->payload, length + 1);
-            rc = (size < length) ? emit_packet(devfp, string->payload, size) : emit_sentence(devfp, string->payload);
-            if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
-            last = string;
-            string = last->next;
-            free(last);
-        }
-
     }
 
     if (service == (const char *)0) {
@@ -773,6 +764,28 @@ int main(int argc, char * argv[])
 
         if (role != CONSUMER) {
 
+        	/*
+        	 * If we have any initialization strings to send, do so one at a
+        	 * time while reading from the device. Otherwise, the device can
+        	 * (will) overrun the UART buffer with responses before we can
+        	 * read them.
+        	 */
+
+        	if (device == (const char *)0) {
+        		/* Do nothing. */
+        	} else if (first == (struct String *)0) {
+        		/* Do nothing. */
+        	} else {
+        		string = first;
+            	length = strlen(string->payload) + 1;
+                size = diminuto_escape_collapse(string->payload, string->payload, length);
+                if (verbose) { print_sentence(errfp, string->payload, size); }
+                rc = (size < length) ? emit_packet(devfp, string->payload, size) : emit_sentence(devfp, string->payload);
+                if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
+                first = string->next;
+                free(string);
+        	}
+
             while (!0) {
                 ch = fgetc(infp);
                 prior = state;
@@ -814,11 +827,7 @@ int main(int argc, char * argv[])
                     continue;
                 }
 
-                if (verbose) {
-                	diminuto_dump(errfp, buffer, length);
-                    fflush(errfp);
-                }
-
+                if (verbose) { print_sentence(errfp, buffer, length); }
             	if (escape) { fputs("\033[1;1H\033[0K", outfp); }
                 if (report) { print_sentence(outfp, buffer, length); }
 
@@ -860,11 +869,7 @@ int main(int argc, char * argv[])
             continue;
         }
 
-        if (verbose) {
-            fputs(buffer, errfp);
-            fflush(errfp);
-        }
-
+        if (verbose) { print_sentence(errfp, buffer, size - 1); }
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
         if (report) { print_sentence(outfp, buffer, size - 1); }
 
