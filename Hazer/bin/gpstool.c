@@ -40,6 +40,7 @@
 #include "com/diag/diminuto/diminuto_criticalsection.h"
 #include "com/diag/diminuto/diminuto_interrupter.h"
 #include "com/diag/diminuto/diminuto_escape.h"
+#include "com/diag/diminuto/diminuto_dump.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
@@ -58,6 +59,30 @@ static int emit_sentence(FILE * fp, const char * string)
         if (hazer_checksum2characters(cs, &msn, &lsn) < 0) { break; }
 
         if (fprintf(fp, "%s%c%c%c\r\n", string, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) { break; }
+        if (fflush(fp) == EOF) { break; }
+
+        rc = 0;
+
+    } while (0);
+
+    return rc;
+}
+
+static int emit_packet(FILE * fp, const void * packet, size_t size)
+{
+    int rc = -1;
+    const void * bp = (const void *)0;
+    uint8_t ck_a = 0;
+    uint8_t ck_b = 0;
+
+    do {
+
+        bp = hazer_fletcher(packet, size, &ck_a, &ck_b);
+        if (bp == (void *)0) { break; }
+
+        if (fwrite(packet, (const char *)bp - (const char *)packet, 1, fp) < 1) { break; }
+        if (fwrite(&ck_a, sizeof(ck_a), 1, fp) < 1) { break; }
+        if (fwrite(&ck_b, sizeof(ck_b), 1, fp) < 1) { break; }
         if (fflush(fp) == EOF) { break; }
 
         rc = 0;
@@ -369,6 +394,7 @@ int main(int argc, char * argv[])
     int rc = 0;
     int ch = EOF;
     ssize_t size = 0;
+    ssize_t length = 0;
     char * bb = (char *)0;
     size_t ss = 0;
     size_t ll = 0;
@@ -576,8 +602,9 @@ int main(int argc, char * argv[])
 
         string = first;
         while (string != (struct String *)0) {
-            diminuto_escape_collapse(string->payload, string->payload, strlen(string->payload) + 1);
-            rc = emit_sentence(devfp, string->payload);
+        	length = strlen(string->payload);
+            size = diminuto_escape_collapse(string->payload, string->payload, length + 1);
+            rc = (size < length) ? emit_packet(devfp, string->payload, size) : emit_sentence(devfp, string->payload);
             if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
             last = string;
             string = last->next;
@@ -769,6 +796,34 @@ int main(int argc, char * argv[])
             assert(state == HAZER_STATE_END);
 
             size = ss;
+
+            length = hazer_parse_length(buffer, size);
+            if (length < 0) {
+
+            	/*
+            	 * This is a Ublox binary packet. We validate it, report it,
+            	 * but otherwise don't process it (yet).
+            	 */
+
+            	length = -length;
+
+            	rc = hazer_validate(buffer, size);
+                if (rc < 0) {
+                    /* Validation failed. */
+                    fprintf(stderr, "%s: UBX %zd\n", program, length);
+                    continue;
+                }
+
+                if (verbose) {
+                	diminuto_dump(errfp, buffer, length);
+                    fflush(errfp);
+                }
+
+            	if (escape) { fputs("\033[1;1H\033[0K", outfp); }
+                if (report) { print_sentence(outfp, buffer, length); }
+
+                continue;
+            }
 
         } else if (protocol == IPV4) {
 

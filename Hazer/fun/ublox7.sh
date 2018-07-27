@@ -13,7 +13,9 @@
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-9600}
 
-MESSAGE1="\$PUBX,00"
-MESSAGE2="\$PUBX,03"
-MESSAGE3="\\x24PUBX,04"
-gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v -W "${MESSAGE1}" -W "${MESSAGE2}" -W "${MESSAGE3}"
+COMMAND1="\$PUBX,00"
+COMMAND2="\$PUBX,03"
+COMMAND3="\$PUBX,04"
+COMMAND4="\\xb5\\x62\\x0a\\x04\\x00\\x00"
+
+gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v -W "${COMMAND1}" -W "${COMMAND2}" -W "${COMMAND3}" -W "${COMMAND4}"

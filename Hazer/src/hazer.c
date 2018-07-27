@@ -459,9 +459,9 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
 /*
  * Ublox, p. 74
  */
-int hazer_validate(const void * buffer, size_t size)
+const void * hazer_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
 {
-	int rc = -1;
+	const void * result = (void *)0;
 	const uint8_t * bp = (const uint8_t *)0;
 	uint8_t ck_a = 0;
 	uint8_t ck_b = 0;
@@ -489,10 +489,33 @@ int hazer_validate(const void * buffer, size_t size)
 			ck_b += ck_a;
 		}
 
-		if ((ck_a == bp[0]) && (ck_b == bp[1])) {
-			rc = 0;
-		}
+		*ck_ap = ck_a;
+		*ck_bp = ck_b;
 
+		result = bp;
+
+	}
+
+	return (const void *)bp;
+}
+
+/*
+ * Ublox, p. 74
+ */
+int hazer_validate(const void * buffer, size_t size)
+{
+	int rc = -1;
+	uint8_t * bp = (uint8_t *)0;
+	uint8_t ck_a = 0;
+	uint8_t ck_b = 0;
+
+	bp = (uint8_t *)hazer_fletcher(buffer, size, &ck_a, &ck_b);
+	if (bp == (uint8_t *)0) {
+		/* Do nothing. */
+	} else if ((ck_a != bp[0]) || (ck_b == bp[1])) {
+		/* Do nothing. */
+	} else {
+		rc = 0;
 	}
 
 	return rc;

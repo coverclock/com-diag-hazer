@@ -315,10 +315,22 @@ extern int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp);
 extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
 
 /**
- * Validate a Ublox sentence by computing its sixteen-bit checksum and comparing
+ * Compute the Fletcher checksum used by Ublox for the specified buffer. The
+ * buffer points to the beginning of the Ublox sentence, not to the subset that
+ * is checksummed, and the sentence must contain a valid length field.
+ * @param buffer points to the beginning of the buffer.
+ * @param size is the size of the buffer in bytes.
+ * @param ck_ap points to where the ck_a value will be stored.
+ * @param ck_bp points to where the ck_b value will be stored.
+ * @return where the ck_a, ck_b would be in the buffer, or NULL if an error occurred.
+ */
+extern const void * hazer_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp);
+
+/**
+ * Validate a Ublox sentence by computing its Fletcher checksum and comparing
  * it to the checksum at the end of the sentence.
  * @param buffer points to the beginning of the buffer.
- * @param size is the size of the output buffer in bytes.
+ * @param size is the size of the buffer in bytes.
  * @return 0 for success, <0 if invalid or an error occurred.
  */
 extern int hazer_validate(const void * buffer, size_t size);
