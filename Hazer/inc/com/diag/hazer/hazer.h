@@ -93,12 +93,11 @@ extern int hazer_initialize(void);
 extern int hazer_finalize(void);
 
 /*******************************************************************************
- * COLLECTING AN NMEA SENTENCE
+ * COLLECTING AN NMEA OR UBLOX SENTENCE
  ******************************************************************************/
 
 /**
  * NMEA 0183 4.10, 5.3.3.1, Table 1
- * NMEA 0183 4.10, 5.3
  *
  * SiRF NMEA, p. 2-2 has an example which appears to violate the
  * NMEA spec as to the length of the message ID.
@@ -108,17 +107,41 @@ extern int hazer_finalize(void);
  * '$' and the terminating \r\n by (so far) one character.
  *
  * The NaviSys GR-701W with the uBlox-7 chipset emits proprietary
- * messages longer than the NMEA spec.
+ * PUBX messages longer than the NMEA spec.
  */
-enum HazerConstant {
+enum HazerConstantNmea {
     HAZER_CONSTANT_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
     HAZER_CONSTANT_NMEA_LONGEST     = 512, /* Adjusted. */
     HAZER_CONSTANT_NMEA_TALKER      = sizeof("GP") - 1,
     HAZER_CONSTANT_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
     HAZER_CONSTANT_NMEA_ID          = sizeof("$GPGGAXX") - 1, /* Adjusted. */
+};
+
+/**
+ * NMEA 0183, 4.10, 5.3
+ */
+enum HazerConstantGps {
     HAZER_CONSTANT_GPS_CHANNELS     = 48,
     HAZER_CONSTANT_GPS_VIEWS        = 4,
     HAZER_CONSTANT_GPS_SATELLITES   = 12,
+};
+
+/**
+ * UBlox, p.73
+ */
+enum HazerxConstantUblox {
+	HAZER_CONSTANT_UBLOX_SYNC_1		= 0,	/* Always 0xb5. */
+	HAZER_CONSTANT_UBLOX_SYNC_2		= 1,	/* Always 0x62. */
+	HAZER_CONSTANT_UBLOX_CLASS		= 2,
+	HAZER_CONSTANT_UBLOX_ID			= 3,
+	HAZER_CONSTANT_UBLOX_LENGTH_LSB	= 4,	/* 16-bit, little endian (LSB). */
+	HAZER_CONSTANT_UBLOX_LENGTH_MSB = 5,	/* 16-bit, little endian (MSB). */
+	/* ... */								/* Payload[LENGTH]. */
+	HAZER_CONSTANT_UBLOX_CK_A		= 6,	/* Only if no LENGTH == 0. */
+	HAZER_CONSTANT_UBLOX_CK_B		= 7,	/* Only if no LENGTH == 0. */
+	HAZER_CONSTANT_UBLOX_SHORTEST	= 8,
+	HAZER_CONSTANT_UBLOX_SUMMED		= 4,	/* CLASS[1], ID[1], LENGTH[2], ... */
+	HAZER_CONSTANT_UBLOX_UNSUMMED	= 4,	/* SYNC1[1], SYNC2[1], CK_A[1], CK_B[1] */
 };
 
 /**
@@ -130,16 +153,16 @@ enum HazerConstant {
  * failed; that might be of interest to the application.
  */
 typedef enum HazerState {
-    HAZER_STATE_EOF                 = -1,
-    HAZER_STATE_START               = 0,
+    HAZER_STATE_EOF					= 0,
+    HAZER_STATE_START,
     HAZER_STATE_BODY,
     HAZER_STATE_MSN,
     HAZER_STATE_LSN,
     HAZER_STATE_CR,
     HAZER_STATE_LF,
     HAZER_STATE_END,
-#if 0
-	HAZER_STATE_UBLOX_SYNC_2,
+	HAZER_STATE_UBLOX_FIRST,
+	HAZER_STATE_UBLOX_SYNC_2		= HAZER_STATE_UBLOX_FIRST,
 	HAZER_STATE_UBLOX_CLASS,
 	HAZER_STATE_UBLOX_ID,
 	HAZER_STATE_UBLOX_LENGTH_1,
@@ -147,7 +170,6 @@ typedef enum HazerState {
 	HAZER_STATE_UBLOX_PAYLOAD,
 	HAZER_STATE_UBLOX_CK_A,
 	HAZER_STATE_UBLOX_CK_B,
-#endif
 } hazer_state_t;
 
 /**
@@ -168,8 +190,10 @@ enum HazerStimulus {
     HAZER_STIMULUS_CHECKSUM         = '*',
     HAZER_STIMULUS_DECMIN           = '0',
     HAZER_STIMULUS_DECMAX           = '9',
-    HAZER_STIMULUS_HEXMIN           = 'A',
-    HAZER_STIMULUS_HEXMAX           = 'F',
+    HAZER_STIMULUS_HEXMIN_UC        = 'A',
+    HAZER_STIMULUS_HEXMAX_UC        = 'F',
+    HAZER_STIMULUS_HEXMIN_LC        = 'a',
+    HAZER_STIMULUS_HEXMAX_LC        = 'f',
     HAZER_STIMULUS_GNSS             = 'G',
     HAZER_STIMULUS_EAST             = 'E',
     HAZER_STIMULUS_WEST             = 'W',
@@ -179,6 +203,8 @@ enum HazerStimulus {
     HAZER_STIMULUS_LF               = '\n',
     HAZER_STIMULUS_MAXIMUM          = '}',
     HAZER_STIMULUS_RESERVED         = '~',
+	HAZER_STIMULUS_UBLOX_SYNC_1		= '\xb5', /* ISO 8859.1 for 'mu' [Ublox]. */
+	HAZER_STIMULUS_UBLOX_SYNC_2		= '\x62', /* 'b' but in hex in [Ublox]. */
 };
 
 /**
@@ -189,6 +215,7 @@ typedef enum HazerAction {
     HAZER_ACTION_SAVE,
     HAZER_ACTION_SAVESPECIAL,
     HAZER_ACTION_TERMINATE,
+	HAZER_ACTION_FINAL,
 } hazer_action_t;
 
 /**
@@ -243,23 +270,28 @@ typedef char (hazer_buffer_t)[HAZER_CONSTANT_NMEA_LONGEST + 1]; /* plus NUL */
  * to the application are the EOF and END staes. The EOF state indicates
  * that the input stream has ended, detected by virtue of the stimulus character
  * being equal to the standard I/O EOF. The END state indicates that a complete
- * NMEA sentence resides in the buffer; the pointer state variable points
- * past the end of the NUL-terminated sentence, and the size state variable
- * contrains the size of the sentence including the terminating NUL.
+ * NMEA sentence resides in the buffer. The pointer state variable points
+ * past the end of the NUL-terminated sentence, the size state variable
+ * contrains the size of the sentence including the terminating NUL;
  * @param state is the prior state of the machine.
  * @param ch is the next character from the NMEA sentence stream.
  * @param buffer points to the beginning of the output buffer.
  * @param size is the size of the output buffer in bytes.
- * @param bp points to a character pointer state variable.
- * @param sp points to a size state variable.
+ * @param bp points to a character pointer state variable of no initial value.
+ * @param sp points to a size state variable of no initial value.
+ * @param lp points to the length state variable of no initial value.
  * @return the next state of the machine.
  */
-extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp);
+extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp);
+
+/*******************************************************************************
+ * VALIDATING AN NMEA OR UBLOX SENTENCE
+ ******************************************************************************/
 
 /**
- * Compute the checksum of an NMEA sentence.
- * @param buffer points to the beginning of the output buffer.
- * @param size is the size of the output buffer in bytes.
+ * Compute the eight-bit checksum of an NMEA sentence.
+ * @param buffer points to the beginning of the sentence.
+ * @param size is the size of the buffer in bytes.
  * @return the checksum.
  */
 extern uint8_t hazer_checksum(const void * buffer, size_t size);
@@ -281,6 +313,15 @@ extern int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp);
  * @return 0 for success, <0 if an error occurred.
  */
 extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
+
+/**
+ * Validate a Ublox sentence by computing its sixteen-bit checksum and comparing
+ * it to the checksum at the end of the sentence.
+ * @param buffer points to the beginning of the buffer.
+ * @param size is the size of the output buffer in bytes.
+ * @return !0 if valid, 0 if invalid, <0 if an error occurred.
+ */
+extern int hazer_validate(const void * buffer, size_t size);
 
 /*******************************************************************************
  * BREAKING UP AN NMEA SENTENCE INTO FIELDS
@@ -546,12 +587,6 @@ extern double hazer_parse_num(const char * string);
  */
 #define HAZER_PROPRIETARY_GPS_PUBX "PUBX"
 
-/**
- * @def HAZER_NMEA_GPS_PROPRIETARY_UBX
- * ublox7 Protocol Reference, p. 73, UBX
- */
-#define HAZER_PROPRIETARY_GPS_UBX "\xb5\x62"
-
 /*******************************************************************************
  * DETERMINING TALKER
  ******************************************************************************/
@@ -559,12 +594,11 @@ extern double hazer_parse_num(const char * string);
 /**
  * Determine if the talker is one in which we are interested. Return its
  * index if it is, <0 otherwise. We are only interested in certain talkers,
- * and even among those, only certain talkers are constellations.
- * @param vector contains the words in the NMEA sentence.
- * @param count is size of the vector in slots including the null pointer.
+ * and even among those, only certain talkers are systems.
+ * @param buffer points to the beginning or the first token of the sentence.
  * @return the index of the talker or TALKER TOTAL if N/A.
  */
-extern hazer_talker_t hazer_parse_talker(char * vector[], size_t count);
+extern hazer_talker_t hazer_parse_talker(const void * buffer);
 
 /**
  * Return a system given a talker. Only some talkers are associated with
@@ -574,6 +608,18 @@ extern hazer_talker_t hazer_parse_talker(char * vector[], size_t count);
  * @return the index of the system or SYSTEM TOTAL if N/A.
  */
 extern hazer_system_t hazer_parse_system(hazer_talker_t talker);
+
+/**
+ * Return the length of the completed packet in bytes. If the returned length
+ * is >0, the packet is a NUL-terminated NMEA sentence and the length does not
+ * include the terminating NUL. If the length is <0, the packet is a binary
+ * Ublox packet and the length is that of the entire packet. If the length is
+ * zero, the packet is not valid.
+ * @param buffer points to buffer containing the completed sentence.
+ * @param size is the size of the buffer containing the sentence.
+ * @return the length of the sentence encoded to indicate NMEA, Ublox, or error.
+ */
+extern ssize_t hazer_parse_length(const void * buffer, size_t size);
 
 /*******************************************************************************
  * PARSING POSITION, HEADING, AND VELOCITY SENTENCES

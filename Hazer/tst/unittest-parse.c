@@ -18,7 +18,7 @@ int main(void)
 {
 	hazer_talker_t talker = HAZER_TALKER_TOTAL;
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
-	char * vector[1] = { (char *)0, };
+	char * string = (char *)0;
     uint64_t numerator = 0;
     uint64_t denominator = 0;
     int64_t nanodegrees = 0;
@@ -30,62 +30,62 @@ int main(void)
 
     /**************************************************************************/
 
-    vector[0] = "$" "GN";
-    talker = hazer_parse_talker(vector, 1);
+    string = "$" "GN";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_GNSS);
     system = hazer_parse_system(talker);
     assert(system = HAZER_SYSTEM_GNSS);
 
-    vector[0] = "$" "GP";
-    talker = hazer_parse_talker(vector, 1);
+    string = "$" "GP";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_GPS);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_GPS);
 
-    vector[0] = "$" "GL";
-    talker = hazer_parse_talker(vector, 1);
+    string = "$" "GL";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_GLONASS);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_GLONASS);
 
-    vector[0] = "$" "GA";
-    talker = hazer_parse_talker(vector, 1);
+    string = "$" "GA";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_GALILEO);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_GALILEO);
 
-    vector[0] = "$" "ZV";
-    talker = hazer_parse_talker(vector, 1);
+    string = "$" "ZV";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_RADIO);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_TOTAL);
 
-    vector[0] = "$" "PUBX";
-    talker = hazer_parse_talker(vector, 1);
+    string = "$" "PUBX";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_PUBX);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_TOTAL);
 
-    vector[0] = "\xb5\x62";
-    talker = hazer_parse_talker(vector, 1);
+    string = "\xb5\x62";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_UBX);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_TOTAL);
 
-    vector[0] = "$??";
-    talker = hazer_parse_talker(vector, 1);
+    string = "$??";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_TOTAL);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_TOTAL);
 
-    vector[0] = "???";
-    talker = hazer_parse_talker(vector, 1);
+    string = "???";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_TOTAL);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_TOTAL);
 
-    vector[0] = "";
-    talker = hazer_parse_talker(vector, 1);
+    string = "";
+    talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_TOTAL);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_TOTAL);

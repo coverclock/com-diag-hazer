@@ -368,9 +368,10 @@ int main(int argc, char * argv[])
     int sock = -1;
     int rc = 0;
     int ch = EOF;
-    char * bb = (char *)0;
     ssize_t size = 0;
-    ssize_t ss = 0;
+    char * bb = (char *)0;
+    size_t ss = 0;
+    size_t ll = 0;
     size_t current = 0;
     int end = 0;
     ssize_t check = 0;
@@ -748,7 +749,7 @@ int main(int argc, char * argv[])
             while (!0) {
                 ch = fgetc(infp);
                 prior = state;
-                state = hazer_machine(state, ch, buffer, sizeof(buffer), &bb, &ss);
+                state = hazer_machine(state, ch, buffer, sizeof(buffer), &bb, &ss, &ll);
                 if (state == HAZER_STATE_END) {
                     break;
                 } else if  (state == HAZER_STATE_EOF) {
@@ -768,7 +769,6 @@ int main(int argc, char * argv[])
             assert(state == HAZER_STATE_END);
 
             size = ss;
-            assert(size > 0);
 
         } else if (protocol == IPV4) {
 
@@ -840,7 +840,9 @@ int main(int argc, char * argv[])
         if (escape) { fputs("\033[2;1H\033[0K", outfp); }
         if (report) { print_sentence(outfp, datagram, size - 1); }
 
-        if ((talker = hazer_parse_talker(vector, count)) >= HAZER_TALKER_TOTAL) {
+        if (count < 1) {
+        	/* Do nothing. */
+        } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
             /* Do nothing. */
         } else if ((system = hazer_parse_system(talker)) >= HAZER_SYSTEM_TOTAL) {
             /* Do nothing. */
