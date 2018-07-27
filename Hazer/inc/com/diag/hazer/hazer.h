@@ -319,7 +319,7 @@ extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
  * it to the checksum at the end of the sentence.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the output buffer in bytes.
- * @return !0 if valid, 0 if invalid, <0 if an error occurred.
+ * @return 0 for success, <0 if invalid or an error occurred.
  */
 extern int hazer_validate(const void * buffer, size_t size);
 

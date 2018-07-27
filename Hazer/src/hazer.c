@@ -461,7 +461,7 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
  */
 int hazer_validate(const void * buffer, size_t size)
 {
-	uint16_t rc = -1;
+	int rc = -1;
 	const uint8_t * bp = (const uint8_t *)0;
 	uint8_t ck_a = 0;
 	uint8_t ck_b = 0;
@@ -489,10 +489,11 @@ int hazer_validate(const void * buffer, size_t size)
 			ck_b += ck_a;
 		}
 
-		rc = (ck_a == *(bp + 0)) && (ck_b == *(bp + 1));
+		if ((ck_a == bp[0]) && (ck_b == bp[1])) {
+			rc = 0;
+		}
 
 	}
-
 
 	return rc;
 }
@@ -996,7 +997,11 @@ ssize_t hazer_parse_length(const void * buffer, size_t size)
 		length = ((unsigned)(sentence[HAZER_CONSTANT_UBLOX_LENGTH_MSB])) << 8;
 		length |= ((unsigned)(sentence[HAZER_CONSTANT_UBLOX_LENGTH_LSB]));
 		length += HAZER_CONSTANT_UBLOX_SHORTEST;
-		length = -length;
+		if (length <= size) {
+			length = -length;
+		} else {
+			length = 0;
+		}
 	}
 
 	return length;

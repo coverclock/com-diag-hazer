@@ -106,21 +106,120 @@ int main(void)
 
 	{
 		ssize_t size = 0;
+		uint8_t cs = 0;
+		uint8_t ck = 0;
+		unsigned char msn = '\0';
+		unsigned char lsn = '\0';
 		int rc = 0;
-		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x12, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 0xad, 0x19 };
+		static const unsigned char NMEA[] = "$GPGSV,4,3,13,24,39,292,21,28,32,109,36,46,38,215,35,48,36,220,37*89\r\n"; /* Bad checksum. */
 
-		assert(UBLOX[HAZER_CONSTANT_UBLOX_LENGTH_LSB] == 0x12);
+		size = hazer_parse_length(NMEA, sizeof(NMEA));
+		assert(size == (sizeof(NMEA) - 1));
+
+		cs = hazer_checksum(NMEA, sizeof(NMEA));
+
+		assert(NMEA[sizeof(NMEA) - 5] == '8');
+		assert(NMEA[sizeof(NMEA) - 4] == '9');
+
+		rc = hazer_characters2checksum(NMEA[sizeof(NMEA) - 5], NMEA[sizeof(NMEA) - 4], &ck);
+		assert(rc == 0);
+		assert(cs != ck);
+
+		rc = hazer_checksum2characters(ck, &msn, &lsn);
+		assert(rc == 0);
+		assert(msn == NMEA[sizeof(NMEA) - 5]);
+		assert(lsn == NMEA[sizeof(NMEA) - 4]);
+	}
+
+    /**************************************************************************/
+
+	{
+		ssize_t size = 0;
+		int rc = 0;
+		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xca };
+
+		assert(UBLOX[HAZER_CONSTANT_UBLOX_LENGTH_LSB] == 0x04);
 		assert(UBLOX[HAZER_CONSTANT_UBLOX_LENGTH_MSB] == 0x00);
 
 		size = UBLOX[HAZER_CONSTANT_UBLOX_LENGTH_MSB] << 8;
 		size |= UBLOX[HAZER_CONSTANT_UBLOX_LENGTH_LSB];
-		assert(size == 18);
+		assert(size == 4);
 
 		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
 		assert(size == -(ssize_t)sizeof(UBLOX));
 
 		rc = hazer_validate(UBLOX, sizeof(UBLOX));
 		assert(rc == 0);
+	}
+
+    /**************************************************************************/
+
+	{
+		ssize_t size = 0;
+		int rc = 0;
+		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0c, 0xca }; /* Bad checksum. */
+
+		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
+		assert(size == -(ssize_t)sizeof(UBLOX));
+
+		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		assert(rc < 0);
+	}
+
+    /**************************************************************************/
+
+	{
+		ssize_t size = 0;
+		int rc = 0;
+		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xc8 }; /* Bad checksum. */
+
+		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
+		assert(size == -(ssize_t)sizeof(UBLOX));
+
+		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		assert(rc < 0);
+	}
+
+    /**************************************************************************/
+
+	{
+		ssize_t size = 0;
+		int rc = 0;
+		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 5, 4, 0x0d, 0xca }; /* Payload corrupted. */
+
+		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
+		assert(size == -(ssize_t)sizeof(UBLOX));
+
+		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		assert(rc < 0);
+	}
+
+    /**************************************************************************/
+
+	{
+		ssize_t size = 0;
+		int rc = 0;
+		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x01, 1, 2, 3, 4, 0x0d, 0xca }; /* Length too long. */
+
+		size = hazer_parse_length(UBLOX, sizeof(UBLOX)); /* Overflows buffer. */
+		assert(size == 0);
+
+		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		assert(rc < 0);
+	}
+
+    /**************************************************************************/
+
+	{
+		ssize_t size = 0;
+		int rc = 0;
+		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x02, 0x00, 1, 2, 3, 4, 0x0d, 0xca }; /* Length too short. */
+
+		size = hazer_parse_length(UBLOX, sizeof(UBLOX)); /* But not correct. */
+		assert(size < 0);
+
+		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		assert(rc < 0);
 	}
 
     /**************************************************************************/
