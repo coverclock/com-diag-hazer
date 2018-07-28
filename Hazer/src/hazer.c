@@ -60,7 +60,11 @@ const char * HAZER_SYSTEM_NAME[] = {
 
 int hazer_initialize(void)
 {
-    tzset(); /* In my glibc this is an expensive operation the first time. */
+	/*
+	 * In the glibc I perused, this is a relatively expensive operation the
+	 * first time it is called.
+	 */
+    tzset();
     return 0;
 }
 
@@ -95,7 +99,7 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
 
     }
 
-    if (state < HAZER_STATE_UBLOX_FIRST) {
+    if ((HAZER_STATE_EOF < state) && (state < HAZER_STATE_UBX_FIRST)) {
 
     	switch (ch) {
 
@@ -157,9 +161,9 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
             action = HAZER_ACTION_SAVE;
             *bp = (char *)buffer;
             *sp = size;
-        } else if (ch == HAZER_STIMULUS_UBLOX_SYNC_1) {
+        } else if (ch == HAZER_STIMULUS_UBX_SYNC_1) {
             DEBUG("UBLOX 0x%x.\n", ch);
-            state = HAZER_STATE_UBLOX_SYNC_2;
+            state = HAZER_STATE_UBX_SYNC_2;
             action = HAZER_ACTION_SAVESPECIAL;
             *bp = (char *)buffer;
             *sp = size;
@@ -227,54 +231,54 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         }
         break;
 
-    case HAZER_STATE_UBLOX_SYNC_2:
-    	if (ch == HAZER_STIMULUS_UBLOX_SYNC_2) {
-    		state = HAZER_STATE_UBLOX_CLASS;
+    case HAZER_STATE_UBX_SYNC_2:
+    	if (ch == HAZER_STIMULUS_UBX_SYNC_2) {
+    		state = HAZER_STATE_UBX_CLASS;
     		action = HAZER_ACTION_SAVESPECIAL;
     	} else {
     		state = HAZER_STATE_START;
     	}
     	break;
 
-    case HAZER_STATE_UBLOX_CLASS:
-		state = HAZER_STATE_UBLOX_ID;
+    case HAZER_STATE_UBX_CLASS:
+		state = HAZER_STATE_UBX_ID;
 		action = HAZER_ACTION_SAVESPECIAL;
     	break;
 
-    case HAZER_STATE_UBLOX_ID:
-		state = HAZER_STATE_UBLOX_LENGTH_1;
+    case HAZER_STATE_UBX_ID:
+		state = HAZER_STATE_UBX_LENGTH_1;
 		action = HAZER_ACTION_SAVESPECIAL;
     	break;
 
-    case HAZER_STATE_UBLOX_LENGTH_1:
+    case HAZER_STATE_UBX_LENGTH_1:
         DEBUG("LENGTH1 0x%x.\n", ch);
-		state = HAZER_STATE_UBLOX_LENGTH_2;
+		state = HAZER_STATE_UBX_LENGTH_2;
 		action = HAZER_ACTION_SAVESPECIAL;
     	break;
 
-    case HAZER_STATE_UBLOX_LENGTH_2:
+    case HAZER_STATE_UBX_LENGTH_2:
     	*lp = ((unsigned)ch) << 8;
     	*lp |= (unsigned)*((*bp) - 1);
         DEBUG("LENGTH %zu.\n", *lp);
-		state = HAZER_STATE_UBLOX_PAYLOAD;
+		state = HAZER_STATE_UBX_PAYLOAD;
 		action = HAZER_ACTION_SAVESPECIAL;
     	break;
 
-    case HAZER_STATE_UBLOX_PAYLOAD:
+    case HAZER_STATE_UBX_PAYLOAD:
     	if (((*lp)--) > 1) {
-    		state = HAZER_STATE_UBLOX_PAYLOAD;
+    		state = HAZER_STATE_UBX_PAYLOAD;
     	} else {
-    		state = HAZER_STATE_UBLOX_CK_A;
+    		state = HAZER_STATE_UBX_CK_A;
     	}
 		action = HAZER_ACTION_SAVESPECIAL;
     	break;
 
-    case HAZER_STATE_UBLOX_CK_A:
-		state = HAZER_STATE_UBLOX_CK_B;
+    case HAZER_STATE_UBX_CK_A:
+		state = HAZER_STATE_UBX_CK_B;
 		action = HAZER_ACTION_SAVESPECIAL;
      	break;
 
-    case HAZER_STATE_UBLOX_CK_B:
+    case HAZER_STATE_UBX_CK_B:
 		state = HAZER_STATE_END;
 		action = HAZER_ACTION_SAVESPECIAL;
     	break;
@@ -460,10 +464,14 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     return rc;
 }
 
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 /*
  * Ublox, p. 74
  */
-const void * hazer_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
+const void * hazer_ubx_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
 {
 	const void * result = (void *)0;
 	const uint8_t * bp = (const uint8_t *)buffer;
@@ -480,13 +488,13 @@ const void * hazer_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, u
 	 * CK_B).
 	 */
 
-	length = ((uint8_t)(bp[HAZER_CONSTANT_UBLOX_LENGTH_MSB])) << 8;
-	length |= ((uint8_t)(bp[HAZER_CONSTANT_UBLOX_LENGTH_LSB]));
-	length += HAZER_CONSTANT_UBLOX_SUMMED;
+	length = ((uint8_t)(bp[HAZER_CONSTANT_UBX_LENGTH_MSB])) << 8;
+	length |= ((uint8_t)(bp[HAZER_CONSTANT_UBX_LENGTH_LSB]));
+	length += HAZER_CONSTANT_UBX_SUMMED;
 
-	if ((length + HAZER_CONSTANT_UBLOX_UNSUMMED) <= size) {
+	if ((length + HAZER_CONSTANT_UBX_UNSUMMED) <= size) {
 
-		for (bp += HAZER_CONSTANT_UBLOX_CLASS; length > 0; --length) {
+		for (bp += HAZER_CONSTANT_UBX_CLASS; length > 0; --length) {
 			ck_a += *(bp++);
 			ck_b += ck_a;
 		}
@@ -504,14 +512,14 @@ const void * hazer_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, u
 /*
  * Ublox, p. 74
  */
-int hazer_validate(const void * buffer, size_t size)
+int hazer_ubx_validate(const void * buffer, size_t size)
 {
 	int rc = -1;
 	uint8_t * bp = (uint8_t *)0;
 	uint8_t ck_a = 0;
 	uint8_t ck_b = 0;
 
-	bp = (uint8_t *)hazer_fletcher(buffer, size, &ck_a, &ck_b);
+	bp = (uint8_t *)hazer_ubx_fletcher(buffer, size, &ck_a, &ck_b);
 	if (bp == (uint8_t *)0) {
 		/* Do nothing. */
 	} else if ((ck_a != bp[0]) || (ck_b != bp[1])) {
@@ -961,9 +969,9 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
 
     if (talker < HAZER_TALKER_TOTAL) {
     	/* Do nothing. */
-    } else if (sentence[0] != HAZER_STIMULUS_UBLOX_SYNC_1) {
+    } else if (sentence[0] != HAZER_STIMULUS_UBX_SYNC_1) {
     	/* Do nothing. */
-    } else if (sentence[1] != HAZER_STIMULUS_UBLOX_SYNC_2) {
+    } else if (sentence[1] != HAZER_STIMULUS_UBX_SYNC_2) {
     	/* Do nothing. */
     } else {
         talker = HAZER_TALKER_UBX;
@@ -1012,16 +1020,25 @@ ssize_t hazer_parse_length(const void * buffer, size_t size)
 
 	if (sentence[0] == HAZER_STIMULUS_START) {
 		length = strnlen(sentence, size);
-	} else if (sentence[HAZER_CONSTANT_UBLOX_SYNC_1] != HAZER_STIMULUS_UBLOX_SYNC_1) {
+		if (sentence[length - 1] != HAZER_STIMULUS_LF) {
+			length = 0;
+		} else if (sentence[length - 2] != HAZER_STIMULUS_CR) {
+			length = 0;
+		} else if (sentence[length - 5] != HAZER_STIMULUS_CHECKSUM) {
+			length = 0;
+		} else {
+			/* Do nothing. */
+		}
+	} else if (sentence[HAZER_CONSTANT_UBX_SYNC_1] != HAZER_STIMULUS_UBX_SYNC_1) {
 		/* Do nothing. */
-	} else if (sentence[HAZER_CONSTANT_UBLOX_SYNC_2] != HAZER_STIMULUS_UBLOX_SYNC_2) {
+	} else if (sentence[HAZER_CONSTANT_UBX_SYNC_2] != HAZER_STIMULUS_UBX_SYNC_2) {
 		/* Do nothing. */
-	} else if (size < HAZER_CONSTANT_UBLOX_SHORTEST) {
+	} else if (size < HAZER_CONSTANT_UBX_SHORTEST) {
 		/* Do nothing. */
 	} else {
-		length = ((unsigned)(sentence[HAZER_CONSTANT_UBLOX_LENGTH_MSB])) << 8;
-		length |= ((unsigned)(sentence[HAZER_CONSTANT_UBLOX_LENGTH_LSB]));
-		length += HAZER_CONSTANT_UBLOX_SHORTEST;
+		length = ((unsigned)(sentence[HAZER_CONSTANT_UBX_LENGTH_MSB])) << 8;
+		length |= ((unsigned)(sentence[HAZER_CONSTANT_UBX_LENGTH_LSB]));
+		length += HAZER_CONSTANT_UBX_SHORTEST;
 		if (length <= size) {
 			length = -length;
 		} else {

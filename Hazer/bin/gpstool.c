@@ -78,7 +78,7 @@ static int emit_packet(FILE * fp, const void * packet, size_t size)
 
     do {
 
-        bp = hazer_fletcher(packet, size, &ck_a, &ck_b);
+        bp = hazer_ubx_fletcher(packet, size, &ck_a, &ck_b);
         if (bp == (void *)0) { break; }
         length = (const char *)bp - (const char *)packet;
 
@@ -766,7 +766,7 @@ int main(int argc, char * argv[])
 
         	/*
         	 * If we have any initialization strings to send, do so one at a
-        	 * time while reading from the device. Otherwise, the device can
+        	 * time, while reading from the device. Otherwise, the device can
         	 * (will) overrun the UART buffer with responses before we can
         	 * read them.
         	 */
@@ -820,7 +820,7 @@ int main(int argc, char * argv[])
 
             	length = -length;
 
-            	rc = hazer_validate(buffer, size);
+            	rc = hazer_ubx_validate(buffer, size);
                 if (rc < 0) {
                     /* Validation failed. */
                     fprintf(stderr, "%s: UBX %zd\n", program, length);

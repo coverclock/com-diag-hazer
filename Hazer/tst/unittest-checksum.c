@@ -136,19 +136,19 @@ int main(void)
 	{
 		ssize_t size = 0;
 		int rc = 0;
-		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xca };
+		static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xca };
 
-		assert(UBLOX[HAZER_CONSTANT_UBLOX_LENGTH_LSB] == 0x04);
-		assert(UBLOX[HAZER_CONSTANT_UBLOX_LENGTH_MSB] == 0x00);
+		assert(UBX[HAZER_CONSTANT_UBX_LENGTH_LSB] == 0x04);
+		assert(UBX[HAZER_CONSTANT_UBX_LENGTH_MSB] == 0x00);
 
-		size = UBLOX[HAZER_CONSTANT_UBLOX_LENGTH_MSB] << 8;
-		size |= UBLOX[HAZER_CONSTANT_UBLOX_LENGTH_LSB];
+		size = UBX[HAZER_CONSTANT_UBX_LENGTH_MSB] << 8;
+		size |= UBX[HAZER_CONSTANT_UBX_LENGTH_LSB];
 		assert(size == 4);
 
-		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
-		assert(size == -(ssize_t)sizeof(UBLOX));
+		size = hazer_parse_length(UBX, sizeof(UBX));
+		assert(size == -(ssize_t)sizeof(UBX));
 
-		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		rc = hazer_ubx_validate(UBX, sizeof(UBX));
 		assert(rc == 0);
 	}
 
@@ -162,7 +162,7 @@ int main(void)
 		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
 		assert(size == -(ssize_t)sizeof(UBLOX));
 
-		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
 		assert(rc < 0);
 	}
 
@@ -176,7 +176,7 @@ int main(void)
 		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
 		assert(size == -(ssize_t)sizeof(UBLOX));
 
-		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
 		assert(rc < 0);
 	}
 
@@ -190,7 +190,7 @@ int main(void)
 		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
 		assert(size == -(ssize_t)sizeof(UBLOX));
 
-		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
 		assert(rc < 0);
 	}
 
@@ -204,7 +204,7 @@ int main(void)
 		size = hazer_parse_length(UBLOX, sizeof(UBLOX)); /* Overflows buffer. */
 		assert(size == 0);
 
-		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
 		assert(rc < 0);
 	}
 
@@ -218,7 +218,7 @@ int main(void)
 		size = hazer_parse_length(UBLOX, sizeof(UBLOX)); /* But not correct. */
 		assert(size < 0);
 
-		rc = hazer_validate(UBLOX, sizeof(UBLOX));
+		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
 		assert(rc < 0);
 	}
 

@@ -129,19 +129,19 @@ enum HazerConstantGps {
 /**
  * UBlox, p.73
  */
-enum HazerxConstantUblox {
-	HAZER_CONSTANT_UBLOX_SYNC_1		= 0,	/* Always 0xb5. */
-	HAZER_CONSTANT_UBLOX_SYNC_2		= 1,	/* Always 0x62. */
-	HAZER_CONSTANT_UBLOX_CLASS		= 2,
-	HAZER_CONSTANT_UBLOX_ID			= 3,
-	HAZER_CONSTANT_UBLOX_LENGTH_LSB	= 4,	/* 16-bit, little endian (LSB). */
-	HAZER_CONSTANT_UBLOX_LENGTH_MSB = 5,	/* 16-bit, little endian (MSB). */
+enum HazerxConstantUbx {
+	HAZER_CONSTANT_UBX_SYNC_1		= 0,	/* Always 0xb5. */
+	HAZER_CONSTANT_UBX_SYNC_2		= 1,	/* Always 0x62. */
+	HAZER_CONSTANT_UBX_CLASS		= 2,
+	HAZER_CONSTANT_UBX_ID			= 3,
+	HAZER_CONSTANT_UBX_LENGTH_LSB	= 4,	/* 16-bit, little endian (LSB). */
+	HAZER_CONSTANT_UBX_LENGTH_MSB 	= 5,	/* 16-bit, little endian (MSB). */
 	/* ... */								/* Payload[LENGTH]. */
-	HAZER_CONSTANT_UBLOX_CK_A		= 6,	/* Only if no LENGTH == 0. */
-	HAZER_CONSTANT_UBLOX_CK_B		= 7,	/* Only if no LENGTH == 0. */
-	HAZER_CONSTANT_UBLOX_SHORTEST	= 8,
-	HAZER_CONSTANT_UBLOX_UNSUMMED	= 2,	/* SYNC1[1], SYNC2[1], */
-	HAZER_CONSTANT_UBLOX_SUMMED		= 4,	/* CLASS[1], ID[1], LENGTH[2], ... */
+	HAZER_CONSTANT_UBX_CK_A			= 6,	/* Only if no LENGTH == 0. */
+	HAZER_CONSTANT_UBX_CK_B			= 7,	/* Only if no LENGTH == 0. */
+	HAZER_CONSTANT_UBX_SHORTEST		= 8,
+	HAZER_CONSTANT_UBX_UNSUMMED		= 2,	/* SYNC1[1], SYNC2[1], */
+	HAZER_CONSTANT_UBX_SUMMED		= 4,	/* CLASS[1], ID[1], LENGTH[2] ... */
 };
 
 /**
@@ -161,15 +161,15 @@ typedef enum HazerState {
     HAZER_STATE_CR,
     HAZER_STATE_LF,
     HAZER_STATE_END,
-	HAZER_STATE_UBLOX_FIRST,
-	HAZER_STATE_UBLOX_SYNC_2		= HAZER_STATE_UBLOX_FIRST,
-	HAZER_STATE_UBLOX_CLASS,
-	HAZER_STATE_UBLOX_ID,
-	HAZER_STATE_UBLOX_LENGTH_1,
-	HAZER_STATE_UBLOX_LENGTH_2,
-	HAZER_STATE_UBLOX_PAYLOAD,
-	HAZER_STATE_UBLOX_CK_A,
-	HAZER_STATE_UBLOX_CK_B,
+	HAZER_STATE_UBX_FIRST,
+	HAZER_STATE_UBX_SYNC_2			= HAZER_STATE_UBX_FIRST,
+	HAZER_STATE_UBX_CLASS,
+	HAZER_STATE_UBX_ID,
+	HAZER_STATE_UBX_LENGTH_1,
+	HAZER_STATE_UBX_LENGTH_2,
+	HAZER_STATE_UBX_PAYLOAD,
+	HAZER_STATE_UBX_CK_A,
+	HAZER_STATE_UBX_CK_B,
 } hazer_state_t;
 
 /**
@@ -203,8 +203,8 @@ enum HazerStimulus {
     HAZER_STIMULUS_LF               = '\n',
     HAZER_STIMULUS_MAXIMUM          = '}',
     HAZER_STIMULUS_RESERVED         = '~',
-	HAZER_STIMULUS_UBLOX_SYNC_1		= '\xb5', /* ISO 8859.1 for 'mu' [Ublox]. */
-	HAZER_STIMULUS_UBLOX_SYNC_2		= '\x62', /* 'b' but in hex in [Ublox]. */
+	HAZER_STIMULUS_UBX_SYNC_1		= '\xb5', /* ISO 8859.1 for 'mu' [Ublox]. */
+	HAZER_STIMULUS_UBX_SYNC_2		= '\x62', /* 'b' but in hex in [Ublox]. */
 };
 
 /**
@@ -290,7 +290,7 @@ typedef char (hazer_buffer_t)[HAZER_CONSTANT_NMEA_LONGEST + 1]; /* plus NUL */
 extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp);
 
 /*******************************************************************************
- * VALIDATING AN NMEA OR UBLOX SENTENCE
+ * VALIDATING AN NMEA SENTENCE
  ******************************************************************************/
 
 /**
@@ -319,9 +319,13 @@ extern int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp);
  */
 extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
 
+/*******************************************************************************
+ * VALIDATING A UBX PACKET
+ ******************************************************************************/
+
 /**
- * Compute the Fletcher checksum used by Ublox for the specified buffer. The
- * buffer points to the beginning of the Ublox sentence, not to the subset that
+ * Compute the Fletcher checksum used by UBX for the specified buffer. The
+ * buffer points to the beginning of the UBX packet, not to the subset that
  * is checksummed, and the sentence must contain a valid length field.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
@@ -329,16 +333,16 @@ extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
  * @param ck_bp points to where the ck_b value will be stored.
  * @return where the ck_a, ck_b would be in the buffer, or NULL if an error occurred.
  */
-extern const void * hazer_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp);
+extern const void * hazer_ubx_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp);
 
 /**
- * Validate a Ublox sentence by computing its Fletcher checksum and comparing
+ * Validate a UBX packet by computing its Fletcher checksum and comparing
  * it to the checksum at the end of the sentence.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
  * @return 0 for success, <0 if invalid or an error occurred.
  */
-extern int hazer_validate(const void * buffer, size_t size);
+extern int hazer_ubx_validate(const void * buffer, size_t size);
 
 /*******************************************************************************
  * BREAKING UP AN NMEA SENTENCE INTO FIELDS
@@ -627,11 +631,11 @@ extern hazer_talker_t hazer_parse_talker(const void * buffer);
 extern hazer_system_t hazer_parse_system(hazer_talker_t talker);
 
 /**
- * Return the length of the completed packet in bytes. If the returned length
- * is >0, the packet is a NUL-terminated NMEA sentence and the length does not
+ * Return the length of the completed datum in bytes. If the returned length
+ * is >0, the datum is a NUL-terminated NMEA sentence and the length does not
  * include the terminating NUL. If the length is <0, the packet is a binary
- * Ublox packet and the length is that of the entire packet. If the length is
- * zero, the packet is not valid.
+ * UBX packet and the length includes the header, payload, and checksum. If the
+ * length is zero, the packet is not valid.
  * @param buffer points to buffer containing the completed sentence.
  * @param size is the size of the buffer containing the sentence.
  * @return the length of the sentence encoded to indicate NMEA, Ublox, or error.

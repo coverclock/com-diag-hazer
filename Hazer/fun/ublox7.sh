@@ -17,5 +17,6 @@ COMMAND1="\$PUBX,00"
 COMMAND2="\$PUBX,03"
 COMMAND3="\$PUBX,04"
 COMMAND4="\\xb5\\x62\\x0a\\x04\\x00\\x00"
+COMMAND5="\\xb5\\x62\\x06\\x31\\x00\\x00"
 
-gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v -W "${COMMAND1}" -W "${COMMAND2}" -W "${COMMAND3}" -W "${COMMAND4}"
+gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v -W "${COMMAND1}" -W "${COMMAND2}" -W "${COMMAND3}" -W "${COMMAND4}" -W "${COMMAND5}"
