@@ -77,8 +77,8 @@ Hazer has been successfully tested with the following GPS devices.
 [1] My favorite unit so far, all things considered; also my first.    
 [2] Emits all sorts of interesting stuff in $GPTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
-[4] Receives GPS (U.S., formerly "Navstar")  and GLONASS (Russian) constellations.    
-[5] Receives GPS (U.S.), GLONASS (Russian), and QZSS (Japanese) constellations.    
+[4] Receives GPS (U.S., formerly "Navstar") *and* GLONASS (Russian) constellations concurrently.    
+[5] Receives GPS (U.S.) *or* GLONASS (Russian) constellations optionally.    
 [6] Supports One Pulse Per Second (1PPS) by toggling digital output pin.    
 [7] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
 
