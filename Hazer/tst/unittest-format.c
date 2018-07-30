@@ -2,10 +2,10 @@
 /**
  * @file
  *
- * Copyright 2017 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2017-2018 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-hazer
+ * https://github.com/coverclock/com-diag-hazer<BR>
  */
 
 #include <stdio.h>
@@ -15,7 +15,7 @@
 #include "com/diag/hazer/hazer.h"
 
 /**
- * Deriged from "Points of the compass" in Wikipedia except that, remarkably, I don't think
+ * Derived from "Points of the compass" in Wikipedia except that, remarkably, I don't think
  * it's correct. The "32 cardinal points" table needs to have three fractional digits to be
  * accurate.
  */

@@ -6,10 +6,10 @@
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-SPEED=${1:-"4800"}
+SPEED=${1:-"9600"}
 DEVICE=${2:-"/dev/ttyUSB0"}
 PORT=${3:-"5555"}
-HOST=${4:-"consumer"}
+HOST=${4:-"ip6-localhost"}
 
 stty sane
 clear

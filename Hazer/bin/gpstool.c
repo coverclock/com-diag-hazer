@@ -85,7 +85,7 @@ static int emit_packet(FILE * fp, const void * packet, size_t size)
         if (bp == (void *)0) { break; }
         length = (const char *)bp - (const char *)packet;
 
-#if 1
+#if 0
         diminuto_dump(stderr, packet, length);
         diminuto_dump(stderr, &ck_a, sizeof(ck_a));
         diminuto_dump(stderr, &ck_b, sizeof(ck_b));
@@ -600,6 +600,10 @@ int main(int argc, char * argv[])
         }
     }
 
+    /**
+     ** INITIALIZATION
+     **/
+
     if (device != (const char *)0) {
 
         devfd = open(device, readonly ? O_RDONLY : O_RDWR);
@@ -774,6 +778,10 @@ int main(int argc, char * argv[])
 
     rc = yodel_initialize();
     assert(rc == 0);
+
+    /**
+     ** WORK LOOP
+     **/
 
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
 
@@ -1017,6 +1025,10 @@ int main(int argc, char * argv[])
         }
 
     }
+
+    /**
+     ** FINIALIZATION
+     **/
 
     fprintf(stderr, "%s: END\n", program);
 

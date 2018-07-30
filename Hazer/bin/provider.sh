@@ -6,7 +6,7 @@
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-SPEED=${1:-"4800"}
+SPEED=${1:-"9600"}
 DEVICE=${2:-"/dev/ttyS0"}
 PORT=${3:-"5555"}
 
