@@ -407,6 +407,7 @@ int main(int argc, char * argv[])
     FILE * outfp = stdout;
     FILE * errfp = stderr;
     FILE * devfp = stdout;
+    FILE * logfp = (FILE *)0;
     FILE * strobefp = (FILE *)0;
     FILE * ppsfp = (FILE *)0;
     int devfd = -1;
@@ -429,6 +430,7 @@ int main(int argc, char * argv[])
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
+    const char * path = (const char *)0;
     int bitspersecond = 9600;
     int databits = 8;
     int paritybit = 0;
@@ -460,7 +462,7 @@ int main(int argc, char * argv[])
     void * result = (void *)0;
     pthread_t thread;
     int pthreadrc = -1;
-    static const char OPTIONS[] = "124678A:D:EI:OP:RW:b:cdehlmnop:rsv?";
+    static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:b:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -504,6 +506,9 @@ int main(int argc, char * argv[])
         case 'I':
             pps = optarg;
             break;
+        case 'L':
+        	path = optarg;
+        	break;
         case 'O':
             output = !0;
             break;
@@ -567,7 +572,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ]\n", program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]\n", program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(stderr, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -578,6 +583,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -D DEVICE   Use DEVICE.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI escape sequences.\n");
             fprintf(stderr, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
+            fprintf(stderr, "       -L FILE     Log sentences to FILE.\n");
             fprintf(stderr, "       -O          Output sentences to DEVICE.\n");
             fprintf(stderr, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(stderr, "       -R          Print a report on standard output.\n");
@@ -620,6 +626,22 @@ int main(int argc, char * argv[])
         if (devfp == (FILE *)0) { diminuto_perror(device); }
         assert(devfp != (FILE *)0);
         infp = devfp;
+
+    }
+
+    if (path == (const char *)0) {
+
+    	/* Do nothing. */
+
+    } else if (strcmp(path, "-") == 0) {
+
+    	logfp = stdout;
+
+    } else {
+
+    	logfp = fopen(path, "ab");
+    	if (logfp == (FILE *)0) { diminuto_perror(path); }
+    	assert(logfp != (FILE *)0);
 
     }
 
@@ -943,6 +965,7 @@ int main(int argc, char * argv[])
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
         if (report) { print_sentence(outfp, buffer, length); }
         if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
+        if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
 
         if (format == NMEA) {
 
@@ -1061,6 +1084,14 @@ int main(int argc, char * argv[])
 
     if (sock >= 0) {
         diminuto_ipc_close(sock);
+    }
+
+    if (logfp == (FILE *)0) {
+    	/* Do nothing. */
+    } else if (logfp == stdout) {
+    	/* Do nothing. */
+    } else {
+    	fclose(logfp);
     }
 
     (void)fclose(infp);
