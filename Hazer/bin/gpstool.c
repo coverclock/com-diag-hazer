@@ -386,18 +386,20 @@ int main(int argc, char * argv[])
     int escape = 0;
     int report = 0;
     hazer_state_t nmea_state = HAZER_STATE_EOF;
+    hazer_buffer_t nmea_buffer = { 0 };
     char * nmea_bb = (char *)0;
     size_t nmea_ss = 0;
     size_t nmea_ll = 0;
     uint8_t nmea_cs = 0;
     uint8_t nmea_ck = 0;
     yodel_state_t ubx_state = YODEL_STATE_EOF;
+    hazer_buffer_t ubx_buffer = { 0 };
     char * ubx_bb = (char *)0;
     size_t ubx_ss = 0;
     size_t ubx_ll = 0;
     uint8_t ubx_ck_a = 0;
     uint8_t ubx_ck_b = 0;
-    hazer_buffer_t buffer = { 0 };
+    unsigned char * buffer = (unsigned char *)0;
     hazer_buffer_t datagram = { 0 };
     hazer_vector_t vector = { 0 };
     hazer_position_t position = { 0 };
@@ -803,6 +805,7 @@ int main(int argc, char * argv[])
 
     while (!diminuto_interrupter_check()) {
 
+    	buffer = (void *)0;
         nmea_state = HAZER_STATE_START;
         ubx_state = YODEL_STATE_START;
 
@@ -846,12 +849,18 @@ int main(int argc, char * argv[])
             	/*
             	 * The NMEA and UBX parsers can be thought of as a single
             	 * non-deterministic finite state machines: an automaton that
-            	 * can be in more than one state at a time.
+            	 * can be in more than one state at a time. The two state
+            	 * machines must use different state variables and even
+            	 * different buffers, since it is possible both could be active
+            	 * at the same time until one of them determines that it has
+            	 * collected a correct sentence or packet. The datagram
+            	 * code below can use either buffer, and may ultimately
+            	 * receive either NMEA or UBX data from the far end.
             	 */
 
-                nmea_state = hazer_machine(nmea_state, ch, buffer, sizeof(buffer), &nmea_bb, &nmea_ss, &nmea_ll);
+                nmea_state = hazer_machine(nmea_state, ch, nmea_buffer, sizeof(nmea_buffer), &nmea_bb, &nmea_ss, &nmea_ll);
 
-                ubx_state = yodel_machine(ubx_state, ch, buffer, sizeof(buffer), &ubx_bb, &ubx_ss, &ubx_ll);
+                ubx_state = yodel_machine(ubx_state, ch, ubx_buffer, sizeof(ubx_buffer), &ubx_bb, &ubx_ss, &ubx_ll);
 
                 if (nmea_state == HAZER_STATE_END) {
                 	break;
@@ -878,8 +887,10 @@ int main(int argc, char * argv[])
             } else if (ubx_state == YODEL_STATE_EOF) {
             	break;
             } else if (nmea_state == HAZER_STATE_END) {
+            	buffer = nmea_buffer;
             	size = nmea_ss;
             } else if (ubx_state == YODEL_STATE_END) {
+            	buffer = ubx_buffer;
             	size = ubx_ss;
             } else {
             	assert(0);
@@ -887,15 +898,17 @@ int main(int argc, char * argv[])
 
         } else if (protocol == IPV4) {
 
-            size = diminuto_ipc4_datagram_receive(sock, buffer, sizeof(buffer) - 1);
+            size = diminuto_ipc4_datagram_receive(sock, nmea_buffer, sizeof(nmea_buffer) - 1);
             if (size <= 0) { break; }
-            buffer[size++] = '\0';
+            nmea_buffer[size++] = '\0';
+            buffer = nmea_buffer;
 
         } else if (protocol == IPV6) {
 
-            size = diminuto_ipc6_datagram_receive(sock, buffer, sizeof(buffer) - 1);
+            size = diminuto_ipc6_datagram_receive(sock, ubx_buffer, sizeof(ubx_buffer) - 1);
             if (size <= 0) { break; }
-            buffer[size++] = '\0';
+            ubx_buffer[size++] = '\0';
+            buffer = ubx_buffer;
 
         } else {
 
@@ -1040,6 +1053,16 @@ int main(int argc, char * argv[])
 				fputs(datagram, devfp);
 				fflush(devfp);
 			}
+
+        } else if (format == UBX) {
+
+#if 1
+        	if (verbose) { diminuto_dump(errfp, buffer, length); }
+#endif
+
+        } else {
+
+        	/* Do nothing. */
 
         }
 

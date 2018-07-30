@@ -111,7 +111,7 @@ extern int hazer_finalize(void);
  */
 enum HazerConstantNmea {
     HAZER_CONSTANT_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
-    HAZER_CONSTANT_NMEA_LONGEST     = 4096, /* Adjusted. */
+    HAZER_CONSTANT_NMEA_LONGEST     = 512, /* Adjusted. */
     HAZER_CONSTANT_NMEA_TALKER      = sizeof("GP") - 1,
     HAZER_CONSTANT_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
     HAZER_CONSTANT_NMEA_ID          = sizeof("$GPGGAXX") - 1, /* Adjusted. */
@@ -233,7 +233,7 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
  * according to the NMEA spec, plus a trailing NUL (and then some).
  * NMEA 0183 4.10, 5.3, p. 11
  */
-typedef char (hazer_buffer_t)[HAZER_CONSTANT_NMEA_LONGEST + 1]; /* plus NUL */
+typedef unsigned char (hazer_buffer_t)[HAZER_CONSTANT_NMEA_LONGEST + 1]; /* plus NUL */
 
 /**
  * Process a single character of stimulus for the state machine that is
