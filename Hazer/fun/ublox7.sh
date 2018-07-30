@@ -2,7 +2,7 @@
 # Copyright 2018 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
-# https://github.com/coverclock/com-diag-diminuto
+# https://github.com/coverclock/com-diag-hazer
 
 # I use a NaviSys Technology GR-701W USB GPS device to for this.
 # The GR-701W exports 1PPS via DCD, which the "-c" option below
