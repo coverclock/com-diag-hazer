@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include "com/diag/hazer/hazer.h"
+#include "com/diag/hazer/yodel.h"
 
 int main(void)
 {
@@ -34,7 +35,7 @@ int main(void)
     talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_GNSS);
     system = hazer_parse_system(talker);
-    assert(system = HAZER_SYSTEM_GNSS);
+    assert(system == HAZER_SYSTEM_GNSS);
 
     string = "$" "GP";
     talker = hazer_parse_talker(string);
@@ -63,12 +64,6 @@ int main(void)
     string = "$" "PUBX";
     talker = hazer_parse_talker(string);
     assert(talker == HAZER_TALKER_PUBX);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_TOTAL);
-
-    string = "\xb5\x62";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_UBX);
     system = hazer_parse_system(talker);
     assert(system == HAZER_SYSTEM_TOTAL);
 

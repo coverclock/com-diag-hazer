@@ -5,7 +5,7 @@
  * Copyright 2017-2018 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-hazer
+ * https://github.com/coverclock/com-diag-hazer<BR>
  */
 
 #include <stdio.h>
@@ -83,59 +83,52 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
     hazer_action_t action = HAZER_ACTION_SKIP;
 
     /*
-     * Short circuit state machine for some characters in some states.
+     * Short circuit state machine for some characters.
      */
 
-    switch (ch) {
+	switch (ch) {
 
-    case EOF:
-        DEBUG("EOF %d!\n", ch);
-        state = HAZER_STATE_EOF;
-        break;
+	case EOF:
+		DEBUG("EOF %d!\n", ch);
+		state = HAZER_STATE_EOF;
+		break;
 
-    default:
-    	/* Do nothing. */
-    	break;
+	case HAZER_STIMULUS_NUL:
+		DEBUG("STARTING '%c'?\n", ch);
+		state = HAZER_STATE_START;
+		break;
 
-    }
+	case HAZER_STIMULUS_START:
+		DEBUG("STARTING '%c'?\n", ch);
+		state = HAZER_STATE_START;
+		break;
 
-    if ((HAZER_STATE_EOF < state) && (state < HAZER_STATE_UBX_FIRST)) {
+	case HAZER_STIMULUS_ENCAPSULATION:
+		DEBUG("STARTING '%c'?\n", ch);
+		state = HAZER_STATE_START;
+		break;
 
-    	switch (ch) {
+	case HAZER_STIMULUS_CR:
+		/* Do nothing. */
+		break;
 
-		case HAZER_STIMULUS_NUL:
-			DEBUG("STARTING '%c'?\n", ch);
+	case HAZER_STIMULUS_LF:
+		/* Do nothing. */
+		break;
+
+	default:
+		/*
+		 * This will specifically reject the SYNC1 and SYNC2 characters from
+		 * UBX binary packets in additional to garbage on the serial line that
+		 * corrupts NMEA sentences.
+		 */
+		if (!((HAZER_STIMULUS_MINIMUM <= ch) && (ch <= HAZER_STIMULUS_MAXIMUM))) {
+			DEBUG("STARTING 0x%x!\n", ch);
 			state = HAZER_STATE_START;
-			break;
-
-		case HAZER_STIMULUS_START:
-			DEBUG("STARTING '%c'?\n", ch);
-			state = HAZER_STATE_START;
-			break;
-
-		case HAZER_STIMULUS_ENCAPSULATION:
-			DEBUG("STARTING '%c'?\n", ch);
-			state = HAZER_STATE_START;
-			break;
-
-		case HAZER_STIMULUS_CR:
-			/* Do nothing. */
-			break;
-
-		case HAZER_STIMULUS_LF:
-			/* Do nothing. */
-			break;
-
-		default:
-			if (!((HAZER_STIMULUS_MINIMUM <= ch) && (ch <= HAZER_STIMULUS_MAXIMUM))) {
-				DEBUG("STARTING 0x%x!\n", ch);
-				state = HAZER_STATE_START;
-			}
-			break;
-
 		}
+		break;
 
-    }
+	}
 
     /*
      * Advance state machine based on stimulus.
@@ -159,12 +152,6 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
             DEBUG("ENCAPSULATE '%c'.\n", ch);
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
-            *bp = (char *)buffer;
-            *sp = size;
-        } else if (ch == HAZER_STIMULUS_UBX_SYNC_1) {
-            DEBUG("UBLOX 0x%x.\n", ch);
-            state = HAZER_STATE_UBX_SYNC_2;
-            action = HAZER_ACTION_SAVESPECIAL;
             *bp = (char *)buffer;
             *sp = size;
         } else {
@@ -231,58 +218,6 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         }
         break;
 
-    case HAZER_STATE_UBX_SYNC_2:
-    	if (ch == HAZER_STIMULUS_UBX_SYNC_2) {
-    		state = HAZER_STATE_UBX_CLASS;
-    		action = HAZER_ACTION_SAVESPECIAL;
-    	} else {
-    		state = HAZER_STATE_START;
-    	}
-    	break;
-
-    case HAZER_STATE_UBX_CLASS:
-		state = HAZER_STATE_UBX_ID;
-		action = HAZER_ACTION_SAVESPECIAL;
-    	break;
-
-    case HAZER_STATE_UBX_ID:
-		state = HAZER_STATE_UBX_LENGTH_1;
-		action = HAZER_ACTION_SAVESPECIAL;
-    	break;
-
-    case HAZER_STATE_UBX_LENGTH_1:
-        DEBUG("LENGTH1 0x%x.\n", ch);
-		state = HAZER_STATE_UBX_LENGTH_2;
-		action = HAZER_ACTION_SAVESPECIAL;
-    	break;
-
-    case HAZER_STATE_UBX_LENGTH_2:
-    	*lp = ((unsigned)ch) << 8;
-    	*lp |= (unsigned)*((*bp) - 1);
-        DEBUG("LENGTH %zu.\n", *lp);
-		state = HAZER_STATE_UBX_PAYLOAD;
-		action = HAZER_ACTION_SAVESPECIAL;
-    	break;
-
-    case HAZER_STATE_UBX_PAYLOAD:
-    	if (((*lp)--) > 1) {
-    		state = HAZER_STATE_UBX_PAYLOAD;
-    	} else {
-    		state = HAZER_STATE_UBX_CK_A;
-    	}
-		action = HAZER_ACTION_SAVESPECIAL;
-    	break;
-
-    case HAZER_STATE_UBX_CK_A:
-		state = HAZER_STATE_UBX_CK_B;
-		action = HAZER_ACTION_SAVESPECIAL;
-     	break;
-
-    case HAZER_STATE_UBX_CK_B:
-		state = HAZER_STATE_END;
-		action = HAZER_ACTION_SAVESPECIAL;
-    	break;
-
     case HAZER_STATE_END:
         DEBUG("END 0x%x!\n", ch);
         break;
@@ -300,11 +235,7 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
     switch (action) {
 
     case HAZER_ACTION_SKIP:
-    	if ((' ' <= ch) && (ch <= '~')) {
-    		DEBUG("SKIP '%c'?\n", ch);
-    	} else {
-    		DEBUG("SKIP 0x%x?\n", ch);
-    	}
+    	DEBUG("SKIP 0x%x?\n", ch);
         break;
 
     case HAZER_ACTION_SAVE:
@@ -344,18 +275,6 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         }
         break;
 
-    case HAZER_ACTION_FINAL:
-        if ((*sp) > 1) {
-            *((*bp)++) = ch;
-            (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", ch);
-            (*sp) = size - (*sp);
-        } else {
-            state = HAZER_STATE_START;
-            DEBUG("LONG!\n");
-        }
-    	break;
-
     /*
      * No default: must handle all cases.
      */
@@ -377,30 +296,29 @@ uint8_t hazer_checksum(const void * buffer, size_t size)
 {
     uint8_t cs = 0;
     const char * bb = (const char *)buffer;
-    size_t ss = size;
     uint8_t ch = '\0';
 
     do {
 
-        if (ss == 0) {
+        if (size == 0) {
             break;
         }
 
         ++bb;
-        --ss;
+        --size;
 
-        if (ss == 0) {
+        if (size == 0) {
             break;
         }
 
         ch = *(bb++);
         cs = ch;
-        --ss;
+        --size;
 
-        while ((ss > 0) && (*bb != HAZER_STIMULUS_CHECKSUM) && (*bb != '\0')) {
+        while ((size > 0) && (*bb != HAZER_STIMULUS_CHECKSUM) && (*bb != '\0')) {
             ch = *(bb++);
             cs ^= ch;
-            --ss;
+            --size;
         }
 
     } while (0);
@@ -464,71 +382,32 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     return rc;
 }
 
-/******************************************************************************
- *
- ******************************************************************************/
-
-/*
- * Ublox, p. 74
- */
-const void * hazer_ubx_fletcher(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
+ssize_t hazer_length(const void * buffer, size_t size)
 {
-	const void * result = (void *)0;
-	const uint8_t * bp = (const uint8_t *)buffer;
-	uint8_t ck_a = 0;
-	uint8_t ck_b = 0;
-	uint16_t length = 0;
+	ssize_t result = -1;
+	size_t length = 0;
+	const char * sentence = (const char *)0;
 
-	/*
-	 * The portion of the buffer being summed includes the length, but we have
-	 * to compute the length first to do the checksum. Seems chicken-and-egg,
-	 * but I've seen the same thing in TCP headers; in fact [Ublox p. 74] says
-	 * this is the Fletcher checksum from RFC 1145. It refers to this as an
-	 * eight-bit checksum, but the result is really sixteen bits (CK_A and
-	 * CK_B).
-	 */
+	sentence = (const char *)buffer;
 
-	length = ((uint8_t)(bp[HAZER_CONSTANT_UBX_LENGTH_MSB])) << 8;
-	length |= ((uint8_t)(bp[HAZER_CONSTANT_UBX_LENGTH_LSB]));
-	length += HAZER_CONSTANT_UBX_SUMMED;
-
-	if ((length + HAZER_CONSTANT_UBX_UNSUMMED) <= size) {
-
-		for (bp += HAZER_CONSTANT_UBX_CLASS; length > 0; --length) {
-			ck_a += *(bp++);
-			ck_b += ck_a;
-		}
-
-		*ck_ap = ck_a;
-		*ck_bp = ck_b;
-
-		result = bp;
-
-	}
-
-	return (const void *)bp;
-}
-
-/*
- * Ublox, p. 74
- */
-int hazer_ubx_validate(const void * buffer, size_t size)
-{
-	int rc = -1;
-	uint8_t * bp = (uint8_t *)0;
-	uint8_t ck_a = 0;
-	uint8_t ck_b = 0;
-
-	bp = (uint8_t *)hazer_ubx_fletcher(buffer, size, &ck_a, &ck_b);
-	if (bp == (uint8_t *)0) {
-		/* Do nothing. */
-	} else if ((ck_a != bp[0]) || (ck_b != bp[1])) {
+	if (sentence[0] != HAZER_STIMULUS_START) {
 		/* Do nothing. */
 	} else {
-		rc = 0;
+		length = strnlen(sentence, size);
+		if (sentence[length] != HAZER_STIMULUS_NUL) {
+			/* Do nothing. */
+		} else if (sentence[length - 1] != HAZER_STIMULUS_LF) {
+			/* Do nothing. */
+		} else if (sentence[length - 2] != HAZER_STIMULUS_CR) {
+			/* Do nothing. */
+		} else if (sentence[length - 5] != HAZER_STIMULUS_CHECKSUM) {
+			/* Do nothing. */
+		} else {
+			result = length;
+		}
 	}
 
-	return rc;
+	return result;
 }
 
 /******************************************************************************
@@ -967,16 +846,6 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
         /* Do nothing. */
     }
 
-    if (talker < HAZER_TALKER_TOTAL) {
-    	/* Do nothing. */
-    } else if (sentence[0] != HAZER_STIMULUS_UBX_SYNC_1) {
-    	/* Do nothing. */
-    } else if (sentence[1] != HAZER_STIMULUS_UBX_SYNC_2) {
-    	/* Do nothing. */
-    } else {
-        talker = HAZER_TALKER_UBX;
-    }
-
     return talker;
 }
 
@@ -1009,44 +878,6 @@ hazer_system_t hazer_parse_system(hazer_talker_t talker)
 	}
 
 	return system;
-}
-
-ssize_t hazer_parse_length(const void * buffer, size_t size)
-{
-	ssize_t length = 0;
-	const char * sentence = (const char *)0;
-
-	sentence = (const char *)buffer;
-
-	if (sentence[0] == HAZER_STIMULUS_START) {
-		length = strnlen(sentence, size);
-		if (sentence[length - 1] != HAZER_STIMULUS_LF) {
-			length = 0;
-		} else if (sentence[length - 2] != HAZER_STIMULUS_CR) {
-			length = 0;
-		} else if (sentence[length - 5] != HAZER_STIMULUS_CHECKSUM) {
-			length = 0;
-		} else {
-			/* Do nothing. */
-		}
-	} else if (sentence[HAZER_CONSTANT_UBX_SYNC_1] != HAZER_STIMULUS_UBX_SYNC_1) {
-		/* Do nothing. */
-	} else if (sentence[HAZER_CONSTANT_UBX_SYNC_2] != HAZER_STIMULUS_UBX_SYNC_2) {
-		/* Do nothing. */
-	} else if (size < HAZER_CONSTANT_UBX_SHORTEST) {
-		/* Do nothing. */
-	} else {
-		length = ((unsigned)(sentence[HAZER_CONSTANT_UBX_LENGTH_MSB])) << 8;
-		length |= ((unsigned)(sentence[HAZER_CONSTANT_UBX_LENGTH_LSB]));
-		length += HAZER_CONSTANT_UBX_SHORTEST;
-		if (length <= size) {
-			length = -length;
-		} else {
-			length = 0;
-		}
-	}
-
-	return length;
 }
 
 /******************************************************************************

@@ -29,6 +29,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include "com/diag/hazer/hazer.h"
+#include "com/diag/hazer/yodel.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
@@ -44,7 +45,9 @@
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
-typedef enum Protocol { IPV4 = 4, IPV6 = 6, } protocol_t;
+typedef enum Protocol { UNUSED = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
+
+typedef enum Format { UNKNOWN = 0, NMEA = 1, UBX = 2 } format_t;
 
 static int emit_sentence(FILE * fp, const char * string)
 {
@@ -78,9 +81,15 @@ static int emit_packet(FILE * fp, const void * packet, size_t size)
 
     do {
 
-        bp = hazer_ubx_fletcher(packet, size, &ck_a, &ck_b);
+        bp = yodel_checksum(packet, size, &ck_a, &ck_b);
         if (bp == (void *)0) { break; }
         length = (const char *)bp - (const char *)packet;
+
+#if 1
+        diminuto_dump(stderr, packet, length);
+        diminuto_dump(stderr, &ck_a, sizeof(ck_a));
+        diminuto_dump(stderr, &ck_b, sizeof(ck_b));
+#endif
 
         if (fwrite(packet, length, 1, fp) < 1) { break; }
         if (fwrite(&ck_a, sizeof(ck_a), 1, fp) < 1) { break; }
@@ -364,8 +373,8 @@ static void * gpiopoller(void * argp)
 	return xc;
 }
 
-struct String {
-    struct String * next;
+struct Written {
+    struct Written * next;
     char * payload;
 };
 
@@ -376,8 +385,18 @@ int main(int argc, char * argv[])
     int verbose = 0;
     int escape = 0;
     int report = 0;
-    hazer_state_t state = HAZER_STATE_EOF;
-    hazer_state_t prior = HAZER_STATE_START;
+    hazer_state_t nmea_state = HAZER_STATE_EOF;
+    char * nmea_bb = (char *)0;
+    size_t nmea_ss = 0;
+    size_t nmea_ll = 0;
+    uint8_t nmea_cs = 0;
+    uint8_t nmea_ck = 0;
+    yodel_state_t ubx_state = YODEL_STATE_EOF;
+    char * ubx_bb = (char *)0;
+    size_t ubx_ss = 0;
+    size_t ubx_ll = 0;
+    uint8_t ubx_ck_a = 0;
+    uint8_t ubx_ck_b = 0;
     hazer_buffer_t buffer = { 0 };
     hazer_buffer_t datagram = { 0 };
     hazer_vector_t vector = { 0 };
@@ -397,16 +416,11 @@ int main(int argc, char * argv[])
     int ch = EOF;
     ssize_t size = 0;
     ssize_t length = 0;
-    char * bb = (char *)0;
-    size_t ss = 0;
-    size_t ll = 0;
     size_t current = 0;
     int end = 0;
     ssize_t check = 0;
     ssize_t count = 0;
     char ** vv = (char **)0;
-    uint8_t cs = 0;
-    uint8_t ck = 0;
     char msn = '\0';
     char lsn = '\0';
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
@@ -428,15 +442,16 @@ int main(int argc, char * argv[])
     int ppspin = -1;
     role_t role = NONE;
     protocol_t protocol = IPV4;
+    format_t format = UNKNOWN;
     const char * host = (const char *)0;
     const char * service = (const char *)0;
     diminuto_ipv4_t ipv4 = 0;
     diminuto_ipv6_t ipv6 = { 0 };
     diminuto_port_t port = 0;
     int output = 0;
-    struct String * string = (struct String *)0;
-    struct String * first = (struct String *)0;
-    struct String * last = (struct String *)0;
+    struct Written * written = (struct Written *)0;
+    struct Written * first = (struct Written *)0;
+    struct Written * last = (struct Written *)0;
     int onepps = 0;
     int tmppps = 0;
     uint64_t nanoseconds = 0;
@@ -500,15 +515,15 @@ int main(int argc, char * argv[])
             break;
         case 'W':
             readonly = 0;
-            string = (struct String *)malloc(sizeof(struct String));
-            string->next = (struct String *)0;
-            string->payload = optarg;
-            if (first == (struct String *)0) {
-                first = string;
+            written = (struct Written *)malloc(sizeof(struct Written));
+            written->next = (struct Written *)0;
+            written->payload = optarg;
+            if (first == (struct Written *)0) {
+                first = written;
             } else {
-                last->next = string;
+                last->next = written;
             }
-            last = string;
+            last = written;
             break;
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
@@ -566,7 +581,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -O          Output sentences to DEVICE.\n");
             fprintf(stderr, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(stderr, "       -R          Print a report on standard output.\n");
-            fprintf(stderr, "       -W NMEA     Collapse escapes, append * and checksum, and write NMEA to DEVICE.\n");
+            fprintf(stderr, "       -W NMEA     Collapse escapes, generate and append suffix, and write to DEVICE.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -c          Wait for DCD to be asserted (requires -D and implies -m).\n");
             fprintf(stderr, "       -d          Display debug output on standard error.\n");
@@ -751,87 +766,99 @@ int main(int argc, char * argv[])
 
     if (debug) {
         hazer_debug(stderr);
+        yodel_debug(stderr);
     }
 
     rc = hazer_initialize();
+    assert(rc == 0);
+
+    rc = yodel_initialize();
     assert(rc == 0);
 
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
 
     while (!diminuto_interrupter_check()) {
 
-        state = HAZER_STATE_START;
+        nmea_state = HAZER_STATE_START;
+        ubx_state = YODEL_STATE_START;
+
+        /**
+         ** INPUT
+         **
+         ** The input could be an NMEA sentence, a binary UBX packet, or
+         ** something we don't know about. It could be coming from standard
+         ** input, from a GPS device with a serial byte stream, or from a UDP
+         ** IPv4 or IPv6 datagram stream.
+         **/
 
         if (role != CONSUMER) {
 
         	/*
         	 * If we have any initialization strings to send, do so one at a
-        	 * time, while reading from the device. Otherwise, the device can
-        	 * (will) overrun the UART buffer with responses before we can
-        	 * read them.
+        	 * time, while reading from the device. This prevents any
+             * incoming data from backing up too much. (I should convert
+             * all of this code to a multiplexing scheme using Mux.)
         	 */
 
         	if (device == (const char *)0) {
         		/* Do nothing. */
-        	} else if (first == (struct String *)0) {
+        	} else if (first == (struct Written *)0) {
         		/* Do nothing. */
         	} else {
-        		string = first;
-            	length = strlen(string->payload) + 1;
-                size = diminuto_escape_collapse(string->payload, string->payload, length);
-                if (verbose) { print_sentence(errfp, string->payload, size); }
-                rc = (size < length) ? emit_packet(devfp, string->payload, size) : emit_sentence(devfp, string->payload);
+        		written = first;
+            	length = strlen(written->payload) + 1;
+                size = diminuto_escape_collapse(written->payload, written->payload, length);
+                if (verbose) { print_sentence(errfp, written->payload, size); }
+                rc = (size < length) ? emit_packet(devfp, written->payload, size) : emit_sentence(devfp, written->payload);
                 if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
-                first = string->next;
-                free(string);
+                first = written->next;
+                free(written);
         	}
 
             while (!0) {
-                ch = fgetc(infp);
-                prior = state;
-                state = hazer_machine(state, ch, buffer, sizeof(buffer), &bb, &ss, &ll);
-                if (state == HAZER_STATE_END) {
+
+            	ch = fgetc(infp);
+
+            	/*
+            	 * The NMEA and UBX parsers can be thought of as a single
+            	 * non-deterministic finite state machines: an automaton that
+            	 * can be in more than one state at a time.
+            	 */
+
+                nmea_state = hazer_machine(nmea_state, ch, buffer, sizeof(buffer), &nmea_bb, &nmea_ss, &nmea_ll);
+
+                ubx_state = yodel_machine(ubx_state, ch, buffer, sizeof(buffer), &ubx_bb, &ubx_ss, &ubx_ll);
+
+                if (nmea_state == HAZER_STATE_END) {
+                	break;
+                } else if  (nmea_state == HAZER_STATE_EOF) {
+                	fprintf(stderr, "%s: EOF\n", program);
                     break;
-                } else if  (state == HAZER_STATE_EOF) {
-                    fprintf(stderr, "%s: EOF\n", program);
-                    break;
-                } else if ((prior != HAZER_STATE_START) && (state == HAZER_STATE_START)) {
-                    fprintf(stderr, "%s: ERR\n", program);
                 } else {
                     /* Do nothing. */
                 }
-            }
 
-            if (state == HAZER_STATE_EOF) {
-                break;
-            }
-
-            assert(state == HAZER_STATE_END);
-
-            size = ss;
-
-            length = hazer_parse_length(buffer, size);
-            if (length < 0) {
-
-            	/*
-            	 * This is a Ublox binary packet. We validate it, report it,
-            	 * but otherwise don't process it (yet).
-            	 */
-
-            	length = -length;
-
-            	rc = hazer_ubx_validate(buffer, size);
-                if (rc < 0) {
-                    /* Validation failed. */
-                    fprintf(stderr, "%s: UBX %zd\n", program, length);
-                    continue;
+                if (ubx_state == YODEL_STATE_END) {
+                	break;
+                } else if  (ubx_state == YODEL_STATE_EOF) {
+                	fprintf(stderr, "%s: EOF\n", program);
+                	break;
+                } else {
+                    /* Do nothing. */
                 }
 
-                if (verbose) { print_sentence(errfp, buffer, length); }
-            	if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-                if (report) { print_sentence(outfp, buffer, length); }
+            }
 
-                continue;
+            if (nmea_state == HAZER_STATE_EOF) {
+            	break;
+            } else if (ubx_state == YODEL_STATE_EOF) {
+            	break;
+            } else if (nmea_state == HAZER_STATE_END) {
+            	size = nmea_ss;
+            } else if (ubx_state == YODEL_STATE_END) {
+            	size = ubx_ss;
+            } else {
+            	assert(0);
             }
 
         } else if (protocol == IPV4) {
@@ -852,105 +879,149 @@ int main(int argc, char * argv[])
 
         }
 
-        assert(buffer[0] == '$');
-        assert(buffer[size - 1] == '\0');
-        assert(buffer[size - 2] == '\n');
-        assert(buffer[size - 3] == '\r');
-        assert(buffer[size - 6] == '*');
+        /**
+         ** VALIDATE
+         **
+         ** We know how to validate an NMEA sentence and a UBX packet. We sanity
+         ** check the data format in either case, and compute the appropriate
+         ** checksum and verify it. The state machines know what the format of
+         ** the data is when we got it directly from the device, but in the case
+         ** of IP datagrams, we haven't figured that out yet.
+         **/
 
-        cs = hazer_checksum(buffer, size);
+        if ((length = hazer_length(buffer, size)) > 0) {
 
-        rc = hazer_characters2checksum(buffer[size - 5], buffer[size - 4], &ck);
-        assert(rc >= 0);
+        	nmea_cs = hazer_checksum(buffer, size);
 
-        if (ck != cs) {
-            /* Checksum failed. */
-            fprintf(stderr, "%s: SUM 0x%02x 0x%02x\n", program, cs, ck);
-            continue;
+            rc = hazer_characters2checksum(buffer[size - sizeof("ML\r\n")], buffer[size - sizeof("L\r\n")], &nmea_ck);
+            assert(rc >= 0);
+
+            if (nmea_ck != nmea_cs) {
+                fprintf(stderr, "%s: BAD 0x%02x 0x%02x\n", program, nmea_cs, nmea_ck);
+                continue;
+            }
+
+            format = NMEA;
+
+        } else if ((length = yodel_length(buffer, size)) > 0) {
+        	const unsigned char * here = (const char *)0;
+
+        	here = (const unsigned char *)yodel_checksum(buffer, size, &ubx_ck_a, &ubx_ck_b);
+        	assert(here != (const unsigned char *)0);
+
+        	if ((ubx_ck_a != here[0]) || (ubx_ck_b != here[1])) {
+                fprintf(stderr, "%s: BAD 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, here[0], here[1]);
+                continue;
+        	}
+
+        	format = UBX;
+
+        } else {
+
+            fprintf(stderr, "%s: ERR %zu\n", program, length);
+        	continue;
+
         }
 
-        if (verbose) { print_sentence(errfp, buffer, size - 1); }
+        /**
+         ** PROCESS
+         **
+         ** We forward anything we recognize: currently NMEA sentences or UBX
+         ** packets. Note that we don't forward the terminating NUL (length,
+         ** instead of size).
+         **/
+
+        if (verbose) { print_sentence(errfp, buffer, length); }
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        if (report) { print_sentence(outfp, buffer, size - 1); }
+        if (report) { print_sentence(outfp, buffer, length); }
+        if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
 
-        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
-        assert(count >= 0);
-        assert(vector[count - 1] == (char *)0);
-        assert(count <= (sizeof(vector) / sizeof(vector[0])));
+        if (format == NMEA) {
 
-        size = hazer_serialize(datagram, sizeof(datagram), vector, count);
-        assert(size <= (sizeof(datagram) - 4));
-        assert(datagram[size - 1] == '\0');
-        assert(datagram[size - 2] == '*');
-        cs = hazer_checksum(datagram, size);
-        hazer_checksum2characters(cs, &msn, &lsn);
-        bb = &datagram[size - 1];
-        *(bb++) = msn;
-        *(bb++) = lsn;
-        *(bb++) = '\r';
-        *(bb++) = '\n';
-        *(bb++) = '\0';
-        size += 4;
-        assert(size <= sizeof(datagram));
+			count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
+			assert(count >= 0);
+			assert(vector[count - 1] == (char *)0);
+			assert(count <= (sizeof(vector) / sizeof(vector[0])));
 
-        if (role == PRODUCER) {
-            send_sentence(sock, protocol, &ipv4, &ipv6, port, datagram, size - 1);
-        }
+			/*
+			 * This next part is mostly done just to functionally test the API.
+			 */
 
-        if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-        if (report) { print_sentence(outfp, datagram, size - 1); }
+			size = hazer_serialize(datagram, sizeof(datagram), vector, count);
+			assert(size <= (sizeof(datagram) - 4));
+			assert(datagram[size - 1] == '\0');
+			assert(datagram[size - 2] == '*');
 
-        if (count < 1) {
-        	/* Do nothing. */
-        } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
-            /* Do nothing. */
-        } else if ((system = hazer_parse_system(talker)) >= HAZER_SYSTEM_TOTAL) {
-            /* Do nothing. */
-        } else if (hazer_parse_gga(&position, vector, count) == 0) {
-            DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-            	tmppps = onepps;
-            	onepps = 0;
-            DIMINUTO_CRITICAL_SECTION_END;
-            if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            if (report) { print_position(outfp, "MAP",  &position, tmppps); }
-            if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-            if (report) { print_datum(outfp, "GGA",  &position); }
-        } else if (hazer_parse_rmc(&position, vector, count) == 0) {
-            DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-            	tmppps = onepps;
-            	onepps = 0;
-            DIMINUTO_CRITICAL_SECTION_END;
-            if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-            if (report) { print_position(outfp, "MAP", &position, tmppps); }
-            if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-            if (report) { print_datum(outfp, "RMC",  &position); }
-        } else if (hazer_parse_gsa(&solution, vector, count) == 0) {
-            if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-            if (report) { print_active(outfp, "GSA", &solution); }
-        } else if (hazer_parse_gsv(&constellation[system], vector, count) == 0) {
-            if (escape) { fputs("\033[6;1H\033[0J", outfp); }
-            if (report) { print_view(outfp, "GSV", constellation); }
-        } else {
-            /* Do nothing. */
-        }
+			nmea_cs = hazer_checksum(datagram, size);
+			hazer_checksum2characters(nmea_cs, &msn, &lsn);
+			nmea_bb = &datagram[size - 1];
+			*(nmea_bb++) = msn;
+			*(nmea_bb++) = lsn;
+			*(nmea_bb++) = '\r';
+			*(nmea_bb++) = '\n';
+			*(nmea_bb++) = '\0';
+			size += 4;
+			assert(size <= sizeof(datagram));
 
-        if (report) { fflush(outfp); }
+			if (escape) { fputs("\033[2;1H\033[0K", outfp); }
+			if (report) { print_sentence(outfp, datagram, size - 1); }
 
-        assert(position.tot_nanoseconds >= nanoseconds);
-        nanoseconds = position.tot_nanoseconds;
+			if (count < 1) {
+				/* Do nothing. */
+			} else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
+				/* Do nothing. */
+			} else if ((system = hazer_parse_system(talker)) >= HAZER_SYSTEM_TOTAL) {
+				/* Do nothing. */
+			} else if (hazer_parse_gga(&position, vector, count) == 0) {
+				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+					tmppps = onepps;
+					onepps = 0;
+				DIMINUTO_CRITICAL_SECTION_END;
+				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
+				if (report) { print_position(outfp, "MAP",  &position, tmppps); }
+				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
+				if (report) { print_datum(outfp, "GGA",  &position); }
+			} else if (hazer_parse_rmc(&position, vector, count) == 0) {
+				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+					tmppps = onepps;
+					onepps = 0;
+				DIMINUTO_CRITICAL_SECTION_END;
+				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
+				if (report) { print_position(outfp, "MAP", &position, tmppps); }
+				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
+				if (report) { print_datum(outfp, "RMC",  &position); }
+			} else if (hazer_parse_gsa(&solution, vector, count) == 0) {
+				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
+				if (report) { print_active(outfp, "GSA", &solution); }
+			} else if (hazer_parse_gsv(&constellation[system], vector, count) == 0) {
+				if (escape) { fputs("\033[6;1H\033[0J", outfp); }
+				if (report) { print_view(outfp, "GSV", constellation); }
+			} else {
+				/* Do nothing. */
+			}
 
-        if (!output) {
-            /* Do nothing. */
-        } else if (position.dmy_nanoseconds == 0) {
-            /* Do nothing (confuses Google Earth). */
-        } else {
-            fputs(datagram, devfp);
-            fflush(devfp);
+			if (report) { fflush(outfp); }
+
+			assert(position.tot_nanoseconds >= nanoseconds);
+			nanoseconds = position.tot_nanoseconds;
+
+			if (!output) {
+				/* Do nothing. */
+			} else if (position.dmy_nanoseconds == 0) {
+				/* Do nothing (confuses Google Earth). */
+			} else {
+				fputs(datagram, devfp);
+				fflush(devfp);
+			}
+
         }
 
     }
 
     fprintf(stderr, "%s: END\n", program);
+
+    rc = yodel_finalize();
+    assert(rc >= 0);
 
     rc = hazer_finalize();
     assert(rc >= 0);

@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include "com/diag/hazer/hazer.h"
+#include "com/diag/hazer/yodel.h"
 
 int main(void)
 {
@@ -84,7 +85,7 @@ int main(void)
 		int rc = 0;
 		static const unsigned char NMEA[] = "$GPGSV,4,3,13,24,39,292,21,28,32,109,36,46,38,215,35,48,36,220,37*78\r\n";
 
-		size = hazer_parse_length(NMEA, sizeof(NMEA));
+		size = hazer_length(NMEA, sizeof(NMEA));
 		assert(size == (sizeof(NMEA) - 1));
 
 		cs = hazer_checksum(NMEA, sizeof(NMEA));
@@ -113,7 +114,7 @@ int main(void)
 		int rc = 0;
 		static const unsigned char NMEA[] = "$GPGSV,4,3,13,24,39,292,21,28,32,109,36,46,38,215,35,48,36,220,37*89\r\n"; /* Bad checksum. */
 
-		size = hazer_parse_length(NMEA, sizeof(NMEA));
+		size = hazer_length(NMEA, sizeof(NMEA));
 		assert(size == (sizeof(NMEA) - 1));
 
 		cs = hazer_checksum(NMEA, sizeof(NMEA));
@@ -136,20 +137,24 @@ int main(void)
 	{
 		ssize_t size = 0;
 		int rc = 0;
-		static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xca };
+		static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xca, '\0' };
+    	const unsigned char * here = (const char *)0;
+    	uint8_t ck_a = 0;
+    	uint8_t ck_b = 0;
 
-		assert(UBX[HAZER_CONSTANT_UBX_LENGTH_LSB] == 0x04);
-		assert(UBX[HAZER_CONSTANT_UBX_LENGTH_MSB] == 0x00);
+		assert(UBX[YODEL_CONSTANT_LENGTH_LSB] == 0x04);
+		assert(UBX[YODEL_CONSTANT_LENGTH_MSB] == 0x00);
 
-		size = UBX[HAZER_CONSTANT_UBX_LENGTH_MSB] << 8;
-		size |= UBX[HAZER_CONSTANT_UBX_LENGTH_LSB];
+		size = UBX[YODEL_CONSTANT_LENGTH_MSB] << 8;
+		size |= UBX[YODEL_CONSTANT_LENGTH_LSB];
 		assert(size == 4);
 
-		size = hazer_parse_length(UBX, sizeof(UBX));
-		assert(size == -(ssize_t)sizeof(UBX));
+		size = yodel_length(UBX, sizeof(UBX));
+		assert(size == (sizeof(UBX) - 1));
 
-		rc = hazer_ubx_validate(UBX, sizeof(UBX));
-		assert(rc == 0);
+    	here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+    	assert(here != (const unsigned char *)0);
+    	assert((ck_a == here[0]) && (ck_b == here[1]));
 	}
 
     /**************************************************************************/
@@ -157,13 +162,17 @@ int main(void)
 	{
 		ssize_t size = 0;
 		int rc = 0;
-		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0c, 0xca }; /* Bad checksum. */
+		static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0c, 0xca, '\0' }; /* Bad checksum. */
+    	const unsigned char * here = (const char *)0;
+    	uint8_t ck_a = 0;
+    	uint8_t ck_b = 0;
 
-		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
-		assert(size == -(ssize_t)sizeof(UBLOX));
+		size = yodel_length(UBX, sizeof(UBX));
+		assert(size == (sizeof(UBX) - 1));
 
-		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
-		assert(rc < 0);
+    	here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+    	assert(here != (const unsigned char *)0);
+    	assert((ck_a != here[0]) || (ck_b != here[1]));
 	}
 
     /**************************************************************************/
@@ -171,13 +180,17 @@ int main(void)
 	{
 		ssize_t size = 0;
 		int rc = 0;
-		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xc8 }; /* Bad checksum. */
+		static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xc8, '\0' }; /* Bad checksum. */
+    	const unsigned char * here = (const char *)0;
+    	uint8_t ck_a = 0;
+    	uint8_t ck_b = 0;
 
-		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
-		assert(size == -(ssize_t)sizeof(UBLOX));
+		size = yodel_length(UBX, sizeof(UBX));
+		assert(size == (sizeof(UBX) - 1));
 
-		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
-		assert(rc < 0);
+    	here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+    	assert(here != (const unsigned char *)0);
+    	assert((ck_a != here[0]) || (ck_b != here[1]));
 	}
 
     /**************************************************************************/
@@ -185,13 +198,17 @@ int main(void)
 	{
 		ssize_t size = 0;
 		int rc = 0;
-		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 5, 4, 0x0d, 0xca }; /* Payload corrupted. */
+		static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 5, 4, 0x0d, 0xca, '\0' }; /* Payload corrupted. */
+    	const unsigned char * here = (const char *)0;
+    	uint8_t ck_a = 0;
+    	uint8_t ck_b = 0;
 
-		size = hazer_parse_length(UBLOX, sizeof(UBLOX));
-		assert(size == -(ssize_t)sizeof(UBLOX));
+		size = yodel_length(UBX, sizeof(UBX));
+		assert(size == (sizeof(UBX) - 1));
 
-		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
-		assert(rc < 0);
+    	here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+    	assert(here != (const unsigned char *)0);
+    	assert((ck_a != here[0]) || (ck_b != here[1]));
 	}
 
     /**************************************************************************/
@@ -199,27 +216,28 @@ int main(void)
 	{
 		ssize_t size = 0;
 		int rc = 0;
-		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x01, 1, 2, 3, 4, 0x0d, 0xca }; /* Length too long. */
+		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x01, 1, 2, 3, 4, 0x0d, 0xca, '\0' }; /* Length too long for buffer. */
 
-		size = hazer_parse_length(UBLOX, sizeof(UBLOX)); /* Overflows buffer. */
-		assert(size == 0);
-
-		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
-		assert(rc < 0);
-	}
-
-    /**************************************************************************/
-
-	{
-		ssize_t size = 0;
-		int rc = 0;
-		static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x02, 0x00, 1, 2, 3, 4, 0x0d, 0xca }; /* Length too short. */
-
-		size = hazer_parse_length(UBLOX, sizeof(UBLOX)); /* But not correct. */
+		size = yodel_length(UBLOX, sizeof(UBLOX)); /* Length overflows buffer. */
 		assert(size < 0);
+	}
 
-		rc = hazer_ubx_validate(UBLOX, sizeof(UBLOX));
-		assert(rc < 0);
+    /**************************************************************************/
+
+	{
+		ssize_t size = 0;
+		int rc = 0;
+		static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x02, 0x00, 1, 2, 3, 4, 0x0d, 0xca, '\0' }; /* Length too short for payload. */
+    	const unsigned char * here = (const char *)0;
+    	uint8_t ck_a = 0;
+    	uint8_t ck_b = 0;
+
+		size = yodel_length(UBX, sizeof(UBX)); /* Length not correct. */
+		assert(size >= 0);
+
+    	here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+    	assert(here != (const unsigned char *)0);
+    	assert((ck_a != here[0]) || (ck_b != here[1]));
 	}
 
     /**************************************************************************/
