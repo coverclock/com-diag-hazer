@@ -630,19 +630,13 @@ int main(int argc, char * argv[])
     }
 
     if (path == (const char *)0) {
-
     	/* Do nothing. */
-
     } else if (strcmp(path, "-") == 0) {
-
     	logfp = stdout;
-
     } else {
-
     	logfp = fopen(path, "ab");
     	if (logfp == (FILE *)0) { diminuto_perror(path); }
     	assert(logfp != (FILE *)0);
-
     }
 
     if (service == (const char *)0) {
