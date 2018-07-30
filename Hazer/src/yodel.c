@@ -259,7 +259,7 @@ ssize_t yodel_length(const void * buffer, size_t size)
 {
        ssize_t result = -1;
        uint16_t length = 0;
-       const char * sentence = (const char *)0;
+       const unsigned char * sentence = (const char *)0;
 
        sentence = (const char *)buffer;
 
@@ -270,8 +270,8 @@ ssize_t yodel_length(const void * buffer, size_t size)
        } else if (size < YODEL_CONSTANT_SHORTEST) {
            /* Do nothing. */
        } else {
-           length = ((unsigned)(sentence[YODEL_CONSTANT_LENGTH_MSB])) << 8;
-           length |= ((unsigned)(sentence[YODEL_CONSTANT_LENGTH_LSB]));
+           length = sentence[YODEL_CONSTANT_LENGTH_MSB] << 8;
+           length |= sentence[YODEL_CONSTANT_LENGTH_LSB];
            if (length > (size - YODEL_CONSTANT_SHORTEST)) {
         	   /* Do nothing. */
            } else {

@@ -832,8 +832,8 @@ int main(int argc, char * argv[])
         		written = first;
             	length = strlen(written->payload) + 1;
                 size = diminuto_escape_collapse(written->payload, written->payload, length);
-                if (verbose) { print_sentence(errfp, written->payload, size); }
-                rc = (size < length) ? emit_packet(devfp, written->payload, size) : emit_sentence(devfp, written->payload);
+                if (verbose) { print_sentence(errfp, written->payload, size - 1); }
+                rc = (size < length) ? emit_packet(devfp, written->payload, size - 1) : emit_sentence(devfp, written->payload);
                 if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
                 first = written->next;
                 free(written);
@@ -903,6 +903,8 @@ int main(int argc, char * argv[])
 
         }
 
+        if (verbose) { print_sentence(errfp, buffer, size - 1); }
+
         /**
          ** VALIDATE
          **
@@ -942,10 +944,13 @@ int main(int argc, char * argv[])
 
         } else {
 
-            fprintf(stderr, "%s: ERR %zu\n", program, length);
+            fprintf(stderr, "%s: ERR %zd\n", program, length);
         	continue;
 
         }
+
+        if (escape) { fputs("\033[1;1H\033[0K", outfp); }
+        if (report) { print_sentence(outfp, buffer, length); }
 
         /**
          ** PROCESS
@@ -955,9 +960,6 @@ int main(int argc, char * argv[])
          ** instead of size).
          **/
 
-        if (verbose) { print_sentence(errfp, buffer, length); }
-        if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        if (report) { print_sentence(outfp, buffer, length); }
         if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
         if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
 
