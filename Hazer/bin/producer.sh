@@ -18,4 +18,4 @@ HOST=${4:-"ip6-localhost"}
 stty sane
 clear
 
-exec gpstool -D ${DEVICE} -b ${SPEED} -8 -n -1 -6 -A ${HOST} -P ${PORT} -E
+exec gpstool -D ${DEVICE} -b ${SPEED} -8 -n -1 -6 -c -A ${HOST} -P ${PORT} -E

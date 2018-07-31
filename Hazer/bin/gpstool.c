@@ -1056,9 +1056,7 @@ int main(int argc, char * argv[])
 
         } else if (format == UBX) {
 
-#if 1
         	if (verbose) { diminuto_dump(errfp, buffer, length); }
-#endif
 
         } else {
 
