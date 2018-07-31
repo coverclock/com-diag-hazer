@@ -85,12 +85,6 @@ static int emit_packet(FILE * fp, const void * packet, size_t size)
         if (bp == (void *)0) { break; }
         length = (const char *)bp - (const char *)packet;
 
-#if 0
-        diminuto_dump(stderr, packet, length);
-        diminuto_dump(stderr, &ck_a, sizeof(ck_a));
-        diminuto_dump(stderr, &ck_b, sizeof(ck_b));
-#endif
-
         if (fwrite(packet, length, 1, fp) < 1) { break; }
         if (fwrite(&ck_a, sizeof(ck_a), 1, fp) < 1) { break; }
         if (fwrite(&ck_b, sizeof(ck_b), 1, fp) < 1) { break; }
@@ -791,15 +785,15 @@ int main(int argc, char * argv[])
         yodel_debug(stderr);
     }
 
+    /**
+     ** WORK LOOP
+     **/
+
     rc = hazer_initialize();
     assert(rc == 0);
 
     rc = yodel_initialize();
     assert(rc == 0);
-
-    /**
-     ** WORK LOOP
-     **/
 
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
 
@@ -966,15 +960,22 @@ int main(int argc, char * argv[])
         if (report) { print_sentence(outfp, buffer, length); }
 
         /**
-         ** PROCESS
+         ** FORWARD AND LOG
          **
-         ** We forward anything we recognize: currently NMEA sentences or UBX
-         ** packets. Note that we don't forward the terminating NUL (length,
-         ** instead of size).
+         ** We forward and log anything we recognize: currently NMEA sentences
+         ** or UBX packets. Note that we don't forward the terminating NUL
+         ** (using length, instead of size) that terminate all datagrams of any
+         ** format (whether that's useful or not).
          **/
 
         if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
         if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
+
+        /**
+         ** PROCESS
+         **
+         ** (Currently) we only process NMEA sentences.
+         **/
 
         if (format == NMEA) {
 
@@ -1005,9 +1006,6 @@ int main(int argc, char * argv[])
 			assert(size <= sizeof(datagram));
 			assert(strncmp(datagram, buffer, size));
 
-			if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-			if (report) { print_sentence(outfp, datagram, size - 1); }
-
 			if (count < 1) {
 				/* Do nothing. */
 			} else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
@@ -1019,24 +1017,24 @@ int main(int argc, char * argv[])
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
-				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
+				if (escape) { fputs("\033[2;1H\033[0K", outfp); }
 				if (report) { print_position(outfp, "MAP",  &position, tmppps); }
-				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
+				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
 				if (report) { print_datum(outfp, "GGA",  &position); }
 			} else if (hazer_parse_rmc(&position, vector, count) == 0) {
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
-				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
+				if (escape) { fputs("\033[2;1H\033[0K", outfp); }
 				if (report) { print_position(outfp, "MAP", &position, tmppps); }
-				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
+				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
 				if (report) { print_datum(outfp, "RMC",  &position); }
 			} else if (hazer_parse_gsa(&solution, vector, count) == 0) {
-				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
+				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
 				if (report) { print_active(outfp, "GSA", &solution); }
 			} else if (hazer_parse_gsv(&constellation[system], vector, count) == 0) {
-				if (escape) { fputs("\033[6;1H\033[0J", outfp); }
+				if (escape) { fputs("\033[5;1H\033[0J", outfp); }
 				if (report) { print_view(outfp, "GSV", constellation); }
 			} else {
 				/* Do nothing. */
