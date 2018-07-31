@@ -77,7 +77,7 @@ int hazer_finalize(void)
  *
  ******************************************************************************/
 
-hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp)
+hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp)
 {
     int done = !0;
     hazer_action_t action = HAZER_ACTION_SKIP;
@@ -292,38 +292,30 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
  *
  ******************************************************************************/
 
-uint8_t hazer_checksum(const void * buffer, size_t size)
+const void * hazer_checksum(const void * buffer, size_t size, uint8_t * ckp)
 {
+    const unsigned char * bp = (const unsigned char *)0;
     uint8_t cs = 0;
-    const char * bb = (const char *)buffer;
     uint8_t ch = '\0';
 
-    do {
+    if (size > 0) {
 
-        if (size == 0) {
-            break;
-        }
+		bp = (const unsigned char *)buffer;
 
-        ++bb;
-        --size;
+		++bp;
+		--size;
 
-        if (size == 0) {
-            break;
-        }
+		while ((size > 0) && (*bp != HAZER_STIMULUS_CHECKSUM) && (*bp != '\0')) {
+			ch = *(bp++);
+			cs ^= ch;
+			--size;
+		}
 
-        ch = *(bb++);
-        cs = ch;
-        --size;
+        *ckp = cs;
 
-        while ((size > 0) && (*bb != HAZER_STIMULUS_CHECKSUM) && (*bb != '\0')) {
-            ch = *(bb++);
-            cs ^= ch;
-            --size;
-        }
+    }
 
-    } while (0);
-
-    return cs;
+    return (const void *)bp;
 }
 
 int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp)
@@ -394,7 +386,9 @@ ssize_t hazer_length(const void * buffer, size_t size)
 		/* Do nothing. */
 	} else {
 		length = strnlen(sentence, size);
-		if (sentence[length] != HAZER_STIMULUS_NUL) {
+		if (length >= size) {
+			/* Do nothing. */
+		} else if (sentence[length] != HAZER_STIMULUS_NUL) {
 			/* Do nothing. */
 		} else if (sentence[length - 1] != HAZER_STIMULUS_LF) {
 			/* Do nothing. */
@@ -995,9 +989,9 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
         } else if (message > messages) {
             /* Do nothing. */
         } else {
-            channel = (message - 1) * HAZER_CONSTANT_GPS_VIEWS;
+            channel = (message - 1) * HAZER_GPS_VIEWS;
             satellites = strtol(vector[3], (char **)0, 10);
-            for (slot = 0; slot < HAZER_CONSTANT_GPS_VIEWS; ++slot) {
+            for (slot = 0; slot < HAZER_GPS_VIEWS; ++slot) {
                 if (channel >= satellites) { break; }
                 if (channel > limit) { break; }
                 id = strtol(vector[index++], (char **)0, 10);

@@ -13,6 +13,9 @@
  * This file is part of the Digital Aggregates Corporation Hazer package.
  * Hazer is a simple C-based parser of the National Marine Electronics
  * Association (NMEA) strings produced by typical consumer GPS devices.
+ * (A hazer is a rodeo cowboy who rides along side a steer to keep it running
+ * straight and true while the bulldogger or steer wrestler rides along
+ * the other side.)
  *
  * This code deliberately tries to avoid using floating poing arithmetic.
  * Some of the smaller embedded platforms I work on don't have floating
@@ -109,21 +112,21 @@ extern int hazer_finalize(void);
  * The NaviSys GR-701W with the uBlox-7 chipset emits proprietary
  * PUBX messages longer than the NMEA spec.
  */
-enum HazerConstantNmea {
-    HAZER_CONSTANT_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
-    HAZER_CONSTANT_NMEA_LONGEST     = 512, /* Adjusted. */
-    HAZER_CONSTANT_NMEA_TALKER      = sizeof("GP") - 1,
-    HAZER_CONSTANT_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
-    HAZER_CONSTANT_NMEA_ID          = sizeof("$GPGGAXX") - 1, /* Adjusted. */
+enum HazerNmea {
+    HAZER_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
+    HAZER_NMEA_LONGEST     = 512, /* Adjusted. */
+    HAZER_NMEA_TALKER      = sizeof("GP") - 1,
+    HAZER_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
+    HAZER_NMEA_ID          = sizeof("$GPGGAXX") - 1, /* Adjusted. */
 };
 
 /**
  * NMEA 0183, 4.10, 5.3
  */
-enum HazerConstantGps {
-    HAZER_CONSTANT_GPS_CHANNELS     = 48,
-    HAZER_CONSTANT_GPS_VIEWS        = 4,
-    HAZER_CONSTANT_GPS_SATELLITES   = 12,
+enum HazerGps {
+    HAZER_GPS_CHANNELS     = 48,
+    HAZER_GPS_VIEWS        = 4,
+    HAZER_GPS_SATELLITES   = 12,
 };
 
 /**
@@ -233,7 +236,7 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
  * according to the NMEA spec, plus a trailing NUL (and then some).
  * NMEA 0183 4.10, 5.3, p. 11
  */
-typedef unsigned char (hazer_buffer_t)[HAZER_CONSTANT_NMEA_LONGEST + 1]; /* plus NUL */
+typedef unsigned char (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
 
 /**
  * Process a single character of stimulus for the state machine that is
@@ -254,22 +257,26 @@ typedef unsigned char (hazer_buffer_t)[HAZER_CONSTANT_NMEA_LONGEST + 1]; /* plus
  * @param size is the size of the output buffer in bytes.
  * @param bp points to a character pointer state variable of no initial value.
  * @param sp points to a size state variable of no initial value.
- * @param lp points to the length state variable of no initial value.
  * @return the next state of the machine.
  */
-extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp);
+extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp);
 
 /*******************************************************************************
  * VALIDATING AN NMEA SENTENCE
  ******************************************************************************/
 
 /**
- * Compute the eight-bit checksum of an NMEA sentence.
- * @param buffer points to the beginning of the sentence.
+ * Compute the eight-bit checksum of an NMEA sentence. The buffer points to the
+ * beginning of the NMEA sentence, including the '$', not to the subset that
+ * is checksummed. A pointer is returned pointing just past the checksummed
+ * portion; this is where the '*' and the checksum will be stored in a correctly
+ * formed packet.
+ * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
- * @return the checksum.
+ * @param ckp points to where the checksum value will be stored.
+ * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
-extern uint8_t hazer_checksum(const void * buffer, size_t size);
+extern const void * hazer_checksum(const void * buffer, size_t size, uint8_t * ckp);
 
 /**
  * Given two checksum characters, convert to an eight-bit checksum.
@@ -302,11 +309,11 @@ extern ssize_t hazer_length(const void * buffer, size_t size);
  ******************************************************************************/
 
 /**
- * THis is an argument vector big enough to hold all possible sentences no
+ * This is an argument vector big enough to hold all possible sentences no
  * larger than those that can fit in the buffer type, plus a NULL pointer in
  * the last position.
  */
-typedef char * (hazer_vector_t)[HAZER_CONSTANT_NMEA_LONGEST - HAZER_CONSTANT_NMEA_SHORTEST + 1]; /* plus NULL */
+typedef char * (hazer_vector_t)[HAZER_NMEA_LONGEST - HAZER_NMEA_SHORTEST + 1]; /* plus NULL */
 
 /**
  * Tokenize an NMEA sentence by splitting it into substrings whose pointers
@@ -642,7 +649,7 @@ typedef struct HazerSolution {
     double hdop;                /* Horizontal Dilution Of Precisioin. */
     double vdop;                /* Vertical Diilution Of Precisioin. */
     uint8_t active;             /* Number of satellites active. */
-    uint8_t id[HAZER_CONSTANT_GPS_SATELLITES];  /* Satellite IDentifiers. */
+    uint8_t id[HAZER_GPS_SATELLITES];  /* Satellite IDentifiers. */
     uint8_t unused[3];          /* Unused. */
 } hazer_solution_t;
 
@@ -672,7 +679,7 @@ typedef struct HazerSatellite {
  * have channels configured. THIS OBJECT SHOULD BE INITIALIZED TO ALL ZEROS.
  */
 typedef struct HazerConstellation {
-    hazer_satellite_t sat[HAZER_CONSTANT_GPS_CHANNELS]; /* Satellites viewed. */
+    hazer_satellite_t sat[HAZER_GPS_CHANNELS]; /* Satellites viewed. */
     uint8_t view;               /* Number of satellites in view. */
     uint8_t channels;           /* Number of channels used in view. */
     uint8_t unused[6];          /* Unused. */

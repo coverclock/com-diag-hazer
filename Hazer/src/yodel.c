@@ -234,13 +234,13 @@ const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, u
 	 * CK_B), although it is performed eight-bits at a time on the input data.
 	 */
 
-	length = ((uint8_t)(bp[YODEL_CONSTANT_LENGTH_MSB])) << 8;
-	length |= ((uint8_t)(bp[YODEL_CONSTANT_LENGTH_LSB]));
-	length += YODEL_CONSTANT_SUMMED;
+	length = ((uint8_t)(bp[YODEL_UBX_LENGTH_MSB])) << 8;
+	length |= ((uint8_t)(bp[YODEL_UBX_LENGTH_LSB]));
+	length += YODEL_UBX_SUMMED;
 
-	if ((length + YODEL_CONSTANT_UNSUMMED) <= size) {
+	if ((length + YODEL_UBX_UNSUMMED) <= size) {
 
-		for (bp += YODEL_CONSTANT_CLASS; length > 0; --length) {
+		for (bp += YODEL_UBX_CLASS; length > 0; --length) {
 			ck_a += *(bp++);
 			ck_b += ck_a;
 		}
@@ -263,20 +263,20 @@ ssize_t yodel_length(const void * buffer, size_t size)
 
        sentence = (const char *)buffer;
 
-       if (sentence[YODEL_CONSTANT_SYNC_1] != YODEL_STIMULUS_SYNC_1) {
+       if (size < YODEL_UBX_SHORTEST) {
+    	   /* Do nothing. */
+       } else if (sentence[YODEL_UBX_SYNC_1] != YODEL_STIMULUS_SYNC_1) {
            /* Do nothing. */
-       } else if (sentence[YODEL_CONSTANT_SYNC_2] != YODEL_STIMULUS_SYNC_2) {
-           /* Do nothing. */
-       } else if (size < YODEL_CONSTANT_SHORTEST) {
+       } else if (sentence[YODEL_UBX_SYNC_2] != YODEL_STIMULUS_SYNC_2) {
            /* Do nothing. */
        } else {
-           length = sentence[YODEL_CONSTANT_LENGTH_MSB] << 8;
-           length |= sentence[YODEL_CONSTANT_LENGTH_LSB];
-           if (length > (size - YODEL_CONSTANT_SHORTEST)) {
+           length = sentence[YODEL_UBX_LENGTH_MSB] << 8;
+           length |= sentence[YODEL_UBX_LENGTH_LSB];
+           if (length > (size - YODEL_UBX_SHORTEST)) {
         	   /* Do nothing. */
            } else {
         	   result = length;
-        	   result += YODEL_CONSTANT_SHORTEST;
+        	   result += YODEL_UBX_SHORTEST;
            }
        }
 

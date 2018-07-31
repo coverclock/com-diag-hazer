@@ -13,12 +13,11 @@
  * This file is part of the Digital Aggregates Corporation Hazer package.
  * Hazer is a simple C-based parser of the National Marine Electronics
  * Association (NMEA) strings produced by typical consumer GPS devices.
- * Yodel is a C-based parser of the UBX binary packet format that is optionally
+ * Yodel is a C-based parser for the UBX binary packet format that is optionally
  * produced by GPS devices manufactured by ublox AG. Yodel can be used in
  * parallel with Hazer for devices that produce both output formats in the same
  * data stream. (ublox is based in Switzerland; yodeling was a style of singing
- * introduced to Western U.S. culture by cowboys who immigrated from
- * Switzerland.)
+ * introduced to Western U.S. culture by cowboys who immigrated from there.)
  *
  * REFERENCES
  *
@@ -68,19 +67,20 @@ extern int yodel_finalize(void);
 /**
  * UBlox, p.73
  */
-enum YodelConstant {
-	YODEL_CONSTANT_SYNC_1		= 0,	/* Always 0xb5. */
-	YODEL_CONSTANT_SYNC_2		= 1,	/* Always 0x62. */
-	YODEL_CONSTANT_CLASS		= 2,
-	YODEL_CONSTANT_ID			= 3,
-	YODEL_CONSTANT_LENGTH_LSB	= 4,	/* 16-bit, little endian (LSB). */
-	YODEL_CONSTANT_LENGTH_MSB 	= 5,	/* 16-bit, little endian (MSB). */
-	/* ... */							/* Payload[LENGTH]. */
-	YODEL_CONSTANT_CK_A			= 6,	/* Only if no LENGTH == 0. */
-	YODEL_CONSTANT_CK_B			= 7,	/* Only if no LENGTH == 0. */
-	YODEL_CONSTANT_SHORTEST		= 8,
-	YODEL_CONSTANT_UNSUMMED		= 2,	/* SYNC1[1], SYNC2[1], */
-	YODEL_CONSTANT_SUMMED		= 4,	/* CLASS[1], ID[1], LENGTH[2] ... */
+enum YodelUbx {
+	YODEL_UBX_SYNC_1		= 0,	/* Always 0xb5. */
+	YODEL_UBX_SYNC_2		= 1,	/* Always 0x62. */
+	YODEL_UBX_CLASS			= 2,
+	YODEL_UBX_ID			= 3,
+	YODEL_UBX_LENGTH_LSB	= 4,	/* 16-bit, little endian (LSB). */
+	YODEL_UBX_LENGTH_MSB 	= 5,	/* 16-bit, little endian (MSB). */
+	/* ... */						/* Payload[LENGTH]. */
+	YODEL_UBX_CK_A			= 6,	/* Only if no LENGTH == 0. */
+	YODEL_UBX_CK_B			= 7,	/* Only if no LENGTH == 0. */
+	YODEL_UBX_UNSUMMED		= 2,	/* SYNC1[1], SYNC2[1] */
+	YODEL_UBX_SUMMED		= 4,	/* CLASS[1], ID[1], LENGTH[2] ... */
+	YODEL_UBX_SHORTEST		= 8,	/* UNSUMMED[2], SUMMED[4], CK_A[1], CK_B[1] */
+	YODEL_UBX_LONGEST		= 512,	/* No clue what this should be. */
 };
 
 /**
@@ -123,6 +123,13 @@ typedef enum YodelAction {
 } yodel_action_t;
 
 /**
+ * This buffer is large enough to contain the largest UBX packet,
+ * plus a trailing NUL (and then some), aligned so that we can lay
+ * a UBX structure on top of it.
+ */
+typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (8))); /* plus NUL */
+
+/**
  * Process a single character of stimulus for the state machine that is
  * assembling a single UBX packet in the caller provided buffer. State
  * is maintained in a character pointer and a size variable, pointers to
@@ -153,12 +160,14 @@ extern yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, s
 /**
  * Compute the Fletcher checksum used by UBX for the specified buffer. The
  * buffer points to the beginning of the UBX packet, not to the subset that
- * is checksummed, and the sentence must contain a valid length field.
+ * is checksummed, and the sentence must contain a valid length field. A pointer
+ * is returned pointing just past the checksummed portion; this is where the
+ * checksum will be stored in a correctly formed packet.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
  * @param ck_ap points to where the ck_a value will be stored.
  * @param ck_bp points to where the ck_b value will be stored.
- * @return where the ck_a, ck_b would be in the buffer, or NULL if an error occurred.
+ * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
 extern const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp);
 

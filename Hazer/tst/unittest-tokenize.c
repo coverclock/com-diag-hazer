@@ -86,17 +86,17 @@ int main(void)
     memset(datagram, ~0, sizeof(datagram));
     size = hazer_serialize(datagram, 0, (char **)0, 0);
     assert(size == 0);
-    assert(datagram[0] == (char)~0);
+    assert(datagram[0] == (unsigned char)~0);
 
     memset(datagram, ~0, sizeof(datagram));
     size = hazer_serialize(datagram, 0, vector, 0);
     assert(size == 0);
-    assert(datagram[0] == (char)~0);
+    assert(datagram[0] == (unsigned char)~0);
 
     memset(datagram, ~0, sizeof(datagram));
     size = hazer_serialize(datagram, 0, vector, COUNT);
     assert(size == 0);
-    assert(datagram[0] == (char)~0);
+    assert(datagram[0] == (unsigned char)~0);
 
     /**************************************************************************/
 

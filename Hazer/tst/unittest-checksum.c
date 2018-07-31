@@ -28,6 +28,7 @@ int main(void)
 		uint8_t ck = 0;
 		char lsc = '\0';
 		char msc = '\0';
+		const void * bp = (const void *)0;
 		static const char NIB[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', };
 
 		rc = hazer_characters2checksum('0' - 1, '0', &cs);
@@ -55,22 +56,63 @@ int main(void)
 			}
 		}
 
-		cs = hazer_checksum("", 0);
-		/* There is no wrong answer here, we just want to make sure it doesn't core dump. */
+		cs = '?';
+		bp = hazer_checksum((const void *)0, 0, &cs);
+		assert(bp == (const void *)0);
+		assert(cs == '?');
 
-		cs = hazer_checksum("$V*TU\r\n", 8);
-		assert(cs == 0x56);
+		cs = '!';
+		bp = hazer_checksum("", 0, &cs);
+		assert(bp == (const void *)0);
+		assert(cs == '!');
 
-		cs = hazer_checksum("$VW*TU\r\n", 9);
-		assert(cs == 0x01);
-
-		cs = hazer_checksum("$VWX*TU\r\n", 10);
-		assert(cs == 0x59);
-
-		cs = hazer_checksum("$VWXY*TU\r\n", 11);
+		cs = ~0;
+		bp = hazer_checksum("$", 1, &cs);
+		assert(bp != (const void *)0);
+		assert(*(unsigned char *)bp == '\0');
 		assert(cs == 0x00);
 
-		cs = hazer_checksum("$VWXYZ*TU\r\n", 12);
+		cs = ~0;
+		bp = hazer_checksum("$", 2, &cs);
+		assert(bp != (const void *)0);
+		assert(*(unsigned char *)bp == '\0');
+		assert(cs == 0x00);
+
+		cs = ~0;
+		bp = hazer_checksum("$*", 2, &cs);
+		assert(bp != (const void *)0);
+		assert(*(unsigned char *)bp == '*');
+		assert(cs == 0x00);
+
+		cs = ~0;
+		bp = hazer_checksum("$*", 3, &cs);
+		assert(bp != (const void *)0);
+		assert(*(unsigned char *)bp == '*');
+		assert(cs == 0x00);
+
+		bp = hazer_checksum("$V*TU\r\n", 8, &cs);
+		assert(bp != (const void *)0);
+		assert(*(unsigned char *)bp == '*');
+		assert(cs == 0x56);
+
+		bp = hazer_checksum("$VW*TU\r\n", 9, &cs);
+		assert(bp != (const void *)0);
+		assert(*(unsigned char *)bp == '*');
+		assert(cs == 0x01);
+
+		bp = hazer_checksum("$VWX*TU\r\n", 10, &cs);
+		assert(bp != (const void *)0);
+		assert(*(unsigned char *)bp == '*');
+		assert(cs == 0x59);
+
+		bp = hazer_checksum("$VWXY*TU\r\n", 11, &cs);
+		assert(bp != (const void *)0);
+		assert(*(unsigned char *)bp == '*');
+		assert(cs == 0x00);
+
+		bp = hazer_checksum("$VWXYZ*TU\r\n", 12, & cs);
+		assert(bp != (const void *)0);
+		assert(*(unsigned char *)bp == '*');
 		assert(cs == 0x5A);
 	}
 
@@ -83,24 +125,28 @@ int main(void)
 		unsigned char msn = '\0';
 		unsigned char lsn = '\0';
 		int rc = 0;
+		const unsigned char * bp = (const void *)0;
 		static const unsigned char NMEA[] = "$GPGSV,4,3,13,24,39,292,21,28,32,109,36,46,38,215,35,48,36,220,37*78\r\n";
 
 		size = hazer_length(NMEA, sizeof(NMEA));
 		assert(size == (sizeof(NMEA) - 1));
 
-		cs = hazer_checksum(NMEA, sizeof(NMEA));
+		bp = hazer_checksum(NMEA, sizeof(NMEA), &cs);
+		assert(bp == &NMEA[sizeof(NMEA) - 6]);
 
-		assert(NMEA[sizeof(NMEA) - 5] == '7');
-		assert(NMEA[sizeof(NMEA) - 4] == '8');
+		assert(bp[0] == '*');
+		assert(bp[1] == '7');
+		assert(bp[2] == '8');
 
-		rc = hazer_characters2checksum(NMEA[sizeof(NMEA) - 5], NMEA[sizeof(NMEA) - 4], &ck);
+		rc = hazer_characters2checksum(bp[1], bp[2], &ck);
 		assert(rc == 0);
+		assert(ck == 0x78);
 		assert(cs == ck);
 
 		rc = hazer_checksum2characters(ck, &msn, &lsn);
 		assert(rc == 0);
-		assert(msn == NMEA[sizeof(NMEA) - 5]);
-		assert(lsn == NMEA[sizeof(NMEA) - 4]);
+		assert(msn == bp[1]);
+		assert(lsn == bp[2]);
 	}
 
     /**************************************************************************/
@@ -112,24 +158,28 @@ int main(void)
 		unsigned char msn = '\0';
 		unsigned char lsn = '\0';
 		int rc = 0;
+		const unsigned char * bp = (const void *)0;
 		static const unsigned char NMEA[] = "$GPGSV,4,3,13,24,39,292,21,28,32,109,36,46,38,215,35,48,36,220,37*89\r\n"; /* Bad checksum. */
 
 		size = hazer_length(NMEA, sizeof(NMEA));
 		assert(size == (sizeof(NMEA) - 1));
 
-		cs = hazer_checksum(NMEA, sizeof(NMEA));
+		bp = hazer_checksum(NMEA, sizeof(NMEA), &cs);
+		assert(bp == &NMEA[sizeof(NMEA) - 6]);
 
-		assert(NMEA[sizeof(NMEA) - 5] == '8');
-		assert(NMEA[sizeof(NMEA) - 4] == '9');
+		assert(bp[0] == '*');
+		assert(bp[1] == '8');
+		assert(bp[2] == '9');
 
-		rc = hazer_characters2checksum(NMEA[sizeof(NMEA) - 5], NMEA[sizeof(NMEA) - 4], &ck);
+		rc = hazer_characters2checksum(bp[1], bp[2], &ck);
 		assert(rc == 0);
+		assert(ck == 0x89);
 		assert(cs != ck);
 
 		rc = hazer_checksum2characters(ck, &msn, &lsn);
 		assert(rc == 0);
-		assert(msn == NMEA[sizeof(NMEA) - 5]);
-		assert(lsn == NMEA[sizeof(NMEA) - 4]);
+		assert(msn == bp[1]);
+		assert(lsn == bp[2]);
 	}
 
     /**************************************************************************/
@@ -142,11 +192,11 @@ int main(void)
     	uint8_t ck_a = 0;
     	uint8_t ck_b = 0;
 
-		assert(UBX[YODEL_CONSTANT_LENGTH_LSB] == 0x04);
-		assert(UBX[YODEL_CONSTANT_LENGTH_MSB] == 0x00);
+		assert(UBX[YODEL_UBX_LENGTH_LSB] == 0x04);
+		assert(UBX[YODEL_UBX_LENGTH_MSB] == 0x00);
 
-		size = UBX[YODEL_CONSTANT_LENGTH_MSB] << 8;
-		size |= UBX[YODEL_CONSTANT_LENGTH_LSB];
+		size = UBX[YODEL_UBX_LENGTH_MSB] << 8;
+		size |= UBX[YODEL_UBX_LENGTH_LSB];
 		assert(size == 4);
 
 		size = yodel_length(UBX, sizeof(UBX));

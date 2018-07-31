@@ -49,7 +49,7 @@ typedef enum Protocol { UNUSED = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
 typedef enum Format { UNKNOWN = 0, NMEA = 1, UBX = 2 } format_t;
 
-static int emit_sentence(FILE * fp, const char * string)
+static int emit_sentence(FILE * fp, const char * string, size_t size)
 {
     int rc = -1;
     uint8_t cs = 0;
@@ -58,7 +58,7 @@ static int emit_sentence(FILE * fp, const char * string)
 
     do {
 
-        cs = hazer_checksum(string, strlen(string));
+        (void)hazer_checksum(string, size, &cs);
         if (hazer_checksum2characters(cs, &msn, &lsn) < 0) { break; }
 
         if (fprintf(fp, "%s%c%c%c\r\n", string, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) { break; }
@@ -389,17 +389,17 @@ int main(int argc, char * argv[])
     hazer_buffer_t nmea_buffer = { 0 };
     char * nmea_bb = (char *)0;
     size_t nmea_ss = 0;
-    size_t nmea_ll = 0;
     uint8_t nmea_cs = 0;
     uint8_t nmea_ck = 0;
     yodel_state_t ubx_state = YODEL_STATE_EOF;
-    hazer_buffer_t ubx_buffer = { 0 };
+    yodel_buffer_t ubx_buffer = { 0 };
     char * ubx_bb = (char *)0;
     size_t ubx_ss = 0;
     size_t ubx_ll = 0;
     uint8_t ubx_ck_a = 0;
     uint8_t ubx_ck_b = 0;
     unsigned char * buffer = (unsigned char *)0;
+	unsigned char * bp = (char *)0;
     hazer_buffer_t datagram = { 0 };
     hazer_vector_t vector = { 0 };
     hazer_position_t position = { 0 };
@@ -836,29 +836,29 @@ int main(int argc, char * argv[])
             	length = strlen(written->payload) + 1;
                 size = diminuto_escape_collapse(written->payload, written->payload, length);
                 if (verbose) { print_sentence(errfp, written->payload, size - 1); }
-                rc = (size < length) ? emit_packet(devfp, written->payload, size - 1) : emit_sentence(devfp, written->payload);
+                rc = (size < length) ? emit_packet(devfp, written->payload, size - 1) : emit_sentence(devfp, written->payload, size - 1);
                 if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
                 first = written->next;
                 free(written);
         	}
 
+        	/*
+        	 * The NMEA and UBX parsers can be thought of as a single
+        	 * non-deterministic finite state machine: an automaton that
+        	 * can be in more than one state at a time. The two state
+        	 * machines must use different state variables and even
+        	 * different buffers, since it is possible both could be active
+        	 * at the same time until one of them determines that it has
+        	 * collected a correct sentence or packet. The datagram
+        	 * code below use the UBX buffer, since it may ultimately
+        	 * receive either NMEA or UBX data from the far end.
+        	 */
+
             while (!0) {
 
             	ch = fgetc(infp);
 
-            	/*
-            	 * The NMEA and UBX parsers can be thought of as a single
-            	 * non-deterministic finite state machines: an automaton that
-            	 * can be in more than one state at a time. The two state
-            	 * machines must use different state variables and even
-            	 * different buffers, since it is possible both could be active
-            	 * at the same time until one of them determines that it has
-            	 * collected a correct sentence or packet. The datagram
-            	 * code below can use either buffer, and may ultimately
-            	 * receive either NMEA or UBX data from the far end.
-            	 */
-
-                nmea_state = hazer_machine(nmea_state, ch, nmea_buffer, sizeof(nmea_buffer), &nmea_bb, &nmea_ss, &nmea_ll);
+                nmea_state = hazer_machine(nmea_state, ch, nmea_buffer, sizeof(nmea_buffer), &nmea_bb, &nmea_ss);
 
                 ubx_state = yodel_machine(ubx_state, ch, ubx_buffer, sizeof(ubx_buffer), &ubx_bb, &ubx_ss, &ubx_ll);
 
@@ -898,10 +898,10 @@ int main(int argc, char * argv[])
 
         } else if (protocol == IPV4) {
 
-            size = diminuto_ipc4_datagram_receive(sock, nmea_buffer, sizeof(nmea_buffer) - 1);
+            size = diminuto_ipc4_datagram_receive(sock, ubx_buffer, sizeof(ubx_buffer) - 1);
             if (size <= 0) { break; }
-            nmea_buffer[size++] = '\0';
-            buffer = nmea_buffer;
+            ubx_buffer[size++] = '\0';
+            buffer = ubx_buffer;
 
         } else if (protocol == IPV6) {
 
@@ -930,9 +930,10 @@ int main(int argc, char * argv[])
 
         if ((length = hazer_length(buffer, size)) > 0) {
 
-        	nmea_cs = hazer_checksum(buffer, size);
+        	bp = (unsigned char *)hazer_checksum(buffer, size, &nmea_cs);
+        	assert(bp != (unsigned char *)0);
 
-            rc = hazer_characters2checksum(buffer[size - sizeof("ML\r\n")], buffer[size - sizeof("L\r\n")], &nmea_ck);
+            rc = hazer_characters2checksum(bp[1], bp[2], &nmea_ck);
             assert(rc >= 0);
 
             if (nmea_ck != nmea_cs) {
@@ -943,13 +944,12 @@ int main(int argc, char * argv[])
             format = NMEA;
 
         } else if ((length = yodel_length(buffer, size)) > 0) {
-        	const unsigned char * here = (const char *)0;
 
-        	here = (const unsigned char *)yodel_checksum(buffer, size, &ubx_ck_a, &ubx_ck_b);
-        	assert(here != (const unsigned char *)0);
+        	bp = (unsigned char *)yodel_checksum(buffer, size, &ubx_ck_a, &ubx_ck_b);
+        	assert(bp != (unsigned char *)0);
 
-        	if ((ubx_ck_a != here[0]) || (ubx_ck_b != here[1])) {
-                fprintf(stderr, "%s: BAD 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, here[0], here[1]);
+        	if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
+                fprintf(stderr, "%s: BAD 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
                 continue;
         	}
 
@@ -984,24 +984,26 @@ int main(int argc, char * argv[])
 			assert(count <= (sizeof(vector) / sizeof(vector[0])));
 
 			/*
-			 * This next part is mostly done just to functionally test the API.
+			 * This next part is mostly done just to functionally test the API
+			 * by demonstrating reversability by regenerating the original
+			 * sentence.
 			 */
 
 			size = hazer_serialize(datagram, sizeof(datagram), vector, count);
 			assert(size <= (sizeof(datagram) - 4));
 			assert(datagram[size - 1] == '\0');
 			assert(datagram[size - 2] == '*');
-
-			nmea_cs = hazer_checksum(datagram, size);
+			bp = (unsigned char *)hazer_checksum(datagram, size, &nmea_cs);
 			hazer_checksum2characters(nmea_cs, &msn, &lsn);
-			nmea_bb = &datagram[size - 1];
-			*(nmea_bb++) = msn;
-			*(nmea_bb++) = lsn;
-			*(nmea_bb++) = '\r';
-			*(nmea_bb++) = '\n';
-			*(nmea_bb++) = '\0';
+			assert(bp[0] == '*');
+			*(++bp) = msn;
+			*(++bp) = lsn;
+			*(++bp) = '\r';
+			*(++bp) = '\n';
+			*(++bp) = '\0';
 			size += 4;
 			assert(size <= sizeof(datagram));
+			assert(strncmp(datagram, buffer, size));
 
 			if (escape) { fputs("\033[2;1H\033[0K", outfp); }
 			if (report) { print_sentence(outfp, datagram, size - 1); }
