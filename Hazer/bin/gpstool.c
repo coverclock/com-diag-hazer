@@ -64,6 +64,9 @@
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/diminuto/diminuto_list.h"
 
+static const size_t LIMIT = 80;
+static const size_t UNLIMITED = ~0;
+
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
 typedef enum Protocol { UNUSED = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
@@ -138,7 +141,7 @@ static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p
 
 }
 
-static void print_sentence(FILE * fp, const void * buffer, size_t size)
+static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t limit)
 {
     const char * bb = (const char *)0;
     size_t current = 0;
@@ -146,6 +149,7 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size)
 
     for (bb = buffer; size > 0; --size) {
         diminuto_phex_emit(fp, *(bb++), ~(size_t)0, 0, 0, 0, &current, &end, 0);
+        if (current > limit) { break; }
     }
     fputc('\r', fp);
     fputc('\n', fp);
@@ -848,7 +852,7 @@ int main(int argc, char * argv[])
         		assert(buffer != (unsigned char *)0);
             	length = strlen(buffer) + 1;
                 size = diminuto_escape_collapse(buffer, buffer, length);
-                if (verbose) { print_sentence(errfp, buffer, size - 1); }
+                if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
                 rc = (size < length) ? emit_packet(devfp, buffer, size - 1) : emit_sentence(devfp, buffer, size - 1);
                 if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
                 free(node);
@@ -928,7 +932,7 @@ int main(int argc, char * argv[])
 
         }
 
-        if (verbose) { print_sentence(errfp, buffer, size - 1); }
+        if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
 
         /**
          ** VALIDATE
@@ -975,7 +979,7 @@ int main(int argc, char * argv[])
         }
 
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        if (report) { print_sentence(outfp, buffer, length); }
+        if (report) { print_sentence(outfp, buffer, length, LIMIT); }
 
         /**
          ** FORWARD AND LOG
