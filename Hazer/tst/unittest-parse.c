@@ -332,10 +332,12 @@ int main(void)
 
     {
     	yodel_buffer_t buffer = { 0 };
+    	yodel_header_t data[2] = { 0 };
     	yodel_header_t * hp = (yodel_header_t *)0;
     	unsigned char * bp = (unsigned char *)0;
 
     	assert(sizeof(yodel_header_t) == (YODEL_UBX_UNSUMMED + YODEL_UBX_SUMMED));
+    	assert(sizeof(data) == (2 * sizeof(yodel_header_t)));
 
     	bp = (unsigned char *)&buffer;
 
