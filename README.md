@@ -27,6 +27,8 @@ supported by a parallel stack called Yodel that is included in  the Hazer
 distribution. gpstool uses both the Hazer stack and the Yodel stack to process
 both NMEA and UBX messages interleaved in the same input stream.
 
+# Devices
+
 Hazer has been successfully tested with the following GPS chipsets.
 
 * Quectel L80-R    
@@ -70,6 +72,8 @@ Hazer has been successfully tested with the following GPS devices.
 [6] Supports One Pulse Per Second (1PPS) by toggling digital output pin.    
 [7] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
 [8] Supports UBX.
+
+# Platforms
 
 Various releases of Hazer have been tested on one or more the following targets
 and platforms.
@@ -151,7 +155,7 @@ Optionally install Diminuto and Hazer in /usr/local.
     cd ~/src/com-diag-hazer/Hazer
     sudo make install
 
-## Directories
+# Directories
  
 * bin - utility source files.    
 * cfg - configuration makefiles.    
@@ -177,7 +181,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 * gr701w -script that uses gpstool to exercise the NaviSys GR701W device.    
 * ublox7 - script that uses gpstool to exercise any ublox7 device.    
 
-# Notes
+# Help
 
     > gpstool -?
     
@@ -211,6 +215,8 @@ Optionally install Diminuto and Hazer in /usr/local.
        -s          Use XON/XOFF for DEVICE.
        -v          Display verbose output on standard error.
 
+# Dependencies
+
 The Hazer library itself is standlone other than the usual standard
 C and POSIX libraries. But the gpstool is also built on top of the
 Digital Aggretates Corporation Diminuto library. Diminuto is a general
@@ -218,6 +224,57 @@ purpose C-based systems programming library that supports serial
 port configuration, socket-based communication, and a passle of other
 useful stuff. If you don't build Diminuto where the Makefile expects it, some
 minor Makefile hacking might be required.
+
+# Display
+
+When using the -E option with gpstool, so that it uses ASCII escape sequences
+to do cursor control for its report on standard output, the display looks
+something like this as it is continually updated.
+
+    > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E
+
+    $GPGSV,3,3,12,29,03,281,,46,38,215,,48,36,220,38,51,44,183,42*7C\r\n
+    \xb5b\x06>\0\0
+    MAP 2018-08-01T18:35:58Z 39*47'39.01"N,105*09'12.11"W  5618.70' N     0.130mph PPS 0
+    GGA 39.794171,-105.153365  1712.600m   0.000*    0.113knots [10] 9 10 5 0 4
+    GSA {  25  51   5   6  12  48  19  24   2  17 } [10] pdop 1.73 hdop 0.95 vdop 1.44
+    GSV [01] sat   2 elv 78 azm 254 snr 30dBHz con GPS
+    GSV [02] sat   5 elv 22 azm 171 snr 41dBHz con GPS
+    GSV [03] sat   6 elv 51 azm  46 snr 29dBHz con GPS
+    GSV [04] sat  12 elv 72 azm 297 snr 33dBHz con GPS
+    GSV [05] sat  17 elv 17 azm  86 snr 26dBHz con GPS
+    GSV [06] sat  19 elv 38 azm  74 snr 12dBHz con GPS
+    GSV [07] sat  24 elv 21 azm 231 snr 28dBHz con GPS
+    GSV [08] sat  25 elv 27 azm 315 snr 23dBHz con GPS
+    GSV [09] sat  29 elv  3 azm 281 snr  0dBHz con GPS
+    GSV [10] sat  46 elv 38 azm 215 snr  0dBHz con GPS
+    GSV [11] sat  48 elv 36 azm 220 snr 38dBHz con GPS
+    GSV [12] sat  51 elv 44 azm 183 snr 42dBHz con GPS
+
+The first line is the most recently read valid NMEA sentence or UBX packet.
+
+The second line is the most recently written NMEA sentence or UBX packet (if
+there is one) minus the ending material that contains the checksum for either
+format (this is added automatically when the buffer is written).
+
+The third line is the date and time in UTC, latitude and longitude in hours
+minutes and decimal seconds, altitude in feet, cardinal direction, and speed in
+miles per hour, and the current one pulse per second (PPS) strobe value.    
+
+The fourth line is the decimal latitude and longitude, altitude in meters,
+compass bearing in decimal degrees, speed in knots, the number of satellites
+used for the most recent navigation fix, and some numbers indicating significant
+digits of accuracy for various values.
+
+The fifth line is a list of satellites that are currently being received, a
+count of how many satellites are in the list, and the quality of the fix in
+terms of position, horizontal, and vertical dilution of precision.
+
+The remaining lines are, for each satellite, its identifying number, its
+elevation, azimuth, and signal/noise ratio, and the constellation of which it
+is a member.
+
+# Examples
 
 Here is an example of using gpstool to read an NMEA sentence stream from a
 serial device at 4800 8n1, display the data using ANSI escape sequences to

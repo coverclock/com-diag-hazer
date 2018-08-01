@@ -829,7 +829,7 @@ int main(int argc, char * argv[])
 
         	/*
         	 * If we have any initialization strings to send, do so one at a
-        	 * time, while reading from the device. This prevents any
+        	 * time, if we have a device and its idle. This prevents any
              * incoming data from backing up too much. (I should convert
              * all of this code to a multiplexing scheme using Mux.) Because
              * this queue of writes is checked everytime we reiterate in the
@@ -841,7 +841,9 @@ int main(int argc, char * argv[])
              * free it.
         	 */
 
-        	if (device == (const char *)0) {
+        	if (devfd < 0) {
+        		/* Do nothing. */
+        	} else if (diminuto_serial_available(devfd) > 0) {
         		/* Do nothing. */
         	} else if (diminuto_list_isempty(&head)) {
         		/* Do nothing. */
@@ -852,9 +854,11 @@ int main(int argc, char * argv[])
         		assert(buffer != (unsigned char *)0);
             	length = strlen(buffer) + 1;
                 size = diminuto_escape_collapse(buffer, buffer, length);
-                if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
                 rc = (size < length) ? emit_packet(devfp, buffer, size - 1) : emit_sentence(devfp, buffer, size - 1);
-                if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
+                if (rc < 0) { fprintf(stderr, "%s: ERR \"%s\"\n", program, buffer); }
+                if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
+                if (escape) { fputs("\033[2;1H\033[0J", outfp); }
+                if (report) { print_sentence(outfp, buffer, size - 1, LIMIT); }
                 free(node);
         	}
 
@@ -1039,24 +1043,24 @@ int main(int argc, char * argv[])
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
-				if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, "MAP",  &position, tmppps); }
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
+				if (report) { print_position(outfp, "MAP",  &position, tmppps); }
+				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
 				if (report) { print_datum(outfp, "GGA",  &position); }
 			} else if (hazer_parse_rmc(&position, vector, count) == 0) {
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
-				if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, "MAP", &position, tmppps); }
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
+				if (report) { print_position(outfp, "MAP", &position, tmppps); }
+				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
 				if (report) { print_datum(outfp, "RMC",  &position); }
 			} else if (hazer_parse_gsa(&solution, vector, count) == 0) {
-				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
+				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
 				if (report) { print_active(outfp, "GSA", &solution); }
 			} else if (hazer_parse_gsv(&constellation[system], vector, count) == 0) {
-				if (escape) { fputs("\033[5;1H\033[0J", outfp); }
+				if (escape) { fputs("\033[6;1H\033[0J", outfp); }
 				if (report) { print_view(outfp, "GSV", constellation); }
 			} else {
 				/* Do nothing. */

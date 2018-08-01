@@ -453,7 +453,7 @@ extern double hazer_parse_num(const char * string);
 #define HAZER_NMEA_TALKER_RADIO "ZV"
 
 /*******************************************************************************
- * IDENTIFYING SPECIFIC SENTENCES
+ * IDENTIFYING STANDARD SENTENCES
  ******************************************************************************/
 
 /**
@@ -481,28 +481,10 @@ extern double hazer_parse_num(const char * string);
 #define HAZER_NMEA_GPS_MESSAGE_GLL "GLL"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_GLQ
- * ublox7 Protocol Reference, p. vi, poll a standard message for talker GL
- */
-#define HAZER_NMEA_GPS_MESSAGE_GLQ "GLQ"
-
-/**
- * @def HAZER_NMEA_GPS_MESSAGE_GNQ
- * ublox7 Protocol Reference, p. vi, poll a standard message for talker GN
- */
-#define HAZER_NMEA_GPS_MESSAGE_GNQ "GNQ"
-
-/**
  * @def HAZER_NMEA_GPS_MESSAGE_GNS
  * ublox7 Protocol Reference, p. vi, GNSS fix data
  */
 #define HAZER_NMEA_GPS_MESSAGE_GNS "GNS"
-
-/**
- * @def HAZER_NMEA_GPS_MESSAGE_GPQ
- * ublox7 Protocol Reference, p. vi, poll a standard message for talker GP
- */
-#define HAZER_NMEA_GPS_MESSAGE_GPQ "GPQ"
 
 /**
  * @def HAZER_NMEA_GPS_MESSAGE_GRS
