@@ -130,6 +130,18 @@ typedef enum YodelAction {
 typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (8))); /* plus NUL */
 
 /**
+ * This is the structure of the header on every UBX packet.
+ */
+typedef struct YodelHeader {
+	uint8_t yodel_sync_1;		/* 0xb5 */
+	uint8_t yodel_sync_2;		/* 0x62 */
+	uint8_t yodel_class;
+	uint8_t yodel_id;
+	uint16_t yodel_length;		/* Little endian. */
+	uint8_t yodel_payload[0];
+} yodel_header_t;
+
+/**
  * Process a single character of stimulus for the state machine that is
  * assembling a single UBX packet in the caller provided buffer. State
  * is maintained in a character pointer and a size variable, pointers to
