@@ -42,6 +42,7 @@
 #include "com/diag/diminuto/diminuto_interrupter.h"
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_dump.h"
+#include "com/diag/diminuto/diminuto_list.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
@@ -367,11 +368,6 @@ static void * gpiopoller(void * argp)
 	return xc;
 }
 
-struct Written {
-    struct Written * next;
-    char * payload;
-};
-
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
@@ -447,9 +443,8 @@ int main(int argc, char * argv[])
     diminuto_ipv6_t ipv6 = { 0 };
     diminuto_port_t port = 0;
     int output = 0;
-    struct Written * written = (struct Written *)0;
-    struct Written * first = (struct Written *)0;
-    struct Written * last = (struct Written *)0;
+    diminuto_list_t * node = (diminuto_list_t *)0;
+    diminuto_list_t head = DIMINUTO_LIST_NULLINIT(&head);
     int onepps = 0;
     int tmppps = 0;
     uint64_t nanoseconds = 0;
@@ -516,15 +511,9 @@ int main(int argc, char * argv[])
             break;
         case 'W':
             readonly = 0;
-            written = (struct Written *)malloc(sizeof(struct Written));
-            written->next = (struct Written *)0;
-            written->payload = optarg;
-            if (first == (struct Written *)0) {
-                first = written;
-            } else {
-                last->next = written;
-            }
-            last = written;
+            node = (diminuto_list_t *)malloc(sizeof(diminuto_list_t));
+            diminuto_list_datainit(node, optarg);
+            diminuto_list_enqueue(&head, node);
             break;
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
@@ -818,22 +807,31 @@ int main(int argc, char * argv[])
         	 * If we have any initialization strings to send, do so one at a
         	 * time, while reading from the device. This prevents any
              * incoming data from backing up too much. (I should convert
-             * all of this code to a multiplexing scheme using Mux.)
+             * all of this code to a multiplexing scheme using Mux.) Because
+             * this queue of writes is checked everytime we reiterate in the
+             * work loop, so later code can enqueue new commands to be written
+             * to the device. Because this is a doubly-linked list, queued
+             * commands can be removed from the queue before they are processed.
+             * And the list header can be prepended onto a command string as
+             * part of a dynamically allocated structure, and this code will
+             * free it.
         	 */
 
         	if (device == (const char *)0) {
         		/* Do nothing. */
-        	} else if (first == (struct Written *)0) {
+        	} else if (diminuto_list_isempty(&head)) {
         		/* Do nothing. */
         	} else {
-        		written = first;
-            	length = strlen(written->payload) + 1;
-                size = diminuto_escape_collapse(written->payload, written->payload, length);
-                if (verbose) { print_sentence(errfp, written->payload, size - 1); }
-                rc = (size < length) ? emit_packet(devfp, written->payload, size - 1) : emit_sentence(devfp, written->payload, size - 1);
+        		node = diminuto_list_dequeue(&head);
+        		assert(node != (diminuto_list_t *)0);
+        		buffer = (unsigned char *)diminuto_list_data(node);
+        		assert(buffer != (unsigned char *)0);
+            	length = strlen(buffer) + 1;
+                size = diminuto_escape_collapse(buffer, buffer, length);
+                if (verbose) { print_sentence(errfp, buffer, size - 1); }
+                rc = (size < length) ? emit_packet(devfp, buffer, size - 1) : emit_sentence(devfp, buffer, size - 1);
                 if (rc < 0) { fprintf(stderr, "%s: ERR\n", program); }
-                first = written->next;
-                free(written);
+                free(node);
         	}
 
         	/*

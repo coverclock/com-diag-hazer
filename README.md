@@ -151,6 +151,32 @@ Optionally install Diminuto and Hazer in /usr/local.
     cd ~/src/com-diag-hazer/Hazer
     sudo make install
 
+## Directories
+ 
+* bin - utility source files.    
+* cfg - configuration makefiles.    
+* fun - functional test source files (may require special hardware).    
+* inc - public header files.    
+* out - build artifacts.    
+* fs - file system overlay that may be useful on the host on which Hazer runs.    
+* src - feature implementation and private header source files.    
+* tst - unit test source files.    
+
+# Utilities
+
+* consumer - uses gpstool to consume NMEA etc. datagrams and report on stdout.    
+* gpstool - C program that uses Diminuto and Hazer and implements scripts.    
+* hazerclient - MacOS file to run Google Maps API in Firefox browser.    
+* hazer - uses gpstool to consume NMEA etc. from serial port and report on stdout.    
+* pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.    
+* producer - uses gpstool to consume NMEA etc. from serial port and forward as datagrams.    
+* provider - uses gpstool to conume NMEA etc. datagrams and forward to serial port.    
+
+# Functional Tests
+
+* gr701w -script that uses gpstool to exercise the NaviSys GR701W device.    
+* ublox7 - script that uses gpstool to exercise any ublox7 device.    
+
 # Notes
 
     > gpstool -?
