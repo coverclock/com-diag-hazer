@@ -7,7 +7,27 @@
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-hazer
  *
+ * ABSTRACT
+ *
+ * gpstool is the Swiss Army knife of Hazer. It can read NMEA sentences and UBX
+ * packets from a GPS device or as datagrams from an IP UDP port, log the
+ * data on standard error, write the data to a file, interpret the more
+ * common NMEA sentences and display the results in a pretty way on standard
+ * output using ANSI control sequences, and forward the data to an IP UDP port
+ * where perhaps it will be received by another gpstool. It has been used, for
+ * example, to integrate a GPS device with a USB interface with the Google Earth
+ * web application to create a moving map display, and to implement remote
+ * tracking of a moving vehicle.
+ *
  * EXAMPLES
+ *
+ * gpstool -?
+ *
+ * gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -v
+ *
+ * gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E
+ *
+ * gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -L nmea.txt
  *
  * gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -6 -A ::1 -P 5555
  *
@@ -263,7 +283,7 @@ static void print_datum(FILE * fp, const char * name, const hazer_position_t * p
     fputc('\n', fp);
 }
 
-struct context {
+struct Context {
 	int done;
 	diminuto_mux_t * muxp;
 	FILE * ppsfp;
@@ -276,13 +296,13 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static void * dcdpoller(void * argp)
 {
 	void * xc = (void *)1;
-	struct context * ctxp = (struct context *)0;
+	struct Context * ctxp = (struct Context *)0;
 	int done = 0;
 	int rc = -1;
 	int nowpps = 0;
 	int waspps = 0;
 
-	ctxp = (struct context *)argp;
+	ctxp = (struct Context *)argp;
 
 	while (!0) {
 		DIMINUTO_COHERENT_SECTION_BEGIN;
@@ -322,13 +342,13 @@ static void * dcdpoller(void * argp)
 static void * gpiopoller(void * argp)
 {
 	void * xc = (void *)1;
-	struct context * ctxp = (struct context *)0;
+	struct Context * ctxp = (struct Context *)0;
 	int done = 0;
 	int rc = -1;
 	int nowpps = 0;
 	int waspps = 0;
 
-	ctxp = (struct context *)argp;
+	ctxp = (struct Context *)argp;
 
 	while (!0) {
 		DIMINUTO_COHERENT_SECTION_BEGIN;
@@ -449,7 +469,7 @@ int main(int argc, char * argv[])
     int tmppps = 0;
     uint64_t nanoseconds = 0;
     diminuto_mux_t mux = { 0 };
-    struct context ctx = { 0 };
+    struct Context ctx = { 0 };
     void * result = (void *)0;
     pthread_t thread;
     int pthreadrc = -1;
