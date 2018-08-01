@@ -4,22 +4,31 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 
-# I use a NaviSys Technology GR-701W USB GPS device to for this.
+# I use a NaviSys Technology GR-701W USB GPS device for this.
 # The GR-701W exports 1PPS via DCD, which the "-c" option below
-# expects.
+# expects. But you could use this on any Ublox 7 GPS device and
+# if it doesn't implement 1PPS, the script should still otherwise
+# work.
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-9600}
 
-COMMAND1="\$PUBX,00"
-COMMAND2="\$PUBX,03"
-COMMAND3="\$PUBX,04"
-COMMAND4="\\xB5\\x62\\x06\\x01\\x08\\x00\\x02\\x13\\x00\\x01\\x00\\x00\\x00\\x00" # \\x25 \\x3D
-COMMAND5="\\xb5\\x62\\x0a\\x04\\x00\\x00"
-COMMAND6="\\xb5\\x62\\x06\\x31\\x00\\x00"
-COMMAND7="\\xb5\\x62\\x06\\x3e\\x00\\x00"
-COMMAND8="\\xb5\\x62\\x06\\x06\\x00\\x00"
+COMMANDS='
+    "\$PUBX,00"
+    "\$PUBX,03"
+    "\$PUBX,04"
+    "\\xB5\\x62\\x06\\x01\\x08\\x00\\x02\\x13\\x00\\x01\\x00\\x00\\x00\\x00"
+    "\\xb5\\x62\\x0a\\x04\\x00\\x00"
+    "\\xb5\\x62\\x06\\x31\\x00\\x00"
+    "\\xb5\\x62\\x06\\x3e\\x00\\x00"
+    "\\xb5\\x62\\x06\\x06\\x00\\x00"
+'
 
-gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v -W "${COMMAND1}" -W "${COMMAND2}" -W "${COMMAND3}" -W "${COMMAND4}" -W "${COMMAND5}" -W "${COMMAND6}" -W "${COMMAND7}" -W "${COMMAND8}"
+OPTIONS=""
+for OPTION in ${COMMANDS}; do
+    OPTIONS="${OPTIONS} -W ${OPTION}"
+done
+
+eval gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v ${OPTIONS}
