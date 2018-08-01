@@ -277,7 +277,7 @@ is a member.
 # Examples
 
 Here is an example of using gpstool to read an NMEA sentence stream from a
-serial device at 4800 8n1, display the data using ANSI escape sequences to
+serial device at 115200 8n1, display the data using ANSI escape sequences to
 control the output terminal, and forwards NMEA sentences to a remote
 instance of itself listing on port 5555.
 
