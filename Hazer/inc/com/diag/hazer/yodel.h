@@ -130,7 +130,7 @@ typedef enum YodelAction {
  * fields, e.g. floating point numbers, are typically half-word aligned,
  * not double-word aligned.)
  */
-typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (8))); /* plus NUL */
+typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (2))); /* plus NUL */
 
 /**
  * This is the structure of the header on every UBX packet.
@@ -142,7 +142,7 @@ typedef struct YodelHeader {
 	uint8_t yodel_id;
 	uint16_t yodel_length;		/* Little endian. */
 	uint8_t yodel_payload[0];
-} yodel_header_t;
+} yodel_header_t __attribute__ ((aligned (2)));
 
 /**
  * Process a single character of stimulus for the state machine that is

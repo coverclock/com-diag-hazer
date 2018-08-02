@@ -328,33 +328,39 @@ int main(void)
     value = hazer_parse_num("521.125");
     assert(value == 521.125);
 
+    value = hazer_parse_num("-521.125");
+    assert(value == -521.125);
+
     /**************************************************************************/
 
     {
-    	yodel_buffer_t buffer = { 0 };
-    	yodel_header_t data[2] = { 0 };
-    	yodel_header_t * hp = (yodel_header_t *)0;
-    	unsigned char * bp = (unsigned char *)0;
+    	yodel_header_t headers[2];
 
     	assert(sizeof(yodel_header_t) == (YODEL_UBX_UNSUMMED + YODEL_UBX_SUMMED));
-    	assert(sizeof(data) == (2 * sizeof(yodel_header_t)));
 
-    	bp = (unsigned char *)&buffer;
+    	assert(sizeof(headers) == (2 * sizeof(yodel_header_t)));
+    }
 
-    	bp[YODEL_UBX_SYNC_1] = YODEL_STIMULUS_SYNC_1;
-    	bp[YODEL_UBX_SYNC_2] = YODEL_STIMULUS_SYNC_2;
-        bp[YODEL_UBX_CLASS] = 0xaa;
-    	bp[YODEL_UBX_ID] = 0x55;
-    	bp[YODEL_UBX_LENGTH_LSB] = 0xa5;
-    	bp[YODEL_UBX_LENGTH_MSB] = 0x5a;
+    /**************************************************************************/
 
-    	hp = (yodel_header_t *)&buffer;
+    {
+    	union {
+    		yodel_buffer_t buffer;
+    		yodel_header_t header;
+    	} packet;
 
-    	assert(hp->yodel_sync_1 == bp[YODEL_UBX_SYNC_1]);
-    	assert(hp->yodel_sync_2 == bp[YODEL_UBX_SYNC_2]);
-    	assert(hp->yodel_class == bp[YODEL_UBX_CLASS]);
-    	assert(hp->yodel_id == bp[YODEL_UBX_ID]);
-    	assert(le16toh(hp->yodel_length) == 0x5aa5);
+    	packet.buffer[YODEL_UBX_SYNC_1] = YODEL_STIMULUS_SYNC_1;
+    	packet.buffer[YODEL_UBX_SYNC_2] = YODEL_STIMULUS_SYNC_2;
+    	packet.buffer[YODEL_UBX_CLASS] = 0xaa;
+    	packet.buffer[YODEL_UBX_ID] = 0x55;
+    	packet.buffer[YODEL_UBX_LENGTH_LSB] = 0xa5;
+    	packet.buffer[YODEL_UBX_LENGTH_MSB] = 0x5a;
+
+    	assert(packet.header.yodel_sync_1 == packet.buffer[YODEL_UBX_SYNC_1]);
+    	assert(packet.header.yodel_sync_2 == packet.buffer[YODEL_UBX_SYNC_2]);
+    	assert(packet.header.yodel_class == packet.buffer[YODEL_UBX_CLASS]);
+    	assert(packet.header.yodel_id == packet.buffer[YODEL_UBX_ID]);
+    	assert(le16toh(packet.header.yodel_length) == 0x5aa5);
     }
 
     /**************************************************************************/
