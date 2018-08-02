@@ -285,8 +285,8 @@ position, horizontal, and vertical dilution of precision.
 
 The remaining lines are, for each satellite being received (which is often a
 superset of those that contributed to the current solution): its identifying
-number (for the GPS constellation this is the Pseudo-Random Noise code number),
-its elevation, azimuth, and signal/noise ratio, and the constellation of 
+number (for the GPS constellation this is its Pseudo-Random Noise code number),
+its elevation, azimuth, and signal/noise ratio, and the constellation of which
 it is a member.
 
     GSV [01] sat   2 elv 78 azm 254 snr 30dBHz con GPS
