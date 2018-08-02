@@ -50,6 +50,9 @@
 #include <pthread.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
+#include "com/diag/hazer/hazer_release.h"
+#include "com/diag/hazer/hazer_revision.h"
+#include "com/diag/hazer/hazer_vintage.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
@@ -476,7 +479,8 @@ int main(int argc, char * argv[])
     void * result = (void *)0;
     pthread_t thread;
     int pthreadrc = -1;
-    static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:b:cdehlmnop:rsv?";
+    FILE * fp = (FILE *)0;
+    static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:Vb:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -538,6 +542,9 @@ int main(int argc, char * argv[])
             diminuto_list_datainit(node, optarg);
             diminuto_list_enqueue(&head, node);
             break;
+        case 'V':
+        	fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+        	break;
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
             break;
@@ -570,8 +577,9 @@ int main(int argc, char * argv[])
             strobe = optarg;
             break;
         case 'r':
-            outfp = stderr;
-            errfp = stdout;
+        	fp = outfp;
+        	outfp = errfp;
+        	errfp = fp;
             break;
         case 's':
             xonxoff = !0;
@@ -580,35 +588,35 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]\n", program);
-            fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
-            fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
-            fprintf(stderr, "       -4          Use IPv4 for ADDRESS, PORT.\n");
-            fprintf(stderr, "       -6          Use IPv6 for ADDRESS, PORT.\n");
-            fprintf(stderr, "       -7          Use seven data bits for DEVICE.\n");
-            fprintf(stderr, "       -8          Use eight data bits for DEVICE.\n");
-            fprintf(stderr, "       -A ADDRESS  Send sentences to ADDRESS.\n");
-            fprintf(stderr, "       -D DEVICE   Use DEVICE.\n");
-            fprintf(stderr, "       -E          Like -R but use ANSI escape sequences.\n");
-            fprintf(stderr, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
-            fprintf(stderr, "       -L FILE     Log sentences to FILE.\n");
-            fprintf(stderr, "       -O          Output sentences to DEVICE.\n");
-            fprintf(stderr, "       -P PORT     Send to or receive from PORT.\n");
-            fprintf(stderr, "       -R          Print a report on standard output.\n");
-            fprintf(stderr, "       -W NMEA     Collapse escapes, generate and append suffix, and write to DEVICE.\n");
-            fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
-            fprintf(stderr, "       -c          Wait for DCD to be asserted (requires -D and implies -m).\n");
-            fprintf(stderr, "       -d          Display debug output on standard error.\n");
-            fprintf(stderr, "       -e          Use even parity for DEVICE.\n");
-            fprintf(stderr, "       -l          Use local control for DEVICE.\n");
-            fprintf(stderr, "       -m          Use modem control for DEVICE.\n");
-            fprintf(stderr, "       -o          Use odd parity for DEVICE.\n");
-            fprintf(stderr, "       -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).\n");
-            fprintf(stderr, "       -n          Use no parity for DEVICE.\n");
-            fprintf(stderr, "       -h          Use RTS/CTS for DEVICE.\n");
-            fprintf(stderr, "       -r          Reverse use of standard output and error.\n");
-            fprintf(stderr, "       -s          Use XON/XOFF for DEVICE.\n");
-            fprintf(stderr, "       -v          Display verbose output on standard error.\n");
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]\n", program);
+            fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
+            fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
+            fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
+            fprintf(errfp, "       -6          Use IPv6 for ADDRESS, PORT.\n");
+            fprintf(errfp, "       -7          Use seven data bits for DEVICE.\n");
+            fprintf(errfp, "       -8          Use eight data bits for DEVICE.\n");
+            fprintf(errfp, "       -A ADDRESS  Send sentences to ADDRESS.\n");
+            fprintf(errfp, "       -D DEVICE   Use DEVICE.\n");
+            fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
+            fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
+            fprintf(errfp, "       -L FILE     Log sentences to FILE.\n");
+            fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
+            fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
+            fprintf(errfp, "       -R          Print a report on standard output.\n");
+            fprintf(errfp, "       -W NMEA     Collapse escapes, generate and append suffix, and write to DEVICE.\n");
+            fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
+            fprintf(errfp, "       -c          Wait for DCD to be asserted (requires -D and implies -m).\n");
+            fprintf(errfp, "       -d          Display debug output on standard error.\n");
+            fprintf(errfp, "       -e          Use even parity for DEVICE.\n");
+            fprintf(errfp, "       -l          Use local control for DEVICE.\n");
+            fprintf(errfp, "       -m          Use modem control for DEVICE.\n");
+            fprintf(errfp, "       -o          Use odd parity for DEVICE.\n");
+            fprintf(errfp, "       -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).\n");
+            fprintf(errfp, "       -n          Use no parity for DEVICE.\n");
+            fprintf(errfp, "       -h          Use RTS/CTS for DEVICE.\n");
+            fprintf(errfp, "       -r          Reverse use of standard output and standard error.\n");
+            fprintf(errfp, "       -s          Use XON/XOFF for DEVICE.\n");
+            fprintf(errfp, "       -v          Display verbose output on standard error.\n");
             return 1;
             break;
         }
@@ -793,8 +801,8 @@ int main(int argc, char * argv[])
     } while (0);
 
     if (debug) {
-        hazer_debug(stderr);
-        yodel_debug(stderr);
+        hazer_debug(errfp);
+        yodel_debug(errfp);
     }
 
     /**
@@ -854,7 +862,7 @@ int main(int argc, char * argv[])
             	length = strlen(buffer) + 1;
                 size = diminuto_escape_collapse(buffer, buffer, length);
                 rc = (size < length) ? emit_packet(devfp, buffer, size - 1) : emit_sentence(devfp, buffer, size - 1);
-                if (rc < 0) { fprintf(stderr, "%s: ERR \"%s\"\n", program, buffer); }
+                if (rc < 0) { fprintf(errfp, "%s: ERR \"%s\"\n", program, buffer); }
                 if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
                 if (escape) { fputs("\033[2;1H\033[0J", outfp); }
                 if (report) { print_sentence(outfp, buffer, size - 1, LIMIT); }
@@ -884,7 +892,7 @@ int main(int argc, char * argv[])
                 if (nmea_state == HAZER_STATE_END) {
                 	break;
                 } else if  (nmea_state == HAZER_STATE_EOF) {
-                	fprintf(stderr, "%s: EOF\n", program);
+                	fprintf(errfp, "%s: EOF\n", program);
                     break;
                 } else {
                     /* Do nothing. */
@@ -893,7 +901,7 @@ int main(int argc, char * argv[])
                 if (ubx_state == YODEL_STATE_END) {
                 	break;
                 } else if  (ubx_state == YODEL_STATE_EOF) {
-                	fprintf(stderr, "%s: EOF\n", program);
+                	fprintf(errfp, "%s: EOF\n", program);
                 	break;
                 } else {
                     /* Do nothing. */
@@ -956,7 +964,7 @@ int main(int argc, char * argv[])
             assert(rc >= 0);
 
             if (nmea_ck != nmea_cs) {
-                fprintf(stderr, "%s: BAD 0x%02x 0x%02x\n", program, nmea_cs, nmea_ck);
+                fprintf(errfp, "%s: BAD 0x%02x 0x%02x\n", program, nmea_cs, nmea_ck);
                 continue;
             }
 
@@ -968,7 +976,7 @@ int main(int argc, char * argv[])
         	assert(bp != (unsigned char *)0);
 
         	if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
-                fprintf(stderr, "%s: BAD 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
+                fprintf(errfp, "%s: BAD 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
                 continue;
         	}
 
@@ -976,7 +984,7 @@ int main(int argc, char * argv[])
 
         } else {
 
-            fprintf(stderr, "%s: ERR %zd\n", program, length);
+            fprintf(errfp, "%s: ERR %zd\n", program, length);
         	continue;
 
         }
@@ -1095,7 +1103,7 @@ int main(int argc, char * argv[])
      ** FINIALIZATION
      **/
 
-    fprintf(stderr, "%s: END\n", program);
+    fprintf(errfp, "%s: END\n", program);
 
     rc = yodel_finalize();
     assert(rc >= 0);
