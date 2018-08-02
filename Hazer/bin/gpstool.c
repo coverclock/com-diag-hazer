@@ -151,7 +151,6 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
         diminuto_phex_emit(fp, *(bb++), ~(size_t)0, 0, 0, 0, &current, &end, 0);
         if (current > limit) { break; }
     }
-    fputc('\r', fp);
     fputc('\n', fp);
 
     fflush(fp);
