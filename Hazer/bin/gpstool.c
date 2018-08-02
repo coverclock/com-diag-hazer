@@ -13,7 +13,7 @@
  * packets from a GPS device or as datagrams from an IP UDP port, log the
  * data on standard error, write the data to a file, interpret the more
  * common NMEA sentences and display the results in a pretty way on standard
- * output using ANSI control sequences, and forward the data to an IP UDP port
+ * output using ANSI escape sequences, and forward the data to an IP UDP port
  * where perhaps it will be received by another gpstool. It has been used, for
  * example, to integrate a GPS device with a USB interface with the Google Earth
  * web application to create a moving map display, and to implement remote
