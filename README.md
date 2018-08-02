@@ -185,35 +185,36 @@ Optionally install Diminuto and Hazer in /usr/local.
 
     > gpstool -?
     
-    usage: gpstool [ -d ] [ -v ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]
-       -1          Use one stop bit for DEVICE.
-       -2          Use two stop bits for DEVICE.
-       -4          Use IPv4 for ADDRESS, PORT.
-       -6          Use IPv6 for ADDRESS, PORT.
-       -7          Use seven data bits for DEVICE.
-       -8          Use eight data bits for DEVICE.
-       -A ADDRESS  Send sentences to ADDRESS.
-       -D DEVICE   Use DEVICE.
-       -E          Like -R but use ANSI escape sequences.
-       -I PIN      Take 1PPS from GPIO input PIN (requires -D).
-       -L FILE     Log sentences to FILE.
-       -O          Output sentences to DEVICE.
-       -P PORT     Send to or receive from PORT.
-       -R          Print a report on standard output.
-       -W NMEA     Collapse escapes, generate and append suffix, and write to DEVICE.
-       -b BPS      Use BPS bits per second for DEVICE.
-       -c          Wait for DCD to be asserted (requires -D and implies -m).
-       -d          Display debug output on standard error.
-       -e          Use even parity for DEVICE.
-       -l          Use local control for DEVICE.
-       -m          Use modem control for DEVICE.
-       -o          Use odd parity for DEVICE.
-       -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).
-       -n          Use no parity for DEVICE.
-       -h          Use RTS/CTS for DEVICE.
-       -r          Reverse use of standard output and error.
-       -s          Use XON/XOFF for DEVICE.
-       -v          Display verbose output on standard error.
+    usage: gpstool [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]
+           -1          Use one stop bit for DEVICE.
+           -2          Use two stop bits for DEVICE.
+           -4          Use IPv4 for ADDRESS, PORT.
+           -6          Use IPv6 for ADDRESS, PORT.
+           -7          Use seven data bits for DEVICE.
+           -8          Use eight data bits for DEVICE.
+           -A ADDRESS  Send sentences to ADDRESS.
+           -D DEVICE   Use DEVICE.
+           -E          Like -R but use ANSI escape sequences.
+           -I PIN      Take 1PPS from GPIO input PIN (requires -D).
+           -L FILE     Log sentences to FILE.
+           -O          Output sentences to DEVICE.
+           -P PORT     Send to or receive from PORT.
+           -R          Print a report on standard output.
+           -W NMEA     Collapse escapes, generate and append suffix, and write to DEVICE.
+           -V          Print release, vintage, and revision on standard output.
+           -b BPS      Use BPS bits per second for DEVICE.
+           -c          Wait for DCD to be asserted (requires -D and implies -m).
+           -d          Display debug output on standard error.
+           -e          Use even parity for DEVICE.
+           -l          Use local control for DEVICE.
+           -m          Use modem control for DEVICE.
+           -o          Use odd parity for DEVICE.
+           -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).
+           -n          Use no parity for DEVICE.
+           -h          Use RTS/CTS for DEVICE.
+           -r          Reverse use of standard output and standard error.
+           -s          Use XON/XOFF for DEVICE.
+           -v          Display verbose output on standard error.
 
 # Dependencies
 
