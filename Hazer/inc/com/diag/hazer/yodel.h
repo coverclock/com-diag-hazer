@@ -125,7 +125,10 @@ typedef enum YodelAction {
 /**
  * This buffer is large enough to contain the largest UBX packet,
  * plus a trailing NUL (and then some), aligned so that we can lay
- * a UBX structure on top of it.
+ * a UBX structure on top of it. (My experience decoding binary UBX
+ * packets in hex dumps suggests that - remarkabably - the eight byte
+ * fields, e.g. floating point numbers, are typically half-word aligned,
+ * not double-word aligned.)
  */
 typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (8))); /* plus NUL */
 
