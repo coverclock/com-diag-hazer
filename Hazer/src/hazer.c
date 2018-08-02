@@ -40,7 +40,13 @@ const char * HAZER_TALKER_NAME[] = {
     "GNSS",				/* [HAZER_TALKER_GNSS] */
     "RADIO",			/* [HAZER_TALKER_RADIO] */
 	"PUBX",				/* [HAZER_TALKER_PUBX] */
-	"UBX",				/* [HAZER_TALKER_UBX] */
+	"LORANC",			/* [HAZER_TALKER_LORANC] */
+	"II",				/* [HAZER_TALKER_II] */
+	"IN",				/* [HAZER_TALKER_IN] */
+	"DSC",				/* [HAZER_TALKER_DSC] */
+	"BEIDOU",			/* [HAZER_TALKER_BEIDOU] */
+	"BEIDOU",			/* [HAZER_TALKER_BEIDOU2] */
+	"QZSS",		    	/* [HAZER_TALKER_QZSS] */
 	"N/A",				/* [HAZER_TALKER_TOTAL] */
 	(const char *)0,
 };
@@ -50,6 +56,8 @@ const char * HAZER_SYSTEM_NAME[] = {
     "GLONASS",			/* [HAZER_SYSTEM_GLONASS] */
     "GALILEO",			/* [HAZER_SYSTEM_GALILEO] */
     "GNSS",				/* [HAZER_SYSTEM_GNSS] */
+    "BEIDOU",			/* [HAZER_SYSTEM_BEIDOU] */
+    "QZSS",				/* [HAZER_SYSTEM_QZSS] */
 	"N/A",				/* [HAZER_SYSTEM_TOTAL] */
 	(const char *)0,
 };
@@ -840,6 +848,18 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
         talker = HAZER_TALKER_RADIO;
     } else if (strncmp(id, HAZER_PROPRIETARY_GPS_PUBX, sizeof(HAZER_PROPRIETARY_GPS_PUBX) - 1) == 0) {
         talker = HAZER_TALKER_PUBX;
+    } else if (strncmp(id, HAZER_NMEA_TALKER_LORANC, sizeof(HAZER_NMEA_TALKER_LORANC) - 1) == 0) {
+        talker = HAZER_TALKER_LORANC;
+    } else if (strncmp(id, HAZER_NMEA_TALKER_INSTRUMENTATION, sizeof(HAZER_NMEA_TALKER_INSTRUMENTATION) - 1) == 0) {
+        talker = HAZER_TALKER_INSTRUMENTATION;
+    } else if (strncmp(id, HAZER_NMEA_TALKER_NAVIGATION, sizeof(HAZER_NMEA_TALKER_NAVIGATION) - 1) == 0) {
+        talker = HAZER_TALKER_NAVIGATION;
+    } else if (strncmp(id, HAZER_NMEA_TALKER_DSC, sizeof(HAZER_NMEA_TALKER_DSC) - 1) == 0) {
+        talker = HAZER_TALKER_DSC;
+    } else if (strncmp(id, HAZER_NMEA_TALKER_BEIDOU, sizeof(HAZER_NMEA_TALKER_BEIDOU) - 1) == 0) {
+        talker = HAZER_TALKER_BEIDOU;
+    } else if (strncmp(id, HAZER_NMEA_TALKER_QZSS, sizeof(HAZER_NMEA_TALKER_QZSS) - 1) == 0) {
+        talker = HAZER_TALKER_QZSS;
     } else {
         /* Do nothing. */
     }
@@ -867,6 +887,14 @@ hazer_system_t hazer_parse_system(hazer_talker_t talker)
 
 	case HAZER_TALKER_GNSS:
 		system = HAZER_TALKER_GNSS;
+		break;
+
+	case HAZER_TALKER_BEIDOU:
+		system = HAZER_SYSTEM_BEIDOU;
+		break;
+
+	case HAZER_TALKER_QZSS:
+		system = HAZER_SYSTEM_QZSS;
 		break;
 
 	default:

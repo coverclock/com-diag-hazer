@@ -202,6 +202,13 @@ typedef enum HazerTalker {
     HAZER_TALKER_GNSS,
     HAZER_TALKER_RADIO,
 	HAZER_TALKER_PUBX,
+	HAZER_TALKER_LORANC,
+	HAZER_TALKER_INSTRUMENTATION,
+	HAZER_TALKER_NAVIGATION,
+	HAZER_TALKER_DSC,
+	HAZER_TALKER_BEIDOU,
+	HAZER_TALKER_BEIDOU2,
+	HAZER_TALKER_QZSS,
     HAZER_TALKER_TOTAL,
 } hazer_talker_t;
 
@@ -218,6 +225,8 @@ typedef enum HazerSystem {
     HAZER_SYSTEM_GLONASS,
     HAZER_SYSTEM_GALILEO,
     HAZER_SYSTEM_GNSS,
+	HAZER_SYSTEM_BEIDOU,
+	HAZER_SYSTEM_QZSS,
     HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 
@@ -423,10 +432,34 @@ extern double hazer_parse_num(const char * string);
  ******************************************************************************/
 
 /**
+ * @define HAZER_NMEA_TALKER_BEIDOU2
+ * Raymond, Table 1
+ */
+#define HAZER_NMEA_TALKER_BEIDOU2 "BD"
+
+/**
+ * @define HAZER_NMEA_TALKER_DSC
+ * Raymond, Table 1
+ */
+#define HAZER_NMEA_TALKER_DSC "DSC"
+
+/**
+ * @define HAZER_NMEA_TALKER_ECDIS
+ * Raymond, Table 1
+ */
+#define HAZER_NMEA_TALKER_ECDIS "EC"
+
+/**
  * @def HAZER_NMEA_TALKER_GALILEO
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
 #define HAZER_NMEA_TALKER_GALILEO "GA"
+
+/**
+ * @define HAZER_NMEA_TALKER_BEIDOU
+ * Raymond, Table 1
+ */
+#define HAZER_NMEA_TALKER_BEIDOU "GB"
 
 /**
  * @def HAZER_NMEA_TALKER_GLONASS
@@ -445,6 +478,30 @@ extern double hazer_parse_num(const char * string);
  * NMEA 0183 4.10, 6.1.4, Table 6
  */
 #define HAZER_NMEA_TALKER_GPS "GP"
+
+/**
+ * @define HAZER_NMEA_TALKER_INSTRUMENTATION
+ * Raymond, Table 1
+ */
+#define HAZER_NMEA_TALKER_INSTRUMENTATION "II"
+
+/**
+ * @define HAZER_NMEA_TALKER_NAVIGATION
+ * Raymond, Table 1
+ */
+#define HAZER_NMEA_TALKER_NAVIGATION "IN"
+
+/**
+ * @define HAZER_NMEA_TALKER_LORANC
+ * Raymond, Table 1
+ */
+#define HAZER_NMEA_TALKER_LORANC "LC"
+
+/**
+ * @define HAZER_NMEA_TALKER_QZSS
+ * Raymond, Table 1
+ */
+#define HAZER_NMEA_TALKER_QZSS "QZ"
 
 /**
  * @def HAZER_NMEA_TALKER_RADIO
