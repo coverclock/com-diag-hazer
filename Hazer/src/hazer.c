@@ -411,23 +411,26 @@ ssize_t hazer_length(const void * buffer, size_t size)
 ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size)
 {
     char ** vv = vector;
+    char ** tt = (char **)0;
     char * bb = (char *)buffer;
 
     if (count > 1) {
+    	tt = vv;
         *(vv++) = bb;
         --count;
         while ((size--) > 0) {
             if (*bb == ',') {
                 *(bb++) = '\0';
-                DEBUG("TOK \"%s\".\n", *vv);
+                DEBUG("TOK \"%s\".\n", *tt);
                 if (count <= 1) {
                     break;
                 }
+                tt = vv;
                 *(vv++) = bb;
                 --count;
             } else if (*bb == '*') {
                 *(bb++) = '\0';
-                DEBUG("TOK \"%s\".\n", *vv);
+                DEBUG("TOK \"%s\".\n", *tt);
                 break;
             } else {
                 ++bb;
@@ -436,8 +439,9 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     }
 
     if (count > 0) {
+    	tt = vv;
         *(vv++) = (char *)0;
-        DEBUG("TOK 0x0.\n");
+        DEBUG("TOK %p.\n", *tt);
         --count;
     }
 
@@ -464,10 +468,10 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
         }
         if (count > 2) {
             *(bb++) = HAZER_STIMULUS_DELIMITER;
-            DEBUG("CHR \"%c\".\n", HAZER_STIMULUS_DELIMITER);
+            DEBUG("CHR '%c'.\n", HAZER_STIMULUS_DELIMITER);
         } else {
             *(bb++) = HAZER_STIMULUS_CHECKSUM;
-            DEBUG("CHR \"%c\".\n", HAZER_STIMULUS_CHECKSUM);
+            DEBUG("CHR '%c'.\n", HAZER_STIMULUS_CHECKSUM);
         }
         --count;
         --size;
@@ -476,7 +480,7 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
 
     if (size > 0) {
         *(bb++) = '\0';
-        DEBUG("CHR 0x0.\n");
+        DEBUG("CHR '\\0'.\n");
         --size;
     }
 
