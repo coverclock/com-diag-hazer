@@ -1025,7 +1025,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     return rc;
 }
 
-int hazer_parse_gsa(hazer_solution_t * solutionp, char * vector[], size_t count)
+int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 {
     int rc = -1;
     static const char GSA[] = HAZER_NMEA_GPS_MESSAGE_GSA;
@@ -1033,7 +1033,7 @@ int hazer_parse_gsa(hazer_solution_t * solutionp, char * vector[], size_t count)
     int slot = 0;
     int id = 0;
     int satellites = 0;
-    static const int ACTIVES = sizeof(solutionp->id) / sizeof(solutionp->id[0]);
+    static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
 
     if (count < 1) {
         /* Do nothing. */
@@ -1048,16 +1048,16 @@ int hazer_parse_gsa(hazer_solution_t * solutionp, char * vector[], size_t count)
     } else if (*vector[2] == '1') {
         /* Do nothing. */
     } else {
-        for (slot = 0; slot < ACTIVES; ++slot) {
+        for (slot = 0; slot < IDENTIFIERS; ++slot) {
             id = strtol(vector[index++], (char **)0, 10);
             if (id <= 0) { break; }
-            solutionp->id[slot] = id;
+            activep->id[slot] = id;
             ++satellites;
         }
-        solutionp->active = satellites;
-        solutionp->pdop = hazer_parse_num(vector[15]);
-        solutionp->hdop = hazer_parse_num(vector[16]);
-        solutionp->vdop = hazer_parse_num(vector[17]);
+        activep->active = satellites;
+        activep->pdop = hazer_parse_num(vector[15]);
+        activep->hdop = hazer_parse_num(vector[16]);
+        activep->vdop = hazer_parse_num(vector[17]);
         rc = 0;
     }
 

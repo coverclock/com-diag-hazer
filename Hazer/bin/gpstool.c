@@ -160,39 +160,39 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
     fflush(fp);
 }
 
-static void print_active(FILE * fp, const char * name, const hazer_solution_t * sp)
+static void print_active(FILE * fp, const char * name, const hazer_active_t * ap)
 {
-    static const unsigned int SATELLITES = sizeof(sp->id) / sizeof(sp->id[0]);
+    static const unsigned int SATELLITES = sizeof(ap->id) / sizeof(ap->id[0]);
     int satellite = 0;
     int limit = 0;
 
-    limit = sp->active;
+    limit = ap->active;
     if (limit > SATELLITES) { limit = SATELLITES; }
 
     fprintf(fp, "%s {", name);
     for (satellite = 0; satellite < limit; ++satellite) {
-        if (sp->id[satellite] != 0) {
-            fprintf(fp, " %3u", sp->id[satellite]);
+        if (ap->id[satellite] != 0) {
+            fprintf(fp, " %3u", ap->id[satellite]);
         }
     }
-    fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", sp->active, sp->pdop, sp->hdop, sp->vdop);
+    fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", ap->active, ap->pdop, ap->hdop, ap->vdop);
 }
 
-static void print_view(FILE *fp, const char * name, const hazer_view_t cp[])
+static void print_view(FILE *fp, const char * name, const hazer_view_t vp[])
 {
-    static const int MAXIMUM = sizeof(cp[0].sat) / sizeof(cp[0].sat[0]);
+    static const int SATELLITES = sizeof(vp[0].sat) / sizeof(vp[0].sat[0]);
     int channel = 0;
-    int constellation = 0;
+    int system = 0;
     int satellite = 0;
     int limit = 0;
 
-    for (constellation = 0; constellation < HAZER_TALKER_TOTAL; ++constellation) {
-        limit = cp[constellation].channels;
-        if (limit > cp[constellation].view) { limit = cp[constellation].view; }
-        if (limit > MAXIMUM) { limit = MAXIMUM; }
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        limit = vp[system].channels;
+        if (limit > vp[system].view) { limit = vp[system].view; }
+        if (limit > SATELLITES) { limit = SATELLITES; }
         for (satellite = 0; satellite < limit; ++satellite) {
-            if (cp[constellation].sat[satellite].id != 0) {
-                fprintf(fp, "%s [%02d] sat %3u elv %2u azm %3u snr %2udBHz con %s\n", name, ++channel, cp[constellation].sat[satellite].id, cp[constellation].sat[satellite].elv_degrees, cp[constellation].sat[satellite].azm_degrees, cp[constellation].sat[satellite].snr_dbhz, HAZER_TALKER_NAME[constellation]);
+            if (vp[system].sat[satellite].id != 0) {
+                fprintf(fp, "%s [%02d] sat %3u elv %2u azm %3u snr %2udBHz con %s\n", name, ++channel, vp[system].sat[satellite].id, vp[system].sat[satellite].elv_degrees, vp[system].sat[satellite].azm_degrees, vp[system].sat[satellite].snr_dbhz, HAZER_SYSTEM_NAME[system]);
             }
         }
     }
@@ -257,7 +257,7 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     fputc('\n', fp);
 }
 
-static void print_datum(FILE * fp, const char * name, const hazer_position_t * pp)
+static void print_solution(FILE * fp, const char * name, const hazer_position_t * pp)
 {
     double decimal = 0.0;
 
@@ -419,9 +419,9 @@ int main(int argc, char * argv[])
 	unsigned char * bp = (char *)0;
     hazer_buffer_t datagram = { 0 };
     hazer_vector_t vector = { 0 };
-    hazer_position_t position = { 0 };
-    hazer_solution_t solution = { 0 };
-    hazer_view_t view[HAZER_TALKER_TOTAL] = { { 0 } };
+    hazer_position_t position[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    hazer_active_t solution[HAZER_SYSTEM_TOTAL] = { 0 };
+    hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0 } };
     FILE * infp = stdin;
     FILE * outfp = stdout;
     FILE * errfp = stderr;
@@ -1046,32 +1046,36 @@ int main(int argc, char * argv[])
 			assert(strncmp(datagram, buffer, size));
 
 			if (count < 1) {
-				/* Do nothing. */
+				continue;
 			} else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
-				/* Do nothing. */
+				continue;
 			} else if ((system = hazer_parse_system(talker)) >= HAZER_SYSTEM_TOTAL) {
+				continue;
+			} else {
 				/* Do nothing. */
-			} else if (hazer_parse_gga(&position, vector, count) == 0) {
+			}
+
+			if (hazer_parse_gga(&position[system], vector, count) == 0) {
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, "MAP",  &position, tmppps); }
+				if (report) { print_position(outfp, "MAP",  &position[system], tmppps); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_datum(outfp, "GGA",  &position); }
-			} else if (hazer_parse_rmc(&position, vector, count) == 0) {
+				if (report) { print_solution(outfp, "GGA",  &position[system]); }
+			} else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, "MAP", &position, tmppps); }
+				if (report) { print_position(outfp, "MAP", &position[system], tmppps); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_datum(outfp, "RMC",  &position); }
-			} else if (hazer_parse_gsa(&solution, vector, count) == 0) {
+				if (report) { print_solution(outfp, "RMC",  &position[system]); }
+			} else if (hazer_parse_gsa(&solution[system], vector, count) == 0) {
 				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-				if (report) { print_active(outfp, "GSA", &solution); }
+				if (report) { print_active(outfp, "GSA", &solution[system]); }
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 				if (escape) { fputs("\033[6;1H\033[0J", outfp); }
 				if (report) { print_view(outfp, "GSV", view); }
@@ -1081,12 +1085,12 @@ int main(int argc, char * argv[])
 
 			if (report) { fflush(outfp); }
 
-			assert(position.tot_nanoseconds >= nanoseconds);
-			nanoseconds = position.tot_nanoseconds;
+			assert(position[system].tot_nanoseconds >= nanoseconds);
+			nanoseconds = position[system].tot_nanoseconds;
 
 			if (!output) {
 				/* Do nothing. */
-			} else if (position.dmy_nanoseconds == 0) {
+			} else if (position[system].dmy_nanoseconds == 0) {
 				/* Do nothing (confuses Google Earth). */
 			} else {
 				fputs(datagram, devfp);

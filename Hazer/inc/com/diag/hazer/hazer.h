@@ -640,23 +640,23 @@ extern int hazer_parse_rmc(hazer_position_t *positionp, char * vector[], size_t 
  * constellation that were used in the position solution. THIS OBJECT
  * SHOULD BE INITIALIZED TO ALL ZEROS.
  */
-typedef struct HazerSolution {
+typedef struct HazerActive {
     double pdop;                /* Position Dilution Of Precision. */
-    double hdop;                /* Horizontal Dilution Of Precisioin. */
-    double vdop;                /* Vertical Diilution Of Precisioin. */
+    double hdop;                /* Horizontal Dilution Of Precision. */
+    double vdop;                /* Vertical Dilution Of Precision. */
     uint8_t active;             /* Number of satellites active. */
     uint8_t id[HAZER_GNSS_ACTIVES];  /* Satellites active. */
     uint8_t unused[3];          /* Unused. */
-} hazer_solution_t;
+} hazer_active_t;
 
 /**
  * Parse a GSA NMEA sentence, updating the constellation.
- * @param solutionp points to the solution structure (initialized to zeros).
+ * @param activep points to the active structure (initialized to zeros).
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
  */
-extern int hazer_parse_gsa(hazer_solution_t * solutionp, char * vector[], size_t count);
+extern int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count);
 
 /**
  * This structure maintains the elevation, azimuth, and signal strength of a
