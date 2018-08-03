@@ -1153,12 +1153,6 @@ int main(int argc, char * argv[])
 			assert(vector[count - 1] == (char *)0);
 			assert(count <= (sizeof(vector) / sizeof(vector[0])));
 
-			/*
-			 * This next part is mostly done just to functionally test the API
-			 * by demonstrating reversability by regenerating the original
-			 * sentence.
-			 */
-
 			size = hazer_serialize(datagram, sizeof(datagram), vector, count);
 			assert(size <= (sizeof(datagram) - 4));
 			assert(datagram[size - 1] == '\0');
@@ -1220,8 +1214,20 @@ int main(int argc, char * argv[])
 
 			if (report) { fflush(outfp); }
 
+			/*
+			 * Check that time is only running forwards. (I put this check
+			 * in for a reason.)
+			 */
+
 			assert(position[system].tot_nanoseconds >= nanoseconds);
 			nanoseconds = position[system].tot_nanoseconds;
+
+			/*
+			 * We only output NMEA sentences to a device, and even then
+			 * we output the regenerated sentence, not the original one.
+			 * Note that this can only be done if we got the original
+			 * sentence over the IP UDP port.
+			 */
 
 			if (!output) {
 				/* Do nothing. */
