@@ -17,7 +17,8 @@
  * where perhaps it will be received by another gpstool. It has been used, for
  * example, to integrate a GPS device with a USB interface with the Google Earth
  * web application to create a moving map display, and to implement remote
- * tracking of a moving vehicle.
+ * tracking of a moving vehicle by forwarding GPS output in UDP datagrams
+ * using an IPv6 connection over an LTE modem.
  *
  * EXAMPLES
  *
@@ -613,6 +614,7 @@ int main(int argc, char * argv[])
     int pthreadrc = -1;
     FILE * fp = (FILE *)0;
     int offset = 1;
+    int offsetb4 = 0;
     static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:Vb:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
@@ -1207,7 +1209,8 @@ int main(int argc, char * argv[])
 				active = select_active(solution);
 				assert(active < HAZER_SYSTEM_TOTAL);
 				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-				if (report) { offset = print_actives(outfp, "GSA", solution); }
+				if (report) { offsetb4 = offset; offset = print_actives(outfp, "GSA", solution); }
+				if (escape) { if (offset != offsetb4) { fprintf(outfp, "\033[%d;1H\033[0J", 5 + offset); } }
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 				if (escape) { fprintf(outfp, "\033[%d;1H\033[0J", 5 + offset); }
 				if (report) { print_views(outfp, "GSV", view); }
