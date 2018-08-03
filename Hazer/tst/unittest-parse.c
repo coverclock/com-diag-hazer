@@ -33,59 +33,29 @@ int main(void)
 
     /**************************************************************************/
 
-    string = "$" "GN";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_GNSS);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_GNSS);
+#define UNITTEST_PARSE_TALKER_SYSTEM(_STRING_, _TALKER_, _SYSTEM_) \
+	{ \
+	    string = "$" _STRING_; \
+	    talker = hazer_parse_talker(string); \
+	    assert(talker == _TALKER_); \
+	    system = hazer_parse_system(talker); \
+	    assert(system == _SYSTEM_); \
+	    assert((_TALKER_ == HAZER_TALKER_TOTAL) || (strcmp(_STRING_, HAZER_TALKER_NAME[_TALKER_]) == 0)); \
+	}
 
-    string = "$" "GP";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_GPS);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_GPS);
-
-    string = "$" "GL";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_GLONASS);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_GLONASS);
-
-    string = "$" "GA";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_GALILEO);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_GALILEO);
-
-    string = "$" "ZV";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_RADIO);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_TOTAL);
-
-    string = "$" "PUBX";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_PUBX);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_TOTAL);
-
-    string = "$??";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_TOTAL);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_TOTAL);
-
-    string = "???";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_TOTAL);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_TOTAL);
-
-    string = "";
-    talker = hazer_parse_talker(string);
-    assert(talker == HAZER_TALKER_TOTAL);
-    system = hazer_parse_system(talker);
-    assert(system == HAZER_SYSTEM_TOTAL);
+    UNITTEST_PARSE_TALKER_SYSTEM("GN", HAZER_TALKER_GNSS, HAZER_SYSTEM_GNSS);
+    UNITTEST_PARSE_TALKER_SYSTEM("GP", HAZER_TALKER_GPS, HAZER_SYSTEM_GPS);
+    UNITTEST_PARSE_TALKER_SYSTEM("GL", HAZER_TALKER_GLONASS, HAZER_SYSTEM_GLONASS);
+    UNITTEST_PARSE_TALKER_SYSTEM("GA", HAZER_TALKER_GALILEO, HAZER_SYSTEM_GALILEO);
+    UNITTEST_PARSE_TALKER_SYSTEM("ZV", HAZER_TALKER_RADIO, HAZER_SYSTEM_TOTAL);
+    UNITTEST_PARSE_TALKER_SYSTEM("GB", HAZER_TALKER_BEIDOU1, HAZER_SYSTEM_BEIDOU);
+    UNITTEST_PARSE_TALKER_SYSTEM("BD", HAZER_TALKER_BEIDOU2, HAZER_SYSTEM_BEIDOU);
+    UNITTEST_PARSE_TALKER_SYSTEM("CD", HAZER_TALKER_DSC, HAZER_SYSTEM_TOTAL);
+    UNITTEST_PARSE_TALKER_SYSTEM("EC", HAZER_TALKER_ECDIS, HAZER_SYSTEM_TOTAL);
+    UNITTEST_PARSE_TALKER_SYSTEM("PUBX", HAZER_TALKER_PUBX, HAZER_SYSTEM_TOTAL);
+    UNITTEST_PARSE_TALKER_SYSTEM("??", HAZER_TALKER_TOTAL, HAZER_SYSTEM_TOTAL);
+    UNITTEST_PARSE_TALKER_SYSTEM("???", HAZER_TALKER_TOTAL, HAZER_SYSTEM_TOTAL);
+    UNITTEST_PARSE_TALKER_SYSTEM("", HAZER_TALKER_TOTAL, HAZER_SYSTEM_TOTAL);
 
     /**************************************************************************/
 

@@ -23,6 +23,14 @@
 
 static FILE * debug  = (FILE *)0;
 
+const char * HAZER_TALKER_NAME[] = HAZER_TALKER_NAME_INITIALIZER;
+
+const char * HAZER_SYSTEM_NAME[] = HAZER_SYSTEM_NAME_INITIALIZER;
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 FILE * hazer_debug(FILE * now)
 {
     FILE * was;
@@ -32,35 +40,6 @@ FILE * hazer_debug(FILE * now)
 
     return was;
 }
-
-const char * HAZER_TALKER_NAME[] = {
-    "GPS",				/* [HAZER_TALKER_GPS] */
-    "GLONASS",			/* [HAZER_TALKER_GLONASS] */
-    "GALILEO",			/* [HAZER_TALKER_GALILEO] */
-    "GNSS",				/* [HAZER_TALKER_GNSS] */
-    "RADIO",			/* [HAZER_TALKER_RADIO] */
-	"PUBX",				/* [HAZER_TALKER_PUBX] */
-	"LORANC",			/* [HAZER_TALKER_LORANC] */
-	"II",				/* [HAZER_TALKER_II] */
-	"IN",				/* [HAZER_TALKER_IN] */
-	"DSC",				/* [HAZER_TALKER_DSC] */
-	"BEIDOU",			/* [HAZER_TALKER_BEIDOU] */
-	"BEIDOU",			/* [HAZER_TALKER_BEIDOU2] */
-	"QZSS",		    	/* [HAZER_TALKER_QZSS] */
-	"N/A",				/* [HAZER_TALKER_TOTAL] */
-	(const char *)0,
-};
-
-const char * HAZER_SYSTEM_NAME[] = {
-    "GPS",				/* [HAZER_SYSTEM_GPS] */
-    "GLONASS",			/* [HAZER_SYSTEM_GLONASS] */
-    "GALILEO",			/* [HAZER_SYSTEM_GALILEO] */
-    "GNSS",				/* [HAZER_SYSTEM_GNSS] */
-    "BEIDOU",			/* [HAZER_SYSTEM_BEIDOU] */
-    "QZSS",				/* [HAZER_SYSTEM_QZSS] */
-	"N/A",				/* [HAZER_SYSTEM_TOTAL] */
-	(const char *)0,
-};
 
 /******************************************************************************
  *
@@ -828,6 +807,9 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
 	const char * sentence = (const char *)0;
     const char * id = (const char *)0;
+    const char * name = (const char *)0;
+    int ii = 0;
+    int rc = -1;
 
 	sentence = (const char *)buffer;
     id = &(sentence[1]);
@@ -836,32 +818,20 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
         /* Do nothing. */
     } else if (strnlen(sentence, sizeof("$XX")) < (sizeof("$XX") - 1)) {
         /* Do nothing. */
-    } else if (strncmp(id, HAZER_NMEA_TALKER_GNSS, sizeof(HAZER_NMEA_TALKER_GNSS) - 1) == 0) {
-        talker = HAZER_TALKER_GNSS;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_GPS, sizeof(HAZER_NMEA_TALKER_GPS) - 1) == 0) {
-        talker = HAZER_TALKER_GPS;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_GLONASS, sizeof(HAZER_NMEA_TALKER_GLONASS) - 1) == 0) {
-        talker = HAZER_TALKER_GLONASS;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_GALILEO, sizeof(HAZER_NMEA_TALKER_GALILEO) - 1) == 0) {
-        talker = HAZER_TALKER_GALILEO;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_RADIO, sizeof(HAZER_NMEA_TALKER_RADIO) - 1) == 0) {
-        talker = HAZER_TALKER_RADIO;
-    } else if (strncmp(id, HAZER_PROPRIETARY_GPS_PUBX, sizeof(HAZER_PROPRIETARY_GPS_PUBX) - 1) == 0) {
-        talker = HAZER_TALKER_PUBX;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_LORANC, sizeof(HAZER_NMEA_TALKER_LORANC) - 1) == 0) {
-        talker = HAZER_TALKER_LORANC;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_INSTRUMENTATION, sizeof(HAZER_NMEA_TALKER_INSTRUMENTATION) - 1) == 0) {
-        talker = HAZER_TALKER_INSTRUMENTATION;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_NAVIGATION, sizeof(HAZER_NMEA_TALKER_NAVIGATION) - 1) == 0) {
-        talker = HAZER_TALKER_NAVIGATION;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_DSC, sizeof(HAZER_NMEA_TALKER_DSC) - 1) == 0) {
-        talker = HAZER_TALKER_DSC;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_BEIDOU, sizeof(HAZER_NMEA_TALKER_BEIDOU) - 1) == 0) {
-        talker = HAZER_TALKER_BEIDOU;
-    } else if (strncmp(id, HAZER_NMEA_TALKER_QZSS, sizeof(HAZER_NMEA_TALKER_QZSS) - 1) == 0) {
-        talker = HAZER_TALKER_QZSS;
     } else {
-        /* Do nothing. */
+    	for (ii = 0; ii < HAZER_TALKER_TOTAL; ++ii) {
+    		name = HAZER_TALKER_NAME[ii];
+    		rc = strncmp(id, name, strlen(name));
+    		if (rc < 0) {
+    			break;
+    		} else if (rc == 0) {
+    			talker = (hazer_talker_t)ii;
+    			break;
+    		} else {
+    			/* Do nothing. */
+    		}
+    	}
+
     }
 
     return talker;
@@ -882,14 +852,18 @@ hazer_system_t hazer_parse_system(hazer_talker_t talker)
 		break;
 
 	case HAZER_TALKER_GALILEO:
-		system = HAZER_TALKER_GALILEO;
+		system = HAZER_SYSTEM_GALILEO;
 		break;
 
 	case HAZER_TALKER_GNSS:
-		system = HAZER_TALKER_GNSS;
+		system = HAZER_SYSTEM_GNSS;
 		break;
 
-	case HAZER_TALKER_BEIDOU:
+	case HAZER_TALKER_BEIDOU1:
+		system = HAZER_SYSTEM_BEIDOU;
+		break;
+
+	case HAZER_TALKER_BEIDOU2:
 		system = HAZER_SYSTEM_BEIDOU;
 		break;
 
@@ -910,7 +884,7 @@ hazer_system_t hazer_parse_system(hazer_talker_t talker)
  *
  ******************************************************************************/
 
-int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
+int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     static const char GGA[] = HAZER_NMEA_GPS_MESSAGE_GGA;
@@ -931,14 +905,14 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
         /* Do nothing. */
     } else {
         utc_nanoseconds = hazer_parse_utc(vector[1]);
-        tot_nanoseconds = utc_nanoseconds + datap->dmy_nanoseconds;
-        if (tot_nanoseconds >= datap->tot_nanoseconds) {
-            datap->tot_nanoseconds = tot_nanoseconds;
-            datap->utc_nanoseconds = utc_nanoseconds;
-            datap->lat_nanodegrees = hazer_parse_latlon(vector[2], *(vector[3]), &datap->lat_digits);
-            datap->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &datap->lon_digits);
-            datap->sat_used = strtol(vector[7], (char **)0, 10);
-            datap->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &datap->alt_digits);
+        tot_nanoseconds = utc_nanoseconds + positionp->dmy_nanoseconds;
+        if (tot_nanoseconds >= positionp->tot_nanoseconds) {
+            positionp->tot_nanoseconds = tot_nanoseconds;
+            positionp->utc_nanoseconds = utc_nanoseconds;
+            positionp->lat_nanodegrees = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits);
+            positionp->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
+            positionp->sat_used = strtol(vector[7], (char **)0, 10);
+            positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits);
             rc = 0;
         } else {
             DEBUG("TIME?\n");
@@ -948,7 +922,7 @@ int hazer_parse_gga(hazer_position_t * datap, char * vector[], size_t count)
     return rc;
 }
 
-int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
+int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     static const char RMC[] = HAZER_NMEA_GPS_MESSAGE_RMC;
@@ -972,14 +946,14 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
         utc_nanoseconds = hazer_parse_utc(vector[1]);
         dmy_nanoseconds = hazer_parse_dmy(vector[9]);
         tot_nanoseconds = utc_nanoseconds + dmy_nanoseconds;
-        if (tot_nanoseconds >= datap->tot_nanoseconds) {
-            datap->tot_nanoseconds = tot_nanoseconds;
-            datap->utc_nanoseconds = utc_nanoseconds;
-            datap->dmy_nanoseconds = dmy_nanoseconds;
-            datap->lat_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &datap->lat_digits);
-            datap->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &datap->lon_digits);
-            datap->sog_microknots = hazer_parse_sog(vector[7], &datap->sog_digits);
-            datap->cog_nanodegrees = hazer_parse_cog(vector[8], &datap->cog_digits);
+        if (tot_nanoseconds >= positionp->tot_nanoseconds) {
+            positionp->tot_nanoseconds = tot_nanoseconds;
+            positionp->utc_nanoseconds = utc_nanoseconds;
+            positionp->dmy_nanoseconds = dmy_nanoseconds;
+            positionp->lat_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
+            positionp->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
+            positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits);
+            positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits);
             rc = 0;
         } else {
             DEBUG("TIME?\n");
@@ -989,7 +963,7 @@ int hazer_parse_rmc(hazer_position_t * datap, char * vector[], size_t count)
     return rc;
 }
 
-int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count)
+int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 {
     int rc = -1;
     static const char GSV[] = HAZER_NMEA_GPS_MESSAGE_GSV;
@@ -1000,8 +974,8 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
     int slot = 0;
     int channel = 0;
     int satellites = 0;
-    int limit = sizeof(datap->sat) / sizeof(datap->sat[0]);
     unsigned int id = 0;
+    static const int SATELLITES = sizeof(viewp->sat) / sizeof(viewp->sat[0]);
     
     if (count < 1) {
         /* Do nothing. */
@@ -1021,25 +995,26 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
         } else if (message > messages) {
             /* Do nothing. */
         } else {
-            channel = (message - 1) * HAZER_GPS_VIEWS;
-            satellites = strtol(vector[3], (char **)0, 10);
-            for (slot = 0; slot < HAZER_GPS_VIEWS; ++slot) {
-                if (channel >= satellites) { break; }
-                if (channel > limit) { break; }
-                id = strtol(vector[index++], (char **)0, 10);
-                if (id <= 0) { break; }
-                datap->sat[channel].id = id;
-                datap->sat[channel].elv_degrees = strtoul(vector[index++], (char **)0, 10);
-                datap->sat[channel].azm_degrees = strtoul(vector[index++], (char **)0, 10);
-                datap->sat[channel].snr_dbhz = strtoul(vector[index++], (char **)0, 10);
-                ++channel;
-                rc = 1;
-            }
-            datap->channels = channel;
-            datap->view = satellites;
+            channel = (message - 1) * HAZER_GNSS_VIEWS;
+			satellites = strtol(vector[3], (char **)0, 10);
+			for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
+				if (channel >= satellites) { break; }
+				if (channel >= SATELLITES) { break; }
+				id = strtol(vector[index++], (char **)0, 10);
+				if (id <= 0) { break; }
+				viewp->sat[channel].id = id;
+				viewp->sat[channel].elv_degrees = strtoul(vector[index++], (char **)0, 10);
+				viewp->sat[channel].azm_degrees = strtoul(vector[index++], (char **)0, 10);
+				viewp->sat[channel].snr_dbhz = strtoul(vector[index++], (char **)0, 10);
+				++channel;
+				rc = 1;
+			}
+			viewp->channels = channel;
+			viewp->view = satellites;
+			viewp->pending = messages - message;
             if (rc < 0) {
                 /* Do nothing. */
-            } else if (message < messages) {
+            } else if (viewp->pending > 0) {
                 /* Do nothing. */
             } else {
                 rc = 0;
@@ -1050,15 +1025,15 @@ int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count
     return rc;
 }
 
-int hazer_parse_gsa(hazer_solution_t * datap, char * vector[], size_t count)
+int hazer_parse_gsa(hazer_solution_t * solutionp, char * vector[], size_t count)
 {
     int rc = -1;
+    static const char GSA[] = HAZER_NMEA_GPS_MESSAGE_GSA;
     int index = 3;
     int slot = 0;
     int id = 0;
     int satellites = 0;
-    static const char GSA[] = HAZER_NMEA_GPS_MESSAGE_GSA;
-    int limit = sizeof(datap->id) / sizeof(datap->id[0]);
+    static const int ACTIVES = sizeof(solutionp->id) / sizeof(solutionp->id[0]);
 
     if (count < 1) {
         /* Do nothing. */
@@ -1073,16 +1048,16 @@ int hazer_parse_gsa(hazer_solution_t * datap, char * vector[], size_t count)
     } else if (*vector[2] == '1') {
         /* Do nothing. */
     } else {
-        for (slot = 0; slot < limit; ++slot) {
+        for (slot = 0; slot < ACTIVES; ++slot) {
             id = strtol(vector[index++], (char **)0, 10);
             if (id <= 0) { break; }
-            datap->id[slot] = id;
+            solutionp->id[slot] = id;
             ++satellites;
         }
-        datap->active = satellites;
-        datap->pdop = hazer_parse_num(vector[15]);
-        datap->hdop = hazer_parse_num(vector[16]);
-        datap->vdop = hazer_parse_num(vector[17]);
+        solutionp->active = satellites;
+        solutionp->pdop = hazer_parse_num(vector[15]);
+        solutionp->hdop = hazer_parse_num(vector[16]);
+        solutionp->vdop = hazer_parse_num(vector[17]);
         rc = 0;
     }
 

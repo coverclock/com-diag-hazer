@@ -100,6 +100,15 @@ extern int hazer_finalize(void);
  ******************************************************************************/
 
 /**
+ * NMEA 0183, 4.10, 5.3
+ */
+enum HazerGnss {
+    HAZER_GNSS_SATELLITES   = 32,	/* Per constellation or system. */
+    HAZER_GNSS_VIEWS        = 4,	/* Per NMEA GSV message. */
+    HAZER_GNSS_ACTIVES		= 12,	/* Per NMEA GSA message. */
+};
+
+/**
  * NMEA 0183 4.10, 5.3.3.1, Table 1
  *
  * SiRF NMEA, p. 2-2 has an example which appears to violate the
@@ -118,15 +127,6 @@ enum HazerNmea {
     HAZER_NMEA_TALKER      = sizeof("GP") - 1,
     HAZER_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
     HAZER_NMEA_ID          = sizeof("$GPGGAXX") - 1, /* Adjusted. */
-};
-
-/**
- * NMEA 0183, 4.10, 5.3
- */
-enum HazerGps {
-    HAZER_GPS_CHANNELS     = 48,
-    HAZER_GPS_VIEWS        = 4,
-    HAZER_GPS_SATELLITES   = 12,
 };
 
 /**
@@ -194,46 +194,85 @@ typedef enum HazerAction {
 
 /**
  * GNSS talkers.
+ * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerTalker {
-    HAZER_TALKER_GPS				= 0,
-    HAZER_TALKER_GLONASS,
+	HAZER_TALKER_BEIDOU2			= 0,
+	HAZER_TALKER_DSC,
+	HAZER_TALKER_ECDIS,
     HAZER_TALKER_GALILEO,
+	HAZER_TALKER_BEIDOU1,
+    HAZER_TALKER_GLONASS,
     HAZER_TALKER_GNSS,
-    HAZER_TALKER_RADIO,
-	HAZER_TALKER_PUBX,
-	HAZER_TALKER_LORANC,
+    HAZER_TALKER_GPS,
 	HAZER_TALKER_INSTRUMENTATION,
 	HAZER_TALKER_NAVIGATION,
-	HAZER_TALKER_DSC,
-	HAZER_TALKER_BEIDOU,
-	HAZER_TALKER_BEIDOU2,
+	HAZER_TALKER_LORANC,
+	HAZER_TALKER_PUBX,
 	HAZER_TALKER_QZSS,
+    HAZER_TALKER_RADIO,
     HAZER_TALKER_TOTAL,
 } hazer_talker_t;
 
 /**
+ * @define HAZER_TALKER_NAME_INITIALIZER
+ * Initialize the array of character strings that map from a Hazer talker
+ * enumerated value to the printable name of the talker. These strings must
+ * be in collating sequence order.
+ */
+#define HAZER_TALKER_NAME_INITIALIZER \
+	{ \
+		"BD", \
+		"CD", \
+		"EC", \
+		"GA", \
+		"GB", \
+		"GL", \
+		"GN", \
+		"GP", \
+		"II", \
+		"IN", \
+		"LC", \
+		"PUBX", \
+		"QZ", \
+		"ZV", \
+		(const char *)0, \
+	}
+
+/**
+ * Array of TALKER names indexed by talker enumeration.
+ */
+extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
+
+/**
  * GNSS systems.
- *
- * N.B. Because the uBlox 7 receiver has only a single RF front-end, it cannot
- * track multiple systems (constellations) concurrently. Other inexpensive GPS
- * receivers I've used can routinely do this (but those receivers don't support
- * 1PPS like the uBlox 7-based GR-701W does).
+ * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerSystem {
-    HAZER_SYSTEM_GPS				= 0,
+    HAZER_SYSTEM_GNSS				= 0,
+    HAZER_SYSTEM_GPS,
     HAZER_SYSTEM_GLONASS,
     HAZER_SYSTEM_GALILEO,
-    HAZER_SYSTEM_GNSS,
 	HAZER_SYSTEM_BEIDOU,
 	HAZER_SYSTEM_QZSS,
     HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 
 /**
- * Array of TALKER names indexed by talker enumeration.
+ * @define HAZER_SYSTEM_NAME_INITIALIZER
+ * Initialize the array of character strings that map from a Hazer system
+ * enumerated value to the printable name of the system.
  */
-extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
+#define HAZER_SYSTEM_NAME_INITIALIZER \
+	{ \
+		"GNSS", \
+		"GPS", \
+		"GLONASS", \
+	    "GALILEO", \
+		"BEIDOU", \
+		"QZSS", \
+		(const char *)0, \
+	}
 
 /**
  * Array of SYSTEM names indexed by system enumeration.
@@ -428,88 +467,6 @@ extern int64_t hazer_parse_alt(const char * string, char units, uint8_t * digits
 extern double hazer_parse_num(const char * string);
 
 /*******************************************************************************
- * IDENTIFYING SPECIFIC TALKERS
- ******************************************************************************/
-
-/**
- * @define HAZER_NMEA_TALKER_BEIDOU2
- * Raymond, Table 1
- */
-#define HAZER_NMEA_TALKER_BEIDOU2 "BD"
-
-/**
- * @define HAZER_NMEA_TALKER_DSC
- * Raymond, Table 1
- */
-#define HAZER_NMEA_TALKER_DSC "DSC"
-
-/**
- * @define HAZER_NMEA_TALKER_ECDIS
- * Raymond, Table 1
- */
-#define HAZER_NMEA_TALKER_ECDIS "EC"
-
-/**
- * @def HAZER_NMEA_TALKER_GALILEO
- * NMEA 0183 4.10, 6.1.4, Table 6
- */
-#define HAZER_NMEA_TALKER_GALILEO "GA"
-
-/**
- * @define HAZER_NMEA_TALKER_BEIDOU
- * Raymond, Table 1
- */
-#define HAZER_NMEA_TALKER_BEIDOU "GB"
-
-/**
- * @def HAZER_NMEA_TALKER_GLONASS
- * NMEA 0183 4.10, 6.1.4, Table 6
- */
-#define HAZER_NMEA_TALKER_GLONASS "GL"
-
-/**
- * @def HAZER_NMEA_TALKER_GNSS
- * NMEA 0183 4.10, 6.1.4, Table 6
- */
-#define HAZER_NMEA_TALKER_GNSS "GN"
-
-/**
- * @def HAZER_NMEA_TALKER_GPS
- * NMEA 0183 4.10, 6.1.4, Table 6
- */
-#define HAZER_NMEA_TALKER_GPS "GP"
-
-/**
- * @define HAZER_NMEA_TALKER_INSTRUMENTATION
- * Raymond, Table 1
- */
-#define HAZER_NMEA_TALKER_INSTRUMENTATION "II"
-
-/**
- * @define HAZER_NMEA_TALKER_NAVIGATION
- * Raymond, Table 1
- */
-#define HAZER_NMEA_TALKER_NAVIGATION "IN"
-
-/**
- * @define HAZER_NMEA_TALKER_LORANC
- * Raymond, Table 1
- */
-#define HAZER_NMEA_TALKER_LORANC "LC"
-
-/**
- * @define HAZER_NMEA_TALKER_QZSS
- * Raymond, Table 1
- */
-#define HAZER_NMEA_TALKER_QZSS "QZ"
-
-/**
- * @def HAZER_NMEA_TALKER_RADIO
- * NMEA 0183 4.10, 6.1.4, Table 6
- */
-#define HAZER_NMEA_TALKER_RADIO "ZV"
-
-/*******************************************************************************
  * IDENTIFYING STANDARD SENTENCES
  ******************************************************************************/
 
@@ -658,21 +615,21 @@ typedef struct HazerPosition {
 
 /**
  * Parse a GGA NMEA sentence, updating the position.
- * @param datap points to the position structure (initialized to zeros).
+ * @param positionp points to the position structure (initialized to zeros).
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
  */
-extern int hazer_parse_gga(hazer_position_t *datap, char * vector[], size_t count);
+extern int hazer_parse_gga(hazer_position_t *positionp, char * vector[], size_t count);
 
 /**
  * Parse a RMC NMEA sentence, updating the position.
- * @param datap points to the position structure (initialized to zeros).
+ * @param positionp points to the position structure (initialized to zeros).
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
  */
-extern int hazer_parse_rmc(hazer_position_t *datap, char * vector[], size_t count);
+extern int hazer_parse_rmc(hazer_position_t *positionp, char * vector[], size_t count);
 
 /*******************************************************************************
  * PARSING SATELLITE ELEVATION, AZIMUTH, AND SIGNAL STRENGTH SENTENCES
@@ -688,18 +645,18 @@ typedef struct HazerSolution {
     double hdop;                /* Horizontal Dilution Of Precisioin. */
     double vdop;                /* Vertical Diilution Of Precisioin. */
     uint8_t active;             /* Number of satellites active. */
-    uint8_t id[HAZER_GPS_SATELLITES];  /* Satellite IDentifiers. */
+    uint8_t id[HAZER_GNSS_ACTIVES];  /* Satellites active. */
     uint8_t unused[3];          /* Unused. */
 } hazer_solution_t;
 
 /**
  * Parse a GSA NMEA sentence, updating the constellation.
- * @param datap points to the solution structure (initialized to zeros).
+ * @param solutionp points to the solution structure (initialized to zeros).
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
  */
-extern int hazer_parse_gsa(hazer_solution_t * datap, char * vector[], size_t count);
+extern int hazer_parse_gsa(hazer_solution_t * solutionp, char * vector[], size_t count);
 
 /**
  * This structure maintains the elevation, azimuth, and signal strength of a
@@ -717,21 +674,22 @@ typedef struct HazerSatellite {
  * This structure maintains the information on as many satellites as we
  * have channels configured. THIS OBJECT SHOULD BE INITIALIZED TO ALL ZEROS.
  */
-typedef struct HazerConstellation {
-    hazer_satellite_t sat[HAZER_GPS_CHANNELS]; /* Satellites viewed. */
+typedef struct HazerView {
+    hazer_satellite_t sat[HAZER_GNSS_SATELLITES]; /* Satellites viewed. */
     uint8_t view;               /* Number of satellites in view. */
     uint8_t channels;           /* Number of channels used in view. */
+    uint8_t pending;			/* Number of updates pending. */
     uint8_t unused[6];          /* Unused. */
-} hazer_constellation_t;
+} hazer_view_t;
 
 /**
  * Parse a GSV NMEA sentence, updating the constellation.
- * @param datap points to the constellation structure (initialized to zeros).
+ * @param viewp points to the view structure (initialized to zeros).
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.
  */
-extern int hazer_parse_gsv(hazer_constellation_t * datap, char * vector[], size_t count);
+extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
 
 /*******************************************************************************
  * FORMATTING DATA FOR OUTPUT

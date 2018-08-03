@@ -22,4 +22,4 @@ for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} -W ${OPTION}"
 done
 
-eval gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v ${OPTIONS}
+eval gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -v -R ${OPTIONS}

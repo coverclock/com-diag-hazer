@@ -66,6 +66,7 @@
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/diminuto/diminuto_list.h"
+#include "com/diag/diminuto/diminuto_core.h"
 
 static const size_t LIMIT = 80;
 static const size_t UNLIMITED = ~0;
@@ -177,9 +178,9 @@ static void print_active(FILE * fp, const char * name, const hazer_solution_t * 
     fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", sp->active, sp->pdop, sp->hdop, sp->vdop);
 }
 
-static void print_view(FILE *fp, const char * name, const hazer_constellation_t cp[])
+static void print_view(FILE *fp, const char * name, const hazer_view_t cp[])
 {
-    static const int LIMIT = sizeof(cp[0].sat) / sizeof(cp[0].sat[0]);
+    static const int MAXIMUM = sizeof(cp[0].sat) / sizeof(cp[0].sat[0]);
     int channel = 0;
     int constellation = 0;
     int satellite = 0;
@@ -188,7 +189,7 @@ static void print_view(FILE *fp, const char * name, const hazer_constellation_t 
     for (constellation = 0; constellation < HAZER_TALKER_TOTAL; ++constellation) {
         limit = cp[constellation].channels;
         if (limit > cp[constellation].view) { limit = cp[constellation].view; }
-        if (limit > LIMIT) { limit = LIMIT; }
+        if (limit > MAXIMUM) { limit = MAXIMUM; }
         for (satellite = 0; satellite < limit; ++satellite) {
             if (cp[constellation].sat[satellite].id != 0) {
                 fprintf(fp, "%s [%02d] sat %3u elv %2u azm %3u snr %2udBHz con %s\n", name, ++channel, cp[constellation].sat[satellite].id, cp[constellation].sat[satellite].elv_degrees, cp[constellation].sat[satellite].azm_degrees, cp[constellation].sat[satellite].snr_dbhz, HAZER_TALKER_NAME[constellation]);
@@ -420,7 +421,7 @@ int main(int argc, char * argv[])
     hazer_vector_t vector = { 0 };
     hazer_position_t position = { 0 };
     hazer_solution_t solution = { 0 };
-    hazer_constellation_t constellation[HAZER_SYSTEM_TOTAL] = { {  0 } };
+    hazer_view_t view[HAZER_TALKER_TOTAL] = { { 0 } };
     FILE * infp = stdin;
     FILE * outfp = stdout;
     FILE * errfp = stderr;
@@ -480,7 +481,7 @@ int main(int argc, char * argv[])
     pthread_t thread;
     int pthreadrc = -1;
     FILE * fp = (FILE *)0;
-    static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:Vb:cdehlmnop:rsv?";
+    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:Vb:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -514,6 +515,9 @@ int main(int argc, char * argv[])
         case 'A':
             host = optarg;
             break;
+        case 'C':
+        	(void)diminuto_core_enable();
+        	break;
         case 'D':
             device = optarg;
             break;
@@ -588,7 +592,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]\n", program);
+            fprintf(errfp, "usage: %s [ -C ] [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -596,6 +600,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -7          Use seven data bits for DEVICE.\n");
             fprintf(errfp, "       -8          Use eight data bits for DEVICE.\n");
             fprintf(errfp, "       -A ADDRESS  Send sentences to ADDRESS.\n");
+            fprintf(errfp, "       -C          Enable core dumps if a fatal error occurs.\n");
             fprintf(errfp, "       -D DEVICE   Use DEVICE.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
@@ -1067,9 +1072,9 @@ int main(int argc, char * argv[])
 			} else if (hazer_parse_gsa(&solution, vector, count) == 0) {
 				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
 				if (report) { print_active(outfp, "GSA", &solution); }
-			} else if (hazer_parse_gsv(&constellation[system], vector, count) == 0) {
+			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 				if (escape) { fputs("\033[6;1H\033[0J", outfp); }
-				if (report) { print_view(outfp, "GSV", constellation); }
+				if (report) { print_view(outfp, "GSV", view); }
 			} else {
 				/* Do nothing. */
 			}
