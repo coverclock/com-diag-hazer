@@ -66,7 +66,6 @@
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/diminuto/diminuto_list.h"
-#include "com/diag/diminuto/diminuto_core.h"
 
 static const size_t LIMIT = 80;
 static const size_t UNLIMITED = ~0;
@@ -160,7 +159,7 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
     fflush(fp);
 }
 
-static void print_active(FILE * fp, const char * name, const hazer_active_t * ap)
+static void print_active(FILE * fp, const char * name, const hazer_active_t * ap, const char * active)
 {
     static const unsigned int SATELLITES = sizeof(ap->id) / sizeof(ap->id[0]);
     int satellite = 0;
@@ -175,24 +174,54 @@ static void print_active(FILE * fp, const char * name, const hazer_active_t * ap
             fprintf(fp, " %3u", ap->id[satellite]);
         }
     }
-    fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf\n", ap->active, ap->pdop, ap->hdop, ap->vdop);
+    fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf act %s\n", ap->active, ap->pdop, ap->hdop, ap->vdop, active);
 }
 
-static void print_view(FILE *fp, const char * name, const hazer_view_t vp[])
+static hazer_system_t select_active(const hazer_active_t aa[])
 {
-    static const int SATELLITES = sizeof(vp[0].sat) / sizeof(vp[0].sat[0]);
+	hazer_system_t system = HAZER_SYSTEM_TOTAL;
+	int ii = 0;
+
+	for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
+		if (aa[ii].active == 0) {
+			continue;
+		} else if (system == HAZER_SYSTEM_TOTAL) {
+			system = (hazer_system_t)ii;
+		} else if (aa[ii].pdop > aa[system].pdop) {
+			continue;
+		} else if (aa[ii].pdop < aa[system].pdop) {
+			system = (hazer_system_t)ii;
+		} else if (aa[ii].hdop > aa[system].hdop) {
+			continue;
+ 		} else if (aa[ii].hdop < aa[system].hdop) {
+ 			system = (hazer_system_t)ii;
+ 		} else if (aa[ii].vdop > aa[system].vdop) {
+ 			continue;
+ 		} else if (aa[ii].vdop < aa[system].vdop) {
+ 			system = (hazer_system_t)ii;
+ 		} else {
+ 			/* Do nothing. */
+ 		}
+	}
+
+	return system;
+}
+
+static void print_views(FILE *fp, const char * name, const hazer_view_t va[])
+{
+    static const int SATELLITES = sizeof(va[0].sat) / sizeof(va[0].sat[0]);
     int channel = 0;
     int system = 0;
     int satellite = 0;
     int limit = 0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
-        limit = vp[system].channels;
-        if (limit > vp[system].view) { limit = vp[system].view; }
+        limit = va[system].channels;
+        if (limit > va[system].view) { limit = va[system].view; }
         if (limit > SATELLITES) { limit = SATELLITES; }
         for (satellite = 0; satellite < limit; ++satellite) {
-            if (vp[system].sat[satellite].id != 0) {
-                fprintf(fp, "%s [%02d] sat %3u elv %2u azm %3u snr %2udBHz con %s\n", name, ++channel, vp[system].sat[satellite].id, vp[system].sat[satellite].elv_degrees, vp[system].sat[satellite].azm_degrees, vp[system].sat[satellite].snr_dbhz, HAZER_SYSTEM_NAME[system]);
+            if (va[system].sat[satellite].id != 0) {
+                fprintf(fp, "%s [%02d] sat %3u elv %2u* azm %3u* snr %2udBHz con %s\n", name, ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, HAZER_SYSTEM_NAME[system]);
             }
         }
     }
@@ -445,6 +474,7 @@ int main(int argc, char * argv[])
     char lsn = '\0';
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    hazer_system_t active = HAZER_SYSTEM_TOTAL;
     int opt = -1;
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
@@ -481,7 +511,7 @@ int main(int argc, char * argv[])
     pthread_t thread;
     int pthreadrc = -1;
     FILE * fp = (FILE *)0;
-    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:Vb:cdehlmnop:rsv?";
+    static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:Vb:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -515,9 +545,6 @@ int main(int argc, char * argv[])
         case 'A':
             host = optarg;
             break;
-        case 'C':
-        	(void)diminuto_core_enable();
-        	break;
         case 'D':
             device = optarg;
             break;
@@ -592,7 +619,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -C ] [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]\n", program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -600,7 +627,6 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -7          Use seven data bits for DEVICE.\n");
             fprintf(errfp, "       -8          Use eight data bits for DEVICE.\n");
             fprintf(errfp, "       -A ADDRESS  Send sentences to ADDRESS.\n");
-            fprintf(errfp, "       -C          Enable core dumps if a fatal error occurs.\n");
             fprintf(errfp, "       -D DEVICE   Use DEVICE.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
@@ -1051,6 +1077,8 @@ int main(int argc, char * argv[])
 				continue;
 			} else if ((system = hazer_parse_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 				continue;
+			} else if (active >= HAZER_SYSTEM_TOTAL) {
+				active = system;
 			} else {
 				/* Do nothing. */
 			}
@@ -1061,24 +1089,26 @@ int main(int argc, char * argv[])
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, "MAP",  &position[system], tmppps); }
+				if (report) { print_position(outfp, "MAP",  &position[active], tmppps); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, "GGA",  &position[system]); }
+				if (report) { print_solution(outfp, "GGA",  &position[active]); }
 			} else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, "MAP", &position[system], tmppps); }
+				if (report) { print_position(outfp, "MAP", &position[active], tmppps); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, "RMC",  &position[system]); }
+				if (report) { print_solution(outfp, "RMC",  &position[active]); }
 			} else if (hazer_parse_gsa(&solution[system], vector, count) == 0) {
+				active = select_active(solution);
+				assert(active < HAZER_SYSTEM_TOTAL);
 				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-				if (report) { print_active(outfp, "GSA", &solution[system]); }
+				if (report) { print_active(outfp, "GSA", &solution[active], HAZER_SYSTEM_NAME[active]); }
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 				if (escape) { fputs("\033[6;1H\033[0J", outfp); }
-				if (report) { print_view(outfp, "GSV", view); }
+				if (report) { print_views(outfp, "GSV", view); }
 			} else {
 				/* Do nothing. */
 			}

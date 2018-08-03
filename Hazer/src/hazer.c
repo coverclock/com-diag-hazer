@@ -1063,3 +1063,4 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 
     return rc;
 }
+

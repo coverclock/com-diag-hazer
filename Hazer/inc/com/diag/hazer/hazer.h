@@ -38,8 +38,16 @@
  * "SiRF Binary Protocol Reference Manual", revision 2.4, 1040-0041, SiRF
  * Technology, Inc., 2008-11
  *
+ * "u-blox 7 Receiver Description Including Protocol Specification V14",
+ * GPS.G7-SW-12001-B, ublox AG, 2013
+ *
+ * "u-blox 8 / u-blox M8 Receiver Description Including Protocol Specification",
+ * UBX-13003221-R15, ublox AG, 2018-03-06
+ *
  * Eric S. Raymond, "NMEA Revealed", 2.21, http://www.catb.org/gpsd/NMEA.html,
  * 2016-01
+ *
+ * Richard B. Langley, "Dilution of Precision", GPS World, 1999-05, p. 52-59
  *
  * "GP-2106 SiRF Star IV GPS module with antenna", version 0.2, ADH Technology
  * Co. Ltd., 2010-12-08
@@ -61,6 +69,9 @@
  *
  * "Points of the compass", Wikipedia,
  * https://en.wikipedia.org/wiki/Points_of_the_compass, 2017-01-17
+ *
+ * "Dilution of Precision", Wikipedia,
+ * https://en.wikipedia.org/wiki/Dilution_of_precision_(navigation), 2018-08-03
  */
 
 #include <stdio.h>
@@ -261,7 +272,11 @@ typedef enum HazerSystem {
 /**
  * @define HAZER_SYSTEM_NAME_INITIALIZER
  * Initialize the array of character strings that map from a Hazer system
- * enumerated value to the printable name of the system.
+ * enumerated value to the printable name of the system. These strings should
+ * be in order of preference for systems having (unlikely as it might be)
+ * exactly the same dilution of precision (DOP). For example, you might prefer
+ * GLONASS over GPS, or GPS over GNSS (which represents a solution using
+ * multiple systems, which can be problematic).
  */
 #define HAZER_SYSTEM_NAME_INITIALIZER \
 	{ \
