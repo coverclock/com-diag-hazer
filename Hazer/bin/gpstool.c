@@ -395,7 +395,7 @@ static void print_solution(FILE * fp, const char * name, const hazer_position_t 
 
     fprintf(fp, " [%02u]", pp->sat_used);
 
-    fprintf(fp, " { %d %d %d %d %d }", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->sog_digits);
+    fprintf(fp, " ( %d %d %d %d %d )", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->sog_digits);
 
     fprintf(fp, " act %s", system);
 

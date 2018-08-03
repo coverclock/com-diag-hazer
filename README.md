@@ -233,16 +233,18 @@ to do cursor control for its report on standard output,
 
     > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E
 
-the display looks something like this snapshot as it is continually updated.
-(In this and most other output, the asterisk * is used to mean the degree
-symbol. This should not be confused with its use as a delimeter in NMEA
-sentences.)
+and when using a GPS receiver that can only receive a single frequency range
+at a time (so it can only detect GPS, or only GLONASS, but not both
+simultaneously), the display looks something like this snapshot as it is
+continually updated. (In this and most other output, the asterisk * is used to
+mean the degree symbol. This should not be confused with its use as a delimeter
+in NMEA sentences.)
 
     $GPGSV,3,3,12,29,03,281,,46,38,215,,48,36,220,38,51,44,183,42*7C\r\n
     \xb5b\x06>\0\0
     MAP 2018-08-01T18:35:58Z 39*47'39.01"N,105*09'12.11"W  5618.70' N     0.130mph PPS 0
-    GGA 39.794171,-105.153365  1712.600m   0.000*    0.113knots [10] 9 10 5 0 4
-    GSA {  25  51   5   6  12  48  19  24   2  17 } [10] pdop 1.73 hdop 0.95 vdop 1.44 act GPS
+    GGA 39.794171,-105.153365  1712.600m   0.000*    0.113knots [10] ( 9 10 5 0 4 ) act GPS
+    GSA {  25  51   5   6  12  48  19  24   2  17 } [10] pdop 1.73 hdop 0.95 vdop 1.44 sys GPS
     GSV [01] sat   2 elv 78 azm 254 snr 30dBHz con GPS
     GSV [02] sat   5 elv 22 azm 171 snr 41dBHz con GPS
     GSV [03] sat   6 elv 51 azm  46 snr 29dBHz con GPS
