@@ -234,12 +234,15 @@ to do cursor control for its report on standard output,
     > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E
 
 the display looks something like this snapshot as it is continually updated.
+(In this and most other output, the asterisk * is used to mean the degree
+symbol. This should not be confused with its use as a delimeter in NMEA
+sentences.)
 
     $GPGSV,3,3,12,29,03,281,,46,38,215,,48,36,220,38,51,44,183,42*7C\r\n
     \xb5b\x06>\0\0
     MAP 2018-08-01T18:35:58Z 39*47'39.01"N,105*09'12.11"W  5618.70' N     0.130mph PPS 0
     GGA 39.794171,-105.153365  1712.600m   0.000*    0.113knots [10] 9 10 5 0 4
-    GSA {  25  51   5   6  12  48  19  24   2  17 } [10] pdop 1.73 hdop 0.95 vdop 1.44
+    GSA {  25  51   5   6  12  48  19  24   2  17 } [10] pdop 1.73 hdop 0.95 vdop 1.44 act GPS
     GSV [01] sat   2 elv 78 azm 254 snr 30dBHz con GPS
     GSV [02] sat   5 elv 22 azm 171 snr 41dBHz con GPS
     GSV [03] sat   6 elv 51 azm  46 snr 29dBHz con GPS
@@ -280,15 +283,23 @@ what message was used to most recently update this information.
 The fifth line is a list of satellites that contributed to the current
 solution (which is frequently a subset of those being received), a count of how
 many satellites are in the list, and the quality of the fix in terms of
-position, horizontal, and vertical dilution of precision.
+position, horizontal, and vertical dilution of precision. Later versions of
+Hazer have prototype support for receivers with multiple RF stages that are
+able to track multiple satellite constellations (for example, both GPS and
+GLONASS) simultaneously, and which may arrive at multiple or ensemble solutions.
+In that case, the solution displayed is that with the better (lower) dilution of
+precision (DOP), and the name of the system used is shown. This can change
+dynamically as satellites move in their orbits.
 
-    GSA {  25  51   5   6  12  48  19  24   2  17 } [10] pdop 1.73 hdop 0.95 vdop 1.44
+    GSA {  25  51   5   6  12  48  19  24   2  17 } [10] pdop 1.73 hdop 0.95 vdop 1.44 act GPS
 
 The remaining lines are, for each satellite being received (which is often a
-superset of those that contributed to the current solution): its identifying
-number (for the GPS constellation this is its Pseudo-Random Noise code number),
-its elevation, azimuth, and signal/noise ratio, and the constellation of which
-it is a member.
+superset of those that contributed to the current solution): a virtual channel
+number (purely an artifact of Hazer), the satellite's identifying number (for
+the GPS constellation this is its Pseudo-Random Noise code number), its
+elevation, azimuth, and signal/noise ratio, and the constellation of which
+it is a member. Note that all satellites being tracked are shown, and so
+multiple systems are displayed, although only the best solution is displayed.
 
     GSV [01] sat   2 elv 78 azm 254 snr 30dBHz con GPS
     GSV [02] sat   5 elv 22 azm 171 snr 41dBHz con GPS

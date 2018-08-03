@@ -76,6 +76,15 @@ typedef enum Protocol { UNUSED = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
 typedef enum Format { UNKNOWN = 0, NMEA = 1, UBX = 2 } format_t;
 
+/**
+ * Emit an NMEA sentences to the specified stream after adding the ending
+ * matter consisting of the checksum delimiter, the two checksum characters,
+ * a carriage return, and a line feed.
+ * @param fp points to the FILE stream.
+ * @param string points to the NUL-terminated sentence minus the ending matter.
+ * @param size is the size of the NMEA sentence.
+ * @return 0 for success, <0 if an error occurred.
+ */
 static int emit_sentence(FILE * fp, const char * string, size_t size)
 {
     int rc = -1;
@@ -98,6 +107,14 @@ static int emit_sentence(FILE * fp, const char * string, size_t size)
     return rc;
 }
 
+/**
+ * Emit a UBX packet to the specified stream after adding the ending matter
+ * consisting of the two Fletcher checksum bytes.
+ * @param fp points to the FILE stream.
+ * @param packet points to the packet minus the ending matter.
+ * @param size is the size of the UBX packet.
+ * @return 0 for success, <0 if an error occurred.
+ */
 static int emit_packet(FILE * fp, const void * packet, size_t size)
 {
     int rc = -1;
@@ -124,6 +141,17 @@ static int emit_packet(FILE * fp, const void * packet, size_t size)
     return rc;
 }
 
+/**
+ * Forward an NMEA sentence or a UBX packet to a remote IPv4 or IPv6 host and
+ * UDP port.
+ * @param sock is an open socket.
+ * @param protocol indicates either IPv4 or IPv6.
+ * @param ipv4p points to an IPv4 address (if IPv4).
+ * @param ipv6p points to an IPv6 address (if IPv6).
+ * @param port is an IP UDP port.
+ * @param buffer points to the sentence or packet.
+ * @param size is the size of the sentence or packet.
+ */
 static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
 {
     int rc = 0;
@@ -144,6 +172,14 @@ static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p
 
 }
 
+/**
+ * Print an NMEA sentence or UBX packet to a stream, expanding non-printable
+ * characters into escape sequences.
+ * @param fp points to the FILE stream.
+ * @param buffer points to the sentence or packet.
+ * @param size is the size of the sentence or packet.
+ * @param limit is the maximum number of characters to display.
+ */
 static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t limit)
 {
     const char * bb = (const char *)0;
@@ -159,46 +195,34 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
     fflush(fp);
 }
 
-static void print_active(FILE * fp, const char * name, const hazer_active_t * ap, const char * active)
-{
-    static const unsigned int SATELLITES = sizeof(ap->id) / sizeof(ap->id[0]);
-    int satellite = 0;
-    int limit = 0;
-
-    limit = ap->active;
-    if (limit > SATELLITES) { limit = SATELLITES; }
-
-    fprintf(fp, "%s {", name);
-    for (satellite = 0; satellite < limit; ++satellite) {
-        if (ap->id[satellite] != 0) {
-            fprintf(fp, " %3u", ap->id[satellite]);
-        }
-    }
-    fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf act %s\n", ap->active, ap->pdop, ap->hdop, ap->vdop, active);
-}
-
+/**
+ * Select the best global navigation satellite system from among those
+ * currently active by finding the one with the lowest dilution of precision.
+ * @param aa points to the array of active GNSSes.
+ * @return an index to the best GNSS or HAZER_SYSTEM_TOTAL is an error occurred.
+ */
 static hazer_system_t select_active(const hazer_active_t aa[])
 {
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
-	int ii = 0;
+	int candidate = 0;
 
-	for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-		if (aa[ii].active == 0) {
+	for (candidate = 0; candidate < HAZER_SYSTEM_TOTAL; ++candidate) {
+		if (aa[candidate].active == 0) {
 			continue;
 		} else if (system == HAZER_SYSTEM_TOTAL) {
-			system = (hazer_system_t)ii;
-		} else if (aa[ii].pdop > aa[system].pdop) {
+			system = (hazer_system_t)candidate;
+		} else if (aa[candidate].pdop > aa[system].pdop) {
 			continue;
-		} else if (aa[ii].pdop < aa[system].pdop) {
-			system = (hazer_system_t)ii;
-		} else if (aa[ii].hdop > aa[system].hdop) {
+		} else if (aa[candidate].pdop < aa[system].pdop) {
+			system = (hazer_system_t)candidate;
+		} else if (aa[candidate].hdop > aa[system].hdop) {
 			continue;
- 		} else if (aa[ii].hdop < aa[system].hdop) {
- 			system = (hazer_system_t)ii;
- 		} else if (aa[ii].vdop > aa[system].vdop) {
+ 		} else if (aa[candidate].hdop < aa[system].hdop) {
+ 			system = (hazer_system_t)candidate;
+ 		} else if (aa[candidate].vdop > aa[system].vdop) {
  			continue;
- 		} else if (aa[ii].vdop < aa[system].vdop) {
- 			system = (hazer_system_t)ii;
+ 		} else if (aa[candidate].vdop < aa[system].vdop) {
+ 			system = (hazer_system_t)candidate;
  		} else {
  			/* Do nothing. */
  		}
@@ -207,6 +231,49 @@ static hazer_system_t select_active(const hazer_active_t aa[])
 	return system;
 }
 
+/**
+ * Print all of the active global navigation satellite systems.
+ * @param fp points to the FILE stream.
+ * @param name is the NMEA sentence performing this print.
+ * @param aa points to the array of active GNSSes.
+ * @return the number of active GNSSes printed.
+ */
+static int print_actives(FILE * fp, const char * name, const hazer_active_t aa[])
+{
+	int count = 0;
+    static const unsigned int IDENTIFIERS = sizeof(aa[0].id) / sizeof(aa[0].id[0]);
+    int satellite = 0;
+    int limit = 0;
+    int system = 0;
+
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+        limit = aa[system].active;
+        if (limit == 0) { continue; }
+        if (limit > IDENTIFIERS) { limit = IDENTIFIERS; }
+
+        fprintf(fp, "%s {", name);
+
+        for (satellite = 0; satellite < limit; ++satellite) {
+            if (aa[system].id[satellite] != 0) {
+                fprintf(fp, " %3u", aa[system].id[satellite]);
+            }
+        }
+
+       fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf sys %s\n", aa[system].active, aa[system].pdop, aa[system].hdop, aa[system].vdop, HAZER_SYSTEM_NAME[system]);
+
+       count += 1;
+    }
+
+    return count;
+}
+
+/**
+ * Print all of the satellites currently being viewed by the receiver.
+ * @param fp points to the FILE stream.
+ * @param name is the NMEA sentence performing this print.
+ * @param va points to the array of all satellite being viewed.
+ */
 static void print_views(FILE *fp, const char * name, const hazer_view_t va[])
 {
     static const int SATELLITES = sizeof(va[0].sat) / sizeof(va[0].sat[0]);
@@ -227,6 +294,13 @@ static void print_views(FILE *fp, const char * name, const hazer_view_t va[])
     }
 }
 
+/**
+ * Print a single navigation position.
+ * @param fp points to the FILE stream.
+ * @param name is NMEA sentence performing this print.
+ * @param pp points to the single navigation position.
+ * @param pps is the current value of the 1PPS strobe.
+ */
 static void print_position(FILE * fp, const char * name, const hazer_position_t * pp, int pps)
 {
     uint64_t nanoseconds = 0;
@@ -286,7 +360,14 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     fputc('\n', fp);
 }
 
-static void print_solution(FILE * fp, const char * name, const hazer_position_t * pp)
+/**
+ * Print a single navigation solution.
+ * @param fp points to the FILE stream.
+ * @param name is NMEA sentence performing this print.
+ * @param pp points to the single navigation position.
+ * @param system is the name of the best GNSS selected.
+ */
+static void print_solution(FILE * fp, const char * name, const hazer_position_t * pp, const char * system)
 {
     double decimal = 0.0;
 
@@ -314,7 +395,9 @@ static void print_solution(FILE * fp, const char * name, const hazer_position_t 
 
     fprintf(fp, " [%02u]", pp->sat_used);
 
-    fprintf(fp, " %d %d %d %d %d", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->sog_digits);
+    fprintf(fp, " { %d %d %d %d %d }", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->sog_digits);
+
+    fprintf(fp, " act %s", system);
 
     fputc('\n', fp);
 }
@@ -329,6 +412,12 @@ struct Context {
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
+/**
+ * Implement a thread that polls for the data carrier detect (DCD) state for
+ * 1PPS.
+ * @param argp points to the thread context.
+ * @return the final value of the thread.
+ */
 static void * dcdpoller(void * argp)
 {
 	void * xc = (void *)1;
@@ -375,6 +464,12 @@ static void * dcdpoller(void * argp)
 	return xc;
 }
 
+/**
+ * Implement a thread that polls for the general purpose input/output (GPIO)
+ * state for 1PPS.
+ * @param argp points to the thread context.
+ * @return the final value of the thread.
+ */
 static void * gpiopoller(void * argp)
 {
 	void * xc = (void *)1;
@@ -424,6 +519,12 @@ static void * gpiopoller(void * argp)
 	return xc;
 }
 
+/**
+ * Run the main program.
+ * @param argc is the number of tokens on the command line argument list.
+ * @param argv contains the tokens on the command line argument list.
+ * @return the exit value of the main program.
+ */
 int main(int argc, char * argv[])
 {
     const char * program = (const char *)0;
@@ -511,6 +612,7 @@ int main(int argc, char * argv[])
     pthread_t thread;
     int pthreadrc = -1;
     FILE * fp = (FILE *)0;
+    int offset = 1;
     static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:Vb:cdehlmnop:rsv?";
     extern char * optarg;
     extern int optind;
@@ -1091,7 +1193,7 @@ int main(int argc, char * argv[])
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
 				if (report) { print_position(outfp, "MAP",  &position[active], tmppps); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, "GGA",  &position[active]); }
+				if (report) { print_solution(outfp, "GGA",  &position[active], HAZER_SYSTEM_NAME[active]); }
 			} else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
@@ -1100,14 +1202,14 @@ int main(int argc, char * argv[])
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
 				if (report) { print_position(outfp, "MAP", &position[active], tmppps); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, "RMC",  &position[active]); }
+				if (report) { print_solution(outfp, "RMC",  &position[active], HAZER_SYSTEM_NAME[active]); }
 			} else if (hazer_parse_gsa(&solution[system], vector, count) == 0) {
 				active = select_active(solution);
 				assert(active < HAZER_SYSTEM_TOTAL);
 				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-				if (report) { print_active(outfp, "GSA", &solution[active], HAZER_SYSTEM_NAME[active]); }
+				if (report) { offset = print_actives(outfp, "GSA", solution); }
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
-				if (escape) { fputs("\033[6;1H\033[0J", outfp); }
+				if (escape) { fprintf(outfp, "\033[%d;1H\033[0J", 5 + offset); }
 				if (report) { print_views(outfp, "GSV", view); }
 			} else {
 				/* Do nothing. */
