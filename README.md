@@ -318,6 +318,10 @@ multiple systems are displayed, although only the best solution is displayed.
 
 # Examples
 
+(Note: some of the examples below were taken from earlier versions of
+Hazer and its gpstool utility; the examples were cut and pasted from actual
+output and may differ slightly from that of the most current version.)
+
 Here is an example of using gpstool to read an NMEA sentence stream from a
 serial device at 115200 8n1, display the data using ANSI escape sequences to
 control the output terminal, and forwards NMEA sentences to a remote
