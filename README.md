@@ -27,6 +27,13 @@ supported by a parallel stack called Yodel that is included in  the Hazer
 distribution. gpstool uses both the Hazer stack and the Yodel stack to process
 both NMEA and UBX messages interleaved in the same input stream.
 
+If you're wondering why I don't use the excellent open source GPS daemon
+(gpsd) and its GPS monitor (gpsmon), the answer is I have, in several projects,
+typically in conjunction with the open source NTPsec daemon (ntpd). Hazer was
+developed as an excuse for me to learn in detail more about how GPS works and
+NMEA sentences are formatted, because I only learn by doing. Hazer and gpstool
+have also turned out to be really useful tools to examine GPS devices.
+
 # Devices
 
 Hazer has been successfully tested with the following GPS chipsets.
@@ -185,7 +192,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 
     > gpstool -?
     
-    usage: gpstool [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]
+    usage: gpstool [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -200,7 +207,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -O          Output sentences to DEVICE.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
-           -W NMEA     Collapse escapes, generate and append suffix, and write to DEVICE.
+           -W NMEA     Collapse escapes, append checksum, and write to DEVICE.
            -V          Print release, vintage, and revision on standard output.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Wait for DCD to be asserted (requires -D and implies -m).
@@ -214,6 +221,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -h          Use RTS/CTS for DEVICE.
            -r          Reverse use of standard output and standard error.
            -s          Use XON/XOFF for DEVICE.
+           -t SECONDS  Expire GNSS data after SECONDS seconds.
            -v          Display verbose output on standard error.
 
 # Dependencies
@@ -231,7 +239,7 @@ minor Makefile hacking might be required.
 When using the -E option with gpstool, so that it uses ASCII escape sequences
 to do cursor control for its report on standard output,
 
-    > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E
+    > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E -t 10
 
 and when using a GPS receiver that can only receive a single frequency range
 at a time (so it can only detect GPS, or only GLONASS, but not both
@@ -240,60 +248,69 @@ continually updated. (In this and most other output, the asterisk * is used to
 mean the degree symbol. This should not be confused with its use as a delimeter
 in NMEA sentences.)
 
-    $GPGSV,3,3,12,29,03,281,,46,38,215,,48,36,220,38,51,44,183,42*7C\r\n
+    $GPGLL,3947.65116,N,10509.20214,W,155017.00,A,D*7D\r\n
     \xb5b\x06>\0\0
-    MAP 2018-08-01T18:35:58Z 39*47'39.01"N,105*09'12.11"W  5618.70' N     0.130mph PPS 0
-    GGA 39.794171,-105.153365  1712.600m   0.000*    0.113knots [10] ( 9 10 5 0 4 ) act GPS
-    GSA {  25  51   5   6  12  48  19  24   2  17 } [10] pdop 1.73 hdop 0.95 vdop 1.44 sys GPS
-    GSV [01] sat   2 elv 78 azm 254 snr 30dBHz con GPS
-    GSV [02] sat   5 elv 22 azm 171 snr 41dBHz con GPS
-    GSV [03] sat   6 elv 51 azm  46 snr 29dBHz con GPS
-    GSV [04] sat  12 elv 72 azm 297 snr 33dBHz con GPS
-    GSV [05] sat  17 elv 17 azm  86 snr 26dBHz con GPS
-    GSV [06] sat  19 elv 38 azm  74 snr 12dBHz con GPS
-    GSV [07] sat  24 elv 21 azm 231 snr 28dBHz con GPS
-    GSV [08] sat  25 elv 27 azm 315 snr 23dBHz con GPS
-    GSV [09] sat  29 elv  3 azm 281 snr  0dBHz con GPS
-    GSV [10] sat  46 elv 38 azm 215 snr  0dBHz con GPS
-    GSV [11] sat  48 elv 36 azm 220 snr 38dBHz con GPS
-    GSV [12] sat  51 elv 44 azm 183 snr 42dBHz con GPS
+    FIX 2018-08-06T15:50:17Z 39*47'39.06"N,105*09'12.12"W  5627.23' N     0.052mph pps 0 sec 10
+    GGA 39.794186,-105.153369  1715.200m   0.000*    0.045knots [12] ( 9 10 5 0 4 ) sys GPS
+    GSA {  51  24  30  48  12  19   2  28   6   3  17  22 } [12] pdop 1.36 hdop 0.75 vdop 1.13 sys GPS
+    GSV [01] sat   1 elv 10* azm  38* snr 19dBHz sys GPS
+    GSV [02] sat   2 elv 14* azm 203* snr 35dBHz sys GPS
+    GSV [03] sat   3 elv 12* azm  72* snr 28dBHz sys GPS
+    GSV [04] sat   6 elv 51* azm 175* snr 39dBHz sys GPS
+    GSV [05] sat  12 elv 12* azm 301* snr 21dBHz sys GPS
+    GSV [06] sat  13 elv  6* azm 226* snr  0dBHz sys GPS
+    GSV [07] sat  15 elv  3* azm 261* snr  0dBHz sys GPS
+    GSV [08] sat  17 elv 65* azm  28* snr 21dBHz sys GPS
+    GSV [09] sat  19 elv 73* azm 297* snr 32dBHz sys GPS
+    GSV [10] sat  22 elv  8* azm  51* snr 15dBHz sys GPS
+    GSV [11] sat  24 elv 34* azm 303* snr 33dBHz sys GPS
+    GSV [12] sat  28 elv 41* azm  99* snr 32dBHz sys GPS
+    GSV [13] sat  30 elv  9* azm 161* snr 37dBHz sys GPS
+    GSV [14] sat  46 elv 38* azm 215* snr 33dBHz sys GPS
+    GSV [15] sat  48 elv 36* azm 220* snr 37dBHz sys GPS
+    GSV [16] sat  51 elv 44* azm 183* snr 40dBHz sys GPS
 
 The first line is the most recently read valid NMEA sentence or UBX packet.
 
-    $GPGSV,3,3,12,29,03,281,,46,38,215,,48,36,220,38,51,44,183,42*7C\r\n
+    $GPGLL,3947.65116,N,10509.20214,W,155017.00,A,D*7D\r\n
 
 The second line is the most recently written NMEA sentence or UBX packet (if
 there is one) minus the ending material that includes the checksum for either
-format (this is added automatically when the buffer is written).
+format (this is added automatically when the buffer is written).    
 
     \xb5b\x06>\0\0
 
 The third line is the date and time in UTC, latitude and longitude in hours
 minutes and decimal seconds, altitude in feet, cardinal direction, speed in
-miles per hour, and the current one pulse per second (PPS) strobe value.    
+miles per hour, the current one pulse per second (PPS) strobe value, and
+the number of seconds that must elapse for this particular fix to be considered
+stale because no update for the GNSS from which is was computed has been
+received.
 
-    MAP 2018-08-01T18:35:58Z 39*47'39.01"N,105*09'12.11"W  5618.70' N     0.130mph PPS 0
+    FIX 2018-08-06T15:50:17Z 39*47'39.06"N,105*09'12.12"W  5627.23' N     0.052mph pps 0 sec 10
 
 The fourth line is the decimal latitude and longitude, altitude in meters,
 compass bearing in decimal degrees, speed in knots, the number of satellites
-used for the most recent navigation fix, and some numbers indicating significant
-digits of accuracy for various values. The text at the beginning indicates
-what message was used to most recently update this information.
+used for the most recent navigation fix, some numbers indicating significant
+digits of accuracy for various values, and the GNSS that is algorithmically
+selected as the best position fix. The text at the beginning indicates
+what message was used to most recently update this information, since it can
+be provided by either a GGA or a RMC sentence.
 
-    GGA 39.794171,-105.153365  1712.600m   0.000*    0.113knots [10] 9 10 5 0 4
+    GGA 39.794186,-105.153369  1715.200m   0.000*    0.045knots [12] ( 9 10 5 0 4 ) sys GPS
 
 The fifth line is a list of satellites that contributed to the current
 solution (which is frequently a subset of those being received), a count of how
-many satellites are in the list, and the quality of the fix in terms of
-position, horizontal, and vertical dilution of precision. Later versions of
-Hazer have prototype support for receivers with multiple RF stages that are
-able to track multiple satellite constellations (for example, both GPS and
-GLONASS) simultaneously, and which may arrive at multiple or ensemble solutions.
-In that case, the solution displayed is that with the better (lower) dilution of
-precision (DOP), and the name of the system used is shown. This can change
+many satellites are in the list, the quality of the fix in terms of position,
+horizontal, and vertical dilution of precision, and the GNSS to which this
+applies. Later versions of Hazer have prototype support for receivers with
+multiple RF stages that are able to track multiple satellite constellations
+(for example, both GPS and GLONASS) simultaneously, and which may arrive at
+multiple or ensemble solutions. In that case, the fix displayed above is that
+with the best (lowest) dilution of precision (DOP). This can change
 dynamically as satellites move in their orbits.
 
-    GSA {  25  51   5   6  12  48  19  24   2  17 } [10] pdop 1.73 hdop 0.95 vdop 1.44 act GPS
+    GSA {  51  24  30  48  12  19   2  28   6   3  17  22 } [12] pdop 1.36 hdop 0.75 vdop 1.13 sys GPS
 
 The remaining lines are, for each satellite being received (which is often a
 superset of those that contributed to the current solution): a virtual channel
@@ -303,29 +320,35 @@ elevation, azimuth, and signal/noise ratio, and the constellation of which
 it is a member. Note that all satellites being tracked are shown, and so
 multiple systems are displayed, although only the best solution is displayed.
 
-    GSV [01] sat   2 elv 78 azm 254 snr 30dBHz con GPS
-    GSV [02] sat   5 elv 22 azm 171 snr 41dBHz con GPS
-    GSV [03] sat   6 elv 51 azm  46 snr 29dBHz con GPS
-    GSV [04] sat  12 elv 72 azm 297 snr 33dBHz con GPS
-    GSV [05] sat  17 elv 17 azm  86 snr 26dBHz con GPS
-    GSV [06] sat  19 elv 38 azm  74 snr 12dBHz con GPS
-    GSV [07] sat  24 elv 21 azm 231 snr 28dBHz con GPS
-    GSV [08] sat  25 elv 27 azm 315 snr 23dBHz con GPS
-    GSV [09] sat  29 elv  3 azm 281 snr  0dBHz con GPS
-    GSV [10] sat  46 elv 38 azm 215 snr  0dBHz con GPS
-    GSV [11] sat  48 elv 36 azm 220 snr 38dBHz con GPS
-    GSV [12] sat  51 elv 44 azm 183 snr 42dBHz con GPS
+    GSV [01] sat   1 elv 10* azm  38* snr 19dBHz sys GPS
+    GSV [02] sat   2 elv 14* azm 203* snr 35dBHz sys GPS
+    GSV [03] sat   3 elv 12* azm  72* snr 28dBHz sys GPS
+    GSV [04] sat   6 elv 51* azm 175* snr 39dBHz sys GPS
+    GSV [05] sat  12 elv 12* azm 301* snr 21dBHz sys GPS
+    GSV [06] sat  13 elv  6* azm 226* snr  0dBHz sys GPS
+    GSV [07] sat  15 elv  3* azm 261* snr  0dBHz sys GPS
+    GSV [08] sat  17 elv 65* azm  28* snr 21dBHz sys GPS
+    GSV [09] sat  19 elv 73* azm 297* snr 32dBHz sys GPS
+    GSV [10] sat  22 elv  8* azm  51* snr 15dBHz sys GPS
+    GSV [11] sat  24 elv 34* azm 303* snr 33dBHz sys GPS
+    GSV [12] sat  28 elv 41* azm  99* snr 32dBHz sys GPS
+    GSV [13] sat  30 elv  9* azm 161* snr 37dBHz sys GPS
+    GSV [14] sat  46 elv 38* azm 215* snr 33dBHz sys GPS
+    GSV [15] sat  48 elv 36* azm 220* snr 37dBHz sys GPS
+    GSV [16] sat  51 elv 44* azm 183* snr 40dBHz sys GPS
 
-# Examples
+# Notes
 
-(Note: some of the examples below were taken from earlier versions of
-Hazer and its gpstool utility; the examples were cut and pasted from actual
-output and may differ slightly from that of the most current version.)
+Some of the snapshots below were taken from earlier versions of Hazer and its
+gpstool utility; the snapshots were cut and pasted from actual output and may
+differ slightly from that of the most current version.
+
+## Forwarding Datagrams
 
 Here is an example of using gpstool to read an NMEA sentence stream from a
 serial device at 115200 8n1, display the data using ANSI escape sequences to
 control the output terminal, and forwards NMEA sentences to a remote
-instance of itself listing on port 5555.
+instance of itself listing on port 5555 on host "lead".
 
     > gpstool -D /dev/ttyUSB0 -b 115200 -8 -n -1 -E -6 -A lead -P 5555
     
@@ -345,6 +368,8 @@ instance of itself listing on port 5555.
     GSV [10] sat  46 elv 38 azm 215 snr 34dBHz con GPS
     GSV [11] sat  48 elv 36 azm 220 snr 39dBHz con GPS
     GSV [12] sat  51 elv 44 azm 183 snr 43dBHz con GPS
+
+## Receiving Datagrams
 
 Here is the remote instance of gpstool receiving the NMEA stream via
 the UDP socket on port 5555.
@@ -368,15 +393,7 @@ the UDP socket on port 5555.
     GSV [11] sat  48 elv 36 azm 220 snr 39dBHz con GPS
     GSV [12] sat  51 elv 44 azm 183 snr 42dBHz con GPS
 
-You can use the socat utility, available for Linux/GNU and MacOS flavored
-systems, to capture the NMEA stream on the UDP port.
-
-    > socat UDP6-RECVFROM:5555,reuseaddr,fork STDOUT
-
-    $GPGSA,M,3,32,10,14,18,31,11,24,08,21,27,01,,1.3,0.8,1.1*33
-    $GPGSV,3,1,12,32,79,305,39,10,66,062,41,14,58,247,35,18,40,095,34*72
-    $GPGSV,3,2,12,31,21,180,45,11,20,309,27,24,19,044,30,08,17,271,31*7A
-    $GPGSV,3,3,12,21,13,156,39,27,13,233,33,01,09,320,20,51,43,183,42*72
+## Using screen
 
 You can use the screen utility, also available for MacOS and Linux/GNU,
 to capture the NMEA stream on a serial port.
@@ -388,6 +405,34 @@ to capture the NMEA stream on a serial port.
     $GPGSV,3,1,12,32,77,276,37,10,69,048,31,14,53,241,37,18,44,090,23*7F
     $GPGSV,3,2,12,24,23,047,28,08,19,276,33,21,19,156,32,11,17,312,23*79
     $GPGSV,3,3,12,27,16,237,32,31,15,181,39,01,05,321,23,51,43,183,42*71
+
+## Using gpsd
+
+You can test GPS devices independently of this software using the
+excellent Linux open source GPS stack. Here is just a simple example of
+stopping the GPS daemon if it has already been started (make sure you
+are not going to break something doing this), restarting it in non-deamon
+debug mode, and running a client against it. In this example, I use the
+Garmin GLO Bluetooth device I have already set up, and the X11 GPS client.
+
+    > sudo service gpsd stop
+    > gpsd -N /dev/rfcomm0 &
+    > xgps
+    ...
+    > kill %+
+    > sudo service start gpsd
+
+## Using socat
+
+You can use the socat utility, available for Linux/GNU and MacOS flavored
+systems, to capture the NMEA stream on the UDP port.
+
+    > socat UDP6-RECVFROM:5555,reuseaddr,fork STDOUT
+
+    $GPGSA,M,3,32,10,14,18,31,11,24,08,21,27,01,,1.3,0.8,1.1*33
+    $GPGSV,3,1,12,32,79,305,39,10,66,062,41,14,58,247,35,18,40,095,34*72
+    $GPGSV,3,2,12,31,21,180,45,11,20,309,27,24,19,044,30,08,17,271,31*7A
+    $GPGSV,3,3,12,21,13,156,39,27,13,233,33,01,09,320,20,51,43,183,42*72
 
 You may be tempted (I was) to dispense with gpstool entirely and use
 socat to forward NMEA strings to a remote site.  Be aware that when
@@ -416,7 +461,9 @@ diverges more and more with reality.  It is better to lose an NMEA
 sentence than have it delayed. After all, another more up-to-date sentence
 is on the way right behind it.
 
-You can sent initialization commands to the GPS device. These can be either
+## Sending Commands
+
+You can send initialization commands to the GPS device. These can be either
 NMEA sentences (without escape sequences) or binary UBX sentence (with
 escape sequences). In either case, gpstool will automatically append the
 appropriate ending sequences including a computed NMEA or UBX checksum.
@@ -436,6 +483,8 @@ like the NaviSys GR-701W.
           -W "\\xb5\\x62\\x06\\x31\\x00\\x00" \
           -W "\\xb5\\x62\\x06\\x3e\\x00\\x00" \
           -W "\\xb5\\x62\\x06\\x06\\x00\\x00"
+
+## Using Bluetooth
 
 You can use gpstool with Bluetooth GPS units like the Garmin GLO.
 
@@ -474,19 +523,7 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     power off
     quit
 
-You can test GPS devices independently of this software using the
-excellent Linux open source GPS stack. Here is just a simple example of
-stopping the GPS daemon if it has already been started (make sure you
-are not going to break something doing this), restarting it in non-deamon
-debug mode, and running a client against it. In this example, I use the
-Garmin GLO Bluetooth device I have already set up, and the X11 GPS client.
-
-    > sudo service gpsd stop
-    > gpsd -N /dev/rfcomm0 &
-    > xgps
-    ...
-    > kill %+
-    > sudo service start gpsd
+## Using One Pulse Per Second
 
 Some GPS devices provide a 1Hz One Pulse Per Second (1PPS) signal that is, if
 implemented correctly, closely phase locked to GPS time. Hazer and its
@@ -543,12 +580,14 @@ to run gpstool as root to access the GPIO pins.)
     GSV [10] sat   8 elv  5 azm 160 snr 34dBHz con GPS
     GSV [11] sat  31 elv  2 azm  73 snr  0dBHz con GPS
 
-gpstool can assert an output GPIO pin in approximate time with the 1PPS signal
-derived from either DCD or GPIO. This example (which I've run on a Raspberry Pi
-with the GR-701W) uses pin 16. Note the addition of the -p flag. (Again, you
-may have to run gpstool as root to access the GPIO pins.)
+gpstool can assert an output GPIO pin in approximate syntonization with the
+1PPS signal derived from either DCD or GPIO. This example (which I've run on a
+Raspberry Pi with the GR-701W) uses pin 16. Note the addition of the -p flag.
+(Again, you may have to run gpstool as root to access the GPIO pins.)
 
     # gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -c -p 16
+
+## Cleaning Up
 
 The GPIO functions implemented in Diminuto and used by gpstool may get confused
 if gpstool exits ungracefully leaving GPIO pins configured. If necessary, you
