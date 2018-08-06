@@ -300,7 +300,7 @@ static void print_views(FILE *fp, const char * name, const hazer_view_t va[])
         if (limit > SATELLITES) { limit = SATELLITES; }
         for (satellite = 0; satellite < limit; ++satellite) {
             if (va[system].sat[satellite].id != 0) {
-                fprintf(fp, "%s [%02d] sat %3u elv %2u* azm %3u* snr %2udBHz con %s\n", name, ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, HAZER_SYSTEM_NAME[system]);
+                fprintf(fp, "%s [%02d] sat %3u elv %2u* azm %3u* snr %2udBHz sys %s\n", name, ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, HAZER_SYSTEM_NAME[system]);
             }
         }
     }
@@ -412,7 +412,7 @@ static void print_solution(FILE * fp, const char * name, const hazer_position_t 
 
     fprintf(fp, " ( %d %d %d %d %d )", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->sog_digits);
 
-    fprintf(fp, " act %s", system);
+    fprintf(fp, " sys %s", system);
 
     fputc('\n', fp);
 }
@@ -1226,32 +1226,6 @@ int main(int argc, char * argv[])
         if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
         if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
 
-        /*
-         * EXPIRE
-         *
-         * See how many seconds have elapsed since the last time we received
-         * a valid message from a system we recognize. (Might be zero.)
-         * Subtract that number from all the expirations and figure out if
-         * there's a system we've stopped hearing from. Then update the
-         * system we just heard from with a full expiration time.
-         */
-
-        elapsed = diminuto_alarm_check();
-        if (elapsed > 0) {
-        	int ii;
-        	for (ii = 0; ii < countof(lifetime); ++ii) {
-        		if (lifetime[ii] == 0) {
-        			/* Do nothing. */
-        		} else if (lifetime[ii] <= elapsed) {
-        			lifetime[ii] = 0;
-        		} else {
-        			lifetime[ii] -= elapsed;
-        		}
-        	}
-        }
-
-        lifetime[system] = timeout;
-
         /**
          ** PROCESS
          **
@@ -1316,6 +1290,32 @@ int main(int argc, char * argv[])
 			} else {
 				/* Do nothing. */
 			}
+
+	        /*
+	         * See how many seconds have elapsed since the last time we received
+	         * a valid message from any system we recognize. (Might be zero.)
+	         * Subtract that number from all the lifetimes of all the systems we
+	         * care about to figure out if there's a system from which we've
+	         * stopped hearing. Finally, update the lifetime for the system
+	         * from which we just got an update to give it a full ration of
+	         * time.
+	         */
+
+	        elapsed = diminuto_alarm_check();
+	        if (elapsed > 0) {
+	        	int ii;
+	        	for (ii = 0; ii < countof(lifetime); ++ii) {
+	        		if (lifetime[ii] == 0) {
+	        			/* Do nothing. */
+	        		} else if (lifetime[ii] <= elapsed) {
+	        			lifetime[ii] = 0;
+	        		} else {
+	        			lifetime[ii] -= elapsed;
+	        		}
+	        	}
+	        }
+
+	        lifetime[system] = timeout;
 
 			/*
 			 * Parse the sentences we care about - GGA, RMC, GSA, and GSV
