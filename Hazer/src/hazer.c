@@ -922,42 +922,77 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
     return rc;
 }
 
-int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
+int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char RMC[] = HAZER_NMEA_GPS_MESSAGE_RMC;
+    static const char GLL[] = HAZER_NMEA_GPS_MESSAGE_GLL;
     uint64_t utc_nanoseconds = 0;
-    uint64_t dmy_nanoseconds = 0;
     uint64_t tot_nanoseconds = 0;
 
-    if (count < 1) { 
+    if (count < 1) {
         /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XXRMC")) != (sizeof("$XXRMC") - 1)) {
+    } else if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
         /* Do nothing. */
     } else if (*vector[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
-    } else if (strncmp(vector[0] + sizeof("$XX") - 1, RMC, sizeof(RMC) - 1) != 0) {
+    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GLL, sizeof(GLL) - 1) != 0) {
         /* Do nothing. */
-    } else if (count < 10) { 
+    } else if (count < 11) {
         /* Do nothing. */
-    } else if (*vector[2] != 'A') {
+    } else if (*vector[6] == '0') {
         /* Do nothing. */
     } else {
         utc_nanoseconds = hazer_parse_utc(vector[1]);
-        dmy_nanoseconds = hazer_parse_dmy(vector[9]);
-        tot_nanoseconds = utc_nanoseconds + dmy_nanoseconds;
+        tot_nanoseconds = utc_nanoseconds + positionp->dmy_nanoseconds;
         if (tot_nanoseconds >= positionp->tot_nanoseconds) {
             positionp->tot_nanoseconds = tot_nanoseconds;
             positionp->utc_nanoseconds = utc_nanoseconds;
-            positionp->dmy_nanoseconds = dmy_nanoseconds;
-            positionp->lat_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
-            positionp->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
-            positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits);
-            positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits);
+            positionp->lat_nanodegrees = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits);
+            positionp->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
+            positionp->sat_used = strtol(vector[7], (char **)0, 10);
+            positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits);
             rc = 0;
         } else {
             DEBUG("TIME?\n");
         }
+    }
+
+    return rc;
+}
+int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
+{
+    int rc = -1;
+    static const char GSA[] = HAZER_NMEA_GPS_MESSAGE_GSA;
+    int index = 3;
+    int slot = 0;
+    int id = 0;
+    int satellites = 0;
+    static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
+
+    if (count < 1) {
+        /* Do nothing. */
+    } else if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
+        /* Do nothing. */
+    } else if (*vector[0] != HAZER_STIMULUS_START) {
+        /* Do nothing. */
+    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GSA, sizeof(GSA) - 1) != 0) {
+        /* Do nothing. */
+    } else if (count < 18) {
+        /* Do nothing. */
+    } else if (*vector[2] == '1') {
+        /* Do nothing. */
+    } else {
+        for (slot = 0; slot < IDENTIFIERS; ++slot) {
+            id = strtol(vector[index++], (char **)0, 10);
+            if (id <= 0) { break; }
+            activep->id[slot] = id;
+            ++satellites;
+        }
+        activep->active = satellites;
+        activep->pdop = hazer_parse_num(vector[15]);
+        activep->hdop = hazer_parse_num(vector[16]);
+        activep->vdop = hazer_parse_num(vector[17]);
+        rc = 0;
     }
 
     return rc;
@@ -1025,40 +1060,42 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     return rc;
 }
 
-int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
+int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char GSA[] = HAZER_NMEA_GPS_MESSAGE_GSA;
-    int index = 3;
-    int slot = 0;
-    int id = 0;
-    int satellites = 0;
-    static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
+    static const char RMC[] = HAZER_NMEA_GPS_MESSAGE_RMC;
+    uint64_t utc_nanoseconds = 0;
+    uint64_t dmy_nanoseconds = 0;
+    uint64_t tot_nanoseconds = 0;
 
     if (count < 1) {
         /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
+    } else if (strnlen(vector[0], sizeof("$XXRMC")) != (sizeof("$XXRMC") - 1)) {
         /* Do nothing. */
     } else if (*vector[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
-    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GSA, sizeof(GSA) - 1) != 0) {
+    } else if (strncmp(vector[0] + sizeof("$XX") - 1, RMC, sizeof(RMC) - 1) != 0) {
         /* Do nothing. */
-    } else if (count < 18) {
+    } else if (count < 10) {
         /* Do nothing. */
-    } else if (*vector[2] == '1') {
+    } else if (*vector[2] != 'A') {
         /* Do nothing. */
     } else {
-        for (slot = 0; slot < IDENTIFIERS; ++slot) {
-            id = strtol(vector[index++], (char **)0, 10);
-            if (id <= 0) { break; }
-            activep->id[slot] = id;
-            ++satellites;
+        utc_nanoseconds = hazer_parse_utc(vector[1]);
+        dmy_nanoseconds = hazer_parse_dmy(vector[9]);
+        tot_nanoseconds = utc_nanoseconds + dmy_nanoseconds;
+        if (tot_nanoseconds >= positionp->tot_nanoseconds) {
+            positionp->tot_nanoseconds = tot_nanoseconds;
+            positionp->utc_nanoseconds = utc_nanoseconds;
+            positionp->dmy_nanoseconds = dmy_nanoseconds;
+            positionp->lat_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
+            positionp->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
+            positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits);
+            positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits);
+            rc = 0;
+        } else {
+            DEBUG("TIME?\n");
         }
-        activep->active = satellites;
-        activep->pdop = hazer_parse_num(vector[15]);
-        activep->hdop = hazer_parse_num(vector[16]);
-        activep->vdop = hazer_parse_num(vector[17]);
-        rc = 0;
     }
 
     return rc;

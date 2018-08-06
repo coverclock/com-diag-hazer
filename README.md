@@ -69,7 +69,7 @@ Hazer has been successfully tested with the following GPS devices.
 * Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
-* Navlocate GN-803G (U-Blox 8) (PENDING)
+* Navlocate GN-803G (U-Blox 8, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8]
 
 [1] An excellent all around GPS receiver easily acquired from numerous outlets.    
 [2] Emits all sorts of interesting stuff in unsolicited $GPTXT sentences.    
@@ -128,6 +128,12 @@ mailto:coverclock@diag.com
 <https://coverclock.blogspot.com/2018/04/a-menagerie-of-gps-devices-with-usb.html>
 
 <https://www.flickr.com/photos/johnlsloan/albums/72157678580152480>
+
+<https://support.google.com/earth/answer/148095>
+
+<http://earth.google.com/intl/ar/userguide/v4/index.htm>
+
+<http://static.googleusercontent.com/media/earth.google.com/en//userguide/v4/google_earth_user_guide.pdf>
 
 # Build
 
@@ -395,16 +401,32 @@ the UDP socket on port 5555.
 
 ## Using screen
 
-You can use the screen utility, also available for MacOS and Linux/GNU,
-to capture the NMEA stream on a serial port.
+You can use the screen utility, available for MacOS and Linux/GNU, to capture
+the NMEA stream on a serial port. (On Windows systems I use PuTTY.)
 
-    > screen /dev/tty.usbserial-FT98KOIH 4800 8n1
+    > screen /dev/cu.usbserial-FT8WG16Y 9600 8n1
 
-    $GPGSA,M,3,32,10,14,18,24,08,21,11,27,31,01,51,1.3,0.8,1.1*37
-    $GPGSA,M,3,32,10,14,18,24,08,21,27,31,,,,1.7,1.0,1.3*3D
-    $GPGSV,3,1,12,32,77,276,37,10,69,048,31,14,53,241,37,18,44,090,23*7F
-    $GPGSV,3,2,12,24,23,047,28,08,19,276,33,21,19,156,32,11,17,312,23*79
-    $GPGSV,3,3,12,27,16,237,32,31,15,181,39,01,05,321,23,51,43,183,42*71
+    $GPRMC,190019.00,A,3947.65139,N,10509.20196,W,0.053,,060818,,,D*66
+    $GPVTG,,T,,M,0.053,N,0.099,K,D*20
+    $GPGGA,190019.00,3947.65139,N,10509.20196,W,2,10,1.05,1707.9,M,-21.5,M,,0000*5B
+    $GPGSA,A,3,06,19,24,51,02,12,48,29,25,05,,,1.75,1.05,1.40*08
+    $GPGSV,4,1,14,02,77,008,30,05,42,164,48,06,32,051,20,09,03,060,*71
+    $GPGSV,4,2,14,12,73,214,28,17,04,101,13,19,24,092,20,24,06,217,31*71
+    $GPGSV,4,3,14,25,45,305,29,29,17,294,11,31,03,327,08,46,38,215,30*71
+    $GPGSV,4,4,14,48,36,220,32,51,44,183,42*7C
+    $GPGLL,3947.65139,N,10509.20196,W,190019.00,A,D*7E
+    $GPRMC,190020.00,A,3947.65143,N,10509.20192,W,0.044,,060818,,,D*63
+    $GPVTG,,T,,M,0.044,N,0.081,K,D*2F
+    $GPGGA,190020.00,3947.65143,N,10509.20192,W,2,09,1.05,1707.9,M,-21.5,M,,0000*50
+    $GPGSA,A,3,06,19,24,51,02,12,48,25,05,,,,1.75,1.05,1.40*03
+    $GPGSV,4,1,14,02,77,008,31,05,42,164,48,06,32,051,21,09,03,060,23*70
+    $GPGSV,4,2,14,12,73,214,29,17,04,101,12,19,24,092,19,24,06,217,31*7B
+    $GPGSV,4,3,14,25,45,305,29,29,17,294,09,31,03,327,06,46,38,215,31*77
+    $GPGSV,4,4,14,48,36,220,32,51,44,183,43*7D
+    $GPGLL,3947.65143,N,10509.20192,W,190020.00,A,D*7D
+    $GPRMC,190021.00,A,3947.65143,N,10509.20191,W,0.050,,060818,,,D*64
+    $GPVTG,,T,,M,0.050,N,0.092,K,D*28
+    $GPGGA,190021.00,3947.65143,N,10509.20191,W,2,10,1.05,1708.0,M,-21.5,M,,0000*5C
 
 ## Using gpsd
 
