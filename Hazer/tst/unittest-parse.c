@@ -12,7 +12,9 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
+#if !defined(_BSD_SOURCE)
 #define _BSD_SOURCE
+#endif
 #include <endian.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"

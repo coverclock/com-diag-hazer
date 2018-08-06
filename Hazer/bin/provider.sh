@@ -11,10 +11,10 @@
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 SPEED=${1:-"9600"}
-DEVICE=${2:-"/dev/ttyS0"}
+DEVICE=${2:-"/dev/ttyUSB1"}
 PORT=${3:-"5555"}
 
 stty sane
 clear
 
-exec gpstool -6 -P ${PORT} -D ${DEVICE} -b ${SPEED} -8 -n -1 -O -E
+exec gpstool -6 -P ${PORT} -O -D ${DEVICE} -b ${SPEED} -8 -n -1 -E
