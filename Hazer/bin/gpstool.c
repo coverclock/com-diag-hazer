@@ -1361,7 +1361,7 @@ int main(int argc, char * argv[])
 			 * reason to put this reality check in.)
 			 */
 
-			assert(fix[system].tot_nanoseconds >= nanoseconds);
+			//assert(fix[system].tot_nanoseconds >= nanoseconds);
 			nanoseconds = fix[system].tot_nanoseconds;
 
 			/*
