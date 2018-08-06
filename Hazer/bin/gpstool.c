@@ -64,18 +64,26 @@
 #include "com/diag/diminuto/diminuto_coherentsection.h"
 #include "com/diag/diminuto/diminuto_criticalsection.h"
 #include "com/diag/diminuto/diminuto_interrupter.h"
+#include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/diminuto/diminuto_list.h"
-
-static const size_t LIMIT = 80;
-static const size_t UNLIMITED = ~0;
+#include "com/diag/diminuto/diminuto_alarm.h"
+#include "com/diag/diminuto/diminuto_timer.h"
+#include "com/diag/diminuto/diminuto_frequency.h"
+#include "com/diag/diminuto/diminuto_countof.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
 typedef enum Protocol { UNUSED = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
 typedef enum Format { UNKNOWN = 0, NMEA = 1, UBX = 2 } format_t;
+
+static const size_t LIMIT = 80;
+
+static const size_t UNLIMITED = ~(size_t)0;
+
+static const char LABEL[] = "FIX";
 
 /**
  * Emit an NMEA sentences to the specified stream after adding the ending
@@ -200,15 +208,18 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
  * Select the best global navigation satellite system from among those
  * currently active by finding the one with the lowest dilution of precision.
  * @param aa points to the array of active GNSSes.
+ * @param la points to the array of lifetimes for each GNSS.
  * @return an index to the best GNSS or HAZER_SYSTEM_TOTAL is an error occurred.
  */
-static hazer_system_t select_active(const hazer_active_t aa[])
+static hazer_system_t select_active(const hazer_active_t aa[], const unsigned la[])
 {
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
 	int candidate = 0;
 
 	for (candidate = 0; candidate < HAZER_SYSTEM_TOTAL; ++candidate) {
-		if (aa[candidate].active == 0) {
+		if (la[candidate] == 0) {
+			continue;
+		} else if (aa[candidate].active == 0) {
 			continue;
 		} else if (system == HAZER_SYSTEM_TOTAL) {
 			system = (hazer_system_t)candidate;
@@ -242,7 +253,7 @@ static hazer_system_t select_active(const hazer_active_t aa[])
 static int print_actives(FILE * fp, const char * name, const hazer_active_t aa[])
 {
 	int count = 0;
-    static const unsigned int IDENTIFIERS = sizeof(aa[0].id) / sizeof(aa[0].id[0]);
+    static const unsigned int IDENTIFIERS = countof(aa[0].id);
     int satellite = 0;
     int limit = 0;
     int system = 0;
@@ -277,7 +288,7 @@ static int print_actives(FILE * fp, const char * name, const hazer_active_t aa[]
  */
 static void print_views(FILE *fp, const char * name, const hazer_view_t va[])
 {
-    static const int SATELLITES = sizeof(va[0].sat) / sizeof(va[0].sat[0]);
+    static const int SATELLITES = countof(va[0].sat);
     int channel = 0;
     int system = 0;
     int satellite = 0;
@@ -296,13 +307,14 @@ static void print_views(FILE *fp, const char * name, const hazer_view_t va[])
 }
 
 /**
- * Print a single navigation position.
+ * Print a single navigation position fix.
  * @param fp points to the FILE stream.
  * @param name is NMEA sentence performing this print.
  * @param pp points to the single navigation position.
  * @param pps is the current value of the 1PPS strobe.
+ * @param lifetime is the number of seconds until this fix expires.
  */
-static void print_position(FILE * fp, const char * name, const hazer_position_t * pp, int pps)
+static void print_position(FILE * fp, const char * name, const hazer_position_t * pp, int pps, unsigned lifetime)
 {
     uint64_t nanoseconds = 0;
     int year = 0;
@@ -356,7 +368,9 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
 
     fprintf(fp, " %8.3lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
 
-    fprintf(fp, " PPS %c", pps ? '1' : '0');
+    fprintf(fp, " pps %c", pps ? '1' : '0');
+
+    fprintf(fp, " sec %u", lifetime);
 
     fputc('\n', fp);
 }
@@ -403,12 +417,11 @@ static void print_solution(FILE * fp, const char * name, const hazer_position_t 
     fputc('\n', fp);
 }
 
-struct Context {
-	int done;
-	diminuto_mux_t * muxp;
+struct Poller {
 	FILE * ppsfp;
 	FILE * strobefp;
 	int * oneppsp;
+	int done;
 };
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -422,13 +435,13 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static void * dcdpoller(void * argp)
 {
 	void * xc = (void *)1;
-	struct Context * ctxp = (struct Context *)0;
+	struct Poller * ctxp = (struct Poller *)0;
 	int done = 0;
 	int rc = -1;
 	int nowpps = 0;
 	int waspps = 0;
 
-	ctxp = (struct Context *)argp;
+	ctxp = (struct Poller *)argp;
 
 	while (!0) {
 		DIMINUTO_COHERENT_SECTION_BEGIN;
@@ -474,48 +487,62 @@ static void * dcdpoller(void * argp)
 static void * gpiopoller(void * argp)
 {
 	void * xc = (void *)1;
-	struct Context * ctxp = (struct Context *)0;
+	struct Poller * pollerp = (struct Poller *)0;
+    diminuto_mux_t mux = { 0 };
+	int ppsfd = -1;
 	int done = 0;
 	int rc = -1;
 	int nowpps = 0;
 	int waspps = 0;
 
-	ctxp = (struct Context *)argp;
+	pollerp = (struct Poller *)argp;
+
+    diminuto_mux_init(&mux);
+    ppsfd = fileno(pollerp->ppsfp);
+    rc = diminuto_mux_register_interrupt(&mux, ppsfd);
+    assert(rc >= 0);
 
 	while (!0) {
 		DIMINUTO_COHERENT_SECTION_BEGIN;
-			done = ctxp->done;
+			done = pollerp->done;
 		DIMINUTO_COHERENT_SECTION_END;
 		if (done) {
 			xc = (void *)0;
 			break;
 		}
-		rc = diminuto_mux_wait(ctxp->muxp, -1);
+		rc = diminuto_mux_wait(&mux, -1);
 		if (rc < 0) { break; }
 		if (rc == 0) { continue; }
-		rc = diminuto_mux_ready_interrupt(ctxp->muxp);
-		assert(rc == fileno(ctxp->ppsfp));
-		rc = diminuto_pin_get(ctxp->ppsfp);
-		if (rc < 0) { break; }
-		nowpps = !!rc;
-		if (nowpps == waspps) {
-			/* Do nothing. */
-		} else if (nowpps) {
-			if (ctxp->strobefp != (FILE *)0) {
-				rc = diminuto_pin_set(ctxp->strobefp);
-				if (rc < 0) { break; }
+		while (!0) {
+			rc = diminuto_mux_ready_interrupt(&mux);
+			if (rc < 0) { break; }
+			assert(rc == ppsfd);
+			rc = diminuto_pin_get(pollerp->ppsfp);
+			if (rc < 0) { break; }
+			nowpps = !!rc;
+			if (nowpps == waspps) {
+				/* Do nothing. */
+			} else if (nowpps) {
+				if (pollerp->strobefp != (FILE *)0) {
+					rc = diminuto_pin_set(pollerp->strobefp);
+					if (rc < 0) { break; }
+				}
+				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+					*(pollerp->oneppsp) = !0;
+				DIMINUTO_CRITICAL_SECTION_END;
+			} else {
+				if (pollerp->strobefp != (FILE *)0) {
+					rc = diminuto_pin_clear(pollerp->strobefp);
+					if (rc < 0) { break; }
+				}
 			}
-			DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-				*(ctxp->oneppsp) = !0;
-			DIMINUTO_CRITICAL_SECTION_END;
-		} else {
-			if (ctxp->strobefp != (FILE *)0) {
-				rc = diminuto_pin_clear(ctxp->strobefp);
-				if (rc < 0) { break; }
-			}
+			waspps = nowpps;
 		}
-		waspps = nowpps;
+		if (rc < 0) { break; }
 	}
+
+    rc = diminuto_mux_unregister_interrupt(&mux, ppsfd);
+    diminuto_mux_fini(&mux);
 
 	return xc;
 }
@@ -550,9 +577,10 @@ int main(int argc, char * argv[])
 	unsigned char * bp = (char *)0;
     hazer_buffer_t datagram = { 0 };
     hazer_vector_t vector = { 0 };
-    hazer_position_t position[HAZER_SYSTEM_TOTAL] = { { 0 } };
-    hazer_active_t solution[HAZER_SYSTEM_TOTAL] = { 0 };
+    hazer_position_t fix[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0 } };
     hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    unsigned lifetime[HAZER_SYSTEM_TOTAL] = { 0 };
     FILE * infp = stdin;
     FILE * outfp = stdout;
     FILE * errfp = stderr;
@@ -561,7 +589,6 @@ int main(int argc, char * argv[])
     FILE * strobefp = (FILE *)0;
     FILE * ppsfp = (FILE *)0;
     int devfd = -1;
-    int ppsfd = -1;
     int sock = -1;
     int rc = 0;
     int ch = EOF;
@@ -576,7 +603,7 @@ int main(int argc, char * argv[])
     char lsn = '\0';
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
-    hazer_system_t active = HAZER_SYSTEM_TOTAL;
+    hazer_system_t preferred = HAZER_SYSTEM_TOTAL;
     int opt = -1;
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
@@ -607,24 +634,26 @@ int main(int argc, char * argv[])
     int onepps = 0;
     int tmppps = 0;
     uint64_t nanoseconds = 0;
-    diminuto_mux_t mux = { 0 };
-    struct Context ctx = { 0 };
+    struct Poller poller = { 0 };
     void * result = (void *)0;
     pthread_t thread;
     int pthreadrc = -1;
     FILE * fp = (FILE *)0;
     int offset = 1;
     int offsetb4 = 0;
-    static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:Vb:cdehlmnop:rsv?";
+    int elapsed = 0;
+    unsigned timeout = 60;
+    static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:Vb:cdehlmnop:rst:v?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
     extern int optopt;
 
-    program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
+    /*
+     * Parse the command line.
+     */
 
-    rc = diminuto_interrupter_install(0);
-    assert(rc >= 0);
+    program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
     while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
@@ -719,11 +748,14 @@ int main(int argc, char * argv[])
         case 's':
             xonxoff = !0;
             break;
+        case 't':
+            timeout = strtoul(optarg, (char **)0, 0);
+        	break;
         case 'v':
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ]\n", program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -738,7 +770,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
             fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(errfp, "       -R          Print a report on standard output.\n");
-            fprintf(errfp, "       -W NMEA     Collapse escapes, generate and append suffix, and write to DEVICE.\n");
+            fprintf(errfp, "       -W NMEA     Collapse escapes, append checksum, and write to DEVICE.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
             fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(errfp, "       -c          Wait for DCD to be asserted (requires -D and implies -m).\n");
@@ -752,6 +784,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -h          Use RTS/CTS for DEVICE.\n");
             fprintf(errfp, "       -r          Reverse use of standard output and standard error.\n");
             fprintf(errfp, "       -s          Use XON/XOFF for DEVICE.\n");
+            fprintf(errfp, "       -t SECONDS  Expire GNSS data after SECONDS seconds.\n");
             fprintf(errfp, "       -v          Display verbose output on standard error.\n");
             return 1;
             break;
@@ -761,6 +794,24 @@ int main(int argc, char * argv[])
     /**
      ** INITIALIZATION
      **/
+
+    /*
+     * Install our signal handlers.
+     */
+
+    rc = diminuto_interrupter_install(0);
+    assert(rc >= 0);
+
+    rc = diminuto_terminator_install(0);
+    assert(rc >= 0);
+
+    rc = diminuto_alarm_install(!0);
+    assert(rc >= 0);
+
+    /*
+     * Are we using a GPS receiver with a serial port instead of a IP datagram
+     * or standard input?
+     */
 
     if (device != (const char *)0) {
 
@@ -781,6 +832,10 @@ int main(int argc, char * argv[])
 
     }
 
+    /*
+     * Are we logging every valid sentence or packet to an output file?
+     */
+
     if (path == (const char *)0) {
     	/* Do nothing. */
     } else if (strcmp(path, "-") == 0) {
@@ -790,6 +845,11 @@ int main(int argc, char * argv[])
     	if (logfp == (FILE *)0) { diminuto_perror(path); }
     	assert(logfp != (FILE *)0);
     }
+
+    /*
+     * Are we consuming GPS data from an IP port, or producing GPS data on an
+     * IP host and port?
+     */
 
     if (service == (const char *)0) {
 
@@ -851,6 +911,12 @@ int main(int argc, char * argv[])
 
     }
 
+    /*
+     * Are we strobing a GPIO pin with the one pulse per second (1PPS)
+     * indication we receive via either another GPIO pin or Data Carrier
+     * Detect (DCD) on the serial line?
+     */
+
     if (strobe != (const char *)0) {
         strobepin = strtol(strobe, (char **)0, 0);
         if (strobepin >= 0) {
@@ -889,16 +955,11 @@ int main(int argc, char * argv[])
         assert (ppsfp != (FILE *)0);
         rc = diminuto_pin_get(ppsfp);
         assert(rc >= 0);
-        ppsfd = fileno(ppsfp);
-        diminuto_mux_init(&mux);
-        rc = diminuto_mux_register_interrupt(&mux, ppsfd);
-        assert(rc >= 0);
-        ctx.done = 0;
-        ctx.muxp = &mux;
-        ctx.ppsfp = ppsfp;
-        ctx.strobefp = strobefp;
-        ctx.oneppsp = &onepps;
-        pthreadrc = pthread_create(&thread, 0, gpiopoller, &ctx);
+        poller.done = 0;
+        poller.ppsfp = ppsfp;
+        poller.strobefp = strobefp;
+        poller.oneppsp = &onepps;
+        pthreadrc = pthread_create(&thread, 0, gpiopoller, &poller);
         if (pthreadrc != 0) {
         	errno = pthreadrc;
         	diminuto_perror("pthread_create");
@@ -924,11 +985,11 @@ int main(int argc, char * argv[])
 		if (!carrierdetect) {
 			break;
 		}
-        ctx.done = 0;
-        ctx.ppsfp = devfp;
-        ctx.strobefp = strobefp;
-        ctx.oneppsp = &onepps;
-        pthreadrc = pthread_create(&thread, 0, dcdpoller, &ctx);
+        poller.done = 0;
+        poller.ppsfp = devfp;
+        poller.strobefp = strobefp;
+        poller.oneppsp = &onepps;
+        pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
         if (pthreadrc != 0) {
         	errno = pthreadrc;
         	diminuto_perror("pthread_create");
@@ -941,9 +1002,27 @@ int main(int argc, char * argv[])
         yodel_debug(errfp);
     }
 
-    /**
-     ** WORK LOOP
-     **/
+    /*
+     * Fire up our periodic timer so we can keep track of the age of every
+     * GPS update we receive. GPS receivers aren't polite enough to inform
+     * us when they've stopped getting updates from a particular global
+     * navigation satellite system (GNSS); we must notice this by their absence.
+     * And some receivers can receive updates from more than one GNSS by virtue
+     * of having more than one radio frequency (RF) stage, so that they can
+     * receive multiple frequencies simultaneously. Fresher updates are
+     * preferred over stale ones.
+     */
+
+    rc = diminuto_timer_periodic(diminuto_frequency());
+    assert(rc == 0);
+
+    /*
+     * Initialize the NMEA (Hazer) and UBX (Yodel) parsers. If you're into this
+     * kind of thing, these parsers are effectively a single non-deterministic
+     * finite state automata, an FSA that can be in more than one state at a
+     * time, with both state machines racing to see who can recognize a valid
+     * statement in their own grammar first.
+     */
 
     rc = hazer_initialize();
     assert(rc == 0);
@@ -951,9 +1030,16 @@ int main(int argc, char * argv[])
     rc = yodel_initialize();
     assert(rc == 0);
 
+    /**
+     ** WORK LOOP
+     **
+     ** We keep working until the far end goes away (file EOF or socket close),
+     ** or until we are interrupted by a SIGINT or terminated by a SIGTERM.
+     **/
+
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
 
-    while (!diminuto_interrupter_check()) {
+    while ((!diminuto_interrupter_check()) && (!diminuto_terminator_check())) {
 
     	buffer = (void *)0;
         nmea_state = HAZER_STATE_START;
@@ -1140,6 +1226,32 @@ int main(int argc, char * argv[])
         if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
         if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
 
+        /*
+         * EXPIRE
+         *
+         * See how many seconds have elapsed since the last time we received
+         * a valid message from a system we recognize. (Might be zero.)
+         * Subtract that number from all the expirations and figure out if
+         * there's a system we've stopped hearing from. Then update the
+         * system we just heard from with a full expiration time.
+         */
+
+        elapsed = diminuto_alarm_check();
+        if (elapsed > 0) {
+        	int ii;
+        	for (ii = 0; ii < countof(lifetime); ++ii) {
+        		if (lifetime[ii] == 0) {
+        			/* Do nothing. */
+        		} else if (lifetime[ii] <= elapsed) {
+        			lifetime[ii] = 0;
+        		} else {
+        			lifetime[ii] -= elapsed;
+        		}
+        	}
+        }
+
+        lifetime[system] = timeout;
+
         /**
          ** PROCESS
          **
@@ -1148,66 +1260,95 @@ int main(int argc, char * argv[])
 
         if (format == NMEA) {
 
-			count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]),  buffer, size);
+        	/*
+        	 * We tokenize the NMEA sentence so we can parse it later. Then
+        	 * we regenerate the sentence, and verify it, mostly to test the
+        	 * underlying API (although we may use the regenerated sentence
+        	 * later, since the original was mutated by the tokenization).
+        	 */
+
+			count = hazer_tokenize(vector, countof(vector), buffer, size);
 			assert(count >= 0);
 			assert(vector[count - 1] == (char *)0);
-			assert(count <= (sizeof(vector) / sizeof(vector[0])));
+			assert(count <= countof(vector));
 
 			size = hazer_serialize(datagram, sizeof(datagram), vector, count);
 			assert(size <= (sizeof(datagram) - 4));
 			assert(datagram[size - 1] == '\0');
 			assert(datagram[size - 2] == '*');
+
 			bp = (unsigned char *)hazer_checksum(datagram, size, &nmea_cs);
 			hazer_checksum2characters(nmea_cs, &msn, &lsn);
 			assert(bp[0] == '*');
+
 			*(++bp) = msn;
 			*(++bp) = lsn;
 			*(++bp) = '\r';
 			*(++bp) = '\n';
 			*(++bp) = '\0';
+
 			size += 4;
 			assert(size <= sizeof(datagram));
 			assert(strncmp(datagram, buffer, size));
 
+			/*
+			 * Make sure it's a talker and a GNSS that we care about.
+			 *
+			 * As a special case, if we receive an update on active satellites
+			 * or satellites in view from something we don't recognize, then
+			 * we have a new GNSS that isn't supported. That's worth noting.
+			 */
+
 			if (count < 1) {
 				continue;
 			} else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
+				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
+					fprintf(errfp, "%s: NEW \"%c%c\"\n", program, vector[0][1], vector[0][2]);
+				}
 				continue;
 			} else if ((system = hazer_parse_system(talker)) >= HAZER_SYSTEM_TOTAL) {
+				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
+					fprintf(errfp, "%s: NEW \"%c%c\"\n", program, vector[0][1], vector[0][2]);
+				}
 				continue;
-			} else if (active >= HAZER_SYSTEM_TOTAL) {
-				active = system;
+			} else if (preferred >= HAZER_SYSTEM_TOTAL) {
+				preferred = system;
 			} else {
 				/* Do nothing. */
 			}
 
-			if (hazer_parse_gga(&position[system], vector, count) == 0) {
+			/*
+			 * Parse the sentences we care about - GGA, RMC, GSA, and GSV
+			 * currently - and update our state to reflect to new data.
+			 */
+
+			if (hazer_parse_gga(&fix[system], vector, count) == 0) {
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, "MAP",  &position[active], tmppps); }
+				if (report) { print_position(outfp, LABEL,  &fix[preferred], tmppps, lifetime[preferred]); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, "GGA",  &position[active], HAZER_SYSTEM_NAME[active]); }
-			} else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
+				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_GGA,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+			} else if (hazer_parse_rmc(&fix[system], vector, count) == 0) {
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, "MAP", &position[active], tmppps); }
+				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, "RMC",  &position[active], HAZER_SYSTEM_NAME[active]); }
-			} else if (hazer_parse_gsa(&solution[system], vector, count) == 0) {
-				active = select_active(solution);
-				assert(active < HAZER_SYSTEM_TOTAL);
+				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_RMC,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+			} else if (hazer_parse_gsa(&active[system], vector, count) == 0) {
+				preferred = select_active(active, lifetime);
+				assert(preferred < HAZER_SYSTEM_TOTAL);
 				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-				if (report) { offsetb4 = offset; offset = print_actives(outfp, "GSA", solution); }
+				if (report) { offsetb4 = offset; offset = print_actives(outfp, HAZER_NMEA_GPS_MESSAGE_GSA, active); }
 				if (escape) { if (offset != offsetb4) { fprintf(outfp, "\033[%d;1H\033[0J", 5 + offset); } }
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 				if (escape) { fprintf(outfp, "\033[%d;1H\033[0J", 5 + offset); }
-				if (report) { print_views(outfp, "GSV", view); }
+				if (report) { print_views(outfp, HAZER_NMEA_GPS_MESSAGE_GSV, view); }
 			} else {
 				/* Do nothing. */
 			}
@@ -1215,12 +1356,12 @@ int main(int argc, char * argv[])
 			if (report) { fflush(outfp); }
 
 			/*
-			 * Check that time is only running forwards. (I put this check
-			 * in for a reason.)
+			 * Check that time is only running forwards. (Remarkably, I had a
+			 * reason to put this reality check in.)
 			 */
 
-			assert(position[system].tot_nanoseconds >= nanoseconds);
-			nanoseconds = position[system].tot_nanoseconds;
+			assert(fix[system].tot_nanoseconds >= nanoseconds);
+			nanoseconds = fix[system].tot_nanoseconds;
 
 			/*
 			 * We only output NMEA sentences to a device, and even then
@@ -1231,7 +1372,7 @@ int main(int argc, char * argv[])
 
 			if (!output) {
 				/* Do nothing. */
-			} else if (position[system].dmy_nanoseconds == 0) {
+			} else if (fix[system].dmy_nanoseconds == 0) {
 				/* Do nothing (confuses Google Earth). */
 			} else {
 				fputs(datagram, devfp);
@@ -1264,7 +1405,7 @@ int main(int argc, char * argv[])
 
     if (pthreadrc == 0) {
     	DIMINUTO_COHERENT_SECTION_BEGIN;
-    		ctx.done = !0;
+    		poller.done = !0;
     	DIMINUTO_COHERENT_SECTION_END;
     	pthreadrc = pthread_join(thread, &result);
     	if (pthreadrc != 0) {
@@ -1274,8 +1415,6 @@ int main(int argc, char * argv[])
     }
 
     if (ppsfp != (FILE *)0) {
-        rc = diminuto_mux_unregister_interrupt(&mux, ppsfd);
-        diminuto_mux_fini(&mux);
         ppsfp = diminuto_pin_unused(ppsfp, ppspin);
     }
 
