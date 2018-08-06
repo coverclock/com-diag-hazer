@@ -1341,6 +1341,15 @@ int main(int argc, char * argv[])
 				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
 				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_RMC,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+			} else if (hazer_parse_gll(&fix[system], vector, count) == 0) {
+				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+					tmppps = onepps;
+					onepps = 0;
+				DIMINUTO_CRITICAL_SECTION_END;
+				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
+				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
+				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
+				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_GLL,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
 			} else if (hazer_parse_gsa(&active[system], vector, count) == 0) {
 				preferred = select_active(active, lifetime);
 				assert(preferred < HAZER_SYSTEM_TOTAL);

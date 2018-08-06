@@ -646,6 +646,15 @@ extern int hazer_parse_gga(hazer_position_t *positionp, char * vector[], size_t 
  */
 extern int hazer_parse_rmc(hazer_position_t *positionp, char * vector[], size_t count);
 
+/**
+ * Parse a GLL NMEA sentence, updating the position.
+ * @param positionp points to the position structure (initialized to zeros).
+ * @param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_parse_gll(hazer_position_t *positionp, char * vector[], size_t count);
+
 /*******************************************************************************
  * PARSING SATELLITE ELEVATION, AZIMUTH, AND SIGNAL STRENGTH SENTENCES
  ******************************************************************************/

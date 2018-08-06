@@ -69,7 +69,7 @@ Hazer has been successfully tested with the following GPS devices.
 * Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
-* Navlocate GN-803G (U-Blox 8, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8]
+* TOPGNSS GN-803G (U-Blox 8 UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8]
 
 [1] An excellent all around GPS receiver easily acquired from numerous outlets.    
 [2] Emits all sorts of interesting stuff in unsolicited $GPTXT sentences.    
@@ -617,3 +617,43 @@ can deconfigure GPIO pins using the Diminuto pintool utility
 
     # pintool -p 18 -n
     # pintool -p 16 -n
+
+## Ensemble Fixes
+
+Some GPS receivers, U-Blox 8 among them, have multiple RF stages so that they
+can receive more than one GNSS at a time, at different frequencies. This is
+what the display looks like with such a receiver, in this case a GN-803G with
+a U-Blox 8. Note that the receiver is computing a fix based on the GLONASS
+constellation, but identifies the talker as GN or generic GNSS, indicating it
+may be based on an ensemble of multiple global navigation satellite systems.
+
+    $GNGLL,3947.65609,N,10509.21294,W,202955.00,A,D*6D\r\n
+    \xb5b\x06>\0\0
+    FIX 2018-08-06T20:29:55Z 39*47'39.36"N,105*09'12.77"W  5624.60' N     0.066mph pps 0 sec 10
+    GLL 39.794268,-105.153549  1714.400m   0.000*    0.057knots [12] ( 9 10 5 0 4 ) sys GNSS
+    GSA {  86  71  85  87  76  72  78 } [07] pdop 1.20 hdop 0.67 vdop 1.00 sys GNSS
+    GSV [01] sat   2 elv 45* azm  59* snr 29dBHz sys GPS
+    GSV [02] sat   5 elv 71* azm  92* snr 27dBHz sys GPS
+    GSV [03] sat   6 elv  1* azm  72* snr  0dBHz sys GPS
+    GSV [04] sat   9 elv  0* azm  27* snr  0dBHz sys GPS
+    GSV [05] sat  12 elv 30* azm 186* snr 34dBHz sys GPS
+    GSV [06] sat  13 elv  8* azm 137* snr 20dBHz sys GPS
+    GSV [07] sat  15 elv  0* azm 172* snr 12dBHz sys GPS
+    GSV [08] sat  21 elv 10* azm 265* snr 20dBHz sys GPS
+    GSV [09] sat  25 elv 50* azm 240* snr 31dBHz sys GPS
+    GSV [10] sat  26 elv  2* azm 328* snr  0dBHz sys GPS
+    GSV [11] sat  29 elv 51* azm 316* snr 37dBHz sys GPS
+    GSV [12] sat  31 elv  1* azm 293* snr  0dBHz sys GPS
+    GSV [13] sat  46 elv 38* azm 215* snr 29dBHz sys GPS
+    GSV [14] sat  48 elv 36* azm 220* snr  0dBHz sys GPS
+    GSV [15] sat  51 elv 44* azm 183* snr 37dBHz sys GPS
+    GSV [16] sat  70 elv 26* azm  36* snr  0dBHz sys GLONASS
+    GSV [17] sat  71 elv 57* azm  98* snr 27dBHz sys GLONASS
+    GSV [18] sat  72 elv 31* azm 166* snr 36dBHz sys GLONASS
+    GSV [19] sat  76 elv 12* azm 228* snr 30dBHz sys GLONASS
+    GSV [20] sat  77 elv 25* azm 287* snr 13dBHz sys GLONASS
+    GSV [21] sat  78 elv 10* azm 335* snr 21dBHz sys GLONASS
+    GSV [22] sat  85 elv 18* azm  91* snr 22dBHz sys GLONASS
+    GSV [23] sat  86 elv 57* azm  35* snr 30dBHz sys GLONASS
+    GSV [24] sat  87 elv 31* azm 311* snr 31dBHz sys GLONASS
+
