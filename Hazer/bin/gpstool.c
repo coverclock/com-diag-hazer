@@ -692,6 +692,7 @@ int main(int argc, char * argv[])
         	path = optarg;
         	break;
         case 'O':
+            readonly = 0;
             output = !0;
             break;
         case 'P':
@@ -1375,8 +1376,10 @@ int main(int argc, char * argv[])
 			} else if (fix[system].dmy_nanoseconds == 0) {
 				/* Do nothing (confuses Google Earth). */
 			} else {
-				fputs(datagram, devfp);
-				fflush(devfp);
+				rc = fputs(datagram, devfp);
+                assert(rc != EOF);
+				rc = fflush(devfp);
+                assert(rc != EOF);
 			}
 
         } else if (format == UBX) {
@@ -1421,14 +1424,17 @@ int main(int argc, char * argv[])
 
     if (ppsfp != (FILE *)0) {
         ppsfp = diminuto_pin_unused(ppsfp, ppspin);
+        assert(ppsfp == (FILE *)0);
     }
 
     if (strobefp != (FILE *)0) {
     	strobefp = diminuto_pin_unused(strobefp, strobepin);
+        assert(strobefp == (FILE *)0);
     }
 
     if (sock >= 0) {
-        diminuto_ipc_close(sock);
+        rc = diminuto_ipc_close(sock);
+        assert(rc >= 0);
     }
 
     if (logfp == (FILE *)0) {
@@ -1436,14 +1442,18 @@ int main(int argc, char * argv[])
     } else if (logfp == stdout) {
     	/* Do nothing. */
     } else {
-    	fclose(logfp);
+    	rc = fclose(logfp);
+        assert(rc != EOF);
     }
 
-    (void)fclose(infp);
+    rc =fclose(infp);
+    assert(rc != EOF);
 
-    (void)fclose(outfp);
+    rc = fclose(outfp);
+    assert(rc != EOF);
 
-    (void)fclose(errfp);
+    rc = fclose(errfp);
+    assert(rc != EOF);
 
     return 0;
 }
