@@ -31,8 +31,11 @@ If you're wondering why I don't use the excellent open source GPS daemon
 (gpsd) and its GPS monitor (gpsmon), the answer is I have, in several projects,
 typically in conjunction with the open source NTPsec daemon (ntpd). Hazer was
 developed as an excuse for me to learn in detail more about how GPS works and
-NMEA sentences are formatted, because I only learn by doing. Hazer and gpstool
-have also turned out to be really useful tools to examine GPS devices.
+how NMEA and UBX sentences are formatted (because I only learn by doing), and
+also to develop an NMEA and UBX parsing library that I can incorporate into
+the kinds of embedded systems I am frequently called to work upon. Hazer and
+gpstool have also turned out to be really useful tools for testing and
+evaluating GPS devices.
 
 # Devices
 
@@ -42,16 +45,17 @@ Hazer has been successfully tested with the following GPS chipsets.
 * SiRF Star II    
 * SiRF Star III    
 * SiRF Star IV    
-* U-Blox 7    
 * U-Blox LEA-6T    
+* U-Blox 7    
 * U-Blox M8    
 
-Hazer has been successfully tested with the following serial-to-USB chipsets.
+Hazer has been successfully tested with the following serial-to-USB chipsets
+used by GPS devices.
 
 * Cygnal Integrated Products    
 * FTDI    
 * Prolific    
-* U-Blox (probably integrated into the GPS chip itself)    
+* U-Blox (apparently integrated into the GPS chip itself)    
 
 Hazer has been successfully tested with the following GPS devices.
 
@@ -69,7 +73,9 @@ Hazer has been successfully tested with the following GPS devices.
 * Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
-* TOPGNSS GN-803G (U-Blox 8 UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]
+* TOPGNSS GN-803G (U-Blox 8 UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
+
+Footnotes:
 
 [1] An excellent all around GPS receiver easily acquired from numerous outlets.    
 [2] Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
@@ -99,12 +105,27 @@ Ubuntu 16.04.2
 Linux 4.10.0    
 gcc 5.4.0    
 
+"Bronze"    
+Raspberry Pi 2 Model B (32-bit ARM)    
+Broadcom BCM2836 Cortex-A7 ARMv7 @ 900MHz x 4    
+Raspbian GNU/Linux 8.0 "jessie"    
+Linux 4.4.34    
+gcc 4.9.2    
+
 "Zinc"    
 Raspberry Pi 3 Model B    
 Broadcom BCM2837 Cortex-A53 ARMv7 @ 1.2GHz x 4    
 Raspbian GNU/Linux 8.0    
 Linux 4.4.34    
 gcc 4.9.2    
+
+"Gold"    
+Raspberry Pi 3B+    
+ARMv7 64-bit    
+Broadcom BCM2837B0 Cortex-A53 @ 1.4GHz x 4    
+Raspbian 9.4 "stretch"    
+Linux 4.14.34    
+gcc 6.3.0    
 
 # Contact
 
@@ -255,94 +276,110 @@ continually updated. (In this and most other output, the asterisk * is used to
 mean the degree symbol. This should not be confused with its use as a delimeter
 in NMEA sentences.)
 
-    $GPGLL,3947.65116,N,10509.20214,W,155017.00,A,D*7D\r\n
+    GNGLL,3947.65154,N,10509.20172,W,163507.00,A,A*62\r\n
     \xb5b\x06>\0\0
-    FIX 2018-08-06T15:50:17Z 39*47'39.06"N,105*09'12.12"W  5627.23' N     0.052mph pps 0 sec 10
-    GGA 39.794186,-105.153369  1715.200m   0.000*    0.045knots [12] ( 9 10 5 0 4 ) sys GPS
-    GSA {  51  24  30  48  12  19   2  28   6   3  17  22 } [12] pdop 1.36 hdop 0.75 vdop 1.13 sys GPS
-    GSV [01] sat   1 elv 10* azm  38* snr 19dBHz sys GPS
-    GSV [02] sat   2 elv 14* azm 203* snr 35dBHz sys GPS
-    GSV [03] sat   3 elv 12* azm  72* snr 28dBHz sys GPS
-    GSV [04] sat   6 elv 51* azm 175* snr 39dBHz sys GPS
-    GSV [05] sat  12 elv 12* azm 301* snr 21dBHz sys GPS
-    GSV [06] sat  13 elv  6* azm 226* snr  0dBHz sys GPS
-    GSV [07] sat  15 elv  3* azm 261* snr  0dBHz sys GPS
-    GSV [08] sat  17 elv 65* azm  28* snr 21dBHz sys GPS
-    GSV [09] sat  19 elv 73* azm 297* snr 32dBHz sys GPS
-    GSV [10] sat  22 elv  8* azm  51* snr 15dBHz sys GPS
-    GSV [11] sat  24 elv 34* azm 303* snr 33dBHz sys GPS
-    GSV [12] sat  28 elv 41* azm  99* snr 32dBHz sys GPS
-    GSV [13] sat  30 elv  9* azm 161* snr 37dBHz sys GPS
-    GSV [14] sat  46 elv 38* azm 215* snr 33dBHz sys GPS
-    GSV [15] sat  48 elv 36* azm 220* snr 37dBHz sys GPS
-    GSV [16] sat  51 elv 44* azm 183* snr 40dBHz sys GPS
+    FIX 2018-08-07T16:35:07Z 39*47'39.09"N,105*09'12.10"W  5599.01' N     0.044mph pps 0 sec 10
+    GLL 39.794192,-105.153362  1706.600m   0.000*T   0.000*M    0.038knots    0.071kph [12] sys GNSS
+    GSA {  75  85  76  86  74  84 } [06] pdop 1.36 hdop 0.79 vdop 1.11 sys GNSS
+    GSV [01] sat   2 elv 35* azm 208* snr 36dBHz sys GPS
+    GSV [02] sat   3 elv 14* azm  52* snr 35dBHz sys GPS
+    GSV [03] sat   6 elv 74* azm 153* snr 31dBHz sys GPS
+    GSV [04] sat  12 elv 30* azm 311* snr 36dBHz sys GPS
+    GSV [05] sat  17 elv 48* azm  51* snr 35dBHz sys GPS
+    GSV [06] sat  19 elv 69* azm  13* snr 25dBHz sys GPS
+    GSV [07] sat  22 elv  2* azm  34* snr 21dBHz sys GPS
+    GSV [08] sat  24 elv 41* azm 277* snr 35dBHz sys GPS
+    GSV [09] sat  28 elv 24* azm 118* snr 26dBHz sys GPS
+    GSV [10] sat  46 elv 38* azm 215* snr 33dBHz sys GPS
+    GSV [11] sat  48 elv 36* azm 220* snr 31dBHz sys GPS
+    GSV [12] sat  51 elv 44* azm 183* snr 40dBHz sys GPS
+    GSV [13] sat  68 elv  0* azm   5* snr  0dBHz sys GLONASS
+    GSV [14] sat  69 elv  8* azm  51* snr 24dBHz sys GLONASS
+    GSV [15] sat  70 elv  2* azm 101* snr  0dBHz sys GLONASS
+    GSV [16] sat  74 elv 16* azm 158* snr 35dBHz sys GLONASS
+    GSV [17] sat  75 elv 69* azm 184* snr 35dBHz sys GLONASS
+    GSV [18] sat  76 elv 54* azm 317* snr 34dBHz sys GLONASS
+    GSV [19] sat  84 elv  6* azm  45* snr 13dBHz sys GLONASS
+    GSV [20] sat  85 elv 55* azm  20* snr 40dBHz sys GLONASS
+    GSV [21] sat  86 elv 53* azm 262* snr 39dBHz sys GLONASS
+    GSV [22] sat  87 elv  1* azm 236* snr  0dBHz sys GLONASS
 
-The first line is the most recently read valid NMEA sentence or UBX packet.
+Line 1 has the most recently read valid NMEA sentence or UBX packet.
 
-    $GPGLL,3947.65116,N,10509.20214,W,155017.00,A,D*7D\r\n
+    GNGLL,3947.65154,N,10509.20172,W,163507.00,A,A*62\r\n
 
-The second line is the most recently written NMEA sentence or UBX packet (if
+Line 2 is the most recently written NMEA sentence or UBX packet (if
 there is one) minus the ending material that includes the checksum for either
 format (this is added automatically when the buffer is written).    
 
     \xb5b\x06>\0\0
 
-The third line is the date and time in UTC, latitude and longitude in hours
-minutes and decimal seconds, altitude in feet, cardinal direction, speed in
-miles per hour, the current one pulse per second (PPS) strobe value, and
-the number of seconds that must elapse for this particular fix to be considered
-stale because no update for the GNSS from which is was computed has been
-received.
+Line 3 has the date and time in UTC, latitude and longitude in hours
+minutes and decimal seconds, altitude in feet, cardinal direction of the
+true bearing (only valid if you are moving), speed in miles per hour, the
+current one pulse per second (PPS) strobe value, and the number of seconds that
+must elapse for this particular fix to be considered stale because no update for
+the GNSS from which is was computed has been received. (The next line has much
+the same information but in different units.)
 
-    FIX 2018-08-06T15:50:17Z 39*47'39.06"N,105*09'12.12"W  5627.23' N     0.052mph pps 0 sec 10
+    FIX 2018-08-07T16:35:07Z 39*47'39.09"N,105*09'12.10"W  5599.01' N     0.044mph pps 0 sec 10
 
-The fourth line is the decimal latitude and longitude, altitude in meters,
-compass bearing in decimal degrees, speed in knots, the number of satellites
-used for the most recent navigation fix, some numbers indicating significant
-digits of accuracy for various values, and the GNSS that is algorithmically
-selected as the best position fix. The text at the beginning indicates
-what message was used to most recently update this information, since it can
-be provided by either a GGA or a RMC sentence.
+Line 4 has the decimal latitude and longitude, altitude in meters,
+true compass bearing in decimal degrees (which will be zero unless you are
+moving), magnetic compass bearing in decimal degress (which will be zero
+unless your device has a magnetic compass), speed in knots, speed in kilometers
+per hour, the number of satellites used for the most recent navigation fix, some
+numbers indicating significant digits of accuracy for various values, and the
+GNSS that is algorithmically selected as the best position fix. The text at the
+beginning indicates what message was used to most recently update this
+information, since it can be provided by a GGA, GGL, RMC, and VTG sentences.
 
-    GGA 39.794186,-105.153369  1715.200m   0.000*    0.045knots [12] ( 9 10 5 0 4 ) sys GPS
+    GLL 39.794192,-105.153362  1706.600m   0.000*T   0.000*M    0.038knots    0.071kph [12] sys GNSS
 
-The fifth line is a list of satellites that contributed to the current
-solution (which is frequently a subset of those being received), a count of how
-many satellites are in the list, the quality of the fix in terms of position,
-horizontal, and vertical dilution of precision, and the GNSS to which this
-applies. Later versions of Hazer have prototype support for receivers with
-multiple RF stages that are able to track multiple satellite constellations
+Line 5 (and perhaps subsequent) is a list of active satellites that contributed
+to the a solution (which is frequently a subset of those being received), a
+count of how many satellites are in the list, the quality of the fix in terms
+of position, horizontal, and vertical dilution of precision, and the GNSS to
+which this applies. Later versions of Hazer have prototype support for receivers
+with multiple RF stages that are able to track multiple satellite constellations
 (for example, both GPS and GLONASS) simultaneously, and which may arrive at
 multiple or ensemble solutions. In that case, the fix displayed above is that
 with the best (lowest) dilution of precision (DOP). This can change
 dynamically as satellites move in their orbits.
 
-    GSA {  51  24  30  48  12  19   2  28   6   3  17  22 } [12] pdop 1.36 hdop 0.75 vdop 1.13 sys GPS
+    GSA {  75  85  76  86  74  84 } [06] pdop 1.36 hdop 0.79 vdop 1.11 sys GNSS
 
-The remaining lines are, for each satellite being received (which is often a
+The remaining lines are, for each satellite being viewed (which is often a
 superset of those that contributed to the current solution): a virtual channel
 number (purely an artifact of Hazer), the satellite's identifying number (for
-the GPS constellation this is its Pseudo-Random Noise code number), its
-elevation, azimuth, and signal/noise ratio, and the constellation of which
-it is a member. Note that all satellites being tracked are shown, and so
-multiple systems are displayed, although only the best solution is displayed.
+the GPS constellation this is its Pseudo-Random Noise or PRN code number), its
+elevation and azimuth in degrees, and its signal/noise ratio, and the
+constellation of which it is a member. Note that all satellites being tracked
+are shown, and so multiple systems may be displayed, although only the
+solution with the lowest dilution of precision is displayed as the FIX.
 
-    GSV [01] sat   1 elv 10* azm  38* snr 19dBHz sys GPS
-    GSV [02] sat   2 elv 14* azm 203* snr 35dBHz sys GPS
-    GSV [03] sat   3 elv 12* azm  72* snr 28dBHz sys GPS
-    GSV [04] sat   6 elv 51* azm 175* snr 39dBHz sys GPS
-    GSV [05] sat  12 elv 12* azm 301* snr 21dBHz sys GPS
-    GSV [06] sat  13 elv  6* azm 226* snr  0dBHz sys GPS
-    GSV [07] sat  15 elv  3* azm 261* snr  0dBHz sys GPS
-    GSV [08] sat  17 elv 65* azm  28* snr 21dBHz sys GPS
-    GSV [09] sat  19 elv 73* azm 297* snr 32dBHz sys GPS
-    GSV [10] sat  22 elv  8* azm  51* snr 15dBHz sys GPS
-    GSV [11] sat  24 elv 34* azm 303* snr 33dBHz sys GPS
-    GSV [12] sat  28 elv 41* azm  99* snr 32dBHz sys GPS
-    GSV [13] sat  30 elv  9* azm 161* snr 37dBHz sys GPS
-    GSV [14] sat  46 elv 38* azm 215* snr 33dBHz sys GPS
-    GSV [15] sat  48 elv 36* azm 220* snr 37dBHz sys GPS
-    GSV [16] sat  51 elv 44* azm 183* snr 40dBHz sys GPS
+    GSV [01] sat   2 elv 35* azm 208* snr 36dBHz sys GPS
+    GSV [02] sat   3 elv 14* azm  52* snr 35dBHz sys GPS
+    GSV [03] sat   6 elv 74* azm 153* snr 31dBHz sys GPS
+    GSV [04] sat  12 elv 30* azm 311* snr 36dBHz sys GPS
+    GSV [05] sat  17 elv 48* azm  51* snr 35dBHz sys GPS
+    GSV [06] sat  19 elv 69* azm  13* snr 25dBHz sys GPS
+    GSV [07] sat  22 elv  2* azm  34* snr 21dBHz sys GPS
+    GSV [08] sat  24 elv 41* azm 277* snr 35dBHz sys GPS
+    GSV [09] sat  28 elv 24* azm 118* snr 26dBHz sys GPS
+    GSV [10] sat  46 elv 38* azm 215* snr 33dBHz sys GPS
+    GSV [11] sat  48 elv 36* azm 220* snr 31dBHz sys GPS
+    GSV [12] sat  51 elv 44* azm 183* snr 40dBHz sys GPS
+    GSV [13] sat  68 elv  0* azm   5* snr  0dBHz sys GLONASS
+    GSV [14] sat  69 elv  8* azm  51* snr 24dBHz sys GLONASS
+    GSV [15] sat  70 elv  2* azm 101* snr  0dBHz sys GLONASS
+    GSV [16] sat  74 elv 16* azm 158* snr 35dBHz sys GLONASS
+    GSV [17] sat  75 elv 69* azm 184* snr 35dBHz sys GLONASS
+    GSV [18] sat  76 elv 54* azm 317* snr 34dBHz sys GLONASS
+    GSV [19] sat  84 elv  6* azm  45* snr 13dBHz sys GLONASS
+    GSV [20] sat  85 elv 55* azm  20* snr 40dBHz sys GLONASS
+    GSV [21] sat  86 elv 53* azm 262* snr 39dBHz sys GLONASS
+    GSV [22] sat  87 elv  1* azm 236* snr  0dBHz sys GLONASS
 
 # Notes
 
@@ -619,7 +656,7 @@ can deconfigure GPIO pins using the Diminuto pintool utility
     # pintool -p 18 -n
     # pintool -p 16 -n
 
-## Ensemble Fixes
+## Ensemble Solutions
 
 Some GPS receivers, U-Blox 8 among them, have multiple RF stages so that they
 can receive more than one GNSS at a time, at different frequencies. This is
