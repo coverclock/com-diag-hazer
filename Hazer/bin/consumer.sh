@@ -7,6 +7,8 @@
 # 1. Consume NMEA datagrams from the specified IPv6 port.
 # 2. Report on standard output.
 
+# usage: consumer [ PORT ]
+
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 PORT=${1:-"5555"}

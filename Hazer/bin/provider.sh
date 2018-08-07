@@ -8,13 +8,15 @@
 # 2. Produce NMEA sentences to the specified serial device.
 # 3. Report on standard output.
 
+# usage: provider [ DEVICE [ SPEED [ PORT ] ] ]
+
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-SPEED=${1:-"9600"}
-DEVICE=${2:-"/dev/ttyUSB1"}
+DEVICE=${1:-"/dev/ttyUSB0"}
+SPEED=${2:-"4800"}
 PORT=${3:-"5555"}
 
 stty sane
 clear
 
-exec gpstool -6 -P ${PORT} -O -Z -D ${DEVICE} -b ${SPEED} -8 -n -1 -E
+exec gpstool -6 -P ${PORT} -O -D ${DEVICE} -b ${SPEED} -8 -n -1 -E

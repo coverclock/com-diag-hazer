@@ -7,10 +7,12 @@
 # 1. Consume NMEA sentences from the specified serial device
 # 2. Report on standard output.
 
+# usage: hazer [ DEVICE [ SPEED ] ]
+
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-SPEED=${1:-"9600"}
-DEVICE=${2:-"/dev/ttyUSB0"}
+DEVICE=${1:-"/dev/ttyACM0"}
+SPEED=${2:-"9600"}
 
 stty sane
 clear

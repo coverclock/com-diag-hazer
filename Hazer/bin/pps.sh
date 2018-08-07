@@ -10,6 +10,8 @@
 # GPS NMEA stream and PPS signal is fed into gpsd which in turn feeds into
 # ntpd.
 
+# usage: pps [ PIN ]
+
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 PIN=${1:-"18"}

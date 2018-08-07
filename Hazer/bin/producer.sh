@@ -8,12 +8,14 @@
 # 2. Produce NMEA datagrams to the specified IPv6 host and port.
 # 3. Report on standard output.
 
+# usage: producer [ DEVICE [ SPEED [ HOST [ PORT ] ] ] ]
+
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-SPEED=${1:-"9600"}
-DEVICE=${2:-"/dev/ttyUSB0"}
-PORT=${3:-"5555"}
-HOST=${4:-"ip6-localhost"}
+DEVICE=${1:-"/dev/ttyACM0"}
+SPEED=${2:-"9600"}
+HOST=${3:-"ip6-localhost"}
+PORT=${4:-"5555"}
 
 stty sane
 clear

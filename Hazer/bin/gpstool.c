@@ -632,7 +632,6 @@ int main(int argc, char * argv[])
     int strobepin = -1;
     int ppspin = -1;
     int ignorechecksums = 0;
-    int filterzerodmy = 0;
     role_t role = NONE;
     protocol_t protocol = IPV4;
     format_t format = UNKNOWN;
@@ -656,7 +655,7 @@ int main(int argc, char * argv[])
     int offsetb4 = 0;
     int elapsed = 0;
     unsigned timeout = 60;
-    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:VZb:cdehlmnop:rst:v?";
+    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:Vb:cdehlmnop:rst:v?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -726,9 +725,6 @@ int main(int argc, char * argv[])
         case 'V':
         	fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
         	break;
-        case 'Z':
-        	filterzerodmy = !0;
-        	break;
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
             break;
@@ -793,7 +789,6 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -R          Print a report on standard output.\n");
             fprintf(errfp, "       -W NMEA     Collapse escapes, append checksum, and write to DEVICE.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
-            fprintf(errfp, "       -Z          Filter -O until DMY set by RMC (for Google Earth).\n");
             fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(errfp, "       -c          Wait for DCD to be asserted (requires -D and implies -m).\n");
             fprintf(errfp, "       -d          Display debug output on standard error.\n");
@@ -1405,14 +1400,6 @@ int main(int argc, char * argv[])
 			if (report) { fflush(outfp); }
 
 			/*
-			 * Check that time is only running forwards. (Remarkably, I had a
-			 * reason to put this reality check in.)
-			 */
-
-			//assert(fix[system].tot_nanoseconds >= nanoseconds);
-			nanoseconds = fix[system].tot_nanoseconds;
-
-			/*
 			 * We only output NMEA sentences to a device, and even then
 			 * we output the regenerated sentence, not the original one.
 			 * Note that this can only be done if we got the original
@@ -1423,14 +1410,21 @@ int main(int argc, char * argv[])
 
 			if (!output) {
 				/* Do nothing. */
-			} else if (filterzerodmy && (fix[preferred].dmy_nanoseconds == 0)) {
-				/* Do nothing: confuses Google Earth. */
-			} else {
-				rc = fputs(synthesized, devfp);
-                assert(rc != EOF);
-				rc = fflush(devfp);
-                assert(rc != EOF);
+			} else if (fix[preferred].dmy_nanoseconds == 0) {
+				/* Do nothing: day-month-year zero until RMC received. */
+            } else if (fix[preferred].tot_nanoseconds < nanoseconds) {
+				/* Do nothing: time running backwards because UDP OOO delivery. */
+			} else if (fputs(synthesized, devfp) == EOF) {
+                fprintf(errfp, "%s: OUT!\n", program);
+                break;
+            } else if (fflush(devfp) == EOF) {
+                fprintf(errfp, "%s: OUT!\n", program);
+                break;
+            } else {
+                /* Do nothing. */
 			}
+
+			nanoseconds = fix[preferred].tot_nanoseconds;
 
         } else if (format == UBX) {
 
