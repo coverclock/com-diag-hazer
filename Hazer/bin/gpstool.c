@@ -586,7 +586,7 @@ int main(int argc, char * argv[])
     uint8_t ubx_ck_b = 0;
     unsigned char * buffer = (unsigned char *)0;
 	unsigned char * bp = (char *)0;
-    hazer_buffer_t datagram = { 0 };
+    hazer_buffer_t synthesized = { 0 };
     hazer_vector_t vector = { 0 };
     hazer_position_t fix[HAZER_SYSTEM_TOTAL] = { { 0 } };
     hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0 } };
@@ -632,6 +632,7 @@ int main(int argc, char * argv[])
     int strobepin = -1;
     int ppspin = -1;
     int ignorechecksums = 0;
+    int filterzerodmy = 0;
     role_t role = NONE;
     protocol_t protocol = IPV4;
     format_t format = UNKNOWN;
@@ -655,7 +656,7 @@ int main(int argc, char * argv[])
     int offsetb4 = 0;
     int elapsed = 0;
     unsigned timeout = 60;
-    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:Vb:cdehlmnop:rst:v?";
+    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:VZb:cdehlmnop:rst:v?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -725,6 +726,9 @@ int main(int argc, char * argv[])
         case 'V':
         	fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
         	break;
+        case 'Z':
+        	filterzerodmy = !0;
+        	break;
         case 'b':
             bitspersecond = strtoul(optarg, (char **)0, 0);
             break;
@@ -789,6 +793,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -R          Print a report on standard output.\n");
             fprintf(errfp, "       -W NMEA     Collapse escapes, append checksum, and write to DEVICE.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
+            fprintf(errfp, "       -Z          Filter -O until DMY set by RMC (for Google Earth).\n");
             fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(errfp, "       -c          Wait for DCD to be asserted (requires -D and implies -m).\n");
             fprintf(errfp, "       -d          Display debug output on standard error.\n");
@@ -1268,24 +1273,26 @@ int main(int argc, char * argv[])
 			assert(vector[count - 1] == (char *)0);
 			assert(count <= countof(vector));
 
-			size = hazer_serialize(datagram, sizeof(datagram), vector, count);
-			assert(size <= (sizeof(datagram) - 4));
-			assert(datagram[size - 1] == '\0');
-			assert(datagram[size - 2] == '*');
+			size = hazer_serialize(synthesized, sizeof(synthesized), vector, count);
+			assert(size >= 3);
+			assert(size <= (sizeof(synthesized) - 4));
+			assert(synthesized[0] == HAZER_STIMULUS_START);
+			assert(synthesized[size - 2] == HAZER_STIMULUS_CHECKSUM);
+			assert(synthesized[size - 1] == HAZER_STIMULUS_NUL);
 
-			bp = (unsigned char *)hazer_checksum(datagram, size, &nmea_cs);
+			bp = (unsigned char *)hazer_checksum(synthesized, size, &nmea_cs);
 			hazer_checksum2characters(nmea_cs, &msn, &lsn);
-			assert(bp[0] == '*');
+			assert(bp[0] == HAZER_STIMULUS_CHECKSUM);
 
 			*(++bp) = msn;
 			*(++bp) = lsn;
-			*(++bp) = '\r';
-			*(++bp) = '\n';
-			*(++bp) = '\0';
+			*(++bp) = HAZER_STIMULUS_CR;
+			*(++bp) = HAZER_STIMULUS_LF;
+			*(++bp) = HAZER_STIMULUS_NUL;
 
 			size += 4;
-			assert(size <= sizeof(datagram));
-			assert(strncmp(datagram, buffer, size));
+			assert(size <= sizeof(synthesized));
+			assert(strncmp(synthesized, buffer, size));
 
 			/*
 			 * Make sure it's a talker and a GNSS that we care about.
@@ -1409,15 +1416,17 @@ int main(int argc, char * argv[])
 			 * We only output NMEA sentences to a device, and even then
 			 * we output the regenerated sentence, not the original one.
 			 * Note that this can only be done if we got the original
-			 * sentence over the IP UDP port.
+			 * sentence over the IP UDP port or from standard input, because
+			 * that's the only circumstances in which we interpret DEVICE this
+			 * way.
 			 */
 
 			if (!output) {
 				/* Do nothing. */
-			} else if (fix[system].dmy_nanoseconds == 0) {
-				/* Do nothing (confuses Google Earth). */
+			} else if (filterzerodmy && (fix[preferred].dmy_nanoseconds == 0)) {
+				/* Do nothing: confuses Google Earth. */
 			} else {
-				rc = fputs(datagram, devfp);
+				rc = fputs(synthesized, devfp);
                 assert(rc != EOF);
 				rc = fflush(devfp);
                 assert(rc != EOF);

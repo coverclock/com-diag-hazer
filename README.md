@@ -387,6 +387,29 @@ Some of the snapshots below were taken from earlier versions of Hazer and its
 gpstool utility; the snapshots were cut and pasted from actual output and may
 differ slightly from that of the most current version.
 
+## Sending Commands
+
+You can send initialization commands to the GPS device. These can be either
+NMEA sentences (without escape sequences) or binary UBX sentence (with
+escape sequences). In either case, gpstool will automatically append the
+appropriate ending sequences including a computed NMEA or UBX checksum.
+(The code to write commands to the device depends on being driven by incoming
+data from the device, so if the device is initially silent, this won't work.
+All the GPS receivers I've tested are chatty by default, so this hasn't been an
+issue for me.) Here is an example of gpstool writing proprietary NMEA and
+binary UBX sequences to a GPS device that is based on the U-Blox 7 chipset
+like the NaviSys GR-701W.
+
+    > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E \
+          -W "\$PUBX,00" \
+          -W "\$PUBX,03" \
+          -W "\$PUBX,04" \
+          -W "\\xB5\\x62\\x06\\x01\\x08\\x00\\x02\\x13\\x00\\x01\\x00\\x00\\x00\\x00" \
+          -W "\\xb5\\x62\\x0a\\x04\\x00\\x00" \
+          -W "\\xb5\\x62\\x06\\x31\\x00\\x00" \
+          -W "\\xb5\\x62\\x06\\x3e\\x00\\x00" \
+          -W "\\xb5\\x62\\x06\\x06\\x00\\x00"
+
 ## Forwarding Datagrams
 
 Here is an example of using gpstool to read an NMEA sentence stream from a
@@ -440,7 +463,7 @@ the UDP socket on port 5555.
 ## Using screen
 
 You can use the screen utility, available for MacOS and Linux/GNU, to capture
-the NMEA stream on a serial port. (On Windows systems I use PuTTY.)
+the NMEA stream on a serial port. (And on Windows systems, I use PuTTY.)
 
     > screen /dev/cu.usbserial-FT8WG16Y 9600 8n1
 
@@ -474,6 +497,7 @@ stopping the GPS daemon if it has already been started (make sure you
 are not going to break something doing this), restarting it in non-deamon
 debug mode, and running a client against it. In this example, I use the
 Garmin GLO Bluetooth device I have already set up, and the X11 GPS client.
+When I'm done, I restart gpsd in normal daemon mode.
 
     > sudo service gpsd stop
     > gpsd -N /dev/rfcomm0 &
@@ -520,29 +544,6 @@ and that lag increases the longer the system runs. So over time it
 diverges more and more with reality.  It is better to lose an NMEA
 sentence than have it delayed. After all, another more up-to-date sentence
 is on the way right behind it.
-
-## Sending Commands
-
-You can send initialization commands to the GPS device. These can be either
-NMEA sentences (without escape sequences) or binary UBX sentence (with
-escape sequences). In either case, gpstool will automatically append the
-appropriate ending sequences including a computed NMEA or UBX checksum.
-(The code to write commands to the device depends on being driven by incoming
-data from the device, so if the device is initially silent, this won't work.
-All the GPS receivers I've tested are chatty by default, so this hasn't been an
-issue for me.) Here is an example of gpstool writing proprietary NMEA and
-binary UBX sequences to a GPS device that is based on the U-Blox 7 chipset
-like the NaviSys GR-701W.
-
-    > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E \
-          -W "\$PUBX,00" \
-          -W "\$PUBX,03" \
-          -W "\$PUBX,04" \
-          -W "\\xB5\\x62\\x06\\x01\\x08\\x00\\x02\\x13\\x00\\x01\\x00\\x00\\x00\\x00" \
-          -W "\\xb5\\x62\\x0a\\x04\\x00\\x00" \
-          -W "\\xb5\\x62\\x06\\x31\\x00\\x00" \
-          -W "\\xb5\\x62\\x06\\x3e\\x00\\x00" \
-          -W "\\xb5\\x62\\x06\\x06\\x00\\x00"
 
 ## Using Bluetooth
 
@@ -690,6 +691,30 @@ may be based on an ensemble of multiple global navigation satellite systems.
     GSV [20] sat  85 elv 55* azm  20* snr 40dBHz sys GLONASS
     GSV [21] sat  86 elv 53* azm 262* snr 39dBHz sys GLONASS
     GSV [22] sat  87 elv  1* azm 236* snr  0dBHz sys GLONASS
+
+However, the TOPGNSS GN-803G has what in my not so humble opinion is a bug: it
+emits GSA sentences for both the GPS and the GLONASS GNSSes, but labels both of
+them with the same talker code: GN (for GNSS).
+
+$GNGSA,A,3,76,86,75,85,77,71,,,,,,,1.39,0.72,1.19*1D\r\n
+$GNGSA,A,3,06,19,02,24,17,12,51,48,25,05,,,1.34,0.68,1.16*17\r\n
+
+This confuses Hazer since it thinks the two GSA updates are for the same
+satellite constellation or system.
+
+GSA {   6  19   2  24  17  12  51  48  25   5 } [10] pdop 1.39 hdop 0.72 vdop 1.19 sys GNSS
+GSA {  76  86  75  85  77  71 } [06] pdop 1.39 hdop 0.72 vdop 1.19 sys GNSS
+
+The GN-803G is likely computing an ensemble fix since both GSAs have the same
+DOP values, which depends on the specific dynamic geometry of each satellite
+constellation.
+
+I don't see any reliable way to tell them apart except for the satellite
+numbers. Doing this is problematic, because different GNSSes have different
+nomenclature for identifying satellites; for GPS, it's the pseudo-random noise
+(PRN) code number use by the satellite to encode its CDMA transmission. The
+GN-803G (really, the underlying U-Blox 8 chipset) should emit the GPS GSA as
+"GP", and the GLONASS GSA as "GL".
 
 ## True Versus Magnetic Bearings
 
