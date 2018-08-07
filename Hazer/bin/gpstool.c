@@ -275,6 +275,7 @@ static int print_actives(FILE * fp, const char * name, const hazer_active_t aa[]
        fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf sys %s\n", aa[system].active, aa[system].pdop, aa[system].hdop, aa[system].vdop, HAZER_SYSTEM_NAME[system]);
 
        count += 1;
+
     }
 
     return count;
@@ -1085,7 +1086,10 @@ int main(int argc, char * argv[])
             	length = strlen(buffer) + 1;
                 size = diminuto_escape_collapse(buffer, buffer, length);
                 rc = (size < length) ? emit_packet(devfp, buffer, size - 1) : emit_sentence(devfp, buffer, size - 1);
-                if (rc < 0) { fprintf(errfp, "%s: ERR \"%s\"\n", program, buffer); }
+                if (rc < 0) {
+                	fprintf(errfp, "%s: FAILED!\n", program);
+                	print_sentence(errfp, buffer, size - 1, UNLIMITED);
+                }
                 if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
                 if (escape) { fputs("\033[2;1H\033[0J", outfp); }
                 if (report) { print_sentence(outfp, buffer, size - 1, LIMIT); }
@@ -1115,7 +1119,7 @@ int main(int argc, char * argv[])
                 if (nmea_state == HAZER_STATE_END) {
                 	break;
                 } else if  (nmea_state == HAZER_STATE_EOF) {
-                	fprintf(errfp, "%s: EOF\n", program);
+                	fprintf(errfp, "%s: EOF.\n", program);
                     break;
                 } else {
                     /* Do nothing. */
@@ -1124,7 +1128,7 @@ int main(int argc, char * argv[])
                 if (ubx_state == YODEL_STATE_END) {
                 	break;
                 } else if  (ubx_state == YODEL_STATE_EOF) {
-                	fprintf(errfp, "%s: EOF\n", program);
+                	fprintf(errfp, "%s: EOF.\n", program);
                 	break;
                 } else {
                     /* Do nothing. */
@@ -1166,8 +1170,6 @@ int main(int argc, char * argv[])
 
         }
 
-        if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
-
         /**
          ** VALIDATE
          **
@@ -1187,7 +1189,8 @@ int main(int argc, char * argv[])
             assert(rc >= 0);
 
             if (nmea_ck != nmea_cs) {
-                fprintf(errfp, "%s: BAD 0x%02x 0x%02x\n", program, nmea_cs, nmea_ck);
+                fprintf(errfp, "%s: CHECKSUM! 0x%02x 0x%02x\n", program, nmea_cs, nmea_ck);
+                print_sentence(errfp, buffer, size - 1, UNLIMITED);
                 continue;
             }
 
@@ -1199,7 +1202,8 @@ int main(int argc, char * argv[])
         	assert(bp != (unsigned char *)0);
 
         	if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
-                fprintf(errfp, "%s: BAD 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
+                fprintf(errfp, "%s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
+                print_sentence(errfp, buffer, size - 1, UNLIMITED);
                 continue;
         	}
 
@@ -1207,11 +1211,13 @@ int main(int argc, char * argv[])
 
         } else {
 
-            fprintf(errfp, "%s: ERR %zd\n", program, length);
+            fprintf(errfp, "%s: FORMAT! %zd\n", program, length);
+            print_sentence(errfp, buffer, size - 1, UNLIMITED);
         	continue;
 
         }
 
+        if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
         if (report) { print_sentence(outfp, buffer, length, LIMIT); }
 
@@ -1278,12 +1284,14 @@ int main(int argc, char * argv[])
 				continue;
 			} else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
 				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-					fprintf(errfp, "%s: NEW \"%c%c\"\n", program, vector[0][1], vector[0][2]);
+					fprintf(errfp, "%s: TALKER?\n", program);
+	                print_sentence(errfp, buffer, size - 1, UNLIMITED);
 				}
 				continue;
 			} else if ((system = hazer_parse_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-					fprintf(errfp, "%s: NEW \"%c%c\"\n", program, vector[0][1], vector[0][2]);
+					fprintf(errfp, "%s: SYSTEM?\n", program);
+	                print_sentence(errfp, buffer, size - 1, UNLIMITED);
 				}
 				continue;
 			} else if (preferred >= HAZER_SYSTEM_TOTAL) {
@@ -1407,7 +1415,7 @@ int main(int argc, char * argv[])
      ** FINIALIZATION
      **/
 
-    fprintf(errfp, "%s: END\n", program);
+    fprintf(errfp, "%s: END.\n", program);
 
     rc = yodel_finalize();
     assert(rc >= 0);

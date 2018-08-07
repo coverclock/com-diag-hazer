@@ -69,10 +69,10 @@ Hazer has been successfully tested with the following GPS devices.
 * Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
-* TOPGNSS GN-803G (U-Blox 8 UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8]
+* TOPGNSS GN-803G (U-Blox 8 UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]
 
 [1] An excellent all around GPS receiver easily acquired from numerous outlets.    
-[2] Emits all sorts of interesting stuff in unsolicited $GPTXT sentences.    
+[2] Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
 [4] Receives GPS (U.S., formerly "Navstar") *and* GLONASS (Russian) constellations concurrently.    
 [5] Receives GPS (U.S.) *or* GLONASS (Russian) constellations via configuration.    
