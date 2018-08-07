@@ -621,6 +621,7 @@ int main(int argc, char * argv[])
     int carrierdetect = 0;
     int strobepin = -1;
     int ppspin = -1;
+    int ignorechecksums = 0;
     role_t role = NONE;
     protocol_t protocol = IPV4;
     format_t format = UNKNOWN;
@@ -644,7 +645,7 @@ int main(int argc, char * argv[])
     int offsetb4 = 0;
     int elapsed = 0;
     unsigned timeout = 60;
-    static const char OPTIONS[] = "124678A:D:EI:L:OP:RW:Vb:cdehlmnop:rst:v?";
+    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:Vb:cdehlmnop:rst:v?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -679,6 +680,9 @@ int main(int argc, char * argv[])
         case 'A':
             host = optarg;
             break;
+        case 'C':
+        	ignorechecksums = !0;
+        	break;
         case 'D':
             device = optarg;
             break;
@@ -757,7 +761,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ]\n", program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -765,6 +769,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -7          Use seven data bits for DEVICE.\n");
             fprintf(errfp, "       -8          Use eight data bits for DEVICE.\n");
             fprintf(errfp, "       -A ADDRESS  Send sentences to ADDRESS.\n");
+            fprintf(errfp, "       -C          Ignore bad checksums.\n");
             fprintf(errfp, "       -D DEVICE   Use DEVICE.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
@@ -1191,7 +1196,7 @@ int main(int argc, char * argv[])
             if (nmea_ck != nmea_cs) {
                 fprintf(errfp, "%s: CHECKSUM! 0x%02x 0x%02x\n", program, nmea_cs, nmea_ck);
                 print_sentence(errfp, buffer, size - 1, UNLIMITED);
-                continue;
+                if (!ignorechecksums) { continue; }
             }
 
             format = NMEA;
@@ -1204,7 +1209,7 @@ int main(int argc, char * argv[])
         	if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
                 fprintf(errfp, "%s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
                 print_sentence(errfp, buffer, size - 1, UNLIMITED);
-                continue;
+                if (!ignorechecksums) { continue; }
         	}
 
         	format = UBX;

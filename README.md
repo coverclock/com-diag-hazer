@@ -198,7 +198,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 
     > gpstool -?
     
-    usage: gpstool [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ]
+    usage: gpstool [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -206,6 +206,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
            -A ADDRESS  Send sentences to ADDRESS.
+           -C          Ignore bad checksums.
            -D DEVICE   Use DEVICE.
            -E          Like -R but use ANSI escape sequences.
            -I PIN      Take 1PPS from GPIO input PIN (requires -D).
