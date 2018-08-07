@@ -403,15 +403,25 @@ static void print_solution(FILE * fp, const char * name, const hazer_position_t 
 
     decimal = pp->cog_nanodegrees;
     decimal /= 1000000000.0;
-    fprintf(fp, " %7.3lf*", decimal);
+    fprintf(fp, " %7.3lf*T", decimal);
+
+    decimal = pp->mag_nanodegrees;
+    decimal /= 1000000000.0;
+    fprintf(fp, " %7.3lf*M", decimal);
 
     decimal = pp->sog_microknots;
     decimal /= 1000000.0;
     fprintf(fp, " %8.3lfknots", decimal);
 
+    decimal = pp->sog_millimeters;
+    decimal /= 1000000.0;
+    fprintf(fp, " %8.3lfkph", decimal);
+
     fprintf(fp, " [%02u]", pp->sat_used);
 
-    fprintf(fp, " ( %d %d %d %d %d )", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->sog_digits);
+#if 0
+    fprintf(fp, " ( %d %d %d %d %d %d %d )", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->mag_digits, pp->sog_digits, pp->smm_digits);
+#endif
 
     fprintf(fp, " sys %s", system);
 
@@ -1363,6 +1373,15 @@ int main(int argc, char * argv[])
 				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
 				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_GLL,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+			} else if (hazer_parse_vtg(&fix[system], vector, count) == 0) {
+				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+					tmppps = onepps;
+					onepps = 0;
+				DIMINUTO_CRITICAL_SECTION_END;
+				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
+				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
+				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
+				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_VTG,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
 			} else if (hazer_parse_gsa(&active[system], vector, count) == 0) {
 				preferred = select_active(active, lifetime);
 				assert(preferred < HAZER_SYSTEM_TOTAL);

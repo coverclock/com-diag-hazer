@@ -463,6 +463,15 @@ extern int64_t hazer_parse_cog(const char * string, uint8_t * digitsp);
 extern int64_t hazer_parse_sog(const char * string, uint8_t * digitsp);
 
 /**
+ * Parse a string containing a speed in kilometers/h in NMEA format into a
+ * signed integer number of millimeters/hour.
+ * @param string points to the string.
+ * @param digitsp points to where the number of digits is stored.
+ * @return millimeters/hour.
+ */
+extern int64_t hazer_parse_smm(const char * string, uint8_t * digitsp);
+
+/**
  * Parse a decimal number representing altitude above Mean Sea Level (MSL)
  * into integer millimeters. (Currently the units field is ignored and the
  * units are assumed to be meters.)
@@ -618,13 +627,17 @@ typedef struct HazerPosition {
     int64_t lon_nanodegrees;    /* Longitude in nanodegrees. */
     int64_t alt_millimeters;    /* Altitude in millimeters. */
     int64_t sog_microknots;     /* Speed On Ground in microknots. */
-    int64_t cog_nanodegrees;    /* Course On Ground in nanodegrees. */
+    int64_t sog_millimeters;    /* Speed On Ground in millimeters per hour. */
+    int64_t cog_nanodegrees;    /* Course On Ground true in nanodegrees. */
+    int64_t mag_nanodegrees;    /* Magnetic bearing in nanodegrees. */
     uint8_t sat_used;           /* Number of satellites used. */
-    uint8_t lat_digits;         /* Significant digiits of latitude. */
-    uint8_t lon_digits;         /* Signficant digits of longitute. */
+    uint8_t lat_digits;         /* Significant digits of latitude. */
+    uint8_t lon_digits;         /* Significant digits of longitude. */
     uint8_t alt_digits;         /* Significant digits of altitude. */
-    uint8_t sog_digits;         /* Signficant digits of Speed On Ground. */
-    uint8_t cog_digits;         /* Signficant digits of Course On Ground. */
+    uint8_t sog_digits;         /* Significant digits of Speed On Ground. */
+    uint8_t smm_digits;			/* Significant digits of SOG mm/h. */
+    uint8_t cog_digits;         /* Significant digits of Course On Ground. */
+    uint8_t mag_digits;         /* Significant digits of Magnetic bearing. */
     uint8_t unused[2];          /* Unused. */
 } hazer_position_t;
 
@@ -654,6 +667,15 @@ extern int hazer_parse_rmc(hazer_position_t *positionp, char * vector[], size_t 
  * @return 0 for success, <0 otherwise.
  */
 extern int hazer_parse_gll(hazer_position_t *positionp, char * vector[], size_t count);
+
+/**
+ * Parse a VTG NMEA sentence, updating the position.
+ * @param positionp points to the position structure (initialized to zeros).
+ * @param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count);
 
 /*******************************************************************************
  * PARSING SATELLITE ELEVATION, AZIMUTH, AND SIGNAL STRENGTH SENTENCES

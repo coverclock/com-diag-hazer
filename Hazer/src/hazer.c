@@ -659,6 +659,40 @@ int64_t hazer_parse_sog(const char * string, uint8_t * digitsp)
     return microknots;
 }
 
+int64_t hazer_parse_smm(const char * string, uint8_t * digitsp)
+{
+    int64_t millimetersperhour = 0;
+    int64_t fraction = 0;
+    uint64_t denominator = 1;
+    char * end = (char *)0;
+    uint8_t digits = 0;
+
+    digits = strlen(string);
+
+    millimetersperhour = strtol(string, &end, 10);
+    millimetersperhour *= 1000000LL;
+
+    if (millimetersperhour < 0) {
+        --digits;
+    }
+
+    if (*end == HAZER_STIMULUS_DECIMAL) {
+        fraction = hazer_parse_fraction(end + 1, &denominator);
+        fraction *= 1000000;
+        fraction /= denominator;
+        if (millimetersperhour < 0) {
+            millimetersperhour -= fraction;
+        } else {
+            millimetersperhour += fraction;
+        }
+        --digits;
+    }
+
+    *digitsp = digits;
+
+    return millimetersperhour;
+}
+
 int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp)
 {
     int64_t millimeters = 0;
@@ -1039,9 +1073,13 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, RMC, sizeof(RMC) - 1) != 0) {
         /* Do nothing. */
-    } else if (count < 10) {
+    } else if (count < 12) {
         /* Do nothing. */
     } else if (*vector[2] != 'A') {
+        /* Do nothing. */
+    } else if (*vector[10] == 'N') {
+        /* Do nothing. */
+    } else if (*vector[11] == 'V') {
         /* Do nothing. */
     } else {
         utc_nanoseconds = hazer_parse_utc(vector[1]);
@@ -1098,6 +1136,34 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
             DEBUG("TIME?\n");
         }
     }
+
+    return rc;
+}
+
+int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
+{
+    int rc = -1;
+    static const char VTG[] = HAZER_NMEA_GPS_MESSAGE_VTG;
+
+    if (count < 1) {
+        /* Do nothing. */
+    } else if (strnlen(vector[0], sizeof("$XXVTG")) != (sizeof("$XXVTG") - 1)) {
+        /* Do nothing. */
+    } else if (*vector[0] != HAZER_STIMULUS_START) {
+        /* Do nothing. */
+    } else if (strncmp(vector[0] + sizeof("$XX") - 1, VTG, sizeof(VTG) - 1) != 0) {
+        /* Do nothing. */
+    } else if (count < 10) {
+        /* Do nothing. */
+    } else if (*vector[9] == 'N') {
+        /* Do nothing. */
+    } else {
+        positionp->cog_nanodegrees = hazer_parse_cog(vector[1], &positionp->cog_digits);
+        positionp->mag_nanodegrees = hazer_parse_cog(vector[3], &positionp->mag_digits);
+        positionp->sog_microknots = hazer_parse_sog(vector[5], &positionp->sog_digits);
+        positionp->sog_millimeters = hazer_parse_smm(vector[7], &positionp->smm_digits);
+        rc = 0;
+   }
 
     return rc;
 }
