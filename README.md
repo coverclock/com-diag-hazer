@@ -647,8 +647,6 @@ Raspberry Pi with the GR-701W) uses pin 16. Note the addition of the -p flag.
 
     # gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -c -p 16
 
-## Cleaning Up
-
 The GPIO functions implemented in Diminuto and used by gpstool may get confused
 if gpstool exits ungracefully leaving GPIO pins configured. If necessary, you
 can deconfigure GPIO pins using the Diminuto pintool utility
@@ -665,33 +663,40 @@ a U-Blox 8. Note that the receiver is computing a fix based on the GLONASS
 constellation, but identifies the talker as GN or generic GNSS, indicating it
 may be based on an ensemble of multiple global navigation satellite systems.
 
-    $GNGLL,3947.65609,N,10509.21294,W,202955.00,A,D*6D\r\n
+    GNGLL,3947.65154,N,10509.20172,W,163507.00,A,A*62\r\n
     \xb5b\x06>\0\0
-    FIX 2018-08-06T20:29:55Z 39*47'39.36"N,105*09'12.77"W  5624.60' N     0.066mph pps 0 sec 10
-    GLL 39.794268,-105.153549  1714.400m   0.000*    0.057knots [12] ( 9 10 5 0 4 ) sys GNSS
-    GSA {  86  71  85  87  76  72  78 } [07] pdop 1.20 hdop 0.67 vdop 1.00 sys GNSS
-    GSV [01] sat   2 elv 45* azm  59* snr 29dBHz sys GPS
-    GSV [02] sat   5 elv 71* azm  92* snr 27dBHz sys GPS
-    GSV [03] sat   6 elv  1* azm  72* snr  0dBHz sys GPS
-    GSV [04] sat   9 elv  0* azm  27* snr  0dBHz sys GPS
-    GSV [05] sat  12 elv 30* azm 186* snr 34dBHz sys GPS
-    GSV [06] sat  13 elv  8* azm 137* snr 20dBHz sys GPS
-    GSV [07] sat  15 elv  0* azm 172* snr 12dBHz sys GPS
-    GSV [08] sat  21 elv 10* azm 265* snr 20dBHz sys GPS
-    GSV [09] sat  25 elv 50* azm 240* snr 31dBHz sys GPS
-    GSV [10] sat  26 elv  2* azm 328* snr  0dBHz sys GPS
-    GSV [11] sat  29 elv 51* azm 316* snr 37dBHz sys GPS
-    GSV [12] sat  31 elv  1* azm 293* snr  0dBHz sys GPS
-    GSV [13] sat  46 elv 38* azm 215* snr 29dBHz sys GPS
-    GSV [14] sat  48 elv 36* azm 220* snr  0dBHz sys GPS
-    GSV [15] sat  51 elv 44* azm 183* snr 37dBHz sys GPS
-    GSV [16] sat  70 elv 26* azm  36* snr  0dBHz sys GLONASS
-    GSV [17] sat  71 elv 57* azm  98* snr 27dBHz sys GLONASS
-    GSV [18] sat  72 elv 31* azm 166* snr 36dBHz sys GLONASS
-    GSV [19] sat  76 elv 12* azm 228* snr 30dBHz sys GLONASS
-    GSV [20] sat  77 elv 25* azm 287* snr 13dBHz sys GLONASS
-    GSV [21] sat  78 elv 10* azm 335* snr 21dBHz sys GLONASS
-    GSV [22] sat  85 elv 18* azm  91* snr 22dBHz sys GLONASS
-    GSV [23] sat  86 elv 57* azm  35* snr 30dBHz sys GLONASS
-    GSV [24] sat  87 elv 31* azm 311* snr 31dBHz sys GLONASS
+    FIX 2018-08-07T16:35:07Z 39*47'39.09"N,105*09'12.10"W  5599.01' N     0.044mph pps 0 sec 10
+    GLL 39.794192,-105.153362  1706.600m   0.000*T   0.000*M    0.038knots    0.071kph [12] sys GNSS
+    GSA {  75  85  76  86  74  84 } [06] pdop 1.36 hdop 0.79 vdop 1.11 sys GNSS
+    GSV [01] sat   2 elv 35* azm 208* snr 36dBHz sys GPS
+    GSV [02] sat   3 elv 14* azm  52* snr 35dBHz sys GPS
+    GSV [03] sat   6 elv 74* azm 153* snr 31dBHz sys GPS
+    GSV [04] sat  12 elv 30* azm 311* snr 36dBHz sys GPS
+    GSV [05] sat  17 elv 48* azm  51* snr 35dBHz sys GPS
+    GSV [06] sat  19 elv 69* azm  13* snr 25dBHz sys GPS
+    GSV [07] sat  22 elv  2* azm  34* snr 21dBHz sys GPS
+    GSV [08] sat  24 elv 41* azm 277* snr 35dBHz sys GPS
+    GSV [09] sat  28 elv 24* azm 118* snr 26dBHz sys GPS
+    GSV [10] sat  46 elv 38* azm 215* snr 33dBHz sys GPS
+    GSV [11] sat  48 elv 36* azm 220* snr 31dBHz sys GPS
+    GSV [12] sat  51 elv 44* azm 183* snr 40dBHz sys GPS
+    GSV [13] sat  68 elv  0* azm   5* snr  0dBHz sys GLONASS
+    GSV [14] sat  69 elv  8* azm  51* snr 24dBHz sys GLONASS
+    GSV [15] sat  70 elv  2* azm 101* snr  0dBHz sys GLONASS
+    GSV [16] sat  74 elv 16* azm 158* snr 35dBHz sys GLONASS
+    GSV [17] sat  75 elv 69* azm 184* snr 35dBHz sys GLONASS
+    GSV [18] sat  76 elv 54* azm 317* snr 34dBHz sys GLONASS
+    GSV [19] sat  84 elv  6* azm  45* snr 13dBHz sys GLONASS
+    GSV [20] sat  85 elv 55* azm  20* snr 40dBHz sys GLONASS
+    GSV [21] sat  86 elv 53* azm 262* snr 39dBHz sys GLONASS
+    GSV [22] sat  87 elv  1* azm 236* snr  0dBHz sys GLONASS
 
+## True Versus Magnetic Bearings
+
+GPS devices compute the true bearing by comparing successive position fixes to
+determine your speed and direction. Hence, the true bearing, e.g. "135.000*T",
+is only reliable if you are moving, and at a speed fast enough to be within
+the resolution of the accuracy of the position fix. The magnetic bearing is an
+actual magnetic compass bearing, but is only provided by GPS devices which also
+have a magnetic compass; otherwise it will be displayed as "0.000*M". The
+cardinal compass direction, e.g. "SE", is based on the true bearing.
