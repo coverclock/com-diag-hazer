@@ -696,14 +696,14 @@ However, the TOPGNSS GN-803G has what in my not so humble opinion is a bug: it
 emits GSA sentences for both the GPS and the GLONASS GNSSes, but labels both of
 them with the same talker code: GN (for GNSS).
 
-$GNGSA,A,3,76,86,75,85,77,71,,,,,,,1.39,0.72,1.19*1D\r\n
-$GNGSA,A,3,06,19,02,24,17,12,51,48,25,05,,,1.34,0.68,1.16*17\r\n
+    $GNGSA,A,3,76,86,75,85,77,71,,,,,,,1.39,0.72,1.19*1D\r\n
+    $GNGSA,A,3,06,19,02,24,17,12,51,48,25,05,,,1.34,0.68,1.16*17\r\n
 
 This confuses Hazer since it thinks the two GSA updates are for the same
 satellite constellation or system.
 
-GSA {   6  19   2  24  17  12  51  48  25   5 } [10] pdop 1.39 hdop 0.72 vdop 1.19 sys GNSS
-GSA {  76  86  75  85  77  71 } [06] pdop 1.39 hdop 0.72 vdop 1.19 sys GNSS
+    GSA {   6  19   2  24  17  12  51  48  25   5 } [10] pdop 1.39 hdop 0.72 vdop 1.19 sys GNSS
+    GSA {  76  86  75  85  77  71 } [06] pdop 1.39 hdop 0.72 vdop 1.19 sys GNSS
 
 The GN-803G is likely computing an ensemble fix since both GSAs have the same
 DOP values, which depends on the specific dynamic geometry of each satellite
@@ -725,3 +725,15 @@ the resolution of the accuracy of the position fix. The magnetic bearing is an
 actual magnetic compass bearing, but is only provided by GPS devices which also
 have a magnetic compass; otherwise it will be displayed as "0.000*M". The
 cardinal compass direction, e.g. "SE", is based on the true bearing.
+
+## Google Earth
+
+I had originally used Hazer with Google Earth. Google Earth only accepts GPS
+data on a serial port. So I processed the NMEA stream from a serial-attached
+GPS device using gpstool, then forwarded it via UDP datagrams to another
+gpstool, and used that gpstool to forward the NMEA stream across a second
+serial port to a host running Google Earth. But empirically and anecdotally,
+Google Earth appears to only accept serial input at 4800 baud. More recent
+GPS devices default to 9600 baud, and running the host-to-host serial port
+at 4800 (easily done with gpstool) results in the receiving host not being able
+to keep up.
