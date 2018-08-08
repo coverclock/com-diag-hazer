@@ -165,7 +165,7 @@ int main(void)
 
     {
     	static const hazer_view_t VIEW[HAZER_SYSTEM_TOTAL] = {
-    			{ 0 },
+    			{ 0 }, /* GNSS */
 				{
 					{
 						{ 0, 0, HAZER_ID_GPS_FIRST, 0},
@@ -187,7 +187,7 @@ int main(void)
 					0,
 					0,
 				},
-				{ 0 },
+				{ 0 }, /* GALILEO */
 				{
 					{
 						{ 0, 0, HAZER_ID_WAAS_FIRST, 0},
@@ -197,8 +197,8 @@ int main(void)
 					0,
 					0,
 				},
-				{ 0 },
-				{ 0 },
+				{ 0 }, /* BEIDOU */
+				{ 0 }, /* QZSS */
     	};
 
     	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);

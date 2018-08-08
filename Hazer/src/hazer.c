@@ -400,24 +400,27 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     char ** vv = vector;
     char ** tt = (char **)0;
     char * bb = (char *)buffer;
+    ssize_t nn = 0;
 
     if (count > 1) {
     	tt = vv;
         *(vv++) = bb;
+        ++nn;
         --count;
         while ((size--) > 0) {
             if (*bb == ',') {
                 *(bb++) = '\0';
-                DEBUG("TOK \"%s\".\n", *tt);
+                DEBUG("TOK \"%s\" [%zd].\n", *tt, nn);
                 if (count <= 1) {
                     break;
                 }
                 tt = vv;
                 *(vv++) = bb;
+                ++nn;
                 --count;
             } else if (*bb == '*') {
                 *(bb++) = '\0';
-                DEBUG("TOK \"%s\".\n", *tt);
+                DEBUG("TOK \"%s\" [%zd].\n", *tt, nn);
                 break;
             } else {
                 ++bb;
@@ -428,7 +431,8 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     if (count > 0) {
     	tt = vv;
         *(vv++) = (char *)0;
-        DEBUG("TOK %p.\n", *tt);
+        ++nn;
+        DEBUG("TOK %p [%zd].\n", *tt, nn);
         --count;
     }
 
@@ -1002,13 +1006,16 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         activep->pdop = hazer_parse_num(vector[15]);
         activep->hdop = hazer_parse_num(vector[16]);
         activep->vdop = hazer_parse_num(vector[17]);
-        activep->system = (count > 18) ? strtoul(vector[18], (char **)0, 10): 0;
+        activep->system = (count > 19) ? strtoul(vector[18], (char **)0, 10) : 0;
         rc = 0;
     }
 
     return rc;
 }
 
+/*
+ * NMEA 0183 4.10 p. 94..95.
+ */
 hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
 	hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
@@ -1026,14 +1033,18 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
 			} else if ((HAZER_ID_GLONASS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GLONASS_LAST)) {
 				candidate = HAZER_SYSTEM_GLONASS;
 			} else {
-				/* Do nothing. */
+				candidate = HAZER_SYSTEM_TOTAL;
 			}
 			if (candidate == HAZER_SYSTEM_TOTAL) {
 				/* Do nothing. */
-			} if (system == HAZER_SYSTEM_TOTAL) {
+			} else if (system == HAZER_SYSTEM_TOTAL) {
 				system = candidate;
 			} else if (system == candidate) {
 				/* Do nothing. */
+			} else if (candidate == HAZER_SYSTEM_WAAS) {
+				/* Do nothing. */
+			} else if (system == HAZER_SYSTEM_WAAS) {
+				system = candidate;
 			} else {
 				system = HAZER_SYSTEM_GNSS;
 			}

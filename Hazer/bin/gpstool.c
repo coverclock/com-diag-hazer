@@ -204,6 +204,7 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
     fflush(fp);
 }
 
+#if 0
 /**
  * Select the best global navigation satellite system from among those
  * currently active by finding the one with the lowest dilution of precision.
@@ -214,9 +215,14 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
 static hazer_system_t select_active(const hazer_active_t aa[], const unsigned la[])
 {
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
+	int index = 0;
 	int candidate = 0;
 
-	for (candidate = 0; candidate < HAZER_SYSTEM_TOTAL; ++candidate) {
+	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
+		/*
+		 * We want GNSS to be the last possible choice.
+		 */
+		candidate = (index + 1) % HAZER_SYSTEM_TOTAL;
 		if (la[candidate] == 0) {
 			continue;
 		} else if (aa[candidate].active == 0) {
@@ -242,43 +248,46 @@ static hazer_system_t select_active(const hazer_active_t aa[], const unsigned la
 
 	return system;
 }
+#endif
 
 /**
  * Print all of the active global navigation satellite systems.
  * @param fp points to the FILE stream.
  * @param name is the NMEA sentence performing this print.
  * @param aa points to the array of active GNSSes.
- * @return the number of active GNSSes printed.
+ * @param la points to an array of lifetimes.
  */
-static int print_actives(FILE * fp, const char * name, const hazer_active_t aa[])
+static void print_actives(FILE * fp, const char * name, const hazer_active_t aa[], const unsigned la[])
 {
-	int count = 0;
     static const unsigned int IDENTIFIERS = countof(aa[0].id);
+    int system = 0;
     int satellite = 0;
     int limit = 0;
-    int system = 0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
+    	if (la[system] == 0) { continue; }
+
         limit = aa[system].active;
         if (limit == 0) { continue; }
-        if (limit > IDENTIFIERS) { limit = IDENTIFIERS; }
 
         fprintf(fp, "%s {", name);
 
-        for (satellite = 0; satellite < limit; ++satellite) {
-            if (aa[system].id[satellite] != 0) {
+        for (satellite = 0; satellite < IDENTIFIERS; ++satellite) {
+            if ((satellite < limit) && (aa[system].id[satellite] != 0)) {
                 fprintf(fp, " %3u", aa[system].id[satellite]);
+            } else {
+               	fputs("    ", fp);
             }
         }
 
-       fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf sys %s\n", aa[system].active, aa[system].pdop, aa[system].hdop, aa[system].vdop, HAZER_SYSTEM_NAME[system]);
+       fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf", aa[system].active, aa[system].pdop, aa[system].hdop, aa[system].vdop);
 
-       count += 1;
+       fprintf(fp, " sys %-8s", HAZER_SYSTEM_NAME[system]);
+
+       fputc('\n', fp);
 
     }
-
-    return count;
 }
 
 /**
@@ -286,37 +295,54 @@ static int print_actives(FILE * fp, const char * name, const hazer_active_t aa[]
  * @param fp points to the FILE stream.
  * @param name is the NMEA sentence performing this print.
  * @param va points to the array of all satellite being viewed.
+ * @param la points to an array of lifetimes.
  */
-static void print_views(FILE *fp, const char * name, const hazer_view_t va[])
+static void print_views(FILE *fp, const char * name, const hazer_view_t va[], const unsigned la[])
 {
     static const int SATELLITES = countof(va[0].sat);
-    int channel = 0;
     int system = 0;
+    int channel = 0;
     int satellite = 0;
     int limit = 0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
-        limit = va[system].channels;
-        if (limit > va[system].view) { limit = va[system].view; }
+
+    	if (la[system] == 0) { continue; }
+
+    	limit = va[system].channels;
+
+    	if (limit > va[system].view) { limit = va[system].view; }
         if (limit > SATELLITES) { limit = SATELLITES; }
+
         for (satellite = 0; satellite < limit; ++satellite) {
             if (va[system].sat[satellite].id != 0) {
-                fprintf(fp, "%s [%02d] sat %3u elv %2u* azm %3u* snr %2udBHz sys %s\n", name, ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, HAZER_SYSTEM_NAME[system]);
+
+        		fputs(name, fp);
+
+            	fprintf(fp, " [%02d] sat %3u elv %2u* azm %3u* snr %2udBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
+
+                fprintf(fp, " sys %-8s", HAZER_SYSTEM_NAME[system]);
+
+                fputc('\n', fp);
+
             }
+
         }
+
     }
 }
 
 /**
- * Print a single navigation position fix.
+ * Print all of the navigation position fixes.
  * @param fp points to the FILE stream.
  * @param name is NMEA sentence performing this print.
- * @param pp points to the single navigation position.
+ * @param pa points to an array of positions.
+ * @param la points to an array of lifetimes.
  * @param pps is the current value of the 1PPS strobe.
- * @param lifetime is the number of seconds until this fix expires.
  */
-static void print_position(FILE * fp, const char * name, const hazer_position_t * pp, int pps, unsigned lifetime)
+static void print_positions(FILE * fp, const char * name, const hazer_position_t pa[], const unsigned la[], int pps)
 {
+    int system = 0;
     uint64_t nanoseconds = 0;
     int year = 0;
     int month = 0;
@@ -331,101 +357,120 @@ static void print_position(FILE * fp, const char * name, const hazer_position_t 
     int direction = 0;
     const char * compass = (const char *)0;
 
-    if (pp->dmy_nanoseconds == 0) { return; }
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    fputs(name, fp);
+    	if (la[system] == 0) { continue; }
 
-    hazer_format_nanoseconds2timestamp(pp->tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
-    assert((1 <= month) && (month <= 12));
-    assert((1 <= day) && (day <= 31));
-    assert((0 <= hour) && (hour <= 23));
-    assert((0 <= minute) && (minute <= 59));
-    assert((0 <= second) && (second <= 59));
-    assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
-    fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
+    	if (pa[system].dmy_nanoseconds == 0) { continue; }
 
-    hazer_format_nanodegrees2position(pp->lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
-    assert((0 <= degrees) && (degrees <= 90));
-    assert((0 <= minutes) && (minutes <= 59));
-    assert((0 <= seconds) && (seconds <= 59));
-    assert((0 <= hundredths) && (hundredths <= 99));
-    fprintf(fp, " %2d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
+		fputs(name, fp);
 
-    hazer_format_nanodegrees2position(pp->lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
-    assert((0 <= degrees) && (degrees <= 180));
-    assert((0 <= minutes) && (minutes <= 59));
-    assert((0 <= seconds) && (seconds <= 59));
-    assert((0 <= hundredths) && (hundredths <= 99));
-    fprintf(fp, ",%3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
+		hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
+		assert((1 <= month) && (month <= 12));
+		assert((1 <= day) && (day <= 31));
+		assert((0 <= hour) && (hour <= 23));
+		assert((0 <= minute) && (minute <= 59));
+		assert((0 <= second) && (second <= 59));
+		assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
+		fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
 
-    fprintf(fp, " %8.2lf'", pp->alt_millimeters * 3.2808 / 1000.0);
+		hazer_format_nanodegrees2position(pa[system].lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+		assert((0 <= degrees) && (degrees <= 90));
+		assert((0 <= minutes) && (minutes <= 59));
+		assert((0 <= seconds) && (seconds <= 59));
+		assert((0 <= hundredths) && (hundredths <= 99));
+		fprintf(fp, " %2d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
 
-    assert((0LL <= pp->cog_nanodegrees) && (pp->cog_nanodegrees <= 360000000000LL));
+		hazer_format_nanodegrees2position(pa[system].lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+		assert((0 <= degrees) && (degrees <= 180));
+		assert((0 <= minutes) && (minutes <= 59));
+		assert((0 <= seconds) && (seconds <= 59));
+		assert((0 <= hundredths) && (hundredths <= 99));
+		fprintf(fp, ",%3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
-    compass = hazer_format_nanodegrees2compass8(pp->cog_nanodegrees);
-    assert(compass != (const char *)0);
-    assert(strlen(compass) <= 4);
-    fprintf(fp, " %-2s", compass);
+		fprintf(fp, " %8.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
 
-    fprintf(fp, " %8.3lfmph", pp->sog_microknots * 1.150779 / 1000000.0);
+		assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
 
-    fprintf(fp, " pps %c", pps ? '1' : '0');
+		compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
+		assert(compass != (const char *)0);
+		assert(strlen(compass) <= 4);
+		fprintf(fp, " %-2s", compass);
 
-    fprintf(fp, " sec %u", lifetime);
+		fprintf(fp, " %8.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
 
-    fputc('\n', fp);
+		fprintf(fp, " pps %c", pps ? '1' : '0');
+
+		fprintf(fp, " sec %u", la[system]);
+
+        fprintf(fp, " sys %-8s", HAZER_SYSTEM_NAME[system]);
+
+		fputc('\n', fp);
+
+    }
+
 }
 
 /**
- * Print a single navigation solution.
+ * Print all of the navigation solutions.
  * @param fp points to the FILE stream.
  * @param name is NMEA sentence performing this print.
- * @param pp points to the single navigation position.
- * @param system is the name of the best GNSS selected.
+ * @param pa points an array of navigation positions.
+ * @param la points to an array of lifetimes.
  */
-static void print_solution(FILE * fp, const char * name, const hazer_position_t * pp, const char * system)
+static void print_solutions(FILE * fp, const char * name, const hazer_position_t pa[], const unsigned la[])
 {
+	int system = 0;
     double decimal = 0.0;
 
-    fputs(name, fp);
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    decimal = pp->lat_nanodegrees;
-    decimal /= 1000000000.0;
-    fprintf(fp, " %9.6lf", decimal);
+    	if (la[system] == 0) { continue; }
 
-    decimal = pp->lon_nanodegrees;
-    decimal /= 1000000000.0;
-    fprintf(fp, ",%10.6lf", decimal);
+    	if (pa[system].dmy_nanoseconds == 0) { continue; }
 
-    decimal = pp->alt_millimeters;
-    decimal /= 1000.0;
-    fprintf(fp, " %9.3lfm", decimal);
+		fputs(name, fp);
 
-    decimal = pp->cog_nanodegrees;
-    decimal /= 1000000000.0;
-    fprintf(fp, " %7.3lf*T", decimal);
+		decimal = pa[system].lat_nanodegrees;
+		decimal /= 1000000000.0;
+		fprintf(fp, " %9.6lf", decimal);
 
-    decimal = pp->mag_nanodegrees;
-    decimal /= 1000000000.0;
-    fprintf(fp, " %7.3lf*M", decimal);
+		decimal = pa[system].lon_nanodegrees;
+		decimal /= 1000000000.0;
+		fprintf(fp, ",%10.6lf", decimal);
 
-    decimal = pp->sog_microknots;
-    decimal /= 1000000.0;
-    fprintf(fp, " %8.3lfknots", decimal);
+		decimal = pa[system].alt_millimeters;
+		decimal /= 1000.0;
+		fprintf(fp, " %9.3lfm", decimal);
 
-    decimal = pp->sog_millimeters;
-    decimal /= 1000000.0;
-    fprintf(fp, " %8.3lfkph", decimal);
+		decimal = pa[system].cog_nanodegrees;
+		decimal /= 1000000000.0;
+		fprintf(fp, " %7.3lf*T", decimal);
 
-    fprintf(fp, " [%02u]", pp->sat_used);
+		decimal = pa[system].mag_nanodegrees;
+		decimal /= 1000000000.0;
+		fprintf(fp, " %7.3lf*M", decimal);
+
+		decimal = pa[system].sog_microknots;
+		decimal /= 1000000.0;
+		fprintf(fp, " %8.3lfknots", decimal);
+
+		decimal = pa[system].sog_millimeters;
+		decimal /= 1000000.0;
+		fprintf(fp, " %8.3lfkph", decimal);
+
+		fprintf(fp, " [%02u]", pa[system].sat_used);
 
 #if 0
-    fprintf(fp, " ( %d %d %d %d %d %d %d )", pp->lat_digits, pp->lon_digits, pp->alt_digits, pp->cog_digits, pp->mag_digits, pp->sog_digits, pp->smm_digits);
+		fprintf(fp, " ( %d %d %d %d %d %d %d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
 #endif
 
-    fprintf(fp, " sys %s", system);
+		fprintf(fp, " sys %-8s", HAZER_SYSTEM_NAME[system]);
 
-    fputc('\n', fp);
+		fputc('\n', fp);
+
+    }
+
 }
 
 struct Poller {
@@ -648,10 +693,8 @@ int main(int argc, char * argv[])
 	unsigned char * bp = (char *)0;
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
-    hazer_system_t preferred = HAZER_SYSTEM_TOTAL;
     hazer_buffer_t synthesized = { 0 };
     hazer_vector_t vector = { 0 };
-    hazer_active_t cache = { 0 };
     format_t format = UNKNOWN;
     /*
      * GNSS state databases.
@@ -676,9 +719,8 @@ int main(int argc, char * argv[])
     int output = 0;
     uint64_t nanoseconds = 0;
     FILE * fp = (FILE *)0;
-    int offset = 1;
-    int offsetb4 = 0;
     int elapsed = 0;
+    int refresh = 0;
     /*
      * External symbols.
      */
@@ -1350,8 +1392,6 @@ int main(int argc, char * argv[])
 	                print_sentence(errfp, buffer, size - 1, UNLIMITED);
 				}
 				continue;
-			} else if (preferred >= HAZER_SYSTEM_TOTAL) {
-				preferred = system;
 			} else {
 				/* Do nothing. */
 			}
@@ -1381,8 +1421,6 @@ int main(int argc, char * argv[])
 	        	}
 	        }
 
-	        lifetime[system] = timeout;
-
 			/*
 			 * Parse the sentences we care about - GGA, RMC, GSA, and GSV
 			 * currently - and update our state to reflect to new data.
@@ -1395,10 +1433,9 @@ int main(int argc, char * argv[])
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 
-				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, LABEL,  &fix[preferred], tmppps, lifetime[preferred]); }
-				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_GGA,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+		        lifetime[system] = timeout;
+
+		        refresh = !0;
 
 			} else if (hazer_parse_rmc(&fix[system], vector, count) == 0) {
 
@@ -1407,10 +1444,11 @@ int main(int argc, char * argv[])
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 
-				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
-				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_RMC,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+		        lifetime[system] = timeout;
+
+		        refresh = !0;
+
+
 			} else if (hazer_parse_gll(&fix[system], vector, count) == 0) {
 
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
@@ -1418,10 +1456,9 @@ int main(int argc, char * argv[])
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 
-				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
-				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_GLL,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+		        lifetime[system] = timeout;
+
+		        refresh = !0;
 
 			} else if (hazer_parse_vtg(&fix[system], vector, count) == 0) {
 
@@ -1430,36 +1467,40 @@ int main(int argc, char * argv[])
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
 
-				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
-				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
-				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
-				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_VTG,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+		        lifetime[system] = timeout;
 
-			} else if (hazer_parse_gsa(&cache, vector, count) == 0) {
+		        refresh = !0;
 
-				//system = hazer_map_active_to_system(&cache, system);
-				//assert(system < HAZER_SYSTEM_TOTAL);
-				active[system] = cache;
+			} else if (hazer_parse_gsa(&active[system], vector, count) == 0) {
 
-				preferred = select_active(active, lifetime);
-				assert(preferred < HAZER_SYSTEM_TOTAL);
-
-				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
-				if (report) { offsetb4 = offset; offset = print_actives(outfp, HAZER_NMEA_GPS_MESSAGE_GSA, active); }
-				if (escape) { if (offset != offsetb4) { fprintf(outfp, "\033[%d;1H\033[0J", 5 + offset); } }
+		        refresh = !0;
 
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 
-				if (escape) { fprintf(outfp, "\033[%d;1H\033[0J", 5 + offset); }
-				if (report) { print_views(outfp, HAZER_NMEA_GPS_MESSAGE_GSV, view); }
+		        lifetime[system] = timeout;
+
+		        refresh = !0;
 
 			} else {
 
-				/* Do nothing. */
+		        refresh = 0;
 
 			}
 
-			if (report) { fflush(outfp); }
+			/*
+			 * If anything was updated, refresh our display.
+			 */
+
+			if (refresh) {
+				if (escape) { fputs("\033[3;1H\033[0J", outfp); }
+				if (report) {
+					print_positions(outfp, LABEL,  fix, lifetime, tmppps);
+					print_solutions(outfp, HAZER_NMEA_GPS_MESSAGE_GGA,  fix, lifetime);
+					print_actives(outfp, HAZER_NMEA_GPS_MESSAGE_GSA, active, lifetime);
+					print_views(outfp, HAZER_NMEA_GPS_MESSAGE_GSV, view, lifetime);
+					fflush(outfp);
+				}
+			}
 
 			/*
 			 * We only output NMEA sentences to a device, and even then
@@ -1472,9 +1513,9 @@ int main(int argc, char * argv[])
 
 			if (!output) {
 				/* Do nothing. */
-			} else if (fix[preferred].dmy_nanoseconds == 0) {
+			} else if (fix[system].dmy_nanoseconds == 0) {
 				/* Do nothing: day-month-year zero until RMC received. */
-            } else if (fix[preferred].tot_nanoseconds < nanoseconds) {
+            } else if (fix[system].tot_nanoseconds < nanoseconds) {
 				/* Do nothing: time running backwards because UDP OOO delivery. */
 			} else if (fputs(synthesized, devfp) == EOF) {
                 fprintf(errfp, "%s: OUT!\n", program);
@@ -1486,7 +1527,7 @@ int main(int argc, char * argv[])
                 /* Do nothing. */
 			}
 
-			nanoseconds = fix[preferred].tot_nanoseconds;
+			nanoseconds = fix[system].tot_nanoseconds;
 
         } else if (format == UBX) {
 
