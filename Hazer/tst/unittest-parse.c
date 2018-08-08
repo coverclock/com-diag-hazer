@@ -40,7 +40,7 @@ int main(void)
 	    string = "$" _STRING_; \
 	    talker = hazer_parse_talker(string); \
 	    assert(talker == _TALKER_); \
-	    system = hazer_parse_system(talker); \
+	    system = hazer_map_talker_to_system(talker); \
 	    assert(system == _SYSTEM_); \
 	    assert((_TALKER_ == HAZER_TALKER_TOTAL) || (strcmp(_STRING_, HAZER_TALKER_NAME[_TALKER_]) == 0)); \
 	}

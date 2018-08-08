@@ -256,7 +256,8 @@ typedef enum HazerTalker {
 extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
 
 /**
- * GNSS systems.
+ * GNSS system identifiers.
+ * NMEA 0183 4.10 table 20 p. 95.
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerSystem {
@@ -264,6 +265,7 @@ typedef enum HazerSystem {
     HAZER_SYSTEM_GPS,
     HAZER_SYSTEM_GLONASS,
     HAZER_SYSTEM_GALILEO,
+	HAZER_SYSTEM_WAAS,
 	HAZER_SYSTEM_BEIDOU,
 	HAZER_SYSTEM_QZSS,
     HAZER_SYSTEM_TOTAL,
@@ -284,10 +286,24 @@ typedef enum HazerSystem {
 		"GPS", \
 		"GLONASS", \
 	    "GALILEO", \
+		"WAAS", \
 		"BEIDOU", \
 		"QZSS", \
 		(const char *)0, \
 	}
+
+/**
+ * GNSS satellite identifiers.
+ * NMEA 0183 4.10 p. 94.
+ */
+typedef enum HazerId {
+	HAZER_ID_GPS_FIRST = 1,
+	HAZER_ID_GPS_LAST = 32,
+	HAZER_ID_WAAS_FIRST = 33,
+	HAZER_ID_WAAS_LAST = 64,
+	HAZER_ID_GLONASS_FIRST = 65,
+	HAZER_ID_GLONASS_LAST = 96,
+} hazer_id_t;
 
 /**
  * Array of SYSTEM names indexed by system enumeration.
@@ -608,7 +624,7 @@ extern hazer_talker_t hazer_parse_talker(const void * buffer);
  * @param talker is talker index.
  * @return the index of the system or SYSTEM TOTAL if N/A.
  */
-extern hazer_system_t hazer_parse_system(hazer_talker_t talker);
+extern hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker);
 
 /*******************************************************************************
  * PARSING POSITION, HEADING, AND VELOCITY SENTENCES
@@ -703,6 +719,14 @@ typedef struct HazerActive {
  * @return 0 for success, <0 otherwise.
  */
 extern int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count);
+
+/**
+ * Return a system given a list of active satellites. This is based on the
+ * NMEA conventions.
+ * @param activep points to the active structure.
+ * @return the index of the system or SYSTEM TOTAL if N/A.
+ */
+extern hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep);
 
 /**
  * This structure maintains the elevation, azimuth, and signal strength of a

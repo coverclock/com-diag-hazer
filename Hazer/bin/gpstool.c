@@ -590,6 +590,7 @@ int main(int argc, char * argv[])
     hazer_vector_t vector = { 0 };
     hazer_position_t fix[HAZER_SYSTEM_TOTAL] = { { 0 } };
     hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    hazer_active_t cache = { 0 };
     hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0 } };
     unsigned lifetime[HAZER_SYSTEM_TOTAL] = { 0 };
     FILE * infp = stdin;
@@ -1084,7 +1085,12 @@ int main(int argc, char * argv[])
              * commands can be removed from the queue before they are processed.
              * And the list header can be prepended onto a command string as
              * part of a dynamically allocated structure, and this code will
-             * free it.
+             * free it. If an post-collapse string is empty, that signals
+             * the application to exit. This allows gpstool to be used to
+             * initialize a GPS device then exit, perhaps for some other
+             * application (even another gpstool) to use the device. One such
+             * rationale for this is to send a command to change the baud rate
+             * of the GPS device.
         	 */
 
         	if (devfd < 0) {
@@ -1100,6 +1106,10 @@ int main(int argc, char * argv[])
         		assert(buffer != (unsigned char *)0);
             	length = strlen(buffer) + 1;
                 size = diminuto_escape_collapse(buffer, buffer, length);
+            	if (buffer[0] == '\0') {
+                   	fprintf(errfp, "%s: EXIT.\n", program);
+            		break;
+            	}
                 rc = (size < length) ? emit_packet(devfp, buffer, size - 1) : emit_sentence(devfp, buffer, size - 1);
                 if (rc < 0) {
                 	fprintf(errfp, "%s: FAILED!\n", program);
@@ -1305,7 +1315,7 @@ int main(int argc, char * argv[])
 	                print_sentence(errfp, buffer, size - 1, UNLIMITED);
 				}
 				continue;
-			} else if ((system = hazer_parse_system(talker)) >= HAZER_SYSTEM_TOTAL) {
+			} else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
 					fprintf(errfp, "%s: SYSTEM?\n", program);
 	                print_sentence(errfp, buffer, size - 1, UNLIMITED);
@@ -1328,6 +1338,7 @@ int main(int argc, char * argv[])
 	         */
 
 	        elapsed = diminuto_alarm_check();
+
 	        if (elapsed > 0) {
 	        	int ii;
 	        	for (ii = 0; ii < countof(lifetime); ++ii) {
@@ -1349,52 +1360,74 @@ int main(int argc, char * argv[])
 			 */
 
 			if (hazer_parse_gga(&fix[system], vector, count) == 0) {
+
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
+
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
 				if (report) { print_position(outfp, LABEL,  &fix[preferred], tmppps, lifetime[preferred]); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
 				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_GGA,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+
 			} else if (hazer_parse_rmc(&fix[system], vector, count) == 0) {
+
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
+
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
 				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
 				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_RMC,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
 			} else if (hazer_parse_gll(&fix[system], vector, count) == 0) {
+
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
+
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
 				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
 				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_GLL,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
+
 			} else if (hazer_parse_vtg(&fix[system], vector, count) == 0) {
+
 				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
+
 				if (escape) { fputs("\033[3;1H\033[0K", outfp); }
 				if (report) { print_position(outfp, LABEL, &fix[preferred], tmppps, lifetime[preferred]); }
 				if (escape) { fputs("\033[4;1H\033[0K", outfp); }
 				if (report) { print_solution(outfp, HAZER_NMEA_GPS_MESSAGE_VTG,  &fix[preferred], HAZER_SYSTEM_NAME[preferred]); }
-			} else if (hazer_parse_gsa(&active[system], vector, count) == 0) {
+
+			} else if (hazer_parse_gsa(&cache, vector, count) == 0) {
+
+				//system = hazer_map_active_to_system(&cache, system);
+				//assert(system < HAZER_SYSTEM_TOTAL);
+				active[system] = cache;
+
 				preferred = select_active(active, lifetime);
 				assert(preferred < HAZER_SYSTEM_TOTAL);
+
 				if (escape) { fputs("\033[5;1H\033[0K", outfp); }
 				if (report) { offsetb4 = offset; offset = print_actives(outfp, HAZER_NMEA_GPS_MESSAGE_GSA, active); }
 				if (escape) { if (offset != offsetb4) { fprintf(outfp, "\033[%d;1H\033[0J", 5 + offset); } }
+
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
+
 				if (escape) { fprintf(outfp, "\033[%d;1H\033[0J", 5 + offset); }
 				if (report) { print_views(outfp, HAZER_NMEA_GPS_MESSAGE_GSV, view); }
+
 			} else {
+
 				/* Do nothing. */
+
 			}
 
 			if (report) { fflush(outfp); }

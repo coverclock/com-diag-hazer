@@ -14,7 +14,7 @@
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
 
-. $(readlink -e $(dirname ${0})/../fun)/ubx7
+. $(readlink -e $(dirname ${0})/../fun)/ubx8
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do

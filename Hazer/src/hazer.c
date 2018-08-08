@@ -871,7 +871,7 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
     return talker;
 }
 
-hazer_system_t hazer_parse_system(hazer_talker_t talker)
+hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
 {
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
 
@@ -993,6 +993,12 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     }
 
     return rc;
+}
+
+hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
+	hazer_system_t system = HAZER_SYSTEM_TOTAL;
+
+	return system;
 }
 
 int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
