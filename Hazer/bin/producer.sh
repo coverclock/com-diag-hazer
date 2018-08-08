@@ -12,8 +12,8 @@
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-DEVICE=${1:-"/dev/ttyACM0"}
-SPEED=${2:-"9600"}
+DEVICE=${1:-"/dev/ttyUSB0"}
+SPEED=${2:-"4800"}
 HOST=${3:-"ip6-localhost"}
 PORT=${4:-"5555"}
 

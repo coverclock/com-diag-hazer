@@ -566,61 +566,21 @@ static void * gpiopoller(void * argp)
  */
 int main(int argc, char * argv[])
 {
+	/*
+	 * Command line options and parameters with defaults.
+	 */
     const char * program = (const char *)0;
-    int debug = 0;
-    int verbose = 0;
-    int escape = 0;
-    int report = 0;
-    hazer_state_t nmea_state = HAZER_STATE_EOF;
-    hazer_buffer_t nmea_buffer = { 0 };
-    char * nmea_bb = (char *)0;
-    size_t nmea_ss = 0;
-    uint8_t nmea_cs = 0;
-    uint8_t nmea_ck = 0;
-    yodel_state_t ubx_state = YODEL_STATE_EOF;
-    yodel_buffer_t ubx_buffer = { 0 };
-    char * ubx_bb = (char *)0;
-    size_t ubx_ss = 0;
-    size_t ubx_ll = 0;
-    uint8_t ubx_ck_a = 0;
-    uint8_t ubx_ck_b = 0;
-    unsigned char * buffer = (unsigned char *)0;
-	unsigned char * bp = (char *)0;
-    hazer_buffer_t synthesized = { 0 };
-    hazer_vector_t vector = { 0 };
-    hazer_position_t fix[HAZER_SYSTEM_TOTAL] = { { 0 } };
-    hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0 } };
-    hazer_active_t cache = { 0 };
-    hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0 } };
-    unsigned lifetime[HAZER_SYSTEM_TOTAL] = { 0 };
-    FILE * infp = stdin;
-    FILE * outfp = stdout;
-    FILE * errfp = stderr;
-    FILE * devfp = stdout;
-    FILE * logfp = (FILE *)0;
-    FILE * strobefp = (FILE *)0;
-    FILE * ppsfp = (FILE *)0;
-    int devfd = -1;
-    int sock = -1;
-    int rc = 0;
-    int ch = EOF;
-    ssize_t size = 0;
-    ssize_t length = 0;
-    size_t current = 0;
-    int end = 0;
-    ssize_t check = 0;
-    ssize_t count = 0;
-    char ** vv = (char **)0;
-    char msn = '\0';
-    char lsn = '\0';
-    hazer_talker_t talker = HAZER_TALKER_TOTAL;
-    hazer_system_t system = HAZER_SYSTEM_TOTAL;
-    hazer_system_t preferred = HAZER_SYSTEM_TOTAL;
-    int opt = -1;
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
     const char * path = (const char *)0;
+    const char * host = (const char *)0;
+    const char * service = (const char *)0;
+    int opt = -1;
+    int debug = 0;
+    int verbose = 0;
+    int escape = 0;
+    int report = 0;
     int bitspersecond = 9600;
     int databits = 8;
     int paritybit = 0;
@@ -635,32 +595,101 @@ int main(int argc, char * argv[])
     int ignorechecksums = 0;
     role_t role = NONE;
     protocol_t protocol = IPV4;
-    format_t format = UNKNOWN;
-    const char * host = (const char *)0;
-    const char * service = (const char *)0;
+    unsigned timeout = 60;
+    diminuto_list_t * node = (diminuto_list_t *)0;
+    diminuto_list_t head = DIMINUTO_LIST_NULLINIT(&head);
+    /*
+     * Source and sink I/O variables.
+     */
+    FILE * infp = stdin;
+    FILE * outfp = stdout;
+    FILE * errfp = stderr;
+    FILE * devfp = stdout;
+    FILE * logfp = (FILE *)0;
+    FILE * strobefp = (FILE *)0;
+    FILE * ppsfp = (FILE *)0;
+    int devfd = -1;
+    /*
+     * Datagram socket variables.
+     */
     diminuto_ipv4_t ipv4 = 0;
     diminuto_ipv6_t ipv6 = { 0 };
     diminuto_port_t port = 0;
-    int output = 0;
-    diminuto_list_t * node = (diminuto_list_t *)0;
-    diminuto_list_t head = DIMINUTO_LIST_NULLINIT(&head);
-    int onepps = 0;
-    int tmppps = 0;
-    uint64_t nanoseconds = 0;
+    int sock = -1;
+    /*
+     * 1PPS poller thread variables.
+     */
     struct Poller poller = { 0 };
     void * result = (void *)0;
     pthread_t thread;
     int pthreadrc = -1;
+    int onepps = 0;
+    int tmppps = 0;
+    /*
+     * Parser state variables.
+     */
+    hazer_state_t nmea_state = HAZER_STATE_EOF;
+    hazer_buffer_t nmea_buffer = { 0 };
+    char * nmea_bb = (char *)0;
+    size_t nmea_ss = 0;
+    uint8_t nmea_cs = 0;
+    uint8_t nmea_ck = 0;
+    yodel_state_t ubx_state = YODEL_STATE_EOF;
+    yodel_buffer_t ubx_buffer = { 0 };
+    char * ubx_bb = (char *)0;
+    size_t ubx_ss = 0;
+    size_t ubx_ll = 0;
+    uint8_t ubx_ck_a = 0;
+    uint8_t ubx_ck_b = 0;
+    /*
+     * Processing variables.
+     */
+    unsigned char * buffer = (unsigned char *)0;
+	unsigned char * bp = (char *)0;
+    hazer_talker_t talker = HAZER_TALKER_TOTAL;
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    hazer_system_t preferred = HAZER_SYSTEM_TOTAL;
+    hazer_buffer_t synthesized = { 0 };
+    hazer_vector_t vector = { 0 };
+    hazer_active_t cache = { 0 };
+    format_t format = UNKNOWN;
+    /*
+     * GNSS state databases.
+     */
+    hazer_position_t fix[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    unsigned lifetime[HAZER_SYSTEM_TOTAL] = { 0 };
+    /*
+     * Miscellaneous working variables.
+     */
+    int rc = 0;
+    int ch = EOF;
+    ssize_t size = 0;
+    ssize_t length = 0;
+    size_t current = 0;
+    int end = 0;
+    ssize_t check = 0;
+    ssize_t count = 0;
+    char msn = '\0';
+    char lsn = '\0';
+    int output = 0;
+    uint64_t nanoseconds = 0;
     FILE * fp = (FILE *)0;
     int offset = 1;
     int offsetb4 = 0;
     int elapsed = 0;
-    unsigned timeout = 60;
-    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:Vb:cdehlmnop:rst:v?";
+    /*
+     * External symbols.
+     */
     extern char * optarg;
     extern int optind;
     extern int opterr;
     extern int optopt;
+    /*
+     * Command line options.
+     */
+    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:Vb:cdehlmnop:rst:v?";
 
     /*
      * Parse the command line.
@@ -933,8 +962,8 @@ int main(int argc, char * argv[])
     }
 
     /*
-	 * Handle 1PPS from General Purpose Input/Output (GPIO) pin
-	 * by polling until it has changed. The GPIO output of the
+     * Are we monitoring 1PPS from a General Purpose Input/Output pin?
+	 * A thread polls the pin until it has changed. The GPIO output of the
 	 * USB-Port-GPS doesn't appear to correlate with its serial
 	 * output in any way, nor is polling it when we do character
 	 * I/O sufficient. So it's interrogated in a separate thread.
@@ -973,8 +1002,8 @@ int main(int argc, char * argv[])
     } while (0);
 
     /*
-     * Handle 1PPS from Data Carrier Detect (DCD) serial line by
-     * blocking until it is asserted. The GR-701W asserts DCD just
+     * Are we monitoring 1PPS via Data Carrier Detect (DCD) on a serial line?
+     * A thread blocks until it is asserted. The GR-701W asserts DCD just
      * before it unloads a block of sentences. The leading edge of DCD
      * indicates 1PPS. We interrogate DCD in a separate thread to decouple
      * it from our serial input.

@@ -12,7 +12,7 @@
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-DEVICE=${1:-"/dev/ttyUSB0"}
+DEVICE=${1:-"/dev/ttyUSB1"}
 SPEED=${2:-"4800"}
 PORT=${3:-"5555"}
 
