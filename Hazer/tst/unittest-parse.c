@@ -61,6 +61,165 @@ int main(void)
 
     /**************************************************************************/
 
+    {
+    	static const hazer_active_t ACTIVE = {
+    			0.0, 0.0, 0.0,
+				0,
+				4,
+				{
+						HAZER_ID_GPS_FIRST,
+						HAZER_ID_GPS_FIRST + 1,
+						HAZER_ID_GPS_FIRST + 2,
+						HAZER_ID_GPS_LAST,
+				}
+    	};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
+
+    }
+
+	{
+		static const hazer_active_t ACTIVE = {
+				0.0, 0.0, 0.0,
+				0,
+				2,
+				{
+					HAZER_ID_WAAS_FIRST,
+					HAZER_ID_WAAS_LAST,
+				}
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_WAAS);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				0.0, 0.0, 0.0,
+				0,
+				3,
+				{
+					HAZER_ID_GLONASS_FIRST,
+					HAZER_ID_GLONASS_FIRST + 1,
+					HAZER_ID_GLONASS_LAST,
+				}
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GLONASS);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				0.0, 0.0, 0.0,
+				0,
+				4,
+				{
+					HAZER_ID_GPS_FIRST,
+					HAZER_ID_GPS_LAST,
+					HAZER_ID_GLONASS_FIRST,
+					HAZER_ID_GLONASS_LAST,
+				}
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GNSS);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				0.0, 0.0, 0.0,
+				HAZER_SYSTEM_GALILEO,
+				5,
+				{
+					1,
+					2,
+					3,
+					4,
+					5,
+				}
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GALILEO);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				0.0, 0.0, 0.0,
+				0,
+				4,
+				{
+					97,
+					98,
+					99,
+					100,
+				}
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_TOTAL);
+
+	}
+
+    /**************************************************************************/
+
+    {
+    	static const hazer_view_t VIEW[HAZER_SYSTEM_TOTAL] = {
+    			{ 0 },
+				{
+					{
+						{ 0, 0, HAZER_ID_GPS_FIRST, 0},
+						{ 0, 0, HAZER_ID_GPS_FIRST + 1, 0},
+						{ 0, 0, HAZER_ID_GPS_FIRST + 2, 0},
+						{ 0, 0, HAZER_ID_GPS_LAST, 0 },
+					},
+					4,
+					0,
+					0,
+				},
+				{
+					{
+						{ 0, 0, HAZER_ID_GLONASS_FIRST, 0},
+						{ 0, 0, HAZER_ID_GLONASS_FIRST + 1, 0},
+						{ 0, 0, HAZER_ID_GLONASS_LAST, 0 },
+					},
+					3,
+					0,
+					0,
+				},
+				{ 0 },
+				{
+					{
+						{ 0, 0, HAZER_ID_WAAS_FIRST, 0},
+						{ 0, 0, HAZER_ID_WAAS_LAST, 0 },
+					},
+					2,
+					0,
+					0,
+				},
+				{ 0 },
+				{ 0 },
+    	};
+
+    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
+    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
+    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 2, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
+    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 3, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
+    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
+
+    	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+    	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+    	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST + 2, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
+    	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+
+    	assert(hazer_map_svid_to_system(HAZER_ID_WAAS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_WAAS);
+    	assert(hazer_map_svid_to_system(HAZER_ID_WAAS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
+    	assert(hazer_map_svid_to_system(HAZER_ID_WAAS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_WAAS);
+
+    }
+
+    /**************************************************************************/
+
     numerator = hazer_parse_fraction("", &denominator);
     assert(numerator == 0);
     assert(denominator == 1);

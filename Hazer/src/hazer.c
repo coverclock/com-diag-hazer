@@ -966,6 +966,19 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     int satellites = 0;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
 
+    /*
+     * NMEA 0183 4.10 2012 has an additional 19th field containing the GNSS
+     * System ID to identify GPS, GLONASS, GALILEO, etc. Alas, I have yet
+     * to see a GPS receiver that actually provides this, because it sure
+     * would be useful. The satellite ID values depend on the constellation
+     * being reported. You can't depend on the talker for this, because at
+     * least on my 15 different receivers, the two that use the UBlox 8 chipset
+     * that can receive both GPS and GLONASS tag all GSA sentences with talker
+     * GN, for "GNSS", a generic talker indicating an ensemble computation.
+     * "When the Talker ID is GN, the GNSS System ID provides the only method
+     * to determine the meaning of the SVIDs." Hey, no kidding. Thanks for that.
+     */
+
     if (count < 1) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
@@ -989,6 +1002,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         activep->pdop = hazer_parse_num(vector[15]);
         activep->hdop = hazer_parse_num(vector[16]);
         activep->vdop = hazer_parse_num(vector[17]);
+        activep->system = (count > 18) ? strtoul(vector[18], (char **)0, 10): 0;
         rc = 0;
     }
 
@@ -997,6 +1011,34 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 
 hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
+	hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+	int slot = 0;
+    static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
+
+	if ((HAZER_SYSTEM_GPS <= activep->system) && (activep->system <= HAZER_SYSTEM_GALILEO)) {
+		system = (hazer_system_t)activep->system;
+	} else {
+		for (slot = 0; slot < IDENTIFIERS; ++slot) {
+			if ((HAZER_ID_GPS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GPS_LAST)) {
+				candidate = HAZER_SYSTEM_GPS;
+			} else if ((HAZER_ID_WAAS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_WAAS_LAST)) {
+				candidate = HAZER_SYSTEM_WAAS;
+			} else if ((HAZER_ID_GLONASS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GLONASS_LAST)) {
+				candidate = HAZER_SYSTEM_GLONASS;
+			} else {
+				/* Do nothing. */
+			}
+			if (candidate == HAZER_SYSTEM_TOTAL) {
+				/* Do nothing. */
+			} if (system == HAZER_SYSTEM_TOTAL) {
+				system = candidate;
+			} else if (system == candidate) {
+				/* Do nothing. */
+			} else {
+				system = HAZER_SYSTEM_GNSS;
+			}
+		}
+	}
 
 	return system;
 }
@@ -1061,6 +1103,28 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     }
 
     return rc;
+}
+
+hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], size_t count)
+{
+	hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    static const int SATELLITES = sizeof(va[0].sat) / sizeof(va[0].sat[0]);
+    int view = 0;
+    int slot = 0;
+
+    for (view = 0; view < count; ++view) {
+    	if (view >= HAZER_SYSTEM_TOTAL) { break; }
+    	for (slot = 0; slot < SATELLITES; ++slot) {
+    		if (slot >= va[view].view) { break; }
+    		if (va[view].sat[slot].id == 0) { break; }
+    		if (id == va[view].sat[slot].id) {
+    			system = (hazer_system_t)view;
+    			break;
+    		}
+    	}
+    }
+
+    return system;
 }
 
 int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)

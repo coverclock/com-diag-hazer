@@ -257,14 +257,15 @@ extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
 
 /**
  * GNSS system identifiers.
- * NMEA 0183 4.10 table 20 p. 95.
+ * NMEA 0183 4.10 table 20 p. 94-95.
+ * Everything beyond Galileo is really just a guess on my part.
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerSystem {
     HAZER_SYSTEM_GNSS				= 0,
-    HAZER_SYSTEM_GPS,
-    HAZER_SYSTEM_GLONASS,
-    HAZER_SYSTEM_GALILEO,
+    HAZER_SYSTEM_GPS				= 1,
+    HAZER_SYSTEM_GLONASS			= 2,
+    HAZER_SYSTEM_GALILEO			= 3,
 	HAZER_SYSTEM_WAAS,
 	HAZER_SYSTEM_BEIDOU,
 	HAZER_SYSTEM_QZSS,
@@ -291,6 +292,7 @@ typedef enum HazerSystem {
 		"QZSS", \
 		(const char *)0, \
 	}
+
 
 /**
  * GNSS satellite identifiers.
@@ -706,9 +708,10 @@ typedef struct HazerActive {
     double pdop;                /* Position Dilution Of Precision. */
     double hdop;                /* Horizontal Dilution Of Precision. */
     double vdop;                /* Vertical Dilution Of Precision. */
+    uint8_t system;				/* GNSS System ID (zero == unused). */
     uint8_t active;             /* Number of satellites active. */
     uint8_t id[HAZER_GNSS_ACTIVES];  /* Satellites active. */
-    uint8_t unused[3];          /* Unused. */
+    uint8_t unused[2];          /* Unused. */
 } hazer_active_t;
 
 /**
@@ -760,6 +763,15 @@ typedef struct HazerView {
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.
  */
 extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
+
+/**
+ * Return a system given an SVID and an array of views.
+ * @param id is the Satellite Vehicle IDentifier.
+ * @param va is an array of view structures.
+ * @param count is the number of views in the array.
+ * @return the index of the system or SYSTEM TOTAL if N/A.
+ */
+extern hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], size_t count);
 
 /*******************************************************************************
  * FORMATTING DATA FOR OUTPUT
