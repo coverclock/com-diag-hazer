@@ -678,11 +678,11 @@ can deconfigure GPIO pins using the Diminuto pintool utility
 ## True Versus Magnetic Bearings
 
 GPS devices compute the true bearing by comparing successive position fixes to
-determine your speed and direction. Hence, the true bearing, e.g. "135.000*T",
+determine your speed and direction. Hence, the true bearing, e.g. "135.000\*T",
 is only reliable if you are moving, and at a speed fast enough to be within
 the resolution of the accuracy of the position fix. The magnetic bearing is an
 actual magnetic compass bearing, but is only provided by GPS devices which also
-have a magnetic compass; otherwise it will be displayed as "0.000*M". The
+have a magnetic compass; otherwise it will be displayed as "0.000\*M". The
 cardinal compass direction, e.g. "SE", is based on the true bearing.
 
 ## Google Earth
