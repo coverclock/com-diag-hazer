@@ -687,13 +687,23 @@ cardinal compass direction, e.g. "SE", is based on the true bearing.
 
 ## Google Earth
 
-I had originally used Hazer with Google Earth Pro, the desktop version of the
-web based application. Google Earth only accepts GPS data on a serial port.
-So I processed the NMEA stream from a serial-attached GPS device using gpstool,
-then forwarded it via UDP datagrams to another gpstool, and used that gpstool
-to forward the NMEA stream across a second serial port to a host running Google
-Earth. Empirically and anecdotally, Google Earth appears to only accept serial
-input at 4800 baud. More recent and advanced GPS devices default to 9600 baud,
-and will overrun a 4800 baud stream. Even using the same 4800 baud device I used
-before, the BU-353S4, I haven't been able to reproduce my earlier success.
-Whatever fu I used before has thus far eluded me.
+In February 2017 I  used Hazer with Google Earth Pro, the desktop version of the
+web based application. Today, August 2018, the real-time GPS feature of Google
+Earth Pro no longer seems to work with latest version, 7.3.2, for the Mac (I
+haven't tried it for other operating systems). Neither does 7.3.1. But 7.1.8
+seems to work.
+
+Google Earth only accepts GPS data on a serial port, or at least something that
+kinda sorta looks like a serial port. So I process the NMEA stream from a
+serial-attached GPS device using gpstool running on a Linux server, then
+forwarded it via UDP datagrams to another gpstool on the same server, and then
+use that gpstool to forward the NMEA stream out a serial port across a two FTDI
+USB-to-serial adaptors hooked back-to-back with a null modem in between, to a
+Mac running Google Earth Pro.
+
+Note that empirically and anecdotally, Google Earth Pro appears to only accept
+serial input at 4800 baud. More recent and advanced GPS devices default to 9600
+baud, and will overrun a 4800 baud serial port. So I used a USGlobalSat
+BU-353S4, which defaults to 4800 baud, as my GPS device on the Linux server.
+
+As Rube Goldberg as this is, it seems to work.
