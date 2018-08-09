@@ -277,7 +277,7 @@ to do cursor control for its report on standard output,
 and when using a GPS receiver that can only receive a single frequency range
 at a time (so it can only detect GPS, or only GLONASS, but not both
 simultaneously), the display looks something like this snapshot as it is
-continually updated. (In this and most other output, the asterisk * is used to
+continually updated. (In this and most other output, the asterisk \* is used to
 mean the degree symbol. This should not be confused with its use as a delimeter
 in NMEA sentences.)
 
