@@ -7,9 +7,10 @@
 # I use a USGLobalSat BU-353S4 USB GPS device for this.
 # The BU-353S4 uses a SiRF Star Iv chipset.
 
-. $(readlink -e $(dirname ${0})/../bin)/setup
-
+PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-4800}
+
+. $(readlink -e $(dirname ${0})/../bin)/setup
 
 eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -R

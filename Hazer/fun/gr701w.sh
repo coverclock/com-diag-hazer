@@ -10,10 +10,11 @@
 # if it doesn't implement 1PPS, the script should still otherwise
 # work.
 
-. $(readlink -e $(dirname ${0})/../bin)/setup
-
+PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-9600}
+
+. $(readlink -e $(dirname ${0})/../bin)/setup
 
 . $(readlink -e $(dirname ${0})/../fun)/ubx7
 
@@ -22,4 +23,4 @@ for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} -W ${OPTION}"
 done
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -E -t 10 ${OPTIONS}
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -E -t 10 ${OPTIONS} 2> ${PROGRAM}.log

@@ -1016,7 +1016,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 }
 
 /*
- * NMEA 0183 4.10 p. 94..95.
+ * NMEA 0183 4.10 p. 94-95.
  */
 hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
@@ -1028,23 +1028,25 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
 		system = (hazer_system_t)activep->system;
 	} else {
 		for (slot = 0; slot < IDENTIFIERS; ++slot) {
-			if ((HAZER_ID_GPS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GPS_LAST)) {
+			if (slot >= activep->active) {
+				break;
+			} else if (activep->id[slot] == 0) {
+				break;
+			} else if ((HAZER_ID_GPS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GPS_LAST)) {
 				candidate = HAZER_SYSTEM_GPS;
 			} else if ((HAZER_ID_WAAS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_WAAS_LAST)) {
 				candidate = HAZER_SYSTEM_WAAS;
 			} else if ((HAZER_ID_GLONASS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GLONASS_LAST)) {
 				candidate = HAZER_SYSTEM_GLONASS;
 			} else {
-				candidate = HAZER_SYSTEM_TOTAL;
+				continue;
 			}
-			if (candidate == HAZER_SYSTEM_TOTAL) {
-				/* Do nothing. */
-			} else if (system == HAZER_SYSTEM_TOTAL) {
+			if (system == HAZER_SYSTEM_TOTAL) {
 				system = candidate;
 			} else if (system == candidate) {
-				/* Do nothing. */
+				continue;
 			} else if (candidate == HAZER_SYSTEM_WAAS) {
-				/* Do nothing. */
+				continue;
 			} else if (system == HAZER_SYSTEM_WAAS) {
 				system = candidate;
 			} else {

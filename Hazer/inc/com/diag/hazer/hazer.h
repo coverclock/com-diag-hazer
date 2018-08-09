@@ -117,7 +117,7 @@ enum HazerGnss {
     HAZER_GNSS_SATELLITES   = 32,	/* Per constellation or system. */
     HAZER_GNSS_VIEWS        = 4,	/* Per NMEA GSV message. */
     HAZER_GNSS_ACTIVES		= 12,	/* Per NMEA GSA message. */
-	HAZER_GNSS_TICKS		= 256,	/* Maximum ticks. */
+	HAZER_GNSS_TICKS		= 255,	/* Maximum lifetime. */
 };
 
 /**
@@ -730,8 +730,9 @@ extern int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t cou
 
 /**
  * Return a system given a list of active satellites. This is based on the
- * NMEA conventions.
- * @param activep points to the active structure.
+ * NMEA conventions for satellite numbering for GPS, GLONASS, and WAAS.
+ * @param activep points to the active structure. It is sometimes useful for
+ * GPS devices that emit multiple GSA sentences all under the GNSS talker.
  * @return the index of the system or SYSTEM TOTAL if N/A.
  */
 extern hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep);

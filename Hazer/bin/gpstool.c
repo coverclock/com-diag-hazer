@@ -204,52 +204,6 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
     fflush(fp);
 }
 
-#if 0
-/**
- * Select the best global navigation satellite system from among those
- * currently active by finding the one with the lowest dilution of precision.
- * @param aa points to the array of active GNSSes.
- * @param la points to the array of lifetimes for each GNSS.
- * @return an index to the best GNSS or HAZER_SYSTEM_TOTAL is an error occurred.
- */
-static hazer_system_t select_active(const hazer_active_t aa[], const unsigned la[])
-{
-	hazer_system_t system = HAZER_SYSTEM_TOTAL;
-	int index = 0;
-	int candidate = 0;
-
-	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
-		/*
-		 * We want GNSS to be the last possible choice.
-		 */
-		candidate = (index + 1) % HAZER_SYSTEM_TOTAL;
-		if (la[candidate] == 0) {
-			continue;
-		} else if (aa[candidate].active == 0) {
-			continue;
-		} else if (system == HAZER_SYSTEM_TOTAL) {
-			system = (hazer_system_t)candidate;
-		} else if (aa[candidate].pdop > aa[system].pdop) {
-			continue;
-		} else if (aa[candidate].pdop < aa[system].pdop) {
-			system = (hazer_system_t)candidate;
-		} else if (aa[candidate].hdop > aa[system].hdop) {
-			continue;
- 		} else if (aa[candidate].hdop < aa[system].hdop) {
- 			system = (hazer_system_t)candidate;
- 		} else if (aa[candidate].vdop > aa[system].vdop) {
- 			continue;
- 		} else if (aa[candidate].vdop < aa[system].vdop) {
- 			system = (hazer_system_t)candidate;
- 		} else {
- 			/* Do nothing. */
- 		}
-	}
-
-	return system;
-}
-#endif
-
 /**
  * Print all of the active global navigation satellite systems.
  * @param fp points to the FILE stream.
@@ -281,7 +235,7 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
 
        fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf", aa[system].active, aa[system].pdop, aa[system].hdop, aa[system].vdop);
 
-       fprintf(fp, " %3uticks", aa[system].ticks);
+       fprintf(fp, " %3usecs", aa[system].ticks);
 
        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -319,7 +273,7 @@ static void print_views(FILE *fp, const hazer_view_t va[])
 
             	fprintf(fp, " [%02d] sat %3u elv %2u* azm %3u* snr %2udBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
 
-                fprintf(fp, " %3uticks", va[system].ticks);
+                fprintf(fp, " %3usecs", va[system].ticks);
 
                 fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -399,7 +353,9 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps)
 
 		fprintf(fp, " pps %c", pps ? '1' : '0');
 
-	    fprintf(fp, " %3uticks", pa[system].ticks);
+		fputs("      ", fp);
+
+	    fprintf(fp, " %3usecs", pa[system].ticks);
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -461,7 +417,9 @@ static void print_solutions(FILE * fp, const hazer_position_t pa[])
 		fprintf(fp, " ( %d %d %d %d %d %d %d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
 #endif
 
-	    fprintf(fp, " %3uticks", pa[system].ticks);
+		fputs("   ", fp);
+
+	    fprintf(fp, " %3usecs", pa[system].ticks);
 
 		fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -638,7 +596,7 @@ int main(int argc, char * argv[])
     int ignorechecksums = 0;
     role_t role = NONE;
     protocol_t protocol = IPV4;
-    unsigned timeout = 60;
+    unsigned long timeout = HAZER_GNSS_TICKS;
     diminuto_list_t * node = (diminuto_list_t *)0;
     diminuto_list_t head = DIMINUTO_LIST_NULLINIT(&head);
     /*
@@ -691,6 +649,7 @@ int main(int argc, char * argv[])
 	unsigned char * bp = (char *)0;
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
     hazer_buffer_t synthesized = { 0 };
     hazer_vector_t vector = { 0 };
     format_t format = UNKNOWN;
@@ -708,7 +667,6 @@ int main(int argc, char * argv[])
     ssize_t size = 0;
     ssize_t length = 0;
     size_t current = 0;
-    int end = 0;
     ssize_t check = 0;
     ssize_t count = 0;
     char msn = '\0';
@@ -719,6 +677,8 @@ int main(int argc, char * argv[])
     int elapsed = 0;
     int refresh = 0;
 	int index = -1;
+	char * end = (char *)0;
+	hazer_active_t cache = { 0 };
     /*
      * External symbols.
      */
@@ -796,7 +756,11 @@ int main(int argc, char * argv[])
         	fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
         	break;
         case 'b':
-            bitspersecond = strtoul(optarg, (char **)0, 0);
+            bitspersecond = strtoul(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0') || (bitspersecond == 0)) {
+            	errno = EINVAL;
+            	diminuto_perror(optarg);
+            }
             break;
         case 'c':
             modemcontrol = !0;
@@ -835,7 +799,11 @@ int main(int argc, char * argv[])
             xonxoff = !0;
             break;
         case 't':
-            timeout = strtoul(optarg, (char **)0, 0);
+            timeout = strtoul(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0') || (timeout > HAZER_GNSS_TICKS)) {
+            	errno = EINVAL;
+            	diminuto_perror(optarg);
+            }
         	break;
         case 'v':
             verbose = !0;
@@ -1320,7 +1288,7 @@ int main(int argc, char * argv[])
          **
          ** We forward and log anything we recognize: currently NMEA sentences
          ** or UBX packets. Note that we don't forward the terminating NUL
-         ** (using length, instead of size) that terminate all datagrams of any
+         ** (using length, instead of size) that terminate all input of any
          ** format (whether that's useful or not).
          **/
 
@@ -1338,8 +1306,8 @@ int main(int argc, char * argv[])
         	/*
         	 * We tokenize the NMEA sentence so we can parse it later. Then
         	 * we regenerate the sentence, and verify it, mostly to test the
-        	 * underlying API (although we may use the regenerated sentence
-        	 * later, since the original was mutated by the tokenization).
+        	 * underlying API. We can use the regenerated sentence for output,
+        	 * since the original was mutated by the tokenization.
         	 */
 
 			count = hazer_tokenize(vector, countof(vector), buffer, size);
@@ -1399,7 +1367,10 @@ int main(int argc, char * argv[])
 	         * a valid message from any system we recognize. (Might be zero.)
 	         * Subtract that number from all the lifetimes of all the systems we
 	         * care about to figure out if there's a system from which we've
-	         * stopped hearing.
+	         * stopped hearing. This implements an expiry for each entry in our
+	         * database, because NMEA isn't kind enough to remind us that we
+	         * haven't heard from a system lately; hence data can get stale and
+	         * needs to be aged out.
 	         */
 
 	        elapsed = diminuto_alarm_check();
@@ -1459,8 +1430,28 @@ int main(int argc, char * argv[])
 		        fix[system].ticks = timeout;
 		        refresh = !0;
 
-			} else if (hazer_parse_gsa(&active[system], vector, count) == 0) {
+			} else if (hazer_parse_gsa(&cache, vector, count) == 0) {
 
+				/*
+				 * This is a special case for the Ublox 8 used in devices like
+				 * the GN-803G. It emits multiple GSA sentences all under the
+				 * GN (GNSS) talker, but the satellites are either GPS or
+				 * GLONASS *plus* WAAS. We'd like to classify them as either
+				 * GPS or GLONASS. Sadly, later NMEA standards actually have
+				 * a field in the GSA sentence that contains a GNSS System ID,
+				 * but I have yet to see a device that supports it. However,
+				 * the GSA parser function has untested code to extract this ID
+				 * if it exists, and the map function below will use it.
+				 */
+
+				if (system == HAZER_SYSTEM_GNSS) {
+					candidate = hazer_map_active_to_system(&cache);
+					if (candidate < HAZER_SYSTEM_TOTAL) {
+						system = candidate;
+					}
+				}
+
+				active[system] = cache;
 		        active[system].ticks = timeout;
 		        refresh = !0;
 

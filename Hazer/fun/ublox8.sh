@@ -9,10 +9,11 @@
 # RF stages, enabling it to receive GPS and GLONASS GNSS
 # signals simultaneously.
 
-. $(readlink -e $(dirname ${0})/../bin)/setup
-
+PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
+
+. $(readlink -e $(dirname ${0})/../bin)/setup
 
 . $(readlink -e $(dirname ${0})/../fun)/ubx8
 

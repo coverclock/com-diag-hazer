@@ -10,10 +10,11 @@
 # if it doesn't implement 1PPS, the script should still otherwise
 # work.
 
-. $(readlink -e $(dirname ${0})/../bin)/setup
-
+PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-9600}
+
+. $(readlink -e $(dirname ${0})/../bin)/setup
 
 . $(readlink -e $(dirname ${0})/../fun)/ubx7
 
