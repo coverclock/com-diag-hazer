@@ -28,7 +28,7 @@ distribution. gpstool uses both the Hazer stack and the Yodel stack to process
 both NMEA and UBX messages interleaved in the same input stream.
 
 If you're wondering why I don't use the excellent open source GPS daemon
-(gpsd) and its GPS monitor (gpsmon), the answer is I have, in several projects,
+(gpsd) and its GPS monitor (gpsmon), the answer is: I have, in several projects,
 typically in conjunction with the open source NTPsec daemon (ntpd). Hazer was
 developed as an excuse for me to learn in detail more about how GPS works and
 how NMEA and UBX sentences are formatted (because I only learn by doing), and
@@ -191,14 +191,15 @@ Optionally install Diminuto and Hazer in /usr/local.
 
 # Directories
  
-* bin - utility source files.    
-* cfg - configuration makefiles.    
-* fun - functional test source files (may require special hardware).    
-* inc - public header files.    
-* out - build artifacts.    
-* fs - file system overlay that may be useful on the host on which Hazer runs.    
-* src - feature implementation and private header source files.    
-* tst - unit test source files.    
+* bin - utility source files.
+* cfg - configuration makefiles.
+* dat - NMEA and UBX output captured from actual receivers.
+* fun - functional test source files.
+* inc - public header files.
+* out - build artifacts.
+* fs - file system overlay that may be useful on the host on which Hazer runs.
+* src - feature implementation and private header source files.
+* tst - unit test source files (does not require a GPS receiver).
 
 # Utilities
 
@@ -212,8 +213,12 @@ Optionally install Diminuto and Hazer in /usr/local.
 
 # Functional Tests
 
-* gr701w -script that uses gpstool to exercise the NaviSys GR701W device.    
-* ublox7 - script that uses gpstool to exercise any ublox7 device.    
+* bu353s4 - script that uses gpstool to exercise the USGlobalSat BU-353S4 receiver.
+* gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
+* gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
+* sirfstar4 - script that uses gpstool to exercise any SiRF Star 4 receiver.
+* ublox7 - script that uses gpstool to exercise any Ublox 7 device.    
+* ublox8 - script that uses gpstool to exercise any Ublox 8 device.
 
 # Help
 
