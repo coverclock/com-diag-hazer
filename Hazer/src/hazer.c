@@ -925,7 +925,7 @@ hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
 int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char GGA[] = HAZER_NMEA_GPS_MESSAGE_GGA;
+    static const char GGA[] = HAZER_NMEA_SENTENCE_GGA;
     uint64_t utc_nanoseconds = 0;
     uint64_t tot_nanoseconds = 0;
     
@@ -951,6 +951,7 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
             positionp->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
             positionp->sat_used = strtol(vector[7], (char **)0, 10);
             positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits);
+            positionp->label = GGA;
             rc = 0;
         } else {
             DEBUG("TIME?\n");
@@ -963,7 +964,7 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char GSA[] = HAZER_NMEA_GPS_MESSAGE_GSA;
+    static const char GSA[] = HAZER_NMEA_SENTENCE_GSA;
     int index = 3;
     int slot = 0;
     int id = 0;
@@ -1007,6 +1008,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         activep->hdop = hazer_parse_num(vector[16]);
         activep->vdop = hazer_parse_num(vector[17]);
         activep->system = (count > 19) ? strtoul(vector[18], (char **)0, 10) : 0;
+        activep->label = GSA;
         rc = 0;
     }
 
@@ -1057,7 +1059,7 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
 int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char GSV[] = HAZER_NMEA_GPS_MESSAGE_GSV;
+    static const char GSV[] = HAZER_NMEA_SENTENCE_GSV;
     int messages = 0;
     int message = 0;
     int start = 0;
@@ -1103,6 +1105,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 			viewp->channels = channel;
 			viewp->view = satellites;
 			viewp->pending = messages - message;
+			viewp->label = GSV;
             if (rc < 0) {
                 /* Do nothing. */
             } else if (viewp->pending > 0) {
@@ -1141,7 +1144,7 @@ hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], siz
 int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char RMC[] = HAZER_NMEA_GPS_MESSAGE_RMC;
+    static const char RMC[] = HAZER_NMEA_SENTENCE_RMC;
     uint64_t utc_nanoseconds = 0;
     uint64_t dmy_nanoseconds = 0;
     uint64_t tot_nanoseconds = 0;
@@ -1174,6 +1177,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
             positionp->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
             positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits);
             positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits);
+            positionp->label = RMC;
             rc = 0;
         } else {
             DEBUG("TIME?\n");
@@ -1186,7 +1190,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char GLL[] = HAZER_NMEA_GPS_MESSAGE_GLL;
+    static const char GLL[] = HAZER_NMEA_SENTENCE_GLL;
     uint64_t utc_nanoseconds = 0;
     uint64_t tot_nanoseconds = 0;
 
@@ -1212,6 +1216,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
             positionp->utc_nanoseconds = utc_nanoseconds;
             positionp->lat_nanodegrees = hazer_parse_latlon(vector[1], *(vector[2]), &positionp->lat_digits);
             positionp->lon_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lon_digits);
+            positionp->label = GLL;
             rc = 0;
         } else {
             DEBUG("TIME?\n");
@@ -1224,7 +1229,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
 int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char VTG[] = HAZER_NMEA_GPS_MESSAGE_VTG;
+    static const char VTG[] = HAZER_NMEA_SENTENCE_VTG;
 
     if (count < 1) {
         /* Do nothing. */
@@ -1243,6 +1248,7 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
         positionp->mag_nanodegrees = hazer_parse_cog(vector[3], &positionp->mag_digits);
         positionp->sog_microknots = hazer_parse_sog(vector[5], &positionp->sog_digits);
         positionp->sog_millimeters = hazer_parse_smm(vector[7], &positionp->smm_digits);
+        positionp->label = VTG;
         rc = 0;
    }
 

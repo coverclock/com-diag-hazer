@@ -64,6 +64,7 @@ int main(void)
     {
     	static const hazer_active_t ACTIVE = {
     			0.0, 0.0, 0.0,
+				NULL,
 				0,
 				4,
 				{
@@ -81,6 +82,7 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				0.0, 0.0, 0.0,
+				NULL,
 				0,
 				2,
 				{
@@ -96,6 +98,7 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				0.0, 0.0, 0.0,
+				NULL,
 				0,
 				3,
 				{
@@ -112,6 +115,7 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				0.0, 0.0, 0.0,
+				NULL,
 				0,
 				4,
 				{
@@ -129,6 +133,7 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				0.0, 0.0, 0.0,
+				NULL,
 				HAZER_SYSTEM_GALILEO,
 				5,
 				{
@@ -147,6 +152,7 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				0.0, 0.0, 0.0,
+				NULL,
 				0,
 				4,
 				{
@@ -165,8 +171,9 @@ int main(void)
 
     {
     	static const hazer_view_t VIEW[HAZER_SYSTEM_TOTAL] = {
-    			{ 0 }, /* GNSS */
+    			{ NULL }, /* GNSS */
 				{
+					NULL,
 					{
 						{ 0, 0, HAZER_ID_GPS_FIRST, 0},
 						{ 0, 0, HAZER_ID_GPS_FIRST + 1, 0},
@@ -178,6 +185,7 @@ int main(void)
 					0,
 				},
 				{
+					NULL,
 					{
 						{ 0, 0, HAZER_ID_GLONASS_FIRST, 0},
 						{ 0, 0, HAZER_ID_GLONASS_FIRST + 1, 0},
@@ -187,8 +195,9 @@ int main(void)
 					0,
 					0,
 				},
-				{ 0 }, /* GALILEO */
+				{ NULL }, /* GALILEO */
 				{
+					NULL,
 					{
 						{ 0, 0, HAZER_ID_WAAS_FIRST, 0},
 						{ 0, 0, HAZER_ID_WAAS_LAST, 0 },
@@ -197,8 +206,8 @@ int main(void)
 					0,
 					0,
 				},
-				{ 0 }, /* BEIDOU */
-				{ 0 }, /* QZSS */
+				{ NULL }, /* BEIDOU */
+				{ NULL }, /* QZSS */
     	};
 
     	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);

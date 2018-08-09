@@ -117,6 +117,7 @@ enum HazerGnss {
     HAZER_GNSS_SATELLITES   = 32,	/* Per constellation or system. */
     HAZER_GNSS_VIEWS        = 4,	/* Per NMEA GSV message. */
     HAZER_GNSS_ACTIVES		= 12,	/* Per NMEA GSA message. */
+	HAZER_GNSS_TICKS		= 256,	/* Maximum ticks. */
 };
 
 /**
@@ -513,98 +514,98 @@ extern double hazer_parse_num(const char * string);
  ******************************************************************************/
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_DTM
+ * @def HAZER_NMEA_SENTENCE_DTM
  * ublox7 Protocol Reference, p. vi, datum reference
  */
-#define HAZER_NMEA_GPS_MESSAGE_DTM "DTM"
+#define HAZER_NMEA_SENTENCE_DTM "DTM"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_GBS
+ * @def HAZER_NMEA_SENTENCE_GBS
  * ublox7 Protocol Reference, p. vi, GNSS fault detection
  */
-#define HAZER_NMEA_GPS_MESSAGE_GBS "GBS"
+#define HAZER_NMEA_SENTENCE_GBS "GBS"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_GGA
+ * @def HAZER_NMEA_SENTENCE_GGA
  * SiRF NMEA, Table 1-2, GPS fix data
  */
-#define HAZER_NMEA_GPS_MESSAGE_GGA "GGA"
+#define HAZER_NMEA_SENTENCE_GGA "GGA"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_GLL
+ * @def HAZER_NMEA_SENTENCE_GLL
  * SiRF NMEA, Table 1-2, geographic position latitude/longitude
  */
-#define HAZER_NMEA_GPS_MESSAGE_GLL "GLL"
+#define HAZER_NMEA_SENTENCE_GLL "GLL"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_GNS
+ * @def HAZER_NMEA_SENTENCE_GNS
  * ublox7 Protocol Reference, p. vi, GNSS fix data
  */
-#define HAZER_NMEA_GPS_MESSAGE_GNS "GNS"
+#define HAZER_NMEA_SENTENCE_GNS "GNS"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_GRS
+ * @def HAZER_NMEA_SENTENCE_GRS
  * ublox7 Protocol Reference, p. vi, GNSS range residuals
  */
-#define HAZER_NMEA_GPS_MESSAGE_GRS "GRS"
+#define HAZER_NMEA_SENTENCE_GRS "GRS"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_GSA
+ * @def HAZER_NMEA_SENTENCE_GSA
  * SiRF NMEA, Table 1-2, GPS DOP and active satellites
  */
-#define HAZER_NMEA_GPS_MESSAGE_GSA "GSA"
+#define HAZER_NMEA_SENTENCE_GSA "GSA"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_GST
+ * @def HAZER_NMEA_SENTENCE_GST
  * ublox7 Protocol Reference, p. vi, GNSS pseudo range error statistics
  */
-#define HAZER_NMEA_GPS_MESSAGE_GRT "GST"
+#define HAZER_NMEA_SENTENCE_GRT "GST"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_GSV
+ * @def HAZER_NMEA_SENTENCE_GSV
  * SiRF NMEA, Table 1-2, GPS satellites in view
  */
-#define HAZER_NMEA_GPS_MESSAGE_GSV "GSV"
+#define HAZER_NMEA_SENTENCE_GSV "GSV"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_MSS
+ * @def HAZER_NMEA_SENTENCE_MSS
  * SiRF NMEA, Table 1-2, beacon receiver status
  */
-#define HAZER_NMEA_GPS_MESSAGE_MSS "MSS"
+#define HAZER_NMEA_SENTENCE_MSS "MSS"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_RMC
+ * @def HAZER_NMEA_SENTENCE_RMC
  * SiRF NMEA, Table 1-2, recommended minimum navigation information message C
  */
-#define HAZER_NMEA_GPS_MESSAGE_RMC "RMC"
+#define HAZER_NMEA_SENTENCE_RMC "RMC"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_TXT
+ * @def HAZER_NMEA_SENTENCE_TXT
  * ublox7 Protocol Reference, p. vi, text
  */
-#define HAZER_NMEA_GPS_MESSAGE_TXT "TXT"
+#define HAZER_NMEA_SENTENCE_TXT "TXT"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_VTG
+ * @def HAZER_NMEA_SENTENCE_VTG
  * SiRF NMEA, Table 1-2, track made good and ground speed
  */
-#define HAZER_NMEA_GPS_MESSAGE_VTG "VTG"
+#define HAZER_NMEA_SENTENCE_VTG "VTG"
 
 /**
- * @def HAZER_NMEA_GPS_MESSAGE_ZDA
+ * @def HAZER_NMEA_SENTENCE_ZDA
  * SiRF NMEA, Table 1-2, time & date
  */
-#define HAZER_NMEA_GPS_MESSAGE_ZDA "ZDA"
+#define HAZER_NMEA_SENTENCE_ZDA "ZDA"
 
 /*******************************************************************************
  * IDENTIFYING PROPRIETARY SENTENCES
  ******************************************************************************/
 
 /**
- * @def HAZER_NMEA_GPS_PROPRIETARY_PUBX
+ * @def HAZER_NMEA_SENTENCE_PUBX
  * ublox7 Protocol Reference, p. vi, PUBX
  */
-#define HAZER_PROPRIETARY_GPS_PUBX "PUBX"
+#define HAZER_PROPRIETARY_SENTENCE_PUBX "PUBX"
 
 /*******************************************************************************
  * DETERMINING TALKER
@@ -648,6 +649,7 @@ typedef struct HazerPosition {
     int64_t sog_millimeters;    /* Speed On Ground in millimeters per hour. */
     int64_t cog_nanodegrees;    /* Course On Ground true in nanodegrees. */
     int64_t mag_nanodegrees;    /* Magnetic bearing in nanodegrees. */
+    const char * label;			/* Label for sentence. */
     uint8_t sat_used;           /* Number of satellites used. */
     uint8_t lat_digits;         /* Significant digits of latitude. */
     uint8_t lon_digits;         /* Significant digits of longitude. */
@@ -656,7 +658,8 @@ typedef struct HazerPosition {
     uint8_t smm_digits;			/* Significant digits of SOG mm/h. */
     uint8_t cog_digits;         /* Significant digits of Course On Ground. */
     uint8_t mag_digits;         /* Significant digits of Magnetic bearing. */
-    uint8_t unused[2];          /* Unused. */
+    uint8_t ticks;				/* Lifetime in application-defined ticks. */
+    uint8_t unused[1];          /* Unused. */
 } hazer_position_t;
 
 /**
@@ -708,10 +711,12 @@ typedef struct HazerActive {
     double pdop;                /* Position Dilution Of Precision. */
     double hdop;                /* Horizontal Dilution Of Precision. */
     double vdop;                /* Vertical Dilution Of Precision. */
+    const char * label;			/* Label for sentence. */
     uint8_t system;				/* GNSS System ID (zero == unused). */
     uint8_t active;             /* Number of satellites active. */
     uint8_t id[HAZER_GNSS_ACTIVES];  /* Satellites active. */
-    uint8_t unused[2];          /* Unused. */
+    uint8_t ticks;				/* Lifetime in application-defined ticks. */
+    uint8_t unused[1];          /* Unused. */
 } hazer_active_t;
 
 /**
@@ -748,11 +753,13 @@ typedef struct HazerSatellite {
  * have channels configured. THIS OBJECT SHOULD BE INITIALIZED TO ALL ZEROS.
  */
 typedef struct HazerView {
+    const char * label;			/* Label for sentence. */
     hazer_satellite_t sat[HAZER_GNSS_SATELLITES]; /* Satellites viewed. */
     uint8_t view;               /* Number of satellites in view. */
     uint8_t channels;           /* Number of channels used in view. */
     uint8_t pending;			/* Number of updates pending. */
-    uint8_t unused[6];          /* Unused. */
+    uint8_t ticks;				/* Lifetime in application-defined ticks. */
+    uint8_t unused[5];          /* Unused. */
 } hazer_view_t;
 
 /**

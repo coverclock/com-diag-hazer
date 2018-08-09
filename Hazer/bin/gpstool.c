@@ -83,7 +83,7 @@ static const size_t LIMIT = 80;
 
 static const size_t UNLIMITED = ~(size_t)0;
 
-static const char LABEL[] = "FIX";
+static const char * LABEL = "FIX";
 
 /**
  * Emit an NMEA sentences to the specified stream after adding the ending
@@ -253,11 +253,9 @@ static hazer_system_t select_active(const hazer_active_t aa[], const unsigned la
 /**
  * Print all of the active global navigation satellite systems.
  * @param fp points to the FILE stream.
- * @param name is the NMEA sentence performing this print.
  * @param aa points to the array of active GNSSes.
- * @param la points to an array of lifetimes.
  */
-static void print_actives(FILE * fp, const char * name, const hazer_active_t aa[], const unsigned la[])
+static void print_actives(FILE * fp, const hazer_active_t aa[])
 {
     static const unsigned int IDENTIFIERS = countof(aa[0].id);
     int system = 0;
@@ -266,12 +264,12 @@ static void print_actives(FILE * fp, const char * name, const hazer_active_t aa[
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (la[system] == 0) { continue; }
+    	if (aa[system].ticks == 0) { continue; }
 
         limit = aa[system].active;
         if (limit == 0) { continue; }
 
-        fprintf(fp, "%s {", name);
+        fprintf(fp, "%s {", aa[system].label);
 
         for (satellite = 0; satellite < IDENTIFIERS; ++satellite) {
             if ((satellite < limit) && (aa[system].id[satellite] != 0)) {
@@ -283,7 +281,9 @@ static void print_actives(FILE * fp, const char * name, const hazer_active_t aa[
 
        fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf", aa[system].active, aa[system].pdop, aa[system].hdop, aa[system].vdop);
 
-       fprintf(fp, " sys %-8s", HAZER_SYSTEM_NAME[system]);
+       fprintf(fp, " %3uticks", aa[system].ticks);
+
+       fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
        fputc('\n', fp);
 
@@ -293,11 +293,9 @@ static void print_actives(FILE * fp, const char * name, const hazer_active_t aa[
 /**
  * Print all of the satellites currently being viewed by the receiver.
  * @param fp points to the FILE stream.
- * @param name is the NMEA sentence performing this print.
  * @param va points to the array of all satellite being viewed.
- * @param la points to an array of lifetimes.
  */
-static void print_views(FILE *fp, const char * name, const hazer_view_t va[], const unsigned la[])
+static void print_views(FILE *fp, const hazer_view_t va[])
 {
     static const int SATELLITES = countof(va[0].sat);
     int system = 0;
@@ -307,7 +305,7 @@ static void print_views(FILE *fp, const char * name, const hazer_view_t va[], co
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (la[system] == 0) { continue; }
+    	if (va[system].ticks == 0) { continue; }
 
     	limit = va[system].channels;
 
@@ -317,11 +315,13 @@ static void print_views(FILE *fp, const char * name, const hazer_view_t va[], co
         for (satellite = 0; satellite < limit; ++satellite) {
             if (va[system].sat[satellite].id != 0) {
 
-        		fputs(name, fp);
+        		fputs(va[system].label, fp);
 
             	fprintf(fp, " [%02d] sat %3u elv %2u* azm %3u* snr %2udBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
 
-                fprintf(fp, " sys %-8s", HAZER_SYSTEM_NAME[system]);
+                fprintf(fp, " %3uticks", va[system].ticks);
+
+                fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
                 fputc('\n', fp);
 
@@ -335,12 +335,10 @@ static void print_views(FILE *fp, const char * name, const hazer_view_t va[], co
 /**
  * Print all of the navigation position fixes.
  * @param fp points to the FILE stream.
- * @param name is NMEA sentence performing this print.
  * @param pa points to an array of positions.
- * @param la points to an array of lifetimes.
  * @param pps is the current value of the 1PPS strobe.
  */
-static void print_positions(FILE * fp, const char * name, const hazer_position_t pa[], const unsigned la[], int pps)
+static void print_positions(FILE * fp, const hazer_position_t pa[], int pps)
 {
     int system = 0;
     uint64_t nanoseconds = 0;
@@ -359,11 +357,11 @@ static void print_positions(FILE * fp, const char * name, const hazer_position_t
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (la[system] == 0) { continue; }
+    	if (pa[system].ticks == 0) { continue; }
 
     	if (pa[system].dmy_nanoseconds == 0) { continue; }
 
-		fputs(name, fp);
+		fputs(LABEL, fp);
 
 		hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
 		assert((1 <= month) && (month <= 12));
@@ -401,9 +399,9 @@ static void print_positions(FILE * fp, const char * name, const hazer_position_t
 
 		fprintf(fp, " pps %c", pps ? '1' : '0');
 
-		fprintf(fp, " sec %u", la[system]);
+	    fprintf(fp, " %3uticks", pa[system].ticks);
 
-        fprintf(fp, " sys %-8s", HAZER_SYSTEM_NAME[system]);
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
 		fputc('\n', fp);
 
@@ -414,22 +412,20 @@ static void print_positions(FILE * fp, const char * name, const hazer_position_t
 /**
  * Print all of the navigation solutions.
  * @param fp points to the FILE stream.
- * @param name is NMEA sentence performing this print.
  * @param pa points an array of navigation positions.
- * @param la points to an array of lifetimes.
  */
-static void print_solutions(FILE * fp, const char * name, const hazer_position_t pa[], const unsigned la[])
+static void print_solutions(FILE * fp, const hazer_position_t pa[])
 {
 	int system = 0;
     double decimal = 0.0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (la[system] == 0) { continue; }
+    	if (pa[system].ticks == 0) { continue; }
 
     	if (pa[system].dmy_nanoseconds == 0) { continue; }
 
-		fputs(name, fp);
+		fputs(pa[system].label, fp);
 
 		decimal = pa[system].lat_nanodegrees;
 		decimal /= 1000000000.0;
@@ -465,7 +461,9 @@ static void print_solutions(FILE * fp, const char * name, const hazer_position_t
 		fprintf(fp, " ( %d %d %d %d %d %d %d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
 #endif
 
-		fprintf(fp, " sys %-8s", HAZER_SYSTEM_NAME[system]);
+	    fprintf(fp, " %3uticks", pa[system].ticks);
+
+		fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
 		fputc('\n', fp);
 
@@ -702,7 +700,6 @@ int main(int argc, char * argv[])
     hazer_position_t fix[HAZER_SYSTEM_TOTAL] = { { 0 } };
     hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0 } };
     hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0 } };
-    unsigned lifetime[HAZER_SYSTEM_TOTAL] = { 0 };
     /*
      * Miscellaneous working variables.
      */
@@ -721,6 +718,7 @@ int main(int argc, char * argv[])
     FILE * fp = (FILE *)0;
     int elapsed = 0;
     int refresh = 0;
+	int index = -1;
     /*
      * External symbols.
      */
@@ -1401,23 +1399,38 @@ int main(int argc, char * argv[])
 	         * a valid message from any system we recognize. (Might be zero.)
 	         * Subtract that number from all the lifetimes of all the systems we
 	         * care about to figure out if there's a system from which we've
-	         * stopped hearing. Finally, update the lifetime for the system
-	         * from which we just got an update to give it a full ration of
-	         * time.
+	         * stopped hearing.
 	         */
 
 	        elapsed = diminuto_alarm_check();
 
 	        if (elapsed > 0) {
-	        	int ii;
-	        	for (ii = 0; ii < countof(lifetime); ++ii) {
-	        		if (lifetime[ii] == 0) {
+	        	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
+
+	        		if (fix[index].ticks == 0) {
 	        			/* Do nothing. */
-	        		} else if (lifetime[ii] <= elapsed) {
-	        			lifetime[ii] = 0;
+	        		} else if (fix[index].ticks <= elapsed) {
+	        			fix[index].ticks = 0;
 	        		} else {
-	        			lifetime[ii] -= elapsed;
+	        			fix[index].ticks -= elapsed;
 	        		}
+
+	        		if (active[index].ticks == 0) {
+	        			/* Do nothing. */
+	        		} else if (active[index].ticks <= elapsed) {
+	        			active[index].ticks = 0;
+	        		} else {
+	        			active[index].ticks -= elapsed;
+	        		}
+
+	        		if (view[index].ticks == 0) {
+	        			/* Do nothing. */
+	        		} else if (view[index].ticks <= elapsed) {
+	        			view[index].ticks = 0;
+	        		} else {
+	        			view[index].ticks -= elapsed;
+	        		}
+
 	        	}
 	        }
 
@@ -1428,57 +1441,32 @@ int main(int argc, char * argv[])
 
 			if (hazer_parse_gga(&fix[system], vector, count) == 0) {
 
-				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-					tmppps = onepps;
-					onepps = 0;
-				DIMINUTO_CRITICAL_SECTION_END;
-
-		        lifetime[system] = timeout;
-
+		        fix[system].ticks = timeout;
 		        refresh = !0;
 
 			} else if (hazer_parse_rmc(&fix[system], vector, count) == 0) {
 
-				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-					tmppps = onepps;
-					onepps = 0;
-				DIMINUTO_CRITICAL_SECTION_END;
-
-		        lifetime[system] = timeout;
-
+		        fix[system].ticks = timeout;
 		        refresh = !0;
-
 
 			} else if (hazer_parse_gll(&fix[system], vector, count) == 0) {
 
-				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-					tmppps = onepps;
-					onepps = 0;
-				DIMINUTO_CRITICAL_SECTION_END;
-
-		        lifetime[system] = timeout;
-
+		        fix[system].ticks = timeout;
 		        refresh = !0;
 
 			} else if (hazer_parse_vtg(&fix[system], vector, count) == 0) {
 
-				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-					tmppps = onepps;
-					onepps = 0;
-				DIMINUTO_CRITICAL_SECTION_END;
-
-		        lifetime[system] = timeout;
-
+		        fix[system].ticks = timeout;
 		        refresh = !0;
 
 			} else if (hazer_parse_gsa(&active[system], vector, count) == 0) {
 
+		        active[system].ticks = timeout;
 		        refresh = !0;
 
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 
-		        lifetime[system] = timeout;
-
+		        view[system].ticks = timeout;
 		        refresh = !0;
 
 			} else {
@@ -1494,10 +1482,14 @@ int main(int argc, char * argv[])
 			if (refresh) {
 				if (escape) { fputs("\033[3;1H\033[0J", outfp); }
 				if (report) {
-					print_positions(outfp, LABEL,  fix, lifetime, tmppps);
-					print_solutions(outfp, HAZER_NMEA_GPS_MESSAGE_GGA,  fix, lifetime);
-					print_actives(outfp, HAZER_NMEA_GPS_MESSAGE_GSA, active, lifetime);
-					print_views(outfp, HAZER_NMEA_GPS_MESSAGE_GSV, view, lifetime);
+					DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+						tmppps = onepps;
+						onepps = 0;
+					DIMINUTO_CRITICAL_SECTION_END;
+					print_positions(outfp, fix, tmppps);
+					print_solutions(outfp, fix);
+					print_actives(outfp, active);
+					print_views(outfp, view);
 					fflush(outfp);
 				}
 			}
