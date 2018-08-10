@@ -19,4 +19,4 @@ PORT=${3:-"5555"}
 stty sane
 clear
 
-exec gpstool -6 -P ${PORT} -O -D ${DEVICE} -b ${SPEED} -8 -n -1 -E
+exec gpstool -6 -P ${PORT} -O -D ${DEVICE} -b ${SPEED} -8 -n -1
