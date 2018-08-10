@@ -148,13 +148,17 @@ mailto:coverclock@diag.com
 
 <https://coverclock.blogspot.com/2018/04/a-menagerie-of-gps-devices-with-usb.html>
 
-<https://www.flickr.com/photos/johnlsloan/albums/72157678580152480>
+<https://flic.kr/s/aHskRMLrx7>
 
 <https://support.google.com/earth/answer/148095>
 
 <http://earth.google.com/intl/ar/userguide/v4/index.htm>
 
 <http://static.googleusercontent.com/media/earth.google.com/en//userguide/v4/google_earth_user_guide.pdf>
+
+<https://support.google.com/earth/answer/168344>
+
+<https://dl.google.com/earth/client/GE7/release_7_1_8/googleearth-pro-7.1.8.3036.dmg>
 
 # Build
 
@@ -685,25 +689,26 @@ actual magnetic compass bearing, but is only provided by GPS devices which also
 have a magnetic compass; otherwise it will be displayed as "0.000\*M". The
 cardinal compass direction, e.g. "SE", is based on the true bearing.
 
-## Google Earth
+## Google Earth Pro
 
-In February 2017 I  used Hazer with Google Earth Pro, the desktop version of the
+In February 2017 I used Hazer with Google Earth Pro, the desktop version of the
 web based application. Today, August 2018, the real-time GPS feature of Google
 Earth Pro no longer seems to work with latest version, 7.3.2, for the Mac (I
 haven't tried it for other operating systems). Neither does 7.3.1. But 7.1.8
-seems to work.
+works.
 
-Google Earth only accepts GPS data on a serial port, or at least something that
-kinda sorta looks like a serial port. So I process the NMEA stream from a
+Google Earth Pro only accepts GPS data on a serial port, or at least somethin
+that kinda sorta looks like a serial port. So I process the NMEA stream from a
 serial-attached GPS device using gpstool running on a Linux server, then
 forwarded it via UDP datagrams to another gpstool on the same server, and then
 use that gpstool to forward the NMEA stream out a serial port across a two FTDI
 USB-to-serial adaptors hooked back-to-back with a null modem in between, to a
 Mac running Google Earth Pro.
 
-Note that empirically and anecdotally, Google Earth Pro appears to only accept
-serial input at 4800 baud. More recent and advanced GPS devices default to 9600
-baud, and will overrun a 4800 baud serial port. So I used a USGlobalSat
-BU-353S4, which defaults to 4800 baud, as my GPS device on the Linux server.
+Empirically and anecdotally, but undocumentedly, Google Earth Pro appears to
+only accept serial input at 4800 baud. More recent and advanced GPS devices
+default to 9600 baud, and can overrun a 4800 baud serial port. So I used a
+USGlobalSat BU-353S4, which defaults to 4800 baud, as my GPS device on the
+Linux server.
 
 As Rube Goldberg as this is, it seems to work.
