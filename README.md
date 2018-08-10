@@ -712,3 +712,4 @@ USGlobalSat BU-353S4, which defaults to 4800 baud, as my GPS device on the
 Linux server.
 
 As Rube Goldberg as this is, it seems to work.
+
