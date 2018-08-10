@@ -10,6 +10,8 @@
 
 # usage: provider [ DEVICE [ SPEED [ PORT ] ] ]
 
+# example: nohup provider &
+
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 DEVICE=${1:-"/dev/ttyUSB1"}

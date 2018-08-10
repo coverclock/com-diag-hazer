@@ -112,7 +112,7 @@ Raspbian GNU/Linux 8.0 "jessie"
 Linux 4.4.34    
 gcc 4.9.2    
 
-"Zinc"    
+"Zinc" or "Lead"    
 Raspberry Pi 3 Model B    
 Broadcom BCM2837 Cortex-A53 ARMv7 @ 1.2GHz x 4    
 Raspbian GNU/Linux 8.0    
