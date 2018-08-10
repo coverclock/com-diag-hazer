@@ -639,6 +639,7 @@ extern hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker);
  * ZEROS.
  */
 typedef struct HazerPosition {
+    uint64_t old_nanoseconds;	/* Prior total nanoseconds. */
     uint64_t tot_nanoseconds;   /* Total nanoseconds. */
     uint64_t utc_nanoseconds;   /* Time in nanoseconds since 00:00 UTC. */
     uint64_t dmy_nanoseconds;   /* Date in nanoseconds since POSIX epoch. */

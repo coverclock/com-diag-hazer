@@ -291,8 +291,9 @@ static void print_views(FILE *fp, const hazer_view_t va[])
  * @param fp points to the FILE stream.
  * @param pa points to an array of positions.
  * @param pps is the current value of the 1PPS strobe.
+ * @param valid is true if we would output the last sentence to a device.
  */
-static void print_positions(FILE * fp, const hazer_position_t pa[], int pps)
+static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int valid)
 {
     int system = 0;
     uint64_t nanoseconds = 0;
@@ -353,7 +354,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps)
 
 		fprintf(fp, " pps %c", pps ? '1' : '0');
 
-		fputs("      ", fp);
+		fprintf(fp, " out %d", valid);
 
 	    fprintf(fp, " %3usecs", pa[system].ticks);
 
@@ -672,13 +673,13 @@ int main(int argc, char * argv[])
     char msn = '\0';
     char lsn = '\0';
     int output = 0;
-    uint64_t nanoseconds = 0;
     FILE * fp = (FILE *)0;
     int elapsed = 0;
     int refresh = 0;
 	int index = -1;
 	char * end = (char *)0;
 	hazer_active_t cache = { 0 };
+	int valid = 0;
     /*
      * External symbols.
      */
@@ -1414,21 +1415,25 @@ int main(int argc, char * argv[])
 
 		        fix[system].ticks = timeout;
 		        refresh = !0;
+		        valid = (fix[system].dmy_nanoseconds > 0) && (fix[system].tot_nanoseconds >= fix[system].old_nanoseconds);
 
 			} else if (hazer_parse_rmc(&fix[system], vector, count) == 0) {
 
 		        fix[system].ticks = timeout;
 		        refresh = !0;
+		        valid = (fix[system].dmy_nanoseconds > 0) && (fix[system].tot_nanoseconds >= fix[system].old_nanoseconds);
 
 			} else if (hazer_parse_gll(&fix[system], vector, count) == 0) {
 
 		        fix[system].ticks = timeout;
 		        refresh = !0;
+		        valid = (fix[system].dmy_nanoseconds > 0) && (fix[system].tot_nanoseconds >= fix[system].old_nanoseconds);
 
 			} else if (hazer_parse_vtg(&fix[system], vector, count) == 0) {
 
 		        fix[system].ticks = timeout;
 		        refresh = !0;
+		        valid = (fix[system].dmy_nanoseconds > 0) && (fix[system].tot_nanoseconds >= fix[system].old_nanoseconds);
 
 			} else if (hazer_parse_gsa(&cache, vector, count) == 0) {
 
@@ -1454,15 +1459,18 @@ int main(int argc, char * argv[])
 				active[system] = cache;
 		        active[system].ticks = timeout;
 		        refresh = !0;
+		        valid = !0;
 
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 
 		        view[system].ticks = timeout;
 		        refresh = !0;
+		        valid = !0;
 
 			} else {
 
 		        refresh = 0;
+		        valid = !0;
 
 			}
 
@@ -1477,7 +1485,7 @@ int main(int argc, char * argv[])
 						tmppps = onepps;
 						onepps = 0;
 					DIMINUTO_CRITICAL_SECTION_END;
-					print_positions(outfp, fix, tmppps);
+					print_positions(outfp, fix, tmppps, valid);
 					print_solutions(outfp, fix);
 					print_actives(outfp, active);
 					print_views(outfp, view);
@@ -1491,16 +1499,17 @@ int main(int argc, char * argv[])
 			 * Note that this can only be done if we got the original
 			 * sentence over the IP UDP port or from standard input, because
 			 * that's the only circumstances in which we interpret DEVICE this
-			 * way.
+			 * way. Finally, time must monotonically increase (UDP can reorder
+			 * packets), and we have to have gotten an RMC sentence to set the
+			 * date before we forward fixes; doing anything else confuses
+			 * Google Earth, and perhaps other applications.
 			 */
 
 			if (!output) {
 				/* Do nothing. */
-			} else if (fix[system].dmy_nanoseconds == 0) {
-				/* Do nothing: day-month-year zero until RMC received. */
-            } else if (fix[system].tot_nanoseconds < nanoseconds) {
-				/* Do nothing: time running backwards because UDP OOO delivery. */
-			} else if (fputs(synthesized, devfp) == EOF) {
+			} else if (!valid) {
+				/* Do nothing. */
+ 			} else if (fputs(synthesized, devfp) == EOF) {
                 fprintf(errfp, "%s: OUT!\n", program);
                 break;
             } else if (fflush(devfp) == EOF) {
@@ -1509,8 +1518,6 @@ int main(int argc, char * argv[])
             } else {
                 /* Do nothing. */
 			}
-
-			nanoseconds = fix[system].tot_nanoseconds;
 
         } else if (format == UBX) {
 
