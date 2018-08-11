@@ -68,6 +68,8 @@ int main(void)
 
 		rc = hazer_parse_gga(&position, vector, count);
 		assert(rc == 0);
+		assert(strcmp(position.label, "GGA") == 0);
+		assert(position.sat_used == 12);
 	}
 
 	{
@@ -121,6 +123,7 @@ int main(void)
 
 		rc = hazer_parse_rmc(&position, vector, count);
 		assert(rc == 0);
+		assert(strcmp(position.label, "RMC") == 0);
 	}
 
 	{
@@ -174,6 +177,7 @@ int main(void)
 
 		rc = hazer_parse_gll(&position, vector, count);
 		assert(rc == 0);
+		assert(strcmp(position.label, "GLL") == 0);
 	}
 
 	{
@@ -227,6 +231,7 @@ int main(void)
 
 		rc = hazer_parse_vtg(&position, vector, count);
 		assert(rc == 0);
+		assert(strcmp(position.label, "VTG") == 0);
 	}
 
 	{
@@ -280,6 +285,11 @@ int main(void)
 
 		rc = hazer_parse_gsa(&active, vector, count);
 		assert(rc == 0);
+		assert(strcmp(active.label, "GSA") == 0);
+		assert(active.active == 12);
+		assert(active.pdop == 1.27);
+		assert(active.hdop == 0.64);
+		assert(active.vdop == 1.10);
 	}
 
 	{
@@ -341,6 +351,8 @@ int main(void)
 
 			rc = hazer_parse_gsv(&view, vector, count);
 			assert(((ii == 3) && (rc == 0)) || (rc > 0));
+			assert(strcmp(view.label, "GSV") == 0);
+			assert(view.view == 15);
 
 		}
 	}
