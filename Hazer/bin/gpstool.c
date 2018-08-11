@@ -293,7 +293,7 @@ static void print_views(FILE *fp, const hazer_view_t va[])
  * @param pps is the current value of the 1PPS strobe.
  * @param valid is true if we would output the last sentence to a device.
  */
-static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int valid)
+static void print_fixes(FILE * fp, const hazer_position_t pa[], int pps, int valid)
 {
     int system = 0;
     uint64_t nanoseconds = 0;
@@ -371,7 +371,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
  * @param fp points to the FILE stream.
  * @param pa points an array of navigation positions.
  */
-static void print_solutions(FILE * fp, const hazer_position_t pa[])
+static void print_positions(FILE * fp, const hazer_position_t pa[])
 {
 	int system = 0;
     double decimal = 0.0;
@@ -657,7 +657,7 @@ int main(int argc, char * argv[])
     /*
      * GNSS state databases.
      */
-    hazer_position_t fix[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    hazer_position_t position[HAZER_SYSTEM_TOTAL] = { { 0 } };
     hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0 } };
     hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0 } };
     /*
@@ -1379,12 +1379,12 @@ int main(int argc, char * argv[])
 	        if (elapsed > 0) {
 	        	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
 
-	        		if (fix[index].ticks == 0) {
+	        		if (position[index].ticks == 0) {
 	        			/* Do nothing. */
-	        		} else if (fix[index].ticks <= elapsed) {
-	        			fix[index].ticks = 0;
+	        		} else if (position[index].ticks <= elapsed) {
+	        			position[index].ticks = 0;
 	        		} else {
-	        			fix[index].ticks -= elapsed;
+	        			position[index].ticks -= elapsed;
 	        		}
 
 	        		if (active[index].ticks == 0) {
@@ -1407,33 +1407,37 @@ int main(int argc, char * argv[])
 	        }
 
 			/*
-			 * Parse the sentences we care about - GGA, RMC, GSA, and GSV
-			 * currently - and update our state to reflect to new data.
+			 * Parse the sentences we care about and update our state to
+			 * reflect the new data. As we go along we do some reality checks
+			 * to decide if this sentence is valid in the sense at we want
+			 * to output it to an application like Google Earth Pro, that
+			 * gets confused is time runs backwards (which can happen if
+			 * we got this sentence via a UDP datagram).
 			 */
 
-			if (hazer_parse_gga(&fix[system], vector, count) == 0) {
+			if (hazer_parse_gga(&position[system], vector, count) == 0) {
 
-		        fix[system].ticks = timeout;
+		        position[system].ticks = timeout;
 		        refresh = !0;
-		        valid = (fix[system].dmy_nanoseconds > 0) && (fix[system].tot_nanoseconds >= fix[system].old_nanoseconds);
+		        valid = (position[system].dmy_nanoseconds > 0) && (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
-			} else if (hazer_parse_rmc(&fix[system], vector, count) == 0) {
+			} else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 
-		        fix[system].ticks = timeout;
+		        position[system].ticks = timeout;
 		        refresh = !0;
-		        valid = (fix[system].dmy_nanoseconds > 0) && (fix[system].tot_nanoseconds >= fix[system].old_nanoseconds);
+		        valid = (position[system].dmy_nanoseconds > 0) && (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
-			} else if (hazer_parse_gll(&fix[system], vector, count) == 0) {
+			} else if (hazer_parse_gll(&position[system], vector, count) == 0) {
 
-		        fix[system].ticks = timeout;
+		        position[system].ticks = timeout;
 		        refresh = !0;
-		        valid = (fix[system].dmy_nanoseconds > 0) && (fix[system].tot_nanoseconds >= fix[system].old_nanoseconds);
+		        valid = (position[system].dmy_nanoseconds > 0) && (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
-			} else if (hazer_parse_vtg(&fix[system], vector, count) == 0) {
+			} else if (hazer_parse_vtg(&position[system], vector, count) == 0) {
 
-		        fix[system].ticks = timeout;
+		        position[system].ticks = timeout;
 		        refresh = !0;
-		        valid = (fix[system].dmy_nanoseconds > 0) && (fix[system].tot_nanoseconds >= fix[system].old_nanoseconds);
+		        valid = (position[system].dmy_nanoseconds > 0) && (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
 			} else if (hazer_parse_gsa(&cache, vector, count) == 0) {
 
@@ -1485,8 +1489,8 @@ int main(int argc, char * argv[])
 						tmppps = onepps;
 						onepps = 0;
 					DIMINUTO_CRITICAL_SECTION_END;
-					print_positions(outfp, fix, tmppps, valid);
-					print_solutions(outfp, fix);
+					print_fixes(outfp, position, tmppps, valid);
+					print_positions(outfp, position);
 					print_actives(outfp, active);
 					print_views(outfp, view);
 					fflush(outfp);
@@ -1583,7 +1587,7 @@ int main(int argc, char * argv[])
         assert(rc != EOF);
     }
 
-    rc =fclose(infp);
+    rc = fclose(infp);
     assert(rc != EOF);
 
     rc = fclose(outfp);

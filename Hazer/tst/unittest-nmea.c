@@ -355,5 +355,11 @@ int main(void)
 			assert(view.view == 15);
 
 		}
+
+		assert(strcmp(view.label, "GSV") == 0);
+		assert(view.channels == 15);
+		assert(view.pending == 0);
+		assert(view.view == 15);
+
 	}
 }
