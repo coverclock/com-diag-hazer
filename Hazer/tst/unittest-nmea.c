@@ -108,7 +108,7 @@ int main(void)
 		assert(ck == cs);
 
 		count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
-		assert(count == 13);
+		assert(count == 14);
 
 		length = hazer_serialize(temporary, sizeof(temporary), vector, count);
 		assert(length == (strlen(temporary) + 1));
@@ -161,7 +161,7 @@ int main(void)
 		assert(ck == cs);
 
 		count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
-		assert(count == 8);
+		assert(count == 9);
 
 		length = hazer_serialize(temporary, sizeof(temporary), vector, count);
 		assert(length == (strlen(temporary) + 1));
@@ -214,7 +214,7 @@ int main(void)
 		assert(ck == cs);
 
 		count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
-		assert(count == 10);
+		assert(count == 11);
 
 		length = hazer_serialize(temporary, sizeof(temporary), vector, count);
 		assert(length == (strlen(temporary) + 1));
@@ -267,7 +267,7 @@ int main(void)
 		assert(ck == cs);
 
 		count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
-		assert(count == 18);
+		assert(count == 19);
 
 		length = hazer_serialize(temporary, sizeof(temporary), vector, count);
 		assert(length == (strlen(temporary) + 1));
@@ -328,7 +328,7 @@ int main(void)
 			assert(ck == cs);
 
 			count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
-			assert(((ii == 3) && (count == 16)) || (count == 20));
+			assert(((ii == 3) && (count == 17)) || (count == 21));
 
 			length = hazer_serialize(temporary, sizeof(temporary), vector, count);
 			assert(length == (strlen(temporary) + 1));
@@ -340,7 +340,7 @@ int main(void)
 			assert(strcmp(DATA[ii], temporary) == 0);
 
 			rc = hazer_parse_gsv(&view, vector, count);
-			assert(rc == 0);
+			assert(((ii == 3) && (rc == 0)) || (rc > 0));
 
 		}
 	}
