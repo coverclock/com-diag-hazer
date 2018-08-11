@@ -45,9 +45,9 @@ Hazer has been successfully tested with the following GPS chipsets.
 * SiRF Star II    
 * SiRF Star III    
 * SiRF Star IV    
-* U-Blox LEA-6T    
+* U-Blox 6    
 * U-Blox 7    
-* U-Blox M8    
+* U-Blox 8    
 
 Hazer has been successfully tested with the following serial-to-USB chipsets
 used by GPS devices.
@@ -73,7 +73,7 @@ Hazer has been successfully tested with the following GPS devices.
 * Jackson Labs Technologies CSAC GPSDO (U-Blox LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
-* TOPGNSS GN-803G (U-Blox 8 UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
+* TOPGNSS GN-803G (U-Blox UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
 
 Footnotes:
 
