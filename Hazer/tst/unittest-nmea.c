@@ -25,6 +25,12 @@ int main(void)
 		ssize_t length = -1;
 		size_t count = 0;
 		int rc = -1;
+		char * pointer = (char *)0;
+		uint8_t cs = 0;
+		char msn = 0;
+		char lsn = 0;
+		uint8_t ck = 0;
+		hazer_buffer_t temporary = { 0 };
 
 		strncpy(buffer, DATA, sizeof(buffer));
 		buffer[sizeof(buffer) - 1] = '\0';
@@ -33,8 +39,32 @@ int main(void)
 		length = hazer_length(buffer, sizeof(buffer));
 		assert(length == strlen(buffer));
 
+		pointer = (char *)hazer_checksum(buffer, length, &cs);
+		assert(pointer != (char *)0);
+		assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+
+		rc = hazer_checksum2characters(cs, &msn, &lsn);
+		assert(rc == 0);
+		assert(pointer[1] == msn);
+		assert(pointer[2] == lsn);
+		assert(pointer[3] == '\r');
+		assert(pointer[4] == '\n');
+
+		rc = hazer_characters2checksum(msn, lsn, &ck);
+		assert(rc == 0);
+		assert(ck == cs);
+
 		count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
 		assert(count == 16);
+
+		length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+		assert(length == (strlen(temporary) + 1));
+		temporary[length - 1] = msn;
+		temporary[length] = lsn;
+		temporary[length + 1] = '\r';
+		temporary[length + 2] = '\n';
+		temporary[length + 3] = '\0';
+		assert(strcmp(DATA, temporary) == 0);
 
 		rc = hazer_parse_gga(&position, vector, count);
 		assert(rc == 0);
@@ -48,6 +78,12 @@ int main(void)
 		ssize_t length = -1;
 		size_t count = 0;
 		int rc = -1;
+		char * pointer = (char *)0;
+		uint8_t cs = 0;
+		char msn = 0;
+		char lsn = 0;
+		uint8_t ck = 0;
+		hazer_buffer_t temporary = { 0 };
 
 		strncpy(buffer, DATA, sizeof(buffer));
 		buffer[sizeof(buffer) - 1] = '\0';
@@ -56,8 +92,32 @@ int main(void)
 		length = hazer_length(buffer, sizeof(buffer));
 		assert(length == strlen(buffer));
 
+		pointer = (char *)hazer_checksum(buffer, length, &cs);
+		assert(pointer != (char *)0);
+		assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+
+		rc = hazer_checksum2characters(cs, &msn, &lsn);
+		assert(rc == 0);
+		assert(pointer[1] == msn);
+		assert(pointer[2] == lsn);
+		assert(pointer[3] == '\r');
+		assert(pointer[4] == '\n');
+
+		rc = hazer_characters2checksum(msn, lsn, &ck);
+		assert(rc == 0);
+		assert(ck == cs);
+
 		count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
 		assert(count == 13);
+
+		length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+		assert(length == (strlen(temporary) + 1));
+		temporary[length - 1] = msn;
+		temporary[length] = lsn;
+		temporary[length + 1] = '\r';
+		temporary[length + 2] = '\n';
+		temporary[length + 3] = '\0';
+		assert(strcmp(DATA, temporary) == 0);
 
 		rc = hazer_parse_rmc(&position, vector, count);
 		assert(rc == 0);
@@ -71,6 +131,12 @@ int main(void)
 		ssize_t length = -1;
 		size_t count = 0;
 		int rc = -1;
+		char * pointer = (char *)0;
+		uint8_t cs = 0;
+		char msn = 0;
+		char lsn = 0;
+		uint8_t ck = 0;
+		hazer_buffer_t temporary = { 0 };
 
 		strncpy(buffer, DATA, sizeof(buffer));
 		buffer[sizeof(buffer) - 1] = '\0';
@@ -79,8 +145,32 @@ int main(void)
 		length = hazer_length(buffer, sizeof(buffer));
 		assert(length == strlen(buffer));
 
+		pointer = (char *)hazer_checksum(buffer, length, &cs);
+		assert(pointer != (char *)0);
+		assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+
+		rc = hazer_checksum2characters(cs, &msn, &lsn);
+		assert(rc == 0);
+		assert(pointer[1] == msn);
+		assert(pointer[2] == lsn);
+		assert(pointer[3] == '\r');
+		assert(pointer[4] == '\n');
+
+		rc = hazer_characters2checksum(msn, lsn, &ck);
+		assert(rc == 0);
+		assert(ck == cs);
+
 		count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
 		assert(count == 8);
+
+		length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+		assert(length == (strlen(temporary) + 1));
+		temporary[length - 1] = msn;
+		temporary[length] = lsn;
+		temporary[length + 1] = '\r';
+		temporary[length + 2] = '\n';
+		temporary[length + 3] = '\0';
+		assert(strcmp(DATA, temporary) == 0);
 
 		rc = hazer_parse_gll(&position, vector, count);
 		assert(rc == 0);
@@ -94,6 +184,12 @@ int main(void)
 		ssize_t length = -1;
 		size_t count = 0;
 		int rc = -1;
+		char * pointer = (char *)0;
+		uint8_t cs = 0;
+		char msn = 0;
+		char lsn = 0;
+		uint8_t ck = 0;
+		hazer_buffer_t temporary = { 0 };
 
 		strncpy(buffer, DATA, sizeof(buffer));
 		buffer[sizeof(buffer) - 1] = '\0';
@@ -102,8 +198,32 @@ int main(void)
 		length = hazer_length(buffer, sizeof(buffer));
 		assert(length == strlen(buffer));
 
+		pointer = (char *)hazer_checksum(buffer, length, &cs);
+		assert(pointer != (char *)0);
+		assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+
+		rc = hazer_checksum2characters(cs, &msn, &lsn);
+		assert(rc == 0);
+		assert(pointer[1] == msn);
+		assert(pointer[2] == lsn);
+		assert(pointer[3] == '\r');
+		assert(pointer[4] == '\n');
+
+		rc = hazer_characters2checksum(msn, lsn, &ck);
+		assert(rc == 0);
+		assert(ck == cs);
+
 		count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
 		assert(count == 10);
+
+		length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+		assert(length == (strlen(temporary) + 1));
+		temporary[length - 1] = msn;
+		temporary[length] = lsn;
+		temporary[length + 1] = '\r';
+		temporary[length + 2] = '\n';
+		temporary[length + 3] = '\0';
+		assert(strcmp(DATA, temporary) == 0);
 
 		rc = hazer_parse_vtg(&position, vector, count);
 		assert(rc == 0);
@@ -117,6 +237,12 @@ int main(void)
 		ssize_t length = -1;
 		size_t count = 0;
 		int rc = -1;
+		char * pointer = (char *)0;
+		uint8_t cs = 0;
+		uint8_t msn = 0;
+		uint8_t lsn = 0;
+		uint8_t ck = 0;
+		hazer_buffer_t temporary = { 0 };
 
 		strncpy(buffer, DATA, sizeof(buffer));
 		buffer[sizeof(buffer) - 1] = '\0';
@@ -125,8 +251,32 @@ int main(void)
 		length = hazer_length(buffer, sizeof(buffer));
 		assert(length == strlen(buffer));
 
+		pointer = (char *)hazer_checksum(buffer, length, &cs);
+		assert(pointer != (char *)0);
+		assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+
+		rc = hazer_checksum2characters(cs, &msn, &lsn);
+		assert(rc == 0);
+		assert(pointer[1] == msn);
+		assert(pointer[2] == lsn);
+		assert(pointer[3] == '\r');
+		assert(pointer[4] == '\n');
+
+		rc = hazer_characters2checksum(msn, lsn, &ck);
+		assert(rc == 0);
+		assert(ck == cs);
+
 		count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
 		assert(count == 18);
+
+		length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+		assert(length == (strlen(temporary) + 1));
+		temporary[length - 1] = msn;
+		temporary[length] = lsn;
+		temporary[length + 1] = '\r';
+		temporary[length + 2] = '\n';
+		temporary[length + 3] = '\0';
+		assert(strcmp(DATA, temporary) == 0);
 
 		rc = hazer_parse_gsa(&active, vector, count);
 		assert(rc == 0);
@@ -145,6 +295,12 @@ int main(void)
 		ssize_t length = -1;
 		size_t count = 0;
 		int rc = -1;
+		char * pointer = (char *)0;
+		uint8_t cs = 0;
+		char msn = 0;
+		char lsn = 0;
+		uint8_t ck = 0;
+		hazer_buffer_t temporary = { 0 };
 		int ii = 0;
 
 		for (ii = 0; ii < (sizeof(DATA) / sizeof(DATA[0])); ++ii) {
@@ -156,8 +312,32 @@ int main(void)
 			length = hazer_length(buffer, sizeof(buffer));
 			assert(length == strlen(buffer));
 
+			pointer = (char *)hazer_checksum(buffer, length, &cs);
+			assert(pointer != (char *)0);
+			assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+
+			rc = hazer_checksum2characters(cs, &msn, &lsn);
+			assert(rc == 0);
+			assert(pointer[1] == msn);
+			assert(pointer[2] == lsn);
+			assert(pointer[3] == '\r');
+			assert(pointer[4] == '\n');
+
+			rc = hazer_characters2checksum(msn, lsn, &ck);
+			assert(rc == 0);
+			assert(ck == cs);
+
 			count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
 			assert(((ii == 3) && (count == 16)) || (count == 20));
+
+			length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+			assert(length == (strlen(temporary) + 1));
+			temporary[length - 1] = msn;
+			temporary[length] = lsn;
+			temporary[length + 1] = '\r';
+			temporary[length + 2] = '\n';
+			temporary[length + 3] = '\0';
+			assert(strcmp(DATA[ii], temporary) == 0);
 
 			rc = hazer_parse_gsv(&view, vector, count);
 			assert(rc == 0);
