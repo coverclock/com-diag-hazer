@@ -124,6 +124,14 @@ int main(void)
 		rc = hazer_parse_rmc(&position, vector, count);
 		assert(rc == 0);
 		assert(strcmp(position.label, "RMC") == 0);
+		assert(position.utc_nanoseconds == 50188000000000ULL);
+		assert(position.dmy_nanoseconds == 1533600000000000000ULL); /* date -u -d "August 7 2018" +"%s.%N" */
+		assert(position.tot_nanoseconds == (1533600000000000000ULL + 50188000000000ULL));
+		assert(position.lat_nanodegrees == 39794222833LL);
+		assert(position.lon_nanodegrees == -105153370500LL);
+		assert(position.sog_microknots == 10000ULL);
+		assert(position.cog_nanodegrees == 0LL);
+
 	}
 
 	{
