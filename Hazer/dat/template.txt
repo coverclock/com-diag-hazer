@@ -1,0 +1,15 @@
+00000000011111111112222222222333333333344444444445555555555666666666677777777778
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+INP $GNGLL,3947.65496,N,10509.20116,W,141858.00,A,D*69\r\n
+OUT \xb5b\x06>\0\0
+TIM 2018-08-13T14:18:58Z 1pps                                  NNNsecs XXXXXXXX
+POS 39*47'39.29"N,105*09'12.06"W  39.794249,-105.153353        NNNsecs XXXXXXXX
+ALT NNNNNN.NN' NNNNNN.NNNm                                     NNNsecs XXXXXXXX
+COG CC tru NNN.000* mag NNN.000*                               NNNsecs XXXXXXXX
+SOG 000000.000mph 000000.000knots 000000.000kph                NNNsecs XXXXXXXX
+INT GLL [NN] dmy 1 inc 1 ( NN NN NN NN NN NN NN )               10secs GNSS
+ACT {   7   6  24  48  19  30  13   1  17  28  51     } [11]    10secs XXXXXXXX
+ACT {  79  84  80  82  83  81  73                     } [07]    10secs GLONASS
+DOP pdop 1.19 hdop 0.70 vdop 0.96                               10secs GPS
+DOP pdop 1.19 hdop 0.70 vdop 0.96                               10secs GLONASS
+SAT [01] sat   1 elv 31* azm  54* snr 23dBHz                    10secs GPS

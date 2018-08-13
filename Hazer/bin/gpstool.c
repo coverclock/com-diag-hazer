@@ -79,11 +79,9 @@ typedef enum Protocol { UNUSED = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
 typedef enum Format { UNKNOWN = 0, NMEA = 1, UBX = 2 } format_t;
 
-static const size_t LIMIT = 80;
+static const size_t LIMIT = 75;
 
 static const size_t UNLIMITED = ~(size_t)0;
-
-static const char * LABEL = "FIX";
 
 /**
  * Emit an NMEA sentences to the specified stream after adding the ending
@@ -196,12 +194,10 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
     int end = 0;
 
     for (bb = buffer; size > 0; --size) {
-        diminuto_phex_emit(fp, *(bb++), ~(size_t)0, 0, 0, 0, &current, &end, 0);
+        diminuto_phex_emit(fp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
         if (current > limit) { break; }
     }
     fputc('\n', fp);
-
-    fflush(fp);
 }
 
 /**
@@ -214,26 +210,25 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
     static const unsigned int IDENTIFIERS = countof(aa[0].id);
     int system = 0;
     int satellite = 0;
-    int limit = 0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
     	if (aa[system].ticks == 0) { continue; }
+        if (aa[system].active == 0) { continue; }
 
-        limit = aa[system].active;
-        if (limit == 0) { continue; }
-
-        fprintf(fp, "%s {", aa[system].label);
+        fprintf(fp, "%s {", "ACT");
 
         for (satellite = 0; satellite < IDENTIFIERS; ++satellite) {
-            if ((satellite < limit) && (aa[system].id[satellite] != 0)) {
+            if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
                 fprintf(fp, " %3u", aa[system].id[satellite]);
             } else {
                	fputs("    ", fp);
             }
         }
 
-       fprintf(fp, " } [%02u] pdop %4.2lf hdop %4.2lf vdop %4.2lf", aa[system].active, aa[system].pdop, aa[system].hdop, aa[system].vdop);
+       fprintf(fp, " } [%02u]", aa[system].active);
+
+       fprintf(fp, "%2s", "");
 
        fprintf(fp, " %3usecs", aa[system].ticks);
 
@@ -242,6 +237,26 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
        fputc('\n', fp);
 
     }
+
+	for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+       	if (aa[system].ticks == 0) { continue; }
+       	if (aa[system].active == 0) { continue; }
+
+       fprintf(fp, "%s", "DOP");
+
+       fprintf(fp, " pdop %4.2lf hdop %4.2lf vdop %4.2lf", aa[system].pdop, aa[system].hdop, aa[system].vdop);
+
+       fprintf(fp, "%29s", "");
+
+       fprintf(fp, " %3usecs", aa[system].ticks);
+
+       fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+       fputc('\n', fp);
+
+    }
+
 }
 
 /**
@@ -262,16 +277,17 @@ static void print_views(FILE *fp, const hazer_view_t va[])
     	if (va[system].ticks == 0) { continue; }
 
     	limit = va[system].channels;
-
     	if (limit > va[system].view) { limit = va[system].view; }
         if (limit > SATELLITES) { limit = SATELLITES; }
 
         for (satellite = 0; satellite < limit; ++satellite) {
             if (va[system].sat[satellite].id != 0) {
 
-        		fputs(va[system].label, fp);
+        		fputs("SAT", fp);
 
             	fprintf(fp, " [%02d] sat %3u elv %2u* azm %3u* snr %2udBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
+
+            	fprintf(fp, "%18s", "");
 
                 fprintf(fp, " %3usecs", va[system].ticks);
 
@@ -291,11 +307,13 @@ static void print_views(FILE *fp, const hazer_view_t va[])
  * @param fp points to the FILE stream.
  * @param pa points to an array of positions.
  * @param pps is the current value of the 1PPS strobe.
- * @param valid is true if we would output the last sentence to a device.
+ * @param dmyokay is true if the DMY field has been set.
+ * @param totokay is true if time is monotonically increasing.
  */
-static void print_fixes(FILE * fp, const hazer_position_t pa[], int pps, int valid)
+static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyokay, int totokay)
 {
     int system = 0;
+    double decimal = 0.0;
     uint64_t nanoseconds = 0;
     int year = 0;
     int month = 0;
@@ -314,9 +332,7 @@ static void print_fixes(FILE * fp, const hazer_position_t pa[], int pps, int val
 
     	if (pa[system].ticks == 0) { continue; }
 
-    	if (pa[system].dmy_nanoseconds == 0) { continue; }
-
-		fputs(LABEL, fp);
+		fputs("TIM", fp);
 
 		hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
 		assert((1 <= month) && (month <= 12));
@@ -326,6 +342,24 @@ static void print_fixes(FILE * fp, const hazer_position_t pa[], int pps, int val
 		assert((0 <= second) && (second <= 59));
 		assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
 		fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
+
+		fprintf(fp, " %cpps", pps ? '1' : '0');
+
+    	fprintf(fp, "%33s", "");
+
+        fprintf(fp, " %3usecs", pa[system].ticks);
+
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+        fputc('\n', fp);
+
+    }
+
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+    	if (pa[system].ticks == 0) { continue; }
+
+        fputs("POS", fp);
 
 		hazer_format_nanodegrees2position(pa[system].lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
 		assert((0 <= degrees) && (degrees <= 90));
@@ -341,49 +375,6 @@ static void print_fixes(FILE * fp, const hazer_position_t pa[], int pps, int val
 		assert((0 <= hundredths) && (hundredths <= 99));
 		fprintf(fp, ",%3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
-		fprintf(fp, " %8.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
-
-		assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
-
-		compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
-		assert(compass != (const char *)0);
-		assert(strlen(compass) <= 4);
-		fprintf(fp, " %-2s", compass);
-
-		fprintf(fp, " %8.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
-
-		fprintf(fp, " pps %c", pps ? '1' : '0');
-
-		fprintf(fp, " out %d", valid);
-
-	    fprintf(fp, " %3usecs", pa[system].ticks);
-
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
-
-		fputc('\n', fp);
-
-    }
-
-}
-
-/**
- * Print all of the navigation solutions.
- * @param fp points to the FILE stream.
- * @param pa points an array of navigation positions.
- */
-static void print_positions(FILE * fp, const hazer_position_t pa[])
-{
-	int system = 0;
-    double decimal = 0.0;
-
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
-
-    	if (pa[system].ticks == 0) { continue; }
-
-    	if (pa[system].dmy_nanoseconds == 0) { continue; }
-
-		fputs(pa[system].label, fp);
-
 		decimal = pa[system].lat_nanodegrees;
 		decimal /= 1000000000.0;
 		fprintf(fp, " %9.6lf", decimal);
@@ -392,9 +383,50 @@ static void print_positions(FILE * fp, const hazer_position_t pa[])
 		decimal /= 1000000000.0;
 		fprintf(fp, ",%10.6lf", decimal);
 
+    	fprintf(fp, "%8s", "");
+
+        fprintf(fp, " %3usecs", pa[system].ticks);
+
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+        fputc('\n', fp);
+
+    }
+
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+    	if (pa[system].ticks == 0) { continue; }
+
+        fputs("ALT", fp);
+
+		fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
+
 		decimal = pa[system].alt_millimeters;
 		decimal /= 1000.0;
-		fprintf(fp, " %9.3lfm", decimal);
+		fprintf(fp, " %10.3lfm", decimal);
+
+    	fprintf(fp, "%35s", "");
+
+        fprintf(fp, " %3usecs", pa[system].ticks);
+
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+        fputc('\n', fp);
+
+    }
+
+	for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+    	if (pa[system].ticks == 0) { continue; }
+
+        fputs("COG", fp);
+
+		assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
+
+		compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
+		assert(compass != (const char *)0);
+		assert(strlen(compass) <= 4);
+		fprintf(fp, " %-2s", compass);
 
 		decimal = pa[system].cog_nanodegrees;
 		decimal /= 1000000000.0;
@@ -404,25 +436,63 @@ static void print_positions(FILE * fp, const hazer_position_t pa[])
 		decimal /= 1000000000.0;
 		fprintf(fp, " %7.3lf*M", decimal);
 
+    	fprintf(fp, "%36s", "");
+
+        fprintf(fp, " %3usecs", pa[system].ticks);
+
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+        fputc('\n', fp);
+
+    }
+
+	for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+    	if (pa[system].ticks == 0) { continue; }
+
+        fputs("SOG", fp);
+
+		fprintf(fp, " %10.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
+
 		decimal = pa[system].sog_microknots;
 		decimal /= 1000000.0;
-		fprintf(fp, " %8.3lfknots", decimal);
+		fprintf(fp, " %10.3lfknots", decimal);
 
 		decimal = pa[system].sog_millimeters;
 		decimal /= 1000000.0;
-		fprintf(fp, " %8.3lfkph", decimal);
+		fprintf(fp, " %10.3lfkph", decimal);
+
+    	fprintf(fp, "%15s", "");
+
+        fprintf(fp, " %3usecs", pa[system].ticks);
+
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+        fputc('\n', fp);
+
+	}
+
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+    	if (pa[system].ticks == 0) { continue; }
+
+        fputs("INT", fp);
+
+        fprintf(fp, " %s", pa[system].label);
 
 		fprintf(fp, " [%02u]", pa[system].sat_used);
 
-#if 0
-		fprintf(fp, " ( %d %d %d %d %d %d %d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
-#endif
+		fprintf(fp, " dmy %d", dmyokay);
 
-		fputs("   ", fp);
+		fprintf(fp, " inc %d", totokay);
+
+		fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
+
+    	fprintf(fp, "%13s", "");
 
 	    fprintf(fp, " %3usecs", pa[system].ticks);
 
-		fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
 		fputc('\n', fp);
 
@@ -679,7 +749,8 @@ int main(int argc, char * argv[])
 	int index = -1;
 	char * end = (char *)0;
 	hazer_active_t cache = { 0 };
-	int valid = 0;
+	int dmyokay = 0;
+	int totokay = 0;
     /*
      * External symbols.
      */
@@ -1154,8 +1225,8 @@ int main(int argc, char * argv[])
                 	print_sentence(errfp, buffer, size - 1, UNLIMITED);
                 }
                 if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
-                if (escape) { fputs("\033[2;1H\033[0J", outfp); }
-                if (report) { print_sentence(outfp, buffer, size - 1, LIMIT); }
+                if (escape) { fputs("\033[2;1H\033[0J", outfp); fputs("OUT ", outfp); }
+                if (report) { print_sentence(outfp, buffer, size - 1, LIMIT); fflush(outfp); }
                 free(node);
         	}
 
@@ -1281,8 +1352,8 @@ int main(int argc, char * argv[])
         }
 
         if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
-        if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        if (report) { print_sentence(outfp, buffer, length, LIMIT); }
+        if (escape) { fputs("\033[1;1H\033[0K", outfp); fputs("INP ", outfp);  }
+        if (report) { print_sentence(outfp, buffer, length, LIMIT); fflush(outfp); }
 
         /**
          ** FORWARD AND LOG
@@ -1419,25 +1490,29 @@ int main(int argc, char * argv[])
 
 		        position[system].ticks = timeout;
 		        refresh = !0;
-		        valid = (position[system].dmy_nanoseconds > 0) && (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+		        dmyokay = (position[system].dmy_nanoseconds > 0);
+		        totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
 			} else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 
 		        position[system].ticks = timeout;
 		        refresh = !0;
-		        valid = (position[system].dmy_nanoseconds > 0) && (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+		        dmyokay = (position[system].dmy_nanoseconds > 0);
+		        totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
 			} else if (hazer_parse_gll(&position[system], vector, count) == 0) {
 
 		        position[system].ticks = timeout;
 		        refresh = !0;
-		        valid = (position[system].dmy_nanoseconds > 0) && (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+		        dmyokay = (position[system].dmy_nanoseconds > 0);
+		        totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
 			} else if (hazer_parse_vtg(&position[system], vector, count) == 0) {
 
 		        position[system].ticks = timeout;
 		        refresh = !0;
-		        valid = (position[system].dmy_nanoseconds > 0) && (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+		        dmyokay = (position[system].dmy_nanoseconds > 0);
+		        totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
 			} else if (hazer_parse_gsa(&cache, vector, count) == 0) {
 
@@ -1463,18 +1538,15 @@ int main(int argc, char * argv[])
 				active[system] = cache;
 		        active[system].ticks = timeout;
 		        refresh = !0;
-		        valid = !0;
 
 			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 
 		        view[system].ticks = timeout;
 		        refresh = !0;
-		        valid = !0;
 
 			} else {
 
 		        refresh = 0;
-		        valid = !0;
 
 			}
 
@@ -1489,8 +1561,7 @@ int main(int argc, char * argv[])
 						tmppps = onepps;
 						onepps = 0;
 					DIMINUTO_CRITICAL_SECTION_END;
-					print_fixes(outfp, position, tmppps, valid);
-					print_positions(outfp, position);
+					print_positions(outfp, position, tmppps, dmyokay, totokay);
 					print_actives(outfp, active);
 					print_views(outfp, view);
 					fflush(outfp);
@@ -1511,7 +1582,9 @@ int main(int argc, char * argv[])
 
 			if (!output) {
 				/* Do nothing. */
-			} else if (!valid) {
+			} else if (!dmyokay) {
+				/* Do nothing. */
+			} else if (!totokay) {
 				/* Do nothing. */
  			} else if (fputs(synthesized, devfp) == EOF) {
                 fprintf(errfp, "%s: OUT!\n", program);
