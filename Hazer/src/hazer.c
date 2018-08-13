@@ -1091,9 +1091,9 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 				id = strtol(vector[index++], (char **)0, 10);
 				if (id <= 0) { break; }
 				viewp->sat[channel].id = id;
-				viewp->sat[channel].elv_degrees = strtoul(vector[index++], (char **)0, 10);
-				viewp->sat[channel].azm_degrees = strtoul(vector[index++], (char **)0, 10);
-				viewp->sat[channel].snr_dbhz = strtoul(vector[index++], (char **)0, 10);
+				viewp->sat[channel].elv_degrees = strtol(vector[index++], (char **)0, 10);
+				viewp->sat[channel].azm_degrees = strtol(vector[index++], (char **)0, 10);
+				viewp->sat[channel].snr_dbhz = strtol(vector[index++], (char **)0, 10);
 				++channel;
 				rc = 1;
 			}

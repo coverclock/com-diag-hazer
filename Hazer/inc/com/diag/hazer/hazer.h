@@ -743,10 +743,10 @@ extern hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep)
  * single satellite.
  */
 typedef struct HazerSatellite {
-    uint16_t elv_degrees;       /* Elevation in whole dregrees. */
-    uint16_t azm_degrees;       /* Azimuth in whole degrees. */
+    int16_t elv_degrees;        /* Elevation in whole degrees. */
+    int16_t azm_degrees;        /* Azimuth in whole degrees. */
     uint8_t id;                 /* Satellite IDentifier. */
-    uint8_t snr_dbhz;           /* Signal/Noise Ratio in dBHz. */
+    int8_t snr_dbhz;            /* Signal/Noise Ratio in dBHz. */
     uint8_t unused[2];          /* Unused. */
 } hazer_satellite_t;
 
