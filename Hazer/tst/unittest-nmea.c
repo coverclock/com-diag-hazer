@@ -248,6 +248,10 @@ int main(void)
 		rc = hazer_parse_vtg(&position, vector, count);
 		assert(rc == 0);
 		assert(strcmp(position.label, "VTG") == 0);
+		assert(position.cog_nanodegrees == 0LL);
+		assert(position.mag_nanodegrees == 0LL);
+		assert(position.sog_microknots == 21000LL);
+		assert(position.sog_millimeters == 40000LL);
 	}
 
 	{
