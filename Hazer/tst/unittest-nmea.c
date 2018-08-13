@@ -392,7 +392,81 @@ int main(void)
 		assert(view.channels == 15);
 		assert(view.pending == 0);
 		assert(view.view == 15);
-		/* TODO */
+
+		assert(view.sat[0].id == 1);
+		assert(view.sat[0].elv_degrees == 37);
+		assert(view.sat[0].azm_degrees == 78);
+		assert(view.sat[0].snr_dbhz == 36);
+
+		assert(view.sat[1].id == 6);
+		assert(view.sat[1].elv_degrees == 2);
+		assert(view.sat[1].azm_degrees == 184);
+		assert(view.sat[1].snr_dbhz == 29);
+
+		assert(view.sat[2].id == 7);
+		assert(view.sat[2].elv_degrees == 28);
+		assert(view.sat[2].azm_degrees == 143);
+		assert(view.sat[2].snr_dbhz == 44);
+
+		assert(view.sat[3].id == 8);
+		assert(view.sat[3].elv_degrees == 0);
+		assert(view.sat[3].azm_degrees == 48);
+		assert(view.sat[3].snr_dbhz == 22);
+
+		assert(view.sat[4].id == 11);
+		assert(view.sat[4].elv_degrees == 36);
+		assert(view.sat[4].azm_degrees == 59);
+		assert(view.sat[4].snr_dbhz == 30);
+
+		assert(view.sat[5].id == 13);
+		assert(view.sat[5].elv_degrees == 36);
+		assert(view.sat[5].azm_degrees == 270);
+		assert(view.sat[5].snr_dbhz == 37);
+
+		assert(view.sat[6].id == 15);
+		assert(view.sat[6].elv_degrees == 15);
+		assert(view.sat[6].azm_degrees == 304);
+		assert(view.sat[6].snr_dbhz == 28);
+
+		assert(view.sat[7].id == 17);
+		assert(view.sat[7].elv_degrees == 63);
+		assert(view.sat[7].azm_degrees == 226);
+		assert(view.sat[7].snr_dbhz == 40);
+
+		assert(view.sat[8].id == 18);
+		assert(view.sat[8].elv_degrees == 24);
+		assert(view.sat[8].azm_degrees == 52);
+		assert(view.sat[8].snr_dbhz == 32);
+
+		assert(view.sat[9].id == 19);
+		assert(view.sat[9].elv_degrees == 32);
+		assert(view.sat[9].azm_degrees == 223);
+		assert(view.sat[9].snr_dbhz == 36);
+
+		assert(view.sat[10].id == 28);
+		assert(view.sat[10].elv_degrees == 67);
+		assert(view.sat[10].azm_degrees == 20);
+		assert(view.sat[10].snr_dbhz == 28);
+
+		assert(view.sat[11].id == 30);
+		assert(view.sat[11].elv_degrees == 59);
+		assert(view.sat[11].azm_degrees == 149);
+		assert(view.sat[11].snr_dbhz == 38);
+
+		assert(view.sat[12].id == 46);
+		assert(view.sat[12].elv_degrees == 38);
+		assert(view.sat[12].azm_degrees == 215);
+		assert(view.sat[12].snr_dbhz == 40);
+
+		assert(view.sat[13].id == 48);
+		assert(view.sat[13].elv_degrees == 36);
+		assert(view.sat[13].azm_degrees == 220);
+		assert(view.sat[13].snr_dbhz == 34);
+
+		assert(view.sat[14].id == 51);
+		assert(view.sat[14].elv_degrees == 44);
+		assert(view.sat[14].azm_degrees == 183);
+		assert(view.sat[14].snr_dbhz == 45);
 
 	}
 }
