@@ -70,6 +70,10 @@ int main(void)
 		assert(rc == 0);
 		assert(strcmp(position.label, "GGA") == 0);
 		assert(position.sat_used == 12);
+		assert(position.utc_nanoseconds == 50187000000000ULL);
+		assert(position.tot_nanoseconds == 50187000000000ULL);
+		assert(position.lat_nanodegrees == 39794222999LL); /* 39794223000 nominally. */
+		assert(position.lon_nanodegrees == -105153369333LL);
 	}
 
 	{
