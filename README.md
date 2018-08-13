@@ -247,7 +247,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -W NMEA     Collapse escapes, append checksum, and write to DEVICE.
            -V          Print release, vintage, and revision on standard output.
            -b BPS      Use BPS bits per second for DEVICE.
-           -c          Wait for DCD to be asserted (requires -D and implies -m).
+           -c          Take 1PPS from from DCD (requires -D and implies -m).
            -d          Display debug output on standard error.
            -e          Use even parity for DEVICE.
            -l          Use local control for DEVICE.
@@ -285,125 +285,102 @@ continually updated. (In this and most other output, the asterisk \* is used to
 mean the degree symbol. This should not be confused with its use as a delimeter
 in NMEA sentences.)
 
-    $GNGLL,3947.65509,N,10509.19929,W,144510.00,A,D*64\r\n
-    \xb5b\x06>\0\0
-    FIX 2018-08-09T14:45:10Z 39*47'39.30"N,105*09'11.95"W  5553.74' N     0.022mph pps 0        10secs GNSS
-    GLL 39.794251,-105.153322  1692.800m   0.000*T   0.000*M    0.019knots    0.034kph [12]     10secs GNSS
-    GSA {  30  24  15  19   6   1  28  17  51  48  13     } [11] pdop 1.29 hdop 0.72 vdop 1.08  10secs GPS
-    GSA {  87  88  77  75  86  76                         } [06] pdop 1.29 hdop 0.72 vdop 1.08  10secs GLONASS
-    GSV [01] sat   1 elv 28* azm  50* snr 25dBHz  10secs GPS
-    GSV [02] sat   3 elv  2* azm  93* snr 16dBHz  10secs GPS
-    GSV [03] sat   6 elv 25* azm 179* snr 39dBHz  10secs GPS
-    GSV [04] sat   7 elv  4* azm 151* snr 39dBHz  10secs GPS
-    GSV [05] sat  11 elv 16* azm  46* snr  0dBHz  10secs GPS
-    GSV [06] sat  13 elv 23* azm 243* snr 36dBHz  10secs GPS
-    GSV [07] sat  15 elv 13* azm 281* snr 20dBHz  10secs GPS
-    GSV [08] sat  17 elv 81* azm 309* snr 39dBHz  10secs GPS
-    GSV [09] sat  18 elv  7* azm  37* snr  0dBHz  10secs GPS
-    GSV [10] sat  19 elv 55* azm 244* snr 37dBHz  10secs GPS
-    GSV [11] sat  22 elv  4* azm  71* snr  0dBHz  10secs GPS
-    GSV [12] sat  24 elv 17* azm 317* snr 22dBHz  10secs GPS
-    GSV [13] sat  28 elv 56* azm  69* snr 26dBHz  10secs GPS
-    GSV [14] sat  30 elv 32* azm 158* snr 39dBHz  10secs GPS
-    GSV [15] sat  46 elv 43* azm 169* snr 38dBHz  10secs GPS
-    GSV [16] sat  48 elv 36* azm 220* snr 31dBHz  10secs GPS
-    GSV [17] sat  51 elv 44* azm 183* snr 42dBHz  10secs GPS
-    GSV [18] sat  68 elv  0* azm 317* snr  0dBHz  10secs GLONASS
-    GSV [19] sat  75 elv 15* azm 132* snr 31dBHz  10secs GLONASS
-    GSV [20] sat  76 elv 61* azm 118* snr 27dBHz  10secs GLONASS
-    GSV [21] sat  77 elv 49* azm 331* snr 36dBHz  10secs GLONASS
-    GSV [22] sat  78 elv  2* azm 320* snr  0dBHz  10secs GLONASS
-    GSV [23] sat  85 elv  4* azm  33* snr 16dBHz  10secs GLONASS
-    GSV [24] sat  86 elv 58* azm  32* snr 39dBHz  10secs GLONASS
-    GSV [25] sat  87 elv 58* azm 215* snr 41dBHz  10secs GLONASS
-    GSV [26] sat  88 elv 11* azm 214* snr 35dBHz  10secs GLONASS
+    INP $GNGLL,3947.65509,N,10509.20193,W,160929.00,A,D*67\r\n
+    OUT \xb5b\x06>\0\0
+    TIM 2018-08-13T16:09:29Z 0pps                                   10secs GNSS
+    POS 39*47'39.30"N,105*09'12.11"W 39.794251,-105.153366          10secs GNSS
+    ALT    5606.56'   1708.900m                                     10secs GNSS
+    COG N    0.000*T   0.000*M                                      10secs GNSS
+    SOG      0.013mph      0.011knots      0.020kph                 10secs GNSS
+    INT GLL [12] dmy 1 inc 1 (  9 10  5  0  0  4  4 )               10secs GNSS
+    ACT {  12   2   6  24  48  19   3  17  28  51         } [10]    10secs GPS
+    ACT {  85  84  80  83  67  74  73                     } [07]    10secs GLONASS
+    DOP pdop 1.20 hdop 0.70 vdop 0.98                               10secs GPS
+    DOP pdop 1.20 hdop 0.70 vdop 0.98                               10secs GLONASS
+    SAT [01] sat   2 elv 34* azm 208* snr 32dBHz                    10secs GPS
+    SAT [02] sat   3 elv 14* azm  52* snr 21dBHz                    10secs GPS
+    SAT [03] sat   6 elv 74* azm 154* snr 33dBHz                    10secs GPS
+    SAT [04] sat  12 elv 30* azm 311* snr 29dBHz                    10secs GPS
+    SAT [05] sat  17 elv 48* azm  51* snr 33dBHz                    10secs GPS
+    SAT [06] sat  19 elv 69* azm  12* snr 28dBHz                    10secs GPS
+    SAT [07] sat  22 elv  3* azm  34* snr 20dBHz                    10secs GPS
+    SAT [08] sat  24 elv 41* azm 277* snr 25dBHz                    10secs GPS
+    SAT [09] sat  28 elv 24* azm 117* snr 23dBHz                    10secs GPS
+    SAT [10] sat  46 elv 38* azm 215* snr 33dBHz                    10secs GPS
+    SAT [11] sat  48 elv 36* azm 220* snr 31dBHz                    10secs GPS
+    SAT [12] sat  51 elv 44* azm 183* snr 38dBHz                    10secs GPS
+    SAT [13] sat  66 elv  0* azm   5* snr  0dBHz                    10secs GLONASS
+    SAT [14] sat  67 elv  7* azm  51* snr 15dBHz                    10secs GLONASS
+    SAT [15] sat  68 elv  1* azm 100* snr  0dBHz                    10secs GLONASS
+    SAT [16] sat  73 elv 71* azm 187* snr 31dBHz                    10secs GLONASS
+    SAT [17] sat  74 elv 49* azm 322* snr 28dBHz                    10secs GLONASS
+    SAT [18] sat  80 elv 15* azm 159* snr 24dBHz                    10secs GLONASS
+    SAT [19] sat  82 elv  5* azm  46* snr 18dBHz                    10secs GLONASS
+    SAT [20] sat  83 elv 50* azm  24* snr 27dBHz                    10secs GLONASS
+    SAT [21] sat  84 elv 57* azm 264* snr 28dBHz                    10secs GLONASS
+    SAT [22] sat  85 elv  7* azm 238* snr 28dBHz                    10secs GLONASS
 
-Line 1 has the most recently read valid NMEA sentence or UBX packet.
+INP is the most recent data read from the device, either NMEA sentences or
+UBX packets, with binary data converted into standard C escape sequences.
 
-    $GNGLL,3947.65509,N,10509.19929,W,144510.00,A,D*64\r\n
+OUT is the most recent data written to the device, as specified on the command
+line using the -W option.
 
-Line 2 is the most recently written NMEA sentence or UBX packet (if
-there is one) minus the ending material that includes the checksum for either
-format (this is added automatically when the buffer is written).    
+All subsequent lines represent the current state of Hazer data structures
+updated by data read from the device. Each line includes at its end the
+number of seconds left before this data expires because it has not been updated
+by the device, and the system (satellite constellation) with which it is
+associated. GNSS indicates that the device is computing an "ensemble" solution
+that uses transmissions from multiple constellations, for example, from both
+the U.S. GPS constellation and the Russian GLONASS constellation.
 
-    \xb5b\x06>\0\0
+TIM is the most recent time solution, in UTC, and the current value of the
+One Pulse Per Second (1PPS) signal if the device provides it and it was enabled
+on the command line using -c (using data carrier detect or DCD) or -I (using
+general purpose input/output or GPIO).
 
-Line 3 has the date and time in UTC, latitude and longitude in hours
-minutes and decimal seconds, altitude in feet, cardinal direction of the
-true bearing (only valid if you are moving), speed in miles per hour, the
-current one pulse per second (PPS) strobe value, an expiration period that is
-the number of seconds that must elapse for this particular fix to be considered
-stale because no update for the GNSS from which is was computed has been
-received, and the constellation being used for the fix (GNSS is multiple
-constellations are being used). (The next line has much the same information
-but in different units.)
+POS is the most recent position solution, latitude and longitude, in degrees,
+hours, minutes, and decimal seconds, and in degrees and decimal minutes.
 
-    FIX 2018-08-09T14:45:10Z 39*47'39.30"N,105*09'11.95"W  5553.74' N     0.022mph pps 0        10secs GNSS
+ALT is the most recent altitude solution, in feet and meters.
 
-Line 4 has the the sentence used to most recently update this information,
-decimal latitude and longitude, altitude in meters, true compass bearing in
-decimal degrees (which will be zero unless you are moving), magnetic compass
-bearing in decimal degress (which will be zero unless your device has a magnetic
-compass), speed in knots, speed in kilometers per hour, the number of satellites
-used for the most recent navigation fix, an expiration time, and the
-constellation being used for the fix.
+COG is the most recent course on ground solution, in cardinal compass direction,
+and the bearing in degrees true, and degrees magnetic (if available).
 
-    GLL 39.794251,-105.153322  1692.800m   0.000*T   0.000*M    0.019knots    0.034kph [12]     10secs GNSS
+SOG is the most recent speed on ground solution, in miles per hour, knots
+(nautical miles per hour), and kilometers per hour.
 
-Line 5 (and perhaps subsequent) is a list of active satellites that contributed
-to the a solution (which is frequently a subset of those being received), a
-count of how many satellites are in the list, the quality of the fix in terms
-of position, horizontal, and vertical dilution of precision, an expiration
-time, and the GNSS to which this applies. Later versions of Hazer have prototype
-support for receivers with multiple RF stages that are able to track multiple
-satellite constellations (for example, both GPS and GLONASS) simultaneously,
-and which may arrive at multiple or ensemble solutions. The GNSS displayed
-is the one to which the satellites belong, or "GNSS" if there is more than one
-GNSS in the list.
+INT is internal Hazer state including the name of the sentence (GLL in the
+example above) tha most recently updated the solution, the total number of
+satellites that contributed to that solution, an indication as to whether the
+day-month-year value has been set (only occurs once the RMC sentence has been
+received), an indicate as to whether time is incrementing monotonically (it
+can appear to run backwards when receiving UDP packets because UDP may reorder
+them), and some metrics as to the number of significant digits provided for
+various datums provided by the device.
 
-    GSA {  30  24  15  19   6   1  28  17  51  48  13     } [11] pdop 1.29 hdop 0.72 vdop 1.08  10secs GPS
-    GSA {  87  88  77  75  86  76                         } [06] pdop 1.29 hdop 0.72 vdop 1.08  10secs GLONASS
+ACT is the list of active satellites, typically provided seperately for each
+system or constellation by the device, showing each satellites identifying
+number (for GPS, this is its pseudo-random noise or PRN code number, but other
+systems using other conventions), and the number of satellites in the list.
 
-The remaining lines are, for each satellite being viewed (which is often a
-superset of those that contributed to the current solution): a virtual channel
-number (purely an artifact of Hazer), the satellite's identifying number (for
-the GPS constellation this is its Pseudo-Random Noise or PRN code number), its
-elevation and azimuth in degrees, and its signal/noise ratio, am expiration
-time, and the GNSS of which it is a member. Note that all satellites being 
-racked are shown, and so multiple systems may be displayed.
+DOP is the position, horizontal, and vertical dilution of precision - measures
+of the quality of the position fix (smaller is better) - based on the real-time
+geometry of the satellites upon which the current solution is based. If
+multiple constellations are reported, but the DOPs are all the same, the device
+is typically computing an ensemble solution using multiple constellations.
 
-    GSV [01] sat   1 elv 28* azm  50* snr 25dBHz  10secs GPS
-    GSV [02] sat   3 elv  2* azm  93* snr 16dBHz  10secs GPS
-    GSV [03] sat   6 elv 25* azm 179* snr 39dBHz  10secs GPS
-    GSV [04] sat   7 elv  4* azm 151* snr 39dBHz  10secs GPS
-    GSV [05] sat  11 elv 16* azm  46* snr  0dBHz  10secs GPS
-    GSV [06] sat  13 elv 23* azm 243* snr 36dBHz  10secs GPS
-    GSV [07] sat  15 elv 13* azm 281* snr 20dBHz  10secs GPS
-    GSV [08] sat  17 elv 81* azm 309* snr 39dBHz  10secs GPS
-    GSV [09] sat  18 elv  7* azm  37* snr  0dBHz  10secs GPS
-    GSV [10] sat  19 elv 55* azm 244* snr 37dBHz  10secs GPS
-    GSV [11] sat  22 elv  4* azm  71* snr  0dBHz  10secs GPS
-    GSV [12] sat  24 elv 17* azm 317* snr 22dBHz  10secs GPS
-    GSV [13] sat  28 elv 56* azm  69* snr 26dBHz  10secs GPS
-    GSV [14] sat  30 elv 32* azm 158* snr 39dBHz  10secs GPS
-    GSV [15] sat  46 elv 43* azm 169* snr 38dBHz  10secs GPS
-    GSV [16] sat  48 elv 36* azm 220* snr 31dBHz  10secs GPS
-    GSV [17] sat  51 elv 44* azm 183* snr 42dBHz  10secs GPS
-    GSV [18] sat  68 elv  0* azm 317* snr  0dBHz  10secs GLONASS
-    GSV [19] sat  75 elv 15* azm 132* snr 31dBHz  10secs GLONASS
-    GSV [20] sat  76 elv 61* azm 118* snr 27dBHz  10secs GLONASS
-    GSV [21] sat  77 elv 49* azm 331* snr 36dBHz  10secs GLONASS
-    GSV [22] sat  78 elv  2* azm 320* snr  0dBHz  10secs GLONASS
-    GSV [23] sat  85 elv  4* azm  33* snr 16dBHz  10secs GLONASS
-    GSV [24] sat  86 elv 58* azm  32* snr 39dBHz  10secs GLONASS
-    GSV [25] sat  87 elv 58* azm 215* snr 41dBHz  10secs GLONASS
-    GSV [26] sat  88 elv 11* azm 214* snr 35dBHz  10secs GLONASS
+SAT is the list of satellites in view, including an index that is purely an
+artifact of Hazer, the satellites identifying number (same comment as above),
+its elevation and azimuth in degrees from its ephemeris, and the signal to
+noise ratio (really, a carrier to noise density ratio) in decibels Hertz for
+its transmission.
 
 # Notes
 
-N.B. Some of the snapshots below were taken from earlier versions of Hazer and
+N.B. Most of the snapshots below were taken from earlier versions of Hazer and
 its gpstool utility. The snapshots were cut and pasted from actual output and
-may differ slightly from that of the most current version.
+may differ slightly (or greatly) from that of the most current version.
 
 ## Sending Commands
 

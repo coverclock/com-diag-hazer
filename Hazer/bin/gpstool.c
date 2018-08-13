@@ -79,7 +79,7 @@ typedef enum Protocol { UNUSED = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
 typedef enum Format { UNKNOWN = 0, NMEA = 1, UBX = 2 } format_t;
 
-static const size_t LIMIT = 75;
+static const size_t LIMIT = 80 - 1 - 4 - 4;
 
 static const size_t UNLIMITED = ~(size_t)0;
 
@@ -195,7 +195,7 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
 
     for (bb = buffer; size > 0; --size) {
         diminuto_phex_emit(fp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
-        if (current > limit) { break; }
+        if (current >= limit) { break; }
     }
     fputc('\n', fp);
 }
@@ -900,7 +900,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -W NMEA     Collapse escapes, append checksum, and write to DEVICE.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
             fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
-            fprintf(errfp, "       -c          Wait for DCD to be asserted (requires -D and implies -m).\n");
+            fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(errfp, "       -d          Display debug output on standard error.\n");
             fprintf(errfp, "       -e          Use even parity for DEVICE.\n");
             fprintf(errfp, "       -l          Use local control for DEVICE.\n");
