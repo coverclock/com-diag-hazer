@@ -310,6 +310,18 @@ int main(void)
 		assert(active.pdop == 1.27);
 		assert(active.hdop == 0.64);
 		assert(active.vdop == 1.10);
+		assert(active.id[0] == 7);
+		assert(active.id[1] == 11);
+		assert(active.id[2] == 15);
+		assert(active.id[3] == 18);
+		assert(active.id[4] == 19);
+		assert(active.id[5] == 13);
+		assert(active.id[6] == 30);
+		assert(active.id[7] == 28);
+		assert(active.id[8] == 51);
+		assert(active.id[9] == 1);
+		assert(active.id[10] == 48);
+		assert(active.id[11] == 17);
 	}
 
 	{
@@ -380,6 +392,7 @@ int main(void)
 		assert(view.channels == 15);
 		assert(view.pending == 0);
 		assert(view.view == 15);
+		/* TODO */
 
 	}
 }
