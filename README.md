@@ -278,12 +278,10 @@ to do cursor control for its report on standard output,
 
     > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E -t 10
 
-and when using a GPS receiver that can only receive a single frequency range
-at a time (so it can only detect GPS, or only GLONASS, but not both
-simultaneously), the display looks something like this snapshot as it is
-continually updated. (In this and most other output, the asterisk \* is used to
-mean the degree symbol. This should not be confused with its use as a delimeter
-in NMEA sentences.)
+the display looks something like this snapshot as it is continually updated.
+(In this and most other output, the asterisk \* is used to mean the degree
+symbol. This should not be confused with its use as a delimeter in NMEA
+sentences.)
 
     INP $GNGLL,3947.65509,N,10509.20193,W,160929.00,A,D*67\r\n
     OUT \xb5b\x06>\0\0
