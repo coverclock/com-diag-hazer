@@ -342,10 +342,10 @@ hours, minutes, and decimal seconds, and in degrees and decimal minutes.
 
 ALT is the most recent altitude solution, in feet and meters.
 
-COG is the most recent course on ground solution, in cardinal compass direction,
-and the bearing in degrees true, and degrees magnetic (if available).
+COG is the most recent course over ground solution, in cardinal compass
+direction, and the bearing in degrees true, and degrees magnetic (if available).
 
-SOG is the most recent speed on ground solution, in miles per hour, knots
+SOG is the most recent speed over ground solution, in miles per hour, knots
 (nautical miles per hour), and kilometers per hour.
 
 INT is internal Hazer state including the name of the sentence (GLL in the
