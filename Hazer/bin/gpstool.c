@@ -369,24 +369,24 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 		assert((0 <= minutes) && (minutes <= 59));
 		assert((0 <= seconds) && (seconds <= 59));
 		assert((0 <= hundredths) && (hundredths <= 99));
-		fprintf(fp, " %2d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
+		fprintf(fp, " %2d*%02d'%02d.%02d\"%c,", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
 
 		hazer_format_nanodegrees2position(pa[system].lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
 		assert((0 <= degrees) && (degrees <= 180));
 		assert((0 <= minutes) && (minutes <= 59));
 		assert((0 <= seconds) && (seconds <= 59));
 		assert((0 <= hundredths) && (hundredths <= 99));
-		fprintf(fp, ",%3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
+		fprintf(fp, "%3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
 		decimal = pa[system].lat_nanodegrees;
 		decimal /= 1000000000.0;
-		fprintf(fp, " %9.6lf", decimal);
+		fprintf(fp, " %10.6lf,", decimal);
 
 		decimal = pa[system].lon_nanodegrees;
 		decimal /= 1000000000.0;
-		fprintf(fp, ",%10.6lf", decimal);
+		fprintf(fp, "%11.6lf", decimal);
 
-    	fprintf(fp, "%8s", "");
+    	fprintf(fp, "%7s", "");
 
         fprintf(fp, " %3usecs", pa[system].ticks);
 
