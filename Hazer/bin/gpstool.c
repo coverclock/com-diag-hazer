@@ -285,9 +285,9 @@ static void print_views(FILE *fp, const hazer_view_t va[])
 
         		fputs("SAT", fp);
 
-            	fprintf(fp, " [%02d] sat %4d elv %3d* azm %4d* snr %3ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
+            	fprintf(fp, " [%02d] id %4d elv %3d* azm %4d* snr %3ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
 
-            	fprintf(fp, "%14s", "");
+            	fprintf(fp, "%15s", "");
 
                 fprintf(fp, " %3usecs", va[system].ticks);
 
