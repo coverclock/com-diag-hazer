@@ -331,6 +331,8 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
     	if (pa[system].ticks == 0) { continue; }
+    	if (pa[system].utc_nanoseconds == 0) { continue; }
+    	if (pa[system].dmy_nanoseconds == 0) { continue; }
 
 		fputs("TIM", fp);
 
@@ -358,6 +360,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
     	if (pa[system].ticks == 0) { continue; }
+    	if (pa[system].utc_nanoseconds == 0) { continue; }
 
         fputs("POS", fp);
 
@@ -396,6 +399,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
     	if (pa[system].ticks == 0) { continue; }
+    	if (pa[system].utc_nanoseconds == 0) { continue; }
 
         fputs("ALT", fp);
 
@@ -418,6 +422,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 	for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
     	if (pa[system].ticks == 0) { continue; }
+    	if (pa[system].utc_nanoseconds == 0) { continue; }
 
         fputs("COG", fp);
 
@@ -449,6 +454,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 	for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
     	if (pa[system].ticks == 0) { continue; }
+    	if (pa[system].utc_nanoseconds == 0) { continue; }
 
         fputs("SOG", fp);
 
@@ -1164,9 +1170,7 @@ int main(int argc, char * argv[])
      ** or until we are interrupted by a SIGINT or terminated by a SIGTERM.
      **/
 
-    if (escape) { fputs("\033[1;1H\033[0J", outfp); }
-
-    while ((!diminuto_interrupter_check()) && (!diminuto_terminator_check())) {
+     while ((!diminuto_interrupter_check()) && (!diminuto_terminator_check())) {
 
     	buffer = (void *)0;
         nmea_state = HAZER_STATE_START;
@@ -1555,7 +1559,7 @@ int main(int argc, char * argv[])
 			 */
 
 			if (refresh) {
-				if (escape) { fputs("\033[3;1H\033[0J", outfp); }
+				if (escape) { fputs("\033[3;1H", outfp); }
 				if (report) {
 					DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
 						tmppps = onepps;
@@ -1566,6 +1570,7 @@ int main(int argc, char * argv[])
 					print_views(outfp, view);
 					fflush(outfp);
 				}
+				if (escape) { fputs("\033[0J", outfp); }
 			}
 
 			/*
