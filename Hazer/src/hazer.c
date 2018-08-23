@@ -739,9 +739,7 @@ uint16_t hazer_parse_dop(const char * string)
     uint64_t denominator = 0;
     char * end = (char *)0;
 
-    if (*string == '\0') {
-    	/* Do nothing. */
-    } else {
+    if (*string != '\0') {
 
     	number = strtoul(string, &end, 10);
 		if (end == (char *)0) {
