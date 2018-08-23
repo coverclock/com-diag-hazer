@@ -1550,6 +1550,21 @@ int main(int argc, char * argv[])
 		        view[system].ticks = timeout;
 		        refresh = !0;
 
+			} else if (hazer_parse_txt(vector, count) == 0) {
+
+			    const char * bb = vector[4];
+			    size_t current = 0;
+			    int end = 0;
+
+			    fprintf(errfp, "%s: TEXT [%02d][%02d][%02d] \"", program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
+
+			    while ((*bb != HAZER_STIMULUS_NUL) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
+			        diminuto_phex_emit(errfp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
+			    }
+
+			    fputs("\"\n", errfp);
+
+
 			} else {
 
 		        refresh = 0;

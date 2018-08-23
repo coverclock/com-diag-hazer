@@ -783,6 +783,18 @@ extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
 extern hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], size_t count);
 
 /*******************************************************************************
+ * PARSING TEXT SENTENCES
+ ******************************************************************************/
+
+/**
+ * Parse a TXT NMEA sentence.
+ * @param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_parse_txt(char * vector[], size_t count);
+
+/*******************************************************************************
  * FORMATTING DATA FOR OUTPUT
  ******************************************************************************/
 

@@ -26,4 +26,4 @@ done
 DIR=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${DIR}
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -E -t 10 ${OPTIONS} 2> ${DIR}/${PROGRAM}.log
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -E -t 10 ${OPTIONS} 2>> ${DIR}/${PROGRAM}.log

@@ -703,3 +703,20 @@ Linux server.
 
 As Rube Goldberg as this is, it seems to work.
 
+## NMEA TXT Sentences
+
+Some devices are chatty and emit interesting and sometimes useful information
+as NMEA TXT sentences. These can be recognized by Hazer and logged to standard
+error by gpstool. Some of the functional tests save standard error output in
+log files under the build artifact directory.
+
+    gpstool: TEXT [01][01][02] "u-blox AG - www.u-blox.com"
+    gpstool: TEXT [01][01][02] "HW UBX-M8030 00080000"
+    gpstool: TEXT [01][01][02] "ROM CORE 3.01 (107888)"
+    gpstool: TEXT [01][01][02] "FWVER=SPG 3.01"
+    gpstool: TEXT [01][01][02] "PROTVER=18.00"
+    gpstool: TEXT [01][01][02] "GPS;GLO;GAL;BDS"
+    gpstool: TEXT [01][01][02] "SBAS;IMES;QZSS"
+    gpstool: TEXT [01][01][02] "GNSS OTP=GPS;GLO"
+    gpstool: TEXT [01][01][02] "LLC=FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFD"
+    gpstool: TEXT [01][01][02] "ANTSUPERV=AC SD PDoS SR"

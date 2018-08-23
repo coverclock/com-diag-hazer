@@ -1233,3 +1233,25 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
 
     return rc;
 }
+
+int hazer_parse_txt(char * vector[], size_t count)
+{
+    int rc = -1;
+    static const char TXT[] = HAZER_NMEA_SENTENCE_TXT;
+
+    if (count < 1) {
+        /* Do nothing. */
+    } else if (strnlen(vector[0], sizeof("$XXTXT")) != (sizeof("$XXTXT") - 1)) {
+        /* Do nothing. */
+    } else if (*vector[0] != HAZER_STIMULUS_START) {
+        /* Do nothing. */
+    } else if (strncmp(vector[0] + sizeof("$XX") - 1, TXT, sizeof(TXT) - 1) != 0) {
+        /* Do nothing. */
+    } else if (count < 5) {
+        /* Do nothing. */
+    } else {
+        rc = 0;
+   }
+
+    return rc;
+}
