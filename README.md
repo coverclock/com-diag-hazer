@@ -353,10 +353,10 @@ SOG is the most recent speed over ground solution, in miles per hour, knots
 (nautical miles per hour), and kilometers per hour.
 
 INT is internal Hazer state including the name of the sentence (GLL in the
-example above) tha most recently updated the solution, the total number of
+example above) that most recently updated the solution, the total number of
 satellites that contributed to that solution, an indication as to whether the
 day-month-year value has been set (only occurs once the RMC sentence has been
-received), an indicate as to whether time is incrementing monotonically (it
+received), an indication as to whether time is incrementing monotonically (it
 can appear to run backwards when receiving UDP packets because UDP may reorder
 them), and some metrics as to the number of significant digits provided for
 various datums provided by the device.
