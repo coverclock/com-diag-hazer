@@ -341,7 +341,7 @@ general purpose input/output or GPIO).
 
 POS is the most recent position solution, latitude and longitude, in degrees,
 hours, minutes, and decimal seconds, and in decimal degrees. The latter format
-can be cut and pasted directly into into Google Maps.
+can be cut and pasted directly into Google Maps.
 
 ALT is the most recent altitude solution, in feet and meters.
 
