@@ -118,6 +118,7 @@ enum HazerGnss {
     HAZER_GNSS_VIEWS        = 4,	/* Per NMEA GSV message. */
     HAZER_GNSS_ACTIVES		= 12,	/* Per NMEA GSA message. */
 	HAZER_GNSS_TICKS		= 255,	/* Maximum lifetime. */
+	HAZER_GNSS_DOP			= 9999,	/* Maximum DOP in units * 100 */
 };
 
 /**
@@ -502,12 +503,13 @@ extern int64_t hazer_parse_smm(const char * string, uint8_t * digitsp);
 extern int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp);
 
 /**
- * Parse any decimal number with or without a fractional part into a
- * double precision floating point value.
+ * Parse a dilution of precision into a value that is the DOP scaled by
+ * multiplying it by 100. The result will be in the range of 0 to 9999 (DOP of
+ * 99.99).
  * @param string points the string.
- * @return a double precision floating point value.
+ * @return a DOP scaled by 100.
  */
-extern double hazer_parse_num(const char * string);
+extern uint16_t hazer_parse_dop(const char * string);
 
 /*******************************************************************************
  * IDENTIFYING STANDARD SENTENCES
@@ -709,10 +711,10 @@ extern int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t
  * SHOULD BE INITIALIZED TO ALL ZEROS.
  */
 typedef struct HazerActive {
-    double pdop;                /* Position Dilution Of Precision. */
-    double hdop;                /* Horizontal Dilution Of Precision. */
-    double vdop;                /* Vertical Dilution Of Precision. */
     const char * label;			/* Label for sentence. */
+    uint16_t pdop;				/* Position Dilution Of Precision * 100. */
+    uint16_t hdop;				/* Horizontal Dilution Of Precision * 100. */
+    uint16_t vdop;				/* Vertical Dilution Of Precision * 100. */
     uint8_t system;				/* GNSS System ID (zero == unused). */
     uint8_t active;             /* Number of satellites active. */
     uint8_t id[HAZER_GNSS_ACTIVES];  /* Satellites active. */

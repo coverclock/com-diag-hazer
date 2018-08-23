@@ -29,7 +29,7 @@ int main(void)
     int64_t nanodegrees = 0;
     int64_t millimeters = 0;
     int64_t microknots = 0;
-    double value = 0;
+    uint16_t dop = 0;
     uint64_t number = 0;
     uint8_t digits = 0;
 
@@ -63,8 +63,8 @@ int main(void)
 
     {
     	static const hazer_active_t ACTIVE = {
-    			0.0, 0.0, 0.0,
 				NULL,
+    			0, 0, 0,
 				0,
 				4,
 				{
@@ -81,8 +81,8 @@ int main(void)
 
 	{
 		static const hazer_active_t ACTIVE = {
-				0.0, 0.0, 0.0,
 				NULL,
+				0, 0, 0,
 				0,
 				2,
 				{
@@ -97,8 +97,8 @@ int main(void)
 
 	{
 		static const hazer_active_t ACTIVE = {
-				0.0, 0.0, 0.0,
 				NULL,
+				0, 0, 0,
 				0,
 				3,
 				{
@@ -114,8 +114,8 @@ int main(void)
 
 	{
 		static const hazer_active_t ACTIVE = {
-				0.0, 0.0, 0.0,
 				NULL,
+				0, 0, 0,
 				0,
 				4,
 				{
@@ -132,8 +132,8 @@ int main(void)
 
 	{
 		static const hazer_active_t ACTIVE = {
-				0.0, 0.0, 0.0,
 				NULL,
+				0, 0, 0,
 				HAZER_SYSTEM_GALILEO,
 				5,
 				{
@@ -151,8 +151,8 @@ int main(void)
 
 	{
 		static const hazer_active_t ACTIVE = {
-				0.0, 0.0, 0.0,
 				NULL,
+				0, 0, 0,
 				0,
 				4,
 				{
@@ -453,23 +453,29 @@ int main(void)
 
     /**************************************************************************/
 
-    value = hazer_parse_num("");
-    assert(value == 0.0);
+    dop = hazer_parse_dop("");
+    assert(dop == 9999);
 
-    value = hazer_parse_num("0");
-    assert(value == 0.0);
+    dop = hazer_parse_dop("-1");
+    assert(dop == 9999);
 
-    value = hazer_parse_num("0.");
-    assert(value == 0.0);
+    dop = hazer_parse_dop("1");
+    assert(dop == 100);
 
-    value = hazer_parse_num("0.0");
-    assert(value == 0.0);
+    dop = hazer_parse_dop("2.");
+    assert(dop == 200);
 
-    value = hazer_parse_num("521.125");
-    assert(value == 521.125);
+    dop = hazer_parse_dop("3.4");
+    assert(dop == 340);
 
-    value = hazer_parse_num("-521.125");
-    assert(value == -521.125);
+    dop = hazer_parse_dop("56.78");
+    assert(dop == 5678);
+
+    dop = hazer_parse_dop("99.99");
+    assert(dop == 9999);
+
+    dop = hazer_parse_dop("100");
+    assert(dop == 9999);
 
     /**************************************************************************/
 

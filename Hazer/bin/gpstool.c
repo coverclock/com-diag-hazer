@@ -245,9 +245,9 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
 
        fprintf(fp, "%s", "DOP");
 
-       fprintf(fp, " pdop %4.2lf hdop %4.2lf vdop %4.2lf", aa[system].pdop, aa[system].hdop, aa[system].vdop);
+       fprintf(fp, " %6.2lfpdop %6.2lfhdop %6.2lfvdop", (double)aa[system].pdop / 100.0, (double)aa[system].hdop / 100.0, (double)aa[system].vdop / 100.0);
 
-       fprintf(fp, "%29s", "");
+       fprintf(fp, "%26s", "");
 
        fprintf(fp, " %3usecs", aa[system].ticks);
 

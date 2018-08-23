@@ -731,28 +731,43 @@ int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp)
     return millimeters;
 }
 
-double hazer_parse_num(const char * string)
+uint16_t hazer_parse_dop(const char * string)
 {
-    double number = 0.0;
-    double fraction = 0;
-    uint64_t numerator = 0;
+	uint16_t dop = HAZER_GNSS_DOP;
+    unsigned long number = 0;
+    int64_t fraction = 0;
     uint64_t denominator = 0;
     char * end = (char *)0;
 
-    number = strtol(string, &end, 10);
+    if (*string == '\0') {
+    	/* Do nothing. */
+    } else {
 
-    if (*end == HAZER_STIMULUS_DECIMAL) {
-        numerator = hazer_parse_fraction(end + 1, &denominator);
-        fraction = numerator;
-        fraction /= denominator;
-        if (number < 0) {
-            number -= fraction;
-        } else {
-            number += fraction;
-        }
+    	number = strtoul(string, &end, 10);
+		if (end == (char *)0) {
+			/* Do nothing. */
+		} else if (number > (HAZER_GNSS_DOP / 100)) {
+			/* Do nothing. */
+		} else {
+
+			number *= 100;
+
+			if (*end == HAZER_STIMULUS_DECIMAL) {
+
+				fraction = hazer_parse_fraction(end + 1, &denominator);
+				fraction *= 100;
+				fraction /= denominator;
+
+				number += fraction;
+
+			}
+
+			dop = number;
+
+		}
     }
 
-    return number;
+    return dop;
 }
 
 /******************************************************************************
@@ -997,9 +1012,9 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
             ++satellites;
         }
         activep->active = satellites;
-        activep->pdop = hazer_parse_num(vector[15]);
-        activep->hdop = hazer_parse_num(vector[16]);
-        activep->vdop = hazer_parse_num(vector[17]);
+        activep->pdop = hazer_parse_dop(vector[15]);
+        activep->hdop = hazer_parse_dop(vector[16]);
+        activep->vdop = hazer_parse_dop(vector[17]);
         activep->system = (count > 19) ? strtoul(vector[18], (char **)0, 10) : 0;
         activep->label = GSA;
         rc = 0;
