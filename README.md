@@ -142,13 +142,19 @@ mailto:coverclock@diag.com
 
 <https://github.com/coverclock/com-diag-diminuto>
 
-# Resources
+# Media
+
+<https://flic.kr/s/aHskRMLrx7>
+
+<https://youtu.be/ZXT_37PvmhE>
+
+# Articles
 
 <http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
 
 <https://coverclock.blogspot.com/2018/04/a-menagerie-of-gps-devices-with-usb.html>
 
-<https://flic.kr/s/aHskRMLrx7>
+# Resources
 
 <https://support.google.com/earth/answer/148095>
 
