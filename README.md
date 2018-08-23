@@ -276,7 +276,8 @@ minor Makefile hacking might be required.
 # Display
 
 When using the -E option with gpstool, so that it uses ASCII escape sequences
-to do cursor control for its report on standard output,
+to do cursor control for its report on standard output, as this example does
+when using the GN803G receiver,
 
     > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E -t 10
 
@@ -285,40 +286,40 @@ the display looks something like this snapshot as it is continually updated.
 symbol. This should not be confused with its use as a delimeter in NMEA
 sentences.)
 
-    INP $GNGLL,3947.65509,N,10509.20193,W,160929.00,A,D*67\r\n
+    INP $GNGLL,3947.65214,N,10509.20461,W,154025.00,A,D*66\r\n
     OUT \xb5b\x06>\0\0
-    TIM 2018-08-13T16:09:29Z 0pps                                   10secs GNSS
-    POS 39*47'39.30"N,105*09'12.11"W 39.794251,-105.153366          10secs GNSS
-    ALT    5606.56'   1708.900m                                     10secs GNSS
+    TIM 2018-08-23T15:40:25Z 0pps                                   10secs GNSS
+    POS 39*47'39.12"N, 105*09'12.27"W   39.794202, -105.153410      10secs GNSS
+    ALT    5604.92'   1708.400m                                     10secs GNSS
     COG N    0.000*T   0.000*M                                      10secs GNSS
-    SOG      0.013mph      0.011knots      0.020kph                 10secs GNSS
+    SOG      0.040mph      0.035knots      0.066kph                 10secs GNSS
     INT GLL [12] dmy 1 inc 1 (  9 10  5  0  0  4  4 )               10secs GNSS
-    ACT {  12   2   6  24  48  19   3  17  28  51         } [10]    10secs GPS
-    ACT {  85  84  80  83  67  74  73                     } [07]    10secs GLONASS
-    DOP pdop 1.20 hdop 0.70 vdop 0.98                               10secs GPS
-    DOP pdop 1.20 hdop 0.70 vdop 0.98                               10secs GLONASS
-    SAT [01] sat   2 elv 34* azm 208* snr 32dBHz                    10secs GPS
-    SAT [02] sat   3 elv 14* azm  52* snr 21dBHz                    10secs GPS
-    SAT [03] sat   6 elv 74* azm 154* snr 33dBHz                    10secs GPS
-    SAT [04] sat  12 elv 30* azm 311* snr 29dBHz                    10secs GPS
-    SAT [05] sat  17 elv 48* azm  51* snr 33dBHz                    10secs GPS
-    SAT [06] sat  19 elv 69* azm  12* snr 28dBHz                    10secs GPS
-    SAT [07] sat  22 elv  3* azm  34* snr 20dBHz                    10secs GPS
-    SAT [08] sat  24 elv 41* azm 277* snr 25dBHz                    10secs GPS
-    SAT [09] sat  28 elv 24* azm 117* snr 23dBHz                    10secs GPS
-    SAT [10] sat  46 elv 38* azm 215* snr 33dBHz                    10secs GPS
-    SAT [11] sat  48 elv 36* azm 220* snr 31dBHz                    10secs GPS
-    SAT [12] sat  51 elv 44* azm 183* snr 38dBHz                    10secs GPS
-    SAT [13] sat  66 elv  0* azm   5* snr  0dBHz                    10secs GLONASS
-    SAT [14] sat  67 elv  7* azm  51* snr 15dBHz                    10secs GLONASS
-    SAT [15] sat  68 elv  1* azm 100* snr  0dBHz                    10secs GLONASS
-    SAT [16] sat  73 elv 71* azm 187* snr 31dBHz                    10secs GLONASS
-    SAT [17] sat  74 elv 49* azm 322* snr 28dBHz                    10secs GLONASS
-    SAT [18] sat  80 elv 15* azm 159* snr 24dBHz                    10secs GLONASS
-    SAT [19] sat  82 elv  5* azm  46* snr 18dBHz                    10secs GLONASS
-    SAT [20] sat  83 elv 50* azm  24* snr 27dBHz                    10secs GLONASS
-    SAT [21] sat  84 elv 57* azm 264* snr 28dBHz                    10secs GLONASS
-    SAT [22] sat  85 elv  7* azm 238* snr 28dBHz                    10secs GLONASS
+    ACT {   6  19   3   2  17  28  51  48  12  24         } [10]    10secs GPS
+    ACT {  87  75  85  74  86  76                         } [06]    10secs GLONASS
+    DOP pdop 1.22 hdop 0.72 vdop 0.99                               10secs GPS
+    DOP pdop 1.22 hdop 0.72 vdop 0.99                               10secs GLONASS
+    SAT [01] id    2 elv  39* azm  211* snr  39dBHz                 10secs GPS
+    SAT [02] id    3 elv  13* azm   47* snr  28dBHz                 10secs GPS
+    SAT [03] id    6 elv  78* azm  136* snr  31dBHz                 10secs GPS
+    SAT [04] id   12 elv  35* azm  312* snr  37dBHz                 10secs GPS
+    SAT [05] id   17 elv  44* azm   56* snr  34dBHz                 10secs GPS
+    SAT [06] id   19 elv  66* azm   23* snr  30dBHz                 10secs GPS
+    SAT [07] id   22 elv   1* azm   31* snr   0dBHz                 10secs GPS
+    SAT [08] id   24 elv  41* azm  270* snr  37dBHz                 10secs GPS
+    SAT [09] id   28 elv  20* azm  121* snr  34dBHz                 10secs GPS
+    SAT [10] id   46 elv  38* azm  215* snr  44dBHz                 10secs GPS
+    SAT [11] id   48 elv  36* azm  220* snr  42dBHz                 10secs GPS
+    SAT [12] id   51 elv  44* azm  183* snr  46dBHz                 10secs GPS
+    SAT [13] id   69 elv   9* azm   45* snr  20dBHz                 10secs GLONASS
+    SAT [14] id   70 elv   5* azm   97* snr   0dBHz                 10secs GLONASS
+    SAT [15] id   74 elv  11* azm  160* snr  27dBHz                 10secs GLONASS
+    SAT [16] id   75 elv  63* azm  183* snr  42dBHz                 10secs GLONASS
+    SAT [17] id   76 elv  59* azm  311* snr  32dBHz                 10secs GLONASS
+    SAT [18] id   77 elv   3* azm  333* snr   0dBHz                 10secs GLONASS
+    SAT [19] id   84 elv   2* azm   48* snr  14dBHz                 10secs GLONASS
+    SAT [20] id   85 elv  50* azm   24* snr  35dBHz                 10secs GLONASS
+    SAT [21] id   86 elv  56* azm  271* snr  40dBHz                 10secs GLONASS
+    SAT [22] id   87 elv   5* azm  240* snr  24dBHz                 10secs GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -364,6 +365,17 @@ ACT is the list of active satellites, typically provided seperately for each
 system or constellation by the device, showing each satellites identifying
 number (for GPS, this is its pseudo-random noise or PRN code number, but other
 systems using other conventions), and the number of satellites in the list.
+Unlike the other report lines, the system or constellation to which the data
+applies is derived from (in order, depending on availability) the system id
+in the GSA sentence (only available on devices that support later NMEA
+versions), or an analysis of the satellite identifiers based on NMEA
+conventions, or the talker specified at the beginning of the sentence. The
+reason for this is that some devices (I'm looking at you, GN803G), specify GNSS
+as the talker for all GSA sentences when they are computing an ensemble solution
+(one based on multiple constellations); this causes ambiguity between this case
+and the case of successive GSA sentences in which the active satellite list has
+changed. Hazer independently tries to determine the constellation to which the
+GSA sentence refers when the talker is GNSS.
 
 DOP is the position, horizontal, and vertical dilution of precision - measures
 of the quality of the position fix (smaller is better) - based on the real-time
