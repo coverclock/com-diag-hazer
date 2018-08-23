@@ -13,4 +13,7 @@ RATE=${2:-4800}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 2> ${PROGRAM}.log
+DIR=$(readlink -e $(dirname ${0})/..)/log
+mkdir -p ${DIR}
+
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 2> ${DIR}/${PROGRAM}.log

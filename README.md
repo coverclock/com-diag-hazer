@@ -94,28 +94,28 @@ and platforms.
 "Mercury"    
 Dell OptiPlex 7040    
 Intel Core i7-6700T @ 2.8GHz x 8    
-Ubuntu 14.04.4    
+Ubuntu 14.04.4 "Trusty Tahr"    
 Linux 4.2.0    
 gcc 4.8.4    
 
 "Nickel"    
 Intel NUC5i7RYH    
 Intel Core i7-5557U @ 3.10GHz x 8    
-Ubuntu 16.04.2    
+Ubuntu 16.04.2 "Xenial Xerus"    
 Linux 4.10.0    
 gcc 5.4.0    
 
 "Bronze"    
 Raspberry Pi 2 Model B (32-bit ARM)    
 Broadcom BCM2836 Cortex-A7 ARMv7 @ 900MHz x 4    
-Raspbian GNU/Linux 8.0 "jessie"    
+Raspbian 8.0 "Jessie"    
 Linux 4.4.34    
 gcc 4.9.2    
 
 "Zinc" or "Lead"    
 Raspberry Pi 3 Model B    
 Broadcom BCM2837 Cortex-A53 ARMv7 @ 1.2GHz x 4    
-Raspbian GNU/Linux 8.0    
+Raspbian 8.0 "Jessie"    
 Linux 4.4.34    
 gcc 4.9.2    
 
@@ -123,7 +123,7 @@ gcc 4.9.2
 Raspberry Pi 3B+    
 ARMv7 64-bit    
 Broadcom BCM2837B0 Cortex-A53 @ 1.4GHz x 4    
-Raspbian 9.4 "stretch"    
+Raspbian 9.4 "Stretch"    
 Linux 4.14.34    
 gcc 6.3.0    
 
@@ -159,6 +159,8 @@ mailto:coverclock@diag.com
 <https://support.google.com/earth/answer/168344>
 
 <https://dl.google.com/earth/client/GE7/release_7_1_8/googleearth-pro-7.1.8.3036.dmg>
+
+<https://support.google.com/maps/answer/18539>
 
 # Build
 
@@ -338,7 +340,8 @@ on the command line using -c (using data carrier detect or DCD) or -I (using
 general purpose input/output or GPIO).
 
 POS is the most recent position solution, latitude and longitude, in degrees,
-hours, minutes, and decimal seconds, and in degrees and decimal minutes.
+hours, minutes, and decimal seconds, and in decimal degrees. The latter format
+can be cut and pasted directly into into Google Maps.
 
 ALT is the most recent altitude solution, in feet and meters.
 

@@ -543,7 +543,7 @@ $(OUT)/$(MOD_DIR)/%.$(SO):	$(MOD_DIR)/%.c
 
 ########## Helpers
 
-.PHONY:	makeversion gccversion implicit defines iquotes isystems
+.PHONY:	makeversion gccversion implicit defines iquotes isystems out
 
 makeversion:
 	@echo $(MAKE_VERSION)
@@ -562,6 +562,9 @@ iquotes:
 
 isystems:
 	@$(CC) -x c $(CPPFLAGS) $(CFLAGS) -E -v - < /dev/null 2>&1 | awk 'BEGIN { S=0; } ($$0=="#include <...> search starts here:") { S=1; next; } ($$0=="End of search list.") { S=0; next; } (S!=0) { print $$1; } { next; }'
+
+out:
+	@echo $(OUT)
 
 ########## Documentation
 
