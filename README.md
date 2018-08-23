@@ -150,8 +150,6 @@ mailto:coverclock@diag.com
 
 <https://youtu.be/ZXT_37PvmhE>
 
-<https://youtu.be/UluGfpqpiQw>
-
 # Articles
 
 <http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
