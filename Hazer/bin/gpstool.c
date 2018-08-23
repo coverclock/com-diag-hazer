@@ -1231,8 +1231,8 @@ int main(int argc, char * argv[])
                 	print_sentence(errfp, buffer, size - 1, UNLIMITED);
                 }
                 if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
-                if (escape) { fputs("\033[2;1H\033[0J", outfp); fputs("OUT ", outfp); }
-                if (report) { print_sentence(outfp, buffer, size - 1, LIMIT); fflush(outfp); }
+                if (escape) { fputs("\033[2;1H\033[0J", outfp); }
+                if (report) { fputs("OUT ", outfp); print_sentence(outfp, buffer, size - 1, LIMIT); fflush(outfp); }
                 free(node);
         	}
 
@@ -1358,8 +1358,8 @@ int main(int argc, char * argv[])
         }
 
         if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
-        if (escape) { fputs("\033[1;1H\033[0K", outfp); fputs("INP ", outfp);  }
-        if (report) { print_sentence(outfp, buffer, length, LIMIT); fflush(outfp); }
+        if (escape) { fputs("\033[1;1H\033[0K", outfp); }
+        if (report) { fputs("INP ", outfp); print_sentence(outfp, buffer, length, LIMIT); fflush(outfp); }
 
         /**
          ** FORWARD AND LOG
