@@ -378,6 +378,8 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 		assert((0 <= hundredths) && (hundredths <= 99));
 		fprintf(fp, " %3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
+		fputc(' ', fp);
+
 		decimal = pa[system].lat_nanodegrees;
 		decimal /= 1000000000.0;
 		fprintf(fp, " %10.6lf,", decimal);
@@ -386,7 +388,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 		decimal /= 1000000000.0;
 		fprintf(fp, " %11.6lf", decimal);
 
-    	fprintf(fp, "%5s", "");
+    	fprintf(fp, "%4s", "");
 
         fprintf(fp, " %3usecs", pa[system].ticks);
 
