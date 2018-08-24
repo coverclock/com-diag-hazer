@@ -1165,6 +1165,9 @@ int main(int argc, char * argv[])
         yodel_debug(errfp);
     }
 
+    if (escape) { fputs("\033[1;1H\033[0J", outfp); }
+    if (report) { fflush(outfp); }
+
     /**
      ** WORK LOOP
      **
@@ -1231,7 +1234,7 @@ int main(int argc, char * argv[])
                 	print_sentence(errfp, buffer, size - 1, UNLIMITED);
                 }
                 if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
-                if (escape) { fputs("\033[2;1H\033[0J", outfp); }
+                if (escape) { fputs("\033[2;1H\033[0K", outfp); }
                 if (report) { fputs("OUT ", outfp); print_sentence(outfp, buffer, size - 1, LIMIT); fflush(outfp); }
                 free(node);
         	}
