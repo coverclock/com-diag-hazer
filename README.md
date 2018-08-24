@@ -732,3 +732,5 @@ log files under the build artifact directory.
     gpstool: TEXT [01][01][02] "GNSS OTP=GPS;GLO"
     gpstool: TEXT [01][01][02] "LLC=FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFD"
     gpstool: TEXT [01][01][02] "ANTSUPERV=AC SD PDoS SR"
+    gpstool: TEXT [01][01][02] "ANTSTATUS=OK"
+    gpstool: TEXT [01][01][02] "PF=3FF"
