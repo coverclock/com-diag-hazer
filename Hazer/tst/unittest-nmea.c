@@ -307,9 +307,9 @@ int main(void)
 		assert(rc == 0);
 		assert(strcmp(active.label, "GSA") == 0);
 		assert(active.active == 12);
-		assert(active.pdop == 1.27);
-		assert(active.hdop == 0.64);
-		assert(active.vdop == 1.10);
+		assert(active.pdop == 127);
+		assert(active.hdop == 64);
+		assert(active.vdop == 110);
 		assert(active.id[0] == 7);
 		assert(active.id[1] == 11);
 		assert(active.id[2] == 15);
