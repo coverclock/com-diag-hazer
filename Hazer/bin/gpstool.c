@@ -931,30 +931,6 @@ int main(int argc, char * argv[])
      **/
 
     /*
-     * Are we using a GPS receiver with a serial port instead of a IP datagram
-     * or standard input?
-     */
-
-    if (device != (const char *)0) {
-
-        devfd = open(device, readonly ? O_RDONLY : O_RDWR);
-        if (devfd < 0) { diminuto_perror(device); }
-        assert(devfd >= 0);
-
-        rc = diminuto_serial_set(devfd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
-        assert(rc == 0);
-
-        rc = diminuto_serial_raw(devfd);
-        assert(rc == 0);
-
-        devfp = fdopen(devfd, readonly ? "r" : "a+");
-        if (devfp == (FILE *)0) { diminuto_perror(device); }
-        assert(devfp != (FILE *)0);
-        infp = devfp;
-
-    }
-
-    /*
      * Are we logging every valid sentence or packet to an output file?
      */
 
@@ -1090,36 +1066,6 @@ int main(int argc, char * argv[])
     } while (0);
 
     /*
-     * Are we monitoring 1PPS via Data Carrier Detect (DCD) on a serial line?
-     * A thread blocks until it is asserted. The GR-701W asserts DCD just
-     * before it unloads a block of sentences. The leading edge of DCD
-     * indicates 1PPS. We interrogate DCD in a separate thread to decouple
-     * it from our serial input.
-     */
-
-    do {
-		if (devfp == (FILE *)0) {
-			break;
-		}
-		if (!modemcontrol) {
-			break;
-		}
-		if (!carrierdetect) {
-			break;
-		}
-        poller.done = 0;
-        poller.ppsfp = devfp;
-        poller.strobefp = strobefp;
-        poller.oneppsp = &onepps;
-        pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
-        if (pthreadrc != 0) {
-        	errno = pthreadrc;
-        	diminuto_perror("pthread_create");
-        }
-        assert(pthreadrc == 0);
-    } while (0);
-
-    /*
      * Install our signal handlers.
      */
 
@@ -1164,6 +1110,64 @@ int main(int argc, char * argv[])
         hazer_debug(errfp);
         yodel_debug(errfp);
     }
+
+    /*
+     * Are we using a GPS receiver with a serial port instead of a IP datagram
+     * or standard input? If this is the case, it turns out to be a good idea
+     * to open the serial port(ish) device as close to where we first read from
+     * it as practical. This prevents us from losing sentences that the device
+     * generates when - apparently - it detects the open from the far end
+     * (I'm looking at *you* U-blox 8).
+     */
+
+    if (device != (const char *)0) {
+
+        devfd = open(device, readonly ? O_RDONLY : O_RDWR);
+        if (devfd < 0) { diminuto_perror(device); }
+        assert(devfd >= 0);
+
+        rc = diminuto_serial_set(devfd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
+        assert(rc == 0);
+
+        rc = diminuto_serial_raw(devfd);
+        assert(rc == 0);
+
+        devfp = fdopen(devfd, readonly ? "r" : "a+");
+        if (devfp == (FILE *)0) { diminuto_perror(device); }
+        assert(devfp != (FILE *)0);
+        infp = devfp;
+
+    }
+
+    /*
+     * Are we monitoring 1PPS via Data Carrier Detect (DCD) on a serial line?
+     * A thread blocks until it is asserted. The GR-701W asserts DCD just
+     * before it unloads a block of sentences. The leading edge of DCD
+     * indicates 1PPS. We interrogate DCD in a separate thread to decouple
+     * it from our serial input.
+     */
+
+    do {
+		if (devfp == (FILE *)0) {
+			break;
+		}
+		if (!modemcontrol) {
+			break;
+		}
+		if (!carrierdetect) {
+			break;
+		}
+        poller.done = 0;
+        poller.ppsfp = devfp;
+        poller.strobefp = strobefp;
+        poller.oneppsp = &onepps;
+        pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
+        if (pthreadrc != 0) {
+        	errno = pthreadrc;
+        	diminuto_perror("pthread_create");
+        }
+        assert(pthreadrc == 0);
+    } while (0);
 
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
     if (report) { fflush(outfp); }
