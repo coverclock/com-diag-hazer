@@ -78,7 +78,7 @@ Hazer has been successfully tested with the following GPS devices.
 
 Footnotes:
 
-[0] GlobalSat is the company formerly known as USGlobalSat.
+[0] GlobalSat is the company formerly known as USGlobalSat.    
 [1] An excellent all around GPS receiver easily acquired from numerous outlets.    
 [2] Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
