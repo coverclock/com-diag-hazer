@@ -1569,7 +1569,7 @@ int main(int argc, char * argv[])
 			        diminuto_phex_emit(errfp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
 			    }
 
-			    fputs("\"\n", errfp);
+			    fputs("\".\n", errfp);
 
 
 			} else {
