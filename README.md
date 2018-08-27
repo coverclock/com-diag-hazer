@@ -59,9 +59,9 @@ used by GPS devices.
 
 Hazer has been successfully tested with the following GPS devices.
 
-* GlobalSat BU-353S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]    
-* GlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
-* GlobalSat BU-353S4-5Hz (SiRF Star IV/Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
+* GlobalSat BU-353S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [0] [1]    
+* GlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [0]    
+* GlobalSat BU-353S4-5Hz (SiRF Star IV/Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz) [0]   
 * Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
@@ -74,10 +74,11 @@ Hazer has been successfully tested with the following GPS devices.
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
 * TOPGNSS GN-803G (U-Blox UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
-* GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]
+* GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [2] [4] [8]
 
 Footnotes:
 
+[0] GlobalSat is the company formerly known as USGlobalSat.
 [1] An excellent all around GPS receiver easily acquired from numerous outlets.    
 [2] Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
