@@ -152,11 +152,13 @@ mailto:coverclock@diag.com
 
 # Articles
 
-<http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
+<https://coverclock.blogspot.com/2018/08/practical-geolocation.html>
+
+<https://coverclock.blogspot.com/2018/04/a-menagerie-of-gps-devices-with-usb.html>
 
 <https://coverclock.blogspot.com/2017/09/time-space.html>
 
-<https://coverclock.blogspot.com/2018/04/a-menagerie-of-gps-devices-with-usb.html>
+<http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
 
 # Resources
 
