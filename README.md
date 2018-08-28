@@ -739,3 +739,9 @@ log files under the build artifact directory.
     gpstool: TEXT [01][01][02] "ANTSUPERV=AC SD PDoS SR"
     gpstool: TEXT [01][01][02] "ANTSTATUS=OK"
     gpstool: TEXT [01][01][02] "PF=3FF"
+
+# Acknowledgements
+
+Special thanks to Mrs. Overclock for her assistance in road testing this
+software.
+
