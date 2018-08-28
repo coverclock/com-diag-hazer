@@ -243,8 +243,8 @@ Optionally install Diminuto and Hazer in /usr/local.
 # Help
 
     > gpstool -?
-    
-    usage: gpstool [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
+
+    usage: gpstool [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -255,6 +255,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -C          Ignore bad checksums.
            -D DEVICE   Use DEVICE.
            -E          Like -R but use ANSI escape sequences.
+           -F          Like -E but refresh at 1Hz.
            -I PIN      Take 1PPS from GPIO input PIN (requires -D).
            -L FILE     Log sentences to FILE.
            -O          Output sentences to DEVICE.
@@ -263,7 +264,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -W NMEA     Collapse escapes, append checksum, and write to DEVICE.
            -V          Print release, vintage, and revision on standard output.
            -b BPS      Use BPS bits per second for DEVICE.
-           -c          Take 1PPS from from DCD (requires -D and implies -m).
+           -c          Take 1PPS from DCD (requires -D and implies -m).
            -d          Display debug output on standard error.
            -e          Use even parity for DEVICE.
            -l          Use local control for DEVICE.

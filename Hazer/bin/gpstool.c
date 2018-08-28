@@ -673,6 +673,7 @@ int main(int argc, char * argv[])
     int strobepin = -1;
     int ppspin = -1;
     int ignorechecksums = 0;
+    int frequency = 0;
     role_t role = NONE;
     protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
@@ -753,6 +754,8 @@ int main(int argc, char * argv[])
     int output = 0;
     FILE * fp = (FILE *)0;
     int elapsed = 0;
+    unsigned int now = 0;
+    unsigned int was = 0;
     int refresh = 0;
 	int index = -1;
 	char * end = (char *)0;
@@ -769,7 +772,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EI:L:OP:RW:Vb:cdehlmnop:rst:v?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RW:Vb:cdehlmnop:rst:v?";
 
     /*
      * Parse the command line.
@@ -809,6 +812,12 @@ int main(int argc, char * argv[])
         case 'E':
             report = !0;
             escape = !0;
+            frequency = 0;
+            break;
+        case 'F':
+            report = !0;
+            escape = !0;
+            frequency = !0;
             break;
         case 'I':
             pps = optarg;
@@ -889,7 +898,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -900,6 +909,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -C          Ignore bad checksums.\n");
             fprintf(errfp, "       -D DEVICE   Use DEVICE.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
+            fprintf(errfp, "       -F          Like -E but refresh at 1Hz.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
             fprintf(errfp, "       -L FILE     Log sentences to FILE.\n");
             fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
@@ -1458,7 +1468,9 @@ int main(int argc, char * argv[])
 	         * needs to be aged out.
 	         */
 
+            was = now;
 	        elapsed = diminuto_alarm_check();
+            now += elapsed; /* Okay to wrap around. */
 
 	        if (elapsed > 0) {
 	        	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
@@ -1574,7 +1586,7 @@ int main(int argc, char * argv[])
 
 			} else {
 
-		        refresh = 0;
+                /* Do nothing. */
 
 			}
 
@@ -1582,7 +1594,11 @@ int main(int argc, char * argv[])
 			 * If anything was updated, refresh our display.
 			 */
 
-			if (refresh) {
+			if (!refresh) {
+                /* Do nothing. */
+            } else if (frequency && (was == now)) {
+                /* Do nothing. */
+            } else {
 				if (escape) { fputs("\033[3;1H", outfp); }
 				if (report) {
 					DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
@@ -1595,6 +1611,7 @@ int main(int argc, char * argv[])
 				}
 				if (escape) { fputs("\033[0J", outfp); }
 				if (report) { fflush(outfp); }
+		        refresh = 0;
 			}
 
 			/*
