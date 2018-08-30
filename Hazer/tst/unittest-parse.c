@@ -102,6 +102,23 @@ int main(void)
 				0,
 				3,
 				{
+					HAZER_ID_WAAS_FIRST,
+					HAZER_ID_GPS_FIRST,
+					HAZER_ID_WAAS_LAST,
+				}
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				NULL,
+				0, 0, 0,
+				0,
+				3,
+				{
 					HAZER_ID_GLONASS_FIRST,
 					HAZER_ID_GLONASS_FIRST + 1,
 					HAZER_ID_GLONASS_LAST,
@@ -156,6 +173,24 @@ int main(void)
 					HAZER_ID_GPS_FIRST,
 					HAZER_ID_GPS_LAST,
 					HAZER_ID_GLONASS_FIRST,
+					HAZER_ID_GLONASS_LAST,
+				}
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GNSS);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				NULL,
+				0, 0, 0,
+				0,
+				4,
+				{
+					HAZER_ID_GPS_FIRST,
+					HAZER_ID_GLONASS_FIRST,
+					HAZER_ID_GPS_LAST,
 					HAZER_ID_GLONASS_LAST,
 				}
 		};
