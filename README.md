@@ -205,6 +205,8 @@ mailto:coverclock@diag.com
 
 # Articles
 
+<https://coverclock.blogspot.com/2018/08/practical-geolocation-ii.html>
+
 <https://coverclock.blogspot.com/2018/08/practical-geolocation.html>
 
 <https://coverclock.blogspot.com/2018/04/a-menagerie-of-gps-devices-with-usb.html>
