@@ -299,7 +299,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 * bu353w10slow - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver with slow displays.
 * gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
 * gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
-* sirfstar4 - script that uses gpstool to exercise any SiRF Star 4 receiver.
+* sirfstar4 - script that uses gpstool to exercise any SiRF Star 4 device.
 * ublox7 - script that uses gpstool to exercise any Ublox 7 device.    
 * ublox8 - script that uses gpstool to exercise any Ublox 8 device.
 
