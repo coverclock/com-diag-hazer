@@ -159,7 +159,7 @@ Linux 4.10.0
 gcc 5.4.0    
 
 "Bronze"    
-Raspberry Pi 2 Model B (32-bit ARM)    
+Raspberry Pi 2 Model B
 Broadcom BCM2836 Cortex-A7 ARMv7 @ 900MHz x 4    
 Raspbian 8.0 "Jessie"    
 Linux 4.4.34    
@@ -174,8 +174,7 @@ gcc 4.9.2
 
 "Gold"    
 Raspberry Pi 3B+    
-ARMv7 64-bit    
-Broadcom BCM2837B0 Cortex-A53 @ 1.4GHz x 4    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.4 "Stretch"    
 Linux 4.14.34    
 gcc 6.3.0    
