@@ -117,6 +117,40 @@ int main(void)
 				NULL,
 				0, 0, 0,
 				0,
+				3,
+				{
+					HAZER_ID_BEIDOU_FIRST,
+					HAZER_ID_BEIDOU_FIRST + 1,
+					HAZER_ID_BEIDOU_LAST,
+				}
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_BEIDOU);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				NULL,
+				0, 0, 0,
+				0,
+				3,
+				{
+					HAZER_ID_QZSS_FIRST,
+					HAZER_ID_QZSS_FIRST + 1,
+					HAZER_ID_QZSS_LAST,
+				}
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_QZSS);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				NULL,
+				0, 0, 0,
+				0,
 				4,
 				{
 					HAZER_ID_GPS_FIRST,

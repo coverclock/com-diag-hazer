@@ -910,6 +910,17 @@ hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
 		system = HAZER_SYSTEM_GNSS;
 		break;
 
+    /*
+     * There are apparently three different BeiDou systems.
+     * I haven't quite grokked how to discriminate them.
+     * And there are two BeiDou talkers defined. I punt
+     * and map them all to a single system until I find
+     * more documentation. The only cited source is
+     * "Technical Specification of Communication Protocol
+     * for BDS Compatible Positioning Module" (TSCPB) which
+     * I'm told is in Mandarin with no English translation.
+     */
+
 	case HAZER_TALKER_BEIDOU1:
 		system = HAZER_SYSTEM_BEIDOU;
 		break;
@@ -1044,9 +1055,16 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
 				candidate = HAZER_SYSTEM_WAAS;
 			} else if ((HAZER_ID_GLONASS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GLONASS_LAST)) {
 				candidate = HAZER_SYSTEM_GLONASS;
+			} else if ((HAZER_ID_QZSS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_QZSS_LAST)) {
+				candidate = HAZER_SYSTEM_QZSS;
+			} else if ((HAZER_ID_BEIDOU_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_BEIDOU_LAST)) {
+				candidate = HAZER_SYSTEM_BEIDOU;
 			} else {
 				continue;
 			}
+			/*
+			 * No proposed identifiers yet for the EU Galileo constellation.
+			 */
 			if (system == HAZER_SYSTEM_TOTAL) {
 				system = candidate;
 			} else if (system == candidate) {

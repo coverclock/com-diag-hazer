@@ -295,10 +295,9 @@ typedef enum HazerSystem {
 		(const char *)0, \
 	}
 
-
 /**
  * GNSS satellite identifiers.
- * NMEA 0183 4.10 p. 94.
+ * NMEA 0183 4.10 p. 94. and elsewhere.
  */
 typedef enum HazerId {
 	HAZER_ID_GPS_FIRST		= 1,
@@ -307,6 +306,10 @@ typedef enum HazerId {
 	HAZER_ID_WAAS_LAST		= 64,
 	HAZER_ID_GLONASS_FIRST	= 65,
 	HAZER_ID_GLONASS_LAST	= 96,
+	HAZER_ID_QZSS_FIRST		= 193,
+	HAZER_ID_QZSS_LAST		= 200,
+	HAZER_ID_BEIDOU_FIRST	= 201,
+	HAZER_ID_BEIDOU_LAST	= 235,
 } hazer_id_t;
 
 /**

@@ -37,6 +37,57 @@ the kinds of embedded systems I am frequently called to work upon. Hazer and
 gpstool have also turned out to be really useful tools for testing and
 evaluating GPS devices.
 
+# Sentences
+
+Hazer parses the following NMEA sentences.
+
+* GGA - Global Positioning System Fix Data (NMEA 0183 Version 4.10 p. 68)
+* GLL - Geographic Position - Latitude/Longitude (NMEA 0183 Version 4.10 p. 87)
+* GSA - GNSS DOP and Active Satellites (NMEA 0183 Version 4.10 p. 92)
+* GSV - GNSS Satellites In View (NMEA 0183 Version 4.10 p. 96)
+* RMC - Recommended Minimum Specific GNSS Data (NMEA 0183 Version 4.10 p. 113)
+* TXT - Text Transmission (NMEA 0183 Version 4.10 p. 124)
+* VTG - Course Over Ground & Ground Speed (NMEA 0183 Version 4.10 p. 127)
+
+# Talkers
+
+Hazer recognizes the following talkers as belonging to the corresponding
+constellations and systems.
+
+These talkers have been observed in the wild coming from actual GPS receivers.
+
+* GL - GLObal NAvigation Satellite System (GLONASS) - Russia
+* GN - Global Navigation Satellite System (GNSS) - Generic
+* GP - Global Positioning System (GPS, formerly NavStar) - USA
+
+Support for these talkers has been unit tested but has never been exercised
+using actual GPS receivers.
+
+* GA - Galileo (as in Galileo Galilei) - EU
+* BD - BeiDou (as in The Big Dipper) - China
+* GB - BeiDou (as in The Big Dipper) - China
+* QZ - Quasi-Zenith Satellite System (QZSS) - Japan
+
+# Identifiers
+
+Hazer recognizes the following satellite identifiers in the GSA and GSV
+messages.
+
+These satellite identifiers have been observed in the wild coming from actual
+GPS receivers.
+
+* GPS - 1..32
+* SBAS - 33..34
+* GLONASS - 65..88, 89..96
+
+Support for these satellite identifiers has been unit tested but has never been
+exercised using actual GPS receivers.
+
+* QZSS - 193..200
+* BeiDou - 201..235
+
+There is currently no know or proposed satellite identifiers for Galileo.
+
 # Devices
 
 Hazer has been successfully tested with the following GPS chipsets.
@@ -164,6 +215,8 @@ mailto:coverclock@diag.com
 
 # Resources
 
+<http://www.catb.org/gpsd/NMEA.txt>
+
 <https://support.google.com/earth/answer/148095>
 
 <http://earth.google.com/intl/ar/userguide/v4/index.htm>
@@ -175,6 +228,12 @@ mailto:coverclock@diag.com
 <https://dl.google.com/earth/client/GE7/release_7_1_8/googleearth-pro-7.1.8.3036.dmg>
 
 <https://support.google.com/maps/answer/18539>
+
+<https://fossies.org/linux/misc/gpsd-3.17.tar.gz/gpsd-3.17/test/daemon/beidou-gb.log>
+
+<http://ktuukkan.github.io/marine-api/0.9.0/javadoc/net/sf/marineapi/nmea/sentence/TalkerId.html>
+
+<https://github.com/mvglasow/satstat/wiki/NMEA-IDs>
 
 # Build
 
