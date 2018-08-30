@@ -78,7 +78,7 @@ GPS receivers.
 
 * GPS - 1..32
 * SBAS - 33..34
-* GLONASS - 65..88, 89..96
+* GLONASS - 65..96
 
 Support for these satellite identifiers has been unit tested but has never been
 exercised using actual GPS receivers.
