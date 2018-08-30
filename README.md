@@ -1,6 +1,10 @@
 com-diag-hazer
 ==============
 
+Parse NMEA strings from GPS devices.
+
+[![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/coverclock)
+
 # Copyright
 
 Copyright 2017-2018 by the Digital Aggregates Corporation, Colorado, USA.
