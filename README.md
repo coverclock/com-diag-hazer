@@ -173,7 +173,7 @@ Linux 4.4.34
 gcc 4.9.2    
 
 "Gold"    
-Raspberry Pi 3B+    
+Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.4 "Stretch"    
 Linux 4.14.34    
