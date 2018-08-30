@@ -86,7 +86,7 @@ exercised using actual GPS receivers.
 * QZSS - 193..200
 * BeiDou - 201..235
 
-There is currently no know or proposed satellite identifiers for Galileo.
+There is currently no defined or proposed satellite identifiers for Galileo.
 
 # Devices
 
