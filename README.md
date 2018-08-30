@@ -159,7 +159,7 @@ Linux 4.10.0
 gcc 5.4.0    
 
 "Bronze"    
-Raspberry Pi 2 Model B
+Raspberry Pi 2 Model B    
 Broadcom BCM2836 Cortex-A7 ARMv7 @ 900MHz x 4    
 Raspbian 8.0 "Jessie"    
 Linux 4.4.34    
