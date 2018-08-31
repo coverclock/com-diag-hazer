@@ -1443,13 +1443,13 @@ int main(int argc, char * argv[])
 				continue;
 			} else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
 				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-					fprintf(errfp, "%s: TALKER?\n", program);
+					fprintf(errfp, "%s: TALKER? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
 	                print_sentence(errfp, buffer, size - 1, UNLIMITED);
 				}
 				continue;
 			} else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-					fprintf(errfp, "%s: SYSTEM?\n", program);
+					fprintf(errfp, "%s: SYSTEM? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
 	                print_sentence(errfp, buffer, size - 1, UNLIMITED);
 				}
 				continue;
