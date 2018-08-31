@@ -715,12 +715,12 @@ extern int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t
  */
 typedef struct HazerActive {
     const char * label;			/* Label for sentence. */
+    uint16_t id[HAZER_GNSS_ACTIVES];  /* Satellites active. */
     uint16_t pdop;				/* Position Dilution Of Precision * 100. */
     uint16_t hdop;				/* Horizontal Dilution Of Precision * 100. */
     uint16_t vdop;				/* Vertical Dilution Of Precision * 100. */
     uint8_t system;				/* GNSS System ID (zero == unused). */
     uint8_t active;             /* Number of satellites active. */
-    uint8_t id[HAZER_GNSS_ACTIVES];  /* Satellites active. */
     uint8_t ticks;				/* Lifetime in application-defined ticks. */
     uint8_t unused[1];          /* Unused. */
 } hazer_active_t;
@@ -748,9 +748,9 @@ extern hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep)
  * single satellite.
  */
 typedef struct HazerSatellite {
+    uint16_t id;                /* Satellite IDentifier. */
     int16_t elv_degrees;        /* Elevation in whole degrees. */
     int16_t azm_degrees;        /* Azimuth in whole degrees. */
-    uint8_t id;                 /* Satellite IDentifier. */
     int8_t snr_dbhz;            /* Signal/Noise Ratio in dBHz. */
     uint8_t unused[2];          /* Unused. */
 } hazer_satellite_t;

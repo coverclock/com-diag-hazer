@@ -64,15 +64,15 @@ int main(void)
     {
     	static const hazer_active_t ACTIVE = {
 				NULL,
-    			0, 0, 0,
-				0,
-				4,
 				{
 						HAZER_ID_GPS_FIRST,
 						HAZER_ID_GPS_FIRST + 1,
 						HAZER_ID_GPS_FIRST + 2,
 						HAZER_ID_GPS_LAST,
-				}
+				},
+    			0, 0, 0,
+				0,
+				4,
     	};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
@@ -82,13 +82,13 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				0,
-				2,
 				{
 					HAZER_ID_WAAS_FIRST,
 					HAZER_ID_WAAS_LAST,
-				}
+				},
+				0, 0, 0,
+				0,
+				2,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_WAAS);
@@ -98,14 +98,14 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				0,
-				3,
 				{
 					HAZER_ID_WAAS_FIRST,
 					HAZER_ID_GPS_FIRST,
 					HAZER_ID_WAAS_LAST,
-				}
+				},
+				0, 0, 0,
+				0,
+				3,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
@@ -115,14 +115,14 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				0,
-				3,
 				{
 					HAZER_ID_GPS_FIRST,
 					HAZER_ID_WAAS_FIRST,
 					HAZER_ID_WAAS_LAST,
-				}
+				},
+				0, 0, 0,
+				0,
+				3,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
@@ -132,14 +132,14 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				0,
-				3,
 				{
 					HAZER_ID_GLONASS_FIRST,
 					HAZER_ID_GLONASS_FIRST + 1,
 					HAZER_ID_GLONASS_LAST,
-				}
+				},
+				0, 0, 0,
+				0,
+				3,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GLONASS);
@@ -149,14 +149,14 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				0,
-				3,
 				{
 					HAZER_ID_BEIDOU_FIRST,
 					HAZER_ID_BEIDOU_FIRST + 1,
 					HAZER_ID_BEIDOU_LAST,
-				}
+				},
+				0, 0, 0,
+				0,
+				3,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_BEIDOU);
@@ -166,14 +166,14 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				0,
-				3,
 				{
 					HAZER_ID_QZSS_FIRST,
 					HAZER_ID_QZSS_FIRST + 1,
 					HAZER_ID_QZSS_LAST,
-				}
+				},
+				0, 0, 0,
+				0,
+				3,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_QZSS);
@@ -183,15 +183,15 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				0,
-				4,
 				{
 					HAZER_ID_GPS_FIRST,
 					HAZER_ID_GPS_LAST,
 					HAZER_ID_GLONASS_FIRST,
 					HAZER_ID_GLONASS_LAST,
-				}
+				},
+				0, 0, 0,
+				0,
+				4,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GNSS);
@@ -201,15 +201,15 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				0,
-				4,
 				{
 					HAZER_ID_GPS_FIRST,
 					HAZER_ID_GLONASS_FIRST,
 					HAZER_ID_GPS_LAST,
 					HAZER_ID_GLONASS_LAST,
-				}
+				},
+				0, 0, 0,
+				0,
+				4,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GNSS);
@@ -219,16 +219,16 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				HAZER_SYSTEM_GALILEO,
-				5,
 				{
 					1,
 					2,
 					3,
 					4,
 					5,
-				}
+				},
+				0, 0, 0,
+				HAZER_SYSTEM_GALILEO,
+				5,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GALILEO);
@@ -238,15 +238,15 @@ int main(void)
 	{
 		static const hazer_active_t ACTIVE = {
 				NULL,
-				0, 0, 0,
-				0,
-				4,
 				{
 					97,
 					98,
 					99,
 					100,
-				}
+				},
+				0, 0, 0,
+				0,
+				4,
 		};
 
     	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_TOTAL);
@@ -261,10 +261,10 @@ int main(void)
 				{
 					NULL,
 					{
-						{ 0, 0, HAZER_ID_GPS_FIRST, 0},
-						{ 0, 0, HAZER_ID_GPS_FIRST + 1, 0},
-						{ 0, 0, HAZER_ID_GPS_FIRST + 2, 0},
-						{ 0, 0, HAZER_ID_GPS_LAST, 0 },
+						{ HAZER_ID_GPS_FIRST, 0, 0, 0 },
+						{ HAZER_ID_GPS_FIRST + 1, 0, 0, 0 },
+						{ HAZER_ID_GPS_FIRST + 2, 0, 0, 0 },
+						{ HAZER_ID_GPS_LAST, 0, 0, 0 },
 					},
 					4,
 					0,
@@ -273,9 +273,9 @@ int main(void)
 				{
 					NULL,
 					{
-						{ 0, 0, HAZER_ID_GLONASS_FIRST, 0},
-						{ 0, 0, HAZER_ID_GLONASS_FIRST + 1, 0},
-						{ 0, 0, HAZER_ID_GLONASS_LAST, 0 },
+						{ HAZER_ID_GLONASS_FIRST, 0, 0, 0 },
+						{ HAZER_ID_GLONASS_FIRST + 1, 0, 0, 0 },
+						{ HAZER_ID_GLONASS_LAST, 0, 0, 0 },
 					},
 					3,
 					0,
@@ -285,8 +285,8 @@ int main(void)
 				{
 					NULL,
 					{
-						{ 0, 0, HAZER_ID_WAAS_FIRST, 0},
-						{ 0, 0, HAZER_ID_WAAS_LAST, 0 },
+						{ HAZER_ID_WAAS_FIRST, 0, 0, 0},
+						{ HAZER_ID_WAAS_LAST, 0, 0, 0 },
 					},
 					2,
 					0,
