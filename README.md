@@ -162,6 +162,13 @@ Ubuntu 16.04.2 "Xenial Xerus"
 Linux 4.10.0    
 gcc 5.4.0    
 
+"Nickel" (updated)    
+Intel NUC5i7RYH    
+Intel Core i7-5557U @ 3.10GHz x 8    
+Ubuntu 18.04 "Bionic Beaver"    
+Linux 4.15.0    
+gcc 7.3.0    
+
 "Bronze"    
 Raspberry Pi 2 Model B    
 Broadcom BCM2836 Cortex-A7 ARMv7 @ 900MHz x 4    
