@@ -247,6 +247,8 @@ mailto:coverclock@diag.com
 
 <https://github.com/mvglasow/satstat/wiki/NMEA-IDs>
 
+<https://pilotweb.nas.faa.gov/PilotWeb/noticesAction.do?queryType=ALLGPS&formatType=ICAO>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
