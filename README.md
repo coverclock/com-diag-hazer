@@ -150,21 +150,21 @@ and platforms.
 
 "Mercury"    
 Dell OptiPlex 7040    
-Intel Core i7-6700T @ 2.8GHz x 8    
+Intel Core i7-6700T @ 2.8GHz x 4 x 2    
 Ubuntu 14.04.4 "Trusty Tahr"    
 Linux 4.2.0    
 gcc 4.8.4    
 
 "Nickel"    
 Intel NUC5i7RYH    
-Intel Core i7-5557U @ 3.10GHz x 8    
+Intel Core i7-5557U @ 3.10GHz x 2 x 2    
 Ubuntu 16.04.2 "Xenial Xerus"    
 Linux 4.10.0    
 gcc 5.4.0    
 
 "Nickel" (updated)    
 Intel NUC5i7RYH    
-Intel Core i7-5557U @ 3.10GHz x 8    
+Intel Core i7-5557U @ 3.10GHz x 2 x 2    
 Ubuntu 18.04 "Bionic Beaver"    
 Linux 4.15.0    
 gcc 7.3.0    
