@@ -71,6 +71,7 @@
 #include "com/diag/diminuto/diminuto_alarm.h"
 #include "com/diag/diminuto/diminuto_timer.h"
 #include "com/diag/diminuto/diminuto_frequency.h"
+#include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_countof.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
@@ -300,6 +301,58 @@ static void print_views(FILE *fp, const hazer_view_t va[])
         }
 
     }
+}
+
+/**
+ * Print the local (Juliet) time.
+ * @param fp points to the FILE stream.
+ */
+static void print_local(FILE * fp)
+{
+    uint64_t nanoseconds = 0;
+    int year = 0;
+    int month = 0;
+    int day = 0;
+    int hour = 0;
+    int minute = 0;
+    int second = 0;
+    int degrees = 0;
+    int minutes = 0;
+    int seconds = 0;
+    diminuto_sticks_t epoch = 0;
+    diminuto_sticks_t offset = 0;
+    diminuto_ticks_t fraction = 0;
+    int rc = 0;
+
+	fputs("LOC", fp);
+
+	epoch = diminuto_time_clock();
+	assert(epoch >= 0);
+	rc = diminuto_time_juliet(epoch, &year, &month, &day, &hour, &minute, &second, &fraction);
+	assert(rc == 0);
+	assert((1 <= month) && (month <= 12));
+	assert((1 <= day) && (day <= 31));
+	assert((0 <= hour) && (hour <= 23));
+	assert((0 <= minute) && (minute <= 59));
+	assert((0 <= second) && (second <= 59));
+	nanoseconds = diminuto_frequency_ticks2units(fraction, 1000000000LL);
+	assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
+	fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.%09lu", year, month, day, hour, minute, second, (long unsigned int)nanoseconds);
+
+	offset = diminuto_time_timezone(epoch);
+	offset = diminuto_frequency_ticks2wholeseconds(offset);
+	hour = offset / 3600;
+	minute = (offset % 3600) / 60;
+	if (minute < 0) { minute = -minute; }
+	fprintf(fp, "%+2.2d:%2.2d", hour, minute);
+
+	offset = diminuto_time_daylightsaving(epoch);
+	offset = diminuto_frequency_ticks2wholeseconds(offset);
+	hour = offset / 3600;
+	fprintf(fp, "%+2.2dJ", hour);
+
+    fputc('\n', fp);
+
 }
 
 /**
@@ -1605,6 +1658,7 @@ int main(int argc, char * argv[])
 						tmppps = onepps;
 						onepps = 0;
 					DIMINUTO_CRITICAL_SECTION_END;
+					print_local(outfp);
 					print_positions(outfp, position, tmppps, dmyokay, totokay);
 					print_actives(outfp, active);
 					print_views(outfp, view);
