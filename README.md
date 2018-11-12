@@ -15,8 +15,6 @@ Licensed under the terms in LICENSE.txt.
 
 # Abstract
 
-This software is an original work of its author(s).
-
 This file is part of the Digital Aggregates Corporation Hazer
 package. Hazer is a simple C-based parser of the NMEA (National Marine
 Electronics Association) 0183 4.10 strings produced by most Global
@@ -40,6 +38,8 @@ also to develop an NMEA and UBX parsing library that I can incorporate into
 the kinds of embedded systems I am frequently called to work upon. Hazer and
 gpstool have also turned out to be really useful tools for testing and
 evaluating GPS devices.
+
+This software is an original work of its author(s).
 
 # Sentences
 
@@ -129,7 +129,7 @@ Hazer has been successfully tested with the following GPS devices.
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
 * TOPGNSS GN-803G (U-Blox UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
-* GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [2] [4] [8]
+* GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [1] [2] [4] [8]
 
 Footnotes:
 
