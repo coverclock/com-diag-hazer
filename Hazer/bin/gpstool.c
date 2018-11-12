@@ -344,12 +344,14 @@ static void print_local(FILE * fp)
 	hour = offset / 3600;
 	minute = (offset % 3600) / 60;
 	if (minute < 0) { minute = -minute; }
-	fprintf(fp, "%+2.2d:%2.2d", hour, minute);
+	fprintf(fp, "%+2.2d:%02d", hour, minute);
 
 	offset = diminuto_time_daylightsaving(epoch);
 	offset = diminuto_frequency_ticks2wholeseconds(offset);
 	hour = offset / 3600;
 	fprintf(fp, "%+2.2dJ", hour);
+
+	fprintf(fp, " (%s)", COM_DIAG_HAZER_RELEASE);
 
     fputc('\n', fp);
 
