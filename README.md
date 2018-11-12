@@ -18,8 +18,8 @@ Licensed under the terms in LICENSE.txt.
 This software is an original work of its author(s).
 
 This file is part of the Digital Aggregates Corporation Hazer
-package. Hazer is a simple C-based parser of the National Marine
-Electronics Association (NMEA 0183 4.10) strings produced most Global
+package. Hazer is a simple C-based parser of the NMEA (National Marine
+Electronics Association) 0183 4.10 strings produced by most Global
 Positioning System (GPS) devices.  Unlike the Drover project, Hazer does
 its own NMEA parsing.  Hazer includes a gpstool utility to display the
 interpreted GPS data. gpstool accepts NMEA sentences from standard input,
@@ -32,7 +32,7 @@ distribution. gpstool uses both the Hazer stack and the Yodel stack to process
 both NMEA and UBX messages interleaved in the same input stream.
 
 If you're wondering why I don't use the excellent open source GPS daemon
-(gpsd) and its GPS monitor (gpsmon), the answer is: I have, in several projects,
+(gpsd) and its GPS monitor (gpsmon), the answer is: I have, in many projects,
 typically in conjunction with the open source NTPsec daemon (ntpd). Hazer was
 developed as an excuse for me to learn in detail more about how GPS works and
 how NMEA and UBX sentences are formatted (because I only learn by doing), and
@@ -273,6 +273,11 @@ Set up environment and run tests and utilities.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
+    unittest-checksum
+    unittest-format
+    unittest-nmea
+    unittest-parse
+    unittest-tokenize
     gpstool -?
 
 Optionally install Diminuto and Hazer in /usr/local.
