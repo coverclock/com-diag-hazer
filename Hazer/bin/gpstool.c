@@ -77,6 +77,7 @@
 #include "com/diag/diminuto/diminuto_frequency.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_countof.h"
+#include "com/diag/diminuto/diminuto_delay.h"
 
 typedef enum Role { NONE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
@@ -1232,6 +1233,13 @@ int main(int argc, char * argv[])
      * it as practical. This prevents us from losing sentences that the device
      * generates when - apparently - it detects the open from the far end
      * (I'm looking at *you* U-blox 8).
+     *
+     * N.B. For USB GPS devices, it takes a moment or three for the device to
+     * enumerate and show up in the file system. If you, for example, plug in
+     * the GPS device and start gpstool too quickly, the open(2) will fail, the
+     * assert(3) will fire, and the application will dump core. I do this
+     * routinely, alas. Maybe in the future I'll add a check, a delay, and a
+     * retry.
      */
 
     if (device != (const char *)0) {

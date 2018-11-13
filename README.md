@@ -792,19 +792,35 @@ Earth Pro no longer seems to work with latest version, 7.3.2, for the Mac (I
 haven't tried it for other operating systems). Neither does 7.3.1. But 7.1.8
 works.
 
-Google Earth Pro only accepts GPS data on a serial port, or at least somethin
-that kinda sorta looks like a serial port. So I process the NMEA stream from a
-serial-attached GPS device using gpstool running on a Linux server, then
-forwarded it via UDP datagrams to another gpstool on the same server, and then
-use that gpstool to forward the NMEA stream out a serial port across a two FTDI
-USB-to-serial adaptors hooked back-to-back with a null modem in between, to a
-Mac running Google Earth Pro.
+Google Earth Pro only accepts GPS data on a serial port, or at least something
+that kinda sorta looks like a serial port. I've used a FIFO (named pipe), via
+the mkfifo(1) command, for stuff like this in the past, but there doesn't seem
+to be any way to get Pro to recognize the FIFO; only serial(ish) devices may
+apply here.
 
-Empirically and anecdotally, but undocumentedly, Google Earth Pro appears to
-only accept serial input at 4800 baud. More recent and advanced GPS devices
-default to 9600 baud, and can overrun a 4800 baud serial port. So I used a
-USGlobalSat BU-353S4, which defaults to 4800 baud, as my GPS device on the
-Linux server.
+So I processed the NMEA stream from a serial-attached GPS device using gpstool
+running on a Raspberry Pi, then forwarded it via UDP datagrams to another
+gpstool on the Raspberry Pi. (This is the bin/producer.sh script.)
+
+    gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -6 -c -A ip6-localhost -P 5555 -E
+
+Then I used the second gpstool to forward the NMEA stream out a serial port
+across a two FTDI USB-to-serial adaptors hooked back-to-back with a null
+modem in between, to a Mac running Google Earth Pro. (This is the
+bin/provider.sh script.)
+
+    gpstool -6 -P 5555 -O -D /dev/ttyUSB1 -b 4800 -8 -n -1
+
+I used the "GPS Import Realtime" drop down menu in Google Earth Pro to select
+the USB serial device representing the other end of the FTDI "milking
+machine". The menu liked the device "/dev/cu.usbserial-XXXXXXXX" where the Xs
+are some kind of internal identifier on MacOS where Pro was running. 
+
+Empirically, and according to a Google search, anecdotally, but undocumentedly,
+Google Earth Pro appears to only accept serial input at 4800 baud. More recent
+and advanced GPS devices default to 9600 baud, and can overrun a 4800 baud
+serial port. So I used a USGlobalSat BU-353S4, which defaults to 4800 baud, as
+my GPS device on the Linux server.
 
 As Rube Goldberg as this is, it seems to work.
 
