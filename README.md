@@ -846,6 +846,6 @@ log files under the build artifact directory.
 
 # Acknowledgements
 
-Special thanks to Mrs. Overclock for her assistance in road testing this
-software.
+Special thanks to Mrs. Overclock for her assistance in road testing (literally)
+this software.
 
