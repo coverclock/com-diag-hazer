@@ -420,6 +420,9 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
     int hundredths = 0;
     int direction = 0;
     const char * compass = (const char *)0;
+    char zone = '\0';
+
+	zone = diminuto_time_zonename(0);
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -436,7 +439,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 		assert((0 <= minute) && (minute <= 59));
 		assert((0 <= second) && (second <= 59));
 		assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
-		fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
+		fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
 
 		fprintf(fp, " %cpps", pps ? '1' : '0');
 
