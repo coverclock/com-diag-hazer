@@ -216,59 +216,58 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
     static const unsigned int IDENTIFIERS = countof(aa[0].id);
     int system = 0;
     int satellite = 0;
+    int count = 0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
 		if (aa[system].ticks == 0) { continue; }
 		if (aa[system].active == 0) { continue; }
 
-		{
+		fprintf(fp, "%s {", "ACT [1] ");
 
-			fprintf(fp, "%s {", "ACT");
-
-			for (satellite = 0; satellite < (IDENTIFIERS / 2); ++satellite) {
-				if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
-					fprintf(fp, " %5u", aa[system].id[satellite]);
-				} else {
-					fputs("      ", fp);
-				}
+		count = 0;
+		for (satellite = 0; satellite < (IDENTIFIERS / 2); ++satellite) {
+			if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
+				fprintf(fp, " %5u", aa[system].id[satellite]);
+				count += 1;
+			} else {
+				fputs("      ", fp);
 			}
-
-			fprintf(fp, " } [%2u]", aa[system].active);
-
-			fprintf(fp, "%14s", "");
-
-			fprintf(fp, " %3usecs", aa[system].ticks);
-
-			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
-
-		    fputc('\n', fp);
-
 		}
 
-		{
+		fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
 
-			fprintf(fp, "%s {", "ACT");
+		fprintf(fp, "%4s", "");
 
-			for (satellite = (IDENTIFIERS / 2); satellite < IDENTIFIERS; ++satellite) {
-				if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
-					fprintf(fp, " %5u", aa[system].id[satellite]);
-				} else {
-					fputs("      ", fp);
-				}
+		fprintf(fp, " %3usecs", aa[system].ticks);
+
+		fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+		fputc('\n', fp);
+
+		if (aa[system].active <= (IDENTIFIERS / 2)) { continue; }
+
+		fprintf(fp, "%s {", "ACT [2] ");
+
+		count = 0;
+		for (satellite = (IDENTIFIERS / 2); satellite < IDENTIFIERS; ++satellite) {
+			if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
+				fprintf(fp, " %5u", aa[system].id[satellite]);
+				count += 1;
+			} else {
+				fputs("      ", fp);
 			}
-
-			fprintf(fp, " } [%2u]", aa[system].active);
-
-			fprintf(fp, "%14s", "");
-
-			fprintf(fp, " %3usecs", aa[system].ticks);
-
-			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
-
-		    fputc('\n', fp);
-
 		}
+
+		fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
+
+		fprintf(fp, "%4s", "");
+
+		fprintf(fp, " %3usecs", aa[system].ticks);
+
+		fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+		fputc('\n', fp);
 
 	}
 
