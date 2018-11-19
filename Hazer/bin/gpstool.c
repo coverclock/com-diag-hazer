@@ -232,7 +232,7 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
             }
         }
 
-       fprintf(fp, " } [%02u]", aa[system].active);
+       fprintf(fp, " } [%2u]", aa[system].active);
 
        fprintf(fp, "%2s", "");
 
@@ -291,7 +291,7 @@ static void print_views(FILE *fp, const hazer_view_t va[])
 
         		fputs("SAT", fp);
 
-            	fprintf(fp, " [%02d] id %3u elv %3d* azm %4d* snr %3ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
+            	fprintf(fp, " [%2d] id %3u elv %3d* azm %4d* snr %3ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
 
             	fprintf(fp, "%16s", "");
 
@@ -584,7 +584,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
         fprintf(fp, " %s", pa[system].label);
 
-		fprintf(fp, " [%02u]", pa[system].sat_used);
+		fprintf(fp, " [%2u]", pa[system].sat_used);
 
 		fprintf(fp, " dmy %d", dmyokay);
 
@@ -1378,7 +1378,7 @@ int main(int argc, char * argv[])
 
                 if (verbose) { print_sentence(errfp, buffer, size1, UNLIMITED); }
                 if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-                if (report) { fprintf(outfp, "OUT [%03zd] ", size1); print_sentence(outfp, buffer, size1, limitation); fflush(outfp); }
+                if (report) { fprintf(outfp, "OUT [%3zd] ", size1); print_sentence(outfp, buffer, size1, limitation); fflush(outfp); }
                 free(node);
         	}
 
@@ -1507,7 +1507,7 @@ int main(int argc, char * argv[])
 
         if (verbose) { print_sentence(errfp, buffer, size1, UNLIMITED); }
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        if (report) { fprintf(outfp, "INP [%03zd] ", length); print_sentence(outfp, buffer, length, limitation); fflush(outfp); }
+        if (report) { fprintf(outfp, "INP [%3zd] ", length); print_sentence(outfp, buffer, length, limitation); fflush(outfp); }
 
         /**
          ** FORWARD AND LOG
@@ -1706,7 +1706,7 @@ int main(int argc, char * argv[])
 			    size_t current = 0;
 			    int end = 0;
 
-			    fprintf(errfp, "%s: TEXT [%02d][%02d][%02d] \"", program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
+			    fprintf(errfp, "%s: TEXT [%2d][%2d][%2d] \"", program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
 
 			    while ((*bb != HAZER_STIMULUS_NUL) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
 			        diminuto_phex_emit(errfp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
