@@ -24,6 +24,7 @@ int main(void)
 	hazer_talker_t talker = HAZER_TALKER_TOTAL;
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
     uint16_t id = 0;
+    int index = 0;
 	char * string = (char *)0;
     uint64_t numerator = 0;
     uint64_t denominator = 0;
@@ -63,11 +64,9 @@ int main(void)
     /**************************************************************************/
 
 #define UNITTEST_PARSE_ID_SYSTEM(_MIN_, _MAX_, _SYSTEM_) \
-	if (((_MIN_) <= id) && (id <= (_MAX_))) { assert(hazer_map_id_to_system(id) == (_SYSTEM_)); break; }
+	if (((_MIN_) <= id) && (id <= (_MAX_))) { assert(hazer_map_id_to_system(id) == (_SYSTEM_)); continue; }
 
-    id = 0;
-    do {
-    	do {
+    for (id = 0, index = 0; index <= 0xffff; ++index, ++id) {
 			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GPS_FIRST, HAZER_ID_GPS_LAST, HAZER_SYSTEM_GPS)
 			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBAS_FIRST, HAZER_ID_SBAS_LAST, HAZER_SYSTEM_SBAS)
 			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GLONASS_FIRST, HAZER_ID_GLONASS_LAST, HAZER_SYSTEM_GLONASS)
@@ -78,9 +77,7 @@ int main(void)
 			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GALILEO_FIRST, HAZER_ID_GALILEO_LAST, HAZER_SYSTEM_GALILEO)
 			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU2_FIRST, HAZER_ID_BEIDOU2_LAST, HAZER_SYSTEM_BEIDOU)
 			assert(hazer_map_id_to_system(id) == HAZER_SYSTEM_TOTAL);
-    	} while (0);
-    	id += 1;
-    } while (id != 0);
+    }
 
     /**************************************************************************/
 
