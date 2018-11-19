@@ -219,47 +219,75 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (aa[system].ticks == 0) { continue; }
-        if (aa[system].active == 0) { continue; }
+		if (aa[system].ticks == 0) { continue; }
+		if (aa[system].active == 0) { continue; }
 
-        fprintf(fp, "%s {", "ACT");
+		{
 
-        for (satellite = 0; satellite < IDENTIFIERS; ++satellite) {
-            if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
-                fprintf(fp, " %3u", aa[system].id[satellite]);
-            } else {
-               	fputs("    ", fp);
-            }
-        }
+			fprintf(fp, "%s {", "ACT");
 
-       fprintf(fp, " } [%2u]", aa[system].active);
+			for (satellite = 0; satellite < (IDENTIFIERS / 2); ++satellite) {
+				if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
+					fprintf(fp, " %5u", aa[system].id[satellite]);
+				} else {
+					fputs("      ", fp);
+				}
+			}
 
-       fprintf(fp, "%2s", "");
+			fprintf(fp, " } [%2u]", aa[system].active);
 
-       fprintf(fp, " %3usecs", aa[system].ticks);
+			fprintf(fp, "%14s", "");
 
-       fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, " %3usecs", aa[system].ticks);
 
-       fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-    }
+		    fputc('\n', fp);
+
+		}
+
+		{
+
+			fprintf(fp, "%s {", "ACT");
+
+			for (satellite = (IDENTIFIERS / 2); satellite < IDENTIFIERS; ++satellite) {
+				if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
+					fprintf(fp, " %5u", aa[system].id[satellite]);
+				} else {
+					fputs("      ", fp);
+				}
+			}
+
+			fprintf(fp, " } [%2u]", aa[system].active);
+
+			fprintf(fp, "%14s", "");
+
+			fprintf(fp, " %3usecs", aa[system].ticks);
+
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+		    fputc('\n', fp);
+
+		}
+
+	}
 
 	for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
        	if (aa[system].ticks == 0) { continue; }
        	if (aa[system].active == 0) { continue; }
 
-       fprintf(fp, "%s", "DOP");
+        fprintf(fp, "%s", "DOP");
 
-       fprintf(fp, " %6.2lfpdop %6.2lfhdop %6.2lfvdop", (double)aa[system].pdop / 100.0, (double)aa[system].hdop / 100.0, (double)aa[system].vdop / 100.0);
+        fprintf(fp, " %6.2lfpdop %6.2lfhdop %6.2lfvdop", (double)aa[system].pdop / 100.0, (double)aa[system].hdop / 100.0, (double)aa[system].vdop / 100.0);
 
-       fprintf(fp, "%26s", "");
+        fprintf(fp, "%26s", "");
 
-       fprintf(fp, " %3usecs", aa[system].ticks);
+        fprintf(fp, " %3usecs", aa[system].ticks);
 
-       fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-       fputc('\n', fp);
+        fputc('\n', fp);
 
     }
 
@@ -291,9 +319,9 @@ static void print_views(FILE *fp, const hazer_view_t va[])
 
         		fputs("SAT", fp);
 
-            	fprintf(fp, " [%2d] id %3u elv %3d* azm %4d* snr %3ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
+            	fprintf(fp, " [%3d] id %5u elv %3d* azm %4d* snr %3ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
 
-            	fprintf(fp, "%16s", "");
+            	fprintf(fp, "%13s", "");
 
                 fprintf(fp, " %3usecs", va[system].ticks);
 
