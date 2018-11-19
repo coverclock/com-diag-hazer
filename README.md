@@ -382,44 +382,40 @@ the display looks something like this snapshot as it is continually updated.
 symbol. This should not be confused with its use as a delimeter in NMEA
 sentences.)
 
-    INP $GLGSV,3,3,11,84,31,242,35,85,29,307,32,,,,38*61\r\n
+    INP $GLGSV,2,2,08,81,55,335,41,82,07,321,24,87,19,132,33,88,66,110,18*61\r\n
     OUT $PUBX,40,VTG,0,0,0,1,0,0
-    LOC 2018-11-12T14:09:57.056661083-07:00+00J (9.1.0)
-    TIM 2018-11-12T21:09:57Z 0pps                                   10secs GNSS
-    POS 39*47'39.01"N, 105*09'12.29"W   39.794170, -105.153415      10secs GNSS
-    ALT    5637.40'   1718.300m                                     10secs GNSS
+    LOC 2018-11-19T08:49:29.054-07:00+00T "9.2.0"
+    TIM 2018-11-19T15:49:29Z 0pps                                   10secs GNSS
+    POS 39*47'39.15"N, 105*09'12.07"W   39.794209, -105.153353      10secs GNSS
+    ALT    5635.76'   1717.800m                                     10secs GNSS
     COG N    0.000*T   0.000*M                                      10secs GNSS
-    SOG      0.037mph      0.032knots      0.060kph                 10secs GNSS
+    SOG      0.007mph      0.006knots      0.011kph                 10secs GNSS
     INT GGA [12] dmy 1 inc 1 (  9 10  5  0  0  4  4 )               10secs GNSS
-    ACT {  10  32  18  11  31  20   1  12  25  22  51  48 } [12]    10secs GPS
-    ACT {  78  80  79  85  84  68  69                     } [07]    10secs GLONASS
-    DOP   1.25pdop   0.62hdop   1.09vdop                            10secs GPS
-    DOP   1.25pdop   0.62hdop   1.09vdop                            10secs GLONASS
-    SAT [01] id   1 elv  28* azm  312* snr  28dBHz                  10secs GPS
-    SAT [02] id   8 elv   4* azm  248* snr  28dBHz                  10secs GPS
-    SAT [03] id  10 elv  49* azm  103* snr  35dBHz                  10secs GPS
-    SAT [04] id  11 elv  27* azm  290* snr  26dBHz                  10secs GPS
-    SAT [05] id  12 elv   9* azm   59* snr  17dBHz                  10secs GPS
-    SAT [06] id  14 elv  74* azm  304* snr  21dBHz                  10secs GPS
-    SAT [07] id  18 elv  48* azm  284* snr  35dBHz                  10secs GPS
-    SAT [08] id  20 elv  22* azm  118* snr  32dBHz                  10secs GPS
-    SAT [09] id  22 elv  18* azm  303* snr  28dBHz                  10secs GPS
-    SAT [10] id  25 elv  14* azm   93* snr  11dBHz                  10secs GPS
-    SAT [11] id  31 elv  44* azm  180* snr  44dBHz                  10secs GPS
-    SAT [12] id  32 elv  69* azm   25* snr  31dBHz                  10secs GPS
-    SAT [13] id  46 elv  38* azm  215* snr  39dBHz                  10secs GPS
-    SAT [14] id  48 elv  36* azm  220* snr  39dBHz                  10secs GPS
-    SAT [15] id  51 elv  44* azm  183* snr  42dBHz                  10secs GPS
-    SAT [16] id  68 elv  33* azm   70* snr  31dBHz                  10secs GLONASS
-    SAT [17] id  69 elv  57* azm  357* snr  36dBHz                  10secs GLONASS
-    SAT [18] id  70 elv  19* azm  295* snr  21dBHz                  10secs GLONASS
-    SAT [19] id  77 elv   0* azm   17* snr  19dBHz                  10secs GLONASS
-    SAT [20] id  78 elv  35* azm   52* snr   9dBHz                  10secs GLONASS
-    SAT [21] id  79 elv  47* azm  107* snr  22dBHz                  10secs GLONASS
-    SAT [22] id  80 elv  11* azm  171* snr  36dBHz                  10secs GLONASS
-    SAT [23] id  83 elv   0* azm  196* snr   0dBHz                  10secs GLONASS
-    SAT [24] id  84 elv  31* azm  242* snr  35dBHz                  10secs GLONASS
-    SAT [25] id  85 elv  29* azm  307* snr  32dBHz                  10secs GLONASS
+    ACT {  20  29  21  15   5  13  16  10  48  51         } [10]    10secs GPS
+    ACT {  65  81  66  88  87  82  67                     } [07]    10secs GLONASS
+    DOP   1.23pdop   0.70hdop   1.00vdop                            10secs GPS
+    DOP   1.23pdop   0.70hdop   1.00vdop                            10secs GLONASS
+    SAT [01] id   5 elv  15* azm   56* snr  27dBHz                  10secs GPS
+    SAT [02] id  10 elv  17* azm  243* snr  34dBHz                  10secs GPS
+    SAT [03] id  13 elv  38* azm   67* snr  18dBHz                  10secs GPS
+    SAT [04] id  15 elv  57* azm  122* snr  41dBHz                  10secs GPS
+    SAT [05] id  16 elv  16* azm  302* snr  27dBHz                  10secs GPS
+    SAT [06] id  20 elv  42* azm  255* snr  37dBHz                  10secs GPS
+    SAT [07] id  21 elv  61* azm  318* snr  22dBHz                  10secs GPS
+    SAT [08] id  26 elv  17* azm  276* snr   0dBHz                  10secs GPS
+    SAT [09] id  27 elv   0* azm  324* snr   0dBHz                  10secs GPS
+    SAT [10] id  29 elv  52* azm  169* snr  45dBHz                  10secs GPS
+    SAT [11] id  46 elv  38* azm  215* snr  38dBHz                  10secs GPS
+    SAT [12] id  48 elv  36* azm  220* snr  40dBHz                  10secs GPS
+    SAT [13] id  51 elv  44* azm  183* snr  43dBHz                  10secs GPS
+    SAT [14] id  65 elv  49* azm   34* snr  37dBHz                  10secs GLONASS
+    SAT [15] id  66 elv  64* azm  215* snr  34dBHz                  10secs GLONASS
+    SAT [16] id  67 elv  11* azm  215* snr  25dBHz                  10secs GLONASS
+    SAT [17] id  72 elv   5* azm   34* snr  26dBHz                  10secs GLONASS
+    SAT [18] id  81 elv  55* azm  335* snr  41dBHz                  10secs GLONASS
+    SAT [19] id  82 elv   7* azm  321* snr  24dBHz                  10secs GLONASS
+    SAT [20] id  87 elv  19* azm  132* snr  33dBHz                  10secs GLONASS
+    SAT [21] id  88 elv  66* azm  110* snr  18dBHz                  10secs GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -428,9 +424,13 @@ OUT is the most recent data written to the device, as specified on the command
 line using the -W option.
 
 LOC is the current local time provided by the host system, and the revision
-number of this version of Hazer. The local (or 'J' for "Juliet") time includes
-the time zone offset from UTC in hours and minutes, and the current daylight
-saving time (DST) offset in hours.
+number of this version of Hazer. The local time, with a fractional part in
+milliseconds, includes the time zone offset from UTC in hours and minutes, the
+current daylight saving time (DST) offset in hours, and the military time zone
+letter. If the time zone offset is an even number of hours (some aren't:
+Newfie Time, I'm looking at you), it will be a letter like "T" ("Tango")
+for Mountain Standard Time as found in Denver; otherwise it will be "J"
+("Juliet") to indicate any local time zone.
 
 All subsequent lines represent the current state of Hazer data structures
 updated by data read from the device. Each line includes at its end the

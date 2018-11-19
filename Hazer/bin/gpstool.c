@@ -85,7 +85,7 @@ typedef enum Protocol { UNUSED = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
 typedef enum Format { UNKNOWN = 0, NMEA = 1, UBX = 2 } format_t;
 
-static const size_t LIMIT = 80 - 1 - 4 - 4;
+static const size_t LIMIT = 80 /* Legacy */ - 4 /* "XXX " */ - 6 /* "[NNN] " */ - 4 /* "\r\n" */ - 1 /* Wrap */;
 
 static const size_t UNLIMITED = ~(size_t)0;
 
@@ -841,6 +841,7 @@ int main(int argc, char * argv[])
     int rc = 0;
     int ch = EOF;
     ssize_t size = 0;
+    ssize_t size1 = 0; /* size - 1 */
     ssize_t length = 0;
     size_t current = 0;
     ssize_t check = 0;
@@ -858,6 +859,7 @@ int main(int argc, char * argv[])
 	hazer_active_t cache = { 0 };
 	int dmyokay = 0;
 	int totokay = 0;
+	size_t limitation = 0;
     /*
      * External symbols.
      */
@@ -1297,6 +1299,13 @@ int main(int argc, char * argv[])
         assert(pthreadrc == 0);
     } while (0);
 
+    /*
+     * How much of each packet do we display? Depends on whether we're doing
+     * cursor control or not.
+     */
+
+    limitation = escape ? LIMIT : UNLIMITED;
+
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
     if (report) { fflush(outfp); }
 
@@ -1360,14 +1369,16 @@ int main(int argc, char * argv[])
                    	fprintf(errfp, "%s: EXIT.\n", program);
             		break;
             	}
-                rc = (size < length) ? emit_packet(devfp, buffer, size - 1) : emit_sentence(devfp, buffer, size - 1);
+            	size1 = size - 1;
+                rc = (size < length) ? emit_packet(devfp, buffer, size1) : emit_sentence(devfp, buffer, size1);
                 if (rc < 0) {
                 	fprintf(errfp, "%s: FAILED!\n", program);
-                	print_sentence(errfp, buffer, size - 1, UNLIMITED);
+                	print_sentence(errfp, buffer, size1, UNLIMITED);
                 }
-                if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
+
+                if (verbose) { print_sentence(errfp, buffer, size1, UNLIMITED); }
                 if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-                if (report) { fputs("OUT ", outfp); print_sentence(outfp, buffer, size - 1, LIMIT); fflush(outfp); }
+                if (report) { fprintf(outfp, "OUT [%03zd] ", size1); print_sentence(outfp, buffer, size1, limitation); fflush(outfp); }
                 free(node);
         	}
 
@@ -1445,6 +1456,8 @@ int main(int argc, char * argv[])
 
         }
 
+        size1 = size - 1;
+
         /**
          ** VALIDATE
          **
@@ -1465,7 +1478,7 @@ int main(int argc, char * argv[])
 
             if (nmea_ck != nmea_cs) {
                 fprintf(errfp, "%s: CHECKSUM! 0x%02x 0x%02x\n", program, nmea_cs, nmea_ck);
-                print_sentence(errfp, buffer, size - 1, UNLIMITED);
+                print_sentence(errfp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
             }
 
@@ -1478,7 +1491,7 @@ int main(int argc, char * argv[])
 
         	if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
                 fprintf(errfp, "%s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
-                print_sentence(errfp, buffer, size - 1, UNLIMITED);
+                print_sentence(errfp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
         	}
 
@@ -1487,14 +1500,14 @@ int main(int argc, char * argv[])
         } else {
 
             fprintf(errfp, "%s: FORMAT! %zd\n", program, length);
-            print_sentence(errfp, buffer, size - 1, UNLIMITED);
+            print_sentence(errfp, buffer, size1, UNLIMITED);
         	continue;
 
         }
 
-        if (verbose) { print_sentence(errfp, buffer, size - 1, UNLIMITED); }
+        if (verbose) { print_sentence(errfp, buffer, size1, UNLIMITED); }
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        if (report) { fputs("INP ", outfp); print_sentence(outfp, buffer, length, LIMIT); fflush(outfp); }
+        if (report) { fprintf(outfp, "INP [%03zd] ", length); print_sentence(outfp, buffer, length, limitation); fflush(outfp); }
 
         /**
          ** FORWARD AND LOG

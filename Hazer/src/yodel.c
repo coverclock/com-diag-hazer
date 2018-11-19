@@ -51,6 +51,9 @@ int yodel_finalize(void)
  *
  ******************************************************************************/
 
+/*
+ * Ublox 8, p. 134
+ */
 yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp)
 {
     int done = !0;
@@ -91,6 +94,7 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
             action = YODEL_ACTION_SAVE;
             *bp = (char *)buffer;
             *sp = size;
+            *lp = 0;
         }
         break;
 
@@ -114,15 +118,21 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
     	break;
 
     case YODEL_STATE_LENGTH_1:
-        DEBUG("LENGTH1 0x%x.\n", ch);
+    	/*
+    	 * Ublox8, p. 134: "little endian"
+    	 */
+    	*lp = ((unsigned)ch); /* LSB */
+        DEBUG("LENGTH1 0x%x %zu.\n", ch, *lp);
 		state = YODEL_STATE_LENGTH_2;
 		action = YODEL_ACTION_SAVE;
     	break;
 
     case YODEL_STATE_LENGTH_2:
-    	*lp = ((unsigned)ch) << 8;
-    	*lp |= (unsigned)*((*bp) - 1);
-        DEBUG("LENGTH %zu.\n", *lp);
+    	/*
+    	 * Ublox8, p. 134: "little endian"
+    	 */
+    	*lp |= ((unsigned)ch) << 8; /* MSB */
+        DEBUG("LENGTH2 0x%x %zu.\n", ch, *lp);
 		state = YODEL_STATE_PAYLOAD;
 		action = YODEL_ACTION_SAVE;
     	break;
@@ -215,7 +225,12 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
  ******************************************************************************/
 
 /*
- * Ublox, p. 74
+ * The portion of the buffer being summed includes the length, but we have
+ * to compute the length first to do the checksum. Seems chicken-and-egg,
+ * but I've seen the same thing in TCP headers; in fact [Ublox p. 74] says
+ * this is the Fletcher checksum from RFC 1145. It refers to this as an
+ * eight-bit checksum, but the result is really sixteen bits (CK_A and
+ * CK_B), although it is performed eight-bits at a time on the input data.
  */
 const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
 {
@@ -226,14 +241,8 @@ const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, u
 	uint16_t length = 0;
 
 	/*
-	 * The portion of the buffer being summed includes the length, but we have
-	 * to compute the length first to do the checksum. Seems chicken-and-egg,
-	 * but I've seen the same thing in TCP headers; in fact [Ublox p. 74] says
-	 * this is the Fletcher checksum from RFC 1145. It refers to this as an
-	 * eight-bit checksum, but the result is really sixteen bits (CK_A and
-	 * CK_B), although it is performed eight-bits at a time on the input data.
+	 * Ublox8, p. 134: "little endian"
 	 */
-
 	length = ((uint8_t)(bp[YODEL_UBX_LENGTH_MSB])) << 8;
 	length |= ((uint8_t)(bp[YODEL_UBX_LENGTH_LSB]));
 	length += YODEL_UBX_SUMMED;
@@ -270,7 +279,10 @@ ssize_t yodel_length(const void * buffer, size_t size)
        } else if (sentence[YODEL_UBX_SYNC_2] != YODEL_STIMULUS_SYNC_2) {
            /* Do nothing. */
        } else {
-           length = sentence[YODEL_UBX_LENGTH_MSB] << 8;
+    	   /*
+    	    * Ublox8, p. 134: "little endian"
+    	    */
+    	   length = sentence[YODEL_UBX_LENGTH_MSB] << 8;
            length |= sentence[YODEL_UBX_LENGTH_LSB];
            if (length > (size - YODEL_UBX_SHORTEST)) {
         	   /* Do nothing. */
