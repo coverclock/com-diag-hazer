@@ -1032,8 +1032,40 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     return rc;
 }
 
+hazer_system_t hazer_map_id_to_system(uint16_t id)
+{
+	hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+
+	if (id == 0) {
+		/* Do nothing. */
+	} else if ((HAZER_ID_GPS_FIRST <= id) && (id <= HAZER_ID_GPS_LAST)) {
+		candidate = HAZER_SYSTEM_GPS;
+	} else if ((HAZER_ID_SBAS_FIRST <= id) && (id <= HAZER_ID_SBAS_LAST)) {
+		candidate = HAZER_SYSTEM_SBAS;
+	} else if ((HAZER_ID_GLONASS_FIRST <= id) && (id <= HAZER_ID_GLONASS_LAST)) {
+		candidate = HAZER_SYSTEM_GLONASS;
+	} else if ((HAZER_ID_SBASX_FIRST <= id) && (id <= HAZER_ID_SBASX_LAST)) {
+		candidate = HAZER_SYSTEM_SBAS;
+	} else if ((HAZER_ID_IMES_FIRST <= id) && (id <= HAZER_ID_IMES_LAST)) {
+		candidate = HAZER_SYSTEM_IMES;
+	} else if ((HAZER_ID_QZSS_FIRST <= id) && (id <= HAZER_ID_QZSS_LAST)) {
+		candidate = HAZER_SYSTEM_QZSS;
+	} else if ((HAZER_ID_BEIDOU1_FIRST <= id) && (id <= HAZER_ID_BEIDOU1_LAST)) {
+		candidate = HAZER_SYSTEM_BEIDOU;
+	} else if ((HAZER_ID_GALILEO_FIRST <= id) && (id <= HAZER_ID_GALILEO_LAST)) {
+		candidate = HAZER_SYSTEM_GALILEO;
+	} else if ((HAZER_ID_BEIDOU2_FIRST <= id) && (id <= HAZER_ID_BEIDOU2_LAST)) {
+		candidate = HAZER_SYSTEM_BEIDOU;
+	} else {
+		/* Do nothing. */
+	}
+
+	return candidate;
+}
+
 /*
  * NMEA 0183 4.10 p. 94-95.
+ * UBLOX8 R15 p. 373.
  */
 hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
@@ -1049,29 +1081,18 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
 				break;
 			} else if (activep->id[slot] == 0) {
 				break;
-			} else if ((HAZER_ID_GPS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GPS_LAST)) {
-				candidate = HAZER_SYSTEM_GPS;
-			} else if ((HAZER_ID_WAAS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_WAAS_LAST)) {
-				candidate = HAZER_SYSTEM_WAAS;
-			} else if ((HAZER_ID_GLONASS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GLONASS_LAST)) {
-				candidate = HAZER_SYSTEM_GLONASS;
-			} else if ((HAZER_ID_QZSS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_QZSS_LAST)) {
-				candidate = HAZER_SYSTEM_QZSS;
-			} else if ((HAZER_ID_BEIDOU_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_BEIDOU_LAST)) {
-				candidate = HAZER_SYSTEM_BEIDOU;
-			} else {
+			} else if ((candidate = hazer_map_id_to_system(activep->id[slot])) == HAZER_SYSTEM_TOTAL) {
 				continue;
+			} else {
+				/* Do nothing. */
 			}
-			/*
-			 * No proposed identifiers yet for the EU Galileo constellation.
-			 */
 			if (system == HAZER_SYSTEM_TOTAL) {
 				system = candidate;
 			} else if (system == candidate) {
 				continue;
-			} else if (candidate == HAZER_SYSTEM_WAAS) {
+			} else if (candidate == HAZER_SYSTEM_SBAS) {
 				continue;
-			} else if (system == HAZER_SYSTEM_WAAS) {
+			} else if (system == HAZER_SYSTEM_SBAS) {
 				system = candidate;
 			} else {
 				system = HAZER_SYSTEM_GNSS;

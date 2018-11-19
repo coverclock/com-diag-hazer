@@ -23,6 +23,7 @@ int main(void)
 {
 	hazer_talker_t talker = HAZER_TALKER_TOTAL;
 	hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    uint16_t id = 0;
 	char * string = (char *)0;
     uint64_t numerator = 0;
     uint64_t denominator = 0;
@@ -61,6 +62,28 @@ int main(void)
 
     /**************************************************************************/
 
+#define UNITTEST_PARSE_ID_SYSTEM(_MIN_, _MAX_, _SYSTEM_) \
+	if (((_MIN_) <= id) && (id <= (_MAX_))) { assert(hazer_map_id_to_system(id) == (_SYSTEM_)); break; }
+
+    id = 0;
+    do {
+    	do {
+			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GPS_FIRST, HAZER_ID_GPS_LAST, HAZER_SYSTEM_GPS)
+			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBAS_FIRST, HAZER_ID_SBAS_LAST, HAZER_SYSTEM_SBAS)
+			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GLONASS_FIRST, HAZER_ID_GLONASS_LAST, HAZER_SYSTEM_GLONASS)
+			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBASX_FIRST, HAZER_ID_SBASX_LAST, HAZER_SYSTEM_SBAS)
+			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_IMES_FIRST, HAZER_ID_IMES_LAST, HAZER_SYSTEM_IMES)
+			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_QZSS_FIRST, HAZER_ID_QZSS_LAST, HAZER_SYSTEM_QZSS)
+			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU1_FIRST, HAZER_ID_BEIDOU1_LAST, HAZER_SYSTEM_BEIDOU)
+			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GALILEO_FIRST, HAZER_ID_GALILEO_LAST, HAZER_SYSTEM_GALILEO)
+			UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU2_FIRST, HAZER_ID_BEIDOU2_LAST, HAZER_SYSTEM_BEIDOU)
+			assert(hazer_map_id_to_system(id) == HAZER_SYSTEM_TOTAL);
+    	} while (0);
+    	id += 1;
+    } while (id != 0);
+
+    /**************************************************************************/
+
     {
     	static const hazer_active_t ACTIVE = {
 				NULL,
@@ -83,15 +106,15 @@ int main(void)
 		static const hazer_active_t ACTIVE = {
 				NULL,
 				{
-					HAZER_ID_WAAS_FIRST,
-					HAZER_ID_WAAS_LAST,
+					HAZER_ID_SBAS_FIRST,
+					HAZER_ID_SBAS_LAST,
 				},
 				0, 0, 0,
 				0,
 				2,
 		};
 
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_WAAS);
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_SBAS);
 
 	}
 
@@ -99,9 +122,25 @@ int main(void)
 		static const hazer_active_t ACTIVE = {
 				NULL,
 				{
-					HAZER_ID_WAAS_FIRST,
+					HAZER_ID_SBASX_FIRST,
+					HAZER_ID_SBASX_LAST,
+				},
+				0, 0, 0,
+				0,
+				2,
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_SBAS);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				NULL,
+				{
+					HAZER_ID_SBAS_FIRST,
 					HAZER_ID_GPS_FIRST,
-					HAZER_ID_WAAS_LAST,
+					HAZER_ID_SBAS_LAST,
 				},
 				0, 0, 0,
 				0,
@@ -117,8 +156,8 @@ int main(void)
 				NULL,
 				{
 					HAZER_ID_GPS_FIRST,
-					HAZER_ID_WAAS_FIRST,
-					HAZER_ID_WAAS_LAST,
+					HAZER_ID_SBAS_FIRST,
+					HAZER_ID_SBAS_LAST,
 				},
 				0, 0, 0,
 				0,
@@ -150,9 +189,26 @@ int main(void)
 		static const hazer_active_t ACTIVE = {
 				NULL,
 				{
-					HAZER_ID_BEIDOU_FIRST,
-					HAZER_ID_BEIDOU_FIRST + 1,
-					HAZER_ID_BEIDOU_LAST,
+					HAZER_ID_BEIDOU1_FIRST,
+					HAZER_ID_BEIDOU1_FIRST + 1,
+					HAZER_ID_BEIDOU1_LAST,
+				},
+				0, 0, 0,
+				0,
+				3,
+		};
+
+    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_BEIDOU);
+
+	}
+
+	{
+		static const hazer_active_t ACTIVE = {
+				NULL,
+				{
+					HAZER_ID_BEIDOU2_FIRST,
+					HAZER_ID_BEIDOU2_FIRST + 1,
+					HAZER_ID_BEIDOU2_LAST,
 				},
 				0, 0, 0,
 				0,
@@ -285,8 +341,8 @@ int main(void)
 				{
 					NULL,
 					{
-						{ HAZER_ID_WAAS_FIRST, 0, 0, 0},
-						{ HAZER_ID_WAAS_LAST, 0, 0, 0 },
+						{ HAZER_ID_SBAS_FIRST, 0, 0, 0},
+						{ HAZER_ID_SBAS_LAST, 0, 0, 0 },
 					},
 					2,
 					0,
@@ -307,9 +363,9 @@ int main(void)
     	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST + 2, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
     	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
 
-    	assert(hazer_map_svid_to_system(HAZER_ID_WAAS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_WAAS);
-    	assert(hazer_map_svid_to_system(HAZER_ID_WAAS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
-    	assert(hazer_map_svid_to_system(HAZER_ID_WAAS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_WAAS);
+    	assert(hazer_map_svid_to_system(HAZER_ID_SBAS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_SBAS);
+    	assert(hazer_map_svid_to_system(HAZER_ID_SBAS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
+    	assert(hazer_map_svid_to_system(HAZER_ID_SBAS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_SBAS);
 
     }
 

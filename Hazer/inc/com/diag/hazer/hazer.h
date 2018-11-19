@@ -268,9 +268,10 @@ typedef enum HazerSystem {
     HAZER_SYSTEM_GPS				= 1,
     HAZER_SYSTEM_GLONASS			= 2,
     HAZER_SYSTEM_GALILEO			= 3,
-	HAZER_SYSTEM_WAAS,
+	HAZER_SYSTEM_SBAS,
 	HAZER_SYSTEM_BEIDOU,
 	HAZER_SYSTEM_QZSS,
+	HAZER_SYSTEM_IMES,
     HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 
@@ -289,27 +290,62 @@ typedef enum HazerSystem {
 		"GPS", \
 		"GLONASS", \
 	    "GALILEO", \
-		"WAAS", \
+		"SBAS", \
 		"BEIDOU", \
 		"QZSS", \
+		"IMES", \
 		(const char *)0, \
 	}
 
 /**
  * GNSS satellite identifiers.
- * NMEA 0183 4.10 p. 94. and elsewhere.
+ * NMEA 0183 4.10 p. 94.
+ * UBLOX8 R15 p. 373.
+ * There are some conflicts between these documents, and the best receiver I
+ * have only does GPS, SBAS, and GLONASS, so much of this is guess work on
+ * my part.
  */
 typedef enum HazerId {
+	/*                        0,     */
 	HAZER_ID_GPS_FIRST		= 1,
 	HAZER_ID_GPS_LAST		= 32,
-	HAZER_ID_WAAS_FIRST		= 33,
-	HAZER_ID_WAAS_LAST		= 64,
+	HAZER_ID_SBAS_FIRST		= 33,
+	HAZER_ID_SBAS_LAST		= 64,
 	HAZER_ID_GLONASS_FIRST	= 65,
 	HAZER_ID_GLONASS_LAST	= 96,
+	/*						  97,    */
+	/*						   :     */
+	/*						  151,   */
+	HAZER_ID_SBASX_FIRST	= 152,
+	HAZER_ID_SBASX_LAST		= 158,
+	/*						  159,   */
+	/*						   :     */
+	/*						  172,   */
+	HAZER_ID_IMES_FIRST		= 173,
+	HAZER_ID_IMES_LAST		= 182,
+	/*						  183,   */
+	/*						   :     */
+	/*						  192,   */
 	HAZER_ID_QZSS_FIRST		= 193,
-	HAZER_ID_QZSS_LAST		= 200,
-	HAZER_ID_BEIDOU_FIRST	= 201,
-	HAZER_ID_BEIDOU_LAST	= 235,
+	HAZER_ID_QZSS_LAST		= 197,
+	/*						  198,   */
+	/*						   :     */
+	/*						  200,   */
+	HAZER_ID_BEIDOU1_FIRST	= 201,
+	HAZER_ID_BEIDOU1_LAST	= 235,
+	/*						  236,   */
+	/*						   :     */
+	/*						  300,   */
+	HAZER_ID_GALILEO_FIRST	= 301,
+	HAZER_ID_GALILEO_LAST	= 336,
+	/*						  337,   */
+	/*						   :     */
+	/*						  400,   */
+	HAZER_ID_BEIDOU2_FIRST	= 401,
+	HAZER_ID_BEIDOU2_LAST	= 437,
+	/*						  438,   */
+	/*						   :     */
+	/*						  65535, */
 } hazer_id_t;
 
 /**
@@ -733,6 +769,13 @@ typedef struct HazerActive {
  * @return 0 for success, <0 otherwise.
  */
 extern int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count);
+
+/**
+ * Map a single satellite identifier to a system.
+ * @param id is the satellite it.
+ * @return an index of the system of SYSTEM TOTAL if N/A.
+ */
+extern hazer_system_t hazer_map_id_to_system(uint16_t id);
 
 /**
  * Return a system given a list of active satellites. This is based on the
