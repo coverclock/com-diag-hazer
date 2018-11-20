@@ -65,7 +65,9 @@ extern int yodel_finalize(void);
  ******************************************************************************/
 
 /**
- * UBlox, p.73
+ * Yodel constants.
+ * UBlox 7, p.73
+ * UBlox 8 R15, p. 134
  */
 enum YodelUbx {
 	YODEL_UBX_SYNC_1		= 0,	/* Always 0xb5. */
@@ -134,6 +136,8 @@ typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((a
 
 /**
  * This is the structure of the header on every UBX packet.
+ * UBlox 7, p.73
+ * UBlox 8 R15, p. 134
  */
 typedef struct YodelHeader {
 	uint8_t yodel_sync_1;		/* 0xb5 */
@@ -193,5 +197,27 @@ extern const void * yodel_checksum(const void * buffer, size_t size, uint8_t * c
  * @return the length of the packet in bytes or <0 if an error occurred.
  */
 extern ssize_t yodel_length(const void * buffer, size_t size);
+
+/*******************************************************************************
+ * UBX PACKET FORMATS
+ ******************************************************************************/
+
+/**
+ * UBX_MON_HW can be used to detect jamming.
+ * Ublox 8 R15, p. 285-286.
+ * (0x0A, 0x09) [60]
+ */
+typedef struct YodelPayloadUbxMonHw {
+
+} yodel_payload_ubx_mon_hw_t __attribute__ ((aligned (2)));
+
+/**
+ * UBX_NAV_STATUS can be used to detect spoofing.
+ * Ublox 8 R15, p. 316-318.
+ * (0x01, 0x03) [16]
+ */
+typedef struct YodelPayloadUbxNavStatus {
+
+} yodel_payload_ubx_nav_status_t __attribute__ ((aligned (2)));
 
 #endif

@@ -1550,8 +1550,6 @@ int main(int argc, char * argv[])
 
         /**
          ** PROCESS
-         **
-         ** (Currently) we only process NMEA sentences.
          **/
 
         if (format == NMEA) {
