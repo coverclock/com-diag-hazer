@@ -125,17 +125,9 @@ typedef enum YodelAction {
 } yodel_action_t;
 
 /**
- * This buffer is large enough to contain the largest UBX packet,
- * plus a trailing NUL (and then some), aligned so that we can lay
- * a UBX structure on top of it. (My experience decoding binary UBX
- * packets in hex dumps suggests that - remarkabably - the eight byte
- * fields, e.g. floating point numbers, are typically half-word aligned,
- * not double-word aligned.)
- */
-typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (2))); /* plus NUL */
-
-/**
- * This is the structure of the header on every UBX packet.
+ * This is the structure of the header on every UBX packet. Its size is
+ * awkward because it's not a multiple of four bytes, but many of the UBX
+ * payloads begin with a four byte integer or worse.
  * UBlox 7, p.73
  * UBlox 8 R15, p. 134
  */
@@ -149,6 +141,31 @@ typedef struct YodelHeader {
 } yodel_header_t __attribute__ ((aligned (2)));
 
 /**
+ * This buffer is large enough to contain the largest UBX packet,
+ * plus a trailing NUL, and then some, aligned so that we can lay
+ * a UBX structure on top of it. My experience decoding binary UBX
+ * packets in hex dumps suggests that - remarkabably - the four and
+ * eight byte fields - integers, floating point numbers - are typically
+ * half-word aligned. The NUL at the end is useless in the UBX binary
+ * protocol, but is useful in some edge cases in which the data format
+ * has not yet been determined (e.g. incoming UDP datagrams).
+ */
+typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (2)));
+
+/**
+ * This is Yodel record into which UBX packets may be read. As stated
+ * previously, we go to a lot of work to try to align the payload following
+ * the header on a double word (eight byte) boundary.
+ */
+typedef struct YodelRecord {
+	uint16_t yodel_slack;
+	union {
+		yodel_header_t yodel_header;
+		yodel_buffer_t yodel_buffer;
+	} yodel_record;
+} yodel_record_t __attribute__ ((aligned (8)));
+
+/**
  * Process a single character of stimulus for the state machine that is
  * assembling a single UBX packet in the caller provided buffer. State
  * is maintained in a character pointer and a size variable, pointers to
@@ -160,7 +177,7 @@ typedef struct YodelHeader {
  * being equal to the standard I/O EOF. The END state indicates that a complete
  * NMEA sentence resides in the buffer. The pointer state variable points
  * past the end of the NUL-terminated sentence, the size state variable
- * contrains the size of the sentence including the terminating NUL;
+ * constrains the size of the sentence including the terminating NUL;
  * @param state is the prior state of the machine.
  * @param ch is the next character from the NMEA sentence stream.
  * @param buffer points to the beginning of the output buffer.
@@ -203,18 +220,16 @@ extern ssize_t yodel_length(const void * buffer, size_t size);
  ******************************************************************************/
 
 /**
- * UBX_MON_HW can be used to detect jamming.
+ * UBX-MON-HW (0x0A, 0x09) [60] can be used to detect jamming.
  * Ublox 8 R15, p. 285-286.
- * (0x0A, 0x09) [60]
  */
 typedef struct YodelPayloadUbxMonHw {
 
 } yodel_payload_ubx_mon_hw_t __attribute__ ((aligned (2)));
 
 /**
- * UBX_NAV_STATUS can be used to detect spoofing.
+ * UBX-NAV-STATUS (0x01, 0x03) [16] can be used to detect spoofing.
  * Ublox 8 R15, p. 316-318.
- * (0x01, 0x03) [16]
  */
 typedef struct YodelPayloadUbxNavStatus {
 

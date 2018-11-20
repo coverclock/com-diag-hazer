@@ -12,10 +12,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
-#if !defined(_BSD_SOURCE)
-#define _BSD_SOURCE
-#endif
-#include <endian.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 
@@ -615,38 +611,6 @@ int main(void)
 
     dop = hazer_parse_dop("100");
     assert(dop == 9999);
-
-    /**************************************************************************/
-
-    {
-    	yodel_header_t headers[2];
-
-    	assert(sizeof(yodel_header_t) == (YODEL_UBX_UNSUMMED + YODEL_UBX_SUMMED));
-
-    	assert(sizeof(headers) == (2 * sizeof(yodel_header_t)));
-    }
-
-    /**************************************************************************/
-
-    {
-    	union {
-    		yodel_buffer_t buffer;
-    		yodel_header_t header;
-    	} packet;
-
-    	packet.buffer[YODEL_UBX_SYNC_1] = YODEL_STIMULUS_SYNC_1;
-    	packet.buffer[YODEL_UBX_SYNC_2] = YODEL_STIMULUS_SYNC_2;
-    	packet.buffer[YODEL_UBX_CLASS] = 0xaa;
-    	packet.buffer[YODEL_UBX_ID] = 0x55;
-    	packet.buffer[YODEL_UBX_LENGTH_LSB] = 0xa5;
-    	packet.buffer[YODEL_UBX_LENGTH_MSB] = 0x5a;
-
-    	assert(packet.header.yodel_sync_1 == packet.buffer[YODEL_UBX_SYNC_1]);
-    	assert(packet.header.yodel_sync_2 == packet.buffer[YODEL_UBX_SYNC_2]);
-    	assert(packet.header.yodel_class == packet.buffer[YODEL_UBX_CLASS]);
-    	assert(packet.header.yodel_id == packet.buffer[YODEL_UBX_ID]);
-    	assert(le16toh(packet.header.yodel_length) == 0x5aa5);
-    }
 
     /**************************************************************************/
 
