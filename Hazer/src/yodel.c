@@ -89,7 +89,7 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
 
     case YODEL_STATE_START:
     	if (ch == YODEL_STIMULUS_SYNC_1) {
-            DEBUG("UBX 0x%x.\n", ch);
+            DEBUG("UBX 0x%02x.\n", ch);
             state = YODEL_STATE_SYNC_2;
             action = YODEL_ACTION_SAVE;
             *bp = (char *)buffer;
@@ -122,7 +122,7 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
     	 * Ublox8, p. 134: "little endian"
     	 */
     	*lp = ((unsigned)ch); /* LSB */
-        DEBUG("LENGTH1 0x%x %zu.\n", ch, *lp);
+        DEBUG("LENGTH1 0x%02x %zu.\n", ch, *lp);
 		state = YODEL_STATE_LENGTH_2;
 		action = YODEL_ACTION_SAVE;
     	break;
@@ -132,7 +132,7 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
     	 * Ublox8, p. 134: "little endian"
     	 */
     	*lp |= ((unsigned)ch) << 8; /* MSB */
-        DEBUG("LENGTH2 0x%x %zu.\n", ch, *lp);
+        DEBUG("LENGTH2 0x%02x %zu.\n", ch, *lp);
 		state = YODEL_STATE_PAYLOAD;
 		action = YODEL_ACTION_SAVE;
     	break;
@@ -157,7 +157,7 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
     	break;
 
     case YODEL_STATE_END:
-        DEBUG("END 0x%x!\n", ch);
+        DEBUG("END 0x%02x!\n", ch);
         break;
 
     /*
@@ -173,14 +173,14 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
     switch (action) {
 
     case YODEL_ACTION_SKIP:
-    	DEBUG("SKIP 0x%x?\n", ch);
+    	DEBUG("SKIP 0x%02x?\n", ch);
         break;
 
     case YODEL_ACTION_SAVE:
         if ((*sp) > 0) {
             *((*bp)++) = ch;
             (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", ch);
+            DEBUG("SAVE 0x%02x.\n", ch);
         } else {
             state = YODEL_STATE_START;
             DEBUG("LONG!\n");
@@ -196,10 +196,10 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
         if ((*sp) > 1) {
             *((*bp)++) = ch;
             (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", ch);
+            DEBUG("SAVE 0x%02x.\n", ch);
             *((*bp)++) = '\0';
             (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", '\0');
+            DEBUG("SAVE 0x%02x.\n", '\0');
             (*sp) = size - (*sp);
         } else {
             state = YODEL_STATE_START;

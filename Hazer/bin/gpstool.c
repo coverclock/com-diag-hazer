@@ -341,10 +341,10 @@ static void print_views(FILE *fp, const hazer_view_t va[])
  * Print the local (Juliet) time.
  * @param fp points to the FILE stream.
  * @param jamming is the jamming status character from UBX8 FW18+.
- * @param jammed is the carrier wave scaled jamming indicator 0..255.
+ * @param narrow is the narrowband scaled jamming indicator 0..255.
  * @param spoofing is the spoofing status character from UBX8 FW18+.
  */
-static void print_local(FILE * fp, char jamming, uint8_t jammed, char spoofing)
+static void print_local(FILE * fp, char jamming, uint8_t narrow, char spoofing)
 {
     int year = 0;
     int month = 0;
@@ -416,7 +416,14 @@ static void print_local(FILE * fp, char jamming, uint8_t jammed, char spoofing)
 	hour = offset / 3600;
 	fprintf(fp, "%+2.2d%c", hour, zone);
 
-	fprintf(fp, " %cjam %3ucw %cspoof", jamming, jammed, spoofing);
+	/*
+	 * Indicate detection of broadband or continuous wave (cw) jamming, or of
+	 * spoofing (done by comparing activity between multiple GNSS systems).
+	 * Relies on support from later versions of Ublox 8 firmware, and must be
+	 * explicitly enabled by sending appropriate messages to the GPS device.
+	 */
+
+	fprintf(fp, " %cjam %3unarrow %cspoof", jamming, narrow, spoofing);
 
     fputc('\n', fp);
 }
@@ -898,8 +905,8 @@ int main(int argc, char * argv[])
 	size_t limitation = 0;
 	status_t jamming = STATUS;
 	status_t jammingold = STATUS;
-	uint8_t jammed = 0;
-	uint8_t jammedold = 0;
+	uint8_t narrow = 0;
+	uint8_t narrowold = 0;
 	status_t spoofing = STATUS;
 	status_t spoofingold = STATUS;
     /*
@@ -1768,6 +1775,10 @@ int main(int argc, char * argv[])
         	if (yodel_ubx_mon_hw(&hardware, &ubx_header, length) == 0) {
         		uint8_t value;
 
+        		/*
+        		 *
+        		 */
+
         		value = (hardware.flags >> YODEL_UBX_MON_HW_flags_jammingState_SHIFT) & YODEL_UBX_MON_HW_flags_jammingState_MASK;
         		switch (value) {
         		case YODEL_UBX_MON_HW_flags_jammingState_unknown:
@@ -1787,21 +1798,30 @@ int main(int argc, char * argv[])
         			break;
         		}
 
-        		jammed = hardware.jamInd;
+        		narrow = hardware.jamInd;
 
         		if (jamming != jammingold) {
-    			    fprintf(errfp, "%s: UBX JAMMING %u CARRIER %u\n", program, value, jammed);
+    			    fprintf(errfp, "%s: UBX JAMMING %u CARRIER %u\n", program, value, narrow);
         			refresh = !0;
         		}
         		jammingold = jamming;
 
-        		if (jammed != jammedold) {
+        		if (narrow != narrowold) {
         			refresh = !0;
         		}
-        		jammedold = jammed;
+        		narrowold = narrow;
 
         	} else if (yodel_ubx_nav_status(&status, &ubx_header, length) == 0) {
         		uint8_t value;
+
+        		/*
+        		 * Ublox 8 FW18+ can only detect spoofing by comparing position
+        		 * fixes from more than one constellation, e.g. GPS and GLONASS.
+        		 * If both are spoofed, or if only one position fix is
+        		 * available (for example, one of the constellations is being
+        		 * jammed), spoofing detection is not possible.
+        		 * [Ublox8 R15 p. 63, p. 318]
+        		 */
 
         		value = (status.flags2 >> YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT) & YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK;
 
@@ -1886,7 +1906,7 @@ int main(int argc, char * argv[])
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
-				print_local(outfp, jamming, jammed, spoofing);
+				print_local(outfp, jamming, narrow, spoofing);
 				print_positions(outfp, position, tmppps, dmyokay, totokay);
 				print_actives(outfp, active);
 				print_views(outfp, view);

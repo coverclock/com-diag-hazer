@@ -15,6 +15,7 @@
 # UBX-CFG-MSG [3] UBX-TIM-TM2 @1Hz
 # UBX-CFG-MSG [3] UBX-MON-HW @1Hz (ublox8 > fw18)
 # UBX-CFG-MSG [3] UBX-NAV-STATUS @1Hz (ublox8 > fw18)
+# UBX-CFG-ITFM [8] LE(0x96b15600) LE(0x0000631e)
 # UBX-MON-VER [0]
 # UBX-CFG-DAT [0]
 # UBX-CFG-TPS [0]
@@ -32,6 +33,7 @@ COMMANDS='
     "\\xb5\\x62\\x06\\x01\\x03\\x00\\x0d\\x03\\x01"
     "\\xb5\\x62\\x06\\x01\\x03\\x00\\x0a\\x09\\x01"
     "\\xb5\\x62\\x06\\x01\\x03\\x00\\x01\\x03\\x01"
+    "\\xb5\\x62\\x06\\x39\\x08\\x00\\x00\\x56\\xb1\\x96\\x1e\\x63\\x00\\x00"
     "\\xb5\\x62\\x0a\\x04\\x00\\x00"
     "\\xb5\\x62\\x06\\x06\\x00\\x00"
     "\\xb5\\x62\\x06\\x31\\x00\\x00"
