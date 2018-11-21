@@ -840,7 +840,7 @@ int main(int argc, char * argv[])
     uint8_t nmea_ck = 0;
     yodel_state_t ubx_state = YODEL_STATE_EOF;
     yodel_record_t ubx_record = { 0 };
-#define ubx_buffer ubx_record.record.buffer
+#define ubx_buffer ubx_record.data.buffer
     char * ubx_bb = (char *)0;
     size_t ubx_ss = 0;
     size_t ubx_ll = 0;
@@ -1747,59 +1747,6 @@ int main(int argc, char * argv[])
 
 			}
 
-			/*
-			 * If anything was updated, refresh our display.
-			 */
-
-			if (!refresh) {
-                /* Do nothing. */
-            } else if (frequency && (was == now)) {
-                /* Do nothing. */
-            } else {
-				if (escape) { fputs("\033[3;1H", outfp); }
-				if (report) {
-					DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-						tmppps = onepps;
-						onepps = 0;
-					DIMINUTO_CRITICAL_SECTION_END;
-					print_local(outfp);
-					print_positions(outfp, position, tmppps, dmyokay, totokay);
-					print_actives(outfp, active);
-					print_views(outfp, view);
-				}
-				if (escape) { fputs("\033[0J", outfp); }
-				if (report) { fflush(outfp); }
-		        refresh = 0;
-			}
-
-			/*
-			 * We only output NMEA sentences to a device, and even then
-			 * we output the regenerated sentence, not the original one.
-			 * Note that this can only be done if we got the original
-			 * sentence over the IP UDP port or from standard input, because
-			 * that's the only circumstances in which we interpret DEVICE this
-			 * way. Finally, time must monotonically increase (UDP can reorder
-			 * packets), and we have to have gotten an RMC sentence to set the
-			 * date before we forward fixes; doing anything else confuses
-			 * Google Earth, and perhaps other applications.
-			 */
-
-			if (!output) {
-				/* Do nothing. */
-			} else if (!dmyokay) {
-				/* Do nothing. */
-			} else if (!totokay) {
-				/* Do nothing. */
- 			} else if (fputs(synthesized, devfp) == EOF) {
-                fprintf(errfp, "%s: OUT!\n", program);
-                break;
-            } else if (fflush(devfp) == EOF) {
-                fprintf(errfp, "%s: OUT!\n", program);
-                break;
-            } else {
-                /* Do nothing. */
-			}
-
         } else if (format == UBX) {
 
         	if (verbose) { diminuto_dump(errfp, buffer, length); }
@@ -1809,6 +1756,61 @@ int main(int argc, char * argv[])
         	/* Do nothing. */
 
         }
+
+		/*
+		 * We only output NMEA sentences to a device, and even then
+		 * we output the regenerated sentence, not the original one.
+		 * Note that this can only be done if we got the original
+		 * sentence over the IP UDP port or from standard input, because
+		 * that's the only circumstances in which we interpret DEVICE this
+		 * way. Finally, time must monotonically increase (UDP can reorder
+		 * packets), and we have to have gotten an RMC sentence to set the
+		 * date before we forward fixes; doing anything else confuses
+		 * Google Earth, and perhaps other applications.
+		 */
+
+		if (!output) {
+			/* Do nothing. */
+		} else if (format != NMEA) {
+			/* Do nothing. */
+		} else if (!dmyokay) {
+			/* Do nothing. */
+		} else if (!totokay) {
+			/* Do nothing. */
+		} else if (fputs(synthesized, devfp) == EOF) {
+            fprintf(errfp, "%s: OUT!\n", program);
+            break;
+        } else if (fflush(devfp) == EOF) {
+            fprintf(errfp, "%s: OUT!\n", program);
+            break;
+        } else {
+            /* Do nothing. */
+		}
+
+		/*
+		 * If anything was updated, refresh our display.
+		 */
+
+		if (!refresh) {
+            /* Do nothing. */
+        } else if (frequency && (was == now)) {
+            /* Do nothing. */
+        } else {
+			if (escape) { fputs("\033[3;1H", outfp); }
+			if (report) {
+				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+					tmppps = onepps;
+					onepps = 0;
+				DIMINUTO_CRITICAL_SECTION_END;
+				print_local(outfp);
+				print_positions(outfp, position, tmppps, dmyokay, totokay);
+				print_actives(outfp, active);
+				print_views(outfp, view);
+			}
+			if (escape) { fputs("\033[0J", outfp); }
+			if (report) { fflush(outfp); }
+	        refresh = 0;
+		}
 
     }
 

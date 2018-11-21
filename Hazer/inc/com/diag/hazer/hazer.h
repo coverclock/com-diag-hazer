@@ -113,7 +113,7 @@ extern int hazer_finalize(void);
 /**
  * NMEA 0183, 4.10, 5.3
  */
-enum HazerGnss {
+enum HazerGnssConstants {
     HAZER_GNSS_SATELLITES   = 32,	/* Per constellation or system. */
     HAZER_GNSS_VIEWS        = 4,	/* Per NMEA GSV message. */
     HAZER_GNSS_ACTIVES		= 12,	/* Per NMEA GSA message. */
@@ -134,7 +134,7 @@ enum HazerGnss {
  * The NaviSys GR-701W with the uBlox-7 chipset emits proprietary
  * PUBX messages longer than the NMEA spec.
  */
-enum HazerNmea {
+enum HazerNmeaConstants {
     HAZER_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
     HAZER_NMEA_LONGEST     = 512, /* Adjusted. */
     HAZER_NMEA_TALKER      = sizeof("GP") - 1,
