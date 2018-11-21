@@ -299,7 +299,7 @@ ssize_t yodel_length(const void * buffer, size_t size)
  *
  ******************************************************************************/
 
-int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, yodel_ubx_header_t * hp, ssize_t length)
+int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const yodel_ubx_header_t * hp, ssize_t length)
 {
 	int rc = -1;
 
@@ -317,7 +317,7 @@ int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, yodel_ubx_header_t * hp, ssize_t l
 	return rc;
 }
 
-int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, yodel_ubx_header_t * hp, ssize_t length)
+int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const yodel_ubx_header_t * hp, ssize_t length)
 {
 	int rc = -1;
 

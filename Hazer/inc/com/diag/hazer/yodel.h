@@ -275,7 +275,14 @@ enum YodelUbxMonHwFlagsJammingState {
 	YODEL_UBX_MON_HW_flags_jammingState_critical	= 3,
 };
 
-extern int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, yodel_ubx_header_t * hp, ssize_t length);
+/**
+ * Process a possible UBX-MON-HW message.
+ * @param mp points to a UBX-MON-HW structure in which to save the payload.
+ * @param hp points to a UBX header and payload.
+ * @param length is the length of the UBX header and payload in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const yodel_ubx_header_t * hp, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-NAV_STATUS MESSAGES
@@ -356,6 +363,13 @@ enum YodelUbxNavStatusFLags2SpoolDetState {
 	YODEL_UBX_NAV_STATUS_flags2_spoofDetState_many		= 3,
 };
 
-extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, yodel_ubx_header_t * hp, ssize_t length);
+/**
+ * Process a possible UBX-NAV-STATUS message.
+ * @param mp points to a UBX-NAV-STATUS structure in which to save the payload.
+ * @param hp points to a UBX header and payload.
+ * @param length is the length of the UBX header and payload in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const yodel_ubx_header_t * hp, ssize_t length);
 
 #endif
