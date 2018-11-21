@@ -85,7 +85,7 @@ typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
 typedef enum Format { FORMAT = 0, NMEA = 1, UBX = 2 } format_t;
 
-typedef enum Status { STATUS = '*', UNKNOWN = '~', NONE = '-', WARNING = '?', CRITICAL = '!', INVALID = ' ' } status_t;
+typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*' } status_t;
 
 static const size_t LIMIT = 80 /* Legacy */ - 4 /* "XXX " */ - 6 /* "[NNN] " */ - 4 /* "\r\n" */ - 1 /* Wrap */;
 
