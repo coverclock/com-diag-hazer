@@ -839,7 +839,8 @@ int main(int argc, char * argv[])
     uint8_t nmea_cs = 0;
     uint8_t nmea_ck = 0;
     yodel_state_t ubx_state = YODEL_STATE_EOF;
-    yodel_buffer_t ubx_buffer = { 0 };
+    yodel_record_t ubx_record = { 0 };
+#define ubx_buffer ubx_record.record.buffer
     char * ubx_bb = (char *)0;
     size_t ubx_ss = 0;
     size_t ubx_ll = 0;

@@ -132,12 +132,12 @@ typedef enum YodelAction {
  * UBlox 8 R15, p. 134
  */
 typedef struct YodelHeader {
-	uint8_t yodel_sync_1;		/* 0xb5 */
-	uint8_t yodel_sync_2;		/* 0x62 */
-	uint8_t yodel_class;
-	uint8_t yodel_id;
-	uint16_t yodel_length;		/* Little endian. */
-	uint8_t yodel_payload[0];
+	uint8_t sync_1;		/* 0xb5 */
+	uint8_t sync_2;		/* 0x62 */
+	uint8_t class;
+	uint8_t	id;
+	uint16_t length;	/* little endian */
+	uint8_t payload[0];
 } yodel_header_t __attribute__ ((aligned (2)));
 
 /**
@@ -150,7 +150,7 @@ typedef struct YodelHeader {
  * protocol, but is useful in some edge cases in which the data format
  * has not yet been determined (e.g. incoming UDP datagrams).
  */
-typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (2)));
+typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (1)));
 
 /**
  * This is Yodel record into which UBX packets may be read. As stated
@@ -158,11 +158,11 @@ typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((a
  * the header on a double word (eight byte) boundary.
  */
 typedef struct YodelRecord {
-	uint16_t yodel_slack;
+	uint16_t slack;
 	union {
-		yodel_header_t yodel_header;
-		yodel_buffer_t yodel_buffer;
-	} yodel_record;
+		yodel_header_t header;
+		yodel_buffer_t buffer;
+	} record;
 } yodel_record_t __attribute__ ((aligned (8)));
 
 /**
@@ -216,23 +216,136 @@ extern const void * yodel_checksum(const void * buffer, size_t size, uint8_t * c
 extern ssize_t yodel_length(const void * buffer, size_t size);
 
 /*******************************************************************************
- * UBX PACKET FORMATS
+ * UBX MESSAGE FORMATS
  ******************************************************************************/
 
 /**
  * UBX-MON-HW (0x0A, 0x09) [60] can be used to detect jamming.
  * Ublox 8 R15, p. 285-286.
  */
-typedef struct YodelPayloadUbxMonHw {
+typedef struct YodelMonHw {
+	uint32_t pinSel;
+	uint32_t pinBank;
+	uint32_t pinDir;
+	uint32_t pinVal;
+	uint16_t noisePerMS;
+	uint16_t agcCnt;
+	uint8_t aStatus;
+	uint8_t aPower;
+	uint8_t flags;
+	uint8_t reserved1;
+	uint8_t VP[17];
+	uint8_t jamInd;
+	uint8_t reserved2[2];
+	uint32_t pinIrq;
+	uint32_t pullH;
+	uint32_t pullL;
+} yodel_mon_hw_t;
 
-} yodel_payload_ubx_mon_hw_t __attribute__ ((aligned (2)));
+enum YodelMonHwConstants {
+	YODEL_MON_HW_Class	= 0x0a,
+	YODEL_MON_HW_Id		= 0x09,
+	YODEL_MON_HW_Length	= 60,
+};
+
+enum YodelMonHwFlagsMasks {
+	YODEL_MON_HW_flags_rtcCalib_MASK		= 0x1,
+	YODEL_MON_HW_flags_safeBoot_MASK		= 0x1,
+	YODEL_MON_HW_flags_jammingState_MASK	= 0x3,
+	YODEL_MON_HW_flags_xtalAbsent_MASK		= 0x1,
+};
+
+enum YodelMonHwFlagsOffsets {
+	YODEL_MON_HW_flags_rtcCalib_OFFSET		= 0,
+	YODEL_MON_HW_flags_safeBoot_OFFSET		= 1,
+	YODEL_MON_HW_flags_jammingState_OFFSET	= 2,
+	YODEL_MON_HW_flags_xtalAbsent_OFFSET	= 4,
+};
+
+enum YodelMonHwFlagsJammingState {
+	YODEL_MON_HW_flags_jammingState_unknown		= 0,
+	YODEL_MON_HW_flags_jammingState_none		= 1,
+	YODEL_MON_HW_flags_jammingState_warning		= 2,
+	YODEL_MON_HW_flags_jammingState_critical	= 3,
+};
+
+/******************************************************************************/
 
 /**
  * UBX-NAV-STATUS (0x01, 0x03) [16] can be used to detect spoofing.
  * Ublox 8 R15, p. 316-318.
  */
-typedef struct YodelPayloadUbxNavStatus {
+typedef struct YodelNavStatus {
+	uint32_t iTOW;
+	uint8_t gpsFix;
+	uint8_t flags;
+	uint8_t fixStat;
+	uint8_t flags2;
+	uint32_t ttff;
+	uint32_t msss;
+} yodel_nav_status_t;
 
-} yodel_payload_ubx_nav_status_t __attribute__ ((aligned (2)));
+enum YodelNavStatusConstants {
+	YODEL_NAV_STATUS_Class	= 0x01,
+	YODEL_NAV_STATUS_Id		= 0x03,
+	YODEL_NAV_STATUS_Length	= 16,
+};
+
+enum YodelNavStatusFlagsMasks {
+	YODEL_NAV_STATUS_flags_gpsFixOk_MASK	= 0x1,
+	YODEL_NAV_STATUS_flags_diffSoln_MASK	= 0x1,
+	YODEL_NAV_STATUS_flags_wknSet_MASK		= 0x1,
+	YODEL_NAV_STATUS_flags_towSet_MASK		= 0x1,
+};
+
+enum YodelNavStatusFlagsOffsets {
+	YODEL_NAV_STATUS_flags_gpsFixOk_OFFSET	= 0,
+	YODEL_NAV_STATUS_flags_diffSoln_OFFSET	= 1,
+	YODEL_NAV_STATUS_flags_wknSet_OFFSET	= 2,
+	YODEL_NAV_STATUS_flags_towSet_OFFSET	= 3,
+};
+
+enum YodelNavStatusFixStatMasks {
+	YODEL_NAV_STATUS_fixStat_diffCorr_MASK		= 0x1,
+	YODEL_NAV_STATUS_fixStat_mapMatching_MASK	= 0x3,
+};
+
+enum YodelNavStatusFixStatOffsets {
+	YODEL_NAV_STATUS_fixStat_diffCorr_OFFSET	= 0,
+	YODEL_NAV_STATUS_fixStat_mapMatching_OFFSET	= 6,
+};
+
+enum YodelNavStatusFixStatMapMatching {
+	YODEL_NAV_STATUS_fixStat_mapMatching_none			= 0,
+	YODEL_NAV_STATUS_fixStat_mapMatching_unused			= 1,
+	YODEL_NAV_STATUS_fixStat_mapMatching_applied		= 2,
+	YODEL_NAV_STATUS_fixStat_mapMatching_deadreckoning	= 3,
+};
+
+enum YodelNavStatusFlags2Masks {
+	YODEL_NAV_STATUS_flags2_psmState_MASK		= 0x3,
+	YODEL_NAV_STATUS_flags2_spoofDetState_MASK	= 0x3,
+};
+
+enum YodelNavStatusFlags2Offsets {
+	YODEL_NAV_STATUS_flags2_psmState_OFFSET			= 0,
+	YODEL_NAV_STATUS_flags2_spoofDetState_OFFSET	= 3,
+};
+
+enum YodelNavStatusFLags2PsmState {
+	YODEL_NAV_STATUS_flags2_psmState_acquisition	= 0,
+	YODEL_NAV_STATUS_flags2_psmState_nospoofing		= 1,
+	YODEL_NAV_STATUS_flags2_psmState_tracking		= 2,
+	YODEL_NAV_STATUS_flags2_psmState_inactive		= 3,
+};
+
+enum YodelNavStatusFLags2SpoolDetState {
+	YODEL_NAV_STATUS_flags2_spoofDetState_unknown	= 0,
+	YODEL_NAV_STATUS_flags2_spoofDetState_none		= 1,
+	YODEL_NAV_STATUS_flags2_spoofDetState_one		= 2,
+	YODEL_NAV_STATUS_flags2_spoofDetState_many		= 3,
+};
+
+/******************************************************************************/
 
 #endif

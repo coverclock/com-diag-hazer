@@ -40,18 +40,18 @@ int main(void)
 
     	assert(sizeof(record) >= sizeof(yodel_buffer_t));
 
-    	record.yodel_record.yodel_buffer[YODEL_UBX_SYNC_1] = YODEL_STIMULUS_SYNC_1;
-    	record.yodel_record.yodel_buffer[YODEL_UBX_SYNC_2] = YODEL_STIMULUS_SYNC_2;
-    	record.yodel_record.yodel_buffer[YODEL_UBX_CLASS] = 0xaa;
-    	record.yodel_record.yodel_buffer[YODEL_UBX_ID] = 0x55;
-    	record.yodel_record.yodel_buffer[YODEL_UBX_LENGTH_LSB] = 0xa5;
-    	record.yodel_record.yodel_buffer[YODEL_UBX_LENGTH_MSB] = 0x5a;
+    	record.record.buffer[YODEL_UBX_SYNC_1] = YODEL_STIMULUS_SYNC_1;
+    	record.record.buffer[YODEL_UBX_SYNC_2] = YODEL_STIMULUS_SYNC_2;
+    	record.record.buffer[YODEL_UBX_CLASS] = 0xaa;
+    	record.record.buffer[YODEL_UBX_ID] = 0x55;
+    	record.record.buffer[YODEL_UBX_LENGTH_LSB] = 0xa5;
+    	record.record.buffer[YODEL_UBX_LENGTH_MSB] = 0x5a;
 
-    	assert(record.yodel_record.yodel_header.yodel_sync_1 == record.yodel_record.yodel_buffer[YODEL_UBX_SYNC_1]);
-    	assert(record.yodel_record.yodel_header.yodel_sync_2 == record.yodel_record.yodel_buffer[YODEL_UBX_SYNC_2]);
-    	assert(record.yodel_record.yodel_header.yodel_class == record.yodel_record.yodel_buffer[YODEL_UBX_CLASS]);
-    	assert(record.yodel_record.yodel_header.yodel_id == record.yodel_record.yodel_buffer[YODEL_UBX_ID]);
-    	assert(le16toh(record.yodel_record.yodel_header.yodel_length) == 0x5aa5);
+    	assert(record.record.header.sync_1 == record.record.buffer[YODEL_UBX_SYNC_1]);
+    	assert(record.record.header.sync_2 == record.record.buffer[YODEL_UBX_SYNC_2]);
+    	assert(record.record.header.class == record.record.buffer[YODEL_UBX_CLASS]);
+    	assert(record.record.header.id == record.record.buffer[YODEL_UBX_ID]);
+    	assert(le16toh(record.record.header.length) == 0x5aa5);
     }
 
     /**************************************************************************/
@@ -67,6 +67,9 @@ int main(void)
     	assert(offsetof(struct Structure, offset) == 0);
     	assert(offsetof(struct Structure, record) == 8);
 
+    	assert((offsetof(struct Structure, record.record.header.length) % 2) == 0);
+    	assert((offsetof(struct Structure, record.record.header.payload) % 8) == 0);
+
     	assert(sizeof(structure) > (sizeof(structure.offset) + sizeof(structure.record)));
 
     	pointer = &(structure);
@@ -79,19 +82,19 @@ int main(void)
     	integer1 &= 8 - 1;
     	assert(integer1 == 0);
 
-    	pointer = &(structure.record.yodel_record.yodel_header.yodel_length);
+    	pointer = &(structure.record.record.header.length);
     	integer1 = (uintptr_t)pointer;
     	integer1 &= 2 - 1;
     	assert(integer1 == 0);
 
-    	pointer = &(structure.record.yodel_record.yodel_header.yodel_payload[0]);
+    	pointer = &(structure.record.record.header.payload[0]);
     	integer1 = (uintptr_t)pointer;
     	integer1 &= 8 - 1;
     	assert(integer1 == 0);
 
-    	pointer = &(structure.record.yodel_record.yodel_header);
+    	pointer = &(structure.record.record.header);
     	integer1 = (uintptr_t)pointer;
-    	pointer = &(structure.record.yodel_record.yodel_buffer);
+    	pointer = &(structure.record.record.buffer);
     	integer2 = (uintptr_t)pointer;
     	assert(integer1 == integer2);
 
