@@ -167,7 +167,7 @@ typedef struct YodelRecord {
 	union {
 		yodel_ubx_header_t header;
 		yodel_buffer_t buffer;
-	} data;
+	} message;
 } yodel_record_t __attribute__ ((aligned (8)));
 
 /**
@@ -221,7 +221,7 @@ extern const void * yodel_checksum(const void * buffer, size_t size, uint8_t * c
 extern ssize_t yodel_length(const void * buffer, size_t size);
 
 /*******************************************************************************
- * UBX MESSAGE FORMATS
+ * PROCESSING UBX-MON-HW MESSAGES
  ******************************************************************************/
 
 /**
@@ -239,6 +239,7 @@ typedef struct YodelUbxMonHw {
 	uint8_t aPower;
 	uint8_t flags;
 	uint8_t reserved1;
+	uint32_t usedMask;
 	uint8_t VP[17];
 	uint8_t jamInd;
 	uint8_t reserved2[2];
@@ -274,7 +275,11 @@ enum YodelUbxMonHwFlagsJammingState {
 	YODEL_UBX_MON_HW_flags_jammingState_critical	= 3,
 };
 
-/******************************************************************************/
+extern int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, yodel_ubx_header_t * hp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-NAV_STATUS MESSAGES
+ ******************************************************************************/
 
 /**
  * UBX-NAV-STATUS (0x01, 0x03) [16] can be used to detect spoofing.
@@ -351,6 +356,6 @@ enum YodelUbxNavStatusFLags2SpoolDetState {
 	YODEL_UBX_NAV_STATUS_flags2_spoofDetState_many		= 3,
 };
 
-/******************************************************************************/
+extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, yodel_ubx_header_t * hp, ssize_t length);
 
 #endif

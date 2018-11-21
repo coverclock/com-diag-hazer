@@ -294,3 +294,44 @@ ssize_t yodel_length(const void * buffer, size_t size)
 
        return result;
 }
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
+int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, yodel_ubx_header_t * hp, ssize_t length)
+{
+	int rc = -1;
+
+	if (hp->class != YODEL_UBX_MON_HW_Class) {
+		/* Do nothing. */
+	} else if (hp->id != YODEL_UBX_MON_HW_Id) {
+		/* Do nothing. */
+	} else if (length != (YODEL_UBX_MON_HW_Length + YODEL_UBX_SHORTEST)) {
+		/* Do nothing. */
+	} else {
+		memcpy(mp, &(hp->payload), sizeof(*mp));
+		rc = 0;
+	}
+
+	return rc;
+}
+
+int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, yodel_ubx_header_t * hp, ssize_t length)
+{
+	int rc = -1;
+
+	if (hp->class != YODEL_UBX_NAV_STATUS_Class) {
+		/* Do nothing. */
+	} else if (hp->id != YODEL_UBX_NAV_STATUS_Id) {
+		/* Do nothing. */
+	} else if (length != (YODEL_UBX_NAV_STATUS_Length + YODEL_UBX_SHORTEST)) {
+		/* Do nothing. */
+	} else {
+		memcpy(mp, &(hp->payload), sizeof(*mp));
+		rc = 0;
+	}
+
+	return rc;
+}
+

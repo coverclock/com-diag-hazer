@@ -22,4 +22,4 @@ RATE=${2:-9600}
 DIR=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${DIR}
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0' 2>> ${DIR}/${PROGRAM}.log
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0' 2> ${DIR}/${PROGRAM}.log

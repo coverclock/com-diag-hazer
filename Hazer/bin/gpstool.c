@@ -830,7 +830,7 @@ int main(int argc, char * argv[])
     int onepps = 0;
     int tmppps = 0;
     /*
-     * Parser state variables.
+     * NMEA parser state variables.
      */
     hazer_state_t nmea_state = HAZER_STATE_EOF;
     hazer_buffer_t nmea_buffer = { 0 };
@@ -838,9 +838,13 @@ int main(int argc, char * argv[])
     size_t nmea_ss = 0;
     uint8_t nmea_cs = 0;
     uint8_t nmea_ck = 0;
+    /*
+     * UBX parser state variables.
+     */
     yodel_state_t ubx_state = YODEL_STATE_EOF;
     yodel_record_t ubx_record = { 0 };
-#define ubx_buffer ubx_record.data.buffer
+#define ubx_buffer ubx_record.message.buffer
+#define ubx_header ubx_record.message.header
     char * ubx_bb = (char *)0;
     size_t ubx_ss = 0;
     size_t ubx_ll = 0;
@@ -858,11 +862,16 @@ int main(int argc, char * argv[])
     hazer_vector_t vector = { 0 };
     format_t format = UNKNOWN;
     /*
-     * GNSS state databases.
+     * NMEA state databases.
      */
     hazer_position_t position[HAZER_SYSTEM_TOTAL] = { { 0 } };
     hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0 } };
     hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    /*
+     * UBX state databases.
+     */
+    yodel_ubx_mon_hw_t hardware = { 0 };
+    yodel_ubx_nav_status_t status = { 0 };
     /*
      * Miscellaneous working variables.
      */
@@ -1750,6 +1759,16 @@ int main(int argc, char * argv[])
         } else if (format == UBX) {
 
         	if (verbose) { diminuto_dump(errfp, buffer, length); }
+
+        	if (yodel_ubx_mon_hw(&hardware, &ubx_header, length) == 0) {
+
+        	} else if (yodel_ubx_nav_status(&status, &ubx_header, length) == 0) {
+
+        	} else {
+
+        		/* Do nothing. */
+
+        	}
 
         } else {
 
