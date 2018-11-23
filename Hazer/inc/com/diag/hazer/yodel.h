@@ -77,6 +77,30 @@ enum YodelUbxConstants {
 };
 
 /**
+ * This buffer is large enough to contain the largest UBX packet, plus a
+ * trailing NUL, and then some. The NUL at the end is useless in the UBX binary
+ * protocol, but is useful in some edge cases in which the data format has not
+ * yet been determined (e.g. incoming UDP datagrams).
+ */
+typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
+
+/**
+ * This is the structure of the header on every UBX packet. Its size is
+ * awkward because it's not a multiple of four bytes, but many of the UBX
+ * payloads begin with a four byte integer or worse.
+ * UBlox 7, p.73
+ * UBlox 8 R15, p. 134
+ */
+typedef struct YodelUbxHeader {
+	uint8_t sync_1;		/* 0xb5 */
+	uint8_t sync_2;		/* 0x62 */
+	uint8_t class;
+	uint8_t	id;
+	uint16_t length;	/* little endian */
+	uint8_t payload[0];
+} yodel_ubx_header_t __attribute__ ((__aligned__ (2)));
+
+/**
  * Yodel UBX offsets.
  * UBlox 7, p.73
  * UBlox 8 R15, p. 134
@@ -88,6 +112,7 @@ enum YodelUbxOffsets {
 	YODEL_UBX_ID			= 3,
 	YODEL_UBX_LENGTH_LSB	= 4,	/* 16-bit, little endian (LSB). */
 	YODEL_UBX_LENGTH_MSB 	= 5,	/* 16-bit, little endian (MSB). */
+	YODEL_UBX_PAYLOAD		= 6,
 };
 
 /**
@@ -128,47 +153,6 @@ typedef enum YodelAction {
     YODEL_ACTION_SAVE,
 	YODEL_ACTION_TERMINATE,
 } yodel_action_t;
-
-/**
- * This is the structure of the header on every UBX packet. Its size is
- * awkward because it's not a multiple of four bytes, but many of the UBX
- * payloads begin with a four byte integer or worse.
- * UBlox 7, p.73
- * UBlox 8 R15, p. 134
- */
-typedef struct YodelUbxHeader {
-	uint8_t sync_1;		/* 0xb5 */
-	uint8_t sync_2;		/* 0x62 */
-	uint8_t class;
-	uint8_t	id;
-	uint16_t length;	/* little endian */
-	uint8_t payload[0];
-} yodel_ubx_header_t __attribute__ ((aligned (2)));
-
-/**
- * This buffer is large enough to contain the largest UBX packet,
- * plus a trailing NUL, and then some, aligned so that we can lay
- * a UBX structure on top of it. My experience decoding binary UBX
- * packets in hex dumps suggests that - remarkabably - the four and
- * eight byte fields - integers, floating point numbers - are typically
- * half-word aligned. The NUL at the end is useless in the UBX binary
- * protocol, but is useful in some edge cases in which the data format
- * has not yet been determined (e.g. incoming UDP datagrams).
- */
-typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1]  __attribute__ ((aligned (1)));
-
-/**
- * This is Yodel record into which UBX packets may be read. As stated
- * previously, we go to a lot of work to try to align the payload following
- * the header on a double word (eight byte) boundary.
- */
-typedef struct YodelRecord {
-	uint16_t slack;
-	union {
-		yodel_ubx_header_t header;
-		yodel_buffer_t buffer;
-	} message;
-} yodel_record_t __attribute__ ((aligned (8)));
 
 /**
  * Process a single character of stimulus for the state machine that is
@@ -246,7 +230,7 @@ typedef struct YodelUbxMonHw {
 	uint32_t pinIrq;
 	uint32_t pullH;
 	uint32_t pullL;
-} yodel_ubx_mon_hw_t;
+} yodel_ubx_mon_hw_t __attribute__ ((__aligned__ (4)));
 
 enum YodelUbxMonHwConstants {
 	YODEL_UBX_MON_HW_Class	= 0x0a,
@@ -278,11 +262,11 @@ enum YodelUbxMonHwFlagsJammingState {
 /**
  * Process a possible UBX-MON-HW message.
  * @param mp points to a UBX-MON-HW structure in which to save the payload.
- * @param hp points to a UBX header and payload.
+ * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the UBX header and payload in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const yodel_ubx_header_t * hp, ssize_t length);
+extern int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-NAV_STATUS MESSAGES
@@ -300,7 +284,7 @@ typedef struct YodelUbxNavStatus {
 	uint8_t flags2;
 	uint32_t ttff;
 	uint32_t msss;
-} yodel_ubx_nav_status_t;
+} yodel_ubx_nav_status_t __attribute__ ((__aligned__ (4)));
 
 enum YodelUbxNavStatusConstants {
 	YODEL_UBX_NAV_STATUS_Class	= 0x01,
@@ -366,10 +350,10 @@ enum YodelUbxNavStatusFLags2SpoolDetState {
 /**
  * Process a possible UBX-NAV-STATUS message.
  * @param mp points to a UBX-NAV-STATUS structure in which to save the payload.
- * @param hp points to a UBX header and payload.
+ * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the UBX header and payload in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const yodel_ubx_header_t * hp, ssize_t length);
+extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ssize_t length);
 
 #endif

@@ -848,9 +848,7 @@ int main(int argc, char * argv[])
      * UBX parser state variables.
      */
     yodel_state_t ubx_state = YODEL_STATE_EOF;
-    yodel_record_t ubx_record = { 0 };
-#define ubx_buffer ubx_record.message.buffer
-#define ubx_header ubx_record.message.header
+    yodel_buffer_t ubx_buffer = { 0 };
     char * ubx_bb = (char *)0;
     size_t ubx_ss = 0;
     size_t ubx_ll = 0;
@@ -878,6 +876,14 @@ int main(int argc, char * argv[])
      */
     yodel_ubx_mon_hw_t hardware = { 0 };
     yodel_ubx_nav_status_t status = { 0 };
+    uint8_t hardware_ticks = 0;
+	status_t jamming = STATUS;
+	status_t jammingold = STATUS;
+	uint8_t narrow = 0;
+	uint8_t narrowold = 0;
+    uint8_t status_ticks = 0;
+	status_t spoofing = STATUS;
+	status_t spoofingold = STATUS;
     /*
      * Miscellaneous working variables.
      */
@@ -903,12 +909,6 @@ int main(int argc, char * argv[])
 	int dmyokay = 0;
 	int totokay = 0;
 	size_t limitation = 0;
-	status_t jamming = STATUS;
-	status_t jammingold = STATUS;
-	uint8_t narrow = 0;
-	uint8_t narrowold = 0;
-	status_t spoofing = STATUS;
-	status_t spoofingold = STATUS;
     /*
      * External symbols.
      */
@@ -1677,6 +1677,22 @@ int main(int argc, char * argv[])
 	        			view[index].ticks -= elapsed;
 	        		}
 
+	        		if (hardware_ticks == 0) {
+	        			/* Do nothing. */
+	        		} else if (hardware_ticks <= elapsed) {
+	        			hardware_ticks = 0;
+	        		} else {
+	        			hardware_ticks -= elapsed;
+	        		}
+
+	        		if (status_ticks == 0) {
+	        			/* Do nothing. */
+	        		} else if (status_ticks <= elapsed) {
+	        			status_ticks = 0;
+	        		} else {
+	        			status_ticks -= elapsed;
+	        		}
+
 	        	}
 	        }
 
@@ -1772,7 +1788,7 @@ int main(int argc, char * argv[])
 
         	if (verbose) { diminuto_dump(errfp, buffer, length); }
 
-        	if (yodel_ubx_mon_hw(&hardware, &ubx_header, length) == 0) {
+        	if (yodel_ubx_mon_hw(&hardware, ubx_buffer, length) == 0) {
         		uint8_t value;
 
         		/*
@@ -1802,16 +1818,18 @@ int main(int argc, char * argv[])
 
         		if (jamming != jammingold) {
     			    fprintf(errfp, "%s: UBX JAMMING %u CARRIER %u\n", program, value, narrow);
-        			refresh = !0;
+            		refresh = !0;
         		}
         		jammingold = jamming;
 
         		if (narrow != narrowold) {
-        			refresh = !0;
+            		refresh = !0;
         		}
         		narrowold = narrow;
 
-        	} else if (yodel_ubx_nav_status(&status, &ubx_header, length) == 0) {
+        		hardware_ticks = timeout;
+
+        	} else if (yodel_ubx_nav_status(&status, ubx_buffer, length) == 0) {
         		uint8_t value;
 
         		/*
@@ -1848,6 +1866,8 @@ int main(int argc, char * argv[])
         			refresh = !0;
         		}
         		spoofingold = spoofing;
+
+        		status_ticks = timeout;
 
         	} else {
 

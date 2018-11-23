@@ -17,7 +17,7 @@
 # UBX-CFG-MSG [3] UBX-TIM-TM2 @1Hz
 # UBX-CFG-MSG [3] UBX-MON-HW @1Hz (ublox8 > fw18)
 # UBX-CFG-MSG [3] UBX-NAV-STATUS @1Hz (ublox8 > fw18)
-# UBX-CFG-ITFM [8] LE(0x96b156f7) LE(0x0000631e) (dB fields are signed?)
+# UBX-CFG-ITFM [8] LE(0x96b156YX) LE(0x0000631e) (X[4]=BBthresh, Y[5]=CWthresh dB signed?)
 # UBX-MON-VER [0]
 # UBX-CFG-DAT [0]
 # UBX-CFG-TPS [0]
