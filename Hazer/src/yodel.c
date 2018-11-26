@@ -299,29 +299,6 @@ ssize_t yodel_length(const void * buffer, size_t size)
  *
  ******************************************************************************/
 
-#if !defined(_BSD_SOURCE)
-#define _BSD_SOURCE
-#endif
-#include <endian.h>
-
-#define CONVERT(_FIELD_) \
-	do { \
-		switch (sizeof(_FIELD_)) { \
-		case sizeof(uint32_t): \
-			_FIELD_ = le32toh(_FIELD_); \
-			break; \
-		case sizeof(uint16_t): \
-			_FIELD_ = le16toh(_FIELD_); \
-			break; \
-		default: \
-			break; \
-		} \
-	} while (0)
-
-/******************************************************************************
- *
- ******************************************************************************/
-
 int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length)
 {
 	int rc = -1;
@@ -335,16 +312,16 @@ int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length)
 		/* Do nothing. */
 	} else {
 		memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
-		CONVERT(mp->pinSel);
-		CONVERT(mp->pinBank);
-		CONVERT(mp->pinDir);
-		CONVERT(mp->pinVal);
-		CONVERT(mp->noisePerMS);
-		CONVERT(mp->agcCnt);
-		CONVERT(mp->usedMask);
-		CONVERT(mp->pinIrq);
-		CONVERT(mp->pullH);
-		CONVERT(mp->pullL);
+		COM_DIAG_YODEL_LETOH(mp->pinSel);
+		COM_DIAG_YODEL_LETOH(mp->pinBank);
+		COM_DIAG_YODEL_LETOH(mp->pinDir);
+		COM_DIAG_YODEL_LETOH(mp->pinVal);
+		COM_DIAG_YODEL_LETOH(mp->noisePerMS);
+		COM_DIAG_YODEL_LETOH(mp->agcCnt);
+		COM_DIAG_YODEL_LETOH(mp->usedMask);
+		COM_DIAG_YODEL_LETOH(mp->pinIrq);
+		COM_DIAG_YODEL_LETOH(mp->pullH);
+		COM_DIAG_YODEL_LETOH(mp->pullL);
 		rc = 0;
 	}
 
@@ -364,9 +341,9 @@ int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ssize_t l
 		/* Do nothing. */
 	} else {
 		memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
-		CONVERT(mp->iTOW);
-		CONVERT(mp->ttff);
-		CONVERT(mp->msss);
+		COM_DIAG_YODEL_LETOH(mp->iTOW);
+		COM_DIAG_YODEL_LETOH(mp->ttff);
+		COM_DIAG_YODEL_LETOH(mp->msss);
 		rc = 0;
 	}
 

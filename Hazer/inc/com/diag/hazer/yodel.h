@@ -416,4 +416,34 @@ typedef struct YodelStatus {
     uint8_t unused[3];
 } yodel_status_t;
 
+/******************************************************************************
+ * ENDIAN CONVERSION
+ ******************************************************************************/
+
+#if !defined(_BSD_SOURCE)
+#define _BSD_SOURCE
+#endif
+#include <endian.h>
+
+/**
+ * @def COM_DIAG_YODEL_LETOH
+ * Convert variable @a _FIELD_ from Little Endian byte order to host byte order.
+ */
+#define COM_DIAG_YODEL_LETOH(_FIELD_) \
+	do { \
+		switch (sizeof(_FIELD_)) { \
+		case sizeof(uint16_t): \
+			_FIELD_ = le16toh(_FIELD_); \
+			break; \
+		case sizeof(uint32_t): \
+			_FIELD_ = le32toh(_FIELD_); \
+			break; \
+		case sizeof(uint64_t): \
+			_FIELD_ = le64toh(_FIELD_); \
+			break; \
+		default: \
+			break; \
+		} \
+	} while (0)
+
 #endif
