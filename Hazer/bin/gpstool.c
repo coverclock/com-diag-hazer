@@ -125,14 +125,14 @@ static int emit_sentence(FILE * fp, const char * string, size_t size)
 }
 
 /**
- * Emit a UBX packet to the specified stream after adding the ending matter
+ * Emit a UBX message to the specified stream after adding the ending matter
  * consisting of the two Fletcher checksum bytes.
  * @param fp points to the FILE stream.
  * @param packet points to the packet minus the ending matter.
  * @param size is the size of the UBX packet.
  * @return 0 for success, <0 if an error occurred.
  */
-static int emit_packet(FILE * fp, const void * packet, size_t size)
+static int emit_message(FILE * fp, const void * packet, size_t size)
 {
     int rc = -1;
     const void * bp = (const void *)0;
@@ -159,7 +159,7 @@ static int emit_packet(FILE * fp, const void * packet, size_t size)
 }
 
 /**
- * Forward an NMEA sentence or a UBX packet to a remote IPv4 or IPv6 host and
+ * Forward an NMEA sentence or a UBX message to a remote IPv4 or IPv6 host and
  * UDP port.
  * @param sock is an open socket.
  * @param protocol indicates either IPv4 or IPv6.
@@ -169,7 +169,7 @@ static int emit_packet(FILE * fp, const void * packet, size_t size)
  * @param buffer points to the sentence or packet.
  * @param size is the size of the sentence or packet.
  */
-static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
+static void send_buffer(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
 {
     int rc = 0;
 
@@ -190,14 +190,15 @@ static void send_sentence(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p
 }
 
 /**
- * Print an NMEA sentence or UBX packet to a stream, expanding non-printable
+ * Print an NMEA sentence or UBX message to a stream, expanding non-printable
  * characters into escape sequences.
  * @param fp points to the FILE stream.
+ * @param ep points to the FILE stream for errors.
  * @param buffer points to the sentence or packet.
  * @param size is the size of the sentence or packet.
  * @param limit is the maximum number of characters to display.
  */
-static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t limit)
+static void print_buffer(FILE * fp, const void * buffer, size_t size, size_t limit)
 {
     const char * bb = (const char *)0;
     size_t current = 0;
@@ -213,9 +214,10 @@ static void print_sentence(FILE * fp, const void * buffer, size_t size, size_t l
 /**
  * Print all of the active global navigation satellite systems.
  * @param fp points to the FILE stream.
+ * @param ep points to the FILE stream for errors.
  * @param aa points to the array of active GNSSes.
  */
-static void print_actives(FILE * fp, const hazer_active_t aa[])
+static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
 {
     static const unsigned int IDENTIFIERS = countof(aa[0].id);
     int system = 0;
@@ -301,7 +303,7 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
  * @param fp points to the FILE stream.
  * @param va points to the array of all satellite being viewed.
  */
-static void print_views(FILE *fp, const hazer_view_t va[])
+static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[])
 {
     static const int SATELLITES = countof(va[0].sat);
     int system = 0;
@@ -342,8 +344,9 @@ static void print_views(FILE *fp, const hazer_view_t va[])
 /**
  * Print the local (Juliet) time (and the release string).
  * @param fp points to the FILE stream.
+ * @param ep points to the FILE stream for errors.
  */
-static void print_local(FILE * fp)
+static void print_local(FILE * fp, FILE * ep)
 {
     int year = 0;
     int month = 0;
@@ -420,6 +423,12 @@ static void print_local(FILE * fp)
     fputc('\n', fp);
 }
 
+/**
+ * Print the hardware monitor details.
+ * @param fp points to the FILE stream.
+ * @param ep points to the FILE stream for errors.
+ * @param hp points to the hardware monitor details.
+ */
 static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 {
 	/*
@@ -461,6 +470,12 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 	}
 }
 
+/**
+ * Print the navigation status details.
+ * @param fp points to the FILE stream.
+ * @param ep points to the FILE stream for errors.
+ * @param sp points to the navigation status details.
+ */
 static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 {
 	/*
@@ -519,12 +534,13 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 /**
  * Print all of the navigation position fixes.
  * @param fp points to the FILE stream.
+ * @param ep points to the FILE stream for errors.
  * @param pa points to an array of positions.
  * @param pps is the current value of the 1PPS strobe.
  * @param dmyokay is true if the DMY field has been set.
  * @param totokay is true if time is monotonically increasing.
  */
-static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyokay, int totokay)
+static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], int pps, int dmyokay, int totokay)
 {
     int system = 0;
     double decimal = 0.0;
@@ -1498,15 +1514,15 @@ int main(int argc, char * argv[])
             		break;
             	}
             	size1 = size - 1;
-                rc = (size < length) ? emit_packet(devfp, buffer, size1) : emit_sentence(devfp, buffer, size1);
+                rc = (size < length) ? emit_message(devfp, buffer, size1) : emit_sentence(devfp, buffer, size1);
                 if (rc < 0) {
                 	fprintf(errfp, "%s: FAILED!\n", program);
-                	print_sentence(errfp, buffer, size1, UNLIMITED);
+                	print_buffer(errfp, buffer, size1, UNLIMITED);
                 }
 
-                if (verbose) { print_sentence(errfp, buffer, size1, UNLIMITED); }
+                if (verbose) { print_buffer(errfp, buffer, size1, UNLIMITED); }
                 if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-                if (report) { fprintf(outfp, "OUT [%3zd] ", size1); print_sentence(outfp, buffer, size1, limitation); fflush(outfp); }
+                if (report) { fprintf(outfp, "OUT [%3zd] ", size1); print_buffer(outfp, buffer, size1, limitation); fflush(outfp); }
                 free(node);
         	}
 
@@ -1606,7 +1622,7 @@ int main(int argc, char * argv[])
 
             if (nmea_ck != nmea_cs) {
                 fprintf(errfp, "%s: CHECKSUM! 0x%02x 0x%02x\n", program, nmea_cs, nmea_ck);
-                print_sentence(errfp, buffer, size1, UNLIMITED);
+                print_buffer(errfp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
             }
 
@@ -1619,7 +1635,7 @@ int main(int argc, char * argv[])
 
         	if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
                 fprintf(errfp, "%s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
-                print_sentence(errfp, buffer, size1, UNLIMITED);
+                print_buffer(errfp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
         	}
 
@@ -1628,14 +1644,14 @@ int main(int argc, char * argv[])
         } else {
 
             fprintf(errfp, "%s: FORMAT! %zd\n", program, length);
-            print_sentence(errfp, buffer, size1, UNLIMITED);
+            print_buffer(errfp, buffer, size1, UNLIMITED);
         	continue;
 
         }
 
-        if (verbose) { print_sentence(errfp, buffer, size1, UNLIMITED); }
+        if (verbose) { print_buffer(errfp, buffer, size1, UNLIMITED); }
         if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        if (report) { fprintf(outfp, "INP [%3zd] ", length); print_sentence(outfp, buffer, length, limitation); fflush(outfp); }
+        if (report) { fprintf(outfp, "INP [%3zd] ", length); print_buffer(outfp, buffer, length, limitation); fflush(outfp); }
 
         /**
          ** FORWARD AND LOG
@@ -1646,7 +1662,7 @@ int main(int argc, char * argv[])
          ** format (whether that's useful or not).
          **/
 
-        if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
+        if (role == PRODUCER) { send_buffer(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
         if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
 
         /*
@@ -1767,13 +1783,13 @@ int main(int argc, char * argv[])
 			} else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
 				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
 					fprintf(errfp, "%s: TALKER? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
-	                print_sentence(errfp, buffer, size - 1, UNLIMITED);
+	                print_buffer(errfp, buffer, size - 1, UNLIMITED);
 				}
 				continue;
 			} else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
 					fprintf(errfp, "%s: SYSTEM? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
-	                print_sentence(errfp, buffer, size - 1, UNLIMITED);
+	                print_buffer(errfp, buffer, size - 1, UNLIMITED);
 				}
 				continue;
 			} else {
@@ -1945,10 +1961,10 @@ int main(int argc, char * argv[])
 				DIMINUTO_CRITICAL_SECTION_END;
 				print_hardware(outfp, errfp, &hardware);
 				print_status(outfp, errfp, &status);
-				print_local(outfp);
-				print_positions(outfp, position, tmppps, dmyokay, totokay);
-				print_actives(outfp, active);
-				print_views(outfp, view);
+				print_local(outfp, errfp);
+				print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
+				print_actives(outfp, errfp, active);
+				print_views(outfp, errfp, view);
 			}
 			if (escape) { fputs("\033[0J", outfp); }
 			if (report) { fflush(outfp); }
