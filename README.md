@@ -72,8 +72,8 @@ These talkers have been observed in the wild coming from actual GPS receivers.
 Support for these talkers has been unit tested but has never been exercised
 using actual GPS receivers.
 
-* GA - Galileo (as in Galileo Galilei) - EU
 * BD - BeiDou (as in The Big Dipper) - China
+* GA - Galileo (as in Galileo Galilei) - EU
 * GB - BeiDou (as in The Big Dipper) - China
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
 
