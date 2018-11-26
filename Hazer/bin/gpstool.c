@@ -415,7 +415,7 @@ static void print_local(FILE * fp)
 	hour = offset / 3600;
 	fprintf(fp, "%+2.2d%c", hour, zone);
 
-	fprintf(fp, " (%s)", COM_DIAG_HAZER_RELEASE);
+	fprintf(fp, " com-diag-hazer %-26s", COM_DIAG_HAZER_RELEASE);
 
     fputc('\n', fp);
 }
