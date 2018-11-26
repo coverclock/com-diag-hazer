@@ -55,5 +55,38 @@ int main(void)
 
     /**************************************************************************/
 
+    {
+    	union { uint64_t integer; uint8_t byte[sizeof(uint64_t)]; } u64 = { 0x1122334455667788ULL };
+    	union { uint32_t integer; uint8_t byte[sizeof(uint32_t)]; } u32 = { 0x11223344UL };
+    	union { uint16_t integer; uint8_t byte[sizeof(uint16_t)]; } u16 = { 0x1122U };
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    	assert(u64.byte[0] == 0x88);
+    	assert(u32.byte[0] == 0x44);
+    	assert(u16.byte[0] == 0x22);
+#else
+    	assert(u64.byte[0] == 0x11);
+    	assert(u32.byte[0] == 0x11);
+    	assert(u16.byte[0] == 0x11);
+#endif
+
+    	COM_DIAG_YODEL_LETOH(u64.integer);
+    	COM_DIAG_YODEL_LETOH(u32.integer);
+    	COM_DIAG_YODEL_LETOH(u16.integer);
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    	assert(u64.integer == 0x1122334455667788ULL);
+    	assert(u32.integer == 0x11223344UL);
+    	assert(u16.integer == 0x1122U);
+#else
+    	assert(u64.integer == 0x8877665544332211ULL);
+    	assert(u32.integer == 0x44332211UL);
+    	assert(u16.integer == 0x2211U);
+#endif
+
+    }
+
+    /**************************************************************************/
+
     return 0;
 }
