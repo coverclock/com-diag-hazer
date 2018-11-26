@@ -1853,7 +1853,7 @@ int main(int argc, char * argv[])
 			    size_t current = 0;
 			    int end = 0;
 
-			    fprintf(errfp, "%s: TEXT [%2d][%2d][%2d] \"", program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
+			    fprintf(errfp, "%s: TXT [%2d][%2d][%2d] \"", program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
 
 			    while ((*bb != HAZER_STIMULUS_NUL) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
 			        diminuto_phex_emit(errfp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
