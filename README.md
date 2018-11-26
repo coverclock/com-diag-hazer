@@ -53,7 +53,7 @@ Hazer parses the following received NMEA sentences.
 * TXT - Text Transmission (NMEA 0183 Version 4.10 p. 124)
 * VTG - Course Over Ground & Ground Speed (NMEA 0183 Version 4.10 p. 127)
 
-Yodel recognizes the received UBX messages.
+Yodel recognizes the following received UBX messages.
 
 * UBX-MON-HW - Monitor Hardware can be used to detect jamming. (UBLOX 8 R15 p. 285)
 * UBX-NAV-STATUS - Navigation Status can be used to detect spoofing. (UBLOX 8 R15 p. 316)
