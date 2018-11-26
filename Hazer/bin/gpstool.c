@@ -87,9 +87,11 @@ typedef enum Format { FORMAT = 0, NMEA = 1, UBX = 2 } format_t;
 
 typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*' } status_t;
 
-static const size_t LIMIT = 80 /* Legacy */ - 4 /* "XXX " */ - 6 /* "[NNN] " */ - 2 /* "\r\n" */ - 1 /* Wrap */;
+static const size_t LIMIT = 80 /* Legacy */ - 4 /* "LLL " */ - 6 /* "[NNN] " */ - 2 /* "\r\n" */ - 1 /* Wrap */;
 
 static const size_t UNLIMITED = ~(size_t)0;
+
+static const char * program = (const char *)0;
 
 /**
  * Emit an NMEA sentences to the specified stream after adding the ending
@@ -338,13 +340,10 @@ static void print_views(FILE *fp, const hazer_view_t va[])
 }
 
 /**
- * Print the local (Juliet) time.
+ * Print the local (Juliet) time (and the release string).
  * @param fp points to the FILE stream.
- * @param jamming is the jamming status character from UBX8 FW18+.
- * @param narrow is the narrowband scaled jamming indicator 0..255.
- * @param spoofing is the spoofing status character from UBX8 FW18+.
  */
-static void print_local(FILE * fp, char jamming, uint8_t narrow, char spoofing)
+static void print_local(FILE * fp)
 {
     int year = 0;
     int month = 0;
@@ -416,16 +415,105 @@ static void print_local(FILE * fp, char jamming, uint8_t narrow, char spoofing)
 	hour = offset / 3600;
 	fprintf(fp, "%+2.2d%c", hour, zone);
 
-	/*
-	 * Indicate detection of broadband or continuous wave (cw) jamming, or of
-	 * spoofing (done by comparing activity between multiple GNSS systems).
-	 * Relies on support from later versions of Ublox 8 firmware, and must be
-	 * explicitly enabled by sending appropriate messages to the GPS device.
-	 */
-
-	fprintf(fp, " %cjam %3unarrow %cspoof", jamming, narrow, spoofing);
+	fprintf(fp, " (%s)", COM_DIAG_HAZER_RELEASE);
 
     fputc('\n', fp);
+}
+
+static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
+{
+	/*
+	 * Indicate detection of broadband or continuous wave (cw) jamming.
+	 * Relies on support from later versions of Ublox 8 firmware, and must be
+	 * explicitly enabled by sending appropriate messages to the Ublox device.
+	 */
+
+	if (hp->ticks > 0) {
+		uint8_t value;
+		char jamming;
+		static char jamming_prior = STATUS;
+
+		value = (hp->payload.flags >> YODEL_UBX_MON_HW_flags_jammingState_SHIFT) & YODEL_UBX_MON_HW_flags_jammingState_MASK;
+		switch (value) {
+		case YODEL_UBX_MON_HW_flags_jammingState_unknown:
+			jamming = UNKNOWN;
+			break;
+		case YODEL_UBX_MON_HW_flags_jammingState_none:
+			jamming = NONE;
+			break;
+		case YODEL_UBX_MON_HW_flags_jammingState_warning:
+			jamming = WARNING;
+			break;
+		case YODEL_UBX_MON_HW_flags_jammingState_critical:
+			jamming = CRITICAL;
+			break;
+		default:
+			jamming = INVALID;
+			break;
+		}
+
+		if (jamming != jamming_prior) {
+			fprintf(ep, "%s: UBX JAMMING %u INDICATOR %u\n", program, value, hp->payload.jamInd);
+			jamming_prior = jamming;
+		}
+
+		fprintf(fp, "MON %cjam %3uindicator %40s %3usecs %-8s\n", jamming, hp->payload.jamInd, "", hp->ticks, "");
+	}
+}
+
+static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
+{
+	/*
+	 * Indicate detection of spoofing by comparing solutions from multiple
+	 * GNSSes if (and only if) available. Relies on support from later versions
+	 * of Ublox 8 firmware, and must be explicitly enabled by sending
+	 * appropriate messages to the UBlox device.
+	 */
+
+	if (sp->ticks > 0) {
+		uint8_t value;
+		char spoofing;
+		static char spoofing_prior = STATUS;
+
+		value = (sp->payload.flags2 >> YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT) & YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK;
+
+		switch (value) {
+		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_unknown:
+			spoofing = UNKNOWN;
+			break;
+		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_none:
+			spoofing = NONE;
+			break;
+		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_one:
+			spoofing = WARNING;
+			break;
+		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_many:
+			spoofing = CRITICAL;
+			break;
+		default:
+			spoofing = INVALID;
+			break;
+		}
+
+		if (spoofing != spoofing_prior) {
+			fprintf(ep, "%s: UBX SPOOFING %u\n", program, value);
+			spoofing_prior = spoofing;
+		}
+
+		/*
+		 * Indicate detection of broadband or continuous wave (cw) jamming, or of
+		 * spoofing (done by comparing activity between multiple GNSS systems).
+		 * Relies on support from later versions of Ublox 8 firmware, and must be
+		 * explicitly enabled by sending appropriate messages to the GPS device.
+		 */
+		/*
+				MON -jam   9indicator                                             10secsff       1423ms msss  245473920ms   10secs
+				STA -spoof TOW  146965000ms ttff       1423ms msss  245679917ms   10secsNSS
+				TIM 2018-11-26T16:49:07Z 0pps                                   10secs GNSS
+		*/
+
+		fprintf(fp, "STA %cspoof TOW %10ums ff %10ums up %10ums %2s %3usecs %-8s\n", spoofing, sp->payload.iTOW, sp->payload.ttff, sp->payload.msss, "", sp->ticks, "");
+	}
 }
 
 /**
@@ -778,7 +866,6 @@ int main(int argc, char * argv[])
 	/*
 	 * Command line options and parameters with defaults.
 	 */
-    const char * program = (const char *)0;
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
@@ -874,16 +961,8 @@ int main(int argc, char * argv[])
     /*
      * UBX state databases.
      */
-    yodel_ubx_mon_hw_t hardware = { 0 };
-    yodel_ubx_nav_status_t status = { 0 };
-    uint8_t hardware_ticks = 0;
-	status_t jamming = STATUS;
-	status_t jammingold = STATUS;
-	uint8_t narrow = 0;
-	uint8_t narrowold = 0;
-    uint8_t status_ticks = 0;
-	status_t spoofing = STATUS;
-	status_t spoofingold = STATUS;
+    yodel_hardware_t hardware = { { 0 } };
+    yodel_status_t status = { { 0 } };
     /*
      * Miscellaneous working variables.
      */
@@ -1570,6 +1649,70 @@ int main(int argc, char * argv[])
         if (role == PRODUCER) { send_sentence(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
         if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
 
+        /*
+         * EXPIRE
+         *
+         * See how many seconds have elapsed since the last time we received
+         * a valid message from any system we recognize. (Might be zero.)
+         * Subtract that number from all the lifetimes of all the systems we
+         * care about to figure out if there's a system from which we've
+         * stopped hearing. This implements an expiry for each entry in our
+         * database, because NMEA isn't kind enough to remind us that we
+         * haven't heard from a system lately (and UBX isn't kind enough to
+         * remind us when a device has stopped transmitting entirely); hence
+         * data can get stale and needs to be aged out.
+         */
+
+        was = now;
+        elapsed = diminuto_alarm_check();
+        now += elapsed; /* Okay to wrap around. */
+
+        if (elapsed > 0) {
+        	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
+
+        		if (position[index].ticks == 0) {
+        			/* Do nothing. */
+        		} else if (position[index].ticks <= elapsed) {
+        			position[index].ticks = 0;
+        		} else {
+        			position[index].ticks -= elapsed;
+        		}
+
+        		if (active[index].ticks == 0) {
+        			/* Do nothing. */
+        		} else if (active[index].ticks <= elapsed) {
+        			active[index].ticks = 0;
+        		} else {
+        			active[index].ticks -= elapsed;
+        		}
+
+        		if (view[index].ticks == 0) {
+        			/* Do nothing. */
+        		} else if (view[index].ticks <= elapsed) {
+        			view[index].ticks = 0;
+        		} else {
+        			view[index].ticks -= elapsed;
+        		}
+
+        		if (hardware.ticks == 0) {
+        			/* Do nothing. */
+        		} else if (hardware.ticks <= elapsed) {
+        			hardware.ticks = 0;
+        		} else {
+        			hardware.ticks -= elapsed;
+        		}
+
+        		if (status.ticks == 0) {
+        			/* Do nothing. */
+        		} else if (status.ticks <= elapsed) {
+        			status.ticks = 0;
+        		} else {
+        			status.ticks -= elapsed;
+        		}
+
+        	}
+        }
+
         /**
          ** PROCESS
          **/
@@ -1634,67 +1777,6 @@ int main(int argc, char * argv[])
 			} else {
 				/* Do nothing. */
 			}
-
-	        /*
-	         * See how many seconds have elapsed since the last time we received
-	         * a valid message from any system we recognize. (Might be zero.)
-	         * Subtract that number from all the lifetimes of all the systems we
-	         * care about to figure out if there's a system from which we've
-	         * stopped hearing. This implements an expiry for each entry in our
-	         * database, because NMEA isn't kind enough to remind us that we
-	         * haven't heard from a system lately; hence data can get stale and
-	         * needs to be aged out.
-	         */
-
-            was = now;
-	        elapsed = diminuto_alarm_check();
-            now += elapsed; /* Okay to wrap around. */
-
-	        if (elapsed > 0) {
-	        	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
-
-	        		if (position[index].ticks == 0) {
-	        			/* Do nothing. */
-	        		} else if (position[index].ticks <= elapsed) {
-	        			position[index].ticks = 0;
-	        		} else {
-	        			position[index].ticks -= elapsed;
-	        		}
-
-	        		if (active[index].ticks == 0) {
-	        			/* Do nothing. */
-	        		} else if (active[index].ticks <= elapsed) {
-	        			active[index].ticks = 0;
-	        		} else {
-	        			active[index].ticks -= elapsed;
-	        		}
-
-	        		if (view[index].ticks == 0) {
-	        			/* Do nothing. */
-	        		} else if (view[index].ticks <= elapsed) {
-	        			view[index].ticks = 0;
-	        		} else {
-	        			view[index].ticks -= elapsed;
-	        		}
-
-	        		if (hardware_ticks == 0) {
-	        			/* Do nothing. */
-	        		} else if (hardware_ticks <= elapsed) {
-	        			hardware_ticks = 0;
-	        		} else {
-	        			hardware_ticks -= elapsed;
-	        		}
-
-	        		if (status_ticks == 0) {
-	        			/* Do nothing. */
-	        		} else if (status_ticks <= elapsed) {
-	        			status_ticks = 0;
-	        		} else {
-	        			status_ticks -= elapsed;
-	        		}
-
-	        	}
-	        }
 
 			/*
 			 * Parse the sentences we care about and update our state to
@@ -1788,86 +1870,15 @@ int main(int argc, char * argv[])
 
         	if (verbose) { diminuto_dump(errfp, buffer, length); }
 
-        	if (yodel_ubx_mon_hw(&hardware, ubx_buffer, length) == 0) {
-        		uint8_t value;
+        	if (yodel_ubx_mon_hw(&(hardware.payload), ubx_buffer, length) == 0) {
 
-        		/*
-        		 *
-        		 */
+        		hardware.ticks = timeout;
+        		refresh = !0;
 
-        		value = (hardware.flags >> YODEL_UBX_MON_HW_flags_jammingState_SHIFT) & YODEL_UBX_MON_HW_flags_jammingState_MASK;
-        		switch (value) {
-        		case YODEL_UBX_MON_HW_flags_jammingState_unknown:
-        			jamming = UNKNOWN;
-        			break;
-        		case YODEL_UBX_MON_HW_flags_jammingState_none:
-        			jamming = NONE;
-        			break;
-        		case YODEL_UBX_MON_HW_flags_jammingState_warning:
-        			jamming = WARNING;
-        			break;
-        		case YODEL_UBX_MON_HW_flags_jammingState_critical:
-        			jamming = CRITICAL;
-        			break;
-        		default:
-        			jamming = INVALID;
-        			break;
-        		}
+        	} else if (yodel_ubx_nav_status(&(status.payload), ubx_buffer, length) == 0) {
 
-        		narrow = hardware.jamInd;
-
-        		if (jamming != jammingold) {
-    			    fprintf(errfp, "%s: UBX JAMMING %u CARRIER %u\n", program, value, narrow);
-            		refresh = !0;
-        		}
-        		jammingold = jamming;
-
-        		if (narrow != narrowold) {
-            		refresh = !0;
-        		}
-        		narrowold = narrow;
-
-        		hardware_ticks = timeout;
-
-        	} else if (yodel_ubx_nav_status(&status, ubx_buffer, length) == 0) {
-        		uint8_t value;
-
-        		/*
-        		 * Ublox 8 FW18+ can only detect spoofing by comparing position
-        		 * fixes from more than one constellation, e.g. GPS and GLONASS.
-        		 * If both are spoofed, or if only one position fix is
-        		 * available (for example, one of the constellations is being
-        		 * jammed), spoofing detection is not possible.
-        		 * [Ublox8 R15 p. 63, p. 318]
-        		 */
-
-        		value = (status.flags2 >> YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT) & YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK;
-
-        		switch (value) {
-        		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_unknown:
-        			spoofing = UNKNOWN;
-        			break;
-        		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_none:
-        			spoofing = NONE;
-        			break;
-        		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_one:
-        			spoofing = WARNING;
-        			break;
-        		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_many:
-        			spoofing = CRITICAL;
-        			break;
-        		default:
-        			spoofing = INVALID;
-        			break;
-        		}
-
-        		if (spoofing != spoofingold) {
-    			    fprintf(errfp, "%s: UBX SPOOFING %u\n", program, value);
-        			refresh = !0;
-        		}
-        		spoofingold = spoofing;
-
-        		status_ticks = timeout;
+        		status.ticks = timeout;
+        		refresh = !0;
 
         	} else {
 
@@ -1926,7 +1937,9 @@ int main(int argc, char * argv[])
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
-				print_local(outfp, jamming, narrow, spoofing);
+				print_local(outfp);
+				print_hardware(outfp, errfp, &hardware);
+				print_status(outfp, errfp, &status);
 				print_positions(outfp, position, tmppps, dmyokay, totokay);
 				print_actives(outfp, active);
 				print_views(outfp, view);

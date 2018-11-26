@@ -85,22 +85,6 @@ enum YodelUbxConstants {
 typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
 
 /**
- * This is the structure of the header on every UBX packet. Its size is
- * awkward because it's not a multiple of four bytes, but many of the UBX
- * payloads begin with a four byte integer or worse.
- * UBlox 7, p.73
- * UBlox 8 R15, p. 134
- */
-typedef struct YodelUbxHeader {
-	uint8_t sync_1;		/* 0xb5 */
-	uint8_t sync_2;		/* 0x62 */
-	uint8_t class;
-	uint8_t	id;
-	uint16_t length;	/* little endian */
-	uint8_t payload[0];
-} yodel_ubx_header_t __attribute__ ((__aligned__ (2)));
-
-/**
  * Yodel UBX offsets.
  * UBlox 7, p.73
  * UBlox 8 R15, p. 134
@@ -114,6 +98,22 @@ enum YodelUbxOffsets {
 	YODEL_UBX_LENGTH_MSB 	= 5,	/* 16-bit, little endian (MSB). */
 	YODEL_UBX_PAYLOAD		= 6,
 };
+
+/**
+ * This is the structure of the header on every UBX packet. Its size is
+ * awkward because it's not a multiple of four bytes, but many of the UBX
+ * payloads begin with a four byte integer or worse.
+ * UBlox 7, p.73
+ * UBlox 8 R15, p. 134
+ */
+typedef struct YodelUbxHeader {
+	uint8_t sync_1;		/* 0xb5 */
+	uint8_t sync_2;		/* 0x62 */
+	uint8_t class;
+	uint8_t	id;
+	uint16_t length;	/* little endian */
+	uint8_t payload[0];
+} yodel_ubx_header_t __attribute__ ((__aligned__(2)));
 
 /**
  * Yodel state machine states. The only states the application needs
@@ -230,14 +230,20 @@ typedef struct YodelUbxMonHw {
 	uint32_t pinIrq;
 	uint32_t pullH;
 	uint32_t pullL;
-} yodel_ubx_mon_hw_t __attribute__ ((__aligned__ (4)));
+} yodel_ubx_mon_hw_t;
 
+/**
+ * UBX-MON-HW constants.
+ */
 enum YodelUbxMonHwConstants {
 	YODEL_UBX_MON_HW_Class	= 0x0a,
 	YODEL_UBX_MON_HW_Id		= 0x09,
 	YODEL_UBX_MON_HW_Length	= 60,
 };
 
+/**
+ * UBX-MON-HW.flags masks.
+ */
 enum YodelUbxMonHwFlagsMasks {
 	YODEL_UBX_MON_HW_flags_rtcCalib_MASK		= 0x1,
 	YODEL_UBX_MON_HW_flags_safeBoot_MASK		= 0x1,
@@ -245,6 +251,9 @@ enum YodelUbxMonHwFlagsMasks {
 	YODEL_UBX_MON_HW_flags_xtalAbsent_MASK		= 0x1,
 };
 
+/**
+ * UBX-MON-HW.flags left shifts.
+ */
 enum YodelUbxMonHwFlagsShifts {
 	YODEL_UBX_MON_HW_flags_rtcCalib_SHIFT		= 0,
 	YODEL_UBX_MON_HW_flags_safeBoot_SHIFT		= 1,
@@ -252,6 +261,9 @@ enum YodelUbxMonHwFlagsShifts {
 	YODEL_UBX_MON_HW_flags_xtalAbsent_SHIFT		= 4,
 };
 
+/**
+ * UBX-MON-HW.Flags.JammingState values.
+ */
 enum YodelUbxMonHwFlagsJammingState {
 	YODEL_UBX_MON_HW_flags_jammingState_unknown		= 0,
 	YODEL_UBX_MON_HW_flags_jammingState_none		= 1,
@@ -263,10 +275,19 @@ enum YodelUbxMonHwFlagsJammingState {
  * Process a possible UBX-MON-HW message.
  * @param mp points to a UBX-MON-HW structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
- * @param length is the length of the UBX header and payload in bytes.
+ * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
 extern int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length);
+
+/**
+ * Structure combining both a UBX-MON-HW payload and its expiry time in ticks.
+ */
+typedef struct YodelHardware {
+	yodel_ubx_mon_hw_t payload;	/* Payload from UBX-MON-HW message. */
+    uint8_t ticks;				/* Lifetime in application-defined ticks. */
+    uint8_t unused[3];
+} yodel_hardware_t;
 
 /*******************************************************************************
  * PROCESSING UBX-NAV_STATUS MESSAGES
@@ -284,14 +305,20 @@ typedef struct YodelUbxNavStatus {
 	uint8_t flags2;
 	uint32_t ttff;
 	uint32_t msss;
-} yodel_ubx_nav_status_t __attribute__ ((__aligned__ (4)));
+} yodel_ubx_nav_status_t;
 
+/**
+ * UBX-NAV-STATUS constants.
+ */
 enum YodelUbxNavStatusConstants {
 	YODEL_UBX_NAV_STATUS_Class	= 0x01,
 	YODEL_UBX_NAV_STATUS_Id		= 0x03,
 	YODEL_UBX_NAV_STATUS_Length	= 16,
 };
 
+/**
+ * UBX-NAV-STATUS.flags masks.
+ */
 enum YodelUbxNavStatusFlagsMasks {
 	YODEL_UBX_NAV_STATUS_flags_gpsFixOk_MASK	= 0x1,
 	YODEL_UBX_NAV_STATUS_flags_diffSoln_MASK	= 0x1,
@@ -299,6 +326,9 @@ enum YodelUbxNavStatusFlagsMasks {
 	YODEL_UBX_NAV_STATUS_flags_towSet_MASK		= 0x1,
 };
 
+/**
+ * UBX-NAV-STATUS.flags left shifts.
+ */
 enum YodelUbxNavStatusFlagsShifts {
 	YODEL_UBX_NAV_STATUS_flags_gpsFixOk_SHIFT	= 0,
 	YODEL_UBX_NAV_STATUS_flags_diffSoln_SHIFT	= 1,
@@ -306,16 +336,25 @@ enum YodelUbxNavStatusFlagsShifts {
 	YODEL_UBX_NAV_STATUS_flags_towSet_SHIFT		= 3,
 };
 
+/**
+ * UBX-NAV-STATUS.fixStat masks.
+ */
 enum YodelUbxNavStatusFixStatMasks {
 	YODEL_UBX_NAV_STATUS_fixStat_diffCorr_MASK		= 0x1,
 	YODEL_UBX_NAV_STATUS_fixStat_mapMatching_MASK	= 0x3,
 };
 
+/**
+ * UBX-NAV-STATUS.fixStat left shifts.
+ */
 enum YodelUbxNavStatusFixStatShifts {
 	YODEL_UBX_NAV_STATUS_fixStat_diffCorr_SHIFT		= 0,
 	YODEL_UBX_NAV_STATUS_fixStat_mapMatching_SHIFT	= 6,
 };
 
+/**
+ * UBX-NAV-STATUS.fixStat.mapMatching values.
+ */
 enum YodelUbxNavStatusFixStatMapMatching {
 	YODEL_UBX_NAV_STATUS_fixStat_mapMatching_none			= 0,
 	YODEL_UBX_NAV_STATUS_fixStat_mapMatching_unused			= 1,
@@ -323,23 +362,35 @@ enum YodelUbxNavStatusFixStatMapMatching {
 	YODEL_UBX_NAV_STATUS_fixStat_mapMatching_deadreckoning	= 3,
 };
 
+/**
+ * UBX-NAV-STATUS.flags2 masks.
+ */
 enum YodelUbxNavStatusFlags2Masks {
 	YODEL_UBX_NAV_STATUS_flags2_psmState_MASK		= 0x3,
 	YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK	= 0x3,
 };
 
+/**
+ * UBX-NAV-STATUS.flags2 left shifts.
+ */
 enum YodelUbxNavStatusFlags2Shifts {
 	YODEL_UBX_NAV_STATUS_flags2_psmState_SHIFT			= 0,
 	YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT		= 3,
 };
 
-enum YodelUbxNavStatusFLags2PsmState {
+/**
+ * UBX-NAV-STATUS.flags2.psmState values.
+ */
+enum YodelUbxNavStatusFlags2PsmState {
 	YODEL_UBX_NAV_STATUS_flags2_psmState_acquisition	= 0,
 	YODEL_UBX_NAV_STATUS_flags2_psmState_nospoofing		= 1,
 	YODEL_UBX_NAV_STATUS_flags2_psmState_tracking		= 2,
 	YODEL_UBX_NAV_STATUS_flags2_psmState_inactive		= 3,
 };
 
+/**
+ * UBX-NAV-STATUS.flags2.spoofDetState values.
+ */
 enum YodelUbxNavStatusFLags2SpoolDetState {
 	YODEL_UBX_NAV_STATUS_flags2_spoofDetState_unknown	= 0,
 	YODEL_UBX_NAV_STATUS_flags2_spoofDetState_none		= 1,
@@ -351,9 +402,18 @@ enum YodelUbxNavStatusFLags2SpoolDetState {
  * Process a possible UBX-NAV-STATUS message.
  * @param mp points to a UBX-NAV-STATUS structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
- * @param length is the length of the UBX header and payload in bytes.
+ * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
 extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ssize_t length);
+
+/**
+ * Structure combining both a UBX-NAV-STATUS payload and its expiry time in ticks.
+ */
+typedef struct YodelStatus {
+	yodel_ubx_nav_status_t payload;	/* Payload from UBX-NAV-STATUS message. */
+    uint8_t ticks;					/* Lifetime in application-defined ticks. */
+    uint8_t unused[3];
+} yodel_status_t;
 
 #endif
