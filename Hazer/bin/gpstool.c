@@ -1828,7 +1828,11 @@ int main(int argc, char * argv[])
 				 * a field in the GSA sentence that contains a GNSS System ID,
 				 * but I have yet to see a device that supports it. However,
 				 * the GSA parser function has untested code to extract this ID
-				 * if it exists, and the map function below will use it.
+				 * if it exists, and the map function below will use it. Also
+				 * note that apparently the DOP values are computed across all
+				 * the satellites in whatever constellations were used for a
+				 * navigation solution; this means the DOP values for GPS
+				 * and GLONASS will be identical in the Ublox 8.
 				 */
 
 				if (system == HAZER_SYSTEM_GNSS) {
