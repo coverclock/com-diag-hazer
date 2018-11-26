@@ -439,13 +439,18 @@ line using the -W option.
 
 MON displays some of the results received in the UBX-MON-HW message if enabled.
 Ublox 8 chips with firmware revision 18 and above can provide clues to jamming
-based on the received signal strength.
+based on the received signal strength. (N.B. I don't have a way to test this.)
+This requires that the jamming/interference monitor (ITFM) be calibrated using
+the UBX-CFG-ITFM message. (Although I find nothing in the documentation that
+indicates this, I suspect that the dB values in the UBX-CFG-ITFM message are
+signed two's complement.)
 
 STA displays some of the results received in the UBX-NAV-STATUS message if
 enabled. Ublox 8 chips with firmware revision 18 and above can provide clues
 to spoofing based on comparing navigation solutions from multiple GNSSes if
-available. The Time Of Week (TOW), first fix (ff), and uptime numeric fields
-are also good tests of the conversion from little endian to host byte order.
+available. (N.B. I don't have a way to test this.) The Time Of Week (TOW),
+first fix (ff), and uptime numeric fields are also good tests of the conversion
+from little endian to host byte order.
 
 LOC is the current local time provided by the host system and (if available
 and enabled) wideband and narrowband jamming indicators and spoofing indicators.
