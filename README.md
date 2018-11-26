@@ -860,21 +860,17 @@ as NMEA TXT sentences. These can be recognized by Hazer and logged to standard
 error by gpstool. Some of the functional tests save standard error output in
 log files under the build artifact directory.
 
-    gpstool: TEXT [01][01][02] "u-blox AG - www.u-blox.com"
-    gpstool: TEXT [01][01][02] "HW UBX-M8030 00080000"
-    gpstool: TEXT [01][01][02] "ROM CORE 3.01 (107888)"
-    gpstool: TEXT [01][01][02] "FWVER=SPG 3.01"
-    gpstool: TEXT [01][01][02] "PROTVER=18.00"
-    gpstool: TEXT [01][01][02] "GPS;GLO;GAL;BDS"
-    gpstool: TEXT [01][01][02] "SBAS;IMES;QZSS"
-    gpstool: TEXT [01][01][02] "GNSS OTP=GPS;GLO"
-    gpstool: TEXT [01][01][02] "LLC=FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFD"
-    gpstool: TEXT [01][01][02] "ANTSUPERV=AC SD PDoS SR"
-    gpstool: TEXT [01][01][02] "ANTSTATUS=OK"
-    gpstool: TEXT [01][01][02] "PF=3FF"
+    gpstool: TXT [ 1][ 1][ 2] "u-blox AG - www.u-blox.com".
+    gpstool: TXT [ 1][ 1][ 2] "HW UBX-M8030 00080000".
+    gpstool: TXT [ 1][ 1][ 2] "ROM CORE 3.01 (107888)".
+    gpstool: TXT [ 1][ 1][ 2] "FWVER=SPG 3.01".
+    gpstool: TXT [ 1][ 1][ 2] "PROTVER=18.00".
+    gpstool: TXT [ 1][ 1][ 2] "GPS;GLO;GAL;BDS".
+    gpstool: TXT [ 1][ 1][ 2] "SBAS;IMES;QZSS".
+    gpstool: TXT [ 1][ 1][ 2] "GNSS OTP=GPS;GLO".
+    gpstool: TXT [ 1][ 1][ 2] "LLC=FFFFFFFF-FFFF7CBF-FFED7FAA-FFFFFFFF-FFFFFFF9".
 
 # Acknowledgements
 
 Special thanks to Mrs. Overclock for her assistance in road testing (literally)
 this software.
-
