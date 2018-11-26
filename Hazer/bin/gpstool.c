@@ -1668,6 +1668,7 @@ int main(int argc, char * argv[])
         now += elapsed; /* Okay to wrap around. */
 
         if (elapsed > 0) {
+
         	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
 
         		if (position[index].ticks == 0) {
@@ -1694,23 +1695,24 @@ int main(int argc, char * argv[])
         			view[index].ticks -= elapsed;
         		}
 
-        		if (hardware.ticks == 0) {
-        			/* Do nothing. */
-        		} else if (hardware.ticks <= elapsed) {
-        			hardware.ticks = 0;
-        		} else {
-        			hardware.ticks -= elapsed;
-        		}
-
-        		if (status.ticks == 0) {
-        			/* Do nothing. */
-        		} else if (status.ticks <= elapsed) {
-        			status.ticks = 0;
-        		} else {
-        			status.ticks -= elapsed;
-        		}
-
         	}
+
+    		if (hardware.ticks == 0) {
+    			/* Do nothing. */
+    		} else if (hardware.ticks <= elapsed) {
+    			hardware.ticks = 0;
+    		} else {
+    			hardware.ticks -= elapsed;
+    		}
+
+    		if (status.ticks == 0) {
+    			/* Do nothing. */
+    		} else if (status.ticks <= elapsed) {
+    			status.ticks = 0;
+    		} else {
+    			status.ticks -= elapsed;
+    		}
+
         }
 
         /**
@@ -1937,9 +1939,9 @@ int main(int argc, char * argv[])
 					tmppps = onepps;
 					onepps = 0;
 				DIMINUTO_CRITICAL_SECTION_END;
-				print_local(outfp);
 				print_hardware(outfp, errfp, &hardware);
 				print_status(outfp, errfp, &status);
+				print_local(outfp);
 				print_positions(outfp, position, tmppps, dmyokay, totokay);
 				print_actives(outfp, active);
 				print_views(outfp, view);
