@@ -446,23 +446,30 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 		uint8_t value;
 		char jamming;
 		static char jamming_prior = STATUS;
+		static char jamming_history = STATUS;
+		static uint8_t jamInd_maximum = 0;
 
 		value = (hp->payload.flags >> YODEL_UBX_MON_HW_flags_jammingState_SHIFT) & YODEL_UBX_MON_HW_flags_jammingState_MASK;
 		switch (value) {
 		case YODEL_UBX_MON_HW_flags_jammingState_unknown:
 			jamming = UNKNOWN;
+			if (jamming_history == STATUS) { jamming_history = jamming; }
 			break;
 		case YODEL_UBX_MON_HW_flags_jammingState_none:
 			jamming = NONE;
+			if ((jamming_history == STATUS) || (jamming_history == UNKNOWN)) { jamming_history = jamming; }
 			break;
 		case YODEL_UBX_MON_HW_flags_jammingState_warning:
 			jamming = WARNING;
+			if (jamming_history != CRITICAL) { jamming_history = jamming; }
 			break;
 		case YODEL_UBX_MON_HW_flags_jammingState_critical:
 			jamming = CRITICAL;
+			jamming_history = jamming;
 			break;
 		default:
 			jamming = INVALID;
+			if ((jamming_history == STATUS) || (jamming_history == UNKNOWN)) { jamming_history = jamming; }
 			break;
 		}
 
@@ -471,7 +478,9 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 			jamming_prior = jamming;
 		}
 
-		fprintf(fp, "MON %cjam %3uindicator %40s %3usecs %-8s\n", jamming, hp->payload.jamInd, "", hp->ticks, "");
+		if (hp->payload.jamInd > jamInd_maximum) { jamInd_maximum = hp->payload.jamInd; }
+
+		fprintf(fp, "MON %cjam %chistory %3uindicator %3umaximum %20s %3usecs %-8s\n", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum, "", hp->ticks, "");
 	}
 }
 
@@ -494,24 +503,30 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 		uint8_t value;
 		char spoofing;
 		static char spoofing_prior = STATUS;
+		static char spoofing_history = STATUS;
 
 		value = (sp->payload.flags2 >> YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT) & YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK;
 
 		switch (value) {
 		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_unknown:
 			spoofing = UNKNOWN;
+			if (spoofing_history == STATUS) { spoofing_history = spoofing; }
 			break;
 		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_none:
 			spoofing = NONE;
+			if ((spoofing_history == STATUS) || (spoofing_history == UNKNOWN)) { spoofing_history = spoofing; }
 			break;
 		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_one:
 			spoofing = WARNING;
+			if (spoofing_history != CRITICAL) { spoofing_history = spoofing; }
 			break;
 		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_many:
 			spoofing = CRITICAL;
+			spoofing_history = spoofing;
 			break;
 		default:
 			spoofing = INVALID;
+			if ((spoofing_history == STATUS) || (spoofing_history == UNKNOWN)) { spoofing_history = spoofing; }
 			break;
 		}
 
@@ -520,19 +535,7 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 			spoofing_prior = spoofing;
 		}
 
-		/*
-		 * Indicate detection of broadband or continuous wave (cw) jamming, or of
-		 * spoofing (done by comparing activity between multiple GNSS systems).
-		 * Relies on support from later versions of Ublox 8 firmware, and must be
-		 * explicitly enabled by sending appropriate messages to the GPS device.
-		 */
-		/*
-				MON -jam   9indicator                                             10secsff       1423ms msss  245473920ms   10secs
-				STA -spoof TOW  146965000ms ttff       1423ms msss  245679917ms   10secsNSS
-				TIM 2018-11-26T16:49:07Z 0pps                                   10secs GNSS
-		*/
-
-		fprintf(fp, "STA %cspoof TOW %10ums ff %10ums up %10ums %2s %3usecs %-8s\n", spoofing, sp->payload.iTOW, sp->payload.ttff, sp->payload.msss, "", sp->ticks, "");
+		fprintf(fp, "STA %cspoof %chistory ff %10ums up %10ums %10s %3usecs %-8s\n", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, "", sp->ticks, "");
 	}
 }
 

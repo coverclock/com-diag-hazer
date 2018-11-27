@@ -388,48 +388,46 @@ the display looks something like this snapshot as it is continually updated.
 symbol. This should not be confused with its use as a delimeter in NMEA
 sentences.)
 
-    INP [ 68] \xb5b\n\t<\0\0\xf4\x01\0\0\0\0\0\0\0\x01\0\xaf\xff\0\0`\0\xcc\f\x02
+    INP [ 29] $GLGSV,3,3,09,91,03,136,*53\r\n
     OUT [  6] \xb5b\x06>\0\0
-    MON -jam  10indicator                                           10secs
-    STA -spoof TOW  150034000ms ff       1423ms up  248748870ms     10secs
-    LOC 2018-11-26T10:40:16.138-07:00+00T com-diag-hazer 10.0.0
-    TIM 2018-11-26T17:40:16Z 0pps                                   10secs GNSS
-    POS 39*47'39.20"N, 105*09'11.96"W   39.794224, -105.153323      10secs GNSS
-    ALT    5582.61'   1701.600m                                     10secs GNSS
+    MON -jam -history   9indicator  12maximum                       10secs
+    STA -spoof -history ff       2447ms up   80081080ms             10secs
+    LOC 2018-11-27T08:57:23.052-07:00+00T com-diag-hazer 10.0.0
+    TIM 2018-11-27T15:57:23Z 0pps                                   10secs GNSS
+    POS 39*47'39.14"N, 105*09'11.92"W   39.794205, -105.153314      10secs GNSS
+    ALT    5586.55'   1702.800m                                     10secs GNSS
     COG N    0.000*T   0.000*M                                      10secs GNSS
-    SOG      0.013mph      0.011knots      0.020kph                 10secs GNSS
+    SOG      0.013mph      0.011knots      0.021kph                 10secs GNSS
     INT GGA [12] dmy 1 inc 1 (  9 10  5  0  0  4  4 )               10secs GNSS
-    ACT [1]  {    21    32    15     8    10    51 } [ 6] [11]      10secs GPS
-    ACT [2]  {    27    24    14    48    20       } [ 5] [11]      10secs GPS
-    ACT [1]  {    81    67    65    88    75    74 } [ 6] [ 8]      10secs GLONASS
-    ACT [2]  {    66    82                         } [ 2] [ 8]      10secs GLONASS
-    DOP   1.30pdop   0.66hdop   1.11vdop                            10secs GPS
-    DOP   1.30pdop   0.66hdop   1.11vdop                            10secs GLONASS
-    SAT [  1] id     4 elv   0* azm    0* snr  33dBHz               10secs GPS
-    SAT [  2] id     8 elv  20* azm  312* snr  15dBHz               10secs GPS
-    SAT [  3] id    10 elv  61* azm  309* snr  30dBHz               10secs GPS
-    SAT [  4] id    14 elv  18* azm  215* snr  40dBHz               10secs GPS
-    SAT [  5] id    15 elv  24* azm   49* snr  16dBHz               10secs GPS
-    SAT [  6] id    20 elv  71* azm   28* snr  34dBHz               10secs GPS
-    SAT [  7] id    21 elv  58* azm  141* snr  37dBHz               10secs GPS
-    SAT [  8] id    24 elv  32* azm   84* snr  27dBHz               10secs GPS
-    SAT [  9] id    27 elv  36* azm  281* snr  22dBHz               10secs GPS
-    SAT [ 10] id    32 elv  38* azm  217* snr  36dBHz               10secs GPS
-    SAT [ 11] id    46 elv  38* azm  215* snr  36dBHz               10secs GPS
-    SAT [ 12] id    48 elv  36* azm  220* snr  34dBHz               10secs GPS
-    SAT [ 13] id    51 elv  44* azm  183* snr  32dBHz               10secs GPS
-    SAT [ 14] id    65 elv  34* azm   41* snr  34dBHz               10secs GLONASS
-    SAT [ 15] id    66 elv  62* azm  300* snr  33dBHz               10secs GLONASS
-    SAT [ 16] id    67 elv  19* azm  253* snr  22dBHz               10secs GLONASS
-    SAT [ 17] id    74 elv  10* azm   33* snr  23dBHz               10secs GLONASS
-    SAT [ 18] id    75 elv  13* azm   84* snr  27dBHz               10secs GLONASS
-    SAT [ 19] id    76 elv   2* azm  125* snr  25dBHz               10secs GLONASS
-    SAT [ 20] id    81 elv  67* azm  285* snr  15dBHz               10secs GLONASS
-    SAT [ 21] id    82 elv  22* azm  329* snr  33dBHz               10secs GLONASS
-    SAT [ 22] id    87 elv   3* azm  164* snr  35dBHz               10secs GLONASS
-    SAT [ 23] id    88 elv  46* azm  181* snr  34dBHz               10secs GLONASS
-    SAT [ 24] id    91 elv   6* azm  155* snr   0dBHz               10secs GLONASS
-    SAT [ 25] id    92 elv   2* azm  125* snr   0dBHz               10secs GLONASS
+    ACT [1]  {    13    10    21    51    27    24 } [ 6] [12]      10secs GPS
+    ACT [2]  {    15    29    26    48    20    16 } [ 6] [12]      10secs GPS
+    ACT [1]  {    81    67    82    66    88    65 } [ 6] [ 6]      10secs GLONASS
+    DOP   1.15pdop   0.69hdop   0.92vdop                            10secs GPS
+    DOP   1.15pdop   0.69hdop   0.92vdop                            10secs GLONASS
+    SAT [  1] id     4 elv   0* azm    0* snr  29dBHz               10secs GPS
+    SAT [  2] id     5 elv   1* azm   65* snr  12dBHz               10secs GPS
+    SAT [  3] id    10 elv  31* azm  256* snr  21dBHz               10secs GPS
+    SAT [  4] id    13 elv  29* azm   49* snr  26dBHz               10secs GPS
+    SAT [  5] id    15 elv  59* azm   83* snr  17dBHz               10secs GPS
+    SAT [  6] id    16 elv  14* azm  285* snr  26dBHz               10secs GPS
+    SAT [  7] id    20 elv  56* azm  274* snr  27dBHz               10secs GPS
+    SAT [  8] id    21 elv  75* azm  344* snr  30dBHz               10secs GPS
+    SAT [  9] id    24 elv   9* azm  126* snr  20dBHz               10secs GPS
+    SAT [ 10] id    26 elv   8* azm  260* snr  21dBHz               10secs GPS
+    SAT [ 11] id    27 elv  15* azm  321* snr  29dBHz               10secs GPS
+    SAT [ 12] id    29 elv  32* azm  171* snr  44dBHz               10secs GPS
+    SAT [ 13] id    46 elv  38* azm  215* snr  36dBHz               10secs GPS
+    SAT [ 14] id    48 elv  36* azm  220* snr  35dBHz               10secs GPS
+    SAT [ 15] id    51 elv  44* azm  183* snr  33dBHz               10secs GPS
+    SAT [ 16] id    65 elv  29* azm   36* snr  27dBHz               10secs GLONASS
+    SAT [ 17] id    66 elv  80* azm  286* snr  15dBHz               10secs GLONASS
+    SAT [ 18] id    67 elv  29* azm  227* snr  35dBHz               10secs GLONASS
+    SAT [ 19] id    74 elv   0* azm   30* snr   0dBHz               10secs GLONASS
+    SAT [ 20] id    81 elv  77* azm  339* snr  37dBHz               10secs GLONASS
+    SAT [ 21] id    82 elv  25* azm  327* snr  26dBHz               10secs GLONASS
+    SAT [ 22] id    87 elv   3* azm  144* snr  25dBHz               10secs GLONASS
+    SAT [ 23] id    88 elv  47* azm  140* snr  34dBHz               10secs GLONASS
+    SAT [ 24] id    91 elv   3* azm  136* snr   0dBHz               10secs GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -448,9 +446,9 @@ signed two's complement.)
 STA displays some of the results received in the UBX-NAV-STATUS message if
 enabled. Ublox 8 chips with firmware revision 18 and above can provide clues
 to spoofing based on comparing navigation solutions from multiple GNSSes if
-available. (N.B. I don't have a way to test this.) The Time Of Week (TOW),
-first fix (ff), and uptime numeric fields are also good tests of the conversion
-from little endian to host byte order.
+available. (N.B. I don't have a way to test this.) The first fix (ff), and
+uptime (up) numeric fields are also good examples of the conversion from little
+endian to host byte order.
 
 LOC is the current local time provided by the host system and (if available
 and enabled) wideband and narrowband jamming indicators and spoofing indicators.
