@@ -480,7 +480,7 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 
 		if (hp->payload.jamInd > jamInd_maximum) { jamInd_maximum = hp->payload.jamInd; }
 
-		fprintf(fp, "MON %cjam %chistory %3uindicator %3umaximum %20s %3usecs %-8s\n", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum, "", hp->ticks, "");
+		fprintf(fp, "MON %cjammed  %chistory %3uindicator %3umaximum %16s %3usecs %-8s\n", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum, "", hp->ticks, "");
 	}
 }
 
@@ -535,7 +535,7 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 			spoofing_prior = spoofing;
 		}
 
-		fprintf(fp, "STA %cspoof %chistory ff %10ums up %10ums %10s %3usecs %-8s\n", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, "", sp->ticks, "");
+		fprintf(fp, "STA %cspoofed %chistory ff %10ums up %10ums %8s %3usecs %-8s\n", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, "", sp->ticks, "");
 	}
 }
 
