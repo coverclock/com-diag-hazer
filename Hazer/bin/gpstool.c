@@ -22,23 +22,28 @@
  *
  * EXAMPLES
  *
- * gpstool -?
+ *	gpstool -?
  *
- * gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -v
+ *	gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -v
  *
- * gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E
+ *	gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E
  *
- * gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -L nmea.txt
+ *	gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -L nmea.txt
  *
- * gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -6 -A ::1 -P 5555
+ *	gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -6 -A ::1 -P 5555
  *
- * gpstool -6 -P 5555 -E
+ *	pstool -6 -P 5555 -E
  *
- * gpstool -d -v
+ *	gpstool -d -v
  *
- * gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -E -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0'
+ *	gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -E -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0'
  *
- * gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -F -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0'
+ *	gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -F -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0'
+ *
+ * You can log the standard error output to the system log using the Diminuto
+ * log command.
+ *
+ *	gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -E 2> >(log -S)
  */
 
 #include <assert.h>
