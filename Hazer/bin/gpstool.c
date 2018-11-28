@@ -77,8 +77,6 @@
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/diminuto/diminuto_list.h"
-#include "com/diag/diminuto/diminuto_alarm.h"
-#include "com/diag/diminuto/diminuto_timer.h"
 #include "com/diag/diminuto/diminuto_frequency.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_countof.h"
@@ -248,9 +246,7 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
 
         fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
 
-        fprintf(fp, "%4s", "");
-
-        fprintf(fp, " %3usecs", aa[system].ticks);
+        fprintf(fp, "%12s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -272,9 +268,7 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
 
         fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
 
-        fprintf(fp, "%4s", "");
-
-        fprintf(fp, " %3usecs", aa[system].ticks);
+        fprintf(fp, "%12s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -291,9 +285,7 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
 
         fprintf(fp, " %6.2lfpdop %6.2lfhdop %6.2lfvdop", (double)aa[system].pdop / 100.0, (double)aa[system].hdop / 100.0, (double)aa[system].vdop / 100.0);
 
-        fprintf(fp, "%26s", "");
-
-        fprintf(fp, " %3usecs", aa[system].ticks);
+        fprintf(fp, "%34s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -331,9 +323,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[])
 
                 fprintf(fp, " [%3d] id %5u elv %3d* azm %4d* snr %3ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
 
-                fprintf(fp, "%13s", "");
-
-                fprintf(fp, " %3usecs", va[system].ticks);
+                fprintf(fp, "%21s", "");
 
                 fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -480,7 +470,7 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 
         if (hp->payload.jamInd > jamInd_maximum) { jamInd_maximum = hp->payload.jamInd; }
 
-        fprintf(fp, "MON %cjamming  %chistory %3uindicator %3umaximum %15s %3usecs %-8s\n", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum, "", hp->ticks, "");
+        fprintf(fp, "MON %cjamming  %chistory %3uindicator %3umaximum %23s %-8s\n", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum, "", "");
     }
 }
 
@@ -535,7 +525,7 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
             spoofing_prior = spoofing;
         }
 
-        fprintf(fp, "STA %cspoofing %chistory %10ums %10ums %13s %3usecs %-8s\n", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, "", sp->ticks, "");
+        fprintf(fp, "STA %cspoofing %chistory %10ums %10ums %21s %-8s\n", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, "", "");
     }
 }
 
@@ -588,9 +578,7 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
         fprintf(fp, " %cpps", pps ? '1' : '0');
 
-        fprintf(fp, "%33s", "");
-
-        fprintf(fp, " %3usecs", pa[system].ticks);
+        fprintf(fp, "%41s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -629,9 +617,7 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
         decimal /= 1000000000.0;
         fprintf(fp, " %11.6lf", decimal);
 
-        fprintf(fp, "%4s", "");
-
-        fprintf(fp, " %3usecs", pa[system].ticks);
+        fprintf(fp, "%12s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -652,9 +638,7 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
         decimal /= 1000.0;
         fprintf(fp, " %10.3lfm", decimal);
 
-        fprintf(fp, "%35s", "");
-
-        fprintf(fp, " %3usecs", pa[system].ticks);
+        fprintf(fp, "%43s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -684,9 +668,7 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
         decimal /= 1000000000.0;
         fprintf(fp, " %7.3lf*M", decimal);
 
-        fprintf(fp, "%36s", "");
-
-        fprintf(fp, " %3usecs", pa[system].ticks);
+        fprintf(fp, "%44s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -711,9 +693,7 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
         decimal /= 1000000.0;
         fprintf(fp, " %10.3lfkph", decimal);
 
-        fprintf(fp, "%15s", "");
-
-        fprintf(fp, " %3usecs", pa[system].ticks);
+        fprintf(fp, "%23s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -737,9 +717,7 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
         fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
 
-        fprintf(fp, "%15s", "");
-
-        fprintf(fp, " %3usecs", pa[system].ticks);
+        fprintf(fp, "%23s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -913,7 +891,7 @@ int main(int argc, char * argv[])
     int strobepin = -1;
     int ppspin = -1;
     int ignorechecksums = 0;
-    int frequency = 0;
+    int slow = 0;
     role_t role = ROLE;
     protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
@@ -988,6 +966,13 @@ int main(int argc, char * argv[])
     yodel_hardware_t hardware = { { 0 } };
     yodel_status_t status = { { 0 } };
     /*
+     * Real-time-related variables.
+     */
+    diminuto_sticks_t frequency = 0;
+    diminuto_sticks_t was = 0;
+    diminuto_sticks_t now = 0;
+    diminuto_ticks_t elapsed = 0;
+    /*
      * Miscellaneous working variables.
      */
     int rc = 0;
@@ -1002,9 +987,6 @@ int main(int argc, char * argv[])
     char lsn = '\0';
     int output = 0;
     FILE * fp = (FILE *)0;
-    int elapsed = 0;
-    unsigned int now = 0;
-    unsigned int was = 0;
     int refresh = 0;
     int index = -1;
     char * end = (char *)0;
@@ -1062,12 +1044,12 @@ int main(int argc, char * argv[])
         case 'E':
             report = !0;
             escape = !0;
-            frequency = 0;
+            slow = 0;
             break;
         case 'F':
             report = !0;
             escape = !0;
-            frequency = !0;
+            slow = !0;
             break;
         case 'I':
             pps = optarg;
@@ -1335,9 +1317,6 @@ int main(int argc, char * argv[])
     rc = diminuto_terminator_install(0);
     assert(rc >= 0);
 
-    rc = diminuto_alarm_install(!0);
-    assert(rc >= 0);
-
     /*
      * Initialize our time zone. The underlying tzset(3) call is relatively
      * expensive (it accesses the file system). But at least some
@@ -1352,20 +1331,6 @@ int main(int argc, char * argv[])
      */
 
     (void)diminuto_time_timezone(diminuto_time_clock());
-
-    /*
-     * Fire up our periodic timer so we can keep track of the age of every
-     * GPS update we receive. GPS receivers aren't polite enough to inform
-     * us when they've stopped getting updates from a particular global
-     * navigation satellite system (GNSS); we must notice this by their absence.
-     * And some receivers can receive updates from more than one GNSS by virtue
-     * of having more than one radio frequency (RF) stage, so that they can
-     * receive multiple frequencies simultaneously. Fresher updates are
-     * preferred over stale ones.
-     */
-
-    rc = diminuto_timer_periodic(diminuto_frequency());
-    assert(rc == 0);
 
     /*
      * Initialize the NMEA (Hazer) and UBX (Yodel) parsers. If you're into this
@@ -1460,6 +1425,13 @@ int main(int argc, char * argv[])
 
     if (escape) { fputs("\033[1;1H\033[0J", outfp); }
     if (report) { fflush(outfp); }
+
+    /*
+     * Start the clock.
+     */
+
+    frequency = diminuto_frequency();
+    now = diminuto_time_elapsed() / frequency;
 
     /**
      ** WORK LOOP
@@ -1684,12 +1656,13 @@ int main(int argc, char * argv[])
          * database, because NMEA isn't kind enough to remind us that we
          * haven't heard from a system lately (and UBX isn't kind enough to
          * remind us when a device has stopped transmitting entirely); hence
-         * data can get stale and needs to be aged out.
+         * data can get stale and needs to be aged out. (We subtract one to
+         * eliminate what is almost certainly a partial second.)
          */
 
         was = now;
-        elapsed = diminuto_alarm_check();
-        now += elapsed; /* Okay to wrap around. */
+        now = diminuto_time_elapsed() / frequency;
+        elapsed = (now > was) ? now - was : 0;
 
         if (elapsed > 0) {
 
@@ -1952,14 +1925,51 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         }
 
+#if 0
+        /*
+         * This code is just for block-box unit testing the expiration feature.
+         * It turns out to be remarkably difficult to block the most recent
+         * GPS receivers, e.g. the UBlox 8. Multiple RF-shielded bags will not
+         * block the GPS frequencies. Makes me wish I still had access to those
+         * gigantic walk-in Faraday cages that several of my clients have.
+         */
+        if (refresh) {
+            static int crowbar = 1000;
+            if (crowbar <= 0) {
+                for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
+                    position[index].ticks = 0;
+                }
+            }
+            if (crowbar <= 100) {
+                for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
+                    active[index].ticks = 0;
+                 }
+            }
+            if (crowbar <= 200) {
+                for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
+                    view[index].ticks = 0;
+                }
+            }
+            if (crowbar <= 300) {
+                hardware.ticks = 0;
+            }
+            if (crowbar <= 400) {
+                status.ticks = 0;
+            }
+            if (crowbar > 0) {
+            	crowbar -= 1;
+            }
+        }
+#endif
+
         /*
          * If anything was updated, refresh our display.
          */
 
         if (!refresh) {
-            /* Do nothing. */
-        } else if (frequency && (was == now)) {
-            /* Do nothing. */
+            /* Do nothing: nothing changed. */
+        } else if (slow && (was == now)) {
+            /* Do nothing: slow display cannot handle > 1Hz refresh rate. */
         } else {
             if (escape) { fputs("\033[3;1H", outfp); }
             if (report) {
