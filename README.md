@@ -331,7 +331,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 
     > gpstool -?
 
-    usage: gpstool [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
+    usage: gpstool [ -d ] [ -v ] [ -V ] [ -X ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -348,8 +348,9 @@ Optionally install Diminuto and Hazer in /usr/local.
            -O          Output sentences to DEVICE.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
-           -W NMEA     Collapse escapes, append checksum, and write to DEVICE.
            -V          Print release, vintage, and revision on standard output.
+           -W NMEA     Collapse escapes, append checksum, and write to DEVICE.
+           -X          Enable message expiration test mode.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
            -d          Display debug output on standard error.
@@ -388,45 +389,49 @@ the display looks something like this snapshot as it is continually updated.
 symbol. This should not be confused with its use as a delimeter in NMEA
 sentences.)
 
-    INP [ 70] $GLGSV,2,2,08,81,49,136,37,82,73,343,32,83,21,326,18,88,03,141,24*6
+    INP [ 46] $GLGSV,3,3,11,86,03,346,,89,58,011,,,,,40*61\r\n
     OUT [  6] \xb5b\x06>\0\0
-    MON -jamming  -history   9indicator  10maximum                   9secs
-    STA -spoofing -history       4146ms   85161375ms                10secs
-    LOC 2018-11-28T08:41:26.051-07:00+00T com-diag-hazer 10.0.0
-    TIM 2018-11-28T15:41:26Z 0pps                                   10secs GNSS
-    POS 39*47'39.26"N, 105*09'12.09"W   39.794239, -105.153360      10secs GNSS
-    ALT    5618.70'   1712.600m                                     10secs GNSS
-    COG N    0.000*T   0.000*M                                      10secs GNSS
-    SOG      0.016mph      0.014knots      0.026kph                 10secs GNSS
-    INT GGA [12] dmy 1 inc 1 (  9 10  5  0  0  4  4 )               10secs GNSS
-    ACT [1]  {    15    27    10    51    13    29 } [ 6] [12]      10secs GPS
-    ACT [2]  {    24    21    16    48    20    26 } [ 6] [12]      10secs GPS
-    ACT [1]  {    67    66    81    82    83    68 } [ 6] [ 6]      10secs GLONASS
-    DOP   1.11pdop   0.65hdop   0.90vdop                            10secs GPS
-    DOP   1.11pdop   0.65hdop   0.90vdop                            10secs GLONASS
-    SAT [  1] id     4 elv   0* azm    0* snr  30dBHz               10secs GPS
-    SAT [  2] id     5 elv   5* azm   62* snr   0dBHz               10secs GPS
-    SAT [  3] id    10 elv  27* azm  252* snr  22dBHz               10secs GPS
-    SAT [  4] id    13 elv  32* azm   54* snr  35dBHz               10secs GPS
-    SAT [  5] id    15 elv  60* azm   94* snr  33dBHz               10secs GPS
-    SAT [  6] id    16 elv  15* azm  290* snr  20dBHz               10secs GPS
-    SAT [  7] id    20 elv  52* azm  268* snr  28dBHz               10secs GPS
-    SAT [  8] id    21 elv  71* azm  334* snr  34dBHz               10secs GPS
-    SAT [  9] id    24 elv   6* azm  130* snr  28dBHz               10secs GPS
-    SAT [ 10] id    26 elv  11* azm  264* snr  18dBHz               10secs GPS
-    SAT [ 11] id    27 elv  11* azm  322* snr  27dBHz               10secs GPS
-    SAT [ 12] id    29 elv  37* azm  170* snr  46dBHz               10secs GPS
-    SAT [ 13] id    46 elv  38* azm  215* snr  31dBHz               10secs GPS
-    SAT [ 14] id    48 elv  36* azm  220* snr  33dBHz               10secs GPS
-    SAT [ 15] id    51 elv  44* azm  183* snr  31dBHz               10secs GPS
-    SAT [ 16] id    66 elv  43* azm   33* snr  37dBHz               10secs GLONASS
-    SAT [ 17] id    67 elv  77* azm  249* snr  31dBHz               10secs GLONASS
-    SAT [ 18] id    68 elv  22* azm  223* snr  33dBHz               10secs GLONASS
-    SAT [ 19] id    74 elv   0* azm  349* snr   0dBHz               10secs GLONASS
-    SAT [ 20] id    81 elv  49* azm  136* snr  37dBHz               10secs GLONASS
-    SAT [ 21] id    82 elv  73* azm  343* snr  32dBHz               10secs GLONASS
-    SAT [ 22] id    83 elv  21* azm  326* snr  18dBHz               10secs GLONASS
-    SAT [ 23] id    88 elv   3* azm  141* snr  24dBHz               10secs GLONASS
+    MON -jamming  -history   7indicator  14maximum
+    STA -spoofing -history       4146ms  101805147ms
+    LOC 2018-11-28T13:18:50.097-07:00+00T com-diag-hazer 10.0.0
+    TIM 2018-11-28T20:18:50Z 0pps                                          GNSS
+    POS 39*47'39.18"N, 105*09'12.15"W   39.794218, -105.153375             GNSS
+    ALT    5638.38'   1718.600m                                            GNSS
+    COG N    0.000*T   0.000*M                                             GNSS
+    SOG      0.037mph      0.032knots      0.060kph                        GNSS
+    INT GGA [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
+    ACT [1]  {    25     1    10    32    51    11 } [ 6] [12]             GPS
+    ACT [2]  {    31    12    48    20    22    14 } [ 6] [12]             GPS
+    ACT [1]  {    78    69    84    85    79    80 } [ 6] [ 7]             GLONASS
+    ACT [2]  {    68                               } [ 1] [ 7]             GLONASS
+    DOP   1.21pdop   0.60hdop   1.05vdop                                   GPS
+    DOP   1.21pdop   0.60hdop   1.05vdop                                   GLONASS
+    SAT [  1] id     1 elv  32* azm  308* snr  32dBHz                      GPS
+    SAT [  2] id     3 elv   3* azm  303* snr  12dBHz                      GPS
+    SAT [  3] id     8 elv   1* azm  243* snr   0dBHz                      GPS
+    SAT [  4] id    10 elv  43* azm  110* snr  34dBHz                      GPS
+    SAT [  5] id    11 elv  28* azm  282* snr  24dBHz                      GPS
+    SAT [  6] id    12 elv  10* azm   53* snr  22dBHz                      GPS
+    SAT [  7] id    14 elv  75* azm  331* snr  24dBHz                      GPS
+    SAT [  8] id    18 elv  49* azm  274* snr  40dBHz                      GPS
+    SAT [  9] id    20 elv  17* azm  122* snr  32dBHz                      GPS
+    SAT [ 10] id    22 elv  23* azm  305* snr  23dBHz                      GPS
+    SAT [ 11] id    25 elv  17* azm   86* snr  22dBHz                      GPS
+    SAT [ 12] id    31 elv  50* azm  180* snr  42dBHz                      GPS
+    SAT [ 13] id    32 elv  64* azm   35* snr  41dBHz                      GPS
+    SAT [ 14] id    46 elv  38* azm  215* snr   0dBHz                      GPS
+    SAT [ 15] id    48 elv  36* azm  220* snr  39dBHz                      GPS
+    SAT [ 16] id    51 elv  44* azm  183* snr  43dBHz                      GPS
+    SAT [ 17] id    68 elv  29* azm   77* snr  21dBHz                      GLONASS
+    SAT [ 18] id    69 elv  58* azm   11* snr  39dBHz                      GLONASS
+    SAT [ 19] id    70 elv  24* azm  301* snr  26dBHz                      GLONASS
+    SAT [ 20] id    78 elv  32* azm   44* snr  34dBHz                      GLONASS
+    SAT [ 21] id    79 elv  49* azm  115* snr  29dBHz                      GLONASS
+    SAT [ 22] id    80 elv  18* azm  169* snr  32dBHz                      GLONASS
+    SAT [ 23] id    84 elv  25* azm  236* snr  32dBHz                      GLONASS
+    SAT [ 24] id    85 elv  29* azm  298* snr  26dBHz                      GLONASS
+    SAT [ 25] id    86 elv   3* azm  346* snr   0dBHz                      GLONASS
+    SAT [ 26] id    89 elv  58* azm   11* snr   0dBHz                      GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -458,12 +463,11 @@ it will be a letter like "T" ("Tango") for Mountain Standard Time as found
 in Denver; otherwise it will be "J" ("Juliet") to indicate any local time zone.
 
 All subsequent lines represent the current state of Hazer data structures
-updated by data read from the device. Each line includes at its end the
-number of seconds left before this data expires because it has not been updated
-by the device, and the system (satellite constellation) with which it is
-associated. GNSS indicates that the device is computing an "ensemble" solution
-that uses transmissions from multiple constellations, for example, from both
-the U.S. GPS constellation and the Russian GLONASS constellation.
+updated by data read from the device. Each line includes at its end the system
+(satellite constellation) with which it is associated. GNSS indicates that the
+device is computing an "ensemble" solution that uses transmissions from multiple
+constellations, for example, from both the U.S. GPS constellation and the
+Russian GLONASS constellation.
 
 TIM is the most recent time solution, in UTC (or 'Z' for "Zulu"), and the
 current value of the One Pulse Per Second (1PPS) signal if the device provides
@@ -518,6 +522,14 @@ artifact of Hazer, the satellites identifying number (same comment as above),
 its elevation and azimuth in degrees from its ephemeris, and the signal to
 noise ratio (really, a carrier to noise density ratio) in decibels Hertz for
 its transmission.
+
+While NMEA (and UBX too for that matter) is good about updating the application
+with new information, it is not so good about letting the application know
+when that data is no longer relevant. For that reason, all of the data read
+from the GPS devices has associated with it an expiration time in seconds. This
+can be set from the command line, in the range 0 to the default of 255. If the
+data is not updated within that duration by new sentences or messages from the
+GPS device, it is no longer displayed.
 
 # Notes
 
