@@ -1134,7 +1134,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1151,8 +1151,9 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
             fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(errfp, "       -R          Print a report on standard output.\n");
-            fprintf(errfp, "       -W NMEA     Collapse escapes, append checksum, and write to DEVICE.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
+            fprintf(errfp, "       -W NMEA     Collapse escapes, append checksum, and write to DEVICE.\n");
+            fprintf(errfp, "       -X          Enable message expiration test mode.\n");
             fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(errfp, "       -d          Display debug output on standard error.\n");
