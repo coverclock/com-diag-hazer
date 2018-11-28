@@ -892,6 +892,7 @@ int main(int argc, char * argv[])
     int ppspin = -1;
     int ignorechecksums = 0;
     int slow = 0;
+    int expire = 0;
     role_t role = ROLE;
     protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
@@ -1004,7 +1005,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RW:Vb:cdehlmnop:rst:v?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RVW:Xb:cdehlmnop:rst:v?";
 
     /*
      * Parse the command line.
@@ -1067,14 +1068,17 @@ int main(int argc, char * argv[])
         case 'R':
             report = !0;
             break;
+        case 'V':
+            fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            break;
         case 'W':
             readonly = 0;
             node = (diminuto_list_t *)malloc(sizeof(diminuto_list_t));
             diminuto_list_datainit(node, optarg);
             diminuto_list_enqueue(&head, node);
             break;
-        case 'V':
-            fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+        case 'X':
+            expire = !0;
             break;
         case 'b':
             bitspersecond = strtoul(optarg, &end, 0);
@@ -1625,6 +1629,9 @@ int main(int argc, char * argv[])
 
             fprintf(errfp, "%s: FORMAT! %zd\n", program, length);
             print_buffer(errfp, buffer, size1, UNLIMITED);
+
+            format = FORMAT;
+
             continue;
 
         }
@@ -1862,7 +1869,6 @@ int main(int argc, char * argv[])
 
                 fputs("\".\n", errfp);
 
-
             } else {
 
                 /* Do nothing. */
@@ -1925,15 +1931,14 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         }
 
-#if 0
         /*
-         * This code is just for block-box unit testing the expiration feature.
+         * This code is just for testing the expiration feature.
          * It turns out to be remarkably difficult to block the most recent
          * GPS receivers, e.g. the UBlox 8. Multiple RF-shielded bags will not
          * block the GPS frequencies. Makes me wish I still had access to those
          * gigantic walk-in Faraday cages that several of my clients have.
          */
-        if (refresh) {
+        if (expire && refresh) {
             static int crowbar = 1000;
             if (crowbar <= 0) {
                 for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
@@ -1957,10 +1962,9 @@ int main(int argc, char * argv[])
                 status.ticks = 0;
             }
             if (crowbar > 0) {
-            	crowbar -= 1;
+                crowbar -= 1;
             }
         }
-#endif
 
         /*
          * If anything was updated, refresh our display.
