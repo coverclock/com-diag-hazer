@@ -231,61 +231,61 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-		if (aa[system].ticks == 0) { continue; }
-		if (aa[system].active == 0) { continue; }
+        if (aa[system].ticks == 0) { continue; }
+        if (aa[system].active == 0) { continue; }
 
-		fprintf(fp, "%s {", "ACT [1] ");
+        fprintf(fp, "%s {", "ACT [1] ");
 
-		count = 0;
-		for (satellite = 0; satellite < (IDENTIFIERS / 2); ++satellite) {
-			if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
-				fprintf(fp, " %5u", aa[system].id[satellite]);
-				count += 1;
-			} else {
-				fputs("      ", fp);
-			}
-		}
+        count = 0;
+        for (satellite = 0; satellite < (IDENTIFIERS / 2); ++satellite) {
+            if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
+                fprintf(fp, " %5u", aa[system].id[satellite]);
+                count += 1;
+            } else {
+                fputs("      ", fp);
+            }
+        }
 
-		fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
+        fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
 
-		fprintf(fp, "%4s", "");
+        fprintf(fp, "%4s", "");
 
-		fprintf(fp, " %3usecs", aa[system].ticks);
+        fprintf(fp, " %3usecs", aa[system].ticks);
 
-		fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-		fputc('\n', fp);
+        fputc('\n', fp);
 
-		if (aa[system].active <= (IDENTIFIERS / 2)) { continue; }
+        if (aa[system].active <= (IDENTIFIERS / 2)) { continue; }
 
-		fprintf(fp, "%s {", "ACT [2] ");
+        fprintf(fp, "%s {", "ACT [2] ");
 
-		count = 0;
-		for (satellite = (IDENTIFIERS / 2); satellite < IDENTIFIERS; ++satellite) {
-			if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
-				fprintf(fp, " %5u", aa[system].id[satellite]);
-				count += 1;
-			} else {
-				fputs("      ", fp);
-			}
-		}
+        count = 0;
+        for (satellite = (IDENTIFIERS / 2); satellite < IDENTIFIERS; ++satellite) {
+            if ((satellite < aa[system].active) && (aa[system].id[satellite] != 0)) {
+                fprintf(fp, " %5u", aa[system].id[satellite]);
+                count += 1;
+            } else {
+                fputs("      ", fp);
+            }
+        }
 
-		fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
+        fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
 
-		fprintf(fp, "%4s", "");
+        fprintf(fp, "%4s", "");
 
-		fprintf(fp, " %3usecs", aa[system].ticks);
+        fprintf(fp, " %3usecs", aa[system].ticks);
 
-		fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-		fputc('\n', fp);
+        fputc('\n', fp);
 
-	}
+    }
 
-	for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-       	if (aa[system].ticks == 0) { continue; }
-       	if (aa[system].active == 0) { continue; }
+        if (aa[system].ticks == 0) { continue; }
+        if (aa[system].active == 0) { continue; }
 
         fprintf(fp, "%s", "DOP");
 
@@ -318,20 +318,20 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[])
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (va[system].ticks == 0) { continue; }
+        if (va[system].ticks == 0) { continue; }
 
-    	limit = va[system].channels;
-    	if (limit > va[system].view) { limit = va[system].view; }
+        limit = va[system].channels;
+        if (limit > va[system].view) { limit = va[system].view; }
         if (limit > SATELLITES) { limit = SATELLITES; }
 
         for (satellite = 0; satellite < limit; ++satellite) {
             if (va[system].sat[satellite].id != 0) {
 
-        		fputs("SAT", fp);
+                fputs("SAT", fp);
 
-            	fprintf(fp, " [%3d] id %5u elv %3d* azm %4d* snr %3ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
+                fprintf(fp, " [%3d] id %5u elv %3d* azm %4d* snr %3ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
 
-            	fprintf(fp, "%13s", "");
+                fprintf(fp, "%13s", "");
 
                 fprintf(fp, " %3usecs", va[system].ticks);
 
@@ -369,61 +369,61 @@ static void print_local(FILE * fp, FILE * ep)
     char zone = '\0';
     int rc = 0;
 
-	fputs("LOC", fp);
+    fputs("LOC", fp);
 
-	epoch = diminuto_time_clock();
-	assert(epoch >= 0);
-	rc = diminuto_time_juliet(epoch, &year, &month, &day, &hour, &minute, &second, &fraction);
-	assert(rc == 0);
-	assert((1 <= month) && (month <= 12));
-	assert((1 <= day) && (day <= 31));
-	assert((0 <= hour) && (hour <= 23));
-	assert((0 <= minute) && (minute <= 59));
-	assert((0 <= second) && (second <= 59));
+    epoch = diminuto_time_clock();
+    assert(epoch >= 0);
+    rc = diminuto_time_juliet(epoch, &year, &month, &day, &hour, &minute, &second, &fraction);
+    assert(rc == 0);
+    assert((1 <= month) && (month <= 12));
+    assert((1 <= day) && (day <= 31));
+    assert((0 <= hour) && (hour <= 23));
+    assert((0 <= minute) && (minute <= 59));
+    assert((0 <= second) && (second <= 59));
 
-	/*
-	 * I arbitrarily decided to render the fractional part in milliseconds.
-	 */
+    /*
+     * I arbitrarily decided to render the fractional part in milliseconds.
+     */
 
-	milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-	assert((0 <= milliseconds) && (milliseconds < 1000LL));
-	fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.%03lu", year, month, day, hour, minute, second, (long unsigned int)milliseconds);
+    milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
+    assert((0 <= milliseconds) && (milliseconds < 1000LL));
+    fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.%03lu", year, month, day, hour, minute, second, (long unsigned int)milliseconds);
 
-	/*
-	 * There are time zones whose offset are not in whole hours. That's why
-	 * ISO 8601 permits HH:MM as a format. Go figure. Why do we call this
-	 * every time rather than cache the offset ourselves? Because it is
-	 * conceivable that it might be manually changed by a misguided systems
-	 * administrator while the application is running, and the underlying
-	 * tzset(3) might actually notice that the zone information in the file
-	 * system has been altered. Not only will this change the local time,
-	 * but it will add some latency and jitter to the GPS display. (Yet
-	 * another reason to admin your embedded system to UTC.)
-	 */
+    /*
+     * There are time zones whose offset are not in whole hours. That's why
+     * ISO 8601 permits HH:MM as a format. Go figure. Why do we call this
+     * every time rather than cache the offset ourselves? Because it is
+     * conceivable that it might be manually changed by a misguided systems
+     * administrator while the application is running, and the underlying
+     * tzset(3) might actually notice that the zone information in the file
+     * system has been altered. Not only will this change the local time,
+     * but it will add some latency and jitter to the GPS display. (Yet
+     * another reason to admin your embedded system to UTC.)
+     */
 
-	offset = diminuto_time_timezone(epoch);
-	zone = diminuto_time_zonename(offset);
+    offset = diminuto_time_timezone(epoch);
+    zone = diminuto_time_zonename(offset);
 
-	offset = diminuto_frequency_ticks2wholeseconds(offset);
-	hour = offset / 3600;
-	minute = (offset % 3600) / 60;
-	if (minute < 0) { minute = -minute; }
-	fprintf(fp, "%+2.2d:%02d", hour, minute);
+    offset = diminuto_frequency_ticks2wholeseconds(offset);
+    hour = offset / 3600;
+    minute = (offset % 3600) / 60;
+    if (minute < 0) { minute = -minute; }
+    fprintf(fp, "%+2.2d:%02d", hour, minute);
 
-	/*
-	 * The abomination that is Daylight Saving Time has an offset that
-	 * depends upon the current date and time. We express this separately,
-	 * in a mild extension of ISO 8601, so that we don't confuse the DST
-	 * offset (which changes seasonally) with the time zone offset (which is,
-	 * typically, fixed).
-	 */
+    /*
+     * The abomination that is Daylight Saving Time has an offset that
+     * depends upon the current date and time. We express this separately,
+     * in a mild extension of ISO 8601, so that we don't confuse the DST
+     * offset (which changes seasonally) with the time zone offset (which is,
+     * typically, fixed).
+     */
 
-	offset = diminuto_time_daylightsaving(epoch);
-	offset = diminuto_frequency_ticks2wholeseconds(offset);
-	hour = offset / 3600;
-	fprintf(fp, "%+2.2d%c", hour, zone);
+    offset = diminuto_time_daylightsaving(epoch);
+    offset = diminuto_frequency_ticks2wholeseconds(offset);
+    hour = offset / 3600;
+    fprintf(fp, "%+2.2d%c", hour, zone);
 
-	fprintf(fp, " com-diag-hazer %-26s", COM_DIAG_HAZER_RELEASE);
+    fprintf(fp, " com-diag-hazer %-26s", COM_DIAG_HAZER_RELEASE);
 
     fputc('\n', fp);
 }
@@ -436,52 +436,52 @@ static void print_local(FILE * fp, FILE * ep)
  */
 static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 {
-	/*
-	 * Indicate detection of broadband or continuous wave (cw) jamming.
-	 * Relies on support from later versions of Ublox 8 firmware, and must be
-	 * explicitly enabled by sending appropriate messages to the Ublox device.
-	 */
+    /*
+     * Indicate detection of broadband or continuous wave (cw) jamming.
+     * Relies on support from later versions of Ublox 8 firmware, and must be
+     * explicitly enabled by sending appropriate messages to the Ublox device.
+     */
 
-	if (hp->ticks > 0) {
-		uint8_t value;
-		char jamming;
-		static char jamming_prior = STATUS;
-		static char jamming_history = STATUS;
-		static uint8_t jamInd_maximum = 0;
+    if (hp->ticks > 0) {
+        uint8_t value;
+        char jamming;
+        static char jamming_prior = STATUS;
+        static char jamming_history = STATUS;
+        static uint8_t jamInd_maximum = 0;
 
-		value = (hp->payload.flags >> YODEL_UBX_MON_HW_flags_jammingState_SHIFT) & YODEL_UBX_MON_HW_flags_jammingState_MASK;
-		switch (value) {
-		case YODEL_UBX_MON_HW_flags_jammingState_unknown:
-			jamming = UNKNOWN;
-			if (jamming_history == STATUS) { jamming_history = jamming; }
-			break;
-		case YODEL_UBX_MON_HW_flags_jammingState_none:
-			jamming = NONE;
-			if ((jamming_history == STATUS) || (jamming_history == UNKNOWN)) { jamming_history = jamming; }
-			break;
-		case YODEL_UBX_MON_HW_flags_jammingState_warning:
-			jamming = WARNING;
-			if (jamming_history != CRITICAL) { jamming_history = jamming; }
-			break;
-		case YODEL_UBX_MON_HW_flags_jammingState_critical:
-			jamming = CRITICAL;
-			jamming_history = jamming;
-			break;
-		default:
-			jamming = INVALID;
-			if ((jamming_history == STATUS) || (jamming_history == UNKNOWN)) { jamming_history = jamming; }
-			break;
-		}
+        value = (hp->payload.flags >> YODEL_UBX_MON_HW_flags_jammingState_SHIFT) & YODEL_UBX_MON_HW_flags_jammingState_MASK;
+        switch (value) {
+        case YODEL_UBX_MON_HW_flags_jammingState_unknown:
+            jamming = UNKNOWN;
+            if (jamming_history == STATUS) { jamming_history = jamming; }
+            break;
+        case YODEL_UBX_MON_HW_flags_jammingState_none:
+            jamming = NONE;
+            if ((jamming_history == STATUS) || (jamming_history == UNKNOWN)) { jamming_history = jamming; }
+            break;
+        case YODEL_UBX_MON_HW_flags_jammingState_warning:
+            jamming = WARNING;
+            if (jamming_history != CRITICAL) { jamming_history = jamming; }
+            break;
+        case YODEL_UBX_MON_HW_flags_jammingState_critical:
+            jamming = CRITICAL;
+            jamming_history = jamming;
+            break;
+        default:
+            jamming = INVALID;
+            if ((jamming_history == STATUS) || (jamming_history == UNKNOWN)) { jamming_history = jamming; }
+            break;
+        }
 
-		if (jamming != jamming_prior) {
-			fprintf(ep, "%s: UBX JAMMING %u INDICATOR %u\n", program, value, hp->payload.jamInd);
-			jamming_prior = jamming;
-		}
+        if (jamming != jamming_prior) {
+            fprintf(ep, "%s: UBX JAMMING %u INDICATOR %u\n", program, value, hp->payload.jamInd);
+            jamming_prior = jamming;
+        }
 
-		if (hp->payload.jamInd > jamInd_maximum) { jamInd_maximum = hp->payload.jamInd; }
+        if (hp->payload.jamInd > jamInd_maximum) { jamInd_maximum = hp->payload.jamInd; }
 
-		fprintf(fp, "MON %cjamming  %chistory %3uindicator %3umaximum %15s %3usecs %-8s\n", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum, "", hp->ticks, "");
-	}
+        fprintf(fp, "MON %cjamming  %chistory %3uindicator %3umaximum %15s %3usecs %-8s\n", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum, "", hp->ticks, "");
+    }
 }
 
 /**
@@ -492,51 +492,51 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
  */
 static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 {
-	/*
-	 * Indicate detection of spoofing by comparing solutions from multiple
-	 * GNSSes if (and only if) available. Relies on support from later versions
-	 * of Ublox 8 firmware, and must be explicitly enabled by sending
-	 * appropriate messages to the UBlox device.
-	 */
+    /*
+     * Indicate detection of spoofing by comparing solutions from multiple
+     * GNSSes if (and only if) available. Relies on support from later versions
+     * of Ublox 8 firmware, and must be explicitly enabled by sending
+     * appropriate messages to the UBlox device.
+     */
 
-	if (sp->ticks > 0) {
-		uint8_t value;
-		char spoofing;
-		static char spoofing_prior = STATUS;
-		static char spoofing_history = STATUS;
+    if (sp->ticks > 0) {
+        uint8_t value;
+        char spoofing;
+        static char spoofing_prior = STATUS;
+        static char spoofing_history = STATUS;
 
-		value = (sp->payload.flags2 >> YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT) & YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK;
+        value = (sp->payload.flags2 >> YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT) & YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK;
 
-		switch (value) {
-		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_unknown:
-			spoofing = UNKNOWN;
-			if (spoofing_history == STATUS) { spoofing_history = spoofing; }
-			break;
-		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_none:
-			spoofing = NONE;
-			if ((spoofing_history == STATUS) || (spoofing_history == UNKNOWN)) { spoofing_history = spoofing; }
-			break;
-		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_one:
-			spoofing = WARNING;
-			if (spoofing_history != CRITICAL) { spoofing_history = spoofing; }
-			break;
-		case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_many:
-			spoofing = CRITICAL;
-			spoofing_history = spoofing;
-			break;
-		default:
-			spoofing = INVALID;
-			if ((spoofing_history == STATUS) || (spoofing_history == UNKNOWN)) { spoofing_history = spoofing; }
-			break;
-		}
+        switch (value) {
+        case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_unknown:
+            spoofing = UNKNOWN;
+            if (spoofing_history == STATUS) { spoofing_history = spoofing; }
+            break;
+        case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_none:
+            spoofing = NONE;
+            if ((spoofing_history == STATUS) || (spoofing_history == UNKNOWN)) { spoofing_history = spoofing; }
+            break;
+        case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_one:
+            spoofing = WARNING;
+            if (spoofing_history != CRITICAL) { spoofing_history = spoofing; }
+            break;
+        case YODEL_UBX_NAV_STATUS_flags2_spoofDetState_many:
+            spoofing = CRITICAL;
+            spoofing_history = spoofing;
+            break;
+        default:
+            spoofing = INVALID;
+            if ((spoofing_history == STATUS) || (spoofing_history == UNKNOWN)) { spoofing_history = spoofing; }
+            break;
+        }
 
-		if (spoofing != spoofing_prior) {
-			fprintf(ep, "%s: UBX SPOOFING %u\n", program, value);
-			spoofing_prior = spoofing;
-		}
+        if (spoofing != spoofing_prior) {
+            fprintf(ep, "%s: UBX SPOOFING %u\n", program, value);
+            spoofing_prior = spoofing;
+        }
 
-		fprintf(fp, "STA %cspoofing %chistory %10ums %10ums %13s %3usecs %-8s\n", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, "", sp->ticks, "");
-	}
+        fprintf(fp, "STA %cspoofing %chistory %10ums %10ums %13s %3usecs %-8s\n", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, "", sp->ticks, "");
+    }
 }
 
 /**
@@ -567,28 +567,28 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
     const char * compass = (const char *)0;
     char zone = '\0';
 
-	zone = diminuto_time_zonename(0);
+    zone = diminuto_time_zonename(0);
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (pa[system].ticks == 0) { continue; }
-    	if (pa[system].utc_nanoseconds == 0) { continue; }
-    	if (pa[system].dmy_nanoseconds == 0) { continue; }
+        if (pa[system].ticks == 0) { continue; }
+        if (pa[system].utc_nanoseconds == 0) { continue; }
+        if (pa[system].dmy_nanoseconds == 0) { continue; }
 
-		fputs("TIM", fp);
+        fputs("TIM", fp);
 
-		hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
-		assert((1 <= month) && (month <= 12));
-		assert((1 <= day) && (day <= 31));
-		assert((0 <= hour) && (hour <= 23));
-		assert((0 <= minute) && (minute <= 59));
-		assert((0 <= second) && (second <= 59));
-		assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
-		fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
+        hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
+        assert((1 <= month) && (month <= 12));
+        assert((1 <= day) && (day <= 31));
+        assert((0 <= hour) && (hour <= 23));
+        assert((0 <= minute) && (minute <= 59));
+        assert((0 <= second) && (second <= 59));
+        assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
+        fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
 
-		fprintf(fp, " %cpps", pps ? '1' : '0');
+        fprintf(fp, " %cpps", pps ? '1' : '0');
 
-    	fprintf(fp, "%33s", "");
+        fprintf(fp, "%33s", "");
 
         fprintf(fp, " %3usecs", pa[system].ticks);
 
@@ -600,36 +600,36 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (pa[system].ticks == 0) { continue; }
-    	if (pa[system].utc_nanoseconds == 0) { continue; }
+        if (pa[system].ticks == 0) { continue; }
+        if (pa[system].utc_nanoseconds == 0) { continue; }
 
         fputs("POS", fp);
 
-		hazer_format_nanodegrees2position(pa[system].lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
-		assert((0 <= degrees) && (degrees <= 90));
-		assert((0 <= minutes) && (minutes <= 59));
-		assert((0 <= seconds) && (seconds <= 59));
-		assert((0 <= hundredths) && (hundredths <= 99));
-		fprintf(fp, " %2d*%02d'%02d.%02d\"%c,", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
+        hazer_format_nanodegrees2position(pa[system].lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+        assert((0 <= degrees) && (degrees <= 90));
+        assert((0 <= minutes) && (minutes <= 59));
+        assert((0 <= seconds) && (seconds <= 59));
+        assert((0 <= hundredths) && (hundredths <= 99));
+        fprintf(fp, " %2d*%02d'%02d.%02d\"%c,", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
 
-		hazer_format_nanodegrees2position(pa[system].lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
-		assert((0 <= degrees) && (degrees <= 180));
-		assert((0 <= minutes) && (minutes <= 59));
-		assert((0 <= seconds) && (seconds <= 59));
-		assert((0 <= hundredths) && (hundredths <= 99));
-		fprintf(fp, " %3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
+        hazer_format_nanodegrees2position(pa[system].lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+        assert((0 <= degrees) && (degrees <= 180));
+        assert((0 <= minutes) && (minutes <= 59));
+        assert((0 <= seconds) && (seconds <= 59));
+        assert((0 <= hundredths) && (hundredths <= 99));
+        fprintf(fp, " %3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
-		fputc(' ', fp);
+        fputc(' ', fp);
 
-		decimal = pa[system].lat_nanodegrees;
-		decimal /= 1000000000.0;
-		fprintf(fp, " %10.6lf,", decimal);
+        decimal = pa[system].lat_nanodegrees;
+        decimal /= 1000000000.0;
+        fprintf(fp, " %10.6lf,", decimal);
 
-		decimal = pa[system].lon_nanodegrees;
-		decimal /= 1000000000.0;
-		fprintf(fp, " %11.6lf", decimal);
+        decimal = pa[system].lon_nanodegrees;
+        decimal /= 1000000000.0;
+        fprintf(fp, " %11.6lf", decimal);
 
-    	fprintf(fp, "%4s", "");
+        fprintf(fp, "%4s", "");
 
         fprintf(fp, " %3usecs", pa[system].ticks);
 
@@ -641,50 +641,18 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (pa[system].ticks == 0) { continue; }
-    	if (pa[system].utc_nanoseconds == 0) { continue; }
+        if (pa[system].ticks == 0) { continue; }
+        if (pa[system].utc_nanoseconds == 0) { continue; }
 
         fputs("ALT", fp);
 
-		fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
+        fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
 
-		decimal = pa[system].alt_millimeters;
-		decimal /= 1000.0;
-		fprintf(fp, " %10.3lfm", decimal);
+        decimal = pa[system].alt_millimeters;
+        decimal /= 1000.0;
+        fprintf(fp, " %10.3lfm", decimal);
 
-    	fprintf(fp, "%35s", "");
-
-        fprintf(fp, " %3usecs", pa[system].ticks);
-
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
-
-        fputc('\n', fp);
-
-    }
-
-	for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
-
-    	if (pa[system].ticks == 0) { continue; }
-    	if (pa[system].utc_nanoseconds == 0) { continue; }
-
-        fputs("COG", fp);
-
-		assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
-
-		compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
-		assert(compass != (const char *)0);
-		assert(strlen(compass) <= 4);
-		fprintf(fp, " %-2s", compass);
-
-		decimal = pa[system].cog_nanodegrees;
-		decimal /= 1000000000.0;
-		fprintf(fp, " %7.3lf*T", decimal);
-
-		decimal = pa[system].mag_nanodegrees;
-		decimal /= 1000000000.0;
-		fprintf(fp, " %7.3lf*M", decimal);
-
-    	fprintf(fp, "%36s", "");
+        fprintf(fp, "%35s", "");
 
         fprintf(fp, " %3usecs", pa[system].ticks);
 
@@ -693,67 +661,99 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
         fputc('\n', fp);
 
     }
-
-	for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
-
-    	if (pa[system].ticks == 0) { continue; }
-    	if (pa[system].utc_nanoseconds == 0) { continue; }
-
-        fputs("SOG", fp);
-
-		fprintf(fp, " %10.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
-
-		decimal = pa[system].sog_microknots;
-		decimal /= 1000000.0;
-		fprintf(fp, " %10.3lfknots", decimal);
-
-		decimal = pa[system].sog_millimeters;
-		decimal /= 1000000.0;
-		fprintf(fp, " %10.3lfkph", decimal);
-
-    	fprintf(fp, "%15s", "");
-
-        fprintf(fp, " %3usecs", pa[system].ticks);
-
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
-
-        fputc('\n', fp);
-
-	}
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-    	if (pa[system].ticks == 0) { continue; }
+        if (pa[system].ticks == 0) { continue; }
+        if (pa[system].utc_nanoseconds == 0) { continue; }
+
+        fputs("COG", fp);
+
+        assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
+
+        compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
+        assert(compass != (const char *)0);
+        assert(strlen(compass) <= 4);
+        fprintf(fp, " %-2s", compass);
+
+        decimal = pa[system].cog_nanodegrees;
+        decimal /= 1000000000.0;
+        fprintf(fp, " %7.3lf*T", decimal);
+
+        decimal = pa[system].mag_nanodegrees;
+        decimal /= 1000000000.0;
+        fprintf(fp, " %7.3lf*M", decimal);
+
+        fprintf(fp, "%36s", "");
+
+        fprintf(fp, " %3usecs", pa[system].ticks);
+
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+        fputc('\n', fp);
+
+    }
+
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+        if (pa[system].ticks == 0) { continue; }
+        if (pa[system].utc_nanoseconds == 0) { continue; }
+
+        fputs("SOG", fp);
+
+        fprintf(fp, " %10.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
+
+        decimal = pa[system].sog_microknots;
+        decimal /= 1000000.0;
+        fprintf(fp, " %10.3lfknots", decimal);
+
+        decimal = pa[system].sog_millimeters;
+        decimal /= 1000000.0;
+        fprintf(fp, " %10.3lfkph", decimal);
+
+        fprintf(fp, "%15s", "");
+
+        fprintf(fp, " %3usecs", pa[system].ticks);
+
+        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+        fputc('\n', fp);
+
+    }
+
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+        if (pa[system].ticks == 0) { continue; }
 
         fputs("INT", fp);
 
         fprintf(fp, " %s", pa[system].label);
 
-		fprintf(fp, " [%2u]", pa[system].sat_used);
+        fprintf(fp, " [%2u]", pa[system].sat_used);
 
-		fprintf(fp, " dmy %d", dmyokay);
+        fprintf(fp, " %ddmy", dmyokay);
 
-		fprintf(fp, " inc %d", totokay);
+        fprintf(fp, " %dinc", totokay);
 
-		fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
+        fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
 
-    	fprintf(fp, "%13s", "");
+        fprintf(fp, "%15s", "");
 
-	    fprintf(fp, " %3usecs", pa[system].ticks);
+        fprintf(fp, " %3usecs", pa[system].ticks);
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-		fputc('\n', fp);
+        fputc('\n', fp);
 
     }
 
 }
 
 struct Poller {
-	FILE * ppsfp;
-	FILE * strobefp;
-	int * oneppsp;
-	int done;
+    FILE * ppsfp;
+    FILE * strobefp;
+    int * oneppsp;
+    int done;
 };
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -766,48 +766,48 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  */
 static void * dcdpoller(void * argp)
 {
-	void * xc = (void *)1;
-	struct Poller * ctxp = (struct Poller *)0;
-	int done = 0;
-	int rc = -1;
-	int nowpps = 0;
-	int waspps = 0;
+    void * xc = (void *)1;
+    struct Poller * ctxp = (struct Poller *)0;
+    int done = 0;
+    int rc = -1;
+    int nowpps = 0;
+    int waspps = 0;
 
-	ctxp = (struct Poller *)argp;
+    ctxp = (struct Poller *)argp;
 
-	while (!0) {
-		DIMINUTO_COHERENT_SECTION_BEGIN;
-			done = ctxp->done;
-		DIMINUTO_COHERENT_SECTION_END;
-		if (done) {
-			xc = (void *)0;
-			break;
-		}
-		rc = diminuto_serial_wait(fileno(ctxp->ppsfp));
-		if (rc < 0) { break; }
-		rc = diminuto_serial_status(fileno(ctxp->ppsfp));
-		if (rc < 0) { break; }
-		nowpps = !!rc;
-		if (nowpps == waspps) {
-			/* Do nothing. */
-		} else if (nowpps) {
-			if (ctxp->strobefp != (FILE *)0) {
-				rc = diminuto_pin_set(ctxp->strobefp);
-				if (rc < 0) { break; }
-			}
-			DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-				*(ctxp->oneppsp) = !0;
-			DIMINUTO_CRITICAL_SECTION_END;
-		} else {
-			if (ctxp->strobefp != (FILE *)0) {
-				rc = diminuto_pin_clear(ctxp->strobefp);
-				if (rc < 0) { break; }
-			}
-		}
-		waspps = nowpps;
-	}
+    while (!0) {
+        DIMINUTO_COHERENT_SECTION_BEGIN;
+            done = ctxp->done;
+        DIMINUTO_COHERENT_SECTION_END;
+        if (done) {
+            xc = (void *)0;
+            break;
+        }
+        rc = diminuto_serial_wait(fileno(ctxp->ppsfp));
+        if (rc < 0) { break; }
+        rc = diminuto_serial_status(fileno(ctxp->ppsfp));
+        if (rc < 0) { break; }
+        nowpps = !!rc;
+        if (nowpps == waspps) {
+            /* Do nothing. */
+        } else if (nowpps) {
+            if (ctxp->strobefp != (FILE *)0) {
+                rc = diminuto_pin_set(ctxp->strobefp);
+                if (rc < 0) { break; }
+            }
+            DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+                *(ctxp->oneppsp) = !0;
+            DIMINUTO_CRITICAL_SECTION_END;
+        } else {
+            if (ctxp->strobefp != (FILE *)0) {
+                rc = diminuto_pin_clear(ctxp->strobefp);
+                if (rc < 0) { break; }
+            }
+        }
+        waspps = nowpps;
+    }
 
-	return xc;
+    return xc;
 }
 
 /**
@@ -818,65 +818,65 @@ static void * dcdpoller(void * argp)
  */
 static void * gpiopoller(void * argp)
 {
-	void * xc = (void *)1;
-	struct Poller * pollerp = (struct Poller *)0;
+    void * xc = (void *)1;
+    struct Poller * pollerp = (struct Poller *)0;
     diminuto_mux_t mux = { 0 };
-	int ppsfd = -1;
-	int done = 0;
-	int rc = -1;
+    int ppsfd = -1;
+    int done = 0;
+    int rc = -1;
     int fd = -1;
-	int nowpps = 0;
-	int waspps = 0;
+    int nowpps = 0;
+    int waspps = 0;
 
-	pollerp = (struct Poller *)argp;
+    pollerp = (struct Poller *)argp;
 
     diminuto_mux_init(&mux);
     ppsfd = fileno(pollerp->ppsfp);
     rc = diminuto_mux_register_interrupt(&mux, ppsfd);
     assert(rc >= 0);
 
-	while (!0) {
-		DIMINUTO_COHERENT_SECTION_BEGIN;
-			done = pollerp->done;
-		DIMINUTO_COHERENT_SECTION_END;
-		if (done) {
-			xc = (void *)0;
-			break;
-		}
-		rc = diminuto_mux_wait(&mux, -1);
-		if (rc <= 0) { break; }
-		while (!0) {
-			fd = diminuto_mux_ready_interrupt(&mux);
-			if (fd < 0) { break; }
-			assert(fd == ppsfd);
-			rc = diminuto_pin_get(pollerp->ppsfp);
-			if (rc < 0) { break; }
-			nowpps = !!rc;
-			if (nowpps == waspps) {
-				/* Do nothing. */
-			} else if (nowpps) {
-				if (pollerp->strobefp != (FILE *)0) {
-					rc = diminuto_pin_set(pollerp->strobefp);
-					if (rc < 0) { break; }
-				}
-				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-					*(pollerp->oneppsp) = !0;
-				DIMINUTO_CRITICAL_SECTION_END;
-			} else {
-				if (pollerp->strobefp != (FILE *)0) {
-					rc = diminuto_pin_clear(pollerp->strobefp);
-					if (rc < 0) { break; }
-				}
-			}
-			waspps = nowpps;
-		}
-		if (rc < 0) { break; }
-	}
+    while (!0) {
+        DIMINUTO_COHERENT_SECTION_BEGIN;
+            done = pollerp->done;
+        DIMINUTO_COHERENT_SECTION_END;
+        if (done) {
+            xc = (void *)0;
+            break;
+        }
+        rc = diminuto_mux_wait(&mux, -1);
+        if (rc <= 0) { break; }
+        while (!0) {
+            fd = diminuto_mux_ready_interrupt(&mux);
+            if (fd < 0) { break; }
+            assert(fd == ppsfd);
+            rc = diminuto_pin_get(pollerp->ppsfp);
+            if (rc < 0) { break; }
+            nowpps = !!rc;
+            if (nowpps == waspps) {
+                /* Do nothing. */
+            } else if (nowpps) {
+                if (pollerp->strobefp != (FILE *)0) {
+                    rc = diminuto_pin_set(pollerp->strobefp);
+                    if (rc < 0) { break; }
+                }
+                DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+                    *(pollerp->oneppsp) = !0;
+                DIMINUTO_CRITICAL_SECTION_END;
+            } else {
+                if (pollerp->strobefp != (FILE *)0) {
+                    rc = diminuto_pin_clear(pollerp->strobefp);
+                    if (rc < 0) { break; }
+                }
+            }
+            waspps = nowpps;
+        }
+        if (rc < 0) { break; }
+    }
 
     rc = diminuto_mux_unregister_interrupt(&mux, ppsfd);
     diminuto_mux_fini(&mux);
 
-	return xc;
+    return xc;
 }
 
 /**
@@ -887,9 +887,9 @@ static void * gpiopoller(void * argp)
  */
 int main(int argc, char * argv[])
 {
-	/*
-	 * Command line options and parameters with defaults.
-	 */
+    /*
+     * Command line options and parameters with defaults.
+     */
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
@@ -969,7 +969,7 @@ int main(int argc, char * argv[])
      * Processing variables.
      */
     unsigned char * buffer = (unsigned char *)0;
-	unsigned char * bp = (char *)0;
+    unsigned char * bp = (char *)0;
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
     hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
@@ -1006,12 +1006,12 @@ int main(int argc, char * argv[])
     unsigned int now = 0;
     unsigned int was = 0;
     int refresh = 0;
-	int index = -1;
-	char * end = (char *)0;
-	hazer_active_t cache = { 0 };
-	int dmyokay = 0;
-	int totokay = 0;
-	size_t limitation = 0;
+    int index = -1;
+    char * end = (char *)0;
+    hazer_active_t cache = { 0 };
+    int dmyokay = 0;
+    int totokay = 0;
+    size_t limitation = 0;
     /*
      * External symbols.
      */
@@ -1054,8 +1054,8 @@ int main(int argc, char * argv[])
             host = optarg;
             break;
         case 'C':
-        	ignorechecksums = !0;
-        	break;
+            ignorechecksums = !0;
+            break;
         case 'D':
             device = optarg;
             break;
@@ -1073,8 +1073,8 @@ int main(int argc, char * argv[])
             pps = optarg;
             break;
         case 'L':
-        	path = optarg;
-        	break;
+            path = optarg;
+            break;
         case 'O':
             readonly = 0;
             output = !0;
@@ -1092,13 +1092,13 @@ int main(int argc, char * argv[])
             diminuto_list_enqueue(&head, node);
             break;
         case 'V':
-        	fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
-        	break;
+            fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            break;
         case 'b':
             bitspersecond = strtoul(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (bitspersecond == 0)) {
-            	errno = EINVAL;
-            	diminuto_perror(optarg);
+                errno = EINVAL;
+                diminuto_perror(optarg);
             }
             break;
         case 'c':
@@ -1130,9 +1130,9 @@ int main(int argc, char * argv[])
             strobe = optarg;
             break;
         case 'r':
-        	fp = outfp;
-        	outfp = errfp;
-        	errfp = fp;
+            fp = outfp;
+            outfp = errfp;
+            errfp = fp;
             break;
         case 's':
             xonxoff = !0;
@@ -1140,10 +1140,10 @@ int main(int argc, char * argv[])
         case 't':
             timeout = strtoul(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (timeout > HAZER_GNSS_TICKS)) {
-            	errno = EINVAL;
-            	diminuto_perror(optarg);
+                errno = EINVAL;
+                diminuto_perror(optarg);
             }
-        	break;
+            break;
         case 'v':
             verbose = !0;
             break;
@@ -1195,13 +1195,13 @@ int main(int argc, char * argv[])
      */
 
     if (path == (const char *)0) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if (strcmp(path, "-") == 0) {
-    	logfp = stdout;
+        logfp = stdout;
     } else {
-    	logfp = fopen(path, "ab");
-    	if (logfp == (FILE *)0) { diminuto_perror(path); }
-    	assert(logfp != (FILE *)0);
+        logfp = fopen(path, "ab");
+        if (logfp == (FILE *)0) { diminuto_perror(path); }
+        assert(logfp != (FILE *)0);
     }
 
     /*
@@ -1287,11 +1287,11 @@ int main(int argc, char * argv[])
 
     /*
      * Are we monitoring 1PPS from a General Purpose Input/Output pin?
-	 * A thread polls the pin until it has changed. The GPIO output of the
-	 * USB-Port-GPS doesn't appear to correlate with its serial
-	 * output in any way, nor is polling it when we do character
-	 * I/O sufficient. So it's interrogated in a separate thread.
-	 */
+     * A thread polls the pin until it has changed. The GPIO output of the
+     * USB-Port-GPS doesn't appear to correlate with its serial
+     * output in any way, nor is polling it when we do character
+     * I/O sufficient. So it's interrogated in a separate thread.
+     */
 
     do {
         if (pps == (const char *)0) {
@@ -1319,8 +1319,8 @@ int main(int argc, char * argv[])
         poller.oneppsp = &onepps;
         pthreadrc = pthread_create(&thread, 0, gpiopoller, &poller);
         if (pthreadrc != 0) {
-        	errno = pthreadrc;
-        	diminuto_perror("pthread_create");
+            errno = pthreadrc;
+            diminuto_perror("pthread_create");
         }
         assert(pthreadrc == 0);
     } while (0);
@@ -1351,7 +1351,7 @@ int main(int argc, char * argv[])
      * your field support people may thank you.
      */
 
-	(void)diminuto_time_timezone(diminuto_time_clock());
+    (void)diminuto_time_timezone(diminuto_time_clock());
 
     /*
      * Fire up our periodic timer so we can keep track of the age of every
@@ -1430,23 +1430,23 @@ int main(int argc, char * argv[])
      */
 
     do {
-		if (devfp == (FILE *)0) {
-			break;
-		}
-		if (!modemcontrol) {
-			break;
-		}
-		if (!carrierdetect) {
-			break;
-		}
+        if (devfp == (FILE *)0) {
+            break;
+        }
+        if (!modemcontrol) {
+            break;
+        }
+        if (!carrierdetect) {
+            break;
+        }
         poller.done = 0;
         poller.ppsfp = devfp;
         poller.strobefp = strobefp;
         poller.oneppsp = &onepps;
         pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
         if (pthreadrc != 0) {
-        	errno = pthreadrc;
-        	diminuto_perror("pthread_create");
+            errno = pthreadrc;
+            diminuto_perror("pthread_create");
         }
         assert(pthreadrc == 0);
     } while (0);
@@ -1470,7 +1470,7 @@ int main(int argc, char * argv[])
 
      while ((!diminuto_interrupter_check()) && (!diminuto_terminator_check())) {
 
-    	buffer = (void *)0;
+        buffer = (void *)0;
         nmea_state = HAZER_STATE_START;
         ubx_state = YODEL_STATE_START;
 
@@ -1485,9 +1485,9 @@ int main(int argc, char * argv[])
 
         if (role != CONSUMER) {
 
-        	/*
-        	 * If we have any initialization strings to send, do so one at a
-        	 * time, if we have a device and its idle. This prevents any
+            /*
+             * If we have any initialization strings to send, do so one at a
+             * time, if we have a device and its idle. This prevents any
              * incoming data from backing up too much. (I should convert
              * all of this code to a multiplexing scheme using Mux.) Because
              * this queue of writes is checked everytime we reiterate in the
@@ -1502,72 +1502,72 @@ int main(int argc, char * argv[])
              * application (even another gpstool) to use the device. One such
              * rationale for this is to send a command to change the baud rate
              * of the GPS device.
-        	 */
+             */
 
-        	if (devfd < 0) {
-        		/* Do nothing. */
-        	} else if (diminuto_serial_available(devfd) > 0) {
-        		/* Do nothing. */
-        	} else if (diminuto_list_isempty(&head)) {
-        		/* Do nothing. */
-        	} else {
-        		node = diminuto_list_dequeue(&head);
-        		assert(node != (diminuto_list_t *)0);
-        		buffer = (unsigned char *)diminuto_list_data(node);
-        		assert(buffer != (unsigned char *)0);
-            	length = strlen(buffer) + 1;
+            if (devfd < 0) {
+                /* Do nothing. */
+            } else if (diminuto_serial_available(devfd) > 0) {
+                /* Do nothing. */
+            } else if (diminuto_list_isempty(&head)) {
+                /* Do nothing. */
+            } else {
+                node = diminuto_list_dequeue(&head);
+                assert(node != (diminuto_list_t *)0);
+                buffer = (unsigned char *)diminuto_list_data(node);
+                assert(buffer != (unsigned char *)0);
+                length = strlen(buffer) + 1;
                 size = diminuto_escape_collapse(buffer, buffer, length);
-            	if (buffer[0] == '\0') {
-                   	fprintf(errfp, "%s: EXIT.\n", program);
-            		break;
-            	}
-            	size1 = size - 1;
+                if (buffer[0] == '\0') {
+                    fprintf(errfp, "%s: EXIT.\n", program);
+                    break;
+                }
+                size1 = size - 1;
                 rc = (size < length) ? emit_message(devfp, buffer, size1) : emit_sentence(devfp, buffer, size1);
                 if (rc < 0) {
-                	fprintf(errfp, "%s: FAILED!\n", program);
-                	print_buffer(errfp, buffer, size1, UNLIMITED);
+                    fprintf(errfp, "%s: FAILED!\n", program);
+                    print_buffer(errfp, buffer, size1, UNLIMITED);
                 }
 
                 if (verbose) { print_buffer(errfp, buffer, size1, UNLIMITED); }
                 if (escape) { fputs("\033[2;1H\033[0K", outfp); }
                 if (report) { fprintf(outfp, "OUT [%3zd] ", size1); print_buffer(outfp, buffer, size1, limitation); fflush(outfp); }
                 free(node);
-        	}
+            }
 
-        	/*
-        	 * The NMEA and UBX parsers can be thought of as a single
-        	 * non-deterministic finite state machine: an automaton that
-        	 * can be in more than one state at a time. The two state
-        	 * machines must use different state variables and even
-        	 * different buffers, since it is possible both could be active
-        	 * at the same time until one of them determines that it has
-        	 * collected a correct sentence or packet. The datagram
-        	 * code below use the UBX buffer, since it may ultimately
-        	 * receive either NMEA or UBX data from the far end.
-        	 */
+            /*
+             * The NMEA and UBX parsers can be thought of as a single
+             * non-deterministic finite state machine: an automaton that
+             * can be in more than one state at a time. The two state
+             * machines must use different state variables and even
+             * different buffers, since it is possible both could be active
+             * at the same time until one of them determines that it has
+             * collected a correct sentence or packet. The datagram
+             * code below use the UBX buffer, since it may ultimately
+             * receive either NMEA or UBX data from the far end.
+             */
 
             while (!0) {
 
-            	ch = fgetc(infp);
+                ch = fgetc(infp);
 
                 nmea_state = hazer_machine(nmea_state, ch, nmea_buffer, sizeof(nmea_buffer), &nmea_bb, &nmea_ss);
 
                 ubx_state = yodel_machine(ubx_state, ch, ubx_buffer, sizeof(ubx_buffer), &ubx_bb, &ubx_ss, &ubx_ll);
 
                 if (nmea_state == HAZER_STATE_END) {
-                	break;
+                    break;
                 } else if  (nmea_state == HAZER_STATE_EOF) {
-                	fprintf(errfp, "%s: EOF.\n", program);
+                    fprintf(errfp, "%s: EOF.\n", program);
                     break;
                 } else {
                     /* Do nothing. */
                 }
 
                 if (ubx_state == YODEL_STATE_END) {
-                	break;
+                    break;
                 } else if  (ubx_state == YODEL_STATE_EOF) {
-                	fprintf(errfp, "%s: EOF.\n", program);
-                	break;
+                    fprintf(errfp, "%s: EOF.\n", program);
+                    break;
                 } else {
                     /* Do nothing. */
                 }
@@ -1575,17 +1575,17 @@ int main(int argc, char * argv[])
             }
 
             if (nmea_state == HAZER_STATE_EOF) {
-            	break;
+                break;
             } else if (ubx_state == YODEL_STATE_EOF) {
-            	break;
+                break;
             } else if (nmea_state == HAZER_STATE_END) {
-            	buffer = nmea_buffer;
-            	size = nmea_ss;
+                buffer = nmea_buffer;
+                size = nmea_ss;
             } else if (ubx_state == YODEL_STATE_END) {
-            	buffer = ubx_buffer;
-            	size = ubx_ss;
+                buffer = ubx_buffer;
+                size = ubx_ss;
             } else {
-            	assert(0);
+                assert(0);
             }
 
         } else if (protocol == IPV4) {
@@ -1613,17 +1613,17 @@ int main(int argc, char * argv[])
         /**
          ** VALIDATE
          **
-         ** We know how to validate an NMEA sentence and a UBX packet. We sanity
-         ** check the data format in either case, and compute the appropriate
-         ** checksum and verify it. The state machines know what the format of
-         ** the data is when we got it directly from the device, but in the case
-         ** of IP datagrams, we haven't figured that out yet.
+         ** We know how to validate an NMEA sentence and a UBX message. We
+         ** sanity check the data format in either case, and compute the
+         ** appropriate checksum and verify it. The state machines know what
+         ** the format of the data is when we got it directly from the device,
+         ** but in the case of IP datagrams, we haven't figured that out yet.
          **/
 
         if ((length = hazer_length(buffer, size)) > 0) {
 
-        	bp = (unsigned char *)hazer_checksum(buffer, size, &nmea_cs);
-        	assert(bp != (unsigned char *)0);
+            bp = (unsigned char *)hazer_checksum(buffer, size, &nmea_cs);
+            assert(bp != (unsigned char *)0);
 
             rc = hazer_characters2checksum(bp[1], bp[2], &nmea_ck);
             assert(rc >= 0);
@@ -1638,22 +1638,22 @@ int main(int argc, char * argv[])
 
         } else if ((length = yodel_length(buffer, size)) > 0) {
 
-        	bp = (unsigned char *)yodel_checksum(buffer, size, &ubx_ck_a, &ubx_ck_b);
-        	assert(bp != (unsigned char *)0);
+            bp = (unsigned char *)yodel_checksum(buffer, size, &ubx_ck_a, &ubx_ck_b);
+            assert(bp != (unsigned char *)0);
 
-        	if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
+            if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
                 fprintf(errfp, "%s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
                 print_buffer(errfp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
-        	}
+            }
 
-        	format = UBX;
+            format = UBX;
 
         } else {
 
             fprintf(errfp, "%s: FORMAT! %zd\n", program, length);
             print_buffer(errfp, buffer, size1, UNLIMITED);
-        	continue;
+            continue;
 
         }
 
@@ -1693,49 +1693,49 @@ int main(int argc, char * argv[])
 
         if (elapsed > 0) {
 
-        	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
+            for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
 
-        		if (position[index].ticks == 0) {
-        			/* Do nothing. */
-        		} else if (position[index].ticks <= elapsed) {
-        			position[index].ticks = 0;
-        		} else {
-        			position[index].ticks -= elapsed;
-        		}
+                if (position[index].ticks == 0) {
+                    /* Do nothing. */
+                } else if (position[index].ticks <= elapsed) {
+                    position[index].ticks = 0;
+                } else {
+                    position[index].ticks -= elapsed;
+                }
 
-        		if (active[index].ticks == 0) {
-        			/* Do nothing. */
-        		} else if (active[index].ticks <= elapsed) {
-        			active[index].ticks = 0;
-        		} else {
-        			active[index].ticks -= elapsed;
-        		}
+                if (active[index].ticks == 0) {
+                    /* Do nothing. */
+                } else if (active[index].ticks <= elapsed) {
+                    active[index].ticks = 0;
+                } else {
+                    active[index].ticks -= elapsed;
+                }
 
-        		if (view[index].ticks == 0) {
-        			/* Do nothing. */
-        		} else if (view[index].ticks <= elapsed) {
-        			view[index].ticks = 0;
-        		} else {
-        			view[index].ticks -= elapsed;
-        		}
+                if (view[index].ticks == 0) {
+                    /* Do nothing. */
+                } else if (view[index].ticks <= elapsed) {
+                    view[index].ticks = 0;
+                } else {
+                    view[index].ticks -= elapsed;
+                }
 
-        	}
+            }
 
-    		if (hardware.ticks == 0) {
-    			/* Do nothing. */
-    		} else if (hardware.ticks <= elapsed) {
-    			hardware.ticks = 0;
-    		} else {
-    			hardware.ticks -= elapsed;
-    		}
+            if (hardware.ticks == 0) {
+                /* Do nothing. */
+            } else if (hardware.ticks <= elapsed) {
+                hardware.ticks = 0;
+            } else {
+                hardware.ticks -= elapsed;
+            }
 
-    		if (status.ticks == 0) {
-    			/* Do nothing. */
-    		} else if (status.ticks <= elapsed) {
-    			status.ticks = 0;
-    		} else {
-    			status.ticks -= elapsed;
-    		}
+            if (status.ticks == 0) {
+                /* Do nothing. */
+            } else if (status.ticks <= elapsed) {
+                status.ticks = 0;
+            } else {
+                status.ticks -= elapsed;
+            }
 
         }
 
@@ -1745,204 +1745,204 @@ int main(int argc, char * argv[])
 
         if (format == NMEA) {
 
-        	/*
-        	 * We tokenize the NMEA sentence so we can parse it later. Then
-        	 * we regenerate the sentence, and verify it, mostly to test the
-        	 * underlying API. We can use the regenerated sentence for output,
-        	 * since the original was mutated by the tokenization.
-        	 */
+            /*
+             * We tokenize the NMEA sentence so we can parse it later. Then
+             * we regenerate the sentence, and verify it, mostly to test the
+             * underlying API. We can use the regenerated sentence for output,
+             * since the original was mutated by the tokenization.
+             */
 
-			count = hazer_tokenize(vector, countof(vector), buffer, size);
-			assert(count >= 0);
-			assert(vector[count - 1] == (char *)0);
-			assert(count <= countof(vector));
+            count = hazer_tokenize(vector, countof(vector), buffer, size);
+            assert(count >= 0);
+            assert(vector[count - 1] == (char *)0);
+            assert(count <= countof(vector));
 
-			size = hazer_serialize(synthesized, sizeof(synthesized), vector, count);
-			assert(size >= 3);
-			assert(size <= (sizeof(synthesized) - 4));
-			assert(synthesized[0] == HAZER_STIMULUS_START);
-			assert(synthesized[size - 2] == HAZER_STIMULUS_CHECKSUM);
-			assert(synthesized[size - 1] == HAZER_STIMULUS_NUL);
+            size = hazer_serialize(synthesized, sizeof(synthesized), vector, count);
+            assert(size >= 3);
+            assert(size <= (sizeof(synthesized) - 4));
+            assert(synthesized[0] == HAZER_STIMULUS_START);
+            assert(synthesized[size - 2] == HAZER_STIMULUS_CHECKSUM);
+            assert(synthesized[size - 1] == HAZER_STIMULUS_NUL);
 
-			bp = (unsigned char *)hazer_checksum(synthesized, size, &nmea_cs);
-			hazer_checksum2characters(nmea_cs, &msn, &lsn);
-			assert(bp[0] == HAZER_STIMULUS_CHECKSUM);
+            bp = (unsigned char *)hazer_checksum(synthesized, size, &nmea_cs);
+            hazer_checksum2characters(nmea_cs, &msn, &lsn);
+            assert(bp[0] == HAZER_STIMULUS_CHECKSUM);
 
-			*(++bp) = msn;
-			*(++bp) = lsn;
-			*(++bp) = HAZER_STIMULUS_CR;
-			*(++bp) = HAZER_STIMULUS_LF;
-			*(++bp) = HAZER_STIMULUS_NUL;
+            *(++bp) = msn;
+            *(++bp) = lsn;
+            *(++bp) = HAZER_STIMULUS_CR;
+            *(++bp) = HAZER_STIMULUS_LF;
+            *(++bp) = HAZER_STIMULUS_NUL;
 
-			size += 4;
-			assert(size <= sizeof(synthesized));
-			assert(strncmp(synthesized, buffer, size));
+            size += 4;
+            assert(size <= sizeof(synthesized));
+            assert(strncmp(synthesized, buffer, size));
 
-			/*
-			 * Make sure it's a talker and a GNSS that we care about.
-			 *
-			 * As a special case, if we receive an update on active satellites
-			 * or satellites in view from something we don't recognize, then
-			 * we have a new GNSS that isn't supported. That's worth noting.
-			 */
+            /*
+             * Make sure it's a talker and a GNSS that we care about.
+             *
+             * As a special case, if we receive an update on active satellites
+             * or satellites in view from something we don't recognize, then
+             * we have a new GNSS that isn't supported. That's worth noting.
+             */
 
-			if (count < 1) {
-				continue;
-			} else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
-				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-					fprintf(errfp, "%s: TALKER? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
-	                print_buffer(errfp, buffer, size - 1, UNLIMITED);
-				}
-				continue;
-			} else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
-				if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-					fprintf(errfp, "%s: SYSTEM? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
-	                print_buffer(errfp, buffer, size - 1, UNLIMITED);
-				}
-				continue;
-			} else {
-				/* Do nothing. */
-			}
+            if (count < 1) {
+                continue;
+            } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
+                if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
+                    fprintf(errfp, "%s: TALKER? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
+                    print_buffer(errfp, buffer, size - 1, UNLIMITED);
+                }
+                continue;
+            } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
+                if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
+                    fprintf(errfp, "%s: SYSTEM? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
+                    print_buffer(errfp, buffer, size - 1, UNLIMITED);
+                }
+                continue;
+            } else {
+                /* Do nothing. */
+            }
 
-			/*
-			 * Parse the sentences we care about and update our state to
-			 * reflect the new data. As we go along we do some reality checks
-			 * to decide if this sentence is valid in the sense at we want
-			 * to output it to an application like Google Earth Pro, that
-			 * gets confused is time runs backwards (which can happen if
-			 * we got this sentence via a UDP datagram).
-			 */
+            /*
+             * Parse the sentences we care about and update our state to
+             * reflect the new data. As we go along we do some reality checks
+             * to decide if this sentence is valid in the sense at we want
+             * to output it to an application like Google Earth Pro, that
+             * gets confused is time runs backwards (which can happen if
+             * we got this sentence via a UDP datagram).
+             */
 
-			if (hazer_parse_gga(&position[system], vector, count) == 0) {
+            if (hazer_parse_gga(&position[system], vector, count) == 0) {
 
-		        position[system].ticks = timeout;
-		        refresh = !0;
-		        dmyokay = (position[system].dmy_nanoseconds > 0);
-		        totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+                position[system].ticks = timeout;
+                refresh = !0;
+                dmyokay = (position[system].dmy_nanoseconds > 0);
+                totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
-			} else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
+            } else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 
-		        position[system].ticks = timeout;
-		        refresh = !0;
-		        dmyokay = (position[system].dmy_nanoseconds > 0);
-		        totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+                position[system].ticks = timeout;
+                refresh = !0;
+                dmyokay = (position[system].dmy_nanoseconds > 0);
+                totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
-			} else if (hazer_parse_gll(&position[system], vector, count) == 0) {
+            } else if (hazer_parse_gll(&position[system], vector, count) == 0) {
 
-		        position[system].ticks = timeout;
-		        refresh = !0;
-		        dmyokay = (position[system].dmy_nanoseconds > 0);
-		        totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+                position[system].ticks = timeout;
+                refresh = !0;
+                dmyokay = (position[system].dmy_nanoseconds > 0);
+                totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
-			} else if (hazer_parse_vtg(&position[system], vector, count) == 0) {
+            } else if (hazer_parse_vtg(&position[system], vector, count) == 0) {
 
-		        position[system].ticks = timeout;
-		        refresh = !0;
-		        dmyokay = (position[system].dmy_nanoseconds > 0);
-		        totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+                position[system].ticks = timeout;
+                refresh = !0;
+                dmyokay = (position[system].dmy_nanoseconds > 0);
+                totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
-			} else if (hazer_parse_gsa(&cache, vector, count) == 0) {
+            } else if (hazer_parse_gsa(&cache, vector, count) == 0) {
 
-				/*
-				 * This is a special case for the Ublox 8 used in devices like
-				 * the GN-803G. It emits multiple GSA sentences all under the
-				 * GN (GNSS) talker, but the satellites are either GPS or
-				 * GLONASS *plus* WAAS. We'd like to classify them as either
-				 * GPS or GLONASS. Sadly, later NMEA standards actually have
-				 * a field in the GSA sentence that contains a GNSS System ID,
-				 * but I have yet to see a device that supports it. However,
-				 * the GSA parser function has untested code to extract this ID
-				 * if it exists, and the map function below will use it. Also
-				 * note that apparently the DOP values are computed across all
-				 * the satellites in whatever constellations were used for a
-				 * navigation solution; this means the DOP values for GPS
-				 * and GLONASS will be identical in the Ublox 8.
-				 */
+                /*
+                 * This is a special case for the Ublox 8 used in devices like
+                 * the GN-803G. It emits multiple GSA sentences all under the
+                 * GN (GNSS) talker, but the satellites are either GPS or
+                 * GLONASS *plus* WAAS. We'd like to classify them as either
+                 * GPS or GLONASS. Sadly, later NMEA standards actually have
+                 * a field in the GSA sentence that contains a GNSS System ID,
+                 * but I have yet to see a device that supports it. However,
+                 * the GSA parser function has untested code to extract this ID
+                 * if it exists, and the map function below will use it. Also
+                 * note that apparently the DOP values are computed across all
+                 * the satellites in whatever constellations were used for a
+                 * navigation solution; this means the DOP values for GPS
+                 * and GLONASS will be identical in the Ublox 8.
+                 */
 
-				if (system == HAZER_SYSTEM_GNSS) {
-					candidate = hazer_map_active_to_system(&cache);
-					if (candidate < HAZER_SYSTEM_TOTAL) {
-						system = candidate;
-					}
-				}
+                if (system == HAZER_SYSTEM_GNSS) {
+                    candidate = hazer_map_active_to_system(&cache);
+                    if (candidate < HAZER_SYSTEM_TOTAL) {
+                        system = candidate;
+                    }
+                }
 
-				active[system] = cache;
-		        active[system].ticks = timeout;
-		        refresh = !0;
+                active[system] = cache;
+                active[system].ticks = timeout;
+                refresh = !0;
 
-			} else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
+            } else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
 
-		        view[system].ticks = timeout;
-		        refresh = !0;
+                view[system].ticks = timeout;
+                refresh = !0;
 
-			} else if (hazer_parse_txt(vector, count) == 0) {
+            } else if (hazer_parse_txt(vector, count) == 0) {
 
-			    const char * bb = vector[4];
-			    size_t current = 0;
-			    int end = 0;
+                const char * bb = vector[4];
+                size_t current = 0;
+                int end = 0;
 
-			    fprintf(errfp, "%s: TXT [%2d][%2d][%2d] \"", program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
+                fprintf(errfp, "%s: TXT [%2d][%2d][%2d] \"", program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
 
-			    while ((*bb != HAZER_STIMULUS_NUL) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
-			        diminuto_phex_emit(errfp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
-			    }
+                while ((*bb != HAZER_STIMULUS_NUL) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
+                    diminuto_phex_emit(errfp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
+                }
 
-			    fputs("\".\n", errfp);
+                fputs("\".\n", errfp);
 
 
-			} else {
+            } else {
 
                 /* Do nothing. */
 
-			}
+            }
 
         } else if (format == UBX) {
 
-        	if (verbose) { diminuto_dump(errfp, buffer, length); }
+            if (verbose) { diminuto_dump(errfp, buffer, length); }
 
-        	if (yodel_ubx_mon_hw(&(hardware.payload), ubx_buffer, length) == 0) {
+            if (yodel_ubx_mon_hw(&(hardware.payload), ubx_buffer, length) == 0) {
 
-        		hardware.ticks = timeout;
-        		refresh = !0;
+                hardware.ticks = timeout;
+                refresh = !0;
 
-        	} else if (yodel_ubx_nav_status(&(status.payload), ubx_buffer, length) == 0) {
+            } else if (yodel_ubx_nav_status(&(status.payload), ubx_buffer, length) == 0) {
 
-        		status.ticks = timeout;
-        		refresh = !0;
+                status.ticks = timeout;
+                refresh = !0;
 
-        	} else {
+            } else {
 
-        		/* Do nothing. */
+                /* Do nothing. */
 
-        	}
+            }
 
         } else {
 
-        	/* Do nothing. */
+            /* Do nothing. */
 
         }
 
-		/*
-		 * We only output NMEA sentences to a device, and even then
-		 * we output the regenerated sentence, not the original one.
-		 * Note that this can only be done if we got the original
-		 * sentence over the IP UDP port or from standard input, because
-		 * that's the only circumstances in which we interpret DEVICE this
-		 * way. Finally, time must monotonically increase (UDP can reorder
-		 * packets), and we have to have gotten an RMC sentence to set the
-		 * date before we forward fixes; doing anything else confuses
-		 * Google Earth, and perhaps other applications.
-		 */
+        /*
+         * We only output NMEA sentences to a device, and even then
+         * we output the regenerated sentence, not the original one.
+         * Note that this can only be done if we got the original
+         * sentence over the IP UDP port or from standard input, because
+         * that's the only circumstances in which we interpret DEVICE this
+         * way. Finally, time must monotonically increase (UDP can reorder
+         * packets), and we have to have gotten an RMC sentence to set the
+         * date before we forward fixes; doing anything else confuses
+         * Google Earth, and perhaps other applications.
+         */
 
-		if (!output) {
-			/* Do nothing. */
-		} else if (format != NMEA) {
-			/* Do nothing. */
-		} else if (!dmyokay) {
-			/* Do nothing. */
-		} else if (!totokay) {
-			/* Do nothing. */
-		} else if (fputs(synthesized, devfp) == EOF) {
+        if (!output) {
+            /* Do nothing. */
+        } else if (format != NMEA) {
+            /* Do nothing. */
+        } else if (!dmyokay) {
+            /* Do nothing. */
+        } else if (!totokay) {
+            /* Do nothing. */
+        } else if (fputs(synthesized, devfp) == EOF) {
             fprintf(errfp, "%s: OUT!\n", program);
             break;
         } else if (fflush(devfp) == EOF) {
@@ -1950,34 +1950,34 @@ int main(int argc, char * argv[])
             break;
         } else {
             /* Do nothing. */
-		}
+        }
 
-		/*
-		 * If anything was updated, refresh our display.
-		 */
+        /*
+         * If anything was updated, refresh our display.
+         */
 
-		if (!refresh) {
+        if (!refresh) {
             /* Do nothing. */
         } else if (frequency && (was == now)) {
             /* Do nothing. */
         } else {
-			if (escape) { fputs("\033[3;1H", outfp); }
-			if (report) {
-				DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-					tmppps = onepps;
-					onepps = 0;
-				DIMINUTO_CRITICAL_SECTION_END;
-				print_hardware(outfp, errfp, &hardware);
-				print_status(outfp, errfp, &status);
-				print_local(outfp, errfp);
-				print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
-				print_actives(outfp, errfp, active);
-				print_views(outfp, errfp, view);
-			}
-			if (escape) { fputs("\033[0J", outfp); }
-			if (report) { fflush(outfp); }
-	        refresh = 0;
-		}
+            if (escape) { fputs("\033[3;1H", outfp); }
+            if (report) {
+                DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+                    tmppps = onepps;
+                    onepps = 0;
+                DIMINUTO_CRITICAL_SECTION_END;
+                print_hardware(outfp, errfp, &hardware);
+                print_status(outfp, errfp, &status);
+                print_local(outfp, errfp);
+                print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
+                print_actives(outfp, errfp, active);
+                print_views(outfp, errfp, view);
+            }
+            if (escape) { fputs("\033[0J", outfp); }
+            if (report) { fflush(outfp); }
+            refresh = 0;
+        }
 
     }
 
@@ -1994,19 +1994,19 @@ int main(int argc, char * argv[])
     assert(rc >= 0);
 
     if (pthreadrc == 0) {
-    	DIMINUTO_COHERENT_SECTION_BEGIN;
-    		poller.done = !0;
-    	DIMINUTO_COHERENT_SECTION_END;
+        DIMINUTO_COHERENT_SECTION_BEGIN;
+            poller.done = !0;
+        DIMINUTO_COHERENT_SECTION_END;
         pthreadrc = pthread_kill(thread, SIGINT);
-    	if (pthreadrc != 0) {
-    		errno = pthreadrc;
-    		diminuto_perror("pthread_join");
-    	}
-    	pthreadrc = pthread_join(thread, &result);
-    	if (pthreadrc != 0) {
-    		errno = pthreadrc;
-    		diminuto_perror("pthread_join");
-    	}
+        if (pthreadrc != 0) {
+            errno = pthreadrc;
+            diminuto_perror("pthread_join");
+        }
+        pthreadrc = pthread_join(thread, &result);
+        if (pthreadrc != 0) {
+            errno = pthreadrc;
+            diminuto_perror("pthread_join");
+        }
     }
 
     if (ppsfp != (FILE *)0) {
@@ -2015,7 +2015,7 @@ int main(int argc, char * argv[])
     }
 
     if (strobefp != (FILE *)0) {
-    	strobefp = diminuto_pin_unused(strobefp, strobepin);
+        strobefp = diminuto_pin_unused(strobefp, strobepin);
         assert(strobefp == (FILE *)0);
     }
 
@@ -2025,11 +2025,11 @@ int main(int argc, char * argv[])
     }
 
     if (logfp == (FILE *)0) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if (logfp == stdout) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else {
-    	rc = fclose(logfp);
+        rc = fclose(logfp);
         assert(rc != EOF);
     }
 
