@@ -398,47 +398,48 @@ the display looks something like this snapshot as it is continually updated.
 symbol. This should not be confused with its use as a delimeter in NMEA
 sentences.)
 
-    INP [ 42] $GLGSV,3,3,10,85,30,325,37,89,62,334,*6B\r\n
+    INP [ 40] $GLGSV,3,3,10,87,04,346,,89,24,084,*65\r\n
     OUT [  6] \xb5b\x06>\0\0
-    MON -jamming  -history  10indicator  14maximum
-    STA -spoofing -history       4146ms  179494340ms
-    LOC 2018-11-29T10:53:40.651-07:00+00T com-diag-hazer 10.0.0
-    TIM 2018-11-29T17:53:40Z 0pps                                          GNSS
-    POS 39*47'39.05"N, 105*09'12.20"W   39.794183, -105.153391             GNSS
-    ALT    5598.69'   1706.500m                                            GNSS
+    MON -jamming  -history  12indicator  15maximum
+    STA -spoofing -history       4146ms  188684158ms
+    LOC 2018-11-29T13:26:50.834-07:00+00T com-diag-hazer 10.0.0
+    TIM 2018-11-29T20:26:50Z 0pps                                          GNSS
+    POS 39*47'39.29"N, 105*09'11.93"W   39.794247, -105.153315             GNSS
+    ALT    5641.99'   1719.700m                                            GNSS
     COG N    0.000*T   0.000*M                                             GNSS
-    SOG      0.076mph      0.066knots      0.121kph                        GNSS
+    SOG      0.012mph      0.010knots      0.018kph                        GNSS
     INT GGA [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    ACT [1]  {    10    21    20    24    27    32 } [ 6] [11]             GPS
-    ACT [2]  {    51    15     8    48    14       } [ 5] [11]             GPS
-    ACT [1]  {    79    84    69    70    78    85 } [ 6] [ 8]             GLONASS
-    ACT [2]  {    83    68                         } [ 2] [ 8]             GLONASS
-    DOP   1.28pdop   0.64hdop   1.12vdop                                   GPS
-    DOP   1.28pdop   0.64hdop   1.12vdop                                   GLONASS
-    SAT [  1]     4svid   0*elv    0*azm   26dBHz                          GPS
-    SAT [  2]     8svid  23*elv  301*azm   20dBHz <                        GPS
-    SAT [  3]    10svid  67*elv  333*azm   35dBHz <                        GPS
-    SAT [  4]    14svid  29*elv  220*azm   39dBHz <                        GPS
-    SAT [  5]    15svid  14*elv   51*azm   31dBHz <                        GPS
-    SAT [  6]    18svid   5*elv  316*azm    0dBHz                          GPS
-    SAT [  7]    20svid  65*elv   56*azm   27dBHz <                        GPS
-    SAT [  8]    21svid  46*elv  148*azm   43dBHz <                        GPS
-    SAT [  9]    24svid  32*elv   70*azm   33dBHz <                        GPS
-    SAT [ 10]    27svid  34*elv  267*azm   17dBHz <                        GPS
-    SAT [ 11]    32svid  49*elv  224*azm   43dBHz <                        GPS
-    SAT [ 12]    46svid  38*elv  215*azm   42dBHz                          GPS
-    SAT [ 13]    48svid  36*elv  220*azm   41dBHz <                        GPS
-    SAT [ 14]    51svid  44*elv  183*azm   43dBHz <                        GPS
-    SAT [ 15]    68svid  32*elv   45*azm   30dBHz <                        GLONASS
-    SAT [ 16]    69svid  62*elv  334*azm   32dBHz <                        GLONASS
-    SAT [ 17]    70svid  24*elv  264*azm   17dBHz <                        GLONASS
-    SAT [ 18]    77svid   8*elv   23*azm   19dBHz                          GLONASS
-    SAT [ 19]    78svid  19*elv   70*azm   24dBHz <                        GLONASS
-    SAT [ 20]    79svid  10*elv  120*azm   26dBHz <                        GLONASS
-    SAT [ 21]    83svid  24*elv  177*azm   37dBHz <                        GLONASS
-    SAT [ 22]    84svid  66*elv  245*azm   22dBHz <                        GLONASS
-    SAT [ 23]    85svid  30*elv  325*azm   37dBHz <                        GLONASS
-    SAT [ 24]    89svid  62*elv  334*azm    0dBHz                          GLONASS
+    ACT [1]  {    10    20    32    51     1    11 } [ 6] [12]             GPS
+    ACT [2]  {    48    12    31    25    22    14 } [ 6] [12]             GPS
+    ACT [1]  {    79    73    69    80    70    85 } [ 6] [ 8]             GLONASS
+    ACT [2]  {    86    71                         } [ 2] [ 8]             GLONASS
+    DOP   1.18pdop   0.61hdop   1.01vdop                                   GPS
+    DOP   1.18pdop   0.61hdop   1.01vdop                                   GLONASS
+    SAT [  1]     1:  35*elv  303*azm   21dBHz <                           GPS
+    SAT [  2]     3:   7*elv  305*azm    0dBHz                             GPS
+    SAT [  3]    10:  39*elv  115*azm   38dBHz <                           GPS
+    SAT [  4]    11:  27*elv  276*azm   27dBHz <                           GPS
+    SAT [  5]    12:  10*elv   49*azm   36dBHz <                           GPS
+    SAT [  6]    14:  74*elv  350*azm   28dBHz <                           GPS
+    SAT [  7]    18:  49*elv  265*azm   31dBHz                             GPS
+    SAT [  8]    20:  12*elv  125*azm   27dBHz <                           GPS
+    SAT [  9]    22:  28*elv  307*azm   29dBHz <                           GPS
+    SAT [ 10]    25:  19*elv   81*azm   25dBHz <                           GPS
+    SAT [ 11]    31:  56*elv  179*azm   42dBHz <                           GPS
+    SAT [ 12]    32:  60*elv   42*azm   38dBHz <                           GPS
+    SAT [ 13]    46:  38*elv  215*azm   42dBHz                             GPS
+    SAT [ 14]    48:  36*elv  220*azm   42dBHz <                           GPS
+    SAT [ 15]    51:  44*elv  183*azm   42dBHz <                           GPS
+    SAT [ 16]    69:  23*elv   85*azm   22dBHz <                           GLONASS
+    SAT [ 17]    70:  60*elv   15*azm   34dBHz <                           GLONASS
+    SAT [ 18]    71:  30*elv  307*azm   32dBHz <                           GLONASS
+    SAT [ 19]    73:  20*elv  170*azm   37dBHz <                           GLONASS
+    SAT [ 20]    79:  28*elv   38*azm   21dBHz <                           GLONASS
+    SAT [ 21]    80:  54*elv  105*azm   20dBHz <                           GLONASS
+    SAT [ 22]    85:  20*elv  235*azm   36dBHz <                           GLONASS
+    SAT [ 23]    86:  28*elv  295*azm   27dBHz <                           GLONASS
+    SAT [ 24]    87:   4*elv  346*azm    0dBHz                             GLONASS
+    SAT [ 25]    89:  24*elv   84*azm    0dBHz                             GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.

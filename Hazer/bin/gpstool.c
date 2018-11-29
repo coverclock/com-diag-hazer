@@ -339,9 +339,9 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
 			fputs("SAT", fp);
 
-			fprintf(fp, " [%3u] %5usvid %3d*elv %4d*azm %4ddBHz %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, marker);
+			fprintf(fp, " [%3u] %5u: %3d*elv %4d*azm %4ddBHz %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, marker);
 
-			fprintf(fp, "%23s", "");
+			fprintf(fp, "%26s", "");
 
 			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
