@@ -413,7 +413,9 @@ static void print_local(FILE * fp, FILE * ep)
     hour = offset / 3600;
     fprintf(fp, "%+2.2d%c", hour, zone);
 
-    fprintf(fp, " com-diag-hazer %-26s", COM_DIAG_HAZER_RELEASE);
+    fprintf(fp, " com-diag-hazer %-17.17s", COM_DIAG_HAZER_RELEASE);
+
+    fprintf(fp, " %-8s", ""); /* This is actually important. */
 
     fputc('\n', fp);
 }
@@ -470,7 +472,15 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 
         if (hp->payload.jamInd > jamInd_maximum) { jamInd_maximum = hp->payload.jamInd; }
 
-        fprintf(fp, "MON %cjamming  %chistory %3uindicator %3umaximum %23s %-8s\n", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum, "", "");
+        fputs("MON", fp);
+
+        fprintf(fp, " %cjamming  %chistory %3uindicator %3umaximum", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum);
+
+        fprintf(fp, "%24s", ""); /* This is actually important. */
+
+        fprintf(fp, " %-8s", ""); /* This is actually important. */
+
+        fputc('\n', fp);
     }
 }
 
@@ -525,7 +535,15 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
             spoofing_prior = spoofing;
         }
 
-        fprintf(fp, "STA %cspoofing %chistory %10ums %10ums %21s %-8s\n", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, "", "");
+        fputs("STA", fp);
+
+        fprintf(fp, " %cspoofing %chistory %10ums %10ums", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss);
+
+        fprintf(fp, "%22s", ""); /* This is actually important. */
+
+        fprintf(fp, " %-8s", ""); /* This is actually important. */
+
+        fputc('\n', fp);
     }
 }
 
