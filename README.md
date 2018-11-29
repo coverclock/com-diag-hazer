@@ -259,6 +259,10 @@ mailto:coverclock@diag.com
 
 <https://in-the-sky.org/satmap_radar.php>
 
+<https://www.gpsworld.com/the-almanac/>
+
+<https://en.wikipedia.org/wiki/List_of_GPS_satellites>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
