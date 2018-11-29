@@ -255,6 +255,8 @@ mailto:coverclock@diag.com
 
 <https://pilotweb.nas.faa.gov/PilotWeb/noticesAction.do?queryType=ALLGPS&formatType=ICAO>
 
+<https://www.rapidtables.com/convert/number/degrees-to-degrees-minutes-seconds.html>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
@@ -390,49 +392,45 @@ the display looks something like this snapshot as it is continually updated.
 symbol. This should not be confused with its use as a delimeter in NMEA
 sentences.)
 
-    INP [ 46] $GLGSV,3,3,11,86,03,346,,89,58,011,,,,,40*61\r\n
+    INP [ 29] $GLGSV,3,3,09,92,01,023,*57\r\n
     OUT [  6] \xb5b\x06>\0\0
-    MON -jamming  -history   7indicator  14maximum
-    STA -spoofing -history       4146ms  101805147ms
-    LOC 2018-11-28T13:18:50.097-07:00+00T com-diag-hazer 10.0.0
-    TIM 2018-11-28T20:18:50Z 0pps                                          GNSS
-    POS 39*47'39.18"N, 105*09'12.15"W   39.794218, -105.153375             GNSS
-    ALT    5638.38'   1718.600m                                            GNSS
+    MON -jamming  -history  14indicator  16maximum
+    STA -spoofing -history       4146ms  172413458ms
+    LOC 2018-11-29T08:55:39.054-07:00+00T com-diag-hazer 10.0.0
+    TIM 2018-11-29T15:55:39Z 0pps                                          GNSS
+    POS 39*47'39.08"N, 105*09'12.12"W   39.794189, -105.153368             GNSS
+    ALT    5592.12'   1704.500m                                            GNSS
     COG N    0.000*T   0.000*M                                             GNSS
-    SOG      0.037mph      0.032knots      0.060kph                        GNSS
+    SOG      0.064mph      0.056knots      0.105kph                        GNSS
     INT GGA [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    ACT [1]  {    25     1    10    32    51    11 } [ 6] [12]             GPS
-    ACT [2]  {    31    12    48    20    22    14 } [ 6] [12]             GPS
-    ACT [1]  {    78    69    84    85    79    80 } [ 6] [ 7]             GLONASS
-    ACT [2]  {    68                               } [ 1] [ 7]             GLONASS
-    DOP   1.21pdop   0.60hdop   1.05vdop                                   GPS
-    DOP   1.21pdop   0.60hdop   1.05vdop                                   GLONASS
-    SAT [  1] id     1 elv  32* azm  308* snr  32dBHz                      GPS
-    SAT [  2] id     3 elv   3* azm  303* snr  12dBHz                      GPS
-    SAT [  3] id     8 elv   1* azm  243* snr   0dBHz                      GPS
-    SAT [  4] id    10 elv  43* azm  110* snr  34dBHz                      GPS
-    SAT [  5] id    11 elv  28* azm  282* snr  24dBHz                      GPS
-    SAT [  6] id    12 elv  10* azm   53* snr  22dBHz                      GPS
-    SAT [  7] id    14 elv  75* azm  331* snr  24dBHz                      GPS
-    SAT [  8] id    18 elv  49* azm  274* snr  40dBHz                      GPS
-    SAT [  9] id    20 elv  17* azm  122* snr  32dBHz                      GPS
-    SAT [ 10] id    22 elv  23* azm  305* snr  23dBHz                      GPS
-    SAT [ 11] id    25 elv  17* azm   86* snr  22dBHz                      GPS
-    SAT [ 12] id    31 elv  50* azm  180* snr  42dBHz                      GPS
-    SAT [ 13] id    32 elv  64* azm   35* snr  41dBHz                      GPS
-    SAT [ 14] id    46 elv  38* azm  215* snr   0dBHz                      GPS
-    SAT [ 15] id    48 elv  36* azm  220* snr  39dBHz                      GPS
-    SAT [ 16] id    51 elv  44* azm  183* snr  43dBHz                      GPS
-    SAT [ 17] id    68 elv  29* azm   77* snr  21dBHz                      GLONASS
-    SAT [ 18] id    69 elv  58* azm   11* snr  39dBHz                      GLONASS
-    SAT [ 19] id    70 elv  24* azm  301* snr  26dBHz                      GLONASS
-    SAT [ 20] id    78 elv  32* azm   44* snr  34dBHz                      GLONASS
-    SAT [ 21] id    79 elv  49* azm  115* snr  29dBHz                      GLONASS
-    SAT [ 22] id    80 elv  18* azm  169* snr  32dBHz                      GLONASS
-    SAT [ 23] id    84 elv  25* azm  236* snr  32dBHz                      GLONASS
-    SAT [ 24] id    85 elv  29* azm  298* snr  26dBHz                      GLONASS
-    SAT [ 25] id    86 elv   3* azm  346* snr   0dBHz                      GLONASS
-    SAT [ 26] id    89 elv  58* azm   11* snr   0dBHz                      GLONASS
+    ACT [1]  {    10    21    20    24    27    51 } [ 6] [12]             GPS
+    ACT [2]  {    13    16    15    29    26    48 } [ 6] [12]             GPS
+    ACT [1]  {    67    84    69    82    83    68 } [ 6] [ 6]             GLONASS
+    DOP   1.10pdop   0.63hdop   0.91vdop                                   GPS
+    DOP   1.10pdop   0.63hdop   0.91vdop                                   GLONASS
+    SAT [  1]     4svid   0*elv    0*azm   36dBHz                          GPS
+    SAT [  2]    10svid  33*elv  259*azm   29dBHz                          GPS
+    SAT [  3]    13svid  27*elv   47*azm   29dBHz                          GPS
+    SAT [  4]    15svid  58*elv   77*azm   35dBHz                          GPS
+    SAT [  5]    16svid  13*elv  283*azm   22dBHz                          GPS
+    SAT [  6]    20svid  58*elv  278*azm   28dBHz                          GPS
+    SAT [  7]    21svid  78*elv  351*azm   20dBHz                          GPS
+    SAT [  8]    24svid  11*elv  124*azm   25dBHz                          GPS
+    SAT [  9]    26svid   7*elv  258*azm   25dBHz                          GPS
+    SAT [ 10]    27svid  17*elv  320*azm   29dBHz                          GPS
+    SAT [ 11]    29svid  29*elv  171*azm   46dBHz                          GPS
+    SAT [ 12]    46svid  38*elv  215*azm   44dBHz                          GPS
+    SAT [ 13]    48svid  36*elv  220*azm   42dBHz                          GPS
+    SAT [ 14]    51svid  44*elv  183*azm   44dBHz                          GPS
+    SAT [ 15]    67svid  33*elv   35*azm   22dBHz                          GLONASS
+    SAT [ 16]    68svid  80*elv  301*azm   32dBHz                          GLONASS
+    SAT [ 17]    69svid  33*elv  230*azm   40dBHz                          GLONASS
+    SAT [ 18]    76svid   1*elv   22*azm    0dBHz                          GLONASS
+    SAT [ 19]    82svid  38*elv  144*azm   36dBHz                          GLONASS
+    SAT [ 20]    83svid  86*elv   14*azm   28dBHz                          GLONASS
+    SAT [ 21]    84svid  27*elv  327*azm   30dBHz                          GLONASS
+    SAT [ 22]    89svid  32*elv  230*azm    0dBHz                          GLONASS
+    SAT [ 23]    92svid   1*elv   23*azm    0dBHz                          GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -503,7 +501,7 @@ systems using other conventions), and the number of satellites in the list.
 Unlike the other report lines, the system or constellation to which the data
 applies is derived from (in order, depending on availability) the system id
 in the GSA sentence (only available on devices that support later NMEA
-versions), or an analysis of the satellite identifiers based on NMEA
+versions), or an analysis of the Space Vehicle Identifier based on NMEA
 conventions, or the talker specified at the beginning of the sentence. The
 reason for this is that some devices (I'm looking at you, GN803G), specify GNSS
 as the talker for all GSA sentences when they are computing an ensemble solution
@@ -519,9 +517,9 @@ multiple constellations are reported, but the DOPs are all the same, the device
 is typically computing an ensemble solution using multiple constellations.
 
 SAT is the list of satellites in view, including an index that is purely an
-artifact of Hazer, the satellites identifying number (same comment as above),
-its elevation and azimuth in degrees from its ephemeris, and the signal to
-noise ratio (really, a carrier to noise density ratio) in decibels Hertz for
+artifact of Hazer, the Space Vehicle IDentifier (same comment as for ACT),
+its ELeVation and AZiMuth in degrees based on its ephemeris, and the signal to
+noise ratio (really, a carrier to noise density ratio) in deciBels Hertz for
 its transmission.
 
 While NMEA (and UBX too for that matter) is good about updating the application
