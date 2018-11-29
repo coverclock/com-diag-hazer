@@ -257,6 +257,8 @@ mailto:coverclock@diag.com
 
 <https://www.rapidtables.com/convert/number/degrees-to-degrees-minutes-seconds.html>
 
+<https://in-the-sky.org/satmap_radar.php>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
