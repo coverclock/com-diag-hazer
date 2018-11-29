@@ -90,6 +90,8 @@ typedef enum Format { FORMAT = 0, NMEA = 1, UBX = 2 } format_t;
 
 typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*' } status_t;
 
+typedef enum Marker { MARKER = '?', INACTIVE = ' ', ACTIVE = '<' } marker_t;
+
 static const size_t LIMIT = 80 /* Legacy */ - 4 /* "LLL " */ - 6 /* "[NNN] " */ - 2 /* "\r\n" */ - 1 /* Wrap */;
 
 static const size_t UNLIMITED = ~(size_t)0;
@@ -215,17 +217,17 @@ static void print_buffer(FILE * fp, const void * buffer, size_t size, size_t lim
 }
 
 /**
- * Print all of the active global navigation satellite systems.
+ * Print all of the active satellites used for the most recent fix.
  * @param fp points to the FILE stream.
  * @param ep points to the FILE stream for errors.
- * @param aa points to the array of active GNSSes.
+ * @param aa points to the array of active satellites.
  */
 static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
 {
     static const unsigned int IDENTIFIERS = countof(aa[0].id);
-    int system = 0;
-    int satellite = 0;
-    int count = 0;
+    unsigned int system = 0;
+    unsigned int satellite = 0;
+    unsigned int count = 0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -299,14 +301,18 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
  * Print all of the satellites currently being viewed by the receiver.
  * @param fp points to the FILE stream.
  * @param va points to the array of all satellite being viewed.
+ * @param aa points to the array of active satellites.
  */
-static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[])
+static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const hazer_active_t aa[])
 {
-    static const int SATELLITES = countof(va[0].sat);
-    int system = 0;
-    int channel = 0;
-    int satellite = 0;
-    int limit = 0;
+    static const unsigned int SATELLITES = countof(va[0].sat);
+    static const unsigned int IDENTIFIERS = countof(aa[0].id);
+    unsigned int system = 0;
+    unsigned int channel = 0;
+    unsigned int satellite = 0;
+    unsigned int active = 0;
+    unsigned int limit = 0;
+    marker_t marker = MARKER;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -317,19 +323,29 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[])
         if (limit > SATELLITES) { limit = SATELLITES; }
 
         for (satellite = 0; satellite < limit; ++satellite) {
-            if (va[system].sat[satellite].id != 0) {
 
-                fputs("SAT", fp);
+        	if (va[system].sat[satellite].id == 0) { continue; }
 
-                fprintf(fp, " [%3d] %5usvid %3d*elv %4d*azm %4ddBHz", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz);
+			marker = INACTIVE;
+			if (aa[system].active > 0) {
+				for (active = 0; active < IDENTIFIERS; ++active) {
 
-                fprintf(fp, "%25s", "");
+					if (active >= aa[system].active) { break; }
+					if (aa[system].id[active] == 0) { break; }
+					if (aa[system].id[active] == va[system].sat[satellite].id) { marker = ACTIVE; }
 
-                fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+				}
+			}
 
-                fputc('\n', fp);
+			fputs("SAT", fp);
 
-            }
+			fprintf(fp, " [%3u] %5usvid %3d*elv %4d*azm %4ddBHz %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, marker);
+
+			fprintf(fp, "%23s", "");
+
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+
+			fputc('\n', fp);
 
         }
 
@@ -558,7 +574,7 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
  */
 static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], int pps, int dmyokay, int totokay)
 {
-    int system = 0;
+    unsigned int system = 0;
     double decimal = 0.0;
     uint64_t nanoseconds = 0;
     int year = 0;
@@ -2005,7 +2021,7 @@ int main(int argc, char * argv[])
                 print_local(outfp, errfp);
                 print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
                 print_actives(outfp, errfp, active);
-                print_views(outfp, errfp, view);
+                print_views(outfp, errfp, view, active);
             }
             if (escape) { fputs("\033[0J", outfp); }
             if (report) { fflush(outfp); }
