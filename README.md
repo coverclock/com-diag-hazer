@@ -231,6 +231,17 @@ mailto:coverclock@diag.com
 
 <http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
 
+# References
+
+NMEA 0183, "Standard for Interfacing Marine Electronic Devices", Version 4.10,
+National Marine Electronics Association, 2012
+
+u-blox 7, "Receiver Description Including Protocol Specification V14",
+GPS.G7-SW-12001-B, ublox, 65525, 2013-02-01
+
+u-blox 8 / u-blox M8, "Receiver Description Including Protocol Specification
+v15-20.30.22-23.01", UBX-13003221-R15, ublox, 26415b7, 2018-03-06
+
 # Resources
 
 <http://www.catb.org/gpsd/NMEA.txt>
@@ -404,48 +415,46 @@ the display looks something like this snapshot as it is continually updated.
 symbol. This should not be confused with its use as a delimeter in NMEA
 sentences.)
 
-    INP [ 40] $GLGSV,3,3,10,87,04,346,,89,24,084,*65\r\n
+    INP [ 35] $GLGSV,3,3,10,89,67,006,,,,,37*56\r\n
     OUT [  6] \xb5b\x06>\0\0
-    MON -jamming  -history  12indicator  15maximum
-    STA -spoofing -history       4146ms  188684158ms
-    LOC 2018-11-29T13:26:50.834-07:00+00T com-diag-hazer 10.0.0
-    TIM 2018-11-29T20:26:50Z 0pps                                          GNSS
-    POS 39*47'39.29"N, 105*09'11.93"W   39.794247, -105.153315             GNSS
-    ALT    5641.99'   1719.700m                                            GNSS
+    MON -jamming  -history  18indicator  18maximum
+    STA -spoofing -history       4146ms  260526443ms
+    LOC 2018-11-30T09:24:14.045-07:00+00T com-diag-hazer 10.0.0
+    TIM 2018-11-30T16:24:13Z 0pps                                          GNSS
+    POS 39*47'39.13"N, 105*09'12.20"W   39.794204, -105.153391             GNSS
+    ALT    5614.10'   1711.200m                                            GNSS
     COG N    0.000*T   0.000*M                                             GNSS
-    SOG      0.012mph      0.010knots      0.018kph                        GNSS
+    SOG      0.081mph      0.070knots      0.129kph                        GNSS
     INT GGA [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    ACT [1]  {    10    20    32    51     1    11 } [ 6] [12]             GPS
-    ACT [2]  {    48    12    31    25    22    14 } [ 6] [12]             GPS
-    ACT [1]  {    79    73    69    80    70    85 } [ 6] [ 8]             GLONASS
-    ACT [2]  {    86    71                         } [ 2] [ 8]             GLONASS
-    DOP   1.18pdop   0.61hdop   1.01vdop                                   GPS
-    DOP   1.18pdop   0.61hdop   1.01vdop                                   GLONASS
-    SAT [  1]     1:  35*elv  303*azm   21dBHz <                           GPS
-    SAT [  2]     3:   7*elv  305*azm    0dBHz                             GPS
-    SAT [  3]    10:  39*elv  115*azm   38dBHz <                           GPS
-    SAT [  4]    11:  27*elv  276*azm   27dBHz <                           GPS
-    SAT [  5]    12:  10*elv   49*azm   36dBHz <                           GPS
-    SAT [  6]    14:  74*elv  350*azm   28dBHz <                           GPS
-    SAT [  7]    18:  49*elv  265*azm   31dBHz                             GPS
-    SAT [  8]    20:  12*elv  125*azm   27dBHz <                           GPS
-    SAT [  9]    22:  28*elv  307*azm   29dBHz <                           GPS
-    SAT [ 10]    25:  19*elv   81*azm   25dBHz <                           GPS
-    SAT [ 11]    31:  56*elv  179*azm   42dBHz <                           GPS
-    SAT [ 12]    32:  60*elv   42*azm   38dBHz <                           GPS
-    SAT [ 13]    46:  38*elv  215*azm   42dBHz                             GPS
-    SAT [ 14]    48:  36*elv  220*azm   42dBHz <                           GPS
-    SAT [ 15]    51:  44*elv  183*azm   42dBHz <                           GPS
-    SAT [ 16]    69:  23*elv   85*azm   22dBHz <                           GLONASS
-    SAT [ 17]    70:  60*elv   15*azm   34dBHz <                           GLONASS
-    SAT [ 18]    71:  30*elv  307*azm   32dBHz <                           GLONASS
-    SAT [ 19]    73:  20*elv  170*azm   37dBHz <                           GLONASS
-    SAT [ 20]    79:  28*elv   38*azm   21dBHz <                           GLONASS
-    SAT [ 21]    80:  54*elv  105*azm   20dBHz <                           GLONASS
-    SAT [ 22]    85:  20*elv  235*azm   36dBHz <                           GLONASS
-    SAT [ 23]    86:  28*elv  295*azm   27dBHz <                           GLONASS
-    SAT [ 24]    87:   4*elv  346*azm    0dBHz                             GLONASS
-    SAT [ 25]    89:  24*elv   84*azm    0dBHz                             GLONASS
+    ACT [1]  {    29    24    10    51    15    27 } [ 6] [11]             GPS
+    ACT [2]  {    20    32    48    16    21       } [ 5] [11]             GPS
+    ACT [1]  {    69    70    68    84    85    83 } [ 6] [ 6]             GLONASS
+    DOP   1.16pdop   0.68hdop   0.94vdop                                   GPS
+    DOP   1.16pdop   0.68hdop   0.94vdop                                   GLONASS
+    SAT [  1]     4:   0*elv    0*azm   33dBHz   ?                         GPS
+    SAT [  2]     8:   3*elv  328*azm    0dBHz                             GPS
+    SAT [  3]    10:  43*elv  273*azm   35dBHz <                           GPS
+    SAT [  4]    13:  16*elv   41*azm    0dBHz                             GPS
+    SAT [  5]    15:  48*elv   58*azm   37dBHz <                           GPS
+    SAT [  6]    16:   6*elv  270*azm   26dBHz <                           GPS
+    SAT [  7]    20:  67*elv  305*azm   35dBHz <                           GPS
+    SAT [  8]    21:  82*elv   82*azm   27dBHz <                           GPS
+    SAT [  9]    24:  20*elv  112*azm   30dBHz <                           GPS
+    SAT [ 10]    27:  28*elv  311*azm   35dBHz <                           GPS
+    SAT [ 11]    29:  14*elv  171*azm   46dBHz <                           GPS
+    SAT [ 12]    32:  12*elv  207*azm   41dBHz <                           GPS
+    SAT [ 13]    46:  38*elv  215*azm   45dBHz                             GPS
+    SAT [ 14]    48:  36*elv  220*azm   44dBHz <                           GPS
+    SAT [ 15]    51:  44*elv  183*azm   45dBHz <                           GPS
+    SAT [ 16]    68:  19*elv   41*azm   27dBHz <                           GLONASS
+    SAT [ 17]    69:  66*elv    6*azm   33dBHz <                           GLONASS
+    SAT [ 18]    70:  42*elv  246*azm   18dBHz <                           GLONASS
+    SAT [ 19]    77:   2*elv   15*azm   22dBHz                             GLONASS
+    SAT [ 20]    78:   3*elv   60*azm   18dBHz                             GLONASS
+    SAT [ 21]    83:  20*elv  152*azm   35dBHz <                           GLONASS
+    SAT [ 22]    84:  78*elv  169*azm   30dBHz <                           GLONASS
+    SAT [ 23]    85:  40*elv  326*azm   28dBHz <                           GLONASS
+    SAT [ 24]    89:  67*elv    6*azm    0dBHz                             GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -881,17 +890,79 @@ As Rube Goldberg as this is, it seems to work.
 Some devices are chatty and emit interesting and sometimes useful information
 as NMEA TXT sentences. These can be recognized by Hazer and logged to standard
 error by gpstool. Some of the functional tests save standard error output in
-log files under the build artifact directory.
+log files under the build artifact directory, or redirected to the system log
+using the Diminuto log command as shown below.
 
-    gpstool: TXT [ 1][ 1][ 2] "u-blox AG - www.u-blox.com".
-    gpstool: TXT [ 1][ 1][ 2] "HW UBX-M8030 00080000".
-    gpstool: TXT [ 1][ 1][ 2] "ROM CORE 3.01 (107888)".
-    gpstool: TXT [ 1][ 1][ 2] "FWVER=SPG 3.01".
-    gpstool: TXT [ 1][ 1][ 2] "PROTVER=18.00".
-    gpstool: TXT [ 1][ 1][ 2] "GPS;GLO;GAL;BDS".
-    gpstool: TXT [ 1][ 1][ 2] "SBAS;IMES;QZSS".
-    gpstool: TXT [ 1][ 1][ 2] "GNSS OTP=GPS;GLO".
-    gpstool: TXT [ 1][ 1][ 2] "LLC=FFFFFFFF-FFFF7CBF-FFED7FAA-FFFFFFFF-FFFFFFF9".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "u-blox AG - www.u-blox.com".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "HW UBX-M8030 00080000".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "ROM CORE 3.01 (107888)".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "FWVER=SPG 3.01".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "PROTVER=18.00".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "GPS;GLO;GAL;BDS".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "SBAS;IMES;QZSS".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "GNSS OTP=GPS;GLO".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "LLC=FFFFFFFF-FFFF7CBF-FFED7FAA-FFFFFFFF-FFFFFFF9".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "ANTSUPERV=AC SD PDoS SR".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "ANTSTATUS=OK".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "PF=3FF".
+
+## Phantom GPS Satellite PRN 4
+
+Around 2018-11-29T12:00-07:00, I was testing some changes to Hazer with
+the Ublox-8 based BU353W10 receiver by comparing its results to those
+of the web site <https://in-the-sky.org/satmap_radar.php> that presents
+a real-time sky map of the visible orbiting space vehicles (not just
+GPS). I noticed that my BU353W10 was reporting GPS PRN 4 as "in view"
+with a zero elevation and zero azimuth; that vehicle wasn't reported by
+the sky map. Worse: a little web-search-fu told me that there was no PRN
+4. That vehicle was decommisioned and its pseudo-random number code has
+not yet been reused. Before I could do much else, PRN 4 dropped from view.
+
+PRN 4 reappeared the next morning around 2018-11-30T09:00-07:00. I
+quickly dumped the raw NMEA and verified using NMEA 0183 Version 4.10
+pp. 96-97 that I wasn't decoding the GSV sentence incorrectly.
+
+    $GPGSV,4,1,15,04,,,36,05,04,062,22,10,27,253,32,13,32,053,38*43\r\n
+    $GPGSV,4,2,15,15,60,092,39,16,15,289,26,20,53,269,,21,72,336,22*75\r\n
+    $GPGSV,4,3,15,24,06,129,33,26,10,264,15,27,11,322,31,29,36,170,50*78\r\n
+    $GPGSV,4,4,15,46,38,215,45,48,36,220,43,51,44,183,44*43\r\n
+
+However, I noticed that the elevation and azimuth for PRN 4 weren't actually
+zero: they were empty strings, although the SNR was a reasonable value. I coded
+up a change to Hazer to detect this and mark it, and to gpstool to display
+a '?' next to that SAT entry. I was able to test this before PRN 4 again
+dropped from view.
+
+PRN 4 reappeared about twenty minutes later.
+
+    SAT [  1]     4:   0*elv    0*azm   33dBHz   ?                         GPS
+    SAT [  2]     8:   3*elv  328*azm    0dBHz                             GPS
+    SAT [  3]    10:  43*elv  273*azm   35dBHz <                           GPS
+    SAT [  4]    13:  16*elv   41*azm    0dBHz                             GPS
+    SAT [  5]    15:  48*elv   58*azm   37dBHz <                           GPS
+    SAT [  6]    16:   6*elv  270*azm   26dBHz <                           GPS
+    SAT [  7]    20:  67*elv  305*azm   35dBHz <                           GPS
+    SAT [  8]    21:  82*elv   82*azm   27dBHz <                           GPS
+    SAT [  9]    24:  20*elv  112*azm   30dBHz <                           GPS
+    SAT [ 10]    27:  28*elv  311*azm   35dBHz <                           GPS
+    SAT [ 11]    29:  14*elv  171*azm   46dBHz <                           GPS
+    SAT [ 12]    32:  12*elv  207*azm   41dBHz <                           GPS
+    SAT [ 13]    46:  38*elv  215*azm   45dBHz                             GPS
+    SAT [ 14]    48:  36*elv  220*azm   44dBHz <                           GPS
+    SAT [ 15]    51:  44*elv  183*azm   45dBHz <                           GPS
+    SAT [ 16]    68:  19*elv   41*azm   27dBHz <                           GLONASS
+    SAT [ 17]    69:  66*elv    6*azm   33dBHz <                           GLONASS
+    SAT [ 18]    70:  42*elv  246*azm   18dBHz <                           GLONASS
+    SAT [ 19]    77:   2*elv   15*azm   22dBHz                             GLONASS
+    SAT [ 20]    78:   3*elv   60*azm   18dBHz                             GLONASS
+    SAT [ 21]    83:  20*elv  152*azm   35dBHz <                           GLONASS
+    SAT [ 22]    84:  78*elv  169*azm   30dBHz <                           GLONASS
+    SAT [ 23]    85:  40*elv  326*azm   28dBHz <                           GLONASS
+    SAT [ 24]    89:  67*elv    6*azm    0dBHz                             GLONASS
+
+Neither NMEA 0183 4.10 nor Ublox 8 R15 suggests any interpretation of the
+empty elevation and azimuth fields. As always, I'm assuming this somehow is
+a bug in my code.
 
 # Acknowledgements
 
