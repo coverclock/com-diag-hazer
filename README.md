@@ -276,7 +276,7 @@ v15-20.30.22-23.01", UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 
 <https://gssc.esa.int/navipedia/index.php/GPS_Navigation_Message>
 
-<http://ftp.agi.com/pub/Catalog/Almanacs/SEM/GPSAlmanac.al3>
+<ftp://ftp.agi.com/pub/Catalog/Almanacs/SEM/GPSAlmanac.al3>
 
 <https://www.navcen.uscg.gov/?pageName=gpsAlmanacs>
 
