@@ -98,6 +98,12 @@ static const size_t UNLIMITED = ~(size_t)0;
 
 static const char * program = (const char *)0;
 
+#if 0
+static const char DEGREE = 0xa7;
+#else
+static const char DEGREE = '*';
+#endif
+
 /**
  * Emit an NMEA sentences to the specified stream after adding the ending
  * matter consisting of the checksum delimiter, the two checksum characters,
@@ -342,7 +348,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
 			fputs("SAT", fp);
 
-			fprintf(fp, " [%3u] %5u: %3d*elv %4d*azm %4ddBHz %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, marker, phantom);
+			fprintf(fp, " [%3u] %5u: %3d%celv %4d%cazm %4ddBHz %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, DEGREE, va[system].sat[satellite].azm_degrees, DEGREE, va[system].sat[satellite].snr_dbhz, marker, phantom);
 
 			fprintf(fp, "%24s", "");
 
@@ -635,14 +641,14 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
         assert((0 <= minutes) && (minutes <= 59));
         assert((0 <= seconds) && (seconds <= 59));
         assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %2d*%02d'%02d.%02d\"%c,", degrees, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
+        fprintf(fp, " %2d%c%02d'%02d.%02d\"%c,", degrees, DEGREE, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
 
         hazer_format_nanodegrees2position(pa[system].lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
         assert((0 <= degrees) && (degrees <= 180));
         assert((0 <= minutes) && (minutes <= 59));
         assert((0 <= seconds) && (seconds <= 59));
         assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %3d*%02d'%02d.%02d\"%c", degrees, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
+        fprintf(fp, " %3d%c%02d'%02d.%02d\"%c", degrees, DEGREE, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
 
         fputc(' ', fp);
 
@@ -699,11 +705,11 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
         decimal = pa[system].cog_nanodegrees;
         decimal /= 1000000000.0;
-        fprintf(fp, " %7.3lf*T", decimal);
+        fprintf(fp, " %7.3lf%cT", decimal, DEGREE);
 
         decimal = pa[system].mag_nanodegrees;
         decimal /= 1000000000.0;
-        fprintf(fp, " %7.3lf*M", decimal);
+        fprintf(fp, " %7.3lf%cM", decimal, DEGREE);
 
         fprintf(fp, "%44s", "");
 
