@@ -788,14 +788,19 @@ extern hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep)
 
 /**
  * This structure maintains the elevation, azimuth, and signal strength of a
- * single satellite.
+ * single satellite. (The phantom field was introduced due to the Ublox 8
+ * equipped BU353W10 reporting a GPS PRN 4 satellite within view, with an
+ * empty string for both elevation and azimuth, but a reasonable SNR. At that
+ * time, there is no PRN 4, that vehicle having been decommisioned and the
+ * pseudo-random number code #4 not yet reassigned.)
  */
 typedef struct HazerSatellite {
     uint16_t id;                /* Satellite IDentifier. */
     int16_t elv_degrees;        /* Elevation in whole degrees. */
     int16_t azm_degrees;        /* Azimuth in whole degrees. */
     int8_t snr_dbhz;            /* Signal/Noise Ratio in dBHz. */
-    uint8_t unused[2];          /* Unused. */
+    uint8_t phantom;			/* If true, elevation or azimuth were empty. */
+    uint8_t unused;             /* Unused. */
 } hazer_satellite_t;
 
 /**

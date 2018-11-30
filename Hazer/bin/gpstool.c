@@ -90,7 +90,7 @@ typedef enum Format { FORMAT = 0, NMEA = 1, UBX = 2 } format_t;
 
 typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*' } status_t;
 
-typedef enum Marker { MARKER = '?', INACTIVE = ' ', ACTIVE = '<' } marker_t;
+typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?' } marker_t;
 
 static const size_t LIMIT = 80 /* Legacy */ - 4 /* "LLL " */ - 6 /* "[NNN] " */ - 2 /* "\r\n" */ - 1 /* Wrap */;
 
@@ -313,6 +313,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
     unsigned int active = 0;
     unsigned int limit = 0;
     marker_t marker = MARKER;
+    marker_t phantom = MARKER;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -337,11 +338,13 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 				}
 			}
 
+			phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
+
 			fputs("SAT", fp);
 
-			fprintf(fp, " [%3u] %5u: %3d*elv %4d*azm %4ddBHz %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, marker);
+			fprintf(fp, " [%3u] %5u: %3d*elv %4d*azm %4ddBHz %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, va[system].sat[satellite].azm_degrees, va[system].sat[satellite].snr_dbhz, marker, phantom);
 
-			fprintf(fp, "%26s", "");
+			fprintf(fp, "%24s", "");
 
 			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
