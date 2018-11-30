@@ -263,6 +263,12 @@ mailto:coverclock@diag.com
 
 <https://en.wikipedia.org/wiki/List_of_GPS_satellites>
 
+<https://gssc.esa.int/navipedia/index.php/GPS_Navigation_Message>
+
+<ftp://ftp.agi.com/pub/Catalog/Almanacs/SEM/GPSAlmanac.al3>
+
+<https://www.navcen.uscg.gov/?pageName=gpsAlmanacs>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
