@@ -347,6 +347,26 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
 			phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
 
+#if !0
+			{
+				/*
+				 * This code is a special case that remarks on the appearance
+				 * and disappearance of GPS PRN 4 in the view.
+				 */
+				static marker_t history = MARKER;
+				if (system != HAZER_SYSTEM_GPS) {
+					/* Do nothing. */
+				} else if (va[system].sat[satellite].id != 4) {
+					/* Do nothing. */
+				} else if (phantom == history) {
+					/* Do nothing. */
+				} else {
+					fprintf(stderr, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom);
+					history = phantom;
+				}
+			}
+#endif
+
 			fputs("SAT", fp);
 
 			fprintf(fp, " [%3u] %5u: %3d%lcelv %4d%lcazm %4ddBHz %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, DEGREE, va[system].sat[satellite].azm_degrees, DEGREE, va[system].sat[satellite].snr_dbhz, marker, phantom);

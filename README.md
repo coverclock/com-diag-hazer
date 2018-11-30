@@ -221,6 +221,10 @@ mailto:coverclock@diag.com
 
 # Articles
 
+<https://coverclock.blogspot.com/2018/11/gps-satellite-prn-4.html>
+
+<https://coverclock.blogspot.com/2018/09/we-have-met-enemy-and-he-is-us.html>
+
 <https://coverclock.blogspot.com/2018/08/practical-geolocation-ii.html>
 
 <https://coverclock.blogspot.com/2018/08/practical-geolocation.html>
