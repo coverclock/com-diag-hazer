@@ -280,6 +280,8 @@ v15-20.30.22-23.01", UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 
 <https://www.navcen.uscg.gov/?pageName=gpsAlmanacs>
 
+<https://www.notams.faa.gov/dinsQueryWeb/>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
@@ -915,8 +917,11 @@ a real-time sky map of the visible orbiting space vehicles (not just
 GPS). I noticed that my BU353W10 was reporting GPS PRN 4 as "in view"
 with a zero elevation and zero azimuth; that vehicle wasn't reported by
 the sky map. Worse: a little web-search-fu told me that there was no PRN
-4. That vehicle was decommisioned and its pseudo-random number code has
-not yet been reused. Before I could do much else, PRN 4 dropped from view.
+4; it does not appear in the most recent GPS almanac. The GPS vehicle
+using PRN 4 was decommisioned and its pseudo-random number code has
+not yet been reused.
+
+Before I could do much else, PRN 4 dropped from view.
 
 PRN 4 reappeared the next morning around 2018-11-30T09:00-07:00. I
 quickly dumped the raw NMEA and verified using NMEA 0183 Version 4.10
@@ -928,10 +933,10 @@ pp. 96-97 that I wasn't decoding the GSV sentence incorrectly.
     $GPGSV,4,4,15,46,38,215,45,48,36,220,43,51,44,183,44*43\r\n
 
 However, I noticed that the elevation and azimuth for PRN 4 weren't actually
-zero: they were empty strings, although the SNR was a reasonable value. I coded
-up a change to Hazer to detect this and mark it, and to gpstool to display
-a '?' next to that SAT entry. I was able to test this before PRN 4 again
-dropped from view.
+zero: they were empty strings, although the SNR was a reasonable (and changing
+over time) value. I coded up a change to Hazer to detect this and mark it, and
+to gpstool to display a '?' next to that SAT entry. I was able to test this
+before PRN 4 again dropped from view.
 
 PRN 4 reappeared about twenty minutes later.
 
@@ -960,9 +965,14 @@ PRN 4 reappeared about twenty minutes later.
     SAT [ 23]    85:  40*elv  326*azm   28dBHz <                           GLONASS
     SAT [ 24]    89:  67*elv    6*azm    0dBHz                             GLONASS
 
+It continues to drop from view and reappear. Its period of appearance does
+not coincide with the GPS orbital period.
+
 Neither NMEA 0183 4.10 nor Ublox 8 R15 suggests any interpretation of the
 empty elevation and azimuth fields. As always, I'm assuming this somehow is
-a bug in my code.
+a bug in my code. But it does occur to me that PRN 4 would be useful for
+testing a ground-based GPS transmitter; the period of its appearance would
+make sense for a transmitter in the continental America time zones.
 
 # Acknowledgements
 
