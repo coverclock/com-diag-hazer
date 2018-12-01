@@ -354,14 +354,15 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 				 * and disappearance of GPS PRN 4 in the view.
 				 */
 				static marker_t history = MARKER;
+				static const uint16_t PRN = 4;
 				if (system != HAZER_SYSTEM_GPS) {
 					/* Do nothing. */
-				} else if (va[system].sat[satellite].id != 4) {
+				} else if (va[system].sat[satellite].id != PRN) {
 					/* Do nothing. */
 				} else if (phantom == history) {
 					/* Do nothing. */
 				} else {
-					fprintf(stderr, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom);
+					diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom);
 					history = phantom;
 				}
 			}
@@ -1073,12 +1074,20 @@ int main(int argc, char * argv[])
     static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RVW:Xb:cdehlmnop:rst:v?";
 
     /*
-     * Parse the command line.
+     * Initialization.
      */
+
+    program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
     locale = setlocale(LC_ALL, "");
 
-    program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
+    diminuto_log_setmask();
+
+    diminuto_log_open_syslog(program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
+
+    /*
+     * Parse the command line.
+     */
 
     while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
