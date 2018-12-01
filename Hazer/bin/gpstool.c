@@ -309,7 +309,7 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
  * This enables or disables special code that remarks on the appearance and
  * disappearance of GPS PRN 4 from the view.
  */
-#define PRN4 (!0)
+#define PRNX 4
 
 /**
  * Print all of the satellites currently being viewed by the receiver.
@@ -328,9 +328,9 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
     unsigned int limit = 0;
     marker_t marker = MARKER;
     marker_t phantom = MARKER;
-#if defined(PRN4) && PRN4
+#if defined(PRNX) && PRNX
 	static marker_t history = MARKER;
-	static const uint16_t PRN = 4;
+	static const uint16_t PRN = PRNX;
 	bool seen = false;
 #endif
 
@@ -359,7 +359,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
 			phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
 
-#if defined(PRN4) && PRN4
+#if defined(PRNX) && PRNX
 			if (system != HAZER_SYSTEM_GPS) {
 				/* Do nothing. */
 			} else if (va[system].sat[satellite].id != PRN) {
@@ -387,7 +387,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
     }
 
-#if defined(PRN4) && PRN4
+#if defined(PRNX) && PRNX
 	if (seen) {
 		/* Do nothing. */
 	} else if (history == MARKER) {

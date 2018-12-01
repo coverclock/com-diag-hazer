@@ -983,6 +983,28 @@ a bug in my code. But it does occur to me that PRN 4 would be useful for
 testing a ground-based GPS transmitter; the period of its appearance would
 make sense for a transmitter in the continental America time zones.
 
+Checking the FAA Notice To Airmen (NOTAM) notifications on the web, there are
+GPS disruptions scheduled for the late November/early December time frame,
+centered on the White Sands Missle Range (WSMR) in New Mexico, and the Yuma
+Proving Grounds (YPG) in Arizona, either of which is potentially within
+range of my location in Denver Colorado. So this could be the U.S. military
+doing testing.
+
+I've added code to gpstool to monitor the comings and goings of GPS PRN 4 and
+remark upon them in the system log. Here's an example of what those
+log messages look like during an actual run of just a few hours. '#' is the
+initial state value when gpstool starts running, '?' means GPS PRN 4 came into
+view, and ' ' means it exited from view.
+
+    Dec  1 10:37:08 nickel gpstool[14656]: gpstool: phantom GPS PRN 4 was '#' now '?'
+    Dec  1 11:57:59 nickel gpstool[14656]: gpstool: phantom GPS PRN 4 was '?' now ' '
+    Dec  1 13:26:55 nickel gpstool[14656]: gpstool: phantom GPS PRN 4 was ' ' now '?'
+    Dec  1 13:26:58 nickel gpstool[14656]: gpstool: phantom GPS PRN 4 was '?' now ' '
+    Dec  1 13:34:48 nickel gpstool[14656]: gpstool: phantom GPS PRN 4 was ' ' now '?'
+    Dec  1 13:34:49 nickel gpstool[14656]: gpstool: phantom GPS PRN 4 was '?' now ' '
+    Dec  1 13:40:30 nickel gpstool[14656]: gpstool: phantom GPS PRN 4 was ' ' now '?'
+    Dec  1 13:40:31 nickel gpstool[14656]: gpstool: phantom GPS PRN 4 was '?' now ' '
+
 # Acknowledgements
 
 Special thanks to Mrs. Overclock for her assistance in road testing (literally)
