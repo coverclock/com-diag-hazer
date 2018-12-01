@@ -395,7 +395,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 	} else if (history == INACTIVE) {
 		/* Do nothing. */
 	} else {
-		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, INACTIVE);
+		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[HAZER_SYSTEM_GPS], PRN, history, INACTIVE);
 		history = INACTIVE;
 	}
 #endif
