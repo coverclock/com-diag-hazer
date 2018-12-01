@@ -51,6 +51,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -304,6 +305,12 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
 
 }
 
+/*
+ * This enables or disables special code that remarks on the appearance and
+ * disappearance of GPS PRN 4 from the view.
+ */
+#define PRN4 (!0)
+
 /**
  * Print all of the satellites currently being viewed by the receiver.
  * @param fp points to the FILE stream.
@@ -321,6 +328,11 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
     unsigned int limit = 0;
     marker_t marker = MARKER;
     marker_t phantom = MARKER;
+#if defined(PRN4) && PRN4
+	static marker_t history = MARKER;
+	static const uint16_t PRN = 4;
+	bool seen = false;
+#endif
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -347,24 +359,17 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
 			phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
 
-#if !0
-			{
-				/*
-				 * This code is a special case that remarks on the appearance
-				 * and disappearance of GPS PRN 4 in the view.
-				 */
-				static marker_t history = MARKER;
-				static const uint16_t PRN = 4;
-				if (system != HAZER_SYSTEM_GPS) {
-					/* Do nothing. */
-				} else if (va[system].sat[satellite].id != PRN) {
-					/* Do nothing. */
-				} else if (phantom == history) {
-					/* Do nothing. */
-				} else {
-					diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom);
-					history = phantom;
-				}
+#if defined(PRN4) && PRN4
+			if (system != HAZER_SYSTEM_GPS) {
+				/* Do nothing. */
+			} else if (va[system].sat[satellite].id != PRN) {
+				/* Do nothing. */
+			} else if (phantom == history) {
+				seen = true;
+			} else {
+				diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom);
+				history = phantom;
+				seen = true;
 			}
 #endif
 
@@ -381,6 +386,18 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
         }
 
     }
+
+#if defined(PRN4) && PRN4
+	if (seen) {
+		/* Do nothing. */
+	} else if (history == MARKER) {
+		/* Do nothing. */
+	} else {
+		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, INACTIVE);
+		history = INACTIVE;
+	}
+#endif
+
 }
 
 /**
