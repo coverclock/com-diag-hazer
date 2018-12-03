@@ -324,6 +324,8 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
     marker_t marker = MARKER;
     marker_t phantom = MARKER;
 	static marker_t history = MARKER;
+	static int8_t maximum = 0;
+	static diminuto_ticks_t ticks = 0;
 	bool seen = false;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
@@ -358,9 +360,12 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 			} else if (va[system].sat[satellite].id != prn) {
 				/* Do nothing. */
 			} else if (phantom == history) {
+				if (va[system].sat[satellite].snr_dbhz > maximum) { maximum = va[system].sat[satellite].snr_dbhz; }
 				seen = true;
 			} else {
-				diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom);
+				maximum = va[system].sat[satellite].snr_dbhz;
+				ticks = diminuto_time_elapsed();
+				diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c' at %ddBHz\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom, maximum);
 				history = phantom;
 				seen = true;
 			}
@@ -388,7 +393,8 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 	} else if (history == INACTIVE) {
 		/* Do nothing. */
 	} else {
-		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[HAZER_SYSTEM_GPS], prn, history, INACTIVE);
+		ticks = diminuto_time_elapsed() - ticks;
+		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c' at %ddBHz for %llums\n", program, HAZER_SYSTEM_NAME[HAZER_SYSTEM_GPS], prn, history, INACTIVE, maximum, diminuto_frequency_ticks2units(ticks, 1000LL));
 		history = INACTIVE;
 	}
 
