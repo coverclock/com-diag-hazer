@@ -305,19 +305,14 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
 
 }
 
-/*
- * This enables or disables special code that remarks on the appearance and
- * disappearance of GPS PRN 4 from the view.
- */
-#define PRNX 4
-
 /**
  * Print all of the satellites currently being viewed by the receiver.
  * @param fp points to the FILE stream.
  * @param va points to the array of all satellite being viewed.
  * @param aa points to the array of active satellites.
+ * @param prn if non-zero activates a phantom satellite monitor for that PRN.
  */
-static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const hazer_active_t aa[])
+static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const hazer_active_t aa[], uint16_t prn)
 {
     static const unsigned int SATELLITES = countof(va[0].sat);
     static const unsigned int IDENTIFIERS = countof(aa[0].id);
@@ -328,11 +323,8 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
     unsigned int limit = 0;
     marker_t marker = MARKER;
     marker_t phantom = MARKER;
-#if defined(PRNX) && PRNX
 	static marker_t history = MARKER;
-	static const uint16_t PRN = PRNX;
 	bool seen = false;
-#endif
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -359,10 +351,11 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
 			phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
 
-#if defined(PRNX) && PRNX
-			if (system != HAZER_SYSTEM_GPS) {
+			if (prn == 0) {
 				/* Do nothing. */
-			} else if (va[system].sat[satellite].id != PRN) {
+			} else if (system != HAZER_SYSTEM_GPS) {
+				/* Do nothing. */
+			} else if (va[system].sat[satellite].id != prn) {
 				/* Do nothing. */
 			} else if (phantom == history) {
 				seen = true;
@@ -371,7 +364,6 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 				history = phantom;
 				seen = true;
 			}
-#endif
 
 			fputs("SAT", fp);
 
@@ -387,18 +379,18 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
     }
 
-#if defined(PRNX) && PRNX
-	if (seen) {
+    if (prn == 0) {
+    	/* Do nothing. */
+    } else if (seen) {
 		/* Do nothing. */
 	} else if (history == MARKER) {
 		/* Do nothing. */
 	} else if (history == INACTIVE) {
 		/* Do nothing. */
 	} else {
-		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[HAZER_SYSTEM_GPS], PRN, history, INACTIVE);
+		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c'\n", program, HAZER_SYSTEM_NAME[HAZER_SYSTEM_GPS], prn, history, INACTIVE);
 		history = INACTIVE;
 	}
-#endif
 
 }
 
@@ -977,6 +969,7 @@ int main(int argc, char * argv[])
     int ignorechecksums = 0;
     int slow = 0;
     int expire = 0;
+    uint16_t prn = 0;
     role_t role = ROLE;
     protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
@@ -1090,7 +1083,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RVW:Xb:cdehlmnop:rst:v?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:M:OP:RVW:Xb:cdehlmnop:rst:v?";
 
     /*
      * Initialization.
@@ -1153,6 +1146,13 @@ int main(int argc, char * argv[])
         case 'L':
             path = optarg;
             break;
+        case 'M':
+            prn = strtoul(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+            }
+        	break;
         case 'O':
             readonly = 0;
             output = !0;
@@ -1229,7 +1229,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1243,6 +1243,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -F          Like -E but refresh at 1Hz.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
             fprintf(errfp, "       -L FILE     Log sentences to FILE.\n");
+            fprintf(errfp, "       -M PRN      Enable phantom satellite monitoring for PRN.\n");
             fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
             fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(errfp, "       -R          Print a report on standard output.\n");
@@ -2082,7 +2083,7 @@ int main(int argc, char * argv[])
                 print_local(outfp, errfp);
                 print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
                 print_actives(outfp, errfp, active);
-                print_views(outfp, errfp, view, active);
+                print_views(outfp, errfp, view, active, prn);
             }
             if (escape) { fputs("\033[0J", outfp); }
             if (report) { fflush(outfp); }
