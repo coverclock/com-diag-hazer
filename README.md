@@ -286,6 +286,8 @@ v15-20.30.22-23.01", UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 
 <https://www.notams.faa.gov/dinsQueryWeb/>
 
+<https://navcen.uscg.gov/?Do=constellationStatus>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
@@ -974,7 +976,7 @@ PRN 4 reappeared about twenty minutes later.
     SAT [ 23]    85:  40*elv  326*azm   28dBHz <                           GLONASS
     SAT [ 24]    89:  67*elv    6*azm    0dBHz                             GLONASS
 
-It continues to drop from view and reappear. Its period of appearance does
+It continued to drop from view and reappear. Its period of appearance does
 not coincide with the GPS orbital period.
 
 Neither NMEA 0183 4.10 nor Ublox 8 R15 suggests any interpretation of the
@@ -990,7 +992,7 @@ Proving Grounds (YPG) in Arizona, either of which is potentially within
 range of my location in Denver Colorado. So this could be the U.S. military
 doing testing.
 
-I've added code to gpstool to monitor the comings and goings of GPS PRN 4 and
+I added code to gpstool to monitor the comings and goings of GPS PRN 4 and
 remark upon them in the system log. Here's an example of what those
 log messages look like during an actual run of just a few hours. '#' is the
 initial state value when gpstool starts running, '?' means GPS PRN 4 came into
@@ -1058,7 +1060,19 @@ Here is the log for a twenty-four hour period.
 The durations in this sample last for anywhere from a second to half an hour.
 During this period the transmissions ceased at 20:00MST and resumed at 06:00MST.
 This suggests this is a rogue terrestrial transmitter somewhere in the
-continental United States. 
+continental United States.
+
+On 2018-12-04, The U. S. Coast Guard straightened me out.
+
+NOTICE ADVISORY TO NAVSTAR USERS (NANU) 2018042 NANU TYPE: GENERAL
+*** GENERAL MESSAGE TO ALL GPS USERS ***
+ON APPROXIMATELY 10 OCT 2018 SVN36 WILL RESUME TRANSMITTING L-BAND UTILIZING
+PRN04. AT L-BAND ACTIVATION, SVN36/PRN04 WILL BE UNUSABLE UNTIL FURTHER NOTICE.
+ADDITIONALLY, NO BROADCAST ALMANACS WILL INCLUDE SVN36/PRN04 UNTIL FURTHER
+NOTICE.
+*** GENERAL MESSAGE TO ALL GPS USERS ***
+
+Mystery solved!
 
 # Acknowledgements
 
