@@ -530,7 +530,7 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
         }
 
         if (jamming != jamming_prior) {
-            fprintf(ep, "%s: UBX JAMMING %u INDICATOR %u\n", program, value, hp->payload.jamInd);
+        	diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx jamming %u indicator %u\n", program, value, hp->payload.jamInd);
             jamming_prior = jamming;
         }
 
@@ -595,7 +595,7 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
         }
 
         if (spoofing != spoofing_prior) {
-            fprintf(ep, "%s: UBX SPOOFING %u\n", program, value);
+        	diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx spoofing %u\n", program, value);
             spoofing_prior = spoofing;
         }
 
