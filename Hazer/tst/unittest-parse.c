@@ -12,18 +12,16 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
-#if !defined(_BSD_SOURCE)
-#define _BSD_SOURCE
-#endif
-#include <endian.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 
 int main(void)
 {
-	hazer_talker_t talker = HAZER_TALKER_TOTAL;
-	hazer_system_t system = HAZER_SYSTEM_TOTAL;
-	char * string = (char *)0;
+    hazer_talker_t talker = HAZER_TALKER_TOTAL;
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    uint16_t id = 0;
+    int index = 0;
+    char * string = (char *)0;
     uint64_t numerator = 0;
     uint64_t denominator = 0;
     int64_t nanodegrees = 0;
@@ -36,14 +34,14 @@ int main(void)
     /**************************************************************************/
 
 #define UNITTEST_PARSE_TALKER_SYSTEM(_STRING_, _TALKER_, _SYSTEM_) \
-	{ \
-	    string = "$" _STRING_; \
-	    talker = hazer_parse_talker(string); \
-	    assert(talker == _TALKER_); \
-	    system = hazer_map_talker_to_system(talker); \
-	    assert(system == _SYSTEM_); \
-	    assert((_TALKER_ == HAZER_TALKER_TOTAL) || (strcmp(_STRING_, HAZER_TALKER_NAME[_TALKER_]) == 0)); \
-	}
+    { \
+        string = "$" _STRING_; \
+        talker = hazer_parse_talker(string); \
+        assert(talker == _TALKER_); \
+        system = hazer_map_talker_to_system(talker); \
+        assert(system == _SYSTEM_); \
+        assert((_TALKER_ == HAZER_TALKER_TOTAL) || (strcmp(_STRING_, HAZER_TALKER_NAME[_TALKER_]) == 0)); \
+    }
 
     UNITTEST_PARSE_TALKER_SYSTEM("GN", HAZER_TALKER_GNSS, HAZER_SYSTEM_GNSS);
     UNITTEST_PARSE_TALKER_SYSTEM("GP", HAZER_TALKER_GPS, HAZER_SYSTEM_GPS);
@@ -61,255 +59,306 @@ int main(void)
 
     /**************************************************************************/
 
-    {
-    	static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-						HAZER_ID_GPS_FIRST,
-						HAZER_ID_GPS_FIRST + 1,
-						HAZER_ID_GPS_FIRST + 2,
-						HAZER_ID_GPS_LAST,
-				},
-    			0, 0, 0,
-				0,
-				4,
-    	};
+#define UNITTEST_PARSE_ID_SYSTEM(_MIN_, _MAX_, _SYSTEM_) \
+    if (((_MIN_) <= id) && (id <= (_MAX_))) { assert(hazer_map_id_to_system(id) == (_SYSTEM_)); continue; }
 
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
-
+    for (id = 0, index = 0; index <= 0xffff; ++index, ++id) {
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GPS_FIRST, HAZER_ID_GPS_LAST, HAZER_SYSTEM_GPS)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBAS_FIRST, HAZER_ID_SBAS_LAST, HAZER_SYSTEM_SBAS)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GLONASS_FIRST, HAZER_ID_GLONASS_LAST, HAZER_SYSTEM_GLONASS)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBASX_FIRST, HAZER_ID_SBASX_LAST, HAZER_SYSTEM_SBAS)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_IMES_FIRST, HAZER_ID_IMES_LAST, HAZER_SYSTEM_IMES)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_QZSS_FIRST, HAZER_ID_QZSS_LAST, HAZER_SYSTEM_QZSS)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU1_FIRST, HAZER_ID_BEIDOU1_LAST, HAZER_SYSTEM_BEIDOU)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GALILEO_FIRST, HAZER_ID_GALILEO_LAST, HAZER_SYSTEM_GALILEO)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU2_FIRST, HAZER_ID_BEIDOU2_LAST, HAZER_SYSTEM_BEIDOU)
+        assert(hazer_map_id_to_system(id) == HAZER_SYSTEM_TOTAL);
     }
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					HAZER_ID_WAAS_FIRST,
-					HAZER_ID_WAAS_LAST,
-				},
-				0, 0, 0,
-				0,
-				2,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_WAAS);
-
-	}
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					HAZER_ID_WAAS_FIRST,
-					HAZER_ID_GPS_FIRST,
-					HAZER_ID_WAAS_LAST,
-				},
-				0, 0, 0,
-				0,
-				3,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
-
-	}
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					HAZER_ID_GPS_FIRST,
-					HAZER_ID_WAAS_FIRST,
-					HAZER_ID_WAAS_LAST,
-				},
-				0, 0, 0,
-				0,
-				3,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
-
-	}
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					HAZER_ID_GLONASS_FIRST,
-					HAZER_ID_GLONASS_FIRST + 1,
-					HAZER_ID_GLONASS_LAST,
-				},
-				0, 0, 0,
-				0,
-				3,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GLONASS);
-
-	}
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					HAZER_ID_BEIDOU_FIRST,
-					HAZER_ID_BEIDOU_FIRST + 1,
-					HAZER_ID_BEIDOU_LAST,
-				},
-				0, 0, 0,
-				0,
-				3,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_BEIDOU);
-
-	}
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					HAZER_ID_QZSS_FIRST,
-					HAZER_ID_QZSS_FIRST + 1,
-					HAZER_ID_QZSS_LAST,
-				},
-				0, 0, 0,
-				0,
-				3,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_QZSS);
-
-	}
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					HAZER_ID_GPS_FIRST,
-					HAZER_ID_GPS_LAST,
-					HAZER_ID_GLONASS_FIRST,
-					HAZER_ID_GLONASS_LAST,
-				},
-				0, 0, 0,
-				0,
-				4,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GNSS);
-
-	}
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					HAZER_ID_GPS_FIRST,
-					HAZER_ID_GLONASS_FIRST,
-					HAZER_ID_GPS_LAST,
-					HAZER_ID_GLONASS_LAST,
-				},
-				0, 0, 0,
-				0,
-				4,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GNSS);
-
-	}
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					1,
-					2,
-					3,
-					4,
-					5,
-				},
-				0, 0, 0,
-				HAZER_SYSTEM_GALILEO,
-				5,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GALILEO);
-
-	}
-
-	{
-		static const hazer_active_t ACTIVE = {
-				NULL,
-				{
-					97,
-					98,
-					99,
-					100,
-				},
-				0, 0, 0,
-				0,
-				4,
-		};
-
-    	assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_TOTAL);
-
-	}
 
     /**************************************************************************/
 
     {
-    	static const hazer_view_t VIEW[HAZER_SYSTEM_TOTAL] = {
-    			{ NULL }, /* GNSS */
-				{
-					NULL,
-					{
-						{ HAZER_ID_GPS_FIRST, 0, 0, 0 },
-						{ HAZER_ID_GPS_FIRST + 1, 0, 0, 0 },
-						{ HAZER_ID_GPS_FIRST + 2, 0, 0, 0 },
-						{ HAZER_ID_GPS_LAST, 0, 0, 0 },
-					},
-					4,
-					0,
-					0,
-				},
-				{
-					NULL,
-					{
-						{ HAZER_ID_GLONASS_FIRST, 0, 0, 0 },
-						{ HAZER_ID_GLONASS_FIRST + 1, 0, 0, 0 },
-						{ HAZER_ID_GLONASS_LAST, 0, 0, 0 },
-					},
-					3,
-					0,
-					0,
-				},
-				{ NULL }, /* GALILEO */
-				{
-					NULL,
-					{
-						{ HAZER_ID_WAAS_FIRST, 0, 0, 0},
-						{ HAZER_ID_WAAS_LAST, 0, 0, 0 },
-					},
-					2,
-					0,
-					0,
-				},
-				{ NULL }, /* BEIDOU */
-				{ NULL }, /* QZSS */
-    	};
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                        HAZER_ID_GPS_FIRST,
+                        HAZER_ID_GPS_FIRST + 1,
+                        HAZER_ID_GPS_FIRST + 2,
+                        HAZER_ID_GPS_LAST,
+                },
+                0, 0, 0,
+                0,
+                4,
+        };
 
-    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
-    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
-    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 2, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
-    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 3, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
-    	assert(hazer_map_svid_to_system(HAZER_ID_GPS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
 
-    	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
-    	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
-    	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST + 2, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
-    	assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+    }
 
-    	assert(hazer_map_svid_to_system(HAZER_ID_WAAS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_WAAS);
-    	assert(hazer_map_svid_to_system(HAZER_ID_WAAS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
-    	assert(hazer_map_svid_to_system(HAZER_ID_WAAS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_WAAS);
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_SBAS_FIRST,
+                    HAZER_ID_SBAS_LAST,
+                },
+                0, 0, 0,
+                0,
+                2,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_SBAS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_SBASX_FIRST,
+                    HAZER_ID_SBASX_LAST,
+                },
+                0, 0, 0,
+                0,
+                2,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_SBAS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_SBAS_FIRST,
+                    HAZER_ID_GPS_FIRST,
+                    HAZER_ID_SBAS_LAST,
+                },
+                0, 0, 0,
+                0,
+                3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_GPS_FIRST,
+                    HAZER_ID_SBAS_FIRST,
+                    HAZER_ID_SBAS_LAST,
+                },
+                0, 0, 0,
+                0,
+                3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_GLONASS_FIRST,
+                    HAZER_ID_GLONASS_FIRST + 1,
+                    HAZER_ID_GLONASS_LAST,
+                },
+                0, 0, 0,
+                0,
+                3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GLONASS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_BEIDOU1_FIRST,
+                    HAZER_ID_BEIDOU1_FIRST + 1,
+                    HAZER_ID_BEIDOU1_LAST,
+                },
+                0, 0, 0,
+                0,
+                3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_BEIDOU);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_BEIDOU2_FIRST,
+                    HAZER_ID_BEIDOU2_FIRST + 1,
+                    HAZER_ID_BEIDOU2_LAST,
+                },
+                0, 0, 0,
+                0,
+                3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_BEIDOU);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_QZSS_FIRST,
+                    HAZER_ID_QZSS_FIRST + 1,
+                    HAZER_ID_QZSS_LAST,
+                },
+                0, 0, 0,
+                0,
+                3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_QZSS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_GPS_FIRST,
+                    HAZER_ID_GPS_LAST,
+                    HAZER_ID_GLONASS_FIRST,
+                    HAZER_ID_GLONASS_LAST,
+                },
+                0, 0, 0,
+                0,
+                4,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GNSS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_GPS_FIRST,
+                    HAZER_ID_GLONASS_FIRST,
+                    HAZER_ID_GPS_LAST,
+                    HAZER_ID_GLONASS_LAST,
+                },
+                0, 0, 0,
+                0,
+                4,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GNSS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                },
+                0, 0, 0,
+                HAZER_SYSTEM_GALILEO,
+                5,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GALILEO);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    97,
+                    98,
+                    99,
+                    100,
+                },
+                0, 0, 0,
+                0,
+                4,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_TOTAL);
+
+    }
+
+    /**************************************************************************/
+
+    {
+        static const hazer_view_t VIEW[HAZER_SYSTEM_TOTAL] = {
+                { NULL }, /* GNSS */
+                {
+                    NULL,
+                    {
+                        { HAZER_ID_GPS_FIRST, 0, 0, 0 },
+                        { HAZER_ID_GPS_FIRST + 1, 0, 0, 0 },
+                        { HAZER_ID_GPS_FIRST + 2, 0, 0, 0 },
+                        { HAZER_ID_GPS_LAST, 0, 0, 0 },
+                    },
+                    4,
+                    0,
+                    0,
+                },
+                {
+                    NULL,
+                    {
+                        { HAZER_ID_GLONASS_FIRST, 0, 0, 0 },
+                        { HAZER_ID_GLONASS_FIRST + 1, 0, 0, 0 },
+                        { HAZER_ID_GLONASS_LAST, 0, 0, 0 },
+                    },
+                    3,
+                    0,
+                    0,
+                },
+                { NULL }, /* GALILEO */
+                {
+                    NULL,
+                    {
+                        { HAZER_ID_SBAS_FIRST, 0, 0, 0},
+                        { HAZER_ID_SBAS_LAST, 0, 0, 0 },
+                    },
+                    2,
+                    0,
+                    0,
+                },
+                { NULL }, /* BEIDOU */
+                { NULL }, /* QZSS */
+        };
+
+        assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
+        assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
+        assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 2, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
+        assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 3, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
+        assert(hazer_map_svid_to_system(HAZER_ID_GPS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
+
+        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST + 2, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
+        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+
+        assert(hazer_map_svid_to_system(HAZER_ID_SBAS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_SBAS);
+        assert(hazer_map_svid_to_system(HAZER_ID_SBAS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
+        assert(hazer_map_svid_to_system(HAZER_ID_SBAS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_SBAS);
 
     }
 
@@ -562,38 +611,6 @@ int main(void)
 
     dop = hazer_parse_dop("100");
     assert(dop == 9999);
-
-    /**************************************************************************/
-
-    {
-    	yodel_header_t headers[2];
-
-    	assert(sizeof(yodel_header_t) == (YODEL_UBX_UNSUMMED + YODEL_UBX_SUMMED));
-
-    	assert(sizeof(headers) == (2 * sizeof(yodel_header_t)));
-    }
-
-    /**************************************************************************/
-
-    {
-    	union {
-    		yodel_buffer_t buffer;
-    		yodel_header_t header;
-    	} packet;
-
-    	packet.buffer[YODEL_UBX_SYNC_1] = YODEL_STIMULUS_SYNC_1;
-    	packet.buffer[YODEL_UBX_SYNC_2] = YODEL_STIMULUS_SYNC_2;
-    	packet.buffer[YODEL_UBX_CLASS] = 0xaa;
-    	packet.buffer[YODEL_UBX_ID] = 0x55;
-    	packet.buffer[YODEL_UBX_LENGTH_LSB] = 0xa5;
-    	packet.buffer[YODEL_UBX_LENGTH_MSB] = 0x5a;
-
-    	assert(packet.header.yodel_sync_1 == packet.buffer[YODEL_UBX_SYNC_1]);
-    	assert(packet.header.yodel_sync_2 == packet.buffer[YODEL_UBX_SYNC_2]);
-    	assert(packet.header.yodel_class == packet.buffer[YODEL_UBX_CLASS]);
-    	assert(packet.header.yodel_id == packet.buffer[YODEL_UBX_ID]);
-    	assert(le16toh(packet.header.yodel_length) == 0x5aa5);
-    }
 
     /**************************************************************************/
 

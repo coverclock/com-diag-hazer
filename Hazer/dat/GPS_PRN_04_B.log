@@ -1,0 +1,54 @@
+Dec  3 09:32:06 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '#' now '?' at 25dBHz
+Dec  3 09:42:03 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 38dBHz for 597010ms
+Dec  3 09:48:59 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 34dBHz
+Dec  3 09:58:51 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 592009ms
+Dec  3 10:01:11 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 35dBHz
+Dec  3 10:29:57 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 40dBHz for 1726038ms
+Dec  3 10:30:11 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 38dBHz
+Dec  3 10:32:34 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 39dBHz for 143006ms
+Dec  3 10:33:14 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 35dBHz
+Dec  3 10:34:27 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 40dBHz for 72998ms
+Dec  3 10:34:50 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 33dBHz
+Dec  3 10:35:38 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 37dBHz for 48001ms
+Dec  3 10:35:50 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 37dBHz
+Dec  3 11:37:43 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 43dBHz for 3713086ms
+Dec  3 11:42:22 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 29dBHz
+Dec  3 11:49:29 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 427014ms
+Dec  3 11:59:15 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 25dBHz
+Dec  3 11:59:16 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 25dBHz for 999ms
+Dec  3 13:35:06 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 23dBHz
+Dec  3 13:35:07 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 23dBHz for 998ms
+Dec  3 16:37:48 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 31dBHz
+Dec  3 16:45:52 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 484015ms
+Dec  3 17:08:03 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 29dBHz
+Dec  3 17:11:16 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 193003ms
+Dec  3 17:14:37 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 30dBHz
+Dec  3 17:19:16 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 34dBHz for 279011ms
+Dec  3 17:26:53 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 31dBHz
+Dec  3 17:41:51 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 898023ms
+Dec  3 18:00:33 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 30dBHz
+Dec  3 18:06:14 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 341011ms
+Dec  3 18:09:17 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 33dBHz
+Dec  3 18:22:07 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 37dBHz for 770011ms
+Dec  3 18:26:10 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 34dBHz
+Dec  3 18:59:11 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 39dBHz for 1981048ms
+Dec  3 19:00:54 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 33dBHz
+Dec  3 19:30:34 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 38dBHz for 1780046ms
+Dec  3 19:33:50 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 31dBHz
+Dec  3 19:44:47 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 657014ms
+Dec  3 19:55:24 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 27dBHz
+Dec  3 20:02:55 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 33dBHz for 451009ms
+Dec  4 05:52:37 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 26dBHz
+Dec  4 05:52:39 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 26dBHz for 2001ms
+Dec  4 05:52:40 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 26dBHz
+Dec  4 05:52:41 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 26dBHz for 1007ms
+Dec  4 08:10:39 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 31dBHz
+Dec  4 08:16:56 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 33dBHz for 377014ms
+Dec  4 08:19:21 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 29dBHz
+Dec  4 08:22:17 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 31dBHz for 176011ms
+Dec  4 08:28:52 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 32dBHz
+Dec  4 08:40:15 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 34dBHz for 683019ms
+Dec  4 09:03:34 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 33dBHz
+Dec  4 09:17:36 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 38dBHz for 842031ms
+Dec  4 09:22:47 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 35dBHz
+Dec  4 09:39:55 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 35dBHz for 1027038ms

@@ -113,12 +113,12 @@ extern int hazer_finalize(void);
 /**
  * NMEA 0183, 4.10, 5.3
  */
-enum HazerGnss {
+enum HazerGnssConstants {
     HAZER_GNSS_SATELLITES   = 32,	/* Per constellation or system. */
     HAZER_GNSS_VIEWS        = 4,	/* Per NMEA GSV message. */
     HAZER_GNSS_ACTIVES		= 12,	/* Per NMEA GSA message. */
-	HAZER_GNSS_TICKS		= 255,	/* Maximum lifetime. */
-	HAZER_GNSS_DOP			= 9999,	/* Maximum DOP in units * 100 */
+    HAZER_GNSS_TICKS		= 255,	/* Maximum lifetime. */
+    HAZER_GNSS_DOP			= 9999,	/* Maximum DOP in units * 100 */
 };
 
 /**
@@ -134,7 +134,7 @@ enum HazerGnss {
  * The NaviSys GR-701W with the uBlox-7 chipset emits proprietary
  * PUBX messages longer than the NMEA spec.
  */
-enum HazerNmea {
+enum HazerNmeaConstants {
     HAZER_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
     HAZER_NMEA_LONGEST     = 512, /* Adjusted. */
     HAZER_NMEA_TALKER      = sizeof("GP") - 1,
@@ -202,7 +202,7 @@ typedef enum HazerAction {
     HAZER_ACTION_SAVE,
     HAZER_ACTION_SAVESPECIAL,
     HAZER_ACTION_TERMINATE,
-	HAZER_ACTION_FINAL,
+    HAZER_ACTION_FINAL,
 } hazer_action_t;
 
 /**
@@ -210,19 +210,19 @@ typedef enum HazerAction {
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerTalker {
-	HAZER_TALKER_BEIDOU2			= 0,
-	HAZER_TALKER_DSC,
-	HAZER_TALKER_ECDIS,
+    HAZER_TALKER_BEIDOU2			= 0,
+    HAZER_TALKER_DSC,
+    HAZER_TALKER_ECDIS,
     HAZER_TALKER_GALILEO,
-	HAZER_TALKER_BEIDOU1,
+    HAZER_TALKER_BEIDOU1,
     HAZER_TALKER_GLONASS,
     HAZER_TALKER_GNSS,
     HAZER_TALKER_GPS,
-	HAZER_TALKER_INSTRUMENTATION,
-	HAZER_TALKER_NAVIGATION,
-	HAZER_TALKER_LORANC,
-	HAZER_TALKER_PUBX,
-	HAZER_TALKER_QZSS,
+    HAZER_TALKER_INSTRUMENTATION,
+    HAZER_TALKER_NAVIGATION,
+    HAZER_TALKER_LORANC,
+    HAZER_TALKER_PUBX,
+    HAZER_TALKER_QZSS,
     HAZER_TALKER_RADIO,
     HAZER_TALKER_TOTAL,
 } hazer_talker_t;
@@ -234,23 +234,23 @@ typedef enum HazerTalker {
  * be in collating sequence order.
  */
 #define HAZER_TALKER_NAME_INITIALIZER \
-	{ \
-		"BD", \
-		"CD", \
-		"EC", \
-		"GA", \
-		"GB", \
-		"GL", \
-		"GN", \
-		"GP", \
-		"II", \
-		"IN", \
-		"LC", \
-		"PUBX", \
-		"QZ", \
-		"ZV", \
-		(const char *)0, \
-	}
+    { \
+        "BD", \
+        "CD", \
+        "EC", \
+        "GA", \
+        "GB", \
+        "GL", \
+        "GN", \
+        "GP", \
+        "II", \
+        "IN", \
+        "LC", \
+        "PUBX", \
+        "QZ", \
+        "ZV", \
+        (const char *)0, \
+    }
 
 /**
  * Array of TALKER names indexed by talker enumeration.
@@ -268,9 +268,10 @@ typedef enum HazerSystem {
     HAZER_SYSTEM_GPS				= 1,
     HAZER_SYSTEM_GLONASS			= 2,
     HAZER_SYSTEM_GALILEO			= 3,
-	HAZER_SYSTEM_WAAS,
-	HAZER_SYSTEM_BEIDOU,
-	HAZER_SYSTEM_QZSS,
+    HAZER_SYSTEM_SBAS,
+    HAZER_SYSTEM_BEIDOU,
+    HAZER_SYSTEM_QZSS,
+    HAZER_SYSTEM_IMES,
     HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 
@@ -284,32 +285,67 @@ typedef enum HazerSystem {
  * multiple systems, which can be problematic).
  */
 #define HAZER_SYSTEM_NAME_INITIALIZER \
-	{ \
-		"GNSS", \
-		"GPS", \
-		"GLONASS", \
-	    "GALILEO", \
-		"WAAS", \
-		"BEIDOU", \
-		"QZSS", \
-		(const char *)0, \
-	}
+    { \
+        "GNSS", \
+        "GPS", \
+        "GLONASS", \
+        "GALILEO", \
+        "SBAS", \
+        "BEIDOU", \
+        "QZSS", \
+        "IMES", \
+        (const char *)0, \
+    }
 
 /**
  * GNSS satellite identifiers.
- * NMEA 0183 4.10 p. 94. and elsewhere.
+ * NMEA 0183 4.10 p. 94.
+ * UBLOX8 R15 p. 373.
+ * There are some conflicts between these documents, and the best receiver I
+ * have only does GPS, SBAS, and GLONASS, so much of this is guess work on
+ * my part.
  */
 typedef enum HazerId {
-	HAZER_ID_GPS_FIRST		= 1,
-	HAZER_ID_GPS_LAST		= 32,
-	HAZER_ID_WAAS_FIRST		= 33,
-	HAZER_ID_WAAS_LAST		= 64,
-	HAZER_ID_GLONASS_FIRST	= 65,
-	HAZER_ID_GLONASS_LAST	= 96,
-	HAZER_ID_QZSS_FIRST		= 193,
-	HAZER_ID_QZSS_LAST		= 200,
-	HAZER_ID_BEIDOU_FIRST	= 201,
-	HAZER_ID_BEIDOU_LAST	= 235,
+    /*                        0,     */
+    HAZER_ID_GPS_FIRST		= 1,
+    HAZER_ID_GPS_LAST		= 32,
+    HAZER_ID_SBAS_FIRST		= 33,
+    HAZER_ID_SBAS_LAST		= 64,
+    HAZER_ID_GLONASS_FIRST	= 65,
+    HAZER_ID_GLONASS_LAST	= 96,
+    /*						  97,    */
+    /*						   :     */
+    /*						  151,   */
+    HAZER_ID_SBASX_FIRST	= 152,
+    HAZER_ID_SBASX_LAST		= 158,
+    /*						  159,   */
+    /*						   :     */
+    /*						  172,   */
+    HAZER_ID_IMES_FIRST		= 173,
+    HAZER_ID_IMES_LAST		= 182,
+    /*						  183,   */
+    /*						   :     */
+    /*						  192,   */
+    HAZER_ID_QZSS_FIRST		= 193,
+    HAZER_ID_QZSS_LAST		= 197,
+    /*						  198,   */
+    /*						   :     */
+    /*						  200,   */
+    HAZER_ID_BEIDOU1_FIRST	= 201,
+    HAZER_ID_BEIDOU1_LAST	= 235,
+    /*						  236,   */
+    /*						   :     */
+    /*						  300,   */
+    HAZER_ID_GALILEO_FIRST	= 301,
+    HAZER_ID_GALILEO_LAST	= 336,
+    /*						  337,   */
+    /*						   :     */
+    /*						  400,   */
+    HAZER_ID_BEIDOU2_FIRST	= 401,
+    HAZER_ID_BEIDOU2_LAST	= 437,
+    /*						  438,   */
+    /*						   :     */
+    /*						  65535, */
 } hazer_id_t;
 
 /**
@@ -735,6 +771,13 @@ typedef struct HazerActive {
 extern int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count);
 
 /**
+ * Map a single satellite identifier to a system.
+ * @param id is the satellite it.
+ * @return an index of the system of SYSTEM TOTAL if N/A.
+ */
+extern hazer_system_t hazer_map_id_to_system(uint16_t id);
+
+/**
  * Return a system given a list of active satellites. This is based on the
  * NMEA conventions for satellite numbering for GPS, GLONASS, and WAAS.
  * @param activep points to the active structure. It is sometimes useful for
@@ -745,14 +788,19 @@ extern hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep)
 
 /**
  * This structure maintains the elevation, azimuth, and signal strength of a
- * single satellite.
+ * single satellite. (The phantom field was introduced due to the Ublox 8
+ * equipped BU353W10 reporting a GPS PRN 4 satellite within view, with an
+ * empty string for both elevation and azimuth, but a reasonable SNR. At that
+ * time, there is no PRN 4, that vehicle having been decommisioned and the
+ * pseudo-random number code #4 not yet reassigned.)
  */
 typedef struct HazerSatellite {
     uint16_t id;                /* Satellite IDentifier. */
     int16_t elv_degrees;        /* Elevation in whole degrees. */
     int16_t azm_degrees;        /* Azimuth in whole degrees. */
     int8_t snr_dbhz;            /* Signal/Noise Ratio in dBHz. */
-    uint8_t unused[2];          /* Unused. */
+    uint8_t phantom;			/* If true, elevation or azimuth were empty. */
+    uint8_t unused;             /* Unused. */
 } hazer_satellite_t;
 
 /**

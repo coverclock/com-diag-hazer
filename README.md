@@ -15,11 +15,9 @@ Licensed under the terms in LICENSE.txt.
 
 # Abstract
 
-This software is an original work of its author(s).
-
 This file is part of the Digital Aggregates Corporation Hazer
-package. Hazer is a simple C-based parser of the National Marine
-Electronics Association (NMEA 0183 4.10) strings produced most Global
+package. Hazer is a simple C-based parser of the NMEA (National Marine
+Electronics Association) 0183 4.10 strings produced by most Global
 Positioning System (GPS) devices.  Unlike the Drover project, Hazer does
 its own NMEA parsing.  Hazer includes a gpstool utility to display the
 interpreted GPS data. gpstool accepts NMEA sentences from standard input,
@@ -32,7 +30,7 @@ distribution. gpstool uses both the Hazer stack and the Yodel stack to process
 both NMEA and UBX messages interleaved in the same input stream.
 
 If you're wondering why I don't use the excellent open source GPS daemon
-(gpsd) and its GPS monitor (gpsmon), the answer is: I have, in several projects,
+(gpsd) and its GPS monitor (gpsmon), the answer is: I have, in many projects,
 typically in conjunction with the open source NTPsec daemon (ntpd). Hazer was
 developed as an excuse for me to learn in detail more about how GPS works and
 how NMEA and UBX sentences are formatted (because I only learn by doing), and
@@ -41,9 +39,11 @@ the kinds of embedded systems I am frequently called to work upon. Hazer and
 gpstool have also turned out to be really useful tools for testing and
 evaluating GPS devices.
 
+This software is an original work of its author(s).
+
 # Sentences
 
-Hazer parses the following NMEA sentences.
+Hazer parses the following received NMEA sentences.
 
 * GGA - Global Positioning System Fix Data (NMEA 0183 Version 4.10 p. 68)
 * GLL - Geographic Position - Latitude/Longitude (NMEA 0183 Version 4.10 p. 87)
@@ -52,6 +52,11 @@ Hazer parses the following NMEA sentences.
 * RMC - Recommended Minimum Specific GNSS Data (NMEA 0183 Version 4.10 p. 113)
 * TXT - Text Transmission (NMEA 0183 Version 4.10 p. 124)
 * VTG - Course Over Ground & Ground Speed (NMEA 0183 Version 4.10 p. 127)
+
+Yodel recognizes the following received UBX messages.
+
+* UBX-MON-HW - Monitor Hardware can be used to detect jamming. (UBLOX 8 R15 p. 285)
+* UBX-NAV-STATUS - Navigation Status can be used to detect spoofing. (UBLOX 8 R15 p. 316)
 
 # Talkers
 
@@ -67,8 +72,8 @@ These talkers have been observed in the wild coming from actual GPS receivers.
 Support for these talkers has been unit tested but has never been exercised
 using actual GPS receivers.
 
-* GA - Galileo (as in Galileo Galilei) - EU
 * BD - BeiDou (as in The Big Dipper) - China
+* GA - Galileo (as in Galileo Galilei) - EU
 * GB - BeiDou (as in The Big Dipper) - China
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
 
@@ -81,16 +86,17 @@ These satellite identifiers have been observed in the wild coming from actual
 GPS receivers.
 
 * GPS - 1..32
-* SBAS - 33..34
+* SBAS - 33..64
 * GLONASS - 65..96
 
 Support for these satellite identifiers has been unit tested but has never been
 exercised using actual GPS receivers.
 
-* QZSS - 193..200
+* IMES - 173..182
+* QZSS - 193..197
 * BeiDou - 201..235
-
-There is currently no defined or proposed satellite identifiers for Galileo.
+* Galileo - 301..336
+* BeiDou - 401..437
 
 # Devices
 
@@ -129,7 +135,7 @@ Hazer has been successfully tested with the following GPS devices.
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
 * TOPGNSS GN-803G (U-Blox UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
-* GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [2] [4] [8]
+* GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [1] [2] [4] [8]
 
 Footnotes:
 
@@ -215,6 +221,10 @@ mailto:coverclock@diag.com
 
 # Articles
 
+<https://coverclock.blogspot.com/2018/11/gps-satellite-prn-4.html>
+
+<https://coverclock.blogspot.com/2018/09/we-have-met-enemy-and-he-is-us.html>
+
 <https://coverclock.blogspot.com/2018/08/practical-geolocation-ii.html>
 
 <https://coverclock.blogspot.com/2018/08/practical-geolocation.html>
@@ -224,6 +234,17 @@ mailto:coverclock@diag.com
 <https://coverclock.blogspot.com/2017/09/time-space.html>
 
 <http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
+
+# References
+
+NMEA 0183, "Standard for Interfacing Marine Electronic Devices", Version 4.10,
+National Marine Electronics Association, 2012
+
+u-blox 7, "Receiver Description Including Protocol Specification V14",
+GPS.G7-SW-12001-B, ublox, 65525, 2013-02-01
+
+u-blox 8 / u-blox M8, "Receiver Description Including Protocol Specification
+v15-20.30.22-23.01", UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 
 # Resources
 
@@ -248,6 +269,24 @@ mailto:coverclock@diag.com
 <https://github.com/mvglasow/satstat/wiki/NMEA-IDs>
 
 <https://pilotweb.nas.faa.gov/PilotWeb/noticesAction.do?queryType=ALLGPS&formatType=ICAO>
+
+<https://www.rapidtables.com/convert/number/degrees-to-degrees-minutes-seconds.html>
+
+<https://in-the-sky.org/satmap_radar.php>
+
+<https://www.gpsworld.com/the-almanac/>
+
+<https://en.wikipedia.org/wiki/List_of_GPS_satellites>
+
+<https://gssc.esa.int/navipedia/index.php/GPS_Navigation_Message>
+
+<ftp://ftp.agi.com/pub/Catalog/Almanacs/SEM/GPSAlmanac.al3>
+
+<https://www.navcen.uscg.gov/?pageName=gpsAlmanacs>
+
+<https://www.notams.faa.gov/dinsQueryWeb/>
+
+<https://navcen.uscg.gov/?Do=constellationStatus>
 
 <https://celestrak.com/GPS/NANU/description.php>
 
@@ -275,6 +314,11 @@ Set up environment and run tests and utilities.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
+    unittest-checksum
+    unittest-format
+    unittest-nmea
+    unittest-parse
+    unittest-tokenize
     gpstool -?
 
 Optionally install Diminuto and Hazer in /usr/local.
@@ -310,7 +354,8 @@ Optionally install Diminuto and Hazer in /usr/local.
 
 * bu353s4 - script that uses gpstool to exercise the GlobalSat BU-353S4 receiver.
 * bu353w10 - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver.
-* bu353w10slow - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver with slow displays.
+* bu353w10F - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver with slow displays.
+* bu353W10X - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver while testing data expiration.
 * gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
 * gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
 * sirfstar4 - script that uses gpstool to exercise any SiRF Star 4 device.
@@ -322,7 +367,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 
     > gpstool -?
 
-    usage: gpstool [ -d ] [ -v ] [ -V ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
+    usage: gpstool [ -d ] [ -v ] [ -V ] [ -X ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -339,8 +384,9 @@ Optionally install Diminuto and Hazer in /usr/local.
            -O          Output sentences to DEVICE.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
-           -W NMEA     Collapse escapes, append checksum, and write to DEVICE.
            -V          Print release, vintage, and revision on standard output.
+           -W NMEA     Collapse escapes, append checksum, and write to DEVICE.
+           -X          Enable message expiration test mode.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
            -d          Display debug output on standard error.
@@ -370,51 +416,60 @@ minor Makefile hacking might be required.
 
 When using the -E option with gpstool, so that it uses ASCII escape sequences
 to do cursor control for its report on standard output, as this example does
-when using the GN803G receiver,
+when using the BU-353W10 receiver,
 
-    > gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -c -E -t 10
+    > gpstool -D devttyACM0 -b 9600 -8 -n -1 -E -t 10
 
 the display looks something like this snapshot as it is continually updated.
 (In this and most other output, the asterisk \* is used to mean the degree
 symbol. This should not be confused with its use as a delimeter in NMEA
 sentences.)
 
-    INP $GNGLL,3947.64927,N,10509.20521,W,201150.00,A,D*69\r\n
-    OUT \xb5b\x06>\0\0
-    TIM 2018-08-23T20:11:50Z 0pps                                   10secs GNSS
-    POS 39*47'38.95"N, 105*09'12.31"W   39.794154, -105.153420      10secs GNSS
-    ALT    5629.52'   1715.900m                                     10secs GNSS
-    COG N    0.000*T   0.000*M                                      10secs GNSS
-    SOG      0.076mph      0.066knots      0.123kph                 10secs GNSS
-    INT GLL [12] dmy 1 inc 1 (  9 10  5  0  0  4  4 )               10secs GNSS
-    ACT {  26  12  15  25   5  21  20  51  48  29  13     } [11]    10secs GPS
-    ACT {  79  65  81  66  87  88  72  78                 } [08]    10secs GLONASS
-    DOP   1.28pdop   0.70hdop   1.07vdop                            10secs GPS
-    DOP   1.28pdop   0.70hdop   1.07vdop                            10secs GLONASS
-    SAT [01] id    2 elv  29* azm   76* snr   0dBHz                 10secs GPS
-    SAT [02] id    4 elv   0* azm    0* snr  22dBHz                 10secs GPS
-    SAT [03] id    5 elv  54* azm   53* snr  32dBHz                 10secs GPS
-    SAT [04] id   12 elv   7* azm  181* snr  38dBHz                 10secs GPS
-    SAT [05] id   13 elv  25* azm  120* snr  34dBHz                 10secs GPS
-    SAT [06] id   15 elv  18* azm  163* snr  44dBHz                 10secs GPS
-    SAT [07] id   20 elv   5* azm  227* snr  32dBHz                 10secs GPS
-    SAT [08] id   21 elv  26* azm  281* snr  24dBHz                 10secs GPS
-    SAT [09] id   25 elv  31* azm  217* snr  40dBHz                 10secs GPS
-    SAT [10] id   26 elv  16* azm  315* snr  21dBHz                 10secs GPS
-    SAT [11] id   29 elv  75* azm  321* snr  38dBHz                 10secs GPS
-    SAT [12] id   46 elv  38* azm  215* snr  42dBHz                 10secs GPS
-    SAT [13] id   48 elv  36* azm  220* snr  42dBHz                 10secs GPS
-    SAT [14] id   51 elv  44* azm  183* snr  44dBHz                 10secs GPS
-    SAT [15] id   65 elv  65* azm  148* snr  34dBHz                 10secs GLONASS
-    SAT [16] id   66 elv  12* azm  192* snr  38dBHz                 10secs GLONASS
-    SAT [17] id   71 elv   3* azm   25* snr  18dBHz                 10secs GLONASS
-    SAT [18] id   72 elv  48* azm   47* snr  34dBHz                 10secs GLONASS
-    SAT [19] id   78 elv  12* azm  260* snr  19dBHz                 10secs GLONASS
-    SAT [20] id   79 elv  15* azm  300* snr  16dBHz                 10secs GLONASS
-    SAT [21] id   81 elv  13* azm  309* snr  23dBHz                 10secs GLONASS
-    SAT [22] id   86 elv   4* azm  111* snr  10dBHz                 10secs GLONASS
-    SAT [23] id   87 elv  52* azm   77* snr  37dBHz                 10secs GLONASS
-    SAT [24] id   88 elv  54* azm  343* snr  37dBHz                 10secs GLONASS
+    INP [ 55] $GLGSV,3,3,11,86,36,252,32,87,24,320,31,91,10,309,*53\r\n
+    OUT [  6] \xb5b\x06>\0\0
+    MON -jamming  -history  15indicator  18maximum
+    STA -spoofing -history       4146ms  272695329ms
+    LOC 2018-11-30T12:47:02.660-07:00+00T com-diag-hazer 10.0.0
+    TIM 2018-11-30T19:47:02Z 0pps                                          GNSS
+    POS 39°47'39.18"N, 105°09'12.17"W   39.794219, -105.153381             GNSS
+    ALT    5618.37'   1712.500m                                            GNSS
+    COG N    0.000°T   0.000°M                                             GNSS
+    SOG      0.043mph      0.037knots      0.069kph                        GNSS
+    INT GGA [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
+    ACT [1]  {    12    10    51    20    32     8 } [ 6] [11]             GPS
+    ACT [2]  {    48    11    31     1    14       } [ 5] [11]             GPS
+    ACT [1]  {    74    80    70    87    85    71 } [ 6] [ 8]             GLONASS
+    ACT [2]  {    86    73                         } [ 2] [ 8]             GLONASS
+    DOP   1.09pdop   0.58hdop   0.92vdop                                   GPS
+    DOP   1.09pdop   0.58hdop   0.92vdop                                   GLONASS
+    SAT [  1]     1:  25°elv  315°azm   33dBHz <                           GPS
+    SAT [  2]     8:   7°elv  251°azm   26dBHz <                           GPS
+    SAT [  3]    10:  52°elv   98°azm   29dBHz <                           GPS
+    SAT [  4]    11:  27°elv  294°azm   30dBHz <                           GPS
+    SAT [  5]    12:   8°elv   64°azm   27dBHz <                           GPS
+    SAT [  6]    14:  73°elv  289°azm   36dBHz <                           GPS
+    SAT [  7]    18:  46°elv  290°azm   36dBHz                             GPS
+    SAT [  8]    20:  25°elv  115°azm   22dBHz <                           GPS
+    SAT [  9]    22:  14°elv  301°azm    0dBHz                             GPS
+    SAT [ 10]    24:   0°elv   36°azm   12dBHz                             GPS
+    SAT [ 11]    25:  12°elv   96°azm    0dBHz                             GPS
+    SAT [ 12]    27:   1°elv  224°azm    0dBHz                             GPS
+    SAT [ 13]    31:  38°elv  182°azm   46dBHz <                           GPS
+    SAT [ 14]    32:  72°elv   14°azm   35dBHz <                           GPS
+    SAT [ 15]    46:  38°elv  215°azm   44dBHz                             GPS
+    SAT [ 16]    48:  36°elv  220°azm   43dBHz <                           GPS
+    SAT [ 17]    51:  44°elv  183°azm   44dBHz <                           GPS
+    SAT [ 18]    70:  38°elv   64°azm   28dBHz <                           GLONASS
+    SAT [ 19]    71:  56°elv  343°azm   40dBHz <                           GLONASS
+    SAT [ 20]    72:  20°elv  293°azm    0dBHz                             GLONASS
+    SAT [ 21]    73:  37°elv  134°azm   41dBHz <                           GLONASS
+    SAT [ 22]    74:   5°elv  171°azm   37dBHz <                           GLONASS
+    SAT [ 23]    79:   2°elv   17°azm   17dBHz                             GLONASS
+    SAT [ 24]    80:  36°elv   56°azm   26dBHz <                           GLONASS
+    SAT [ 25]    85:   8°elv  202°azm   30dBHz <                           GLONASS
+    SAT [ 26]    86:  36°elv  252°azm   32dBHz <                           GLONASS
+    SAT [ 27]    87:  24°elv  320°azm   31dBHz <                           GLONASS
+    SAT [ 28]    91:  10°elv  309°azm    0dBHz                             GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -422,18 +477,40 @@ UBX packets, with binary data converted into standard C escape sequences.
 OUT is the most recent data written to the device, as specified on the command
 line using the -W option.
 
-All subsequent lines represent the current state of Hazer data structures
-updated by data read from the device. Each line includes at its end the
-number of seconds left before this data expires because it has not been updated
-by the device, and the system (satellite constellation) with which it is
-associated. GNSS indicates that the device is computing an "ensemble" solution
-that uses transmissions from multiple constellations, for example, from both
-the U.S. GPS constellation and the Russian GLONASS constellation.
+MON displays some of the results received in the UBX-MON-HW message if enabled.
+Ublox 8 chips with firmware revision 18 and above can provide clues to jamming
+based on the received signal strength. (N.B. I don't have a way to test this.)
+This requires that the jamming/interference monitor (ITFM) be calibrated using
+the UBX-CFG-ITFM message. (Although I find nothing in the documentation that
+indicates this, I suspect that the dB values in the UBX-CFG-ITFM message are
+two's complement signed.)
 
-TIM is the most recent time solution, in UTC, and the current value of the
-One Pulse Per Second (1PPS) signal if the device provides it and it was enabled
-on the command line using -c (using data carrier detect or DCD) or -I (using
-general purpose input/output or GPIO).
+STA displays some of the results received in the UBX-NAV-STATUS message if
+enabled. Ublox 8 chips with firmware revision 18 and above can provide clues
+to spoofing based on comparing navigation solutions from multiple GNSSes if
+available. (N.B. I don't have a way to test this.) Also shown are the
+milliseconds since first fix and milliseconds uptime provided by the message.
+
+LOC is the current local time provided by the host system and (if available
+and enabled) wideband and narrowband jamming indicators and spoofing indicators.
+The local time, with a fractional part in milliseconds, includes the time zone
+offset from UTC in hours and minutes, the current daylight saving time (DST)
+offset in hours, and the military time zone letter. If the time zone offset
+is an even number of hours (some aren't: Newfie Time, I'm looking at you),
+it will be a letter like "T" ("Tango") for Mountain Standard Time as found
+in Denver; otherwise it will be "J" ("Juliet") to indicate any local time zone.
+
+All subsequent lines represent the current state of Hazer data structures
+updated by data read from the device. Each line includes at its end the system
+(satellite constellation) with which it is associated. GNSS indicates that the
+device is computing an "ensemble" solution that uses transmissions from multiple
+constellations, for example, from both the U.S. GPS constellation and the
+Russian GLONASS constellation.
+
+TIM is the most recent time solution, in UTC (or 'Z' for "Zulu"), and the
+current value of the One Pulse Per Second (1PPS) signal if the device provides
+it and it was enabled on the command line using -c (using data carrier detect
+or DCD) or -I (using general purpose input/output or GPIO).
 
 POS is the most recent position solution, latitude and longitude, in degrees,
 hours, minutes, and decimal seconds, and in decimal degrees. The latter format
@@ -463,7 +540,7 @@ systems using other conventions), and the number of satellites in the list.
 Unlike the other report lines, the system or constellation to which the data
 applies is derived from (in order, depending on availability) the system id
 in the GSA sentence (only available on devices that support later NMEA
-versions), or an analysis of the satellite identifiers based on NMEA
+versions), or an analysis of the Space Vehicle Identifier based on NMEA
 conventions, or the talker specified at the beginning of the sentence. The
 reason for this is that some devices (I'm looking at you, GN803G), specify GNSS
 as the talker for all GSA sentences when they are computing an ensemble solution
@@ -479,10 +556,19 @@ multiple constellations are reported, but the DOPs are all the same, the device
 is typically computing an ensemble solution using multiple constellations.
 
 SAT is the list of satellites in view, including an index that is purely an
-artifact of Hazer, the satellites identifying number (same comment as above),
-its elevation and azimuth in degrees from its ephemeris, and the signal to
-noise ratio (really, a carrier to noise density ratio) in decibels Hertz for
-its transmission.
+artifact of Hazer, the Space Vehicle IDentifier (same comment as for ACT),
+its ELeVation and AZiMuth in degrees based on its ephemeris, the signal to
+noise ratio (really, a carrier to noise density ratio) in deciBels Hertz for
+its transmission, and an indication as to whether the vehicle is in the current
+active list (ACT above) for its constellation.
+
+While NMEA (and UBX too for that matter) is good about updating the application
+with new information, it is not so good about letting the application know
+when that data is no longer relevant. For that reason, all of the data read
+from the GPS devices has associated with it an expiration time in seconds. This
+can be set from the command line, in the range 0 to the default of 255. If the
+data is not updated within that duration by new sentences or messages from the
+GPS device, it is no longer displayed.
 
 # Notes
 
@@ -782,19 +868,35 @@ Earth Pro no longer seems to work with latest version, 7.3.2, for the Mac (I
 haven't tried it for other operating systems). Neither does 7.3.1. But 7.1.8
 works.
 
-Google Earth Pro only accepts GPS data on a serial port, or at least somethin
-that kinda sorta looks like a serial port. So I process the NMEA stream from a
-serial-attached GPS device using gpstool running on a Linux server, then
-forwarded it via UDP datagrams to another gpstool on the same server, and then
-use that gpstool to forward the NMEA stream out a serial port across a two FTDI
-USB-to-serial adaptors hooked back-to-back with a null modem in between, to a
-Mac running Google Earth Pro.
+Google Earth Pro only accepts GPS data on a serial port, or at least something
+that kinda sorta looks like a serial port. I've used a FIFO (named pipe), via
+the mkfifo(1) command, for stuff like this in the past, but there doesn't seem
+to be any way to get Pro to recognize the FIFO; only serial(ish) devices may
+apply here.
 
-Empirically and anecdotally, but undocumentedly, Google Earth Pro appears to
-only accept serial input at 4800 baud. More recent and advanced GPS devices
-default to 9600 baud, and can overrun a 4800 baud serial port. So I used a
-USGlobalSat BU-353S4, which defaults to 4800 baud, as my GPS device on the
-Linux server.
+So I processed the NMEA stream from a serial-attached GPS device using gpstool
+running on a Raspberry Pi, then forwarded it via UDP datagrams to another
+gpstool on the Raspberry Pi. (This is the bin/producer.sh script.)
+
+    gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -6 -c -A ip6-localhost -P 5555 -E
+
+Then I used the second gpstool to forward the NMEA stream out a serial port
+across a two FTDI USB-to-serial adaptors hooked back-to-back with a null
+modem in between, to a Mac running Google Earth Pro. (This is the
+bin/provider.sh script.)
+
+    gpstool -6 -P 5555 -O -D /dev/ttyUSB1 -b 4800 -8 -n -1
+
+I used the "GPS Import Realtime" drop down menu in Google Earth Pro to select
+the USB serial device representing the other end of the FTDI "milking
+machine". The menu liked the device "/dev/cu.usbserial-XXXXXXXX" where the Xs
+are some kind of internal identifier on MacOS where Pro was running. 
+
+Empirically, and according to a Google search, anecdotally, but undocumentedly,
+Google Earth Pro appears to only accept serial input at 4800 baud. More recent
+and advanced GPS devices default to 9600 baud, and can overrun a 4800 baud
+serial port. So I used a USGlobalSat BU-353S4, which defaults to 4800 baud, as
+my GPS device on the Linux server.
 
 As Rube Goldberg as this is, it seems to work.
 
@@ -803,23 +905,178 @@ As Rube Goldberg as this is, it seems to work.
 Some devices are chatty and emit interesting and sometimes useful information
 as NMEA TXT sentences. These can be recognized by Hazer and logged to standard
 error by gpstool. Some of the functional tests save standard error output in
-log files under the build artifact directory.
+log files under the build artifact directory, or redirected to the system log
+using the Diminuto log command as shown below.
 
-    gpstool: TEXT [01][01][02] "u-blox AG - www.u-blox.com"
-    gpstool: TEXT [01][01][02] "HW UBX-M8030 00080000"
-    gpstool: TEXT [01][01][02] "ROM CORE 3.01 (107888)"
-    gpstool: TEXT [01][01][02] "FWVER=SPG 3.01"
-    gpstool: TEXT [01][01][02] "PROTVER=18.00"
-    gpstool: TEXT [01][01][02] "GPS;GLO;GAL;BDS"
-    gpstool: TEXT [01][01][02] "SBAS;IMES;QZSS"
-    gpstool: TEXT [01][01][02] "GNSS OTP=GPS;GLO"
-    gpstool: TEXT [01][01][02] "LLC=FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFD"
-    gpstool: TEXT [01][01][02] "ANTSUPERV=AC SD PDoS SR"
-    gpstool: TEXT [01][01][02] "ANTSTATUS=OK"
-    gpstool: TEXT [01][01][02] "PF=3FF"
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "u-blox AG - www.u-blox.com".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "HW UBX-M8030 00080000".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "ROM CORE 3.01 (107888)".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "FWVER=SPG 3.01".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "PROTVER=18.00".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "GPS;GLO;GAL;BDS".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "SBAS;IMES;QZSS".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "GNSS OTP=GPS;GLO".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "LLC=FFFFFFFF-FFFF7CBF-FFED7FAA-FFFFFFFF-FFFFFFF9".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "ANTSUPERV=AC SD PDoS SR".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "ANTSTATUS=OK".
+    Nov 30 08:36:31 nickel bu353w10F[8836]: gpstool: TXT [ 1][ 1][ 2] "PF=3FF".
+
+## Phantom GPS Satellite PRN 4
+
+Around 2018-11-29T12:00-07:00, I was testing some changes to Hazer with
+the Ublox-8 based BU353W10 receiver by comparing its results to those
+of the web site <https://in-the-sky.org/satmap_radar.php> that presents
+a real-time sky map of the visible orbiting space vehicles (not just
+GPS). I noticed that my BU353W10 was reporting GPS PRN 4 as "in view"
+with a zero elevation and zero azimuth; that vehicle wasn't reported by
+the sky map. Worse: a little web-search-fu told me that there was no PRN
+4; it does not appear in the most recent GPS almanac. The GPS vehicle
+using PRN 4 was decommisioned and its pseudo-random number code has
+not yet been reused.
+
+Before I could do much else, PRN 4 dropped from view.
+
+PRN 4 reappeared the next morning around 2018-11-30T09:00-07:00. I
+quickly dumped the raw NMEA and verified using NMEA 0183 Version 4.10
+pp. 96-97 that I wasn't decoding the GSV sentence incorrectly.
+
+    $GPGSV,4,1,15,04,,,36,05,04,062,22,10,27,253,32,13,32,053,38*43\r\n
+    $GPGSV,4,2,15,15,60,092,39,16,15,289,26,20,53,269,,21,72,336,22*75\r\n
+    $GPGSV,4,3,15,24,06,129,33,26,10,264,15,27,11,322,31,29,36,170,50*78\r\n
+    $GPGSV,4,4,15,46,38,215,45,48,36,220,43,51,44,183,44*43\r\n
+
+However, I noticed that the elevation and azimuth for PRN 4 weren't actually
+zero: they were empty strings, although the SNR was a reasonable (and changing
+over time) value. I coded up a change to Hazer to detect this and mark it, and
+to gpstool to display a '?' next to that SAT entry. I was able to test this
+before PRN 4 again dropped from view.
+
+PRN 4 reappeared about twenty minutes later.
+
+    SAT [  1]     4:   0*elv    0*azm   33dBHz   ?                         GPS
+    SAT [  2]     8:   3*elv  328*azm    0dBHz                             GPS
+    SAT [  3]    10:  43*elv  273*azm   35dBHz <                           GPS
+    SAT [  4]    13:  16*elv   41*azm    0dBHz                             GPS
+    SAT [  5]    15:  48*elv   58*azm   37dBHz <                           GPS
+    SAT [  6]    16:   6*elv  270*azm   26dBHz <                           GPS
+    SAT [  7]    20:  67*elv  305*azm   35dBHz <                           GPS
+    SAT [  8]    21:  82*elv   82*azm   27dBHz <                           GPS
+    SAT [  9]    24:  20*elv  112*azm   30dBHz <                           GPS
+    SAT [ 10]    27:  28*elv  311*azm   35dBHz <                           GPS
+    SAT [ 11]    29:  14*elv  171*azm   46dBHz <                           GPS
+    SAT [ 12]    32:  12*elv  207*azm   41dBHz <                           GPS
+    SAT [ 13]    46:  38*elv  215*azm   45dBHz                             GPS
+    SAT [ 14]    48:  36*elv  220*azm   44dBHz <                           GPS
+    SAT [ 15]    51:  44*elv  183*azm   45dBHz <                           GPS
+    SAT [ 16]    68:  19*elv   41*azm   27dBHz <                           GLONASS
+    SAT [ 17]    69:  66*elv    6*azm   33dBHz <                           GLONASS
+    SAT [ 18]    70:  42*elv  246*azm   18dBHz <                           GLONASS
+    SAT [ 19]    77:   2*elv   15*azm   22dBHz                             GLONASS
+    SAT [ 20]    78:   3*elv   60*azm   18dBHz                             GLONASS
+    SAT [ 21]    83:  20*elv  152*azm   35dBHz <                           GLONASS
+    SAT [ 22]    84:  78*elv  169*azm   30dBHz <                           GLONASS
+    SAT [ 23]    85:  40*elv  326*azm   28dBHz <                           GLONASS
+    SAT [ 24]    89:  67*elv    6*azm    0dBHz                             GLONASS
+
+It continued to drop from view and reappear. Its period of appearance does
+not coincide with the GPS orbital period.
+
+Neither NMEA 0183 4.10 nor Ublox 8 R15 suggests any interpretation of the
+empty elevation and azimuth fields. As always, I'm assuming this somehow is
+a bug in my code. But it does occur to me that PRN 4 would be useful for
+testing a ground-based GPS transmitter; the period of its appearance would
+make sense for a transmitter in the continental America time zones.
+
+Checking the FAA Notice To Airmen (NOTAM) notifications on the web, there are
+GPS disruptions scheduled for the late November/early December time frame,
+centered on the White Sands Missle Range (WSMR) in New Mexico, and the Yuma
+Proving Grounds (YPG) in Arizona, either of which is potentially within
+range of my location in Denver Colorado. So this could be the U.S. military
+doing testing.
+
+I added code to gpstool to monitor the comings and goings of GPS PRN 4 and
+remark upon them in the system log. Here's an example of what those
+log messages look like during an actual run of just a few hours. '#' is the
+initial state value when gpstool starts running, '?' means GPS PRN 4 came into
+view, and ' ' means it exited from view. The log also includes the initial
+and maximum signal strength, and the transmission duration in milliseconds.
+All clock times are in MST.
+
+Here is the log for a twenty-four hour period.
+
+    Dec  3 09:32:06 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '#' now '?' at 25dBHz
+    Dec  3 09:42:03 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 38dBHz for 597010ms
+    Dec  3 09:48:59 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 34dBHz
+    Dec  3 09:58:51 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 592009ms
+    Dec  3 10:01:11 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 35dBHz
+    Dec  3 10:29:57 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 40dBHz for 1726038ms
+    Dec  3 10:30:11 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 38dBHz
+    Dec  3 10:32:34 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 39dBHz for 143006ms
+    Dec  3 10:33:14 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 35dBHz
+    Dec  3 10:34:27 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 40dBHz for 72998ms
+    Dec  3 10:34:50 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 33dBHz
+    Dec  3 10:35:38 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 37dBHz for 48001ms
+    Dec  3 10:35:50 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 37dBHz
+    Dec  3 11:37:43 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 43dBHz for 3713086ms
+    Dec  3 11:42:22 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 29dBHz
+    Dec  3 11:49:29 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 427014ms
+    Dec  3 11:59:15 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 25dBHz
+    Dec  3 11:59:16 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 25dBHz for 999ms
+    Dec  3 13:35:06 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 23dBHz
+    Dec  3 13:35:07 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 23dBHz for 998ms
+    Dec  3 16:37:48 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 31dBHz
+    Dec  3 16:45:52 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 484015ms
+    Dec  3 17:08:03 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 29dBHz
+    Dec  3 17:11:16 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 193003ms
+    Dec  3 17:14:37 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 30dBHz
+    Dec  3 17:19:16 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 34dBHz for 279011ms
+    Dec  3 17:26:53 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 31dBHz
+    Dec  3 17:41:51 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 898023ms
+    Dec  3 18:00:33 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 30dBHz
+    Dec  3 18:06:14 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 341011ms
+    Dec  3 18:09:17 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 33dBHz
+    Dec  3 18:22:07 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 37dBHz for 770011ms
+    Dec  3 18:26:10 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 34dBHz
+    Dec  3 18:59:11 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 39dBHz for 1981048ms
+    Dec  3 19:00:54 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 33dBHz
+    Dec  3 19:30:34 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 38dBHz for 1780046ms
+    Dec  3 19:33:50 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 31dBHz
+    Dec  3 19:44:47 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 36dBHz for 657014ms
+    Dec  3 19:55:24 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 27dBHz
+    Dec  3 20:02:55 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 33dBHz for 451009ms
+    Dec  4 05:52:37 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 26dBHz
+    Dec  4 05:52:39 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 26dBHz for 2001ms
+    Dec  4 05:52:40 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 26dBHz
+    Dec  4 05:52:41 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 26dBHz for 1007ms
+    Dec  4 08:10:39 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 31dBHz
+    Dec  4 08:16:56 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 33dBHz for 377014ms
+    Dec  4 08:19:21 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 29dBHz
+    Dec  4 08:22:17 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 31dBHz for 176011ms
+    Dec  4 08:28:52 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 32dBHz
+    Dec  4 08:40:15 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 34dBHz for 683019ms
+    Dec  4 09:03:34 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 33dBHz
+    Dec  4 09:17:36 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 38dBHz for 842031ms
+    Dec  4 09:22:47 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was ' ' now '?' at 35dBHz
+    Dec  4 09:39:55 nickel gpstool[20052]: gpstool: phantom GPS PRN 4 was '?' now ' ' at 35dBHz for 1027038ms
+
+The durations in this sample last for anywhere from a second to half an hour.
+During this period the transmissions ceased at 20:00MST and resumed at 06:00MST.
+This suggests this is a rogue terrestrial transmitter somewhere in the
+continental United States.
+
+On 2018-12-04, The U. S. Coast Guard straightened me out.
+
+NOTICE ADVISORY TO NAVSTAR USERS (NANU) 2018042 NANU TYPE: GENERAL
+*** GENERAL MESSAGE TO ALL GPS USERS ***
+ON APPROXIMATELY 10 OCT 2018 SVN36 WILL RESUME TRANSMITTING L-BAND UTILIZING
+PRN04. AT L-BAND ACTIVATION, SVN36/PRN04 WILL BE UNUSABLE UNTIL FURTHER NOTICE.
+ADDITIONALLY, NO BROADCAST ALMANACS WILL INCLUDE SVN36/PRN04 UNTIL FURTHER
+NOTICE.
+*** GENERAL MESSAGE TO ALL GPS USERS ***
+
+Mystery solved!
 
 # Acknowledgements
 
-Special thanks to Mrs. Overclock for her assistance in road testing this
-software.
-
+Special thanks to Mrs. Overclock for her assistance in road testing (literally)
+this software.

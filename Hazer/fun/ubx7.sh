@@ -4,6 +4,20 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 
+# NMEA-PUBX-POSITION
+# NMEA-PUBX-SVSTATUS
+# NMEA-PUBX-TIME
+# UBX-CFG-PRT [0] (all)
+# UBX-CFG-MSG [3] UBX-NAV-TIMEGPS @1Hz
+# UBX-CFG-MSG [3] UBX-NAV-TIMEUTC @1Hz
+# UBX-CFG-MSG [3] UBX-NAV-CLOCK @1Hz
+# UBX-CFG-MSG [3] UBX-TIM-TP @1Hz
+# UBX-CFG-MSG [3] UBX-TIM-TM2 @1Hz
+# UBX-MON-VER [0]
+# UBX-CFG-DAT [0]
+# UBX-CFG-TPS [0]
+# UBX-CFG-GNSS [0]
+
 COMMANDS='
     "\$PUBX,00"
     "\$PUBX,03"

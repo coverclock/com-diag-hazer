@@ -24,4 +24,4 @@ mkdir -p ${DIR}
 
 DAT=$(readlink -e $(dirname ${0})/../../../dat)
 
-eval coreable gpstool -R -C < ${DAT}/${PROGRAM}.dat 2>> ${DIR}/${PROGRAM}.log
+eval coreable gpstool -R -C < ${DAT}/${PROGRAM}.dat 2> ${DIR}/${PROGRAM}.log

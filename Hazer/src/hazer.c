@@ -47,10 +47,10 @@ FILE * hazer_debug(FILE * now)
 
 int hazer_initialize(void)
 {
-	/*
-	 * In the glibc I perused, this is a relatively expensive operation the
-	 * first time it is called.
-	 */
+    /*
+     * In the glibc I perused, this is a relatively expensive operation the
+     * first time it is called.
+     */
     tzset();
     return 0;
 }
@@ -73,49 +73,49 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
      * Short circuit state machine for some characters.
      */
 
-	switch (ch) {
+    switch (ch) {
 
-	case EOF:
-		DEBUG("EOF %d!\n", ch);
-		state = HAZER_STATE_EOF;
-		break;
+    case EOF:
+        DEBUG("EOF %d!\n", ch);
+        state = HAZER_STATE_EOF;
+        break;
 
-	case HAZER_STIMULUS_NUL:
-		DEBUG("STARTING '%c'?\n", ch);
-		state = HAZER_STATE_START;
-		break;
+    case HAZER_STIMULUS_NUL:
+        DEBUG("STARTING 0x%02x?\n", ch);
+        state = HAZER_STATE_START;
+        break;
 
-	case HAZER_STIMULUS_START:
-		DEBUG("STARTING '%c'?\n", ch);
-		state = HAZER_STATE_START;
-		break;
+    case HAZER_STIMULUS_START:
+        DEBUG("STARTING 0x%02x?\n", ch);
+        state = HAZER_STATE_START;
+        break;
 
-	case HAZER_STIMULUS_ENCAPSULATION:
-		DEBUG("STARTING '%c'?\n", ch);
-		state = HAZER_STATE_START;
-		break;
+    case HAZER_STIMULUS_ENCAPSULATION:
+        DEBUG("STARTING 0x%02x?\n", ch);
+        state = HAZER_STATE_START;
+        break;
 
-	case HAZER_STIMULUS_CR:
-		/* Do nothing. */
-		break;
+    case HAZER_STIMULUS_CR:
+        /* Do nothing. */
+        break;
 
-	case HAZER_STIMULUS_LF:
-		/* Do nothing. */
-		break;
+    case HAZER_STIMULUS_LF:
+        /* Do nothing. */
+        break;
 
-	default:
-		/*
-		 * This will specifically reject the SYNC1 and SYNC2 characters from
-		 * UBX binary packets in additional to garbage on the serial line that
-		 * corrupts NMEA sentences.
-		 */
-		if (!((HAZER_STIMULUS_MINIMUM <= ch) && (ch <= HAZER_STIMULUS_MAXIMUM))) {
-			DEBUG("STARTING 0x%x!\n", ch);
-			state = HAZER_STATE_START;
-		}
-		break;
+    default:
+        /*
+         * This will specifically reject the SYNC1 and SYNC2 characters from
+         * UBX binary packets in additional to garbage on the serial line that
+         * corrupts NMEA sentences.
+         */
+        if (!((HAZER_STIMULUS_MINIMUM <= ch) && (ch <= HAZER_STIMULUS_MAXIMUM))) {
+            DEBUG("STARTING 0x%02x!\n", ch);
+            state = HAZER_STATE_START;
+        }
+        break;
 
-	}
+    }
 
     /*
      * Advance state machine based on stimulus.
@@ -129,14 +129,14 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         break;
 
     case HAZER_STATE_START:
-    	if (ch == HAZER_STIMULUS_START) {
-            DEBUG("START '%c'.\n", ch);
+        if (ch == HAZER_STIMULUS_START) {
+            DEBUG("START 0x%02x.\n", ch);
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
             *bp = (char *)buffer;
             *sp = size;
         } else if (ch == HAZER_STIMULUS_ENCAPSULATION) {
-            DEBUG("ENCAPSULATE '%c'.\n", ch);
+            DEBUG("ENCAPSULATE 0x%02x.\n", ch);
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
             *bp = (char *)buffer;
@@ -164,7 +164,7 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
             state = HAZER_STATE_LSN;
             action = HAZER_ACTION_SAVE;
         } else {
-            DEBUG("STARTING 0x%x!\n", ch);
+            DEBUG("STARTING 0x%02x!\n", ch);
             state = HAZER_STATE_START;
         }
         break;
@@ -180,7 +180,7 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
             state = HAZER_STATE_CR;
             action = HAZER_ACTION_SAVE;
         } else {
-            DEBUG("STARTING 0x%x!\n", ch);
+            DEBUG("STARTING 0x%02x!\n", ch);
             state = HAZER_STATE_START;
         }
         break;
@@ -190,7 +190,7 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
             state = HAZER_STATE_LF;
             action = HAZER_ACTION_SAVESPECIAL;
         } else {
-            DEBUG("STARTING 0x%x!\n", ch);
+            DEBUG("STARTING 0x%02x!\n", ch);
             state = HAZER_STATE_START;
         }
         break;
@@ -200,13 +200,13 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
             state = HAZER_STATE_END;
             action = HAZER_ACTION_TERMINATE;
         } else {
-            DEBUG("STARTING 0x%x!\n", ch);
+            DEBUG("STARTING 0x%02x!\n", ch);
             state = HAZER_STATE_START;
         }
         break;
 
     case HAZER_STATE_END:
-        DEBUG("END 0x%x!\n", ch);
+        DEBUG("END 0x%02x!\n", ch);
         break;
 
     /*
@@ -222,14 +222,14 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
     switch (action) {
 
     case HAZER_ACTION_SKIP:
-    	DEBUG("SKIP 0x%x?\n", ch);
+        DEBUG("SKIP 0x%02x?\n", ch);
         break;
 
     case HAZER_ACTION_SAVE:
         if ((*sp) > 0) {
             *((*bp)++) = ch;
             (*sp) -= 1;
-            DEBUG("SAVE '%c'.\n", ch);
+            DEBUG("SAVE 0x%02x.\n", ch);
         } else {
             state = HAZER_STATE_START;
             DEBUG("LONG!\n");
@@ -240,7 +240,7 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         if ((*sp) > 0) {
             *((*bp)++) = ch;
             (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", ch);
+            DEBUG("SAVE 0x%02x.\n", ch);
         } else {
             state = HAZER_STATE_START;
             DEBUG("LONG!\n");
@@ -251,10 +251,10 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         if ((*sp) > 1) {
             *((*bp)++) = ch;
             (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", ch);
+            DEBUG("SAVE 0x%02x.\n", ch);
             *((*bp)++) = '\0';
             (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", '\0');
+            DEBUG("SAVE 0x%02x.\n", '\0');
             (*sp) = size - (*sp);
         } else {
             state = HAZER_STATE_START;
@@ -287,16 +287,16 @@ const void * hazer_checksum(const void * buffer, size_t size, uint8_t * ckp)
 
     if (size > 0) {
 
-		bp = (const unsigned char *)buffer;
+        bp = (const unsigned char *)buffer;
 
-		++bp;
-		--size;
+        ++bp;
+        --size;
 
-		while ((size > 0) && (*bp != HAZER_STIMULUS_CHECKSUM) && (*bp != '\0')) {
-			ch = *(bp++);
-			cs ^= ch;
-			--size;
-		}
+        while ((size > 0) && (*bp != HAZER_STIMULUS_CHECKSUM) && (*bp != '\0')) {
+            ch = *(bp++);
+            cs ^= ch;
+            --size;
+        }
 
         *ckp = cs;
 
@@ -363,32 +363,32 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
 
 ssize_t hazer_length(const void * buffer, size_t size)
 {
-	ssize_t result = -1;
-	size_t length = 0;
-	const char * sentence = (const char *)0;
+    ssize_t result = -1;
+    size_t length = 0;
+    const char * sentence = (const char *)0;
 
-	sentence = (const char *)buffer;
+    sentence = (const char *)buffer;
 
-	if (sentence[0] != HAZER_STIMULUS_START) {
-		/* Do nothing. */
-	} else {
-		length = strnlen(sentence, size);
-		if (length >= size) {
-			/* Do nothing. */
-		} else if (sentence[length] != HAZER_STIMULUS_NUL) {
-			/* Do nothing. */
-		} else if (sentence[length - 1] != HAZER_STIMULUS_LF) {
-			/* Do nothing. */
-		} else if (sentence[length - 2] != HAZER_STIMULUS_CR) {
-			/* Do nothing. */
-		} else if (sentence[length - 5] != HAZER_STIMULUS_CHECKSUM) {
-			/* Do nothing. */
-		} else {
-			result = length;
-		}
-	}
+    if (sentence[0] != HAZER_STIMULUS_START) {
+        /* Do nothing. */
+    } else {
+        length = strnlen(sentence, size);
+        if (length >= size) {
+            /* Do nothing. */
+        } else if (sentence[length] != HAZER_STIMULUS_NUL) {
+            /* Do nothing. */
+        } else if (sentence[length - 1] != HAZER_STIMULUS_LF) {
+            /* Do nothing. */
+        } else if (sentence[length - 2] != HAZER_STIMULUS_CR) {
+            /* Do nothing. */
+        } else if (sentence[length - 5] != HAZER_STIMULUS_CHECKSUM) {
+            /* Do nothing. */
+        } else {
+            result = length;
+        }
+    }
 
-	return result;
+    return result;
 }
 
 /******************************************************************************
@@ -403,7 +403,7 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     ssize_t nn = 0;
 
     if (count > 1) {
-    	tt = vv;
+        tt = vv;
         *(vv++) = bb;
         ++nn;
         --count;
@@ -429,7 +429,7 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     }
 
     if (count > 0) {
-    	tt = vv;
+        tt = vv;
         *(vv++) = (char *)0;
         ++nn;
         DEBUG("TOK %p [%zd].\n", *tt, nn);
@@ -459,10 +459,10 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
         }
         if (count > 2) {
             *(bb++) = HAZER_STIMULUS_DELIMITER;
-            DEBUG("CHR '%c'.\n", HAZER_STIMULUS_DELIMITER);
+            DEBUG("CHR 0x%02x.\n", HAZER_STIMULUS_DELIMITER);
         } else {
             *(bb++) = HAZER_STIMULUS_CHECKSUM;
-            DEBUG("CHR '%c'.\n", HAZER_STIMULUS_CHECKSUM);
+            DEBUG("CHR 0x%02x.\n", HAZER_STIMULUS_CHECKSUM);
         }
         --count;
         --size;
@@ -733,7 +733,7 @@ int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp)
 
 uint16_t hazer_parse_dop(const char * string)
 {
-	uint16_t dop = HAZER_GNSS_DOP;
+    uint16_t dop = HAZER_GNSS_DOP;
     unsigned long number = 0;
     int64_t fraction = 0;
     uint64_t denominator = 0;
@@ -741,28 +741,28 @@ uint16_t hazer_parse_dop(const char * string)
 
     if (*string != '\0') {
 
-    	number = strtoul(string, &end, 10);
-		if (end == (char *)0) {
-			/* Do nothing. */
-		} else if (number > (HAZER_GNSS_DOP / 100)) {
-			/* Do nothing. */
-		} else {
+        number = strtoul(string, &end, 10);
+        if (end == (char *)0) {
+            /* Do nothing. */
+        } else if (number > (HAZER_GNSS_DOP / 100)) {
+            /* Do nothing. */
+        } else {
 
-			number *= 100;
+            number *= 100;
 
-			if (*end == HAZER_STIMULUS_DECIMAL) {
+            if (*end == HAZER_STIMULUS_DECIMAL) {
 
-				fraction = hazer_parse_fraction(end + 1, &denominator);
-				fraction *= 100;
-				fraction /= denominator;
+                fraction = hazer_parse_fraction(end + 1, &denominator);
+                fraction *= 100;
+                fraction /= denominator;
 
-				number += fraction;
+                number += fraction;
 
-			}
+            }
 
-			dop = number;
+            dop = number;
 
-		}
+        }
     }
 
     return dop;
@@ -856,13 +856,13 @@ const char * hazer_format_nanodegrees2compass8(int64_t nanodegrees)
 hazer_talker_t hazer_parse_talker(const void * buffer)
 {
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
-	const char * sentence = (const char *)0;
+    const char * sentence = (const char *)0;
     const char * id = (const char *)0;
     const char * name = (const char *)0;
     int ii = 0;
     int rc = -1;
 
-	sentence = (const char *)buffer;
+    sentence = (const char *)buffer;
     id = &(sentence[1]);
 
     if (sentence[0] != HAZER_STIMULUS_START) {
@@ -870,18 +870,18 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
     } else if (strnlen(sentence, sizeof("$XX")) < (sizeof("$XX") - 1)) {
         /* Do nothing. */
     } else {
-    	for (ii = 0; ii < HAZER_TALKER_TOTAL; ++ii) {
-    		name = HAZER_TALKER_NAME[ii];
-    		rc = strncmp(id, name, strlen(name));
-    		if (rc < 0) {
-    			break;
-    		} else if (rc == 0) {
-    			talker = (hazer_talker_t)ii;
-    			break;
-    		} else {
-    			/* Do nothing. */
-    		}
-    	}
+        for (ii = 0; ii < HAZER_TALKER_TOTAL; ++ii) {
+            name = HAZER_TALKER_NAME[ii];
+            rc = strncmp(id, name, strlen(name));
+            if (rc < 0) {
+                break;
+            } else if (rc == 0) {
+                talker = (hazer_talker_t)ii;
+                break;
+            } else {
+                /* Do nothing. */
+            }
+        }
 
     }
 
@@ -890,25 +890,25 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
 
 hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
 {
-	hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
 
-	switch (talker) {
+    switch (talker) {
 
-	case HAZER_TALKER_GPS:
-		system = HAZER_SYSTEM_GPS;
-		break;
+    case HAZER_TALKER_GPS:
+        system = HAZER_SYSTEM_GPS;
+        break;
 
-	case HAZER_TALKER_GLONASS:
-		system = HAZER_SYSTEM_GLONASS;
-		break;
+    case HAZER_TALKER_GLONASS:
+        system = HAZER_SYSTEM_GLONASS;
+        break;
 
-	case HAZER_TALKER_GALILEO:
-		system = HAZER_SYSTEM_GALILEO;
-		break;
+    case HAZER_TALKER_GALILEO:
+        system = HAZER_SYSTEM_GALILEO;
+        break;
 
-	case HAZER_TALKER_GNSS:
-		system = HAZER_SYSTEM_GNSS;
-		break;
+    case HAZER_TALKER_GNSS:
+        system = HAZER_SYSTEM_GNSS;
+        break;
 
     /*
      * There are apparently three different BeiDou systems.
@@ -921,25 +921,25 @@ hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
      * I'm told is in Mandarin with no English translation.
      */
 
-	case HAZER_TALKER_BEIDOU1:
-		system = HAZER_SYSTEM_BEIDOU;
-		break;
+    case HAZER_TALKER_BEIDOU1:
+        system = HAZER_SYSTEM_BEIDOU;
+        break;
 
-	case HAZER_TALKER_BEIDOU2:
-		system = HAZER_SYSTEM_BEIDOU;
-		break;
+    case HAZER_TALKER_BEIDOU2:
+        system = HAZER_SYSTEM_BEIDOU;
+        break;
 
-	case HAZER_TALKER_QZSS:
-		system = HAZER_SYSTEM_QZSS;
-		break;
+    case HAZER_TALKER_QZSS:
+        system = HAZER_SYSTEM_QZSS;
+        break;
 
-	default:
-		/* Do nothing. */
-		break;
+    default:
+        /* Do nothing. */
+        break;
 
-	}
+    }
 
-	return system;
+    return system;
 }
 
 /******************************************************************************
@@ -964,15 +964,15 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
     } else if (*vector[6] == '0') {
         /* Do nothing. */
     } else {
-		positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
-		positionp->old_nanoseconds = positionp->tot_nanoseconds;
-		positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-		positionp->lat_nanodegrees = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits);
-		positionp->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
-		positionp->sat_used = strtol(vector[7], (char **)0, 10);
-		positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits);
-		positionp->label = GGA;
-		rc = 0;
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
+        positionp->old_nanoseconds = positionp->tot_nanoseconds;
+        positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
+        positionp->lat_nanodegrees = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits);
+        positionp->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
+        positionp->sat_used = strtol(vector[7], (char **)0, 10);
+        positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits);
+        positionp->label = GGA;
+        rc = 0;
     }
 
     return rc;
@@ -1032,54 +1032,75 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     return rc;
 }
 
+hazer_system_t hazer_map_id_to_system(uint16_t id)
+{
+    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+
+    if (id == 0) {
+        /* Do nothing. */
+    } else if ((HAZER_ID_GPS_FIRST <= id) && (id <= HAZER_ID_GPS_LAST)) {
+        candidate = HAZER_SYSTEM_GPS;
+    } else if ((HAZER_ID_SBAS_FIRST <= id) && (id <= HAZER_ID_SBAS_LAST)) {
+        candidate = HAZER_SYSTEM_SBAS;
+    } else if ((HAZER_ID_GLONASS_FIRST <= id) && (id <= HAZER_ID_GLONASS_LAST)) {
+        candidate = HAZER_SYSTEM_GLONASS;
+    } else if ((HAZER_ID_SBASX_FIRST <= id) && (id <= HAZER_ID_SBASX_LAST)) {
+        candidate = HAZER_SYSTEM_SBAS;
+    } else if ((HAZER_ID_IMES_FIRST <= id) && (id <= HAZER_ID_IMES_LAST)) {
+        candidate = HAZER_SYSTEM_IMES;
+    } else if ((HAZER_ID_QZSS_FIRST <= id) && (id <= HAZER_ID_QZSS_LAST)) {
+        candidate = HAZER_SYSTEM_QZSS;
+    } else if ((HAZER_ID_BEIDOU1_FIRST <= id) && (id <= HAZER_ID_BEIDOU1_LAST)) {
+        candidate = HAZER_SYSTEM_BEIDOU;
+    } else if ((HAZER_ID_GALILEO_FIRST <= id) && (id <= HAZER_ID_GALILEO_LAST)) {
+        candidate = HAZER_SYSTEM_GALILEO;
+    } else if ((HAZER_ID_BEIDOU2_FIRST <= id) && (id <= HAZER_ID_BEIDOU2_LAST)) {
+        candidate = HAZER_SYSTEM_BEIDOU;
+    } else {
+        /* Do nothing. */
+    }
+
+    return candidate;
+}
+
 /*
  * NMEA 0183 4.10 p. 94-95.
+ * UBLOX8 R15 p. 373.
  */
 hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
-	hazer_system_t system = HAZER_SYSTEM_TOTAL;
-	hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
-	int slot = 0;
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+    int slot = 0;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
 
-	if ((HAZER_SYSTEM_GPS <= activep->system) && (activep->system <= HAZER_SYSTEM_GALILEO)) {
-		system = (hazer_system_t)activep->system;
-	} else {
-		for (slot = 0; slot < IDENTIFIERS; ++slot) {
-			if (slot >= activep->active) {
-				break;
-			} else if (activep->id[slot] == 0) {
-				break;
-			} else if ((HAZER_ID_GPS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GPS_LAST)) {
-				candidate = HAZER_SYSTEM_GPS;
-			} else if ((HAZER_ID_WAAS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_WAAS_LAST)) {
-				candidate = HAZER_SYSTEM_WAAS;
-			} else if ((HAZER_ID_GLONASS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_GLONASS_LAST)) {
-				candidate = HAZER_SYSTEM_GLONASS;
-			} else if ((HAZER_ID_QZSS_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_QZSS_LAST)) {
-				candidate = HAZER_SYSTEM_QZSS;
-			} else if ((HAZER_ID_BEIDOU_FIRST <= activep->id[slot]) && (activep->id[slot] <= HAZER_ID_BEIDOU_LAST)) {
-				candidate = HAZER_SYSTEM_BEIDOU;
-			} else {
-				continue;
-			}
-			/*
-			 * No proposed identifiers yet for the EU Galileo constellation.
-			 */
-			if (system == HAZER_SYSTEM_TOTAL) {
-				system = candidate;
-			} else if (system == candidate) {
-				continue;
-			} else if (candidate == HAZER_SYSTEM_WAAS) {
-				continue;
-			} else if (system == HAZER_SYSTEM_WAAS) {
-				system = candidate;
-			} else {
-				system = HAZER_SYSTEM_GNSS;
-			}
-		}
-	}
+    if ((HAZER_SYSTEM_GPS <= activep->system) && (activep->system <= HAZER_SYSTEM_GALILEO)) {
+        system = (hazer_system_t)activep->system;
+    } else {
+        for (slot = 0; slot < IDENTIFIERS; ++slot) {
+            if (slot >= activep->active) {
+                break;
+            } else if (activep->id[slot] == 0) {
+                break;
+            } else if ((candidate = hazer_map_id_to_system(activep->id[slot])) == HAZER_SYSTEM_TOTAL) {
+                continue;
+            } else {
+                /* Do nothing. */
+            }
+            if (system == HAZER_SYSTEM_TOTAL) {
+                system = candidate;
+            } else if (system == candidate) {
+                continue;
+            } else if (candidate == HAZER_SYSTEM_SBAS) {
+                continue;
+            } else if (system == HAZER_SYSTEM_SBAS) {
+                system = candidate;
+            } else {
+                system = HAZER_SYSTEM_GNSS;
+            }
+        }
+    }
 
-	return system;
+    return system;
 }
 
 int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
@@ -1115,23 +1136,25 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             /* Do nothing. */
         } else {
             channel = (message - 1) * HAZER_GNSS_VIEWS;
-			satellites = strtol(vector[3], (char **)0, 10);
-			for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
-				if (channel >= satellites) { break; }
-				if (channel >= SATELLITES) { break; }
-				id = strtol(vector[index++], (char **)0, 10);
-				if (id <= 0) { break; }
-				viewp->sat[channel].id = id;
-				viewp->sat[channel].elv_degrees = strtol(vector[index++], (char **)0, 10);
-				viewp->sat[channel].azm_degrees = strtol(vector[index++], (char **)0, 10);
-				viewp->sat[channel].snr_dbhz = strtol(vector[index++], (char **)0, 10);
-				++channel;
-				rc = 1;
-			}
-			viewp->channels = channel;
-			viewp->view = satellites;
-			viewp->pending = messages - message;
-			viewp->label = GSV;
+            satellites = strtol(vector[3], (char **)0, 10);
+            for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
+                if (channel >= satellites) { break; }
+                if (channel >= SATELLITES) { break; }
+                id = strtol(vector[index++], (char **)0, 10);
+                if (id <= 0) { break; }
+                viewp->sat[channel].id = id;
+                viewp->sat[channel].phantom = (strlen(vector[index]) == 0);
+                viewp->sat[channel].elv_degrees = strtol(vector[index++], (char **)0, 10);
+                viewp->sat[channel].phantom |= (strlen(vector[index]) == 0);
+                viewp->sat[channel].azm_degrees = strtol(vector[index++], (char **)0, 10);
+                viewp->sat[channel].snr_dbhz = strtol(vector[index++], (char **)0, 10);
+                ++channel;
+                rc = 1;
+            }
+            viewp->channels = channel;
+            viewp->view = satellites;
+            viewp->pending = messages - message;
+            viewp->label = GSV;
             if (rc < 0) {
                 /* Do nothing. */
             } else if (viewp->pending > 0) {
@@ -1147,21 +1170,21 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 
 hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], size_t count)
 {
-	hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
     static const int SATELLITES = sizeof(va[0].sat) / sizeof(va[0].sat[0]);
     int view = 0;
     int slot = 0;
 
     for (view = 0; view < count; ++view) {
-    	if (view >= HAZER_SYSTEM_TOTAL) { break; }
-    	for (slot = 0; slot < SATELLITES; ++slot) {
-    		if (slot >= va[view].view) { break; }
-    		if (va[view].sat[slot].id == 0) { break; }
-    		if (id == va[view].sat[slot].id) {
-    			system = (hazer_system_t)view;
-    			break;
-    		}
-    	}
+        if (view >= HAZER_SYSTEM_TOTAL) { break; }
+        for (slot = 0; slot < SATELLITES; ++slot) {
+            if (slot >= va[view].view) { break; }
+            if (va[view].sat[slot].id == 0) { break; }
+            if (id == va[view].sat[slot].id) {
+                system = (hazer_system_t)view;
+                break;
+            }
+        }
     }
 
     return system;
@@ -1189,16 +1212,16 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
     } else if (*vector[11] == 'V') {
         /* Do nothing. */
     } else {
-		positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
-		positionp->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
-		positionp->old_nanoseconds = positionp->tot_nanoseconds;
-		positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-		positionp->lat_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
-		positionp->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
-		positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits);
-		positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits);
-		positionp->label = RMC;
-		rc = 0;
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
+        positionp->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
+        positionp->old_nanoseconds = positionp->tot_nanoseconds;
+        positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
+        positionp->lat_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
+        positionp->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
+        positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits);
+        positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits);
+        positionp->label = RMC;
+        rc = 0;
     }
 
     return rc;
@@ -1224,13 +1247,13 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
     } else if (*vector[7] == 'N') {
         /* Do nothing. */
     } else {
-		positionp->utc_nanoseconds = hazer_parse_utc(vector[5]);
-		positionp->old_nanoseconds = positionp->tot_nanoseconds;
-		positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;;
-		positionp->lat_nanodegrees = hazer_parse_latlon(vector[1], *(vector[2]), &positionp->lat_digits);
-		positionp->lon_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lon_digits);
-		positionp->label = GLL;
-		rc = 0;
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[5]);
+        positionp->old_nanoseconds = positionp->tot_nanoseconds;
+        positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;;
+        positionp->lat_nanodegrees = hazer_parse_latlon(vector[1], *(vector[2]), &positionp->lat_digits);
+        positionp->lon_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lon_digits);
+        positionp->label = GLL;
+        rc = 0;
     }
 
     return rc;

@@ -51,6 +51,9 @@ int yodel_finalize(void)
  *
  ******************************************************************************/
 
+/*
+ * Ublox 8, p. 134
+ */
 yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp)
 {
     int done = !0;
@@ -68,8 +71,8 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
         break;
 
     default:
-    	/* Do nothing. */
-    	break;
+        /* Do nothing. */
+        break;
 
     }
 
@@ -85,69 +88,76 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
         break;
 
     case YODEL_STATE_START:
-    	if (ch == YODEL_STIMULUS_SYNC_1) {
-            DEBUG("UBX 0x%x.\n", ch);
+        if (ch == YODEL_STIMULUS_SYNC_1) {
+            DEBUG("UBX 0x%02x.\n", ch);
             state = YODEL_STATE_SYNC_2;
             action = YODEL_ACTION_SAVE;
             *bp = (char *)buffer;
             *sp = size;
+            *lp = 0;
         }
         break;
 
     case YODEL_STATE_SYNC_2:
-    	if (ch == YODEL_STIMULUS_SYNC_2) {
-    		state = YODEL_STATE_CLASS;
-    		action = YODEL_ACTION_SAVE;
-    	} else {
-    		state = YODEL_STATE_START;
-    	}
-    	break;
+        if (ch == YODEL_STIMULUS_SYNC_2) {
+            state = YODEL_STATE_CLASS;
+            action = YODEL_ACTION_SAVE;
+        } else {
+            state = YODEL_STATE_START;
+        }
+        break;
 
     case YODEL_STATE_CLASS:
-		state = YODEL_STATE_ID;
-		action = YODEL_ACTION_SAVE;
-    	break;
+        state = YODEL_STATE_ID;
+        action = YODEL_ACTION_SAVE;
+        break;
 
     case YODEL_STATE_ID:
-		state = YODEL_STATE_LENGTH_1;
-		action = YODEL_ACTION_SAVE;
-    	break;
+        state = YODEL_STATE_LENGTH_1;
+        action = YODEL_ACTION_SAVE;
+        break;
 
     case YODEL_STATE_LENGTH_1:
-        DEBUG("LENGTH1 0x%x.\n", ch);
-		state = YODEL_STATE_LENGTH_2;
-		action = YODEL_ACTION_SAVE;
-    	break;
+        /*
+         * Ublox8, p. 134: "little endian"
+         */
+        *lp = ((unsigned)ch); /* LSB */
+        DEBUG("LENGTH1 0x%02x %zu.\n", ch, *lp);
+        state = YODEL_STATE_LENGTH_2;
+        action = YODEL_ACTION_SAVE;
+        break;
 
     case YODEL_STATE_LENGTH_2:
-    	*lp = ((unsigned)ch) << 8;
-    	*lp |= (unsigned)*((*bp) - 1);
-        DEBUG("LENGTH %zu.\n", *lp);
-		state = YODEL_STATE_PAYLOAD;
-		action = YODEL_ACTION_SAVE;
-    	break;
+        /*
+         * Ublox8, p. 134: "little endian"
+         */
+        *lp |= ((unsigned)ch) << 8; /* MSB */
+        DEBUG("LENGTH2 0x%02x %zu.\n", ch, *lp);
+        state = YODEL_STATE_PAYLOAD;
+        action = YODEL_ACTION_SAVE;
+        break;
 
     case YODEL_STATE_PAYLOAD:
-    	if (((*lp)--) > 1) {
-    		state = YODEL_STATE_PAYLOAD;
-    	} else {
-    		state = YODEL_STATE_CK_A;
-    	}
-		action = YODEL_ACTION_SAVE;
-    	break;
+        if (((*lp)--) > 1) {
+            state = YODEL_STATE_PAYLOAD;
+        } else {
+            state = YODEL_STATE_CK_A;
+        }
+        action = YODEL_ACTION_SAVE;
+        break;
 
     case YODEL_STATE_CK_A:
-		state = YODEL_STATE_CK_B;
-		action = YODEL_ACTION_SAVE;
-     	break;
+        state = YODEL_STATE_CK_B;
+        action = YODEL_ACTION_SAVE;
+        break;
 
     case YODEL_STATE_CK_B:
-		state = YODEL_STATE_END;
-		action = YODEL_ACTION_TERMINATE;
-    	break;
+        state = YODEL_STATE_END;
+        action = YODEL_ACTION_TERMINATE;
+        break;
 
     case YODEL_STATE_END:
-        DEBUG("END 0x%x!\n", ch);
+        DEBUG("END 0x%02x!\n", ch);
         break;
 
     /*
@@ -163,14 +173,14 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
     switch (action) {
 
     case YODEL_ACTION_SKIP:
-    	DEBUG("SKIP 0x%x?\n", ch);
+        DEBUG("SKIP 0x%02x?\n", ch);
         break;
 
     case YODEL_ACTION_SAVE:
         if ((*sp) > 0) {
             *((*bp)++) = ch;
             (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", ch);
+            DEBUG("SAVE 0x%02x.\n", ch);
         } else {
             state = YODEL_STATE_START;
             DEBUG("LONG!\n");
@@ -178,18 +188,18 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
         break;
 
     case YODEL_ACTION_TERMINATE:
-    	/*
-    	 * It's not really meaningful to NUL-terminate a binary UBX packet, but
-    	 * doing so simplifies user code that doesn't know yet the format of
-    	 * the data in the buffer, e.g. in the case of IP datagrams.
-    	 */
+        /*
+         * It's not really meaningful to NUL-terminate a binary UBX packet, but
+         * doing so simplifies user code that doesn't know yet the format of
+         * the data in the buffer, e.g. in the case of IP datagrams.
+         */
         if ((*sp) > 1) {
             *((*bp)++) = ch;
             (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", ch);
+            DEBUG("SAVE 0x%02x.\n", ch);
             *((*bp)++) = '\0';
             (*sp) -= 1;
-            DEBUG("SAVE 0x%x.\n", '\0');
+            DEBUG("SAVE 0x%02x.\n", '\0');
             (*sp) = size - (*sp);
         } else {
             state = YODEL_STATE_START;
@@ -215,44 +225,43 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
  ******************************************************************************/
 
 /*
- * Ublox, p. 74
+ * The portion of the buffer being summed includes the length, but we have
+ * to compute the length first to do the checksum. Seems chicken-and-egg,
+ * but I've seen the same thing in TCP headers; in fact [Ublox p. 74] says
+ * this is the Fletcher checksum from RFC 1145. It refers to this as an
+ * eight-bit checksum, but the result is really sixteen bits (CK_A and
+ * CK_B), although it is performed eight-bits at a time on the input data.
  */
 const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
 {
-	const void * result = (void *)0;
-	const uint8_t * bp = (const uint8_t *)buffer;
-	uint8_t ck_a = 0;
-	uint8_t ck_b = 0;
-	uint16_t length = 0;
+    const void * result = (void *)0;
+    const uint8_t * bp = (const uint8_t *)buffer;
+    uint8_t ck_a = 0;
+    uint8_t ck_b = 0;
+    uint16_t length = 0;
 
-	/*
-	 * The portion of the buffer being summed includes the length, but we have
-	 * to compute the length first to do the checksum. Seems chicken-and-egg,
-	 * but I've seen the same thing in TCP headers; in fact [Ublox p. 74] says
-	 * this is the Fletcher checksum from RFC 1145. It refers to this as an
-	 * eight-bit checksum, but the result is really sixteen bits (CK_A and
-	 * CK_B), although it is performed eight-bits at a time on the input data.
-	 */
+    /*
+     * Ublox8, p. 134: "little endian"
+     */
+    length = ((uint8_t)(bp[YODEL_UBX_LENGTH_MSB])) << 8;
+    length |= ((uint8_t)(bp[YODEL_UBX_LENGTH_LSB]));
+    length += YODEL_UBX_SUMMED;
 
-	length = ((uint8_t)(bp[YODEL_UBX_LENGTH_MSB])) << 8;
-	length |= ((uint8_t)(bp[YODEL_UBX_LENGTH_LSB]));
-	length += YODEL_UBX_SUMMED;
+    if ((length + YODEL_UBX_UNSUMMED) <= size) {
 
-	if ((length + YODEL_UBX_UNSUMMED) <= size) {
+        for (bp += YODEL_UBX_CLASS; length > 0; --length) {
+            ck_a += *(bp++);
+            ck_b += ck_a;
+        }
 
-		for (bp += YODEL_UBX_CLASS; length > 0; --length) {
-			ck_a += *(bp++);
-			ck_b += ck_a;
-		}
+        *ck_ap = ck_a;
+        *ck_bp = ck_b;
 
-		*ck_ap = ck_a;
-		*ck_bp = ck_b;
+        result = bp;
 
-		result = bp;
+    }
 
-	}
-
-	return (const void *)bp;
+    return (const void *)bp;
 }
 
 ssize_t yodel_length(const void * buffer, size_t size)
@@ -264,21 +273,80 @@ ssize_t yodel_length(const void * buffer, size_t size)
        sentence = (const char *)buffer;
 
        if (size < YODEL_UBX_SHORTEST) {
-    	   /* Do nothing. */
+           /* Do nothing. */
        } else if (sentence[YODEL_UBX_SYNC_1] != YODEL_STIMULUS_SYNC_1) {
            /* Do nothing. */
        } else if (sentence[YODEL_UBX_SYNC_2] != YODEL_STIMULUS_SYNC_2) {
            /* Do nothing. */
        } else {
+           /*
+            * Ublox8, p. 134: "little endian"
+            */
            length = sentence[YODEL_UBX_LENGTH_MSB] << 8;
            length |= sentence[YODEL_UBX_LENGTH_LSB];
            if (length > (size - YODEL_UBX_SHORTEST)) {
-        	   /* Do nothing. */
+               /* Do nothing. */
            } else {
-        	   result = length;
-        	   result += YODEL_UBX_SHORTEST;
+               result = length;
+               result += YODEL_UBX_SHORTEST;
            }
        }
 
        return result;
 }
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
+int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_HW_Class) {
+        /* Do nothing. */
+    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_MON_HW_Id) {
+        /* Do nothing. */
+    } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_MON_HW_Length)) {
+        /* Do nothing. */
+    } else {
+        memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
+        COM_DIAG_YODEL_LETOH(mp->pinSel);
+        COM_DIAG_YODEL_LETOH(mp->pinBank);
+        COM_DIAG_YODEL_LETOH(mp->pinDir);
+        COM_DIAG_YODEL_LETOH(mp->pinVal);
+        COM_DIAG_YODEL_LETOH(mp->noisePerMS);
+        COM_DIAG_YODEL_LETOH(mp->agcCnt);
+        COM_DIAG_YODEL_LETOH(mp->usedMask);
+        COM_DIAG_YODEL_LETOH(mp->pinIrq);
+        COM_DIAG_YODEL_LETOH(mp->pullH);
+        COM_DIAG_YODEL_LETOH(mp->pullL);
+        rc = 0;
+    }
+
+    return rc;
+}
+
+int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_STATUS_Class) {
+        /* Do nothing. */
+    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_STATUS_Id) {
+        /* Do nothing. */
+    } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_STATUS_Length)) {
+        /* Do nothing. */
+    } else {
+        memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
+        COM_DIAG_YODEL_LETOH(mp->iTOW);
+        COM_DIAG_YODEL_LETOH(mp->ttff);
+        COM_DIAG_YODEL_LETOH(mp->msss);
+        rc = 0;
+    }
+
+    return rc;
+}
+
