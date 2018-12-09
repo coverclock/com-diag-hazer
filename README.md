@@ -249,6 +249,8 @@ mailto:coverclock@diag.com
 
 <https://pilotweb.nas.faa.gov/PilotWeb/noticesAction.do?queryType=ALLGPS&formatType=ICAO>
 
+<https://celestrak.com/GPS/NANU/description.php>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
