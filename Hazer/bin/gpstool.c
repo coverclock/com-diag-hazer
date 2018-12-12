@@ -1091,9 +1091,9 @@ int main(int argc, char * argv[])
      */
     static const char OPTIONS[] = "124678A:CD:EFI:L:M:OP:RVW:Xb:cdehlmnop:rst:v?";
 
-    /*
-     * Initialization.
-     */
+    /**
+     ** PREINITIALIZATION
+     **/
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
