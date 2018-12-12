@@ -156,21 +156,21 @@ and platforms.
 
 "Mercury"    
 Dell OptiPlex 7040    
-Intel Core i7-6700T @ 2.8GHz x 4 x 2    
+Intel Core i7-6700T x86_64 @ 2.8GHz x 4 x 2    
 Ubuntu 14.04.4 "Trusty Tahr"    
 Linux 4.2.0    
 gcc 4.8.4    
 
 "Nickel"    
 Intel NUC5i7RYH    
-Intel Core i7-5557U @ 3.10GHz x 2 x 2    
+Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
 Ubuntu 16.04.2 "Xenial Xerus"    
 Linux 4.10.0    
 gcc 5.4.0    
 
 "Nickel" (updated)    
 Intel NUC5i7RYH    
-Intel Core i7-5557U @ 3.10GHz x 2 x 2    
+Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
 Ubuntu 18.04 "Bionic Beaver"    
 Linux 4.15.0    
 gcc 7.3.0    
@@ -195,6 +195,13 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 9.4 "Stretch"    
 Linux 4.14.34    
 gcc 6.3.0    
+
+"Critter"    
+Intel NUC7i7BNH    
+Intel Core i7-7567U x86_64 @ 3.5GHz x 2 x 2    
+Ubuntu 18.04.1 "bionic"    
+Linux 4.15.0    
+gcc 7.3.0    
 
 # Contact
 
@@ -289,6 +296,8 @@ v15-20.30.22-23.01", UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 <https://navcen.uscg.gov/?Do=constellationStatus>
 
 <https://celestrak.com/GPS/NANU/description.php>
+
+<https://www.rtca.org/sites/default/files/intentional_gps_interference_approved.pdf>
 
 # Build
 
