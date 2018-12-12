@@ -977,6 +977,7 @@ int main(int argc, char * argv[])
     int ignorechecksums = 0;
     int slow = 0;
     int expire = 0;
+    int exiting = 0;
     uint16_t prn = 0;
     role_t role = ROLE;
     protocol_t protocol = IPV4;
@@ -1091,7 +1092,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:M:OP:RS:VW:Xb:cdehlmnop:rst:v?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:M:OP:RS:VW:Xb:cdehlmnop:rst:vx?";
 
     /**
      ** PREINITIALIZATION
@@ -1239,6 +1240,9 @@ int main(int argc, char * argv[])
         case 'v':
             verbose = !0;
             break;
+        case 'x':
+        	exiting = !0;
+        	break;
         case '?':
             fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
@@ -1260,7 +1264,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -R          Print a report on standard output.\n");
             fprintf(errfp, "       -S SOURCE   Use SOURCE for input.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
-            fprintf(errfp, "       -W NMEA     Collapse escapes, append checksum, and write to DEVICE.\n");
+            fprintf(errfp, "       -W STRING   Collapse escapes, append checksum, and write STRINGs to DEVICE.\n");
             fprintf(errfp, "       -X          Enable message expiration test mode.\n");
             fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
@@ -1276,6 +1280,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -s          Use XON/XOFF for DEVICE.\n");
             fprintf(errfp, "       -t SECONDS  Expire GNSS data after SECONDS seconds.\n");
             fprintf(errfp, "       -v          Display verbose output on standard error.\n");
+            fprintf(errfp, "       -x          Exit once all STRINGs written to DEVICE.\n");
             return 1;
             break;
         }
@@ -1566,11 +1571,15 @@ int main(int argc, char * argv[])
      ** or until we are interrupted by a SIGINT or terminated by a SIGTERM.
      **/
 
-     while ((!diminuto_interrupter_check()) && (!diminuto_terminator_check())) {
+     while (!0) {
 
-        buffer = (void *)0;
-        nmea_state = HAZER_STATE_START;
-        ubx_state = YODEL_STATE_START;
+        if (diminuto_interrupter_check()) {
+        	break;
+        }
+
+        if (diminuto_terminator_check()) {
+        	break;
+        }
 
         /**
          ** INPUT
@@ -1580,6 +1589,8 @@ int main(int argc, char * argv[])
          ** input, from a GPS device with a serial byte stream, or from a UDP
          ** IPv4 or IPv6 datagram stream.
          **/
+
+        buffer = (void *)0;
 
         if (role != CONSUMER) {
 
@@ -1607,7 +1618,15 @@ int main(int argc, char * argv[])
             } else if (diminuto_serial_available(devfd) > 0) {
                 /* Do nothing. */
             } else if (diminuto_list_isempty(&head)) {
-                /* Do nothing. */
+            	/*
+            	 * If we are supposed to exit once we have written the
+            	 * initialization strings (if any), now is the time to
+            	 * do it.
+            	 */
+            	if (exiting) {
+                    fprintf(errfp, "%s: DONE.\n", program);
+            		break;
+            	}
             } else {
                 node = diminuto_list_dequeue(&head);
                 assert(node != (diminuto_list_t *)0);
@@ -1643,6 +1662,9 @@ int main(int argc, char * argv[])
              * code below use the UBX buffer, since it may ultimately
              * receive either NMEA or UBX data from the far end.
              */
+
+            nmea_state = HAZER_STATE_START;
+            ubx_state = YODEL_STATE_START;
 
             while (!0) {
 
@@ -2060,7 +2082,11 @@ int main(int argc, char * argv[])
          * block the GPS frequencies. Makes me wish I still had access to those
          * gigantic walk-in Faraday cages that several of my clients have.
          */
-        if (expire && refresh) {
+        if (!expire) {
+        	/* Do nothing. */
+        } else if (!refresh) {
+        	/* Do nothing. */
+        } else {
             static int crowbar = 1000;
             if (crowbar <= 0) {
                 for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {

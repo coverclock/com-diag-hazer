@@ -12,7 +12,19 @@ BYTES=${4:-"512"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
+. $(readlink -e $(dirname ${0})/../fun)/ubx8
+
+OPTIONS=""
+for OPTION in ${COMMANDS}; do
+    OPTIONS="${OPTIONS} -W ${OPTION}"
+done
+
+eval gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -x ${OPTIONS} 2> >(log -S -N ${PROGRAM})
+
 mkfifo ${FIFO} 
+
 socat -u -b ${BYTES} OPEN:${DEVICE},b${RATE},cs8,rawer PIPE:${FIFO} & PID=$!
+
 trap "kill -0 ${PID} && kill ${PID}; rm -f ${FIFO}" INT TERM
-gpstool -S ${FIFO} -E 2> >(log -S -N ${PROGRAM})
+
+gpstool -S ${FIFO} -t 10 -E 2> >(log -S -N ${PROGRAM})
