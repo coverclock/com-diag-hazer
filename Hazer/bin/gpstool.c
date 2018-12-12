@@ -65,6 +65,7 @@
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
+#include "com/diag/diminuto/diminuto_fd.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
@@ -950,6 +951,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options and parameters with defaults.
      */
+	const char * source = (const char *)0;
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
@@ -1089,7 +1091,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:M:OP:RVW:Xb:cdehlmnop:rst:v?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:M:OP:RS:VW:Xb:cdehlmnop:rst:v?";
 
     /**
      ** PREINITIALIZATION
@@ -1169,6 +1171,9 @@ int main(int argc, char * argv[])
         case 'R':
             report = !0;
             break;
+        case 'S':
+            source = optarg;
+            break;
         case 'V':
             fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
@@ -1235,7 +1240,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1244,7 +1249,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -8          Use eight data bits for DEVICE.\n");
             fprintf(errfp, "       -A ADDRESS  Send sentences to ADDRESS.\n");
             fprintf(errfp, "       -C          Ignore bad checksums.\n");
-            fprintf(errfp, "       -D DEVICE   Use DEVICE.\n");
+            fprintf(errfp, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
             fprintf(errfp, "       -F          Like -E but refresh at 1Hz.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
@@ -1253,6 +1258,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
             fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(errfp, "       -R          Print a report on standard output.\n");
+            fprintf(errfp, "       -S SOURCE   Use SOURCE for input.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
             fprintf(errfp, "       -W NMEA     Collapse escapes, append checksum, and write to DEVICE.\n");
             fprintf(errfp, "       -X          Enable message expiration test mode.\n");
@@ -1490,6 +1496,19 @@ int main(int argc, char * argv[])
         if (devfp == (FILE *)0) { diminuto_perror(device); }
         assert(devfp != (FILE *)0);
         infp = devfp;
+
+    }
+
+    /*
+     * If we are using some other source of input (e.g. a file, a FIFO, etc.),
+     * open it here.
+     */
+
+    if (source != (const char *)0) {
+
+        infp = fopen(source, "r");
+        if (infp == (FILE *)0) { diminuto_perror(source); }
+        assert(infp != (FILE *)0);
 
     }
 
