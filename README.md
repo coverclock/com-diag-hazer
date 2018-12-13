@@ -364,6 +364,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 * bu353s4 - script that uses gpstool to exercise the GlobalSat BU-353S4 receiver.
 * bu353w10 - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver.
 * bu353w10F - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver with slow displays.
+* bu353w10M4 - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver logging PRN 4.
 * bu353w10S - script that uses socat to send data from GlobalSat BU-353W10 to gpstool over named pipe.
 * bu353W10X - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver while testing data expiration.
 * gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
