@@ -1554,8 +1554,18 @@ int main(int argc, char * argv[])
 
     limitation = escape ? LIMIT : UNLIMITED;
 
-    if (escape) { fputs("\033[1;1H\033[0J", outfp); }
-    if (report) { fflush(outfp); }
+    /*
+     * Initialize screen.
+     */
+
+    if (escape) {
+    	fputs("\033[1;1H\033[0J", outfp);
+        if (report) {
+        	fprintf(outfp, "INP [%3d]\n", 0);
+        	fprintf(outfp, "OUT [%3d]\n", 0);
+        	fflush(outfp);
+        }
+    }
 
     /*
      * Start the clock.
@@ -1613,7 +1623,7 @@ int main(int argc, char * argv[])
              * of the GPS device.
              */
 
-            if (devfd < 0) {
+        	if (devfd < 0) {
                 /* Do nothing. */
             } else if (diminuto_serial_available(devfd) > 0) {
                 /* Do nothing. */
