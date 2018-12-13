@@ -1264,7 +1264,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -R          Print a report on standard output.\n");
             fprintf(errfp, "       -S SOURCE   Use SOURCE for input.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
-            fprintf(errfp, "       -W STRING   Collapse escapes, append checksum, and write STRINGs to DEVICE.\n");
+            fprintf(errfp, "       -W STRING   Collapse escapes, append checksum, write STRINGs to DEVICE.\n");
             fprintf(errfp, "       -X          Enable message expiration test mode.\n");
             fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");

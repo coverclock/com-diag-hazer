@@ -364,6 +364,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 * bu353s4 - script that uses gpstool to exercise the GlobalSat BU-353S4 receiver.
 * bu353w10 - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver.
 * bu353w10F - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver with slow displays.
+* bu353w10S - script that uses socat to send data from GlobalSat BU-353W10 to gpstool over named pipe.
 * bu353W10X - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver while testing data expiration.
 * gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
 * gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
@@ -371,12 +372,13 @@ Optionally install Diminuto and Hazer in /usr/local.
 * talkers - script that uses gpstool to process a file of synthetic input.
 * ublox7 - script that uses gpstool to exercise any Ublox 7 device.    
 * ublox8 - script that uses gpstool to exercise any Ublox 8 device.
+* ublox8debug - script that uses gpstool with debug enabled to exercise any Ublox 8 device.
 
 # Help
 
     > gpstool -?
 
-    usage: gpstool [ -d ] [ -v ] [ -V ] [ -X ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
+    usage: gpstool [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -385,16 +387,18 @@ Optionally install Diminuto and Hazer in /usr/local.
            -8          Use eight data bits for DEVICE.
            -A ADDRESS  Send sentences to ADDRESS.
            -C          Ignore bad checksums.
-           -D DEVICE   Use DEVICE.
+           -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI escape sequences.
            -F          Like -E but refresh at 1Hz.
            -I PIN      Take 1PPS from GPIO input PIN (requires -D).
            -L FILE     Log sentences to FILE.
+           -M PRN      Enable phantom satellite monitoring for PRN.
            -O          Output sentences to DEVICE.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
+           -S SOURCE   Use SOURCE for input.
            -V          Print release, vintage, and revision on standard output.
-           -W NMEA     Collapse escapes, append checksum, and write to DEVICE.
+           -W STRING   Collapse escapes, append checksum, write STRINGs to DEVICE.
            -X          Enable message expiration test mode.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
@@ -410,6 +414,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -s          Use XON/XOFF for DEVICE.
            -t SECONDS  Expire GNSS data after SECONDS seconds.
            -v          Display verbose output on standard error.
+           -x          Exit once all STRINGs written to DEVICE.
 
 # Dependencies
 
