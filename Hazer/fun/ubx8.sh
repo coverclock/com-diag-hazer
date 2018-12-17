@@ -17,7 +17,7 @@
 # UBX-CFG-MSG [3] UBX-TIM-TM2 @1Hz
 # UBX-CFG-MSG [3] UBX-MON-HW @1Hz (ublox8 > fw18)
 # UBX-CFG-MSG [3] UBX-NAV-STATUS @1Hz (ublox8 > fw18)
-# UBX-CFG-ITFM [8] LE(0x96b156YX) LE(0x0000631e) (X[4]=BBthresh, Y[5]=CWthresh dB signed?)
+# UBX-CFG-ITFM [8] LE(0x96b156YX) LE(0x0000631e) (X[4]=broadband threshold signed dB, Y[5]=continuous wave threshold signed dB)
 # UBX-MON-VER [0]
 # UBX-CFG-DAT [0]
 # UBX-CFG-TPS [0]
