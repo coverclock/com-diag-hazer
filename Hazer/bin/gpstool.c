@@ -541,7 +541,7 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 
         fprintf(fp, " %cjamming  %chistory %3uindicator %5umaximum", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum);
 
-        fprintf(fp, "%24s", ""); /* This is actually important. */
+        fprintf(fp, "%22s", ""); /* This is actually important. */
 
         fprintf(fp, " %-8s", ""); /* This is actually important. */
 
