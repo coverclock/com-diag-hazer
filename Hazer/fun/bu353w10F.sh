@@ -29,4 +29,4 @@ for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} -W ${OPTION}"
 done
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -t 10 -M 4 ${OPTIONS} 2> >(log -S -N ${PROGRAM})
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -t 10 ${OPTIONS} 2> >(log -S -N ${PROGRAM})

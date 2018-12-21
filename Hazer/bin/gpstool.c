@@ -65,6 +65,7 @@
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
+#include "com/diag/diminuto/diminuto_fd.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
@@ -950,6 +951,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options and parameters with defaults.
      */
+	const char * source = (const char *)0;
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
@@ -975,6 +977,7 @@ int main(int argc, char * argv[])
     int ignorechecksums = 0;
     int slow = 0;
     int expire = 0;
+    int exiting = 0;
     uint16_t prn = 0;
     role_t role = ROLE;
     protocol_t protocol = IPV4;
@@ -1089,11 +1092,11 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:M:OP:RVW:Xb:cdehlmnop:rst:v?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:M:OP:RS:VW:Xb:cdehlmnop:rst:vx?";
 
-    /*
-     * Initialization.
-     */
+    /**
+     ** PREINITIALIZATION
+     **/
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
@@ -1169,6 +1172,9 @@ int main(int argc, char * argv[])
         case 'R':
             report = !0;
             break;
+        case 'S':
+            source = optarg;
+            break;
         case 'V':
             fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
@@ -1234,8 +1240,11 @@ int main(int argc, char * argv[])
         case 'v':
             verbose = !0;
             break;
+        case 'x':
+        	exiting = !0;
+        	break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1244,7 +1253,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -8          Use eight data bits for DEVICE.\n");
             fprintf(errfp, "       -A ADDRESS  Send sentences to ADDRESS.\n");
             fprintf(errfp, "       -C          Ignore bad checksums.\n");
-            fprintf(errfp, "       -D DEVICE   Use DEVICE.\n");
+            fprintf(errfp, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
             fprintf(errfp, "       -F          Like -E but refresh at 1Hz.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
@@ -1253,8 +1262,9 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
             fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(errfp, "       -R          Print a report on standard output.\n");
+            fprintf(errfp, "       -S SOURCE   Use SOURCE for input.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
-            fprintf(errfp, "       -W NMEA     Collapse escapes, append checksum, and write to DEVICE.\n");
+            fprintf(errfp, "       -W STRING   Collapse escapes, append checksum, write STRINGs to DEVICE.\n");
             fprintf(errfp, "       -X          Enable message expiration test mode.\n");
             fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
@@ -1270,6 +1280,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -s          Use XON/XOFF for DEVICE.\n");
             fprintf(errfp, "       -t SECONDS  Expire GNSS data after SECONDS seconds.\n");
             fprintf(errfp, "       -v          Display verbose output on standard error.\n");
+            fprintf(errfp, "       -x          Exit once all STRINGs written to DEVICE.\n");
             return 1;
             break;
         }
@@ -1494,6 +1505,19 @@ int main(int argc, char * argv[])
     }
 
     /*
+     * If we are using some other source of input (e.g. a file, a FIFO, etc.),
+     * open it here.
+     */
+
+    if (source != (const char *)0) {
+
+        infp = fopen(source, "r");
+        if (infp == (FILE *)0) { diminuto_perror(source); }
+        assert(infp != (FILE *)0);
+
+    }
+
+    /*
      * Are we monitoring 1PPS via Data Carrier Detect (DCD) on a serial line?
      * A thread blocks until it is asserted. The GR-701W asserts DCD just
      * before it unloads a block of sentences. The leading edge of DCD
@@ -1530,8 +1554,18 @@ int main(int argc, char * argv[])
 
     limitation = escape ? LIMIT : UNLIMITED;
 
-    if (escape) { fputs("\033[1;1H\033[0J", outfp); }
-    if (report) { fflush(outfp); }
+    /*
+     * Initialize screen.
+     */
+
+    if (escape) {
+    	fputs("\033[1;1H\033[0J", outfp);
+        if (report) {
+        	fprintf(outfp, "INP [%3d]\n", 0);
+        	fprintf(outfp, "OUT [%3d]\n", 0);
+        	fflush(outfp);
+        }
+    }
 
     /*
      * Start the clock.
@@ -1547,11 +1581,15 @@ int main(int argc, char * argv[])
      ** or until we are interrupted by a SIGINT or terminated by a SIGTERM.
      **/
 
-     while ((!diminuto_interrupter_check()) && (!diminuto_terminator_check())) {
+     while (!0) {
 
-        buffer = (void *)0;
-        nmea_state = HAZER_STATE_START;
-        ubx_state = YODEL_STATE_START;
+        if (diminuto_interrupter_check()) {
+        	break;
+        }
+
+        if (diminuto_terminator_check()) {
+        	break;
+        }
 
         /**
          ** INPUT
@@ -1561,6 +1599,8 @@ int main(int argc, char * argv[])
          ** input, from a GPS device with a serial byte stream, or from a UDP
          ** IPv4 or IPv6 datagram stream.
          **/
+
+        buffer = (void *)0;
 
         if (role != CONSUMER) {
 
@@ -1583,12 +1623,20 @@ int main(int argc, char * argv[])
              * of the GPS device.
              */
 
-            if (devfd < 0) {
+        	if (devfd < 0) {
                 /* Do nothing. */
             } else if (diminuto_serial_available(devfd) > 0) {
                 /* Do nothing. */
             } else if (diminuto_list_isempty(&head)) {
-                /* Do nothing. */
+            	/*
+            	 * If we are supposed to exit once we have written the
+            	 * initialization strings (if any), now is the time to
+            	 * do it.
+            	 */
+            	if (exiting) {
+                    fprintf(errfp, "%s: DONE.\n", program);
+            		break;
+            	}
             } else {
                 node = diminuto_list_dequeue(&head);
                 assert(node != (diminuto_list_t *)0);
@@ -1624,6 +1672,9 @@ int main(int argc, char * argv[])
              * code below use the UBX buffer, since it may ultimately
              * receive either NMEA or UBX data from the far end.
              */
+
+            nmea_state = HAZER_STATE_START;
+            ubx_state = YODEL_STATE_START;
 
             while (!0) {
 
@@ -2041,7 +2092,11 @@ int main(int argc, char * argv[])
          * block the GPS frequencies. Makes me wish I still had access to those
          * gigantic walk-in Faraday cages that several of my clients have.
          */
-        if (expire && refresh) {
+        if (!expire) {
+        	/* Do nothing. */
+        } else if (!refresh) {
+        	/* Do nothing. */
+        } else {
             static int crowbar = 1000;
             if (crowbar <= 0) {
                 for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {

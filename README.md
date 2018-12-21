@@ -156,21 +156,21 @@ and platforms.
 
 "Mercury"    
 Dell OptiPlex 7040    
-Intel Core i7-6700T @ 2.8GHz x 4 x 2    
+Intel Core i7-6700T x86_64 @ 2.8GHz x 4 x 2    
 Ubuntu 14.04.4 "Trusty Tahr"    
 Linux 4.2.0    
 gcc 4.8.4    
 
 "Nickel"    
 Intel NUC5i7RYH    
-Intel Core i7-5557U @ 3.10GHz x 2 x 2    
+Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
 Ubuntu 16.04.2 "Xenial Xerus"    
 Linux 4.10.0    
 gcc 5.4.0    
 
 "Nickel" (updated)    
 Intel NUC5i7RYH    
-Intel Core i7-5557U @ 3.10GHz x 2 x 2    
+Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
 Ubuntu 18.04 "Bionic Beaver"    
 Linux 4.15.0    
 gcc 7.3.0    
@@ -195,6 +195,13 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 9.4 "Stretch"    
 Linux 4.14.34    
 gcc 6.3.0    
+
+"Critter"    
+Intel NUC7i7BNH    
+Intel Core i7-7567U x86_64 @ 3.5GHz x 2 x 2    
+Ubuntu 18.04.1 "bionic"    
+Linux 4.15.0    
+gcc 7.3.0    
 
 # Contact
 
@@ -288,6 +295,10 @@ v15-20.30.22-23.01", UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 
 <https://navcen.uscg.gov/?Do=constellationStatus>
 
+<https://celestrak.com/GPS/NANU/description.php>
+
+<https://www.rtca.org/sites/default/files/intentional_gps_interference_approved.pdf>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
@@ -353,6 +364,8 @@ Optionally install Diminuto and Hazer in /usr/local.
 * bu353s4 - script that uses gpstool to exercise the GlobalSat BU-353S4 receiver.
 * bu353w10 - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver.
 * bu353w10F - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver with slow displays.
+* bu353w10M4 - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver logging PRN 4.
+* bu353w10S - script that uses socat to send data from GlobalSat BU-353W10 to gpstool over named pipe.
 * bu353W10X - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver while testing data expiration.
 * gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
 * gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
@@ -360,12 +373,13 @@ Optionally install Diminuto and Hazer in /usr/local.
 * talkers - script that uses gpstool to process a file of synthetic input.
 * ublox7 - script that uses gpstool to exercise any Ublox 7 device.    
 * ublox8 - script that uses gpstool to exercise any Ublox 8 device.
+* ublox8debug - script that uses gpstool with debug enabled to exercise any Ublox 8 device.
 
 # Help
 
     > gpstool -?
 
-    usage: gpstool [ -d ] [ -v ] [ -V ] [ -X ] [ -D DEVICE ] [ -b BPS ] [ -7 | -8 ]  [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
+    usage: gpstool [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -374,16 +388,18 @@ Optionally install Diminuto and Hazer in /usr/local.
            -8          Use eight data bits for DEVICE.
            -A ADDRESS  Send sentences to ADDRESS.
            -C          Ignore bad checksums.
-           -D DEVICE   Use DEVICE.
+           -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI escape sequences.
            -F          Like -E but refresh at 1Hz.
            -I PIN      Take 1PPS from GPIO input PIN (requires -D).
            -L FILE     Log sentences to FILE.
+           -M PRN      Enable phantom satellite monitoring for PRN.
            -O          Output sentences to DEVICE.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
+           -S SOURCE   Use SOURCE for input.
            -V          Print release, vintage, and revision on standard output.
-           -W NMEA     Collapse escapes, append checksum, and write to DEVICE.
+           -W STRING   Collapse escapes, append checksum, write STRINGs to DEVICE.
            -X          Enable message expiration test mode.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
@@ -399,6 +415,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -s          Use XON/XOFF for DEVICE.
            -t SECONDS  Expire GNSS data after SECONDS seconds.
            -v          Display verbose output on standard error.
+           -x          Exit once all STRINGs written to DEVICE.
 
 # Dependencies
 
@@ -479,9 +496,7 @@ MON displays some of the results received in the UBX-MON-HW message if enabled.
 Ublox 8 chips with firmware revision 18 and above can provide clues to jamming
 based on the received signal strength. (N.B. I don't have a way to test this.)
 This requires that the jamming/interference monitor (ITFM) be calibrated using
-the UBX-CFG-ITFM message. (Although I find nothing in the documentation that
-indicates this, I suspect that the dB values in the UBX-CFG-ITFM message are
-two's complement signed.)
+the UBX-CFG-ITFM message.
 
 STA displays some of the results received in the UBX-NAV-STATUS message if
 enabled. Ublox 8 chips with firmware revision 18 and above can provide clues
