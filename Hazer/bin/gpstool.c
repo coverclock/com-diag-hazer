@@ -539,9 +539,9 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
 
         fputs("MON", fp);
 
-        fprintf(fp, " %cjamming  %chistory %3uindicator %5umaximum", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum);
+        fprintf(fp, " %cjamming  %chistory %3uindicator %3umaximum", jamming, jamming_history, hp->payload.jamInd, jamInd_maximum);
 
-        fprintf(fp, "%22s", ""); /* This is actually important. */
+        fprintf(fp, "%24s", ""); /* This is actually important. */
 
         fprintf(fp, " %-8s", ""); /* This is actually important. */
 
@@ -557,6 +557,9 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
  */
 static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 {
+    static uint32_t msss_prior = 0;
+    static uint16_t msss_epoch = 0;
+
     /*
      * Indicate detection of spoofing by comparing solutions from multiple
      * GNSSes if (and only if) available. Relies on support from later versions
@@ -565,10 +568,10 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
      */
 
     if (sp->ticks > 0) {
-        uint8_t value;
-        char spoofing;
         static char spoofing_prior = STATUS;
         static char spoofing_history = STATUS;
+        uint8_t value;
+        char spoofing;
 
         value = (sp->payload.flags2 >> YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT) & YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK;
 
@@ -597,19 +600,25 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 
         if (spoofing != spoofing_prior) {
         	diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx spoofing %u\n", program, value);
-            spoofing_prior = spoofing;
+                spoofing_prior = spoofing;
+        }
+
+        if (sp->payload.msss < msss_prior) {
+            msss_epoch += 1;
         }
 
         fputs("STA", fp);
 
-        fprintf(fp, " %cspoofing %chistory %10ums %10ums", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss);
+        fprintf(fp, " %cspoofing %chistory %10ums %10ums %5uepoch", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, msss_epoch);
 
-        fprintf(fp, "%22s", ""); /* This is actually important. */
+        fprintf(fp, "%10s", ""); /* This is actually important. */
 
         fprintf(fp, " %-8s", ""); /* This is actually important. */
 
         fputc('\n', fp);
     }
+
+    msss_prior = sp->payload.msss;
 }
 
 /**
