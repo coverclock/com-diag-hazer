@@ -3,15 +3,15 @@
     	
     <storageModule moduleId="org.eclipse.cdt.core.settings">
         		
-        <cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1874975599">
+        <cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1241868214">
             			
-            <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1874975599" moduleId="org.eclipse.cdt.core.settings" name="Default">
+            <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1241868214" moduleId="org.eclipse.cdt.core.settings" name="Default">
                 				
                 <externalSettings/>
                 				
                 <extensions>
                     					
-                    <extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+                    <extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
                     					
                     <extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
                     					
@@ -29,35 +29,35 @@
             			
             <storageModule moduleId="cdtBuildSystem" version="4.0.0">
                 				
-                <configuration buildProperties="" id="cdt.managedbuild.toolchain.gnu.base.1874975599" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+                <configuration buildProperties="" id="cdt.managedbuild.toolchain.gnu.base.1241868214" name="Default" optionalBuildProperties="" parent="org.eclipse.cdt.build.core.emptycfg">
                     					
-                    <folderInfo id="cdt.managedbuild.toolchain.gnu.base.1874975599.240441039" name="/" resourcePath="">
+                    <folderInfo id="cdt.managedbuild.toolchain.gnu.base.1241868214.1150020798" name="/" resourcePath="">
                         						
-                        <toolChain id="cdt.managedbuild.toolchain.gnu.base.790359544" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+                        <toolChain id="cdt.managedbuild.toolchain.gnu.base.102666616" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
                             							
-                            <targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1031343775" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+                            <targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF" id="cdt.managedbuild.target.gnu.platform.base.470904718" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
                             							
-                            <builder id="cdt.managedbuild.target.gnu.builder.base.1904844359" managedBuildOn="false" name="Gnu Make Builder.Default" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+                            <builder id="cdt.managedbuild.target.gnu.builder.base.1823257444" managedBuildOn="false" name="Gnu Make Builder.Default" superClass="cdt.managedbuild.target.gnu.builder.base"/>
                             							
-                            <tool id="cdt.managedbuild.tool.gnu.archiver.base.918443165" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+                            <tool id="cdt.managedbuild.tool.gnu.archiver.base.874077760" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
                             							
-                            <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1628176225" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+                            <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1840451732" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
                                 								
-                                <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1122863317" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+                                <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1779785819" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
                                 							
                             </tool>
                             							
-                            <tool id="cdt.managedbuild.tool.gnu.c.compiler.base.273604473" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+                            <tool id="cdt.managedbuild.tool.gnu.c.compiler.base.547415879" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
                                 								
-                                <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1519275229" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+                                <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1046091933" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
                                 							
                             </tool>
                             							
-                            <tool id="cdt.managedbuild.tool.gnu.c.linker.base.994194590" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+                            <tool id="cdt.managedbuild.tool.gnu.c.linker.base.268739174" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
                             							
-                            <tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.399573893" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+                            <tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1748352645" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
                                 								
-                                <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1467694275" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+                                <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.335702126" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
                                     									
                                     <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
                                     									
@@ -67,9 +67,9 @@
                                 							
                             </tool>
                             							
-                            <tool id="cdt.managedbuild.tool.gnu.assembler.base.725409741" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+                            <tool id="cdt.managedbuild.tool.gnu.assembler.base.2020635995" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
                                 								
-                                <inputType id="cdt.managedbuild.tool.gnu.assembler.input.2134571445" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+                                <inputType id="cdt.managedbuild.tool.gnu.assembler.input.1781935370" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
                                 							
                             </tool>
                             						
@@ -87,15 +87,15 @@
         	
     </storageModule>
     	
-    <storageModule moduleId="cdtBuildSystem" version="4.0.0">
-        		
-        <project id="com-diag-hazer.null.1474667446" name="com-diag-hazer"/>
-        	
-    </storageModule>
-    	
     <storageModule moduleId="scannerConfiguration">
         		
         <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+        	
+    </storageModule>
+    	
+    <storageModule moduleId="cdtBuildSystem" version="4.0.0">
+        		
+        <project id="com-diag-hazer.null.270094123" name="com-diag-hazer"/>
         	
     </storageModule>
     	
