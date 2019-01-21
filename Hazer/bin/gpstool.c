@@ -113,8 +113,6 @@ static const wchar_t DEGREE = 0x002A;
  * GLOBALS
  */
 
-static diminuto_sticks_t Update = 0;
-
 static const char * Program = (const char *)0;
 
 static char Hostname[9] = { '\0' };
@@ -417,8 +415,9 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
  * Print the local (Juliet) time (and the release string).
  * @param fp points to the FILE stream.
  * @param ep points to the FILE stream for errors.
+ * @param interarrival is the number of ticks between PNT updates.
  */
-static void print_local(FILE * fp, FILE * ep)
+static void print_local(FILE * fp, FILE * ep, diminuto_sticks_t interarrival)
 {
     int year = 0;
     int month = 0;
@@ -433,13 +432,10 @@ static void print_local(FILE * fp, FILE * ep)
     diminuto_sticks_t now = 0;
     diminuto_sticks_t offset = 0;
     diminuto_ticks_t fraction = 0;
-    diminuto_sticks_t update = 0;
     char zone = '\0';
     int rc = 0;
 
     fputs("LOC", fp);
-
-    update = diminuto_time_elapsed();
 
     now = diminuto_time_clock();
     assert(now >= 0);
@@ -498,7 +494,7 @@ static void print_local(FILE * fp, FILE * ep)
      * the prior update.
      */
 
-    rc = diminuto_time_duration(update - Update, &day, &hour, &minute, &second, &fraction);
+    rc = diminuto_time_duration(interarrival, &day, &hour, &minute, &second, &fraction);
     assert(rc >= 0);
     assert(day >= 0);
     assert((0 <= hour) && (hour <= 23));
@@ -509,8 +505,6 @@ static void print_local(FILE * fp, FILE * ep)
     assert((0 <= milliseconds) && (milliseconds < 1000LL));
 
     fprintf(fp, " %10d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
-
-    Update = update;
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
 
@@ -1102,6 +1096,8 @@ int main(int argc, char * argv[])
     diminuto_sticks_t was = 0;
     diminuto_sticks_t now = 0;
     diminuto_ticks_t elapsed = 0;
+    diminuto_sticks_t update = 0;
+    diminuto_sticks_t updated = 0;
     /*
      * Miscellaneous working variables.
      */
@@ -1141,7 +1137,7 @@ int main(int argc, char * argv[])
      ** PREINITIALIZATION
      **/
 
-    Update = diminuto_time_elapsed();
+    update = diminuto_time_elapsed();
 
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
 
@@ -2001,6 +1997,8 @@ int main(int argc, char * argv[])
                 refresh = !0;
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+                updated = update;
+                update = diminuto_time_elapsed();
 
             } else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 
@@ -2008,6 +2006,8 @@ int main(int argc, char * argv[])
                 refresh = !0;
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+                updated = update;
+                update = diminuto_time_elapsed();
 
             } else if (hazer_parse_gll(&position[system], vector, count) == 0) {
 
@@ -2015,6 +2015,8 @@ int main(int argc, char * argv[])
                 refresh = !0;
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+                updated = update;
+                update = diminuto_time_elapsed();
 
             } else if (hazer_parse_vtg(&position[system], vector, count) == 0) {
 
@@ -2022,6 +2024,8 @@ int main(int argc, char * argv[])
                 refresh = !0;
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
+                updated = update;
+                update = diminuto_time_elapsed();
 
             } else if (hazer_parse_gsa(&cache, vector, count) == 0) {
 
@@ -2189,7 +2193,7 @@ int main(int argc, char * argv[])
                 DIMINUTO_CRITICAL_SECTION_END;
                 print_hardware(outfp, errfp, &hardware);
                 print_status(outfp, errfp, &status);
-                print_local(outfp, errfp);
+                print_local(outfp, errfp, update - updated);
                 print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
                 print_actives(outfp, errfp, active);
                 print_views(outfp, errfp, view, active, prn);
