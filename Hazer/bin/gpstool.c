@@ -113,7 +113,7 @@ static const wchar_t DEGREE = 0x002A;
  * GLOBALS
  */
 
-static diminuto_sticks_t Epoch = 0;
+static diminuto_sticks_t Update = 0;
 
 static const char * Program = (const char *)0;
 
@@ -433,13 +433,13 @@ static void print_local(FILE * fp, FILE * ep)
     diminuto_sticks_t now = 0;
     diminuto_sticks_t offset = 0;
     diminuto_ticks_t fraction = 0;
-    diminuto_sticks_t present = 0;
+    diminuto_sticks_t update = 0;
     char zone = '\0';
     int rc = 0;
 
     fputs("LOC", fp);
 
-    present = diminuto_time_elapsed();
+    update = diminuto_time_elapsed();
 
     now = diminuto_time_clock();
     assert(now >= 0);
@@ -498,7 +498,7 @@ static void print_local(FILE * fp, FILE * ep)
      * the prior update.
      */
 
-    rc = diminuto_time_duration(present - Epoch, &day, &hour, &minute, &second, &fraction);
+    rc = diminuto_time_duration(update - Update, &day, &hour, &minute, &second, &fraction);
     assert(rc >= 0);
     assert(day >= 0);
     assert((0 <= hour) && (hour <= 23));
@@ -509,6 +509,8 @@ static void print_local(FILE * fp, FILE * ep)
     assert((0 <= milliseconds) && (milliseconds < 1000LL));
 
     fprintf(fp, " %10d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
+
+    Update = update;
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
 
@@ -1139,7 +1141,7 @@ int main(int argc, char * argv[])
      ** PREINITIALIZATION
      **/
 
-    Epoch = diminuto_time_elapsed();
+    Update = diminuto_time_elapsed();
 
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
 
