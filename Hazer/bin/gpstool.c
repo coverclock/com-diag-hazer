@@ -85,6 +85,10 @@
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_delay.h"
 
+/*
+ * CONSTANTS
+ */
+
 typedef enum Role { ROLE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
 
 typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
@@ -99,13 +103,21 @@ static const size_t LIMIT = 80 /* Legacy */ - 4 /* "LLL " */ - 6 /* "[NNN] " */ 
 
 static const size_t UNLIMITED = ~(size_t)0;
 
-static const char * program = (const char *)0;
-
 #if !0
 static const wchar_t DEGREE = 0x00B0;
 #else
 static const wchar_t DEGREE = 0x002A;
 #endif
+
+/*
+ * GLOBALS
+ */
+
+static diminuto_sticks_t Epoch = 0;
+
+static const char * Program = (const char *)0;
+
+static char Hostname[9] = { '\0' };
 
 /**
  * Emit an NMEA sentences to the specified stream after adding the ending
@@ -366,7 +378,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 			} else {
 				maximum = va[system].sat[satellite].snr_dbhz;
 				ticks = diminuto_time_elapsed();
-				diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c' at %ddBHz\n", program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom, maximum);
+				diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c' at %ddBHz\n", Program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom, maximum);
 				history = phantom;
 				seen = true;
 			}
@@ -395,7 +407,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 		/* Do nothing. */
 	} else {
 		ticks = diminuto_time_elapsed() - ticks;
-		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c' at %ddBHz for %llums\n", program, HAZER_SYSTEM_NAME[HAZER_SYSTEM_GPS], prn, history, INACTIVE, maximum, diminuto_frequency_ticks2units(ticks, 1000LL));
+		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c' at %ddBHz for %llums\n", Program, HAZER_SYSTEM_NAME[HAZER_SYSTEM_GPS], prn, history, INACTIVE, maximum, diminuto_frequency_ticks2units(ticks, 1000LL));
 		history = INACTIVE;
 	}
 
@@ -418,17 +430,20 @@ static void print_local(FILE * fp, FILE * ep)
     int minutes = 0;
     int seconds = 0;
     diminuto_sticks_t milliseconds = 0;
-    diminuto_sticks_t epoch = 0;
+    diminuto_sticks_t now = 0;
     diminuto_sticks_t offset = 0;
     diminuto_ticks_t fraction = 0;
+    diminuto_sticks_t present = 0;
     char zone = '\0';
     int rc = 0;
 
     fputs("LOC", fp);
 
-    epoch = diminuto_time_clock();
-    assert(epoch >= 0);
-    rc = diminuto_time_juliet(epoch, &year, &month, &day, &hour, &minute, &second, &fraction);
+    present = diminuto_time_elapsed();
+
+    now = diminuto_time_clock();
+    assert(now >= 0);
+    rc = diminuto_time_juliet(now, &year, &month, &day, &hour, &minute, &second, &fraction);
     assert(rc == 0);
     assert((1 <= month) && (month <= 12));
     assert((1 <= day) && (day <= 31));
@@ -456,7 +471,7 @@ static void print_local(FILE * fp, FILE * ep)
      * another reason to admin your embedded system to UTC.)
      */
 
-    offset = diminuto_time_timezone(epoch);
+    offset = diminuto_time_timezone(now);
     zone = diminuto_time_zonename(offset);
 
     offset = diminuto_frequency_ticks2wholeseconds(offset);
@@ -473,14 +488,17 @@ static void print_local(FILE * fp, FILE * ep)
      * typically, fixed).
      */
 
-    offset = diminuto_time_daylightsaving(epoch);
+    offset = diminuto_time_daylightsaving(now);
     offset = diminuto_frequency_ticks2wholeseconds(offset);
     hour = offset / 3600;
     fprintf(fp, "%+2.2d%c", hour, zone);
 
-    fprintf(fp, " com-diag-hazer %-17.17s", COM_DIAG_HAZER_RELEASE);
+    milliseconds = diminuto_frequency_ticks2units(present - Epoch, 1000LL);
+    fprintf(fp, " %21ldms", milliseconds);
 
-    fprintf(fp, " %-8s", ""); /* This is actually important. */
+    fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
+
+    fprintf(fp, " %-8.8s", Hostname);
 
     fputc('\n', fp);
 }
@@ -531,7 +549,7 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
         }
 
         if (jamming != jamming_prior) {
-        	diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx jamming %u indicator %u\n", program, value, hp->payload.jamInd);
+        	diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx jamming %u indicator %u\n", Program, value, hp->payload.jamInd);
             jamming_prior = jamming;
         }
 
@@ -599,7 +617,7 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
         }
 
         if (spoofing != spoofing_prior) {
-        	diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx spoofing %u\n", program, value);
+        	diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx spoofing %u\n", Program, value);
                 spoofing_prior = spoofing;
         }
 
@@ -1107,13 +1125,18 @@ int main(int argc, char * argv[])
      ** PREINITIALIZATION
      **/
 
-    program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
+    Epoch = diminuto_time_elapsed();
+
+    Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
+
+    (void)gethostname(Hostname, sizeof(Hostname));
+    Hostname[sizeof(Hostname) - 1] = '\0';
 
     locale = setlocale(LC_ALL, "");
 
     diminuto_log_setmask();
 
-    diminuto_log_open_syslog(program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
+    diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
 
     /*
      * Parse the command line.
@@ -1185,7 +1208,7 @@ int main(int argc, char * argv[])
             source = optarg;
             break;
         case 'V':
-            fprintf(outfp, "com-diag-hazer %s %s %s %s\n", program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            fprintf(outfp, "com-diag-hazer %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
             readonly = 0;
@@ -1253,7 +1276,7 @@ int main(int argc, char * argv[])
         	exiting = !0;
         	break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1643,7 +1666,7 @@ int main(int argc, char * argv[])
             	 * do it.
             	 */
             	if (exiting) {
-                    fprintf(errfp, "%s: DONE.\n", program);
+                    fprintf(errfp, "%s: DONE.\n", Program);
             		break;
             	}
             } else {
@@ -1654,13 +1677,13 @@ int main(int argc, char * argv[])
                 length = strlen(buffer) + 1;
                 size = diminuto_escape_collapse(buffer, buffer, length);
                 if (buffer[0] == '\0') {
-                    fprintf(errfp, "%s: EXIT.\n", program);
+                    fprintf(errfp, "%s: EXIT.\n", Program);
                     break;
                 }
                 size1 = size - 1;
                 rc = (size < length) ? emit_message(devfp, buffer, size1) : emit_sentence(devfp, buffer, size1);
                 if (rc < 0) {
-                    fprintf(errfp, "%s: FAILED!\n", program);
+                    fprintf(errfp, "%s: FAILED!\n", Program);
                     print_buffer(errfp, buffer, size1, UNLIMITED);
                 }
 
@@ -1696,7 +1719,7 @@ int main(int argc, char * argv[])
                 if (nmea_state == HAZER_STATE_END) {
                     break;
                 } else if  (nmea_state == HAZER_STATE_EOF) {
-                    fprintf(errfp, "%s: EOF.\n", program);
+                    fprintf(errfp, "%s: EOF.\n", Program);
                     break;
                 } else {
                     /* Do nothing. */
@@ -1705,7 +1728,7 @@ int main(int argc, char * argv[])
                 if (ubx_state == YODEL_STATE_END) {
                     break;
                 } else if  (ubx_state == YODEL_STATE_EOF) {
-                    fprintf(errfp, "%s: EOF.\n", program);
+                    fprintf(errfp, "%s: EOF.\n", Program);
                     break;
                 } else {
                     /* Do nothing. */
@@ -1768,7 +1791,7 @@ int main(int argc, char * argv[])
             assert(rc >= 0);
 
             if (nmea_ck != nmea_cs) {
-                fprintf(errfp, "%s: CHECKSUM! 0x%02x 0x%02x\n", program, nmea_cs, nmea_ck);
+                fprintf(errfp, "%s: CHECKSUM! 0x%02x 0x%02x\n", Program, nmea_cs, nmea_ck);
                 print_buffer(errfp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
             }
@@ -1781,7 +1804,7 @@ int main(int argc, char * argv[])
             assert(bp != (unsigned char *)0);
 
             if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
-                fprintf(errfp, "%s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
+                fprintf(errfp, "%s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", Program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
                 print_buffer(errfp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
             }
@@ -1790,7 +1813,7 @@ int main(int argc, char * argv[])
 
         } else {
 
-            fprintf(errfp, "%s: FORMAT! %zd\n", program, length);
+            fprintf(errfp, "%s: FORMAT! %zd\n", Program, length);
             print_buffer(errfp, buffer, size1, UNLIMITED);
 
             format = FORMAT;
@@ -1933,13 +1956,13 @@ int main(int argc, char * argv[])
                 continue;
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-                    fprintf(errfp, "%s: TALKER? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
+                    fprintf(errfp, "%s: TALKER? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
                     print_buffer(errfp, buffer, size - 1, UNLIMITED);
                 }
                 continue;
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-                    fprintf(errfp, "%s: SYSTEM? \"%c%c\"\n", program, vector[0][1], vector[0][2]);
+                    fprintf(errfp, "%s: SYSTEM? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
                     print_buffer(errfp, buffer, size - 1, UNLIMITED);
                 }
                 continue;
@@ -2024,7 +2047,7 @@ int main(int argc, char * argv[])
                 size_t current = 0;
                 int end = 0;
 
-                fprintf(errfp, "%s: TXT [%2d][%2d][%2d] \"", program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
+                fprintf(errfp, "%s: TXT [%2d][%2d][%2d] \"", Program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
 
                 while ((*bb != HAZER_STIMULUS_NUL) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
                     diminuto_phex_emit(errfp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
@@ -2085,10 +2108,10 @@ int main(int argc, char * argv[])
         } else if (!totokay) {
             /* Do nothing. */
         } else if (fputs(synthesized, devfp) == EOF) {
-            fprintf(errfp, "%s: OUT!\n", program);
+            fprintf(errfp, "%s: OUT!\n", Program);
             break;
         } else if (fflush(devfp) == EOF) {
-            fprintf(errfp, "%s: OUT!\n", program);
+            fprintf(errfp, "%s: OUT!\n", Program);
             break;
         } else {
             /* Do nothing. */
@@ -2166,7 +2189,7 @@ int main(int argc, char * argv[])
      ** FINIALIZATION
      **/
 
-    fprintf(errfp, "%s: END.\n", program);
+    fprintf(errfp, "%s: END.\n", Program);
 
     rc = yodel_finalize();
     assert(rc >= 0);
