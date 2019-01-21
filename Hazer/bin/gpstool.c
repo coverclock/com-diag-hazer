@@ -493,8 +493,22 @@ static void print_local(FILE * fp, FILE * ep)
     hour = offset / 3600;
     fprintf(fp, "%+2.2d%c", hour, zone);
 
-    milliseconds = diminuto_frequency_ticks2units(present - Epoch, 1000LL);
-    fprintf(fp, " %21ldms", milliseconds);
+    /*
+     * This is where we calculated the elapsed time between this and
+     * the prior update.
+     */
+
+    rc = diminuto_time_duration(present - Epoch, &day, &hour, &minute, &second, &fraction);
+    assert(rc >= 0);
+    assert(day >= 0);
+    assert((0 <= hour) && (hour <= 23));
+    assert((0 <= minute) && (minute <= 59));
+    assert((0 <= second) && (second <= 59));
+
+    milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
+    assert((0 <= milliseconds) && (milliseconds < 1000LL));
+
+    fprintf(fp, " %10d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
 
