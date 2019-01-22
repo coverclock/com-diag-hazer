@@ -207,7 +207,7 @@ Intel NUC7i7BNH
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
 Ubuntu 16.04.5 "Xenial Xerus"    
 Linux 4.15.0    
-gcc 7.3.0    
+gcc 5.4.0    
 
 # Contact
 
