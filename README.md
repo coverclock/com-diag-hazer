@@ -7,7 +7,7 @@ Parse NMEA strings from GPS devices.
 
 # Copyright
 
-Copyright 2017-2018 by the Digital Aggregates Corporation, Colorado, USA.
+Copyright 2017-2019 by the Digital Aggregates Corporation, Colorado, USA.
 
 # License
 
