@@ -177,7 +177,7 @@ gcc 5.4.0
 "Nickel" (updated)    
 Intel NUC5i7RYH    
 Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
-Ubuntu 18.04 "Bionic Beaver"    
+Ubuntu 18.04.1 "Bionic Beaver"    
 Linux 4.15.0    
 gcc 7.3.0    
 
@@ -202,10 +202,10 @@ Raspbian 9.4 "Stretch"
 Linux 4.14.34    
 gcc 6.3.0    
 
-"Critter"    
+"Cadmium"    
 Intel NUC7i7BNH    
-Intel Core i7-7567U x86_64 @ 3.5GHz x 2 x 2    
-Ubuntu 18.04.1 "bionic"    
+Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
+Ubuntu 16.04.5 "Xenial Xerus"    
 Linux 4.15.0    
 gcc 7.3.0    
 
