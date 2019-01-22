@@ -942,6 +942,77 @@ hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
     return system;
 }
 
+hazer_system_t hazer_map_id_to_system(uint16_t id)
+{
+    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+
+    if (id == 0) {
+        /* Do nothing. */
+    } else if ((HAZER_ID_GPS_FIRST <= id) && (id <= HAZER_ID_GPS_LAST)) {
+        candidate = HAZER_SYSTEM_GPS;
+    } else if ((HAZER_ID_SBAS_FIRST <= id) && (id <= HAZER_ID_SBAS_LAST)) {
+        candidate = HAZER_SYSTEM_SBAS;
+    } else if ((HAZER_ID_GLONASS_FIRST <= id) && (id <= HAZER_ID_GLONASS_LAST)) {
+        candidate = HAZER_SYSTEM_GLONASS;
+    } else if ((HAZER_ID_SBASX_FIRST <= id) && (id <= HAZER_ID_SBASX_LAST)) {
+        candidate = HAZER_SYSTEM_SBAS;
+    } else if ((HAZER_ID_IMES_FIRST <= id) && (id <= HAZER_ID_IMES_LAST)) {
+        candidate = HAZER_SYSTEM_IMES;
+    } else if ((HAZER_ID_QZSS_FIRST <= id) && (id <= HAZER_ID_QZSS_LAST)) {
+        candidate = HAZER_SYSTEM_QZSS;
+    } else if ((HAZER_ID_BEIDOU1_FIRST <= id) && (id <= HAZER_ID_BEIDOU1_LAST)) {
+        candidate = HAZER_SYSTEM_BEIDOU;
+    } else if ((HAZER_ID_GALILEO_FIRST <= id) && (id <= HAZER_ID_GALILEO_LAST)) {
+        candidate = HAZER_SYSTEM_GALILEO;
+    } else if ((HAZER_ID_BEIDOU2_FIRST <= id) && (id <= HAZER_ID_BEIDOU2_LAST)) {
+        candidate = HAZER_SYSTEM_BEIDOU;
+    } else {
+        /* Do nothing. */
+    }
+
+    return candidate;
+}
+
+/*
+ * NMEA 0183 4.10 p. 94-95.
+ * UBLOX8 R15 p. 373.
+ */
+hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+    int slot = 0;
+    static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
+
+    if ((HAZER_SYSTEM_GPS <= activep->system) && (activep->system <= HAZER_SYSTEM_GALILEO)) {
+        system = (hazer_system_t)activep->system;
+    } else {
+        for (slot = 0; slot < IDENTIFIERS; ++slot) {
+            if (slot >= activep->active) {
+                break;
+            } else if (activep->id[slot] == 0) {
+                break;
+            } else if ((candidate = hazer_map_id_to_system(activep->id[slot])) == HAZER_SYSTEM_TOTAL) {
+                continue;
+            } else {
+                /* Do nothing. */
+            }
+            if (system == HAZER_SYSTEM_TOTAL) {
+                system = candidate;
+            } else if (system == candidate) {
+                continue;
+            } else if (candidate == HAZER_SYSTEM_SBAS) {
+                continue;
+            } else if (system == HAZER_SYSTEM_SBAS) {
+                system = candidate;
+            } else {
+                system = HAZER_SYSTEM_GNSS;
+            }
+        }
+    }
+
+    return system;
+}
+
 /******************************************************************************
  *
  ******************************************************************************/
@@ -1030,77 +1101,6 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     }
 
     return rc;
-}
-
-hazer_system_t hazer_map_id_to_system(uint16_t id)
-{
-    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
-
-    if (id == 0) {
-        /* Do nothing. */
-    } else if ((HAZER_ID_GPS_FIRST <= id) && (id <= HAZER_ID_GPS_LAST)) {
-        candidate = HAZER_SYSTEM_GPS;
-    } else if ((HAZER_ID_SBAS_FIRST <= id) && (id <= HAZER_ID_SBAS_LAST)) {
-        candidate = HAZER_SYSTEM_SBAS;
-    } else if ((HAZER_ID_GLONASS_FIRST <= id) && (id <= HAZER_ID_GLONASS_LAST)) {
-        candidate = HAZER_SYSTEM_GLONASS;
-    } else if ((HAZER_ID_SBASX_FIRST <= id) && (id <= HAZER_ID_SBASX_LAST)) {
-        candidate = HAZER_SYSTEM_SBAS;
-    } else if ((HAZER_ID_IMES_FIRST <= id) && (id <= HAZER_ID_IMES_LAST)) {
-        candidate = HAZER_SYSTEM_IMES;
-    } else if ((HAZER_ID_QZSS_FIRST <= id) && (id <= HAZER_ID_QZSS_LAST)) {
-        candidate = HAZER_SYSTEM_QZSS;
-    } else if ((HAZER_ID_BEIDOU1_FIRST <= id) && (id <= HAZER_ID_BEIDOU1_LAST)) {
-        candidate = HAZER_SYSTEM_BEIDOU;
-    } else if ((HAZER_ID_GALILEO_FIRST <= id) && (id <= HAZER_ID_GALILEO_LAST)) {
-        candidate = HAZER_SYSTEM_GALILEO;
-    } else if ((HAZER_ID_BEIDOU2_FIRST <= id) && (id <= HAZER_ID_BEIDOU2_LAST)) {
-        candidate = HAZER_SYSTEM_BEIDOU;
-    } else {
-        /* Do nothing. */
-    }
-
-    return candidate;
-}
-
-/*
- * NMEA 0183 4.10 p. 94-95.
- * UBLOX8 R15 p. 373.
- */
-hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
-    hazer_system_t system = HAZER_SYSTEM_TOTAL;
-    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
-    int slot = 0;
-    static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
-
-    if ((HAZER_SYSTEM_GPS <= activep->system) && (activep->system <= HAZER_SYSTEM_GALILEO)) {
-        system = (hazer_system_t)activep->system;
-    } else {
-        for (slot = 0; slot < IDENTIFIERS; ++slot) {
-            if (slot >= activep->active) {
-                break;
-            } else if (activep->id[slot] == 0) {
-                break;
-            } else if ((candidate = hazer_map_id_to_system(activep->id[slot])) == HAZER_SYSTEM_TOTAL) {
-                continue;
-            } else {
-                /* Do nothing. */
-            }
-            if (system == HAZER_SYSTEM_TOTAL) {
-                system = candidate;
-            } else if (system == candidate) {
-                continue;
-            } else if (candidate == HAZER_SYSTEM_SBAS) {
-                continue;
-            } else if (system == HAZER_SYSTEM_SBAS) {
-                system = candidate;
-            } else {
-                system = HAZER_SYSTEM_GNSS;
-            }
-        }
-    }
-
-    return system;
 }
 
 int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)

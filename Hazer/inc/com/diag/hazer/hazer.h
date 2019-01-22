@@ -616,7 +616,7 @@ extern uint16_t hazer_parse_dop(const char * string);
 
 /**
  * @def HAZER_NMEA_SENTENCE_RMC
- * SiRF NMEA, Table 1-2, recommended minimum navigation information message C
+ * SiRF NMEA, Table 1-2, recommended minimum navigation information message
  */
 #define HAZER_NMEA_SENTENCE_RMC "RMC"
 

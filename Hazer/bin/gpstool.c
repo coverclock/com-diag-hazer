@@ -1096,6 +1096,11 @@ int main(int argc, char * argv[])
     diminuto_sticks_t was = 0;
     diminuto_sticks_t now = 0;
     diminuto_ticks_t elapsed = 0;
+    /*
+     * Monotonic time related variables.
+     */
+    diminuto_sticks_t updatable = 0;
+    diminuto_sticks_t updating = 0;
     diminuto_sticks_t update = 0;
     diminuto_sticks_t updated = 0;
     /*
@@ -1137,8 +1142,6 @@ int main(int argc, char * argv[])
      ** PREINITIALIZATION
      **/
 
-    update = diminuto_time_elapsed();
-
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
 
     (void)gethostname(Hostname, sizeof(Hostname));
@@ -1149,6 +1152,9 @@ int main(int argc, char * argv[])
     diminuto_log_setmask();
 
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
+
+    updatable = diminuto_frequency_units2ticks(1LL, 10LL); /* 0.1s */
+    update = diminuto_time_elapsed();
 
     /*
      * Parse the command line.
@@ -1995,28 +2001,25 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
+                updating = diminuto_time_elapsed();;
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
-                updated = update;
-                update = diminuto_time_elapsed();
 
             } else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
+                updating = diminuto_time_elapsed();;
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
-                updated = update;
-                update = diminuto_time_elapsed();
 
             } else if (hazer_parse_gll(&position[system], vector, count) == 0) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
+                updating = diminuto_time_elapsed();;
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
-                updated = update;
-                update = diminuto_time_elapsed();
 
             } else if (hazer_parse_vtg(&position[system], vector, count) == 0) {
 
@@ -2105,6 +2108,11 @@ int main(int argc, char * argv[])
 
             /* Do nothing. */
 
+        }
+
+        if ((updating - updated) >= updatable) {
+            updated = update;
+            update = updating;
         }
 
         /*

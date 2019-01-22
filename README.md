@@ -137,6 +137,11 @@ Hazer has been successfully tested with the following GPS devices.
 * TOPGNSS GN-803G (U-Blox UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
 * GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [1] [2] [4] [8]
 
+Hazer has been successfully tested with the following software defined
+radio (SDR) configurations.
+
+* Ettus Research USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [9]
+
 Footnotes:
 
 [0] GlobalSat is the company formerly known as USGlobalSat.    
@@ -147,7 +152,8 @@ Footnotes:
 [5] Receives GPS (U.S.) *or* GLONASS (Russian) constellations via configuration.    
 [6] Supports One Pulse Per Second (1PPS) by toggling digital output pin.    
 [7] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
-[8] Supports UBX.
+[8] Supports UBX.    
+[9] Hardware from National Instruments.    
 
 # Platforms
 
