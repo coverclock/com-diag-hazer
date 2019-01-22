@@ -1118,7 +1118,7 @@ int main(int argc, char * argv[])
     char lsn = '\0';
     int output = 0;
     FILE * fp = (FILE *)0;
-    int refresh = 0;
+    int refresh = !0;
     int index = -1;
     char * end = (char *)0;
     hazer_active_t cache = { 0 };
@@ -1155,6 +1155,7 @@ int main(int argc, char * argv[])
 
     updatable = diminuto_frequency_units2ticks(1LL, 10LL); /* 0.1s */
     update = diminuto_time_elapsed();
+    updated = update;
 
     /*
      * Parse the command line.
@@ -1613,6 +1614,7 @@ int main(int argc, char * argv[])
         if (report) {
         	fprintf(outfp, "INP [%3d]\n", 0);
         	fprintf(outfp, "OUT [%3d]\n", 0);
+            print_local(outfp, errfp, update - updated);
         	fflush(outfp);
         }
     }
