@@ -491,7 +491,7 @@ static void print_local(FILE * fp, FILE * ep, diminuto_sticks_t interarrival)
 
     /*
      * This is where we calculated the elapsed time between this and
-     * the prior update.
+     * the prior solution.
      */
 
     rc = diminuto_time_duration(interarrival, &day, &hour, &minute, &second, &fraction);
@@ -1156,7 +1156,6 @@ int main(int argc, char * argv[])
     updatable = diminuto_frequency_units2ticks(1LL, 10LL); /* 0.1s */
     update = diminuto_time_elapsed();
     updated = update;
-    updating = update;
 
     /*
      * Parse the command line.
@@ -1615,7 +1614,7 @@ int main(int argc, char * argv[])
         if (report) {
         	fprintf(outfp, "INP [%3d]\n", 0);
         	fprintf(outfp, "OUT [%3d]\n", 0);
-            print_local(outfp, errfp, update - updated);
+            print_local(outfp, errfp, updating);
         	fflush(outfp);
         }
     }
@@ -2004,7 +2003,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                updating = diminuto_time_elapsed();
+                update = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
@@ -2012,7 +2011,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                updating = diminuto_time_elapsed();
+                update = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
@@ -2020,7 +2019,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                updating = diminuto_time_elapsed();
+                update = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
@@ -2111,11 +2110,6 @@ int main(int argc, char * argv[])
 
         }
 
-        if ((updating - updated) >= updatable) {
-            updated = update;
-            update = updating;
-        }
-
         /*
          * We only output NMEA sentences to a device, and even then
          * we output the regenerated sentence, not the original one.
@@ -2186,6 +2180,18 @@ int main(int argc, char * argv[])
         }
 
         /*
+         * This is a goofy way to try to discriminate between redundant
+         * updates (e.g. GGA, GLL, RMC) and new (albeit perhaps unchanging)
+         * position solutions. It's only displayed, to help a human judge
+         * how fast things are changing; no logic depends on it.
+         */
+
+        if ((update - updated) >= updatable) {
+            updating = update - updated;
+            updated = update;
+        }
+
+        /*
          * If anything was updated, refresh our display.
          */
 
@@ -2202,7 +2208,7 @@ int main(int argc, char * argv[])
                 DIMINUTO_CRITICAL_SECTION_END;
                 print_hardware(outfp, errfp, &hardware);
                 print_status(outfp, errfp, &status);
-                print_local(outfp, errfp, update - updated);
+                print_local(outfp, errfp, updating);
                 print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
                 print_actives(outfp, errfp, active);
                 print_views(outfp, errfp, view, active, prn);
