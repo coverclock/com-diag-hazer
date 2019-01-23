@@ -115,7 +115,7 @@ static const wchar_t DEGREE = 0x002A;
 
 static const char * Program = (const char *)0;
 
-static char Hostname[9] = { '\0' };
+static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 
 /**
  * Emit an NMEA sentences to the specified stream after adding the ending
@@ -1090,7 +1090,7 @@ int main(int argc, char * argv[])
     yodel_hardware_t hardware = { { 0 } };
     yodel_status_t status = { { 0 } };
     /*
-     * Real-time-related variables.
+     * Real time related variables.
      */
     diminuto_sticks_t frequency = 0;
     diminuto_sticks_t was = 0;
@@ -1156,6 +1156,7 @@ int main(int argc, char * argv[])
     updatable = diminuto_frequency_units2ticks(1LL, 10LL); /* 0.1s */
     update = diminuto_time_elapsed();
     updated = update;
+    updating = update;
 
     /*
      * Parse the command line.
@@ -2003,7 +2004,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                updating = diminuto_time_elapsed();;
+                updating = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
@@ -2011,7 +2012,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                updating = diminuto_time_elapsed();;
+                updating = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
@@ -2019,7 +2020,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                updating = diminuto_time_elapsed();;
+                updating = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
@@ -2029,8 +2030,6 @@ int main(int argc, char * argv[])
                 refresh = !0;
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
-                updated = update;
-                update = diminuto_time_elapsed();
 
             } else if (hazer_parse_gsa(&cache, vector, count) == 0) {
 
