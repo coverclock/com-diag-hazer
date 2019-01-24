@@ -1080,20 +1080,30 @@ Here is the log for a twenty-four hour period.
 
 The durations in this sample last for anywhere from a second to half an hour.
 During this period the transmissions ceased at 20:00MST and resumed at 06:00MST.
-This suggests this is a rogue terrestrial transmitter somewhere in the
-continental United States.
+This seems correlated with typical "working hours" in the U.S. continental
+time zones.
 
-On 2018-12-04, The U. S. Coast Guard straightened me out.
+On 2018-12-04, the U. S. Coast Guard straightened me out.
 
-NOTICE ADVISORY TO NAVSTAR USERS (NANU) 2018042 NANU TYPE: GENERAL
-*** GENERAL MESSAGE TO ALL GPS USERS ***
-ON APPROXIMATELY 10 OCT 2018 SVN36 WILL RESUME TRANSMITTING L-BAND UTILIZING
-PRN04. AT L-BAND ACTIVATION, SVN36/PRN04 WILL BE UNUSABLE UNTIL FURTHER NOTICE.
-ADDITIONALLY, NO BROADCAST ALMANACS WILL INCLUDE SVN36/PRN04 UNTIL FURTHER
-NOTICE.
-*** GENERAL MESSAGE TO ALL GPS USERS ***
+    *** GENERAL MESSAGE TO ALL GPS USERS ***
+    ON APPROXIMATELY 10 OCT 2018 SVN36 WILL RESUME TRANSMITTING L-BAND
+    UTILIZING PRN04. AT L-BAND ACTIVATION, SVN36/PRN04 WILL BE UNUSABLE
+    UNTIL FURTHER NOTICE.  ADDITIONALLY, NO BROADCAST ALMANACS WILL
+    INCLUDE SVN36/PRN04 UNTIL FURTHER NOTICE.
+    *** GENERAL MESSAGE TO ALL GPS USERS ***
 
-Mystery solved!
+On 2018-12-23, the first of the next generation Block IIIA GPS satellites
+was launched.
+
+    *** GENERAL MESSAGE TO ALL GPS USERS ***
+    GPS III SVN74 (PRN04) WAS LAUNCHED ON 23 DEC 2018 (2018 JDAY 357)
+    AT 1351 ZULU. THIS SATELLITE WILL UNDERGO EXTENSIVE ON-ORBIT CHECK
+    OUT AND TESTING PRIOR TO BEING SET HEALTHY.  A USABINIT NANU WILL
+    BE SENT WHEN THE SATELLITE IS SET ACTIVE TO SERVICE.
+    *** GENERAL MESSAGE TO ALL GPS USERS ***
+
+Note that the new satellite uses PRN 4. I suspect now that the earlier use of PRN 4
+by SVN36 was some kind of control segment testing in advance of the launch of SVN74.
 
 # Acknowledgements
 
