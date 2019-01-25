@@ -259,6 +259,8 @@ GPS.G7-SW-12001-B, ublox, 65525, 2013-02-01
 u-blox 8 / u-blox M8, "Receiver Description Including Protocol Specification
 v15-20.30.22-23.01", UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 
+Paul E. Ceruzzi, *GPS*, MIT Press, 2018
+
 # Resources
 
 <http://www.catb.org/gpsd/NMEA.txt>
@@ -304,6 +306,8 @@ v15-20.30.22-23.01", UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 <https://celestrak.com/GPS/NANU/description.php>
 
 <https://www.rtca.org/sites/default/files/intentional_gps_interference_approved.pdf>
+
+<https://www.novatel.com/an-introduction-to-gnss/>
 
 # Build
 
