@@ -226,11 +226,13 @@ mailto:coverclock@diag.com
 
 # Media
 
-<https://flic.kr/s/aHskRMLrx7>
+"Hazer" album, <https://flic.kr/s/aHskRMLrx7>
 
-<https://youtu.be/UluGfpqpiQw>
+"Hazer Test 2017-02-15 15:45 UTC", <https://youtu.be/UluGfpqpiQw>
 
-<https://youtu.be/ZXT_37PvmhE>
+"GN803G and Hazer 8.0.0", <https://youtu.be/ZXT_37PvmhE>
+
+"Time and Space" talk, <https://youtu.be/szoT23ZBcVU>
 
 # Articles
 
