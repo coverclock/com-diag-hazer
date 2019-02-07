@@ -415,9 +415,9 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
  * Print the local (Juliet) time (and the release string).
  * @param fp points to the FILE stream.
  * @param ep points to the FILE stream for errors.
- * @param interarrival is the number of ticks between PNT updates.
+ * @param timetofirstfix is the number of ticks until thr first fix.
  */
-static void print_local(FILE * fp, FILE * ep, diminuto_sticks_t interarrival)
+static void print_local(FILE * fp, FILE * ep, diminuto_sticks_t timetofirstfix)
 {
     int year = 0;
     int month = 0;
@@ -490,21 +490,28 @@ static void print_local(FILE * fp, FILE * ep, diminuto_sticks_t interarrival)
     fprintf(fp, "%+2.2d%c", hour, zone);
 
     /*
-     * This is where we calculated the elapsed time between this and
-     * the prior solution.
+     * This is where we calculate time to first fix.
      */
 
-    rc = diminuto_time_duration(interarrival, &day, &hour, &minute, &second, &fraction);
-    assert(rc >= 0);
-    assert(day >= 0);
-    assert((0 <= hour) && (hour <= 23));
-    assert((0 <= minute) && (minute <= 59));
-    assert((0 <= second) && (second <= 59));
+    if (timetofirstfix >= 0) {
 
-    milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-    assert((0 <= milliseconds) && (milliseconds < 1000LL));
+        rc = diminuto_time_duration(timetofirstfix, &day, &hour, &minute, &second, &fraction);
+        assert(rc >= 0);
+        assert(day >= 0);
+        assert((0 <= hour) && (hour <= 23));
+        assert((0 <= minute) && (minute <= 59));
+        assert((0 <= second) && (second <= 59));
 
-    fprintf(fp, " %10d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
+        milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
+        assert((0 <= milliseconds) && (milliseconds < 1000LL));
+
+        fprintf(fp, " %10d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
+
+    } else {
+
+        fprintf(fp, " %10s/%2s:%2s:%2s.%3s", "*", "**", "**", "**", "***");
+
+    }
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
 
@@ -1099,10 +1106,9 @@ int main(int argc, char * argv[])
     /*
      * Monotonic time related variables.
      */
-    diminuto_sticks_t updatable = 0;
-    diminuto_sticks_t updating = 0;
-    diminuto_sticks_t update = 0;
-    diminuto_sticks_t updated = 0;
+    diminuto_sticks_t epoch = 0;
+    diminuto_sticks_t fix = -1;
+    diminuto_sticks_t timetofirstfix = -1;
     /*
      * Miscellaneous working variables.
      */
@@ -1153,9 +1159,7 @@ int main(int argc, char * argv[])
 
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
 
-    updatable = diminuto_frequency_units2ticks(1LL, 10LL); /* 0.1s */
-    update = diminuto_time_elapsed();
-    updated = update;
+    epoch = diminuto_time_elapsed();
 
     /*
      * Parse the command line.
@@ -1614,7 +1618,7 @@ int main(int argc, char * argv[])
         if (report) {
         	fprintf(outfp, "INP [%3d]\n", 0);
         	fprintf(outfp, "OUT [%3d]\n", 0);
-            print_local(outfp, errfp, updating);
+            print_local(outfp, errfp, timetofirstfix);
         	fflush(outfp);
         }
     }
@@ -2003,7 +2007,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                update = diminuto_time_elapsed();
+                fix = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
@@ -2011,7 +2015,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                update = diminuto_time_elapsed();
+                fix = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
@@ -2019,7 +2023,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                update = diminuto_time_elapsed();
+                fix = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
@@ -2180,15 +2184,15 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * This is a goofy way to try to discriminate between redundant
-         * updates (e.g. GGA, GLL, RMC) and new (albeit perhaps unchanging)
-         * position solutions. It's only displayed, to help a human judge
-         * how fast things are changing; no logic depends on it.
+         * Calculate our time to first fix.
          */
 
-        if ((update - updated) >= updatable) {
-            updating = update - updated;
-            updated = update;
+        if (fix < 0) {
+            /* Do nothing. */
+        } else if (timetofirstfix >= 0) {
+            /* Do nnothing. */
+        } else {
+            timetofirstfix = fix - epoch;
         }
 
         /*
@@ -2208,7 +2212,7 @@ int main(int argc, char * argv[])
                 DIMINUTO_CRITICAL_SECTION_END;
                 print_hardware(outfp, errfp, &hardware);
                 print_status(outfp, errfp, &status);
-                print_local(outfp, errfp, updating);
+                print_local(outfp, errfp, timetofirstfix);
                 print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
                 print_actives(outfp, errfp, active);
                 print_views(outfp, errfp, view, active, prn);

@@ -464,51 +464,47 @@ the display looks something like this snapshot as it is continually updated.
 symbol. This should not be confused with its use as a delimeter in NMEA
 sentences.)
 
-    INP [ 55] $GLGSV,3,3,11,86,36,252,32,87,24,320,31,91,10,309,*53\r\n
-    OUT [  6] \xb5b\x06>\0\0
-    MON -jamming  -history  15indicator  18maximum
-    STA -spoofing -history       4146ms  272695329ms
-    LOC 2018-11-30T12:47:02.660-07:00+00T com-diag-hazer 10.0.0
-    TIM 2018-11-30T19:47:02Z 0pps                                          GNSS
-    POS 39°47'39.18"N, 105°09'12.17"W   39.794219, -105.153381             GNSS
-    ALT    5618.37'   1712.500m                                            GNSS
+    INP [ 31] $GLGSV,3,3,09,85,08,340,22*5E\r\n
+    bUT [  6] \xb5b\x06>\0\0
+    MON +jamming  +history  51indicator  54maximum
+    STA -spoofing -history       2178ms     224177ms     0epoch
+    LOC 2019-02-07T08:43:01.008-07:00+00T          0/00:00:00.054 13.2.0   cadmium
+    TIM 2019-02-07T15:43:01Z 0pps                                          GNSS
+    POS 39°47'39.14"N, 105°09'12.30"W   39.794208, -105.153418             GNSS
+    ALT    5607.87'   1709.300m                                            GNSS
     COG N    0.000°T   0.000°M                                             GNSS
-    SOG      0.043mph      0.037knots      0.069kph                        GNSS
+    SOG      0.028mph      0.024knots      0.044kph                        GNSS
     INT GGA [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    ACT [1]  {    12    10    51    20    32     8 } [ 6] [11]             GPS
-    ACT [2]  {    48    11    31     1    14       } [ 5] [11]             GPS
-    ACT [1]  {    74    80    70    87    85    71 } [ 6] [ 8]             GLONASS
-    ACT [2]  {    86    73                         } [ 2] [ 8]             GLONASS
-    DOP   1.09pdop   0.58hdop   0.92vdop                                   GPS
-    DOP   1.09pdop   0.58hdop   0.92vdop                                   GLONASS
-    SAT [  1]     1:  25°elv  315°azm   33dBHz <                           GPS
-    SAT [  2]     8:   7°elv  251°azm   26dBHz <                           GPS
-    SAT [  3]    10:  52°elv   98°azm   29dBHz <                           GPS
-    SAT [  4]    11:  27°elv  294°azm   30dBHz <                           GPS
-    SAT [  5]    12:   8°elv   64°azm   27dBHz <                           GPS
-    SAT [  6]    14:  73°elv  289°azm   36dBHz <                           GPS
-    SAT [  7]    18:  46°elv  290°azm   36dBHz                             GPS
-    SAT [  8]    20:  25°elv  115°azm   22dBHz <                           GPS
-    SAT [  9]    22:  14°elv  301°azm    0dBHz                             GPS
-    SAT [ 10]    24:   0°elv   36°azm   12dBHz                             GPS
-    SAT [ 11]    25:  12°elv   96°azm    0dBHz                             GPS
-    SAT [ 12]    27:   1°elv  224°azm    0dBHz                             GPS
-    SAT [ 13]    31:  38°elv  182°azm   46dBHz <                           GPS
-    SAT [ 14]    32:  72°elv   14°azm   35dBHz <                           GPS
-    SAT [ 15]    46:  38°elv  215°azm   44dBHz                             GPS
-    SAT [ 16]    48:  36°elv  220°azm   43dBHz <                           GPS
-    SAT [ 17]    51:  44°elv  183°azm   44dBHz <                           GPS
-    SAT [ 18]    70:  38°elv   64°azm   28dBHz <                           GLONASS
-    SAT [ 19]    71:  56°elv  343°azm   40dBHz <                           GLONASS
-    SAT [ 20]    72:  20°elv  293°azm    0dBHz                             GLONASS
-    SAT [ 21]    73:  37°elv  134°azm   41dBHz <                           GLONASS
-    SAT [ 22]    74:   5°elv  171°azm   37dBHz <                           GLONASS
-    SAT [ 23]    79:   2°elv   17°azm   17dBHz                             GLONASS
-    SAT [ 24]    80:  36°elv   56°azm   26dBHz <                           GLONASS
-    SAT [ 25]    85:   8°elv  202°azm   30dBHz <                           GLONASS
-    SAT [ 26]    86:  36°elv  252°azm   32dBHz <                           GLONASS
-    SAT [ 27]    87:  24°elv  320°azm   31dBHz <                           GLONASS
-    SAT [ 28]    91:  10°elv  309°azm    0dBHz                             GLONASS
+    ACT [1]  {    14    32    31    18    10     1 } [ 6] [12]             GPS
+    ACT [2]  {    22    11    51    48    25    20 } [ 6] [12]             GPS
+    ACT [1]  {    68    78    69    77    84    67 } [ 6] [ 9]             GLONASS
+    ACT [2]  {    79    83    85                   } [ 3] [ 9]             GLONASS
+    DOP   1.16pdop   0.59hdop   1.00vdop                                   GPS
+    DOP   1.16pdop   0.59hdop   1.00vdop                                   GLONASS
+    SAT [  1]     1:  36°elv  301°azm   31dBHz <                           GPS
+    SAT [  2]     3:  10°elv  306°azm    0dBHz                             GPS
+    SAT [  3]    10:  37°elv  116°azm   30dBHz <                           GPS
+    SAT [  4]    11:  27°elv  275°azm   22dBHz <                           GPS
+    SAT [  5]    12:  10°elv   49°azm    0dBHz                             GPS
+    SAT [  6]    14:  73°elv  358°azm   32dBHz <                           GPS
+    SAT [  7]    18:  49°elv  261°azm   28dBHz <                           GPS
+    SAT [  8]    20:  11°elv  126°azm   23dBHz <                           GPS
+    SAT [  9]    22:  31°elv  307°azm   34dBHz <                           GPS
+    SAT [ 10]    25:  19°elv   82°azm   22dBHz <                           GPS
+    SAT [ 11]    31:  56°elv  180°azm   40dBHz <                           GPS
+    SAT [ 12]    32:  61°elv   40°azm   33dBHz <                           GPS
+    SAT [ 13]    46:  38°elv  215°azm   38dBHz                             GPS
+    SAT [ 14]    48:  36°elv  220°azm   37dBHz <                           GPS
+    SAT [ 15]    51:  44°elv  183°azm   39dBHz <                           GPS
+    SAT [ 16]    67:  24°elv   84°azm   22dBHz <                           GLONASS
+    SAT [ 17]    68:  59°elv   20°azm   33dBHz <                           GLONASS
+    SAT [ 18]    69:  32°elv  309°azm   35dBHz <                           GLONASS
+    SAT [ 19]    77:  30°elv   39°azm   30dBHz <                           GLONASS
+    SAT [ 20]    78:  53°elv  107°azm   32dBHz <                           GLONASS
+    SAT [ 21]    79:  24°elv  167°azm   33dBHz <                           GLONASS
+    SAT [ 22]    83:  17°elv  228°azm   25dBHz <                           GLONASS
+    SAT [ 23]    84:  30°elv  288°azm   20dBHz <                           GLONASS
+    SAT [ 24]    85:   8°elv  340°azm   22dBHz <                           GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -528,14 +524,15 @@ to spoofing based on comparing navigation solutions from multiple GNSSes if
 available. (N.B. I don't have a way to test this.) Also shown are the
 milliseconds since first fix and milliseconds uptime provided by the message.
 
-LOC is the current local time provided by the host system and (if available
-and enabled) wideband and narrowband jamming indicators and spoofing indicators.
-The local time, with a fractional part in milliseconds, includes the time zone
-offset from UTC in hours and minutes, the current daylight saving time (DST)
-offset in hours, and the military time zone letter. If the time zone offset
-is an even number of hours (some aren't: Newfie Time, I'm looking at you),
-it will be a letter like "T" ("Tango") for Mountain Standard Time as found
-in Denver; otherwise it will be "J" ("Juliet") to indicate any local time zone.
+LOC is the current local time provided by the host system, the elapsed
+time to first fix, the software release number, and the local host name.
+The local time, with a fractional part in milliseconds, includes the time
+zone offset from UTC in hours and minutes, the current daylight saving
+time (DST) offset in hours, and the military time zone letter. If the
+time zone offset is an even number of hours (some aren't: Newfie Time,
+I'm looking at you), it will be a letter like "T" ("Tango") for Mountain
+Standard Time as found in Denver; otherwise it will be "J" ("Juliet")
+to indicate any local time zone.
 
 All subsequent lines represent the current state of Hazer data structures
 updated by data read from the device. Each line includes at its end the system
