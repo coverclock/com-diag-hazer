@@ -950,18 +950,20 @@ hazer_system_t hazer_map_id_to_system(uint16_t id)
         /* Do nothing. */
     } else if ((HAZER_ID_GPS_FIRST <= id) && (id <= HAZER_ID_GPS_LAST)) {
         candidate = HAZER_SYSTEM_GPS;
-    } else if ((HAZER_ID_SBAS_FIRST <= id) && (id <= HAZER_ID_SBAS_LAST)) {
+    } else if ((HAZER_ID_SBAS1_FIRST <= id) && (id <= HAZER_ID_SBAS1_LAST)) {
         candidate = HAZER_SYSTEM_SBAS;
-    } else if ((HAZER_ID_GLONASS_FIRST <= id) && (id <= HAZER_ID_GLONASS_LAST)) {
+    } else if ((HAZER_ID_GLONASS1_FIRST <= id) && (id <= HAZER_ID_GLONASS1_LAST)) {
         candidate = HAZER_SYSTEM_GLONASS;
-    } else if ((HAZER_ID_SBASX_FIRST <= id) && (id <= HAZER_ID_SBASX_LAST)) {
+    } else if ((HAZER_ID_SBAS2_FIRST <= id) && (id <= HAZER_ID_SBAS2_LAST)) {
         candidate = HAZER_SYSTEM_SBAS;
+    } else if ((HAZER_ID_BEIDOU1_FIRST <= id) && (id <= HAZER_ID_BEIDOU1_LAST)) {
+        candidate = HAZER_SYSTEM_BEIDOU;
     } else if ((HAZER_ID_IMES_FIRST <= id) && (id <= HAZER_ID_IMES_LAST)) {
         candidate = HAZER_SYSTEM_IMES;
     } else if ((HAZER_ID_QZSS_FIRST <= id) && (id <= HAZER_ID_QZSS_LAST)) {
         candidate = HAZER_SYSTEM_QZSS;
-    } else if ((HAZER_ID_BEIDOU1_FIRST <= id) && (id <= HAZER_ID_BEIDOU1_LAST)) {
-        candidate = HAZER_SYSTEM_BEIDOU;
+    } else if ((HAZER_ID_GLONASS2_FIRST <= id) && (id <= HAZER_ID_GLONASS2_LAST)) {
+        candidate = HAZER_SYSTEM_GLONASS;
     } else if ((HAZER_ID_GALILEO_FIRST <= id) && (id <= HAZER_ID_GALILEO_LAST)) {
         candidate = HAZER_SYSTEM_GALILEO;
     } else if ((HAZER_ID_BEIDOU2_FIRST <= id) && (id <= HAZER_ID_BEIDOU2_LAST)) {
@@ -983,9 +985,16 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
     int slot = 0;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
 
-    if ((HAZER_SYSTEM_GPS <= activep->system) && (activep->system <= HAZER_SYSTEM_GALILEO)) {
+    switch (activep->system) {
+    case HAZER_SYSTEM_GPS:
+    case HAZER_SYSTEM_SBAS:
+    case HAZER_SYSTEM_GALILEO:
+    case HAZER_SYSTEM_BEIDOU:
+    case HAZER_SYSTEM_QZSS:
+    case HAZER_SYSTEM_GLONASS:
         system = (hazer_system_t)activep->system;
-    } else {
+        break;
+    default:
         for (slot = 0; slot < IDENTIFIERS; ++slot) {
             if (slot >= activep->active) {
                 break;
@@ -1008,6 +1017,7 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
                 system = HAZER_SYSTEM_GNSS;
             }
         }
+        break;
     }
 
     return system;

@@ -64,9 +64,10 @@ int main(void)
 
     for (id = 0, index = 0; index <= 0xffff; ++index, ++id) {
         UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GPS_FIRST, HAZER_ID_GPS_LAST, HAZER_SYSTEM_GPS)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBAS_FIRST, HAZER_ID_SBAS_LAST, HAZER_SYSTEM_SBAS)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GLONASS_FIRST, HAZER_ID_GLONASS_LAST, HAZER_SYSTEM_GLONASS)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBASX_FIRST, HAZER_ID_SBASX_LAST, HAZER_SYSTEM_SBAS)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBAS1_FIRST, HAZER_ID_SBAS1_LAST, HAZER_SYSTEM_SBAS)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBAS2_FIRST, HAZER_ID_SBAS2_LAST, HAZER_SYSTEM_SBAS)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GLONASS1_FIRST, HAZER_ID_GLONASS1_LAST, HAZER_SYSTEM_GLONASS)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GLONASS2_FIRST, HAZER_ID_GLONASS2_LAST, HAZER_SYSTEM_GLONASS)
         UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_IMES_FIRST, HAZER_ID_IMES_LAST, HAZER_SYSTEM_IMES)
         UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_QZSS_FIRST, HAZER_ID_QZSS_LAST, HAZER_SYSTEM_QZSS)
         UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU1_FIRST, HAZER_ID_BEIDOU1_LAST, HAZER_SYSTEM_BEIDOU)
@@ -87,7 +88,7 @@ int main(void)
                         HAZER_ID_GPS_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 4,
         };
 
@@ -99,11 +100,11 @@ int main(void)
         static const hazer_active_t ACTIVE = {
                 NULL,
                 {
-                    HAZER_ID_SBAS_FIRST,
-                    HAZER_ID_SBAS_LAST,
+                    HAZER_ID_SBAS1_FIRST,
+                    HAZER_ID_SBAS1_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 2,
         };
 
@@ -115,11 +116,11 @@ int main(void)
         static const hazer_active_t ACTIVE = {
                 NULL,
                 {
-                    HAZER_ID_SBASX_FIRST,
-                    HAZER_ID_SBASX_LAST,
+                    HAZER_ID_SBAS2_FIRST,
+                    HAZER_ID_SBAS2_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 2,
         };
 
@@ -131,12 +132,12 @@ int main(void)
         static const hazer_active_t ACTIVE = {
                 NULL,
                 {
-                    HAZER_ID_SBAS_FIRST,
+                    HAZER_ID_SBAS1_FIRST,
                     HAZER_ID_GPS_FIRST,
-                    HAZER_ID_SBAS_LAST,
+                    HAZER_ID_SBAS1_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -149,11 +150,11 @@ int main(void)
                 NULL,
                 {
                     HAZER_ID_GPS_FIRST,
-                    HAZER_ID_SBAS_FIRST,
-                    HAZER_ID_SBAS_LAST,
+                    HAZER_ID_SBAS1_FIRST,
+                    HAZER_ID_SBAS1_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -165,13 +166,47 @@ int main(void)
         static const hazer_active_t ACTIVE = {
                 NULL,
                 {
-                    HAZER_ID_GLONASS_FIRST,
-                    HAZER_ID_GLONASS_FIRST + 1,
-                    HAZER_ID_GLONASS_LAST,
+                    HAZER_ID_GLONASS1_FIRST,
+                    HAZER_ID_GLONASS1_FIRST + 1,
+                    HAZER_ID_GLONASS1_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GLONASS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_GLONASS2_FIRST,
+					HAZER_ID_GLONASS2_LAST,
+                },
+                0, 0, 0,
+				HAZER_SYSTEM_TOTAL,
+                3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GLONASS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_ID_GLONASS1_FIRST,
+					HAZER_ID_GLONASS1_LAST,
+                    HAZER_ID_GLONASS2_FIRST,
+					HAZER_ID_GLONASS2_LAST,
+                },
+                0, 0, 0,
+				HAZER_SYSTEM_TOTAL,
+                4,
         };
 
         assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GLONASS);
@@ -187,7 +222,7 @@ int main(void)
                     HAZER_ID_BEIDOU1_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -204,7 +239,7 @@ int main(void)
                     HAZER_ID_BEIDOU2_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -221,7 +256,7 @@ int main(void)
                     HAZER_ID_QZSS_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -235,11 +270,11 @@ int main(void)
                 {
                     HAZER_ID_GPS_FIRST,
                     HAZER_ID_GPS_LAST,
-                    HAZER_ID_GLONASS_FIRST,
-                    HAZER_ID_GLONASS_LAST,
+                    HAZER_ID_GLONASS1_FIRST,
+                    HAZER_ID_GLONASS1_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 4,
         };
 
@@ -252,12 +287,12 @@ int main(void)
                 NULL,
                 {
                     HAZER_ID_GPS_FIRST,
-                    HAZER_ID_GLONASS_FIRST,
+                    HAZER_ID_GLONASS1_FIRST,
                     HAZER_ID_GPS_LAST,
-                    HAZER_ID_GLONASS_LAST,
+                    HAZER_ID_GLONASS1_LAST,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 4,
         };
 
@@ -294,7 +329,7 @@ int main(void)
                     100,
                 },
                 0, 0, 0,
-                0,
+				HAZER_SYSTEM_TOTAL,
                 4,
         };
 
@@ -306,7 +341,6 @@ int main(void)
 
     {
         static const hazer_view_t VIEW[HAZER_SYSTEM_TOTAL] = {
-                { NULL }, /* GNSS */
                 {
                     NULL,
                     {
@@ -322,27 +356,30 @@ int main(void)
                 {
                     NULL,
                     {
-                        { HAZER_ID_GLONASS_FIRST, 0, 0, 0 },
-                        { HAZER_ID_GLONASS_FIRST + 1, 0, 0, 0 },
-                        { HAZER_ID_GLONASS_LAST, 0, 0, 0 },
-                    },
-                    3,
-                    0,
-                    0,
-                },
-                { NULL }, /* GALILEO */
-                {
-                    NULL,
-                    {
-                        { HAZER_ID_SBAS_FIRST, 0, 0, 0},
-                        { HAZER_ID_SBAS_LAST, 0, 0, 0 },
+                        { HAZER_ID_SBAS1_FIRST, 0, 0, 0},
+                        { HAZER_ID_SBAS1_LAST, 0, 0, 0 },
                     },
                     2,
                     0,
                     0,
                 },
+	            { NULL }, /* GALILEO */
                 { NULL }, /* BEIDOU */
+                { NULL }, /* 4 */
                 { NULL }, /* QZSS */
+                {
+                    NULL,
+                    {
+                        { HAZER_ID_GLONASS1_FIRST, 0, 0, 0 },
+                        { HAZER_ID_GLONASS1_FIRST + 1, 0, 0, 0 },
+                        { HAZER_ID_GLONASS1_LAST, 0, 0, 0 },
+                    },
+                    3,
+                    0,
+                    0,
+                },
+                { NULL }, /* IMES */
+                { NULL }, /* GNSS */
         };
 
         assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
@@ -351,14 +388,14 @@ int main(void)
         assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST + 3, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
         assert(hazer_map_svid_to_system(HAZER_ID_GPS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
 
-        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
-        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
-        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_FIRST + 2, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
-        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS1_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS1_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
+        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS1_FIRST + 2, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
+        assert(hazer_map_svid_to_system(HAZER_ID_GLONASS1_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GLONASS);
 
-        assert(hazer_map_svid_to_system(HAZER_ID_SBAS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_SBAS);
-        assert(hazer_map_svid_to_system(HAZER_ID_SBAS_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
-        assert(hazer_map_svid_to_system(HAZER_ID_SBAS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_SBAS);
+        assert(hazer_map_svid_to_system(HAZER_ID_SBAS1_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_SBAS);
+        assert(hazer_map_svid_to_system(HAZER_ID_SBAS1_FIRST + 1, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_TOTAL);
+        assert(hazer_map_svid_to_system(HAZER_ID_SBAS1_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_SBAS);
 
     }
 

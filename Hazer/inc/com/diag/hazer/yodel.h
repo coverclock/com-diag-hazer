@@ -116,6 +116,18 @@ typedef struct YodelUbxHeader {
 } yodel_ubx_header_t __attribute__ ((__aligned__(2)));
 
 /**
+ * @define YODEL_UBX_HEADER_INITIALIZER
+ * Initialize a YodelUbxHeader structure.
+ */
+#define YODEL_UBX_HEADER_INITIALIZER \
+    { \
+	    0, 0, \
+		0, \
+		0, \
+		0 \
+    }
+
+/**
  * Yodel state machine states. The only states the application needs
  * to take action on are START (to initialize the state), EOF (end of file
  * on the input stream), and END (complete NMEA sentence in buffer). The
@@ -233,6 +245,27 @@ typedef struct YodelUbxMonHw {
 } yodel_ubx_mon_hw_t;
 
 /**
+ * @define YODEL_UBX_MON_HW_INITIALIZER
+ * Initialize a YodelUbxMonHw structure.
+ */
+#define YODEL_UBX_MON_HW_INITIALIZER \
+    { \
+	    0, 0, 0, 0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		{ 0, }, \
+		0, \
+		{ 0, }, \
+		0, \
+		0, 0 \
+    }
+
+/**
  * UBX-MON-HW constants.
  */
 enum YodelUbxMonHwConstants {
@@ -289,6 +322,17 @@ typedef struct YodelHardware {
     uint8_t unused[3];
 } yodel_hardware_t;
 
+/**
+ * @define YODEL_HARDWARE_INITIALIZER
+ * Initialize a YodelHardware structure.
+ */
+#define YODEL_HARDWARE_INITIALIZER \
+    { \
+	    YODEL_UBX_MON_HW_INITIALIZER, \
+		0, \
+		{ 0, } \
+    }
+
 /*******************************************************************************
  * PROCESSING UBX-NAV_STATUS MESSAGES
  ******************************************************************************/
@@ -306,6 +350,21 @@ typedef struct YodelUbxNavStatus {
     uint32_t ttff;
     uint32_t msss;
 } yodel_ubx_nav_status_t;
+
+/**
+ * @define YODEL_UBX_NAV_STATUS_INITIALIZER
+ * Initialize a YodelHardware structure.
+ */
+#define YODEL_UBX_NAV_STATUS_INITIALIZER \
+    { \
+	    0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		0 \
+    }
 
 /**
  * UBX-NAV-STATUS constants.
@@ -415,6 +474,17 @@ typedef struct YodelStatus {
     uint8_t ticks;					/* Lifetime in application-defined ticks. */
     uint8_t unused[3];
 } yodel_status_t;
+
+/**
+ * @define YODEL_STATUS_INITIALIZER
+ * Initialize a YodelHardware structure.
+ */
+#define YODEL_STATUS_INITIALIZER \
+    { \
+	    YODEL_UBX_NAV_STATUS_INITIALIZER, \
+		0, \
+		{ 0, } \
+    }
 
 /******************************************************************************
  * ENDIAN CONVERSION

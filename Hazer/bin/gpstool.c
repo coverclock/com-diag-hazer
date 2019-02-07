@@ -1059,7 +1059,7 @@ int main(int argc, char * argv[])
      * NMEA parser state variables.
      */
     hazer_state_t nmea_state = HAZER_STATE_EOF;
-    hazer_buffer_t nmea_buffer = { 0 };
+    hazer_buffer_t nmea_buffer = HAZER_BUFFER_INITIALIZER;
     char * nmea_bb = (char *)0;
     size_t nmea_ss = 0;
     uint8_t nmea_cs = 0;
@@ -1068,7 +1068,7 @@ int main(int argc, char * argv[])
      * UBX parser state variables.
      */
     yodel_state_t ubx_state = YODEL_STATE_EOF;
-    yodel_buffer_t ubx_buffer = { 0 };
+    yodel_buffer_t ubx_buffer = HAZER_BUFFER_INITIALIZER;
     char * ubx_bb = (char *)0;
     size_t ubx_ss = 0;
     size_t ubx_ll = 0;
@@ -1082,20 +1082,50 @@ int main(int argc, char * argv[])
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
     hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
-    hazer_buffer_t synthesized = { 0 };
-    hazer_vector_t vector = { 0 };
+    hazer_buffer_t synthesized = HAZER_BUFFER_INITIALIZER;
+    hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
     format_t format = FORMAT;
     /*
      * NMEA state databases.
      */
-    hazer_position_t position[HAZER_SYSTEM_TOTAL] = { { 0 } };
-    hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0 } };
-    hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0 } };
+    hazer_position_t position[HAZER_SYSTEM_TOTAL] = {
+    	HAZER_POSITION_INITIALIZER,
+    	HAZER_POSITION_INITIALIZER,
+    	HAZER_POSITION_INITIALIZER,
+    	HAZER_POSITION_INITIALIZER,
+    	HAZER_POSITION_INITIALIZER,
+    	HAZER_POSITION_INITIALIZER,
+    	HAZER_POSITION_INITIALIZER,
+    	HAZER_POSITION_INITIALIZER,
+    	HAZER_POSITION_INITIALIZER,
+    };
+    hazer_active_t active[HAZER_SYSTEM_TOTAL] = {
+    	HAZER_ACTIVE_INITIALIZER,
+    	HAZER_ACTIVE_INITIALIZER,
+    	HAZER_ACTIVE_INITIALIZER,
+    	HAZER_ACTIVE_INITIALIZER,
+    	HAZER_ACTIVE_INITIALIZER,
+    	HAZER_ACTIVE_INITIALIZER,
+    	HAZER_ACTIVE_INITIALIZER,
+    	HAZER_ACTIVE_INITIALIZER,
+    	HAZER_ACTIVE_INITIALIZER,
+	};
+    hazer_view_t view[HAZER_SYSTEM_TOTAL] = {
+    	HAZER_VIEW_INITIALIZER,
+    	HAZER_VIEW_INITIALIZER,
+    	HAZER_VIEW_INITIALIZER,
+    	HAZER_VIEW_INITIALIZER,
+    	HAZER_VIEW_INITIALIZER,
+    	HAZER_VIEW_INITIALIZER,
+    	HAZER_VIEW_INITIALIZER,
+    	HAZER_VIEW_INITIALIZER,
+    	HAZER_VIEW_INITIALIZER,
+    };
     /*
      * UBX state databases.
      */
-    yodel_hardware_t hardware = { { 0 } };
-    yodel_status_t status = { { 0 } };
+    yodel_hardware_t hardware = YODEL_HARDWARE_INITIALIZER;
+    yodel_status_t status = YODEL_STATUS_INITIALIZER;
     /*
      * Real time related variables.
      */
@@ -1127,7 +1157,7 @@ int main(int argc, char * argv[])
     int refresh = !0;
     int index = -1;
     char * end = (char *)0;
-    hazer_active_t cache = { 0 };
+    hazer_active_t cache = HAZER_ACTIVE_INITIALIZER;
     int dmyokay = 0;
     int totokay = 0;
     size_t limitation = 0;

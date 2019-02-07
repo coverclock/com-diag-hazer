@@ -44,6 +44,9 @@
  * "u-blox 8 / u-blox M8 Receiver Description Including Protocol Specification",
  * UBX-13003221-R15, ublox AG, 2018-03-06
  *
+ * "u-blox ZED-F9P Interface Description*, UBX-18010854-R05, ublox AG,
+ * 2018-12-20
+ *
  * Eric S. Raymond, "NMEA Revealed", 2.21, http://www.catb.org/gpsd/NMEA.html,
  * 2016-01
  *
@@ -260,18 +263,20 @@ extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
 /**
  * GNSS system identifiers.
  * NMEA 0183 4.10 table 20 p. 94-95.
- * Everything beyond Galileo is really just a guess on my part.
+ * UBLOX9 R05, p. 242.
+ * These values are ONE GREATER than the documented system identifiers.
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerSystem {
-    HAZER_SYSTEM_GNSS				= 0,
-    HAZER_SYSTEM_GPS				= 1,
-    HAZER_SYSTEM_GLONASS			= 2,
-    HAZER_SYSTEM_GALILEO			= 3,
-    HAZER_SYSTEM_SBAS,
-    HAZER_SYSTEM_BEIDOU,
-    HAZER_SYSTEM_QZSS,
+    HAZER_SYSTEM_GPS				= 0,
+    HAZER_SYSTEM_SBAS				= 1,
+    HAZER_SYSTEM_GALILEO			= 2,
+    HAZER_SYSTEM_BEIDOU				= 3,
+	/*                                4, */
+    HAZER_SYSTEM_QZSS				= 5,
+    HAZER_SYSTEM_GLONASS			= 6,
     HAZER_SYSTEM_IMES,
+    HAZER_SYSTEM_GNSS,
     HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 
@@ -286,14 +291,15 @@ typedef enum HazerSystem {
  */
 #define HAZER_SYSTEM_NAME_INITIALIZER \
     { \
-        "GNSS", \
         "GPS", \
-        "GLONASS", \
-        "GALILEO", \
         "SBAS", \
+        "GALILEO", \
         "BEIDOU", \
+		"", \
         "QZSS", \
+        "GLONASS", \
         "IMES", \
+        "GNSS", \
         (const char *)0, \
     }
 
@@ -301,6 +307,7 @@ typedef enum HazerSystem {
  * GNSS satellite identifiers.
  * NMEA 0183 4.10 p. 94.
  * UBLOX8 R15 p. 373.
+ * UBLOX9 R05 p. 242.
  * There are some conflicts between these documents, and the best receiver I
  * have only does GPS, SBAS, and GLONASS, so much of this is guess work on
  * my part.
@@ -308,41 +315,52 @@ typedef enum HazerSystem {
 typedef enum HazerId {
     /*                        0,     */
     HAZER_ID_GPS_FIRST		= 1,
+	/*                        :      */
     HAZER_ID_GPS_LAST		= 32,
-    HAZER_ID_SBAS_FIRST		= 33,
-    HAZER_ID_SBAS_LAST		= 64,
-    HAZER_ID_GLONASS_FIRST	= 65,
-    HAZER_ID_GLONASS_LAST	= 96,
+    HAZER_ID_SBAS1_FIRST	= 33,
+	/*                        :      */
+    HAZER_ID_SBAS1_LAST		= 64,
+    HAZER_ID_GLONASS1_FIRST	= 65,
+	/*                        :      */
+    HAZER_ID_GLONASS1_LAST	= 96,
     /*						  97,    */
     /*						   :     */
-    /*						  151,   */
-    HAZER_ID_SBASX_FIRST	= 152,
-    HAZER_ID_SBASX_LAST		= 158,
-    /*						  159,   */
+    /*						  119,   */
+    HAZER_ID_SBAS2_FIRST	= 120,
+	/*                        :      */
+    HAZER_ID_SBAS2_LAST		= 158,
+    HAZER_ID_BEIDOU1_FIRST	= 159,
+	/*                        :      */
+    HAZER_ID_BEIDOU1_LAST	= 163,
+    /*						  164,   */
     /*						   :     */
     /*						  172,   */
     HAZER_ID_IMES_FIRST		= 173,
+	/*                        :      */
     HAZER_ID_IMES_LAST		= 182,
     /*						  183,   */
     /*						   :     */
     /*						  192,   */
     HAZER_ID_QZSS_FIRST		= 193,
+	/*                        :      */
     HAZER_ID_QZSS_LAST		= 197,
     /*						  198,   */
     /*						   :     */
-    /*						  200,   */
-    HAZER_ID_BEIDOU1_FIRST	= 201,
-    HAZER_ID_BEIDOU1_LAST	= 235,
-    /*						  236,   */
+    /*						  254,   */
+    HAZER_ID_GLONASS2_FIRST	= 255,
+    HAZER_ID_GLONASS2_LAST	= 255,
+    /*						  256,   */
     /*						   :     */
     /*						  300,   */
     HAZER_ID_GALILEO_FIRST	= 301,
+	/*                        :      */
     HAZER_ID_GALILEO_LAST	= 336,
     /*						  337,   */
     /*						   :     */
     /*						  400,   */
     HAZER_ID_BEIDOU2_FIRST	= 401,
-    HAZER_ID_BEIDOU2_LAST	= 437,
+	/*                        :      */
+   HAZER_ID_BEIDOU2_LAST	= 437,
     /*						  438,   */
     /*						   :     */
     /*						  65535, */
@@ -359,6 +377,12 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
  * NMEA 0183 4.10, 5.3, p. 11
  */
 typedef unsigned char (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
+
+/**
+ * @define HAZER_BUFFER_INITIALIZER
+ * Initialize a HazerBuffer type.
+ */
+#define HAZER_BUFFER_INITIALIZER  { '\0', }
 
 /**
  * Process a single character of stimulus for the state machine that is
@@ -436,6 +460,12 @@ extern ssize_t hazer_length(const void * buffer, size_t size);
  * the last position.
  */
 typedef char * (hazer_vector_t)[HAZER_NMEA_LONGEST - HAZER_NMEA_SHORTEST + 1]; /* plus NULL */
+
+/**
+ * @define HAZER_VECTOR_INITIALIZER
+ * Initialize a HazerVector type.
+ */
+#define HAZER_VECTOR_INITIALIZER  { (char *)0, }
 
 /**
  * Tokenize an NMEA sentence by splitting it into substrings whose pointers
@@ -705,6 +735,22 @@ typedef struct HazerPosition {
 } hazer_position_t;
 
 /**
+ * @define HAZER_POSITION_INITIALIZER
+ * Initialize a HazerPosition structure.
+ */
+#define HAZER_POSITION_INITIALIZER \
+    { \
+	    0, 0, 0, 0, \
+        0, 0, 0, \
+		0, 0, 0, 0, \
+		(const char *)0, \
+		0, \
+		0, 0, 0, 0, 0, 0, 0, \
+		0, \
+		{ 0, } \
+    }
+
+/**
  * Parse a GGA NMEA sentence, updating the position.
  * @param positionp points to the position structure (initialized to zeros).
  * @param vector contains the words in the NMEA sentence.
@@ -755,11 +801,26 @@ typedef struct HazerActive {
     uint16_t pdop;				/* Position Dilution Of Precision * 100. */
     uint16_t hdop;				/* Horizontal Dilution Of Precision * 100. */
     uint16_t vdop;				/* Vertical Dilution Of Precision * 100. */
-    uint8_t system;				/* GNSS System ID (zero == unused). */
+    uint8_t system;				/* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
     uint8_t active;             /* Number of satellites active. */
     uint8_t ticks;				/* Lifetime in application-defined ticks. */
     uint8_t unused[1];          /* Unused. */
 } hazer_active_t;
+
+/**
+ * @define HAZER_ACTIVE_INITIALIZER
+ * Initialize a HazerActive structure.
+ */
+#define HAZER_ACTIVE_INITIALIZER \
+    { \
+	    (const char *)0, \
+		{ 0, }, \
+		0, 0, 0, \
+		HAZER_SYSTEM_TOTAL, \
+		0, \
+		0, \
+		{ 0, } \
+    }
 
 /**
  * Parse a GSA NMEA sentence, updating the constellation.
@@ -804,6 +865,20 @@ typedef struct HazerSatellite {
 } hazer_satellite_t;
 
 /**
+ * @define HAZER_SATELLITE_INITIALIZER
+ * Initialize a HazerSatellite structure.
+ */
+#define HAZER_SATELLITE_INITIALIZER \
+    { \
+	    0, \
+		0, 0, \
+		0, \
+		0, \
+		0, \
+		0 \
+    }
+
+/**fg
  * This structure maintains the information on as many satellites as we
  * have channels configured. THIS OBJECT SHOULD BE INITIALIZED TO ALL ZEROS.
  */
@@ -816,6 +891,21 @@ typedef struct HazerView {
     uint8_t ticks;				/* Lifetime in application-defined ticks. */
     uint8_t unused[5];          /* Unused. */
 } hazer_view_t;
+
+/**
+ * @define HAZER_VIEW_INITIALIZER
+ * Initialize a HazerView structure.
+ */
+#define HAZER_VIEW_INITIALIZER \
+    { \
+	    (const char *)0, \
+		{ 0, }, \
+		0, \
+		0, \
+		0, \
+		0, \
+		{ 0, } \
+    }
 
 /**
  * Parse a GSV NMEA sentence, updating the constellation.
