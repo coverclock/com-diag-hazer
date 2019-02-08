@@ -1,5 +1,5 @@
 # vi: set ts=4 shiftwidth=4:
-# Copyright 2017-2018 Digital Aggregates Corporation
+# Copyright 2017-2019 Digital Aggregates Corporation
 # Licensed under the terms in README.h
 # author:Chip Overclock
 # mailto:coverclock@diag.com
@@ -20,8 +20,8 @@ default:	all
 
 TITLE				:=	Hazer
 
-MAJOR				:=	13# API changes that may require that applications be modified.
-MINOR				:=	3# Only functionality or features added with no legacy API changes.
+MAJOR				:=	14# API changes that may require that applications be modified.
+MINOR				:=	0# Only functionality or features added with no legacy API changes.
 BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my

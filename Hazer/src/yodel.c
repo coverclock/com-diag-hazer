@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2017-2018 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2017-2019 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-hazer<BR>
