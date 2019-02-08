@@ -950,20 +950,16 @@ hazer_system_t hazer_map_id_to_system(uint16_t id)
         /* Do nothing. */
     } else if ((HAZER_ID_GPS_FIRST <= id) && (id <= HAZER_ID_GPS_LAST)) {
         candidate = HAZER_SYSTEM_GPS;
-    } else if ((HAZER_ID_SBAS1_FIRST <= id) && (id <= HAZER_ID_SBAS1_LAST)) {
+    } else if ((HAZER_ID_SBAS_FIRST <= id) && (id <= HAZER_ID_SBAS_LAST)) {
         candidate = HAZER_SYSTEM_SBAS;
-    } else if ((HAZER_ID_GLONASS1_FIRST <= id) && (id <= HAZER_ID_GLONASS1_LAST)) {
+    } else if ((HAZER_ID_GLONASS_FIRST <= id) && (id <= HAZER_ID_GLONASS_LAST)) {
         candidate = HAZER_SYSTEM_GLONASS;
-    } else if ((HAZER_ID_SBAS2_FIRST <= id) && (id <= HAZER_ID_SBAS2_LAST)) {
-        candidate = HAZER_SYSTEM_SBAS;
     } else if ((HAZER_ID_BEIDOU1_FIRST <= id) && (id <= HAZER_ID_BEIDOU1_LAST)) {
         candidate = HAZER_SYSTEM_BEIDOU;
     } else if ((HAZER_ID_IMES_FIRST <= id) && (id <= HAZER_ID_IMES_LAST)) {
         candidate = HAZER_SYSTEM_IMES;
     } else if ((HAZER_ID_QZSS_FIRST <= id) && (id <= HAZER_ID_QZSS_LAST)) {
         candidate = HAZER_SYSTEM_QZSS;
-    } else if ((HAZER_ID_GLONASS2_FIRST <= id) && (id <= HAZER_ID_GLONASS2_LAST)) {
-        candidate = HAZER_SYSTEM_GLONASS;
     } else if ((HAZER_ID_GALILEO_FIRST <= id) && (id <= HAZER_ID_GALILEO_LAST)) {
         candidate = HAZER_SYSTEM_GALILEO;
     } else if ((HAZER_ID_BEIDOU2_FIRST <= id) && (id <= HAZER_ID_BEIDOU2_LAST)) {

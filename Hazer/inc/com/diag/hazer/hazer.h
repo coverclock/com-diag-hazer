@@ -260,23 +260,22 @@ typedef enum HazerTalker {
  */
 extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
 
+
 /**
  * GNSS system identifiers.
  * NMEA 0183 4.10 table 20 p. 94-95.
- * UBLOX9 R05, p. 242.
- * These values are ONE GREATER than the documented system identifiers.
+ * Everything beyond Galileo is really just a guess on my part.
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerSystem {
-    HAZER_SYSTEM_GPS				= 0,
-    HAZER_SYSTEM_SBAS				= 1,
-    HAZER_SYSTEM_GALILEO			= 2,
-    HAZER_SYSTEM_BEIDOU				= 3,
-	/*                                4, */
-    HAZER_SYSTEM_QZSS				= 5,
-    HAZER_SYSTEM_GLONASS			= 6,
+    HAZER_SYSTEM_GNSS				= 0,
+    HAZER_SYSTEM_GPS				= 1,
+    HAZER_SYSTEM_GLONASS			= 2,
+    HAZER_SYSTEM_GALILEO			= 3,
+    HAZER_SYSTEM_SBAS,
+    HAZER_SYSTEM_BEIDOU,
+    HAZER_SYSTEM_QZSS,
     HAZER_SYSTEM_IMES,
-    HAZER_SYSTEM_GNSS,
     HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 
@@ -291,15 +290,14 @@ typedef enum HazerSystem {
  */
 #define HAZER_SYSTEM_NAME_INITIALIZER \
     { \
-        "GPS", \
-        "SBAS", \
-        "GALILEO", \
-        "BEIDOU", \
-		"", \
-        "QZSS", \
-        "GLONASS", \
-        "IMES", \
         "GNSS", \
+        "GPS", \
+        "GLONASS", \
+        "GALILEO", \
+        "SBAS", \
+        "BEIDOU", \
+        "QZSS", \
+        "IMES", \
         (const char *)0, \
     }
 
@@ -307,7 +305,6 @@ typedef enum HazerSystem {
  * GNSS satellite identifiers.
  * NMEA 0183 4.10 p. 94.
  * UBLOX8 R15 p. 373.
- * UBLOX9 R05 p. 242.
  * There are some conflicts between these documents, and the best receiver I
  * have only does GPS, SBAS, and GLONASS, so much of this is guess work on
  * my part.
@@ -315,52 +312,41 @@ typedef enum HazerSystem {
 typedef enum HazerId {
     /*                        0,     */
     HAZER_ID_GPS_FIRST		= 1,
-	/*                        :      */
     HAZER_ID_GPS_LAST		= 32,
-    HAZER_ID_SBAS1_FIRST	= 33,
-	/*                        :      */
-    HAZER_ID_SBAS1_LAST		= 64,
-    HAZER_ID_GLONASS1_FIRST	= 65,
-	/*                        :      */
-    HAZER_ID_GLONASS1_LAST	= 96,
+    HAZER_ID_SBAS_FIRST		= 33,
+    HAZER_ID_SBAS_LAST		= 64,
+    HAZER_ID_GLONASS_FIRST	= 65,
+    HAZER_ID_GLONASS_LAST	= 96,
     /*						  97,    */
     /*						   :     */
-    /*						  119,   */
-    HAZER_ID_SBAS2_FIRST	= 120,
-	/*                        :      */
-    HAZER_ID_SBAS2_LAST		= 158,
-    HAZER_ID_BEIDOU1_FIRST	= 159,
-	/*                        :      */
-    HAZER_ID_BEIDOU1_LAST	= 163,
-    /*						  164,   */
+    /*						  151,   */
+    HAZER_ID_SBASX_FIRST	= 152,
+    HAZER_ID_SBASX_LAST		= 158,
+    /*						  159,   */
     /*						   :     */
     /*						  172,   */
     HAZER_ID_IMES_FIRST		= 173,
-	/*                        :      */
     HAZER_ID_IMES_LAST		= 182,
     /*						  183,   */
     /*						   :     */
     /*						  192,   */
     HAZER_ID_QZSS_FIRST		= 193,
-	/*                        :      */
     HAZER_ID_QZSS_LAST		= 197,
     /*						  198,   */
     /*						   :     */
-    /*						  254,   */
-    HAZER_ID_GLONASS2_FIRST	= 255,
-    HAZER_ID_GLONASS2_LAST	= 255,
-    /*						  256,   */
+    /*						  200,   */
+    HAZER_ID_BEIDOU1_FIRST	= 201,
+    HAZER_ID_BEIDOU1_LAST	= 235,
+    /*						  236,   */
     /*						   :     */
     /*						  300,   */
     HAZER_ID_GALILEO_FIRST	= 301,
-	/*                        :      */
     HAZER_ID_GALILEO_LAST	= 336,
     /*						  337,   */
     /*						   :     */
     /*						  400,   */
     HAZER_ID_BEIDOU2_FIRST	= 401,
-	/*                        :      */
-   HAZER_ID_BEIDOU2_LAST	= 437,
+    HAZER_ID_BEIDOU2_LAST	= 437,
     /*						  438,   */
     /*						   :     */
     /*						  65535, */

@@ -216,6 +216,109 @@ extern const void * yodel_checksum(const void * buffer, size_t size, uint8_t * c
  */
 extern ssize_t yodel_length(const void * buffer, size_t size);
 
+/******************************************************************************
+ *
+ ******************************************************************************/
+
+/**
+ * UBX system identifiers.
+ * UBLOX9 R05, p. 242.
+ * These must be in the same order as the corresponding strings below.
+ */
+typedef enum YodelSystem {
+    YODEL_SYSTEM_GPS				= 0,
+    YODEL_SYSTEM_SBAS				= 1,
+    YODEL_SYSTEM_GALILEO			= 2,
+    YODEL_SYSTEM_BEIDOU				= 3,
+/*  UNUSED                            4, */
+    YODEL_SYSTEM_QZSS				= 5,
+    YODEL_SYSTEM_GLONASS			= 6,
+    YODEL_SYSTEM_IMES,
+    YODEL_SYSTEM_GNSS,
+    YODEL_SYSTEM_TOTAL,
+} yodel_system_t;
+
+/**
+ * @define YODEL_SYSTEM_NAME_INITIALIZER
+ * Initialize the array of character strings that map from a Hazer system
+ * enumerated value to the printable name of the system. These strings should
+ * be in order of preference for systems having (unlikely as it might be)
+ * exactly the same dilution of precision (DOP). For example, you might prefer
+ * GLONASS over GPS, or GPS over GNSS (which represents a solution using
+ * multiple systems, which can be problematic).
+ */
+#define YODEL_SYSTEM_NAME_INITIALIZER \
+    { \
+        "GPS", \
+        "SBAS", \
+        "GALILEO", \
+        "BEIDOU", \
+		"", \
+        "QZSS", \
+        "GLONASS", \
+        "IMES", \
+        "GNSS", \
+        (const char *)0, \
+    }
+
+/**
+ * GNSS satellite identifiers.
+ * UBLOX9 R05 p. 242.
+ */
+typedef enum YodelId {
+    /*                        0,     */
+    YODEL_ID_GPS_FIRST		= 1,
+	/*                        :      */
+    YODEL_ID_GPS_LAST		= 32,
+    YODEL_ID_SBAS1_FIRST	= 33,
+	/*                        :      */
+    YODEL_ID_SBAS1_LAST		= 64,
+    YODEL_ID_GLONASS1_FIRST	= 65,
+	/*                        :      */
+    YODEL_ID_GLONASS1_LAST	= 96,
+    /*						  97,    */
+    /*						   :     */
+    /*						  119,   */
+    YODEL_ID_SBAS2_FIRST	= 120,
+	/*                        :      */
+    YODEL_ID_SBAS2_LAST		= 158,
+    YODEL_ID_BEIDOU1_FIRST	= 159,
+	/*                        :      */
+    YODEL_ID_BEIDOU1_LAST	= 163,
+    /*						  164,   */
+    /*						   :     */
+    /*						  172,   */
+    YODEL_ID_IMES_FIRST		= 173,
+	/*                        :      */
+    YODEL_ID_IMES_LAST		= 182,
+    /*						  183,   */
+    /*						   :     */
+    /*						  192,   */
+    YODEL_ID_QZSS_FIRST		= 193,
+	/*                        :      */
+    YODEL_ID_QZSS_LAST		= 197,
+    /*						  198,   */
+    /*						   :     */
+    /*						  254,   */
+    YODEL_ID_GLONASS2_FIRST	= 255,
+    YODEL_ID_GLONASS2_LAST	= 255,
+    /*						  256,   */
+    /*						   :     */
+    /*						  300,   */
+    YODEL_ID_GALILEO_FIRST	= 301,
+	/*                        :      */
+    YODEL_ID_GALILEO_LAST	= 336,
+    /*						  337,   */
+    /*						   :     */
+    /*						  400,   */
+    YODEL_ID_BEIDOU2_FIRST	= 401,
+	/*                        :      */
+    YODEL_ID_BEIDOU2_LAST	= 437,
+    /*						  438,   */
+    /*						   :     */
+    /*						  65535, */
+} yodel_id_t;
+
 /*******************************************************************************
  * PROCESSING UBX-MON-HW MESSAGES
  ******************************************************************************/
