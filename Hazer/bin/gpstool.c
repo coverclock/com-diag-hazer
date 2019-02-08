@@ -99,7 +99,7 @@ typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CR
 
 typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?' } marker_t;
 
-static const size_t LIMIT = 80 /* Legacy */ - 4 /* "LLL " */ - 6 /* "[NNN] " */ - 2 /* "\r\n" */ - 1 /* Wrap */;
+static const size_t LIMIT = 80 - (sizeof("OUT ") - 1) - (sizeof("[123] ") - 1) - (sizeof("\r\n") - 1) - 1;
 
 static const size_t UNLIMITED = ~(size_t)0;
 
