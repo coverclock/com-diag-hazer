@@ -646,7 +646,7 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 
         fprintf(fp, " %cspoofing %chistory %10ums %10ums %5uepoch", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, msss_epoch);
 
-        fprintf(fp, "%10s", ""); /* This is actually important. */
+        fprintf(fp, "%12s", ""); /* This is actually important. */
 
         fprintf(fp, " %-8s", ""); /* This is actually important. */
 
