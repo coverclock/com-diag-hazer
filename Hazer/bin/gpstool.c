@@ -701,11 +701,11 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
         assert((0 <= minute) && (minute <= 59));
         assert((0 <= second) && (second <= 59));
         assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
-        fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
+        fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
 
         fprintf(fp, " %cpps", pps ? '1' : '0');
 
-        fprintf(fp, "%41s", "");
+        fprintf(fp, "%28s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
