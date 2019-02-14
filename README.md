@@ -313,6 +313,8 @@ ublox, 6cc4473, 2018-12-20
 
 <https://www.gpsworld.com/the-almanac/>
 
+<https://en.wikipedia.org/wiki/Global_Positioning_System>
+
 <https://en.wikipedia.org/wiki/List_of_GPS_satellites>
 
 <https://gssc.esa.int/navipedia/index.php/GPS_Navigation_Message>
@@ -330,6 +332,8 @@ ublox, 6cc4473, 2018-12-20
 <https://www.rtca.org/sites/default/files/intentional_gps_interference_approved.pdf>
 
 <https://github.com/mvglasow/satstat/wiki/NMEA-IDs>
+
+<https://web.archive.org/web/20130225182002/http://www.colorado.edu/geography/gcraft/notes/gps/gpseow.htm>
 
 # Build
 
