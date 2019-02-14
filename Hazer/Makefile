@@ -3,7 +3,7 @@
 # Licensed under the terms in README.h
 # author:Chip Overclock
 # mailto:coverclock@diag.com
-# http://www.diag.com/navigation/downloads/Hazer.html
+# https://github.com/coverclock/com-diag-hazer
 # "Chip Overclock" is a registered trademark.
 # "Digital Aggregates Corporation" is a registered trademark.
 #
@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	14# API changes that may require that applications be modified.
 MINOR				:=	1# Only functionality or features added with no legacy API changes.
-BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	1# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.

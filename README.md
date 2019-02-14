@@ -281,6 +281,8 @@ ublox, 6cc4473, 2018-12-20
 
 <http://www.catb.org/gpsd/NMEA.txt>
 
+<http://www.catb.org/gpsd/NMEA.html>
+
 <https://support.google.com/earth/answer/148095>
 
 <http://earth.google.com/intl/ar/userguide/v4/index.htm>
@@ -322,6 +324,8 @@ ublox, 6cc4473, 2018-12-20
 <https://celestrak.com/GPS/NANU/description.php>
 
 <https://www.rtca.org/sites/default/files/intentional_gps_interference_approved.pdf>
+
+<https://github.com/mvglasow/satstat/wiki/NMEA-IDs>
 
 # Build
 
