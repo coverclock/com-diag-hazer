@@ -254,6 +254,10 @@ mailto:coverclock@diag.com
 
 Paul E. Ceruzzi, *GPS*, MIT Press, 2018
 
+M. Dunn at al., "Navstar GPS Space Segment/Navigation User Interfaces",
+IS-GPS-200H, Global Positioning Systems Directorate / Systems Engineering &
+Integration, 2013-09-24
+
 IGS et al., *RINEX - The Receiver Independent Exchange Format*, Version 3.03,
 RTCM-SC104, 2015-07-14
 
