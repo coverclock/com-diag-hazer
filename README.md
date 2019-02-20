@@ -1178,6 +1178,14 @@ snapshot this information before it is lost.
     F           5       41      14      IIR     RB      
     F           6       43      13      IIR     RB      
 
+    GPS Expandable Slot Designations
+    B5=B1F
+    D5=D2F
+    F5=F2F
+    B1=B1A
+    D2=D2A
+    F2=F2A
+
 # Acknowledgements
 
 Special thanks to Mrs. Overclock for her assistance in road testing (literally)
