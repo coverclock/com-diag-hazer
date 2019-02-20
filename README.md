@@ -1144,39 +1144,39 @@ This change was approved by the Interface Control Working Group on
 2018-12. I've captured a portion of a recent Advisory Message here to
 snapshot this information before it is lost.
 
-GPS Constellation Active Nanu Status 2/20/19	    
-Plane	Slot	SVN	PRN	Block	Clock	    
-A	1	65	24	IIF	CS		    
-A	2	52	31	IIR-M	RB		    
-A	3	64	30	IIF	RB		    
-A	4	48	7	IIR-M	RB		    
-B	1	56	16	IIR	RB		    
-B	2	62	25	IIF	RB		    
-B	3	44	28	IIR	RB		    
-B	4	58	12	IIR-M	RB		    
-B	5	71	26	IIF	RB		    
-C	1	57	29	IIR-M	RB		    
-C	2	66	27	IIF	RB		    
-C	3	72	8	IIF	CS		    
-C	4	53	17	IIR-M	RB		    
-C	5	59	19	IIR	RB		    
-D	1	61	2	IIR	RB		    
-D	2	63	1	IIF	RB		    
-D	3	45	21	IIR	RB		    
-D	4	67	6	IIF	RB		    
-D	5	46	11	IIR	RB		    
-D	6	34	18	IIA	RB	    
-E	1	69	3	IIF	RB		    
-E	2	73	10	IIF	RB		    
-E	3	50	5	IIR-M	RB		    
-E	4	51	20	IIR	RB		    
-E	6	47	22	IIR	RB		    
-F	1	70	32	IIF	RB		    
-F	2	55	15	IIR-M	RB		    
-F	3	68	9	IIF	RB		    
-F	4	60	23	IIR	RB		    
-F	5	41	14	IIR	RB		    
-F	6	43	13	IIR	RB		    
+    GPS Constellation Active Nanu Status 2/20/19
+    Plane       Slot    SVN     PRN     Block   Clock
+    A           1       65      24      IIF     CS      
+    A           2       52      31      IIR-M   RB      
+    A           3       64      30      IIF     RB      
+    A           4       48      7       IIR-M   RB      
+    B           1       56      16      IIR     RB      
+    B           2       62      25      IIF     RB      
+    B           3       44      28      IIR     RB      
+    B           4       58      12      IIR-M   RB      
+    B           5       71      26      IIF     RB      
+    C           1       57      29      IIR-M   RB      
+    C           2       66      27      IIF     RB      
+    C           3       72      8       IIF     CS      
+    C           4       53      17      IIR-M   RB      
+    C           5       59      19      IIR     RB      
+    D           1       61      2       IIR     RB      
+    D           2       63      1       IIF     RB      
+    D           3       45      21      IIR     RB      
+    D           4       67      6       IIF     RB      
+    D           5       46      11      IIR     RB      
+    D           6       34      18      IIA     RB
+    E           1       69      3       IIF     RB      
+    E           2       73      10      IIF     RB      
+    E           3       50      5       IIR-M   RB      
+    E           4       51      20      IIR     RB      
+    E           6       47      22      IIR     RB      
+    F           1       70      32      IIF     RB      
+    F           2       55      15      IIR-M   RB      
+    F           3       68      9       IIF     RB      
+    F           4       60      23      IIR     RB      
+    F           5       41      14      IIR     RB      
+    F           6       43      13      IIR     RB      
 
 # Acknowledgements
 
