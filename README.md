@@ -258,6 +258,9 @@ M. Dunn at al., "Navstar GPS Space Segment/Navigation User Interfaces",
 IS-GPS-200H, Global Positioning Systems Directorate / Systems Engineering &
 Integration, 2013-09-24
 
+John G. Grimes et al., *Global Position System Standard Positioning Service
+Performance Standard*, 4th edition, 2008-09
+
 IGS et al., *RINEX - The Receiver Independent Exchange Format*, Version 3.03,
 RTCM-SC104, 2015-07-14
 
@@ -309,7 +312,12 @@ ublox, 6cc4473, 2018-12-20
 
 <https://www.rapidtables.com/convert/number/degrees-to-degrees-minutes-seconds.html>
 
-<https://in-the-sky.org/satmap_radar.php>
+<https://in-the-sky.org/satmap_radar.php> Note: when using the "Live
+Map of Satellite Positions" page, "Satellites above your horizon" tab,
+the displayed view is as if you are looking *upwards* into the sky. This
+means that the azimuth, which starts at 0 degrees at North, increases
+in the *counter clockwise* direction. This is probably obvious to the
+astronomers in the audience, but it wasn't to me.
 
 <https://www.gpsworld.com/the-almanac/>
 
