@@ -272,10 +272,10 @@ typedef enum HazerSystem {
     HAZER_SYSTEM_GPS				= 1,
     HAZER_SYSTEM_GLONASS			= 2,
     HAZER_SYSTEM_GALILEO			= 3,
+    HAZER_SYSTEM_BEIDOU             = 4,
     HAZER_SYSTEM_SBAS,
-    HAZER_SYSTEM_BEIDOU,
-    HAZER_SYSTEM_QZSS,
     HAZER_SYSTEM_IMES,
+    HAZER_SYSTEM_QZSS               = 15,
     HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 
@@ -294,10 +294,18 @@ typedef enum HazerSystem {
         "GPS", \
         "GLONASS", \
         "GALILEO", \
-        "SBAS", \
         "BEIDOU", \
-        "QZSS", \
+        "SBAS", \
         "IMES", \
+        "7", \
+        "8", \
+        "9", \
+        "10", \
+        "11", \
+        "12", \
+        "13", \
+        "14", \
+        "QZSS", \
         (const char *)0, \
     }
 

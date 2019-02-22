@@ -65,6 +65,8 @@ constellations and systems.
 
 These talkers have been observed in the wild coming from actual GPS receivers.
 
+* GA - Galileo (as in Galileo Galilei) - EU
+* GB - BeiDou (as in The Big Dipper) - China
 * GL - GLObal NAvigation Satellite System (GLONASS) - Russia
 * GN - Global Navigation Satellite System (GNSS) - Generic
 * GP - Global Positioning System (GPS, formerly NavStar) - USA
@@ -73,8 +75,6 @@ Support for these talkers has been unit tested but has never been exercised
 using actual GPS receivers.
 
 * BD - BeiDou (as in The Big Dipper) - China
-* GA - Galileo (as in Galileo Galilei) - EU
-* GB - BeiDou (as in The Big Dipper) - China
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
 
 # Identifiers
@@ -98,6 +98,10 @@ exercised using actual GPS receivers.
 * Galileo - 301..336
 * BeiDou - 401..437
 
+However, receivers that implement the GSA System ID field introduced in
+NMEA 4.10 may reuse satellite identifiers (e.g. I see GPS and Galileo both
+using identifier 9 on the U-Blox 9 receiver).
+
 # Devices
 
 Hazer has been successfully tested with the following GPS chipsets.
@@ -109,6 +113,7 @@ Hazer has been successfully tested with the following GPS chipsets.
 * U-Blox 6    
 * U-Blox 7    
 * U-Blox 8    
+* U-Blox 9
 
 Hazer has been successfully tested with the following serial-to-USB chipsets
 used by GPS devices.
@@ -136,6 +141,7 @@ Hazer has been successfully tested with the following GPS devices.
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
 * TOPGNSS GN-803G (U-Blox UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
 * GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [1] [2] [4] [8]
+* Ardusimple SimpleRTK2B (U-Blox UBX-F9, 9600 8N1, v1516p01a9, ttyACM, 1Hz) [10]
 
 Hazer has been successfully tested with the following software defined
 radio (SDR) configurations.
@@ -148,12 +154,13 @@ Footnotes:
 [1] An excellent all around GPS receiver easily acquired from numerous outlets.    
 [2] Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
-[4] Receives GPS (U.S., formerly "Navstar") *and* GLONASS (Russian) constellations concurrently.    
-[5] Receives GPS (U.S.) *or* GLONASS (Russian) constellations via configuration.    
+[4] Receives GPS (U.S., formerly "Navstar") *and* GLONASS (Russia) constellations concurrently.    
+[5] Receives GPS (U.S.) *or* GLONASS (Russia) constellations via configuration.    
 [6] Supports One Pulse Per Second (1PPS) by toggling digital output pin.    
 [7] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
 [8] Supports UBX.    
 [9] Hardware from National Instruments.    
+[10] Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* BeiDou (China) simultaneously.
 
 # Platforms
 
@@ -254,7 +261,7 @@ mailto:coverclock@diag.com
 
 Paul E. Ceruzzi, *GPS*, MIT Press, 2018
 
-M. Dunn at al., "Navstar GPS Space Segment/Navigation User Interfaces",
+M. Dunn at al., *Navstar GPS Space Segment/Navigation User Interfaces*,
 IS-GPS-200H, Global Positioning Systems Directorate / Systems Engineering &
 Integration, 2013-09-24
 
@@ -344,6 +351,10 @@ astronomers in the audience, but it wasn't to me.
 <https://web.archive.org/web/20130225182002/http://www.colorado.edu/geography/gcraft/notes/gps/gpseow.htm>
 
 <https://www.novatel.com/support/knowledge-and-learning/published-papers-and-documents/unit-conversions/>
+
+<http://geostar-navi.com/files/docs/geos5/GeoS_NMEA_protocol_v4_0_eng.pdf>
+
+<http://ozzmaker.com/wp-content/uploads/2016/08/M10478-M10578-NMEA_Sentence_Output.pdf>
 
 # Build
 

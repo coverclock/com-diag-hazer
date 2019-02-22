@@ -981,16 +981,9 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
     int slot = 0;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
 
-    switch (activep->system) {
-    case HAZER_SYSTEM_GPS:
-    case HAZER_SYSTEM_SBAS:
-    case HAZER_SYSTEM_GALILEO:
-    case HAZER_SYSTEM_BEIDOU:
-    case HAZER_SYSTEM_QZSS:
-    case HAZER_SYSTEM_GLONASS:
+    if ((0 < activep->system) && (activep->system < HAZER_SYSTEM_TOTAL)) {
         system = (hazer_system_t)activep->system;
-        break;
-    default:
+    } else {
         for (slot = 0; slot < IDENTIFIERS; ++slot) {
             if (slot >= activep->active) {
                 break;
@@ -1013,7 +1006,6 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
                 system = HAZER_SYSTEM_GNSS;
             }
         }
-        break;
     }
 
     return system;
