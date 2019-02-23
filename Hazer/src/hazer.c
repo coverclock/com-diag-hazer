@@ -981,7 +981,7 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
     int slot = 0;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
 
-    if ((0 < activep->system) && (activep->system < HAZER_SYSTEM_TOTAL)) {
+    if ((0 <= activep->system) && (activep->system < HAZER_SYSTEM_TOTAL)) {
         system = (hazer_system_t)activep->system;
     } else {
         for (slot = 0; slot < IDENTIFIERS; ++slot) {
@@ -1093,7 +1093,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         activep->pdop = hazer_parse_dop(vector[15]);
         activep->hdop = hazer_parse_dop(vector[16]);
         activep->vdop = hazer_parse_dop(vector[17]);
-        activep->system = (count > 19) ? strtoul(vector[18], (char **)0, 10) : 0;
+        activep->system = (count > 19) ? strtoul(vector[18], (char **)0, 10) : HAZER_SYSTEM_TOTAL;
         activep->label = GSA;
         rc = 0;
     }

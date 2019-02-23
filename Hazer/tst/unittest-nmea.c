@@ -322,6 +322,84 @@ int main(void)
         assert(active.id[9] == 1);
         assert(active.id[10] == 48);
         assert(active.id[11] == 17);
+
+        assert(active.system == HAZER_SYSTEM_TOTAL);
+    }
+
+    {
+        static const char * DATA = "$GNGSA,A,3,07,11,15,18,19,13,30,28,51,01,48,17,1.27,0.64,1.10,15*1C\r\n";
+        hazer_buffer_t buffer = { 0 };
+        hazer_vector_t vector = { 0 };
+        hazer_active_t active = { 0 };
+        ssize_t length = -1;
+        size_t count = 0;
+        int rc = -1;
+        char * pointer = (char *)0;
+        uint8_t cs = 0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
+        uint8_t ck = 0;
+        hazer_buffer_t temporary = { 0 };
+
+        strncpy(buffer, DATA, sizeof(buffer));
+        buffer[sizeof(buffer) - 1] = '\0';
+        assert(strcmp(DATA, buffer) == 0);
+
+        length = hazer_length(buffer, sizeof(buffer));
+        assert(length == strlen(buffer));
+
+        pointer = (char *)hazer_checksum(buffer, length, &cs);
+        assert(pointer != (char *)0);
+        assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+
+        /*
+        rc = hazer_checksum2characters(cs, &msn, &lsn);
+        assert(rc == 0);
+        assert(pointer[1] == msn);
+        assert(pointer[2] == lsn);
+        assert(pointer[3] == '\r');
+        assert(pointer[4] == '\n');
+
+        rc = hazer_characters2checksum(msn, lsn, &ck);
+        assert(rc == 0);
+        assert(ck == cs);
+        */
+
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
+        assert(count == 20);
+
+        /*
+        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(length == (strlen(temporary) + 1));
+        temporary[length - 1] = msn;
+        temporary[length] = lsn;
+        temporary[length + 1] = '\r';
+        temporary[length + 2] = '\n';
+        temporary[length + 3] = '\0';
+        assert(strcmp(DATA, temporary) == 0);
+        */
+
+        rc = hazer_parse_gsa(&active, vector, count);
+        assert(rc == 0);
+        assert(strcmp(active.label, "GSA") == 0);
+        assert(active.active == 12);
+        assert(active.pdop == 127);
+        assert(active.hdop == 64);
+        assert(active.vdop == 110);
+        assert(active.id[0] == 7);
+        assert(active.id[1] == 11);
+        assert(active.id[2] == 15);
+        assert(active.id[3] == 18);
+        assert(active.id[4] == 19);
+        assert(active.id[5] == 13);
+        assert(active.id[6] == 30);
+        assert(active.id[7] == 28);
+        assert(active.id[8] == 51);
+        assert(active.id[9] == 1);
+        assert(active.id[10] == 48);
+        assert(active.id[11] == 17);
+
+        assert(active.system == HAZER_SYSTEM_QZSS);
     }
 
     {

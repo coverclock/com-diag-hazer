@@ -326,6 +326,7 @@ int main(void)
                     0,
                 },
 	            { NULL }, /* GALILEO */
+                { NULL }, /* BEIDOU */
                 {
                     NULL,
                     {
@@ -336,9 +337,16 @@ int main(void)
                     0,
                     0,
                 },
-                { NULL }, /* BEIDOU */
-                { NULL }, /* QZSS */
                 { NULL }, /* IMES */
+                { NULL }, /* 7 */
+                { NULL }, /* 8 */
+                { NULL }, /* 9 */
+                { NULL }, /* 10 */
+                { NULL }, /* 11 */
+                { NULL }, /* 12 */
+                { NULL }, /* 13 */
+                { NULL }, /* 14 */
+                { NULL }, /* QZSS */
         };
 
         assert(hazer_map_svid_to_system(HAZER_ID_GPS_FIRST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_GPS);
