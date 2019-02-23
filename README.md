@@ -69,7 +69,7 @@ These talkers have been observed in the wild coming from actual GPS receivers.
 * GB - BeiDou (as in The Big Dipper) - China
 * GL - GLObal NAvigation Satellite System (GLONASS) - Russia
 * GN - Global Navigation Satellite System (GNSS) - Generic
-* GP - Global Positioning System (GPS, formerly NavStar) - USA
+* GP - Global Positioning System (NavStar GPS) - USA
 
 Support for these talkers has been unit tested but has never been exercised
 using actual GPS receivers.
