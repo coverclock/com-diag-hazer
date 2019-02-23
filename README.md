@@ -67,7 +67,7 @@ These talkers have been observed in the wild coming from actual GPS receivers.
 
 * GA - Galileo (as in Galileo Galilei) - EU
 * GB - BeiDou (as in The Big Dipper) - China
-* GL - GLObal NAvigation Satellite System (GLONASS) - Russia
+* GL - Globalnaya Navigazionnaya Sputnikovaya Sistema (GLONASS) - Russia
 * GN - Global Navigation Satellite System (GNSS) - Generic
 * GP - Global Positioning System (NavStar GPS) - USA
 
