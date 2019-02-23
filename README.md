@@ -426,11 +426,14 @@ Optionally install Diminuto and Hazer in /usr/local.
 * bu353W10X - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver while testing data expiration.
 * gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
 * gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
+* simplertk2b - script that uses gpstool to exercise the Ardusimple SimpleRTK2B board.
 * sirfstar4 - script that uses gpstool to exercise any SiRF Star 4 device.
 * talkers - script that uses gpstool to process a file of synthetic input.
 * ublox7 - script that uses gpstool to exercise any Ublox 7 device.    
 * ublox8 - script that uses gpstool to exercise any Ublox 8 device.
+* ublox9 - script that uses gpstool to exercise any Ublox 9 device.
 * ublox8debug - script that uses gpstool with debug enabled to exercise any Ublox 8 device.
+* uputronics - script that uses gpstool to exercise the Uputronics GPS board for the Rasperry Pi.
 
 # Help
 
