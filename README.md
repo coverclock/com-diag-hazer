@@ -1,7 +1,7 @@
 com-diag-hazer
 ==============
 
-Parse NMEA strings from GPS devices.
+Parse NMEA strings from GNSS devices.
 
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/coverclock)
 
@@ -154,7 +154,7 @@ Footnotes:
 [1] An excellent all around GPS receiver easily acquired from numerous outlets.    
 [2] Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
-[4] Receives GPS (U.S., formerly "Navstar") *and* GLONASS (Russia) constellations concurrently.    
+[4] Receives GPS (U.S.) *and* GLONASS (Russia) constellations concurrently.    
 [5] Receives GPS (U.S.) *or* GLONASS (Russia) constellations via configuration.    
 [6] Supports One Pulse Per Second (1PPS) by toggling digital output pin.    
 [7] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
