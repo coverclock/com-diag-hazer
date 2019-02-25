@@ -880,12 +880,11 @@ typedef struct HazerSatellite {
 typedef struct HazerView {
     const char * label;			/* Label for sentence. */
     hazer_satellite_t sat[HAZER_GNSS_SATELLITES]; /* Satellites viewed. */
+    uint8_t signal[HAZER_GNSS_VIEWS]; /* Signal identifier. */
     uint8_t view;               /* Number of satellites in view. */
     uint8_t channels;           /* Number of channels used in view. */
     uint8_t pending;			/* Number of updates pending. */
-    uint8_t signal;             /* Signal identifier. */
     uint8_t ticks;				/* Lifetime in application-defined ticks. */
-    uint8_t unused[3];          /* Unused. */
 } hazer_view_t;
 
 /**
@@ -934,7 +933,6 @@ typedef struct HazerView {
 		0, \
         0, \
 		0, \
-		{ 0, 0, 0, } \
     }
 
 /**
@@ -946,6 +944,7 @@ typedef struct HazerView {
  */
 extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
 
+#if defined(DEPRECATED)
 /**
  * Return a system given an SVID and an array of views.
  * @param id is the Satellite Vehicle IDentifier.
@@ -954,6 +953,7 @@ extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
  * @return the index of the system or SYSTEM TOTAL if N/A.
  */
 extern hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], size_t count);
+#endif
 
 /*******************************************************************************
  * PARSING TEXT SENTENCES

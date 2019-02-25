@@ -287,18 +287,7 @@ int main(void)
 
     /**************************************************************************/
 
-    /*
-    HAZER_SYSTEM_GNSS				= 0,
-    HAZER_SYSTEM_GPS				= 1,
-    HAZER_SYSTEM_GLONASS			= 2,
-    HAZER_SYSTEM_GALILEO			= 3,
-    HAZER_SYSTEM_SBAS,
-    HAZER_SYSTEM_BEIDOU,
-    HAZER_SYSTEM_QZSS,
-    HAZER_SYSTEM_IMES,
-    HAZER_SYSTEM_TOTAL,
-     */
-
+#if defined(DEPRECATED)
     {
         static const hazer_view_t VIEW[HAZER_SYSTEM_TOTAL] = {
                 { NULL }, /* GNSS */
@@ -365,6 +354,7 @@ int main(void)
         assert(hazer_map_svid_to_system(HAZER_ID_SBAS_LAST, VIEW, sizeof(VIEW) / sizeof(VIEW[0])) == HAZER_SYSTEM_SBAS);
 
     }
+#endif
 
     /**************************************************************************/
 

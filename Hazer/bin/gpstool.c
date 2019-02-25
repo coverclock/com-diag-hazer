@@ -332,6 +332,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
     unsigned int satellite = 0;
     unsigned int active = 0;
     unsigned int limit = 0;
+    unsigned int sequence = 0;
     marker_t ranged = MARKER;
     marker_t phantom = MARKER;
     marker_t untracked = MARKER;
@@ -383,11 +384,13 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 				seen = true;
 			}
 
+            sequence = satellite / HAZER_GNSS_VIEWS;
+
 			fputs("SAT", fp);
 
-			fprintf(fp, " [%3u] %5u: %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, DEGREE, va[system].sat[satellite].azm_degrees, DEGREE, va[system].sat[satellite].snr_dbhz, va[system].signal, ranged, phantom, untracked);
+			fprintf(fp, " [%3u] %5u: %3d%lcelv %4d%lcazm %4ddBHz %1dseq %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, DEGREE, va[system].sat[satellite].azm_degrees, DEGREE, va[system].sat[satellite].snr_dbhz, sequence, va[system].signal[sequence], ranged, phantom, untracked);
 
-			fprintf(fp, "%16s", "");
+			fprintf(fp, "%11s", "");
 
 			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 

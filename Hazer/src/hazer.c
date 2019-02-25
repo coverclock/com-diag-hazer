@@ -1105,6 +1105,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int start = 0;
     int index = 4;
     int slot = 0;
+    int sequence = 0;
     int channel = 0;
     int satellites = 0;
     unsigned int id = 0;
@@ -1128,7 +1129,8 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         } else if (message > messages) {
             /* Do nothing. */
         } else {
-            channel = (message - 1) * HAZER_GNSS_VIEWS;
+            sequence = message - 1;
+            channel = sequence * HAZER_GNSS_VIEWS;
             satellites = strtol(vector[3], (char **)0, 10);
             /*
              * Unlike the GSA sentence, the GSV sentence is variable length.
@@ -1174,9 +1176,9 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
              * L2, etc.
              */
             if (index < (count - 1)) {
-                viewp->signal = strtol(vector[index], (char **)0, 10);
+                viewp->signal[sequence] = strtol(vector[index], (char **)0, 10);
             } else {
-                viewp->signal = 0;
+                viewp->signal[sequence] = 0;
             }
             viewp->channels = channel;
             viewp->view = satellites;
@@ -1195,6 +1197,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     return rc;
 }
 
+#if defined(DEPRECATED)
 hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], size_t count)
 {
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
@@ -1216,6 +1219,7 @@ hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], siz
 
     return system;
 }
+#endif
 
 int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 {
