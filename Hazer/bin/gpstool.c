@@ -321,9 +321,8 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
  * @param fp points to the FILE stream.
  * @param va points to the array of all satellite being viewed.
  * @param aa points to the array of active satellites.
- * @param prn if non-zero activates a phantom satellite monitor for that PRN.
  */
-static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const hazer_active_t aa[], uint16_t prn)
+static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const hazer_active_t aa[])
 {
     static const unsigned int SATELLITES = countof(va[0].sat);
     static const unsigned int IDENTIFIERS = countof(aa[0].id);
@@ -336,10 +335,6 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
     marker_t ranged = MARKER;
     marker_t phantom = MARKER;
     marker_t untracked = MARKER;
-	static marker_t history = MARKER;
-	static int8_t maximum = 0;
-	static diminuto_ticks_t ticks = 0;
-	bool seen = false;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -367,23 +362,6 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 			phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
 			untracked = va[system].sat[satellite].untracked ? UNTRACKED : INACTIVE;
 
-			if (prn == 0) {
-				/* Do nothing. */
-			} else if (system != HAZER_SYSTEM_GPS) {
-				/* Do nothing. */
-			} else if (va[system].sat[satellite].id != prn) {
-				/* Do nothing. */
-			} else if (phantom == history) {
-				if (va[system].sat[satellite].snr_dbhz > maximum) { maximum = va[system].sat[satellite].snr_dbhz; }
-				seen = true;
-			} else {
-				maximum = va[system].sat[satellite].snr_dbhz;
-				ticks = diminuto_time_elapsed();
-				diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c' at %ddBHz\n", Program, HAZER_SYSTEM_NAME[system], va[system].sat[satellite].id, history, phantom, maximum);
-				history = phantom;
-				seen = true;
-			}
-
             sequence = satellite / HAZER_GNSS_VIEWS;
 
 			fputs("SAT", fp);
@@ -399,20 +377,6 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
         }
 
     }
-
-    if (prn == 0) {
-    	/* Do nothing. */
-    } else if (seen) {
-		/* Do nothing. */
-	} else if (history == MARKER) {
-		/* Do nothing. */
-	} else if (history == INACTIVE) {
-		/* Do nothing. */
-	} else {
-		ticks = diminuto_time_elapsed() - ticks;
-		diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: phantom %s PRN %u was '%c' now '%c' at %ddBHz for %llums\n", Program, HAZER_SYSTEM_NAME[HAZER_SYSTEM_GPS], prn, history, INACTIVE, maximum, diminuto_frequency_ticks2units(ticks, 1000LL));
-		history = INACTIVE;
-	}
 
 }
 
@@ -1027,7 +991,6 @@ int main(int argc, char * argv[])
     int slow = 0;
     int expire = 0;
     int exiting = 0;
-    uint16_t prn = 0;
     role_t role = ROLE;
     protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
@@ -1198,7 +1161,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:M:OP:RS:VW:Xb:cdehlmnop:rst:vx?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RS:VW:Xb:cdehlmnop:rst:vx?";
 
     /**
      ** PREINITIALIZATION
@@ -1266,13 +1229,6 @@ int main(int argc, char * argv[])
         case 'L':
             path = optarg;
             break;
-        case 'M':
-            prn = strtoul(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) {
-                errno = EINVAL;
-                diminuto_perror(optarg);
-            }
-        	break;
         case 'O':
             readonly = 0;
             output = !0;
@@ -1369,7 +1325,6 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -F          Like -E but refresh at 1Hz.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
             fprintf(errfp, "       -L FILE     Log sentences to FILE.\n");
-            fprintf(errfp, "       -M PRN      Enable phantom satellite monitoring for PRN.\n");
             fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
             fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(errfp, "       -R          Print a report on standard output.\n");
@@ -2271,7 +2226,7 @@ int main(int argc, char * argv[])
                 print_local(outfp, errfp, timetofirstfix);
                 print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
                 print_actives(outfp, errfp, active);
-                print_views(outfp, errfp, view, active, prn);
+                print_views(outfp, errfp, view, active);
             }
             if (escape) { fputs("\033[0J", outfp); }
             if (report) { fflush(outfp); }

@@ -439,7 +439,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 
     > gpstool -?
 
-    usage: gpstool [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
+    usage: gpstool [ -d ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -453,7 +453,6 @@ Optionally install Diminuto and Hazer in /usr/local.
            -F          Like -E but refresh at 1Hz.
            -I PIN      Take 1PPS from GPIO input PIN (requires -D).
            -L FILE     Log sentences to FILE.
-           -M PRN      Enable phantom satellite monitoring for PRN.
            -O          Output sentences to DEVICE.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
@@ -1064,13 +1063,13 @@ Proving Grounds (YPG) in Arizona, either of which is potentially within
 range of my location in Denver Colorado. So this could be the U.S. military
 doing testing.
 
-I added code to gpstool to monitor the comings and goings of GPS PRN 4 and
-remark upon them in the system log. Here's an example of what those
-log messages look like during an actual run of just a few hours. '#' is the
-initial state value when gpstool starts running, '?' means GPS PRN 4 came into
-view, and ' ' means it exited from view. The log also includes the initial
-and maximum signal strength, and the transmission duration in milliseconds.
-All clock times are in MST.
+I temporarily added code to gpstool to monitor the comings and goings
+of GPS PRN 4 and remark upon them in the system log. Here's an example
+of what those log messages look like during an actual run of just a
+few hours. '#' is the initial state value when gpstool starts running,
+'?' means GPS PRN 4 came into view, and ' ' means it exited from view. The
+log also includes the initial and maximum signal strength, and the
+transmission duration in milliseconds.  All clock times are in MST.
 
 Here is the log for a twenty-four hour period.
 
@@ -1153,8 +1152,9 @@ was launched.
     BE SENT WHEN THE SATELLITE IS SET ACTIVE TO SERVICE.
     *** GENERAL MESSAGE TO ALL GPS USERS ***
 
-Note that the new satellite uses PRN 4. I suspect now that the earlier use of PRN 4
-by SVN36 was some kind of control segment testing in advance of the launch of SVN74.
+Note that the new satellite uses PRN 4. I suspect now that the earlier
+use of PRN 4 by SVN36 was some kind of control segment testing in advance
+of the launch of SVN74.
 
 ## GPS Constellation Status 2018-02-20
 
