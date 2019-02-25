@@ -1,7 +1,7 @@
 com-diag-hazer
 ==============
 
-Parse NMEA strings from GPS devices.
+Parse NMEA strings from GNSS devices.
 
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/coverclock)
 
@@ -141,7 +141,7 @@ Hazer has been successfully tested with the following GPS devices.
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
 * TOPGNSS GN-803G (U-Blox UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
 * GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [1] [2] [4] [8]
-* Ardusimple SimpleRTK2B (U-Blox UBX-F9, 9600 8N1, v1516p01a9, ttyACM, 1Hz) [10]
+* Ardusimple SimpleRTK2B (U-Blox UBX-F9, 9600 8N1, v1516p01a9, ttyACM, 1Hz) [2] [8] [10]
 
 Hazer has been successfully tested with the following software defined
 radio (SDR) configurations.
@@ -154,7 +154,7 @@ Footnotes:
 [1] An excellent all around GPS receiver easily acquired from numerous outlets.    
 [2] Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
-[4] Receives GPS (U.S., formerly "Navstar") *and* GLONASS (Russia) constellations concurrently.    
+[4] Receives GPS (U.S.) *and* GLONASS (Russia) constellations concurrently.    
 [5] Receives GPS (U.S.) *or* GLONASS (Russia) constellations via configuration.    
 [6] Supports One Pulse Per Second (1PPS) by toggling digital output pin.    
 [7] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
