@@ -855,6 +855,7 @@ typedef struct HazerSatellite {
     int16_t azm_degrees;        /* Azimuth in whole degrees. */
     int8_t snr_dbhz;            /* Signal/Noise Ratio in dBHz. */
     uint8_t phantom;			/* If true, elevation or azimuth were empty. */
+    uint8_t untracked;          /* If true, signal strength was empty. */
     uint8_t unused;             /* Unused. */
 } hazer_satellite_t;
 
@@ -882,8 +883,9 @@ typedef struct HazerView {
     uint8_t view;               /* Number of satellites in view. */
     uint8_t channels;           /* Number of channels used in view. */
     uint8_t pending;			/* Number of updates pending. */
+    uint8_t signal;             /* Signal identifier. */
     uint8_t ticks;				/* Lifetime in application-defined ticks. */
-    uint8_t unused[5];          /* Unused. */
+    uint8_t unused[3];          /* Unused. */
 } hazer_view_t;
 
 /**
@@ -893,12 +895,46 @@ typedef struct HazerView {
 #define HAZER_VIEW_INITIALIZER \
     { \
 	    (const char *)0, \
-		{ 0, }, \
+		{ \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+            HAZER_SATELLITE_INITIALIZER, \
+        }, \
 		0, \
 		0, \
 		0, \
+        0, \
 		0, \
-		{ 0, } \
+		{ 0, 0, 0, } \
     }
 
 /**

@@ -1057,19 +1057,6 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     int satellites = 0;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
 
-    /*
-     * NMEA 0183 4.10 2012 has an additional 19th field containing the GNSS
-     * System ID to identify GPS, GLONASS, GALILEO, etc. Alas, I have yet
-     * to see a GPS receiver that actually provides this, because it sure
-     * would be useful. The satellite ID values depend on the constellation
-     * being reported. You can't depend on the talker for this, because at
-     * least on my 15 different receivers, the two that use the UBlox 8 chipset
-     * that can receive both GPS and GLONASS tag all GSA sentences with talker
-     * GN, for "GNSS", a generic talker indicating an ensemble computation.
-     * "When the Talker ID is GN, the GNSS System ID provides the only method
-     * to determine the meaning of the SVIDs." Hey, no kidding. Thanks for that.
-     */
-
     if (count < 1) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
@@ -1089,10 +1076,18 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
             activep->id[slot] = id;
             ++satellites;
         }
+        /*
+         * Unlike the GSV sentence, the GSA sentence isn't variable length.
+         * Unused slots in the active list are denoted by empty fields.
+         */
         activep->active = satellites;
         activep->pdop = hazer_parse_dop(vector[15]);
         activep->hdop = hazer_parse_dop(vector[16]);
         activep->vdop = hazer_parse_dop(vector[17]);
+        /*
+         * NMEA 0183 4.10 2012 has an additional 19th field containing
+         * the GNSS System ID to identify GPS, GLONASS, GALILEO, etc.
+         */
         activep->system = (count > 19) ? strtoul(vector[18], (char **)0, 10) : HAZER_SYSTEM_TOTAL;
         activep->label = GSA;
         rc = 0;
@@ -1135,19 +1130,53 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         } else {
             channel = (message - 1) * HAZER_GNSS_VIEWS;
             satellites = strtol(vector[3], (char **)0, 10);
+            /*
+             * Unlike the GSA sentence, the GSV sentence is variable length.
+             * So from here on all indices are effectively relative.
+             */
             for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
                 if (channel >= satellites) { break; }
                 if (channel >= SATELLITES) { break; }
-                id = strtol(vector[index++], (char **)0, 10);
+                id = strtol(vector[index], (char **)0, 10);
+                ++index;
                 if (id <= 0) { break; }
                 viewp->sat[channel].id = id;
-                viewp->sat[channel].phantom = (strlen(vector[index]) == 0);
-                viewp->sat[channel].elv_degrees = strtol(vector[index++], (char **)0, 10);
-                viewp->sat[channel].phantom |= (strlen(vector[index]) == 0);
-                viewp->sat[channel].azm_degrees = strtol(vector[index++], (char **)0, 10);
-                viewp->sat[channel].snr_dbhz = strtol(vector[index++], (char **)0, 10);
+                viewp->sat[channel].phantom = 0;
+                if (strlen(vector[index]) == 0) {
+                    viewp->sat[channel].phantom = !0;
+                    viewp->sat[channel].elv_degrees = 0;
+                } else {
+                    viewp->sat[channel].elv_degrees = strtol(vector[index], (char **)0, 10);
+                }
+                ++index;
+                if (strlen(vector[index]) == 0) {
+                    viewp->sat[channel].phantom = !0;
+                    viewp->sat[channel].azm_degrees = 0;
+                } else {
+                    viewp->sat[channel].azm_degrees = strtol(vector[index], (char **)0, 10);
+                }
+                ++index;
+                viewp->sat[channel].untracked = 0;
+                if (strlen(vector[index]) == 0) {
+                    viewp->sat[channel].untracked = !0;
+                    viewp->sat[channel].snr_dbhz = 0;
+                } else {
+                    viewp->sat[channel].snr_dbhz = strtol(vector[index], (char **)0, 10);
+                }
+                ++index;
                 ++channel;
                 rc = 1;
+            }
+            /*
+             * NMEA 0183 4.10 2012 has an additional field containing the
+             * signal identifier. This is constellation specific, but
+             * indicates what frequency band was used, e.g. for GPS: L1C/A,
+             * L2, etc.
+             */
+            if (index < (count - 1)) {
+                viewp->signal = strtol(vector[index], (char **)0, 10);
+            } else {
+                viewp->signal = 0;
             }
             viewp->channels = channel;
             viewp->view = satellites;
