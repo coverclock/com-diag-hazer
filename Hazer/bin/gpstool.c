@@ -247,6 +247,13 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
     unsigned int system = 0;
     unsigned int satellite = 0;
     unsigned int count = 0;
+    unsigned int total = 0;
+
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        if (aa[system].ticks == 0) { continue; }
+        if (aa[system].active == 0) { continue; }
+        total += aa[system].active;
+    }
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -265,9 +272,9 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
             }
         }
 
-        fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
+        fprintf(fp, " } [%2u] [%2u] [%2u]", count, aa[system].active, total);
 
-        fprintf(fp, "%12s", "");
+        fprintf(fp, "%7s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -287,9 +294,9 @@ static void print_actives(FILE * fp, FILE * ep, const hazer_active_t aa[])
             }
         }
 
-        fprintf(fp, " } [%2u] [%2u]", count, aa[system].active);
+        fprintf(fp, " } [%2u] [%2u] [%2u]", count, aa[system].active, total);
 
-        fprintf(fp, "%12s", "");
+        fprintf(fp, "%7s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -366,9 +373,9 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
 			fputs("SAT", fp);
 
-			fprintf(fp, " [%3u] %5u: %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, DEGREE, va[system].sat[satellite].azm_degrees, DEGREE, va[system].sat[satellite].snr_dbhz, va[system].signal[sequence], ranged, phantom, untracked);
+			fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, DEGREE, va[system].sat[satellite].azm_degrees, DEGREE, va[system].sat[satellite].snr_dbhz, va[system].signal[sequence], ranged, phantom, untracked);
 
-			fprintf(fp, "%16s", "");
+			fprintf(fp, "%15s", "");
 
 			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
