@@ -929,7 +929,7 @@ typedef struct HazerView {
             HAZER_SATELLITE_INITIALIZER, \
         }, \
 		0, \
-		0, \
+        0, \
 		0, \
         0, \
 		0, \
@@ -943,17 +943,6 @@ typedef struct HazerView {
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.
  */
 extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
-
-#if defined(DEPRECATED)
-/**
- * Return a system given an SVID and an array of views.
- * @param id is the Satellite Vehicle IDentifier.
- * @param va is an array of view structures.
- * @param count is the number of views in the array.
- * @return the index of the system or SYSTEM TOTAL if N/A.
- */
-extern hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], size_t count);
-#endif
 
 /*******************************************************************************
  * PARSING TEXT SENTENCES

@@ -1139,6 +1139,19 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
                 if (channel >= satellites) { break; }
                 if (channel >= SATELLITES) { break; }
+                /*
+                 * I'm pretty sure my U-Blox ZED-F9P-00B-01 chip has a
+                 * firmware bug.  I believe this GSV sentence that it
+                 * sent is incorrect.
+                 *
+                 * $GLGSV,3,3,11,85,26,103,25,86,02,152,29,1*75\r\n.
+                 *
+                 * I think either there should be a third set of four
+                 * fields for the eleventh satellite, or the total count
+                 * should be ten instead of eleven. So we check for that
+                 * here.
+                 */
+                if ((index + 4) >= count) { break; }
                 id = strtol(vector[index], (char **)0, 10);
                 ++index;
                 if (id <= 0) { break; }
@@ -1175,8 +1188,8 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
              * indicates what frequency band was used, e.g. for GPS: L1C/A,
              * L2, etc.
              */
-            if (index < (count - 1)) {
-                viewp->signal[sequence] = strtol(vector[index], (char **)0, 10);
+            if (index <= (count - 2)) {
+                viewp->signal[sequence] = strtol(vector[count - 2], (char **)0, 10);
             } else {
                 viewp->signal[sequence] = 0;
             }
@@ -1196,30 +1209,6 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 
     return rc;
 }
-
-#if defined(DEPRECATED)
-hazer_system_t hazer_map_svid_to_system(uint8_t id, const hazer_view_t va[], size_t count)
-{
-    hazer_system_t system = HAZER_SYSTEM_TOTAL;
-    static const int SATELLITES = sizeof(va[0].sat) / sizeof(va[0].sat[0]);
-    int view = 0;
-    int slot = 0;
-
-    for (view = 0; view < count; ++view) {
-        if (view >= HAZER_SYSTEM_TOTAL) { break; }
-        for (slot = 0; slot < SATELLITES; ++slot) {
-            if (slot >= va[view].view) { break; }
-            if (va[view].sat[slot].id == 0) { break; }
-            if (id == va[view].sat[slot].id) {
-                system = (hazer_system_t)view;
-                break;
-            }
-        }
-    }
-
-    return system;
-}
-#endif
 
 int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 {
