@@ -1208,6 +1208,36 @@ snapshot this information before it is lost.
     D2=D2A
     F2=F2A
 
+## U-Blox ZED-F9P Bug
+
+The Ardusimple SimpleRTK2B board uses the U-Blox ZED-F9P GPS receiver.
+I'm pretty sure the firmware in the ZED-F9P-00B-01 chip on my SimpleRTK2B
+board has a bug. I believe this GSV sentence that it emitted is incorrect.
+
+    $GLGSV,3,3,11,85,26,103,25,86,02,152,29,1*75\r\n
+
+This GSV sentence says it is the third of three GSV sentences for the
+GLONASS constellation, and there are eleven total sateliites cited in
+the three GSV sentences.
+
+GSV is unusal amongst the typical NMEA sentences in that it is variable
+length. Each GSV setence can contain at most four satellites, each
+represented by four numbers: the space vehicle ID (which is specific to
+the constellation), the SV's elevation in degrees, the SV's azimuth in
+degrees, and the signal strength in dB Hz.
+
+The two prior GSV sentences for this report of GLONASS satellites in
+view  would have had at most four satellites, for a total of eight,
+leaving three satellites for this final sentence in the sequence. This
+sentence only has the metrics for two satellites. Note also that this
+messages has the optional signal identifier as its last field before
+the checksum.
+
+I think either there should be a third set of four fields for the eleventh
+satellite, or the total count should be ten instead of eleven. My software
+has been modified to account for this malformed message; it originally
+core dumped with a segmentation violation.
+
 # Acknowledgements
 
 Special thanks to Mrs. Overclock for her assistance in road testing (literally)
