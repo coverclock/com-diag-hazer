@@ -490,56 +490,68 @@ minor Makefile hacking might be required.
 
 When using the -E option with gpstool, so that it uses ASCII escape sequences
 to do cursor control for its report on standard output, as this example does
-when using the BU-353W10 receiver,
+when using Ublox 9-based receiver,
 
     > gpstool -D devttyACM0 -b 9600 -8 -n -1 -E -t 10
 
 the display looks something like this snapshot as it is continually updated.
-(In this and most other output, the asterisk \* is used to mean the degree
-symbol. This should not be confused with its use as a delimeter in NMEA
-sentences.)
 
-    INP [ 31] $GLGSV,3,3,09,85,08,340,22*5E\r\n
-    bUT [  6] \xb5b\x06>\0\0
-    MON +jamming  +history  51indicator  54maximum
-    STA -spoofing -history       2178ms     224177ms     0epoch
-    LOC 2019-02-07T08:43:01.008-07:00+00T          0/00:00:00.054 13.2.0   cadmium
-    TIM 2019-02-07T15:43:01Z 0pps                                          GNSS
-    POS 39°47'39.14"N, 105°09'12.30"W   39.794208, -105.153418             GNSS
-    ALT    5607.87'   1709.300m                                            GNSS
+    INP [ 68] \xb5b\n\t<\0\xc1\x81\0\0\0\0\x01\0\0\x80\0\0\xdfg\0\0Y\02\x13\x01\x02
+    OUT [  0]
+    MON ?jamming  ?history   4indicator   6maximum
+    STA -spoofing -history      42039ms  331615734ms     0epoch
+    LOC 2019-02-26T09:09:14.260-07:00+00T          0/00:00:00.554 15.3.1   nickel
+    TIM 2019-02-26T16:09:14.000-00:00+00Z 0pps                             GNSS
+    POS 39°47'39.21"N, 105°09'12.19"W   39.794227, -105.153386             GNSS
+    ALT    5601.64'   1707.400m                                            GNSS
     COG N    0.000°T   0.000°M                                             GNSS
-    SOG      0.028mph      0.024knots      0.044kph                        GNSS
-    INT GGA [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    ACT [1]  {    14    32    31    18    10     1 } [ 6] [12]             GPS
-    ACT [2]  {    22    11    51    48    25    20 } [ 6] [12]             GPS
-    ACT [1]  {    68    78    69    77    84    67 } [ 6] [ 9]             GLONASS
-    ACT [2]  {    79    83    85                   } [ 3] [ 9]             GLONASS
-    DOP   1.16pdop   0.59hdop   1.00vdop                                   GPS
-    DOP   1.16pdop   0.59hdop   1.00vdop                                   GLONASS
-    SAT [  1]     1:  36°elv  301°azm   31dBHz <                           GPS
-    SAT [  2]     3:  10°elv  306°azm    0dBHz                             GPS
-    SAT [  3]    10:  37°elv  116°azm   30dBHz <                           GPS
-    SAT [  4]    11:  27°elv  275°azm   22dBHz <                           GPS
-    SAT [  5]    12:  10°elv   49°azm    0dBHz                             GPS
-    SAT [  6]    14:  73°elv  358°azm   32dBHz <                           GPS
-    SAT [  7]    18:  49°elv  261°azm   28dBHz <                           GPS
-    SAT [  8]    20:  11°elv  126°azm   23dBHz <                           GPS
-    SAT [  9]    22:  31°elv  307°azm   34dBHz <                           GPS
-    SAT [ 10]    25:  19°elv   82°azm   22dBHz <                           GPS
-    SAT [ 11]    31:  56°elv  180°azm   40dBHz <                           GPS
-    SAT [ 12]    32:  61°elv   40°azm   33dBHz <                           GPS
-    SAT [ 13]    46:  38°elv  215°azm   38dBHz                             GPS
-    SAT [ 14]    48:  36°elv  220°azm   37dBHz <                           GPS
-    SAT [ 15]    51:  44°elv  183°azm   39dBHz <                           GPS
-    SAT [ 16]    67:  24°elv   84°azm   22dBHz <                           GLONASS
-    SAT [ 17]    68:  59°elv   20°azm   33dBHz <                           GLONASS
-    SAT [ 18]    69:  32°elv  309°azm   35dBHz <                           GLONASS
-    SAT [ 19]    77:  30°elv   39°azm   30dBHz <                           GLONASS
-    SAT [ 20]    78:  53°elv  107°azm   32dBHz <                           GLONASS
-    SAT [ 21]    79:  24°elv  167°azm   33dBHz <                           GLONASS
-    SAT [ 22]    83:  17°elv  228°azm   25dBHz <                           GLONASS
-    SAT [ 23]    84:  30°elv  288°azm   20dBHz <                           GLONASS
-    SAT [ 24]    85:   8°elv  340°azm   22dBHz <                           GLONASS
+    SOG      0.024mph      0.021knots      0.038kph                        GNSS
+    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
+    ACT [1]  {     3    22    23    25    18    14 } [ 6] [11] [27]        GPS
+    ACT [2]  {    32    31    16     1    26       } [ 5] [11] [27]        GPS
+    ACT [1]  {    71    65    72    75    74    73 } [ 6] [ 6] [27]        GLONASS
+    ACT [1]  {    26     3     7    30     2     8 } [ 6] [ 7] [27]        GALILEO
+    ACT [2]  {    25                               } [ 1] [ 7] [27]        GALILEO
+    ACT [1]  {    20    23    19                   } [ 3] [ 3] [27]        BEIDOU
+    DOP   0.96pdop   0.53hdop   0.80vdop                                   GPS
+    DOP   0.96pdop   0.53hdop   0.80vdop                                   GLONASS
+    DOP   0.96pdop   0.53hdop   0.80vdop                                   GALILEO
+    DOP   0.96pdop   0.53hdop   0.80vdop                                   BEIDOU
+    SAT [  1]     1id  29°elv  244°azm   31dBHz  6sig <                    GPS
+    SAT [  2]     3id  53°elv  307°azm   34dBHz  6sig <                    GPS
+    SAT [  3]    11id   4°elv  233°azm    0dBHz  6sig     !                GPS
+    SAT [  4]    14id  42°elv   72°azm    0dBHz  6sig <   !                GPS
+    SAT [  5]    16id  13°elv  168°azm    0dBHz  6sig <   !                GPS
+    SAT [  6]    18id  17°elv  215°azm    0dBHz  6sig <   !                GPS
+    SAT [  7]    22id  71°elv  272°azm    0dBHz  6sig <   !                GPS
+    SAT [  8]    23id  21°elv  287°azm    0dBHz  6sig <   !                GPS
+    SAT [  9]    25id  12°elv   38°azm   24dBHz  6sig <                    GPS
+    SAT [ 10]    26id  36°elv  146°azm   38dBHz  6sig <                    GPS
+    SAT [ 11]    31id  65°elv   48°azm   32dBHz  6sig <                    GPS
+    SAT [ 12]    32id  27°elv   84°azm   19dBHz  6sig <                    GPS
+    SAT [ 13]    65id  32°elv  322°azm   28dBHz  3sig <                    GLONASS
+    SAT [ 14]    71id  38°elv  109°azm   35dBHz  3sig <                    GLONASS
+    SAT [ 15]    72id  69°elv   19°azm   33dBHz  3sig <                    GLONASS
+    SAT [ 16]    73id  37°elv   37°azm   36dBHz  3sig <                    GLONASS
+    SAT [ 17]    74id  78°elv  111°azm   31dBHz  3sig <                    GLONASS
+    SAT [ 18]    75id  31°elv  197°azm   42dBHz  3sig <                    GLONASS
+    SAT [ 19]    81id   5°elv  338°azm   16dBHz  3sig                      GLONASS
+    SAT [ 20]    87id   0°elv  252°azm   10dBHz  3sig                      GLONASS
+    SAT [ 21]    88id   8°elv  293°azm    0dBHz  3sig     !                GLONASS
+    SAT [ 22]    89id  37°elv   37°azm    0dBHz  3sig     !                GLONASS
+    SAT [ 23]     2id  59°elv   88°azm   26dBHz  2sig <                    GALILEO
+    SAT [ 24]     3id  24°elv  105°azm   31dBHz  2sig <                    GALILEO
+    SAT [ 25]     7id  44°elv  307°azm   28dBHz  2sig <                    GALILEO
+    SAT [ 26]     8id  72°elv   64°azm    0dBHz  2sig <   !                GALILEO
+    SAT [ 27]    13id   7°elv  232°azm   24dBHz  2sig                      GALILEO
+    SAT [ 28]    25id  18°elv   39°azm   23dBHz  2sig <                    GALILEO
+    SAT [ 29]    26id  13°elv  280°azm   27dBHz  2sig <                    GALILEO
+    SAT [ 30]    30id  41°elv  176°azm   36dBHz  2sig <                    GALILEO
+    SAT [ 31]    33id   3°elv  328°azm    0dBHz  2sig     !                GALILEO
+    SAT [ 32]     8id   6°elv  338°azm    0dBHz  0sig     !                BEIDOU
+    SAT [ 33]    19id  28°elv  311°azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 34]    20id  82°elv  326°azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 35]    23id  30°elv   47°azm    0dBHz  0sig <   !                BEIDOU
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -602,48 +614,61 @@ can appear to run backwards when receiving UDP packets because UDP may reorder
 them), and some metrics as to the number of significant digits provided for
 various datums provided by the device.
 
-ACT is the list of active satellites, typically provided seperately for each
-system or constellation by the device, showing each satellites identifying
-number (for GPS, this is its pseudo-random noise or PRN code number, but other
-systems using other conventions), and the number of satellites in the list.
-Unlike the other report lines, the system or constellation to which the data
-applies is derived from (in order, depending on availability) the system id
-in the GSA sentence (only available on devices that support later NMEA
-versions), or an analysis of the Space Vehicle Identifier based on NMEA
-conventions, or the talker specified at the beginning of the sentence. The
-reason for this is that some devices (I'm looking at you, GN803G), specify GNSS
-as the talker for all GSA sentences when they are computing an ensemble solution
-(one based on multiple constellations); this causes ambiguity between this case
-and the case of successive GSA sentences in which the active satellite list has
-changed. Hazer independently tries to determine the constellation to which the
-GSA sentence refers when the talker is GNSS.
+ACT is the list of active satellites, typically provided seperately
+for each system or constellation by the device, showing each satellites
+identifying number (for GPS, this is its pseudo-random noise or PRN code
+number, but other systems using other conventions), and the number of
+active satellites in this list, the number of active satellites for this
+constellation, and the number of active satellites total.  Unlike the
+other report lines, the system or constellation to which the data applies
+is derived from (in order, depending on availability) the system id in the
+GSA sentence (only available on devices that support later NMEA versions),
+or an analysis of the Space Vehicle Identifier based on NMEA conventions,
+or the talker specified at the beginning of the sentence. The reason
+for this is that some devices (I'm looking at you, GN803G), specify
+GNSS as the talker for all GSA sentences when they are computing an
+ensemble solution (one based on multiple constellations); this causes
+ambiguity between this case and the case of successive GSA sentences in
+which the active satellite list has changed. Hazer independently tries
+to determine the constellation to which the GSA sentence refers when
+the talker is GNSS.
 
-DOP is the position, horizontal, and vertical dilution of precision - measures
-of the quality of the position fix (smaller is better) - based on the real-time
-geometry of the satellites upon which the current solution is based. If
-multiple constellations are reported, but the DOPs are all the same, the device
-is typically computing an ensemble solution using multiple constellations.
+DOP is the position, horizontal, and vertical dilution of precision -
+measures of the quality of the position fix (smaller is better) - based on
+the real-time geometry of the satellites upon which the current solution
+is based. If multiple constellations are reported, but the DOPs are all
+the same, the device is typically computing an ensemble solution using
+multiple constellations.
 
-SAT is the list of satellites in view, including an index that is purely an
-artifact of Hazer, the Space Vehicle IDentifier (same comment as for ACT),
-its ELeVation and AZiMuth in degrees based on its ephemeris, the signal to
-noise ratio (really, a carrier to noise density ratio) in deciBels Hertz for
-its transmission, and an indication as to whether the vehicle is in the current
-active list (ACT above) for its constellation.
+SAT is the list of satellites in view, including an index that is
+purely an artifact of Hazer, the Space Vehicle IDentifier (specific to
+the constellation), its elevation and azimuth in degrees based on its
+ephemeris, the signal strength (really, a carrier to noise density ratio)
+in deciBels Hertz of its transmission, a signal identifier indicating
+which signal or band (e.g.  L1 C/A, L2, etc.) is being used, and one
+or more flags. A flag of '<' indicates that the satellite is on the
+active list (see ACT above), a '?' indicates that the azimuth and/or the
+elevation were empty but display as zero (likely that the satellite is
+not in the transmitted almanac), and an '!' indicates that the signal
+strength was empty but displays as zero (some receivers use this to
+indicate the satellite is not being tracked).
 
-While NMEA (and UBX too for that matter) is good about updating the application
-with new information, it is not so good about letting the application know
-when that data is no longer relevant. For that reason, all of the data read
-from the GPS devices has associated with it an expiration time in seconds. This
-can be set from the command line, in the range 0 to the default of 255. If the
-data is not updated within that duration by new sentences or messages from the
-GPS device, it is no longer displayed.
+While NMEA (and UBX too for that matter) is good about updating the
+application with new information, it is not so good about letting the
+application know when that data is no longer relevant. For that reason,
+all of the data read from the GPS devices has associated with it an
+expiration time in seconds. This can be set from the command line, in
+the range 0 to the default of 255. If the data is not updated within
+that duration by new sentences or messages from the GPS device, it is
+no longer displayed.
 
 # Notes
 
 N.B. Most of the snapshots below were taken from earlier versions of Hazer and
 its gpstool utility. The snapshots were cut and pasted from actual output and
-may differ slightly (or greatly) from that of the most current version.
+may differ slightly (or greatly) from that of the most current version. For
+some of these, a \* was used to mean the degree symbol; later versions of
+Hazer display the actual degree symbol using Unicode.
 
 ## Sending Commands
 
