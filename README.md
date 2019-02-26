@@ -1217,17 +1217,17 @@ board has a bug. I believe this GSV sentence that it emitted is incorrect.
     $GLGSV,3,3,11,85,26,103,25,86,02,152,29,1*75\r\n
 
 This GSV sentence says it is the third of three GSV sentences for the
-GLONASS constellation, and there are eleven total sateliites cited in
+GLONASS constellation, and there are eleven total satellites cited in
 the three GSV sentences.
 
-GSV is unusal amongst the typical NMEA sentences in that it is variable
-length. Each GSV setence can contain at most four satellites, each
+GSV is unusual amongst the typical NMEA sentences in that it is variable
+length. Each GSV sentence can contain at most four satellites, each
 represented by four numbers: the space vehicle ID (which is specific to
 the constellation), the SV's elevation in degrees, the SV's azimuth in
 degrees, and the signal strength in dB Hz.
 
 The two prior GSV sentences for this report of GLONASS satellites in
-view  would have had at most four satellites, for a total of eight,
+view would have had at most four satellites, for a total of eight,
 leaving three satellites for this final sentence in the sequence. This
 sentence only has the metrics for two satellites. Note also that this
 messages has the optional signal identifier as its last field before
