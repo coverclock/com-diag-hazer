@@ -557,8 +557,8 @@ int main(void)
         static const char * DATA[] = {
             "$GPGSV,4,1,15,01,37,078,36,06,02,184,29,07,28,143,44,08,00,048,22,1*7A\r\n",
             "$GPGSV,4,2,15,11,36,059,30,13,36,270,37,15,15,304,28,17,63,226,40,2*7B\r\n",
-            "$GPGSV,4,3,15,18,24,052,32,19,32,223,36,28,67,020,28,30,59,149,38,3*77\r\n",
-            "$GPGSV,4,4,15,46,38,215,40,48,36,220,34,51,44,183,45,4*47\r\n",
+            "$GPGSV,4,3,15,18,24,052,32,19,32,223,36,28,67,020,28,30,59,149,38,*77\r\n",
+            "$GPGSV,4,4,15,46,38,215,40,48,36,220,34,51,44,183,45,3*47\r\n",
         };
         hazer_buffer_t buffer = { 0 };
         hazer_vector_t vector = { 0 };
@@ -628,8 +628,8 @@ int main(void)
 
         assert(view.signal[0] == 1);
         assert(view.signal[1] == 2);
-        assert(view.signal[2] == 3);
-        assert(view.signal[3] == 4);
+        assert(view.signal[2] == 2);
+        assert(view.signal[3] == 3);
 
         assert(view.sat[0].id == 1);
         assert(view.sat[0].elv_degrees == 37);

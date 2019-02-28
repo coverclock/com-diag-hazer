@@ -1133,8 +1133,11 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             channel = sequence * HAZER_GNSS_VIEWS;
             satellites = strtol(vector[3], (char **)0, 10);
             /*
-             * Unlike the GSA sentence, the GSV sentence is variable length.
-             * So from here on all indices are effectively relative.
+             * "Null fields are not required for unused sets when less
+             * than four sets are transmitted." [NMEA 0183 v4.10 2012 p. 96]
+             * Unlike the GSA sentence, the GSV sentence can have a variable
+             * number of fields. So from here on all indices are effectively
+             * relative.
              */
             for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
                 if (channel >= satellites) { break; }
@@ -1156,6 +1159,14 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                 ++index;
                 if (id <= 0) { break; }
                 viewp->sat[channel].id = id;
+                /*
+                 * "For efficiency it is recommended that null fields be used
+                 * in the additional sentences when the data is unchanged from
+                 * the first sentence." [NMEA 0183 v4.10 2012 p. 96]
+                 * Does this mean that the same satellite ID can appear more
+                 * than once in the same tuple of GSV sentences? Or does this
+                 * just apply to the (newish) signal ID in the last field?
+                 */
                 viewp->sat[channel].phantom = 0;
                 if (strlen(vector[index]) == 0) {
                     viewp->sat[channel].phantom = !0;
@@ -1188,8 +1199,12 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
              * indicates what frequency band was used, e.g. for GPS: L1C/A,
              * L2, etc.
              */
-            if (index <= (count - 2)) {
+            if (index > (count - 2)) {
+                viewp->signal[sequence] = 0;
+            } else if (strlen(vector[count - 2]) > 0) {
                 viewp->signal[sequence] = strtol(vector[count - 2], (char **)0, 10);
+            } else if (sequence > 0) {
+                viewp->signal[sequence] =  viewp->signal[sequence - 1];
             } else {
                 viewp->signal[sequence] = 0;
             }
