@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	15# API changes that may require that applications be modified.
 MINOR				:=	3# Only functionality or features added with no legacy API changes.
-BUILD				:=	3# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	4# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -699,3 +699,11 @@ install-include:
 	mkdir -p $(INSTALL_INC)
 	tar -C $(OUT)/$(INC_DIR) -cvf - . | tar -C $(INSTALL_INC) -xvf -
 	tar -C $(INC_DIR) -cvf - . | tar -C $(INSTALL_INC) -xvf -
+
+########## Unit test
+
+unit-test:
+	for U in $(TARGETUNITTESTS); do \
+		echo -n "UNIT TEST $$U "; \
+		test -f $$U && $$U && echo "PASS." || echo "FAIL!"; \
+	done

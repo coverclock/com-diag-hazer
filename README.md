@@ -261,34 +261,41 @@ mailto:coverclock@diag.com
 
 Paul E. Ceruzzi, *GPS*, MIT Press, 2018
 
-M. Dunn at al., *Navstar GPS Space Segment/Navigation User Interfaces*,
+M. Dunn at al., "Navstar GPS Space Segment/Navigation User Interfaces",
 IS-GPS-200H, Global Positioning Systems Directorate / Systems Engineering &
 Integration, 2013-09-24
+
+Mohinder S. Gerwal et al., *Global Navigation Satellite Systems, Inertial
+Navigation, and Integration*, Wiley, 2013
 
 John G. Grimes et al., *Global Position System Standard Positioning Service
 Performance Standard*, 4th edition, 2008-09
 
-IGS et al., *RINEX - The Receiver Independent Exchange Format*, Version 3.03,
+IGS et al., "RINEX - The Receiver Independent Exchange Format", Version 3.03,
 RTCM-SC104, 2015-07-14
 
-Elliott D. Kaplan, *Understanding GPS principles and Applications*, Artech
+Elliott D. Kaplan ed., *Understanding GPS principles and Applications*, Artech
 House, 1996
 
-Mohinder S. Grewal et al., *Global Navigation Satellite Systems, Inertial
-Navigation, and Integration*, Wiley, 2013
+Greg Milner, *Pinpoint: How GPS is Changing Technology, Culture, and Our Minds*,
+W. W. Norton, 2017-05-16
 
-NMEA 0183, *Standard for Interfacing Marine Electronic Devices*, Version 4.10,
+NMEA 0183, "Standard for Interfacing Marine Electronic Devices", Version 4.10,
 National Marine Electronics Association, 2012
 
-NovAtel, *An Introduction to GNSS*, 2nd ed., NovAtel Inc., 2015
+NovAtel, "An Introduction to GNSS", 2nd ed., NovAtel Inc., 2015
 
-u-blox 7, *Receiver Description Including Protocol Specification V14*,
+SAE, "Requirements for a Terrestrial Based Positioning, Navigation, and Timing
+(PNT) System to Improve Nagivation Solutions and Ensure Critical Infrastructure
+Security", SAE6857, 2018-04
+
+u-blox 7, "Receiver Description Including Protocol Specification V14",
 GPS.G7-SW-12001-B, ublox, 65525, 2013-02-01
 
-u-blox 8, *Receiver Description Including Protocol Specification
-v15-20.30.22-23.01*, UBX-13003221-R15, ublox, 26415b7, 2018-03-06
+u-blox 8, "Receiver Description Including Protocol Specification",
+v15-20.30.22-23.01, UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 
-u-blox 9, *ZED-F9P Interface Description*, UBX-18010854-R05,
+u-blox 9, "ZED-F9P Interface Description", UBX-18010854-R05,
 ublox, 6cc4473, 2018-12-20
 
 # Resources

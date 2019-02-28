@@ -2091,7 +2091,7 @@ int main(int argc, char * argv[])
                  * never arrive.
                  */
                 view[system].ticks = timeout;
-                refresh = (rc == 0);
+                if (rc == 0) { refresh = !0; }
 
             } else if (hazer_parse_txt(vector, count) == 0) {
 
