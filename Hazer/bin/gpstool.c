@@ -2081,10 +2081,17 @@ int main(int argc, char * argv[])
                 active[system].ticks = timeout;
                 refresh = !0;
 
-            } else if (hazer_parse_gsv(&view[system], vector, count) == 0) {
+            } else if ((rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
 
+                /*
+                 * I choose not to signal for a refresh unless we have
+                 * processed the last GSV sentence of a tuple for a
+                 * particular constellation. But I do set the timer
+                 * in case the remainder GSV sentences in the tuple
+                 * never arrive.
+                 */
                 view[system].ticks = timeout;
-                refresh = !0;
+                refresh = (rc == 0);
 
             } else if (hazer_parse_txt(vector, count) == 0) {
 

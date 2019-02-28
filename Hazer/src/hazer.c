@@ -1212,6 +1212,11 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             viewp->view = satellites;
             viewp->pending = messages - message;
             viewp->label = GSV;
+            /*
+             * Only if this is the last message in the GSV tuple do we
+             * emit a zero return code. That lets the application decide
+             * when it wants to peruse its view database.
+             */
             if (rc < 0) {
                 /* Do nothing. */
             } else if (viewp->pending > 0) {
