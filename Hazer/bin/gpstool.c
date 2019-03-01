@@ -1708,7 +1708,7 @@ int main(int argc, char * argv[])
             	 * do it.
             	 */
             	if (exiting) {
-                    fprintf(errfp, "%s: DONE.\n", Program);
+                    fprintf(errfp, "END %s: LAST.\n", Program);
             		break;
             	}
             } else {
@@ -1719,13 +1719,13 @@ int main(int argc, char * argv[])
                 length = strlen(buffer) + 1;
                 size = diminuto_escape_collapse(buffer, buffer, length);
                 if (buffer[0] == '\0') {
-                    fprintf(errfp, "%s: EXIT.\n", Program);
+                    fprintf(errfp, "END %s: ZERO.\n", Program);
                     break;
                 }
                 size1 = size - 1;
                 rc = (size < length) ? emit_message(devfp, buffer, size1) : emit_sentence(devfp, buffer, size1);
                 if (rc < 0) {
-                    fprintf(errfp, "%s: FAILED!\n", Program);
+                    fprintf(errfp, "ERR %s: FAILED!\n", Program);
                     print_buffer(errfp, buffer, size1, UNLIMITED);
                 }
 
@@ -1761,7 +1761,7 @@ int main(int argc, char * argv[])
                 if (nmea_state == HAZER_STATE_END) {
                     break;
                 } else if  (nmea_state == HAZER_STATE_EOF) {
-                    fprintf(errfp, "%s: EOF.\n", Program);
+                    fprintf(errfp, "EOF %s: NMEA.\n", Program);
                     break;
                 } else {
                     /* Do nothing. */
@@ -1770,7 +1770,7 @@ int main(int argc, char * argv[])
                 if (ubx_state == YODEL_STATE_END) {
                     break;
                 } else if  (ubx_state == YODEL_STATE_EOF) {
-                    fprintf(errfp, "%s: EOF.\n", Program);
+                    fprintf(errfp, "EOF %s: UBX.\n", Program);
                     break;
                 } else {
                     /* Do nothing. */
@@ -1833,7 +1833,7 @@ int main(int argc, char * argv[])
             assert(rc >= 0);
 
             if (nmea_ck != nmea_cs) {
-                fprintf(errfp, "%s: CHECKSUM! 0x%02x 0x%02x\n", Program, nmea_cs, nmea_ck);
+                fprintf(errfp, "ERR %s: CHECKSUM! 0x%02x 0x%02x\n", Program, nmea_cs, nmea_ck);
                 print_buffer(errfp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
             }
@@ -1846,7 +1846,7 @@ int main(int argc, char * argv[])
             assert(bp != (unsigned char *)0);
 
             if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
-                fprintf(errfp, "%s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", Program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
+                fprintf(errfp, "ERR %s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", Program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
                 print_buffer(errfp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
             }
@@ -1855,7 +1855,7 @@ int main(int argc, char * argv[])
 
         } else {
 
-            fprintf(errfp, "%s: FORMAT! %zd\n", Program, length);
+            fprintf(errfp, "ERR %s: FORMAT! %zd\n", Program, length);
             print_buffer(errfp, buffer, size1, UNLIMITED);
 
             format = FORMAT;
@@ -1998,13 +1998,13 @@ int main(int argc, char * argv[])
                 continue;
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-                    fprintf(errfp, "%s: TALKER? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
+                    fprintf(errfp, "UNK %s: TALKER? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
                     print_buffer(errfp, buffer, size - 1, UNLIMITED);
                 }
                 continue;
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-                    fprintf(errfp, "%s: SYSTEM? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
+                    fprintf(errfp, "UNK %s: SYSTEM? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
                     print_buffer(errfp, buffer, size - 1, UNLIMITED);
                 }
                 continue;
@@ -2099,7 +2099,7 @@ int main(int argc, char * argv[])
                 size_t current = 0;
                 int end = 0;
 
-                fprintf(errfp, "%s: TXT [%2d][%2d][%2d] \"", Program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
+                fprintf(errfp, "TXT %s: TXT [%2d][%2d][%2d] \"", Program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
 
                 while ((*bb != HAZER_STIMULUS_NUL) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
                     diminuto_phex_emit(errfp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
@@ -2160,10 +2160,10 @@ int main(int argc, char * argv[])
         } else if (!totokay) {
             /* Do nothing. */
         } else if (fputs(synthesized, devfp) == EOF) {
-            fprintf(errfp, "%s: OUT!\n", Program);
+            fprintf(errfp, "ERR %s: OUT!\n", Program);
             break;
         } else if (fflush(devfp) == EOF) {
-            fprintf(errfp, "%s: OUT!\n", Program);
+            fprintf(errfp, "ERR %s: OUT!\n", Program);
             break;
         } else {
             /* Do nothing. */
@@ -2253,7 +2253,7 @@ int main(int argc, char * argv[])
      ** FINIALIZATION
      **/
 
-    fprintf(errfp, "%s: END.\n", Program);
+    fprintf(errfp, "END %s: END.\n", Program);
 
     rc = yodel_finalize();
     assert(rc >= 0);
