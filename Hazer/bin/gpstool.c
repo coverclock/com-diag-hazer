@@ -2087,9 +2087,10 @@ int main(int argc, char * argv[])
                  * I choose not to signal for a refresh unless we have
                  * processed the last GSV sentence of a tuple for a
                  * particular constellation. But I do set the timer
-                 * in case the remainder GSV sentences in the tuple
+                 * in case the remainding GSV sentences in the tuple
                  * never arrive.
                  */
+
                 view[system].ticks = timeout;
                 if (rc == 0) { refresh = !0; }
 
@@ -2176,6 +2177,7 @@ int main(int argc, char * argv[])
          * block the GPS frequencies. Makes me wish I still had access to those
          * gigantic walk-in Faraday cages that several of my clients have.
          */
+
         if (!expire) {
         	/* Do nothing. */
         } else if (!refresh) {
