@@ -20,5 +20,3 @@ for OPTION in ${COMMANDS}; do
 done
 
 eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -R ${OPTIONS}
-
-

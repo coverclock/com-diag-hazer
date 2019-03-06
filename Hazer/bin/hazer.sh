@@ -17,4 +17,4 @@ SPEED=${2:-"9600"}
 stty sane
 clear
 
-exec gpstool -D ${DEVICE} -b ${SPEED} -8 -n -1 -E
+exec coreable gpstool -D ${DEVICE} -b ${SPEED} -8 -n -1 -E

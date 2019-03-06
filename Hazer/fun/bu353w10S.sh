@@ -27,4 +27,4 @@ socat -u -b ${BYTES} OPEN:${DEVICE},b${RATE},cs8,rawer PIPE:${FIFO} & PID=$!
 
 trap "kill -0 ${PID} && kill ${PID}; rm -f ${FIFO}" INT TERM
 
-gpstool -S ${FIFO} -t 10 -E 2> >(log -S -N ${PROGRAM})
+exec coreable gpstool -S ${FIFO} -t 10 -E 2> >(log -S -N ${PROGRAM})

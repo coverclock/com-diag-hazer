@@ -363,6 +363,8 @@ astronomers in the audience, but it wasn't to me.
 
 <http://ozzmaker.com/wp-content/uploads/2016/08/M10478-M10578-NMEA_Sentence_Output.pdf>
 
+<https://drotek.gitbook.io/rtk-f9p-positioning-solutions/tutorials/updating-zed-f9p-firmware>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).

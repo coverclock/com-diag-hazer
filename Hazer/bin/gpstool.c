@@ -346,6 +346,7 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
         if (va[system].ticks == 0) { continue; }
+        if (va[system].pending > 0) { continue; }
 
         limit = va[system].channels;
         if (limit > va[system].view) { limit = va[system].view; }
@@ -381,6 +382,21 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
 			fputc('\n', fp);
 
+        }
+
+        if (va[system].pending > 0) {
+            /* Do nothing. */
+        } else if  (va[system].channels == va[system].view) {
+            /* Do nothing. */
+        } else {
+            /*
+             * I have gotten GSV sentences from the U-blox ZED-F9P chip
+             * in which I believe the count in the "satellites in view"
+             * field is one more than the total number of satellites 
+             * reported in the aggregate GSV sentences. I upgraded the
+             * FW to 1.11 and am now testing.
+             */
+            fprintf(ep, "ERR %s: VIEW! \"%s\" %u %u %u\n", Program, HAZER_SYSTEM_NAME[system], va[system].pending, va[system].channels, va[system].view);
         }
 
     }

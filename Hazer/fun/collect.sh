@@ -21,4 +21,4 @@ RATE=${2:-9600}
 DIR=$(readlink -e $(dirname ${0})/..)/dat
 mkdir -p ${DIR}
 
-exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -L ${DIR}/${PROGRAM}.dat -v
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -L ${DIR}/${PROGRAM}.dat -v
