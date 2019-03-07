@@ -93,6 +93,7 @@ static int print_sentence(FILE * fp, const char * string, size_t size)
 static int print_message(FILE * fp, const void * packet, size_t size)
 {
     int rc = -1;
+    ssize_t payload = 0;
     const void * bp = (const void *)0;
     uint8_t ck_a = 0;
     uint8_t ck_b = 0;
@@ -100,7 +101,9 @@ static int print_message(FILE * fp, const void * packet, size_t size)
     char * buffer = (char *)0;
 
     do {
-        bp = yodel_checksum(packet, size, &ck_a, &ck_b);
+        payload = yodel_length(packet, size);
+        if (payload == 0) { break; }
+        bp = yodel_checksum(packet, payload, &ck_a, &ck_b);
         if (bp == (void *)0) { break; }
         length = (const char *)bp - (const char *)packet;
         buffer = malloc(length + 3);
@@ -140,10 +143,10 @@ int main(int argc, char * argv[])
             fputc('\n', stdout);
             continue;
         }
-        if (size < length) {
-            rc = print_message(stdout, buffer, size - 1);
-        } else {
+        if (buffer[0] == '$') {
             rc = print_sentence(stdout, buffer, size - 1);
+        } else {
+            rc = print_message(stdout, buffer, size - 1);
         }
         if (rc < 0) {
             fputc('\n', stdout);
