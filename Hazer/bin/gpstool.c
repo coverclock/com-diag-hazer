@@ -384,20 +384,23 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
         }
 
+#if 0
+        /*
+         * I have gotten GSV sentences from the U-blox ZED-F9P chip
+         * in which I believe the count in the "satellites in view"
+         * field is one more than the total number of satellites 
+         * reported in the aggregate GSV sentences. I upgraded the
+         * FW to 1.11 and still get this message _thousands_ of
+         * times, _always_ on the GLONASS constellation.
+         */
         if (va[system].pending > 0) {
             /* Do nothing. */
         } else if  (va[system].channels == va[system].view) {
             /* Do nothing. */
         } else {
-            /*
-             * I have gotten GSV sentences from the U-blox ZED-F9P chip
-             * in which I believe the count in the "satellites in view"
-             * field is one more than the total number of satellites 
-             * reported in the aggregate GSV sentences. I upgraded the
-             * FW to 1.11 and am now testing.
-             */
             fprintf(ep, "ERR %s: VIEW! \"%s\" %u %u %u\n", Program, HAZER_SYSTEM_NAME[system], va[system].pending, va[system].channels, va[system].view);
         }
+#endif
 
     }
 
