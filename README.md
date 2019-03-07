@@ -1272,6 +1272,14 @@ satellite, or the total count should be ten instead of eleven. My software
 has been modified to account for this malformed message; it originally
 core dumped with a segmentation violation.
 
+## checksum
+
+    $ . out/host/bin/setup
+    $ checksum '$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n'
+    $GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n
+    $ checksum '\xb5\x62\xa5\x5a\x04\x00\x01\x02\x03\x04\x0d\xca'
+    \xb5b\xa5Z\x04\x00\x01\x02\x03\x04\x0d\xca
+
 # Acknowledgements
 
 Special thanks to Mrs. Overclock for her assistance in road testing (literally)
