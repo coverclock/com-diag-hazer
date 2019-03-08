@@ -141,7 +141,7 @@ Hazer has been successfully tested with the following GPS devices.
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
 * TOPGNSS GN-803G (U-Blox UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
 * GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [1] [2] [4] [8]
-* Ardusimple SimpleRTK2B (U-Blox UBX-F9, 9600 8N1, v1516p01a9, ttyACM, 1Hz) [2] [8] [10]
+* Ardusimple SimpleRTK2B (U-Blox UBX-ZED-F9P, 9600 8N1, v1516p01a9, ttyACM, 1Hz) [2] [8] [10]
 
 Hazer has been successfully tested with the following software defined
 radio (SDR) configurations.
