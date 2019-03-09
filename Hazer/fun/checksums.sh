@@ -6,6 +6,8 @@
 
 XC=0
 
+ARGUMENT='$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n'
+echo "ARGUMENT" ${ARGUMENT}
 EXPECTED='$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n'
 echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n')
@@ -13,6 +15,8 @@ echo "ACTUAL  " ${ACTUAL}
 if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
 echo
 
+ARGUMENT='$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*'
+echo "ARGUMENT" ${ARGUMENT}
 EXPECTED='$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n'
 echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*')
@@ -20,6 +24,8 @@ echo "ACTUAL  " ${ACTUAL}
 if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
 echo
 
+ARGUMENT='$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,'
+echo "ARGUMENT" ${ARGUMENT}
 EXPECTED='$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n'
 echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,')
@@ -27,6 +33,8 @@ echo "ACTUAL  " ${ACTUAL}
 if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
 echo
 
+ARGUMENT='\xb5\x62\xa5\x5a\x04\x00\x01\x02\x03\x04\x0d\xca'
+echo "ARGUMENT" ${ARGUMENT}
 EXPECTED='\xb5b\xa5Z\x04\x00\x01\x02\x03\x04\x0d\xca'
 echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '\xb5\x62\xa5\x5a\x04\x00\x01\x02\x03\x04\x0d\xca')
@@ -34,9 +42,20 @@ echo "ACTUAL  " ${ACTUAL}
 if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
 echo
 
+ARGUMENT='\xb5\x62\xa5\x5a\x04\x00\x01\x02\x03\x04'
+echo "ARGUMENT" ${ARGUMENT}
 EXPECTED='\xb5b\xa5Z\x04\x00\x01\x02\x03\x04\x0d\xca'
 echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '\xb5\x62\xa5\x5a\x04\x00\x01\x02\x03\x04')
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
+
+ARGUMENT='\xb5\x62\xa5\x5a\x04\x00\x01\x02\x03\x04\xff\xff'
+echo "ARGUMENT" ${ARGUMENT}
+EXPECTED='\xb5b\xa5Z\x04\x00\x01\x02\x03\x04\x0d\xca'
+echo "EXPECTED" ${EXPECTED}
+ACTUAL=$(checksum '\xb5\x62\xa5\x5a\x04\x00\x01\x02\x03\x04\xff\xff')
 echo "ACTUAL  " ${ACTUAL}
 if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
 echo
