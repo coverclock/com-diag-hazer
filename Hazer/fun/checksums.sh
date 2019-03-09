@@ -7,33 +7,40 @@
 XC=0
 
 EXPECTED='$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n'
+echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n')
-echo ${EXPECTED}
-echo ${ACTUAL}
-if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then XC=1; fi
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
 
 EXPECTED='$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n'
+echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*')
-echo ${EXPECTED}
-echo ${ACTUAL}
-if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then XC=1; fi
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
 
 EXPECTED='$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,*58\r\n'
+echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '$GLGSV,3,3,11,87,41,070,33,88,35,133,29,95,37,062,')
-echo ${EXPECTED}
-echo ${ACTUAL}
-if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then XC=1; fi
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
 
 EXPECTED='\xb5b\xa5Z\x04\x00\x01\x02\x03\x04\x0d\xca'
+echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '\xb5\x62\xa5\x5a\x04\x00\x01\x02\x03\x04\x0d\xca')
-echo ${EXPECTED}
-echo ${ACTUAL}
-if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then XC=1; fi
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
 
 EXPECTED='\xb5b\xa5Z\x04\x00\x01\x02\x03\x04\x0d\xca'
+echo "EXPECTED" ${EXPECTED}
 ACTUAL=$(checksum '\xb5\x62\xa5\x5a\x04\x00\x01\x02\x03\x04')
-echo ${EXPECTED}
-echo ${ACTUAL}
-if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then XC=1; fi
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
+
+if [[ ${XC} == 0 ]]; then echo "PASS    "; else echo "FAIL    "; fi
 
 exit ${XC}
