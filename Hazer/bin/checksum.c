@@ -131,7 +131,7 @@ int main(int argc, char * argv[])
     int rc = 0;
 
     for (index = 1; index < argc; index += 1) {
-        buffer = argv[index++];
+        buffer = argv[index];
         if (buffer[0] == '\0') {
             fputc('\n', stdout);
             continue;
