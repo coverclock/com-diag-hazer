@@ -849,13 +849,24 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
 }
 
+/**
+ * The Poller structure is used by periodic DCD or GPIO poller threads to
+ * communicate with the main program about the assertion of the 1Hz 1PPS
+ * signal from certain GPS receivers which are so-equipped. The volatile
+ * declaration is used to suggest to the compiler that it doesn't optimize
+ * use of these variables out.
+ */
 struct Poller {
     FILE * ppsfp;
     FILE * strobefp;
-    int * oneppsp;
-    int done;
+    volatile int onepps;
+    volatile int done;
 };
 
+/**
+ * This mutual exclusion semaphore is used to serialize the read-modify-write
+ * sequence of the Poller onepps variable.
+ */
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /**
@@ -896,7 +907,7 @@ static void * dcdpoller(void * argp)
                 if (rc < 0) { break; }
             }
             DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-                *(ctxp->oneppsp) = !0;
+                ctxp->onepps = !0;
             DIMINUTO_CRITICAL_SECTION_END;
         } else {
             if (ctxp->strobefp != (FILE *)0) {
@@ -960,7 +971,7 @@ static void * gpiopoller(void * argp)
                     if (rc < 0) { break; }
                 }
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-                    *(pollerp->oneppsp) = !0;
+                    pollerp->onepps = !0;
                 DIMINUTO_CRITICAL_SECTION_END;
             } else {
                 if (pollerp->strobefp != (FILE *)0) {
@@ -1048,7 +1059,6 @@ int main(int argc, char * argv[])
     pthread_t thread;
     int pthreadrc = -1;
     int onepps = 0;
-    int tmppps = 0;
     /*
      * NMEA parser state variables.
      */
@@ -1505,10 +1515,10 @@ int main(int argc, char * argv[])
         assert (ppsfp != (FILE *)0);
         rc = diminuto_pin_get(ppsfp);
         assert(rc >= 0);
-        poller.done = 0;
         poller.ppsfp = ppsfp;
         poller.strobefp = strobefp;
-        poller.oneppsp = &onepps;
+        poller.onepps = 0;
+        poller.done = 0;
         pthreadrc = pthread_create(&thread, 0, gpiopoller, &poller);
         if (pthreadrc != 0) {
             errno = pthreadrc;
@@ -1627,10 +1637,10 @@ int main(int argc, char * argv[])
         if (!carrierdetect) {
             break;
         }
-        poller.done = 0;
         poller.ppsfp = devfp;
         poller.strobefp = strobefp;
-        poller.oneppsp = &onepps;
+        poller.onepps = 0;
+        poller.done = 0;
         pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
         if (pthreadrc != 0) {
             errno = pthreadrc;
@@ -2253,13 +2263,13 @@ int main(int argc, char * argv[])
             if (escape) { fputs("\033[3;1H", outfp); }
             if (report) {
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-                    tmppps = onepps;
-                    onepps = 0;
+                    onepps = poller.onepps;
+                    poller.onepps = 0;
                 DIMINUTO_CRITICAL_SECTION_END;
                 print_hardware(outfp, errfp, &hardware);
                 print_status(outfp, errfp, &status);
                 print_local(outfp, errfp, timetofirstfix);
-                print_positions(outfp, errfp, position, tmppps, dmyokay, totokay);
+                print_positions(outfp, errfp, position, onepps, dmyokay, totokay);
                 print_actives(outfp, errfp, active);
                 print_views(outfp, errfp, view, active);
             }
