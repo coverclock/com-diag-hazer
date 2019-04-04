@@ -247,6 +247,10 @@ const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, u
     length |= ((uint8_t)(bp[YODEL_UBX_LENGTH_LSB]));
     length += YODEL_UBX_SUMMED;
 
+#if 0
+    fprintf(stderr, "YODEL_CHECKSUM 0x%x 0x%x 0x%x 0x%x 0x%lx\n", bp[YODEL_UBX_LENGTH_MSB], bp[YODEL_UBX_LENGTH_LSB], YODEL_UBX_SUMMED, length, size);
+#endif
+
     if ((length + YODEL_UBX_UNSUMMED) <= size) {
 
         for (bp += YODEL_UBX_CLASS; length > 0; --length) {
@@ -350,3 +354,38 @@ int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ssize_t l
     return rc;
 }
 
+int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_ACK_Class) {
+        /* Do nothing. */
+    } else if ((hp[YODEL_UBX_ID] != YODEL_UBX_ACK_ACK_Id) && (hp[YODEL_UBX_ID] != YODEL_UBX_ACK_NAK_Id)) {
+        /* Do nothing. */
+    } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_ACK_Length)) {
+        /* Do nothing. */
+    } else {
+        memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), YODEL_UBX_ACK_Length);
+        mp->state = (hp[YODEL_UBX_ID] == YODEL_UBX_ACK_ACK_Id);
+        rc = 0;
+    }
+
+    return rc;
+}
+
+int yodel_ubx_cfg_valget(const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_CFG_VALGET_Class) {
+        /* Do nothing. */
+    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_CFG_VALGET_Id) {
+        /* Do nothing. */
+    } else {
+        rc = 0;
+    }
+
+    return rc;
+}

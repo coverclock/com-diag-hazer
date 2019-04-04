@@ -365,6 +365,12 @@ astronomers in the audience, but it wasn't to me.
 
 <https://drotek.gitbook.io/rtk-f9p-positioning-solutions/tutorials/updating-zed-f9p-firmware>
 
+<https://www.ardusimple.com/simplertk2b-hookup-guide/>
+
+<https://www.ardusimple.com/question/xbee-usage-documentation-for-simplertk/>
+
+<https://www.digi.com/resources/documentation/Digidocs/90001456-13/concepts/c_transparent_mode_detailed.htm?tocpath=XBee%20transparent%20mode%7CXBee%20transparent%20mode%20in%20detail%7C_____0>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).

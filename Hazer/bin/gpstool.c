@@ -84,6 +84,7 @@
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_delay.h"
+#include "com/diag/diminuto/diminuto_containerof.h"
 
 /*
  * CONSTANTS
@@ -991,6 +992,16 @@ static void * gpiopoller(void * argp)
 }
 
 /**
+ * The Command structure contains a linked list node whose data pointer
+ * points to the command we want to send, and the acknak field indicates
+ * whether this command expects an UBX CFG ACK or a NAK from the device.
+ */
+struct Command {
+	diminuto_list_t link;
+	int acknak;
+};
+
+/**
  * Run the main program.
  * @param argc is the number of tokens on the command line argument list.
  * @param argv contains the tokens on the command line argument list.
@@ -1031,6 +1042,7 @@ int main(int argc, char * argv[])
     role_t role = ROLE;
     protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
+    struct Command * command = (struct Command *)0;
     diminuto_list_t * node = (diminuto_list_t *)0;
     diminuto_list_t head = DIMINUTO_LIST_NULLINIT(&head);
     /*
@@ -1151,6 +1163,8 @@ int main(int argc, char * argv[])
      */
     yodel_hardware_t hardware = YODEL_HARDWARE_INITIALIZER;
     yodel_status_t status = YODEL_STATUS_INITIALIZER;
+    yodel_ubx_ack_t acknak = YODEL_UBX_ACK_INITIALIZER;
+    int acknakpending = 0;
     /*
      * Real time related variables.
      */
@@ -1197,7 +1211,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RS:VW:Xb:cdehlmnop:rst:vx?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RS:U:VW:Xb:cdehlmnop:rst:vx?";
 
     /**
      ** PREINITIALIZATION
@@ -1278,12 +1292,22 @@ int main(int argc, char * argv[])
         case 'S':
             source = optarg;
             break;
+        case 'U':
+            readonly = 0;
+            command = (struct Command *)malloc(sizeof(struct Command));
+            command->acknak = !0;
+            node = &(command->link);
+            diminuto_list_datainit(node, optarg);
+            diminuto_list_enqueue(&head, node);
+            break;
         case 'V':
             fprintf(outfp, "com-diag-hazer %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
             readonly = 0;
-            node = (diminuto_list_t *)malloc(sizeof(diminuto_list_t));
+            command = (struct Command *)malloc(sizeof(struct Command));
+            command->acknak = 0;
+            node = &(command->link);
             diminuto_list_datainit(node, optarg);
             diminuto_list_enqueue(&head, node);
             break;
@@ -1347,7 +1371,7 @@ int main(int argc, char * argv[])
         	exiting = !0;
         	break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", Program);
+            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1365,6 +1389,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(errfp, "       -R          Print a report on standard output.\n");
             fprintf(errfp, "       -S SOURCE   Use SOURCE for input.\n");
+            fprintf(errfp, "       -U STRING   Collapse escapes, append checksum, write STRINGs to DEVICE, expect ACK/NAK.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
             fprintf(errfp, "       -W STRING   Collapse escapes, append checksum, write STRINGs to DEVICE.\n");
             fprintf(errfp, "       -X          Enable message expiration test mode.\n");
@@ -1730,6 +1755,8 @@ int main(int argc, char * argv[])
                 /* Do nothing. */
             } else if (diminuto_serial_available(devfd) > 0) {
                 /* Do nothing. */
+            } else if (acknakpending > 0) {
+            	/* Do nothing. */
             } else if (diminuto_list_isempty(&head)) {
             	/*
             	 * If we are supposed to exit once we have written the
@@ -1743,25 +1770,28 @@ int main(int argc, char * argv[])
             } else {
                 node = diminuto_list_dequeue(&head);
                 assert(node != (diminuto_list_t *)0);
-                buffer = (unsigned char *)diminuto_list_data(node);
+                command = diminuto_containerof(struct Command, link, node);
+                buffer = diminuto_list_data(node);
                 assert(buffer != (unsigned char *)0);
-                length = strlen(buffer) + 1;
-                size = diminuto_escape_collapse(buffer, buffer, length);
                 if (buffer[0] == '\0') {
                     fprintf(errfp, "END %s: ZERO.\n", Program);
+	                free(node);
                     break;
                 }
-                size1 = size - 1;
-                rc = (size < length) ? emit_message(devfp, buffer, size1) : emit_sentence(devfp, buffer, size1);
-                if (rc < 0) {
-                    fprintf(errfp, "ERR %s: FAILED!\n", Program);
-                    print_buffer(errfp, buffer, size1, UNLIMITED);
-                }
-
-                if (verbose) { print_buffer(errfp, buffer, size1, UNLIMITED); }
-                if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-                if (report) { fprintf(outfp, "OUT [%3zd] ", size1); print_buffer(outfp, buffer, size1, limitation); fflush(outfp); }
-                free(node);
+				length = strlen(buffer) + 1;
+				size = diminuto_escape_collapse(buffer, buffer, length);
+				size1 = size - 1;
+				rc = (size < length) ? emit_message(devfp, buffer, size1) : emit_sentence(devfp, buffer, size1);
+				if (rc < 0) {
+					fprintf(errfp, "ERR %s: FAILED!\n", Program);
+					print_buffer(errfp, buffer, size1, UNLIMITED);
+				} else {
+	                if (command->acknak) { acknakpending += 1; }
+					if (verbose) { print_buffer(errfp, buffer, size1, UNLIMITED); }
+					if (escape) { fputs("\033[2;1H\033[0K", outfp); }
+					if (report) { fprintf(outfp, "OUT [%3zd] ", size1); print_buffer(outfp, buffer, size1, limitation); fflush(outfp); }
+				}
+				free(node);
             }
 
             /*
@@ -2156,6 +2186,21 @@ int main(int argc, char * argv[])
 
                 status.ticks = timeout;
                 refresh = !0;
+
+            } else if (yodel_ubx_ack(&acknak, ubx_buffer, length) == 0) {
+
+            	refresh = !0;
+
+                fprintf(errfp, "UBX %s: %s 0x%02x 0x%02x (%d)\n", Program, acknak.state ? "ACK" : "NAK", acknak.clsID, acknak.msgID, acknakpending);
+
+            	if (acknakpending > 0) { acknakpending -= 1; }
+
+            } else if (yodel_ubx_cfg_valget(ubx_buffer, length) == 0) {
+
+            	refresh = !0;
+
+                fprintf(errfp, "UBX %s: CFG VALGET\n", Program);
+                print_buffer(errfp, buffer, length, UNLIMITED);
 
             } else {
 

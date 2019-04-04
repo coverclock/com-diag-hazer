@@ -437,7 +437,7 @@ typedef struct YodelHardware {
     }
 
 /*******************************************************************************
- * PROCESSING UBX-NAV_STATUS MESSAGES
+ * PROCESSING UBX-NAV-STATUS MESSAGES
  ******************************************************************************/
 
 /**
@@ -456,7 +456,7 @@ typedef struct YodelUbxNavStatus {
 
 /**
  * @define YODEL_UBX_NAV_STATUS_INITIALIZER
- * Initialize a YodelHardware structure.
+ * Initialize a YodelUbxNavStatus structure.
  */
 #define YODEL_UBX_NAV_STATUS_INITIALIZER \
     { \
@@ -580,7 +580,7 @@ typedef struct YodelStatus {
 
 /**
  * @define YODEL_STATUS_INITIALIZER
- * Initialize a YodelHardware structure.
+ * Initialize a YodelStatus structure.
  */
 #define YODEL_STATUS_INITIALIZER \
     { \
@@ -588,6 +588,71 @@ typedef struct YodelStatus {
 		0, \
 		{ 0, } \
     }
+
+/*******************************************************************************
+ * PROCESSING UBX-ACK-ACK and UBX-ACK-NAK MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-ACK constants.
+ */
+enum YodelUbxAckConstants {
+    YODEL_UBX_ACK_Class			= 0x05,
+    YODEL_UBX_ACK_Length		= 2,
+    YODEL_UBX_ACK_NAK_Id		= 0x00,
+    YODEL_UBX_ACK_ACK_Id		= 0x01,
+};
+
+/**
+ * UBX-ACK-ACK (0x05, 0x01) [2] and UBX-ACK-NAK (0x05, 0x00) [2] are used to
+ * indicate the success or failure of UBX messages sent to the device.
+ * Ublox 8 R15, p. 145.
+ */
+typedef struct YodelUbxAck {
+	uint8_t clsID;		/* Class of packet ACKed or NAKed. */
+	uint8_t msgID;		/* Message of packet ACKed or NAKed. */
+	uint8_t state;		/* True if ACK, false if NAK. */
+} yodel_ubx_ack_t;
+
+/**
+ * @define YODEL_UBX_ACK_INITIALIZER
+ * Initialize a YodelUbxAck structure.
+ */
+#define YODEL_UBX_ACK_INITIALIZER \
+    { \
+	    ~0, \
+		~0, \
+		0, \
+    }
+
+/**
+ * Process a possible UBX-ACK-ACK or UBX-ACK-NAK message.
+ * @param mp points to a UBX-ACK structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-CFG-VALGET MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-CFG-VALGET constants.
+ */
+enum YodelUbxCfgValgetConstants {
+    YODEL_UBX_CFG_VALGET_Class	= 0x06,
+    YODEL_UBX_CFG_VALGET_Id		= 0x8b,
+};
+
+/**
+ * Process a possible UBX-CFG-VALGET message.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_cfg_valget(const void * bp, ssize_t length);
 
 /******************************************************************************
  * ENDIAN CONVERSION
