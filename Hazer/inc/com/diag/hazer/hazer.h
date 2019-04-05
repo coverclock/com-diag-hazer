@@ -139,7 +139,7 @@ enum HazerGnssConstants {
  */
 enum HazerNmeaConstants {
     HAZER_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
-    HAZER_NMEA_LONGEST     = 512, /* Adjusted. */
+    HAZER_NMEA_LONGEST     = 512, /* Longer than spec. */
     HAZER_NMEA_TALKER      = sizeof("GP") - 1,
     HAZER_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
     HAZER_NMEA_ID          = sizeof("$GPGGAXX") - 1, /* Adjusted. */

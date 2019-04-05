@@ -189,9 +189,12 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
 
     case YODEL_ACTION_TERMINATE:
         /*
-         * It's not really meaningful to NUL-terminate a binary UBX packet, but
-         * doing so simplifies user code that doesn't know yet the format of
-         * the data in the buffer, e.g. in the case of IP datagrams.
+         * It seems like it's not really meaningful to NUL-terminate a binary
+         * UBX packet, but it is. Doing so simplifies user code that doesn't
+         * know yet the format of the data in the buffer, e.g. in the case of
+         * IP datagrams. And it guarantees that we don't run off the end of
+         * some UBX messages (like UBX-MON-VER) that contain null terminated
+         * strings in their payloads.
          */
         if ((*sp) > 1) {
             *((*bp)++) = ch;
@@ -382,6 +385,22 @@ int yodel_ubx_cfg_valget(const void * bp, ssize_t length)
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_CFG_VALGET_Class) {
         /* Do nothing. */
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_CFG_VALGET_Id) {
+        /* Do nothing. */
+    } else {
+        rc = 0;
+    }
+
+    return rc;
+}
+
+int yodel_ubx_mon_ver(const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_VER_Class) {
+        /* Do nothing. */
+    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_MON_VER_Id) {
         /* Do nothing. */
     } else {
         rc = 0;

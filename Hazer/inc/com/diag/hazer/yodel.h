@@ -73,7 +73,8 @@ enum YodelUbxConstants {
     YODEL_UBX_UNSUMMED	= 2,	/* SYNC1[1], SYNC2[1] */
     YODEL_UBX_SUMMED	= 4,	/* CLASS[1], ID[1], LENGTH[2] ... */
     YODEL_UBX_SHORTEST	= 8,	/* UNSUMMED[2], SUMMED[4], CK_A[1], CK_B[1] */
-    YODEL_UBX_LONGEST	= 512,	/* No clue what this should be. */
+	YODEL_UBX_CHECKSUM	= 2,	/* CK_A[1], CK_B[1] */
+    YODEL_UBX_LONGEST	= 1024,	/* Rounded up from SHORTEST + (64 * (4 + 8)). */
 };
 
 /**
@@ -653,6 +654,29 @@ enum YodelUbxCfgValgetConstants {
  * @return 0 if the message was valid, <0 otherwise.
  */
 extern int yodel_ubx_cfg_valget(const void * bp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-MON-VER MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-CFG-VALGET constants.
+ */
+enum YodelUbxMonVerConstants {
+    YODEL_UBX_MON_VER_Class				= 0x0a,
+    YODEL_UBX_MON_VER_Id				= 0x04,
+	YODEL_UBX_MON_VER_LENGTH_swVersion	= 30,
+	YODEL_UBX_MON_VER_LENGTH_hwVersion	= 10,
+	YODEL_UBX_MON_VER_LENGTH_extension	= 30,
+};
+
+/**
+ * Process a possible UBX-MON-VER message.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_mon_ver(const void * bp, ssize_t length);
 
 /******************************************************************************
  * ENDIAN CONVERSION

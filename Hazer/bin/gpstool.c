@@ -2202,6 +2202,28 @@ int main(int argc, char * argv[])
                 fprintf(errfp, "UBX %s: CFG VALGET\n", Program);
                 print_buffer(errfp, buffer, length, UNLIMITED);
 
+            } else if (yodel_ubx_mon_ver(ubx_buffer, length) == 0) {
+
+            	do {
+
+                	const char * bb = &ubx_buffer[YODEL_UBX_PAYLOAD];
+                	const char * ee = &ubx_buffer[length] - 2;
+
+                	if (bb >= ee) { break; }
+            		fprintf(errfp, "UBX %s: VER SW \"%s\"\n", Program, bb);
+            		bb += YODEL_UBX_MON_VER_LENGTH_swVersion;
+
+            		if (bb >= ee) { break; }
+            		fprintf(errfp, "UBX %s: VER HW \"%s\"\n", Program, bb);
+            		bb += YODEL_UBX_MON_VER_LENGTH_hwVersion;
+
+            		while (bb < ee) {
+            			fprintf(errfp, "UBX %s: VER EX \"%s\"\n", Program, bb);
+            			bb += YODEL_UBX_MON_VER_LENGTH_extension;
+            		}
+
+            	} while (false);
+
             } else {
 
                 /* Do nothing. */
