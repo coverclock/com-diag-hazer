@@ -651,6 +651,21 @@ enum YodelUbxCfgValgetConstants {
 };
 
 /**
+ * Note that the way UBX-CFG-VALGET encodes the layer (as an enumeration)
+ * is NOT how UBX-CFG-VALSET encodes the layer (as a bit mask so that multiple
+ * layers can be modified with a single VALSET command). Unless there is a
+ * compelling reason not to, I stick with RAM so that a power cycle can
+ * restore the default to defaults.
+ * Ublox 9, p. 86
+ */
+enum YodelUbxCfgValgetLayer {
+	YODEL_UBX_CFG_VALGET_Layer_RAM	= 0,
+	YODEL_UBX_CFG_VALGET_Layer_BBR	= 1,
+	YODEL_UBX_CFG_VALGET_Layer_NVM	= 2,
+	YODEL_UBX_CFG_VALGET_Layer_ROM	= 7,
+};
+
+/**
  * Ublox 9, p. 191
  */
 enum YodelUbxCfgValgetSize {

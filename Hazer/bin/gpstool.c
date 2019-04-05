@@ -2200,6 +2200,7 @@ int main(int argc, char * argv[])
             	yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)&(ubx_buffer[YODEL_UBX_PAYLOAD]);
             	const char * bb = (const char *)0;
             	const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
+            	const char * layer = (const char *)0;
             	int ii = 0;
             	yodel_ubx_cfg_valget_key_t kk = 0;
             	size_t ss = 0;
@@ -2210,6 +2211,24 @@ int main(int argc, char * argv[])
             	uint64_t vv64 = 0;
 
             	refresh = !0;
+
+            	switch (pp->layer) {
+            	case YODEL_UBX_CFG_VALGET_Layer_RAM:
+            		layer = "RAM";
+            		break;
+            	case YODEL_UBX_CFG_VALGET_Layer_BBR:
+            		layer = "BBR";
+            		break;
+            	case YODEL_UBX_CFG_VALGET_Layer_NVM:
+            		layer = "NVM";
+            		break;
+            	case YODEL_UBX_CFG_VALGET_Layer_ROM:
+            		layer = "ROM";
+            		break;
+            	default:
+            		layer = "INV";
+            		break;
+            	}
 
             	for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
 
@@ -2245,24 +2264,27 @@ int main(int argc, char * argv[])
 
 					switch (ss) {
 					case YODEL_UBX_CFG_VALGET_Size_BIT:
+						vv1 = *bb;
+						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%01x\n", Program, pp->version, layer, ii, kk, vv1);
+						break;
 					case YODEL_UBX_CFG_VALGET_Size_ONE:
 						vv1 = *bb;
-						fprintf(errfp, "UBX %s: CFG VALGET [%d] 0x%08x 0x%02x\n", Program, ii, kk, vv1);
+						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%02x\n", Program, pp->version, layer, ii, kk, vv1);
 						break;
 					case YODEL_UBX_CFG_VALGET_Size_TWO:
 						memcpy(&vv16, bb, sizeof(vv16));
 						vv16 = le16toh(vv16);
-						fprintf(errfp, "UBX %s: CFG VALGET [%d] 0x%08x 0x%04x\n", Program, ii, kk, vv16);
+						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%04x\n", Program, pp->version, layer, ii, kk, vv16);
 						break;
 					case YODEL_UBX_CFG_VALGET_Size_FOUR:
 						memcpy(&vv32, bb, sizeof(vv32));
 						vv32 = le32toh(vv32);
-						fprintf(errfp, "UBX %s: CFG VALGET [%d] 0x%08x 0x%08x\n", Program, ii, kk, vv32);
+						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%08x\n", Program, pp->version,layer, ii, kk, vv32);
 						break;
 					case YODEL_UBX_CFG_VALGET_Size_EIGHT:
 						memcpy(&vv64, bb, sizeof(vv64));
 						vv64 = le64toh(vv64);
-						fprintf(errfp, "UBX %s: CFG VALGET [%d] 0x%08x 0x%016llx\n", Program, ii, kk, (unsigned long long)vv64);
+						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%016llx\n", Program, pp->version, layer, ii, kk, (unsigned long long)vv64);
 						break;
 					}
 
