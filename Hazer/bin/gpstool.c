@@ -2211,10 +2211,9 @@ int main(int argc, char * argv[])
 
             	refresh = !0;
 
-            	bb = &(pp->cfgData[0]);
-				do {
+            	for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
 
-					if ((bb + sizeof(kk)) >= ee) { break; }
+					if ((bb + sizeof(kk)) > ee) { break; }
 					memcpy(&kk, bb, sizeof(kk));
 					kk = le32toh(kk);
 
@@ -2267,12 +2266,9 @@ int main(int argc, char * argv[])
 						break;
 					}
 
-					bb += ll;
-					if (bb >= ee) { break; }
+					++ii;
 
-					ii++;
-
-				} while (!0);
+				}
 
             } else if (yodel_ubx_mon_ver(ubx_buffer, length) == 0) {
 
