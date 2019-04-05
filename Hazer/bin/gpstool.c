@@ -2197,32 +2197,106 @@ int main(int argc, char * argv[])
 
             } else if (yodel_ubx_cfg_valget(ubx_buffer, length) == 0) {
 
+            	yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)&(ubx_buffer[YODEL_UBX_PAYLOAD]);
+            	const char * bb = (const char *)0;
+            	const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
+            	int ii = 0;
+            	yodel_ubx_cfg_valget_key_t kk = 0;
+            	size_t ss = 0;
+            	size_t ll = 0;
+            	uint8_t vv1 = 0;
+            	uint16_t vv16 = 0;
+            	uint32_t vv32 = 0;
+            	uint64_t vv64 = 0;
+
             	refresh = !0;
 
-                fprintf(errfp, "UBX %s: CFG VALGET\n", Program);
-                print_buffer(errfp, buffer, length, UNLIMITED);
+            	bb = &(pp->cfgData[0]);
+				do {
+
+					if ((bb + sizeof(kk)) >= ee) { break; }
+					memcpy(&kk, bb, sizeof(kk));
+					kk = le32toh(kk);
+
+					ss = (kk >> YODEL_UBX_CFG_VALGET_Key_Size_SHIFT) & YODEL_UBX_CFG_VALGET_Key_Size_MASK;
+
+					switch (ss) {
+					case YODEL_UBX_CFG_VALGET_Size_BIT:
+					case YODEL_UBX_CFG_VALGET_Size_ONE:
+						ll = 1;
+						break;
+					case YODEL_UBX_CFG_VALGET_Size_TWO:
+						ll = 2;
+						break;
+					case YODEL_UBX_CFG_VALGET_Size_FOUR:
+						ll = 4;
+						break;
+					case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+						ll = 8;
+						break;
+					default:
+						ll = 0;
+						break;
+					}
+
+					if (ll == 0) { break; }
+
+					bb += sizeof(kk);
+					if ((bb + ll) > ee) { break; }
+
+					switch (ss) {
+					case YODEL_UBX_CFG_VALGET_Size_BIT:
+					case YODEL_UBX_CFG_VALGET_Size_ONE:
+						vv1 = *bb;
+						fprintf(errfp, "UBX %s: CFG VALGET [%d] 0x%08x 0x%02x\n", Program, ii, kk, vv1);
+						break;
+					case YODEL_UBX_CFG_VALGET_Size_TWO:
+						memcpy(&vv16, bb, sizeof(vv16));
+						vv16 = le16toh(vv16);
+						fprintf(errfp, "UBX %s: CFG VALGET [%d] 0x%08x 0x%04x\n", Program, ii, kk, vv16);
+						break;
+					case YODEL_UBX_CFG_VALGET_Size_FOUR:
+						memcpy(&vv32, bb, sizeof(vv32));
+						vv32 = le32toh(vv32);
+						fprintf(errfp, "UBX %s: CFG VALGET [%d] 0x%08x 0x%08x\n", Program, ii, kk, vv32);
+						break;
+					case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+						memcpy(&vv64, bb, sizeof(vv64));
+						vv64 = le64toh(vv64);
+						fprintf(errfp, "UBX %s: CFG VALGET [%d] 0x%08x 0x%016llx\n", Program, ii, kk, (unsigned long long)vv64);
+						break;
+					}
+
+					bb += ll;
+					if (bb >= ee) { break; }
+
+					ii++;
+
+				} while (!0);
 
             } else if (yodel_ubx_mon_ver(ubx_buffer, length) == 0) {
 
+            	const char * bb = &ubx_buffer[YODEL_UBX_PAYLOAD];
+            	const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
+
+            	refresh = !0;
+
             	do {
 
-                	const char * bb = &ubx_buffer[YODEL_UBX_PAYLOAD];
-                	const char * ee = &ubx_buffer[length] - 2;
-
                 	if (bb >= ee) { break; }
-            		fprintf(errfp, "UBX %s: VER SW \"%s\"\n", Program, bb);
-            		bb += YODEL_UBX_MON_VER_LENGTH_swVersion;
+            		fprintf(errfp, "UBX %s: MON VER SW \"%s\"\n", Program, bb);
+            		bb += YODEL_UBX_MON_VER_swVersion_LENGTH;
 
             		if (bb >= ee) { break; }
-            		fprintf(errfp, "UBX %s: VER HW \"%s\"\n", Program, bb);
-            		bb += YODEL_UBX_MON_VER_LENGTH_hwVersion;
+            		fprintf(errfp, "UBX %s: MON VER HW \"%s\"\n", Program, bb);
+            		bb += YODEL_UBX_MON_VER_hwVersion_LENGTH;
 
             		while (bb < ee) {
-            			fprintf(errfp, "UBX %s: VER EX \"%s\"\n", Program, bb);
-            			bb += YODEL_UBX_MON_VER_LENGTH_extension;
+            			fprintf(errfp, "UBX %s: MON VER EX \"%s\"\n", Program, bb);
+            			bb += YODEL_UBX_MON_VER_extension_LENGTH;
             		}
 
-            	} while (false);
+            	} while (0);
 
             } else {
 

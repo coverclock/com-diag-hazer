@@ -386,6 +386,8 @@ int yodel_ubx_cfg_valget(const void * bp, ssize_t length)
         /* Do nothing. */
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_CFG_VALGET_Id) {
         /* Do nothing. */
+    } else if (length < (YODEL_UBX_SHORTEST + YODEL_UBX_CFG_VALGET_Length)) {
+        /* Do nothing. */
     } else {
         rc = 0;
     }

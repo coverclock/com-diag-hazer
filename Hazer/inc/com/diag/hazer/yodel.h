@@ -643,9 +643,28 @@ extern int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length);
  * UBX-CFG-VALGET constants.
  */
 enum YodelUbxCfgValgetConstants {
-    YODEL_UBX_CFG_VALGET_Class	= 0x06,
-    YODEL_UBX_CFG_VALGET_Id		= 0x8b,
+    YODEL_UBX_CFG_VALGET_Class			= 0x06,
+    YODEL_UBX_CFG_VALGET_Id				= 0x8b,
+	YODEL_UBX_CFG_VALGET_Length			= 4,
+	YODEL_UBX_CFG_VALGET_Key_Size_SHIFT	= 28,
+	YODEL_UBX_CFG_VALGET_Key_Size_MASK	= 0x7,
 };
+
+/**
+ * Ublox 9, p. 191
+ */
+enum YodelUbxCfgValgetSize {
+	YODEL_UBX_CFG_VALGET_Size_BIT	= 0x01,
+	YODEL_UBX_CFG_VALGET_Size_ONE	= 0x02,
+	YODEL_UBX_CFG_VALGET_Size_TWO	= 0x03,
+	YODEL_UBX_CFG_VALGET_Size_FOUR	= 0x04,
+	YODEL_UBX_CFG_VALGET_Size_EIGHT	= 0x05,
+};
+
+/**
+ * UBX configuration key identifiers are four bytes little endian.
+ */
+typedef uint32_t yodel_ubx_cfg_valget_key_t;
 
 /**
  * Process a possible UBX-CFG-VALGET message.
@@ -654,6 +673,17 @@ enum YodelUbxCfgValgetConstants {
  * @return 0 if the message was valid, <0 otherwise.
  */
 extern int yodel_ubx_cfg_valget(const void * bp, ssize_t length);
+
+/**
+ * UBX-CFG-VALGET is how generation 9 handles device configuration queries.
+ * Ublox 9, p. 85.
+ */
+typedef struct YodelUbxCfgValget {
+	uint8_t version;		/* Message version: send 0, receive 1. */
+	uint8_t layer;			/* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
+	uint8_t reserved[2];	/* Reserved. */
+	uint8_t cfgData[0];		/* Payload. */
+} yodel_ubx_cfg_valget_t;
 
 /*******************************************************************************
  * PROCESSING UBX-MON-VER MESSAGES
@@ -665,9 +695,9 @@ extern int yodel_ubx_cfg_valget(const void * bp, ssize_t length);
 enum YodelUbxMonVerConstants {
     YODEL_UBX_MON_VER_Class				= 0x0a,
     YODEL_UBX_MON_VER_Id				= 0x04,
-	YODEL_UBX_MON_VER_LENGTH_swVersion	= 30,
-	YODEL_UBX_MON_VER_LENGTH_hwVersion	= 10,
-	YODEL_UBX_MON_VER_LENGTH_extension	= 30,
+	YODEL_UBX_MON_VER_swVersion_LENGTH	= 30,
+	YODEL_UBX_MON_VER_hwVersion_LENGTH	= 10,
+	YODEL_UBX_MON_VER_extension_LENGTH	= 30,
 };
 
 /**
