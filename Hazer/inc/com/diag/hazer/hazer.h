@@ -313,9 +313,9 @@ typedef enum HazerSystem {
  * GNSS satellite identifiers.
  * NMEA 0183 4.10 p. 94.
  * UBLOX8 R15 p. 373.
- * There are some conflicts between these documents, and the best receiver I
- * have only does GPS, SBAS, and GLONASS, so much of this is guess work on
- * my part.
+ * There are some conflicts between these documents, and my most recent
+ * receiver, the U-blox 9, doesn't match these anyway. Despite the
+ * documentation, I don't consider these reliable.
  */
 typedef enum HazerId {
     /*                        0,     */
@@ -826,7 +826,9 @@ typedef struct HazerActive {
 extern int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count);
 
 /**
- * Map a single satellite identifier to a system.
+ * Map a single satellite identifier to a system. Using this is really a last
+ * resort, and will likely only work in old receivers, and then maybe not
+ * reliably.
  * @param id is the satellite it.
  * @return an index of the system of SYSTEM TOTAL if N/A.
  */
@@ -835,8 +837,10 @@ extern hazer_system_t hazer_map_id_to_system(uint16_t id);
 /**
  * Return a system given a list of active satellites. This is based on the
  * NMEA conventions for satellite numbering for GPS, GLONASS, and WAAS.
- * @param activep points to the active structure. It is sometimes useful for
- * GPS devices that emit multiple GSA sentences all under the GNSS talker.
+ * It is sometimes useful for GPS devices that emit multiple GSA sentences all
+ * under the GNSS talker. But I recommend using it only as a last resort, as I
+ * find the documented NMEA conventions for satellite numbering unreliable.
+ * @param activep points to the active structure.
  * @return the index of the system or SYSTEM TOTAL if N/A.
  */
 extern hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep);

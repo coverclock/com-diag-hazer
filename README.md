@@ -1,7 +1,7 @@
 com-diag-hazer
 ==============
 
-Parse NMEA strings from GNSS devices.
+Parse NMEA strings and UBX messages from GNSS devices.
 
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/coverclock)
 
@@ -12,6 +12,15 @@ Copyright 2017-2019 by the Digital Aggregates Corporation, Colorado, USA.
 # License
 
 Licensed under the terms in LICENSE.txt. 
+
+# Contact
+
+Chip Overclock    
+Digital Aggregates Corporation    
+3440 Youngfield Street, Suite 209    
+Wheat Ridge CO 80033 USA    
+http://www.diag.com    
+mailto:coverclock@diag.com    
 
 # Abstract
 
@@ -100,7 +109,9 @@ exercised using actual GPS receivers.
 
 However, receivers that implement the GSA System ID field introduced in
 NMEA 4.10 may reuse satellite identifiers (e.g. I see GPS and Galileo both
-using identifier 9 on the U-Blox 9 receiver).
+using identifier 9 on the U-Blox 9 receiver). Despite NMEA and vendor
+documentation to the contrary, I do not find the satellite identifer convention
+reliable and only use it as a last resort.
 
 # Devices
 
@@ -215,15 +226,6 @@ Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2
 Ubuntu 16.04.5 "Xenial Xerus"    
 Linux 4.15.0    
 gcc 5.4.0    
-
-# Contact
-
-Chip Overclock    
-Digital Aggregates Corporation    
-3440 Youngfield Street, Suite 209    
-Wheat Ridge CO 80033 USA    
-http://www.diag.com    
-mailto:coverclock@diag.com    
 
 # Repositories
 
@@ -443,6 +445,8 @@ Optionally install Diminuto and Hazer in /usr/local.
 * gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
 * gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
 * simplertk2b - script that uses gpstool to exercise the Ardusimple SimpleRTK2B board.
+* simplertk2bbase - script that uses gpstool to exercise the Ardusimple SimpleRTK2B board in base (Survey-In) mode with RTK.
+* simplertk2brover - script that uses gpstool to exercise the Ardusimple SimpleRTK2B board in rover mode with RTK.
 * sirfstar4 - script that uses gpstool to exercise any SiRF Star 4 device.
 * talkers - script that uses gpstool to process a file of synthetic input.
 * ublox7 - script that uses gpstool to exercise any Ublox 7 device.    
@@ -1197,7 +1201,7 @@ Note that the new satellite uses PRN 4. I suspect now that the earlier
 use of PRN 4 by SVN36 was some kind of control segment testing in advance
 of the launch of SVN74.
 
-## GPS Constellation Status 2018-02-20
+## GPS Constellation Status 2019-02-20
 
 The Global Positioning Systems Directoriate proposed a change to the
 "Navstar GPS Control Segment to User Support Community Interfaces"
