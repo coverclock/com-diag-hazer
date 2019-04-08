@@ -17,7 +17,6 @@ RATE=${2:-9600}
 # UBX-CFG-VALGET [8] V0 RAM 0 0 CFG-TMODE-MODE
 # UBX-CFG-VALGET [8] V0 RAM 0 0 CFG-TMODE-SVIN-MIN-DUR
 # UBX-CFG-VALGET [8] V0 RAM 0 0 CFG-TMODE-SVIN-ACC-LIMIT
-# UBX-CFG-VALGET [8] V0 RAM 0 0 CFG-TMODE-MODE
 # UBX-CFG-VALGET [8] V0 RAM 0 0 CFG-UART2-BAUDRATE
 # UBX-CFG-VALGET [8] V0 RAM 0 0 CFG-UART2-STOPBITS
 # UBX-CFG-VALGET [8] V0 RAM 0 0 CFG-UART2-DATABITS
@@ -32,7 +31,7 @@ RATE=${2:-9600}
 # UBX-CFG-VALGET [8] V0 RAM 0 0 CFG-UART2INPROT-RTCM3X
 # UBX-CFG-VALGET [8] V0 RAM 0 0 CFG-UART2OUTPROT-RTCM3X
 
-exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -x \
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -W '\xb5\x62\x0a\x04\x00\x00' \
     -U '\xb5\x62\x06\x8b\x08\x00\x00\x00\x00\x00\x01\x00\x93\x20' \
     -U '\xb5\x62\x06\x8b\x08\x00\x00\x00\x00\x00\x01\x00\x03\x20' \
@@ -51,4 +50,4 @@ exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -x \
     -U '\xb5\x62\x06\x8b\x08\x00\x00\x00\x00\x00\x05\x03\x91\x20' \
     -U '\xb5\x62\x06\x8b\x08\x00\x00\x00\x00\x00\x04\x00\x75\x10' \
     -U '\xb5\x62\x06\x8b\x08\x00\x00\x00\x00\x00\x04\x00\x76\x10' \
-	2> >(log -S -N ${PROGRAM})
+    -x

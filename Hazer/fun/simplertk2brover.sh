@@ -7,7 +7,7 @@
 # This script is specific to the Ardusimple SimpleRTK2B rover (mobile) side.
 
 PROGRAM=$(basename ${0})
-DEVICE=${1:-"/dev/ttyACM1"}
+DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup

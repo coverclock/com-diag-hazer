@@ -371,6 +371,10 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.ardusimple.com/question/xbee-usage-documentation-for-simplertk/>
 
+<https://www.ardusimple.com/question/problem-in-configuring-base-in-time-mode-sending-out-rtcm3-messages-from-base/>
+
+<https://www.ardusimple.com/question/both-units-now-blink-gps-to-xbee-but-no-xbee-to-gps/>
+
 <https://www.digi.com/resources/documentation/Digidocs/90001456-13/concepts/c_transparent_mode_detailed.htm?tocpath=XBee%20transparent%20mode%7CXBee%20transparent%20mode%20in%20detail%7C_____0>
 
 # Build
@@ -1282,6 +1286,102 @@ I think either there should be a third set of four fields for the eleventh
 satellite, or the total count should be ten instead of eleven. My software
 has been modified to account for this malformed message; it originally
 core dumped with a segmentation violation.
+
+## SimpleRTK2B Configurations
+
+### Base A7
+
+    UBX gpstool: MON VER SW "EXT CORE 1.00 (94e56e)"
+    UBX gpstool: MON VER HW "00190000"
+    UBX gpstool: MON VER EX "ROM BASE 0x118B2060"
+    UBX gpstool: MON VER EX "FWVER=HPG 1.11"
+    UBX gpstool: MON VER EX "PROTVER=27.10"
+    UBX gpstool: MON VER EX "MOD=ZED-F9P"
+    UBX gpstool: MON VER EX "GPS;GLO;GAL;BDS"
+    UBX gpstool: MON VER EX "QZSS"
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20930001 0x29
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20030001 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030010 0x0000003c
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030011 0x0000c350
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x40530001 0x00000096
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530002 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530003 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530004 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x10530005 0x1
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x209102bf 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910360 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910365 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036a 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036f 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910305 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x10750004 0x0
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x10760004 0x1
+    UBX gpstool: ACK 0x06 0x8b (1)
+    END gpstool: LAST.
+    END gpstool: END.
+
+### Rover C9
+
+    UBX gpstool: MON VER SW "EXT CORE 1.00 (94e56e)"
+    UBX gpstool: MON VER HW "00190000"
+    UBX gpstool: MON VER EX "ROM BASE 0x118B2060"
+    UBX gpstool: MON VER EX "FWVER=HPG 1.11"
+    UBX gpstool: MON VER EX "PROTVER=27.10"
+    UBX gpstool: MON VER EX "MOD=ZED-F9P"
+    UBX gpstool: MON VER EX "GPS;GLO;GAL;BDS"
+    UBX gpstool: MON VER EX "QZSS"
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20930001 0x29
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20030001 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030010 0x00000000
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030011 0x00000000
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x40530001 0x00000096
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530002 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530003 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530004 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x10530005 0x1
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x209102bf 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910360 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910365 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036a 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036f 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910305 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x10750004 0x1
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x10760004 0x0
+    UBX gpstool: ACK 0x06 0x8b (1)
+    END gpstool: LAST.
+    END gpstool: END.
 
 # Acknowledgements
 
