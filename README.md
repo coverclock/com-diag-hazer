@@ -1307,7 +1307,7 @@ core dumped with a segmentation violation.
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x40030011 0x0000c350
     UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x40530001 0x00000096
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x40530001 0x00009600
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x20530002 0x01
     UBX gpstool: ACK 0x06 0x8b (1)
@@ -1354,7 +1354,7 @@ core dumped with a segmentation violation.
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x40030011 0x00000000
     UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x40530001 0x00000096
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x40530001 0x00009600
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x20530002 0x01
     UBX gpstool: ACK 0x06 0x8b (1)
