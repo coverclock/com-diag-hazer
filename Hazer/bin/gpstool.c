@@ -62,6 +62,7 @@
 #include <locale.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
+#include "com/diag/hazer/gpstool.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
@@ -79,7 +80,6 @@
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_dump.h"
-#include "com/diag/diminuto/diminuto_list.h"
 #include "com/diag/diminuto/diminuto_frequency.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_countof.h"
@@ -87,7 +87,7 @@
 #include "com/diag/diminuto/diminuto_containerof.h"
 
 /*
- * CONSTANTS
+ * ENUMERATIONS
  */
 
 typedef enum Role { ROLE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
@@ -99,6 +99,10 @@ typedef enum Format { FORMAT = 0, NMEA = 1, UBX = 2 } format_t;
 typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*' } status_t;
 
 typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!' } marker_t;
+
+/*
+ * CONSTANTS
+ */
 
 static const size_t LIMIT = 80 - (sizeof("OUT ") - 1) - (sizeof("[123] ") - 1) - (sizeof("\r\n") - 1) - 1;
 
@@ -117,6 +121,8 @@ static const wchar_t DEGREE = 0x002A;
 static const char * Program = (const char *)0;
 
 static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
+
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /**
  * Emit an NMEA sentences to the specified stream after adding the ending
@@ -851,24 +857,30 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 }
 
 /**
- * The Poller structure is used by periodic DCD or GPIO poller threads to
- * communicate with the main program about the assertion of the 1Hz 1PPS
- * signal from certain GPS receivers which are so-equipped. The volatile
- * declaration is used to suggest to the compiler that it doesn't optimize
- * use of these variables out.
+ * Print information about the base and the rover that communicate via RTCM.
+ * @param fp points to the FILE stream.
+ * @param ep points to the FILE stream for errors.
+ * @param bp points to the base structure.
+ * @param rp points to the rover structure.
  */
-struct Poller {
-    FILE * ppsfp;
-    FILE * strobefp;
-    volatile int onepps;
-    volatile int done;
-};
+static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, const yodel_rover_t * rp)
+{
+	if ((bp->ticks != 0) || (rp->ticks != 0)) {
 
-/**
- * This mutual exclusion semaphore is used to serialize the read-modify-write
- * sequence of the Poller onepps variable.
- */
-static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+        fputs("COR", fp);
+
+        fprintf(fp, " %c%c %10uobs %10udmm", bp->payload.active ? 'A' : ' ', bp->payload.valid ? 'V' : ' ', bp->payload.obs, bp->payload.meanAcc);
+
+        fprintf(fp, " 0x%04x:0x%04x:0x%04x", rp->payload.refStation, rp->payload.msgType, rp->payload.subType);
+
+        fprintf(fp, "%6s", "");
+
+        fprintf(fp, " %-8s", "RTCM");
+
+        fputc('\n', fp);
+
+	}
+}
 
 /**
  * Implement a thread that polls for the data carrier detect (DCD) state for
@@ -992,14 +1004,20 @@ static void * gpiopoller(void * argp)
 }
 
 /**
- * The Command structure contains a linked list node whose data pointer
- * points to the command we want to send, and the acknak field indicates
- * whether this command expects an UBX CFG ACK or a NAK from the device.
+ * Common function to count down the expiration fields in the database.
+ * @param ep points to the expiration field to count down.
+ * @param elapsed is the number of ticks to count down.
  */
-struct Command {
-	diminuto_list_t link;
-	int acknak;
-};
+static inline void countdown(expiry_t * ep, diminuto_ticks_t elapsed)
+{
+	if (*ep == 0) {
+		/* Do nothing. */
+	} else if (*ep <= elapsed) {
+		*ep = 0;
+	} else {
+		*ep -= elapsed;
+	}
+}
 
 /**
  * Run the main program.
@@ -1163,6 +1181,8 @@ int main(int argc, char * argv[])
      */
     yodel_hardware_t hardware = YODEL_HARDWARE_INITIALIZER;
     yodel_status_t status = YODEL_STATUS_INITIALIZER;
+    yodel_base_t base = YODEL_BASE_INITIALIZER;
+    yodel_rover_t rover = YODEL_ROVER_INITIALIZER;
     yodel_ubx_ack_t acknak = YODEL_UBX_ACK_INITIALIZER;
     int acknakpending = 0;
     /*
@@ -1940,13 +1960,13 @@ int main(int argc, char * argv[])
         if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
 
         /*
-         * EXPIRE
+         * EXPIRATION
          *
          * See how many seconds have elapsed since the last time we received
          * a valid message from any system we recognize. (Might be zero.)
          * Subtract that number from all the lifetimes of all the systems we
          * care about to figure out if there's a system from which we've
-         * stopped hearing. This implements an expiry for each entry in our
+         * stopped hearing. This implements an expiration for each entry in our
          * database, because NMEA isn't kind enough to remind us that we
          * haven't heard from a system lately (and UBX isn't kind enough to
          * remind us when a device has stopped transmitting entirely); hence
@@ -1960,49 +1980,16 @@ int main(int argc, char * argv[])
 
         if (elapsed > 0) {
 
-            for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
-
-                if (position[index].ticks == 0) {
-                    /* Do nothing. */
-                } else if (position[index].ticks <= elapsed) {
-                    position[index].ticks = 0;
-                } else {
-                    position[index].ticks -= elapsed;
-                }
-
-                if (active[index].ticks == 0) {
-                    /* Do nothing. */
-                } else if (active[index].ticks <= elapsed) {
-                    active[index].ticks = 0;
-                } else {
-                    active[index].ticks -= elapsed;
-                }
-
-                if (view[index].ticks == 0) {
-                    /* Do nothing. */
-                } else if (view[index].ticks <= elapsed) {
-                    view[index].ticks = 0;
-                } else {
-                    view[index].ticks -= elapsed;
-                }
-
+        	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
+                countdown(&position[index].ticks, elapsed);
+                countdown(&active[index].ticks, elapsed);
+                countdown(&view[index].ticks, elapsed);
             }
 
-            if (hardware.ticks == 0) {
-                /* Do nothing. */
-            } else if (hardware.ticks <= elapsed) {
-                hardware.ticks = 0;
-            } else {
-                hardware.ticks -= elapsed;
-            }
-
-            if (status.ticks == 0) {
-                /* Do nothing. */
-            } else if (status.ticks <= elapsed) {
-                status.ticks = 0;
-            } else {
-                status.ticks -= elapsed;
-            }
+        	countdown(&hardware.ticks, elapsed);
+            countdown(&status.ticks, elapsed);
+            countdown(&base.ticks, elapsed);
+            countdown(&rover.ticks, elapsed);
 
         }
 
@@ -2047,7 +2034,6 @@ int main(int argc, char * argv[])
 
             /*
              * Make sure it's a talker and a GNSS that we care about.
-             *
              * As a special case, if we receive an update on active satellites
              * or satellites in view from something we don't recognize, then
              * we have a new GNSS that isn't supported. That's worth noting.
@@ -2264,11 +2250,11 @@ int main(int argc, char * argv[])
 
 					switch (ss) {
 					case YODEL_UBX_CFG_VALGET_Size_BIT:
-						vv1 = *bb;
+						memcpy(&vv1, bb, sizeof(vv1));
 						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%01x\n", Program, pp->version, layer, ii, kk, vv1);
 						break;
 					case YODEL_UBX_CFG_VALGET_Size_ONE:
-						vv1 = *bb;
+						memcpy(&vv1, bb, sizeof(vv1));
 						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%02x\n", Program, pp->version, layer, ii, kk, vv1);
 						break;
 					case YODEL_UBX_CFG_VALGET_Size_TWO:
@@ -2315,6 +2301,16 @@ int main(int argc, char * argv[])
             		}
 
             	} while (0);
+
+            } else if (yodel_ubx_nav_svin(&base.payload, ubx_buffer, length) == 0) {
+
+                base.ticks = timeout;
+            	refresh = !0;
+
+            } else if (yodel_ubx_rxm_rtcm(&rover.payload, ubx_buffer, length) == 0) {
+
+                rover.ticks = timeout;
+            	refresh = !0;
 
             } else {
 
@@ -2411,13 +2407,15 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * If anything was updated, refresh our display.
+         * Refresh our display.
          */
 
         if (!refresh) {
             /* Do nothing: nothing changed. */
+        } else if ((devfd >= 0) && (diminuto_serial_available(devfd) > 0)) {
+            /* Do nothing: we still have real-time input waiting. */
         } else if (slow && (was == now)) {
-            /* Do nothing: slow display cannot handle > 1Hz refresh rate. */
+            /* Do nothing: slow display cannot handle real-time refresh rate. */
         } else {
             if (escape) { fputs("\033[3;1H", outfp); }
             if (report) {
@@ -2429,6 +2427,7 @@ int main(int argc, char * argv[])
                 print_status(outfp, errfp, &status);
                 print_local(outfp, errfp, timetofirstfix);
                 print_positions(outfp, errfp, position, onepps, dmyokay, totokay);
+                print_corrections(outfp, errfp, &base, &rover);
                 print_actives(outfp, errfp, active);
                 print_views(outfp, errfp, view, active);
             }

@@ -417,26 +417,6 @@ enum YodelUbxMonHwFlagsJammingState {
  */
 extern int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length);
 
-/**
- * Structure combining both a UBX-MON-HW payload and its expiry time in ticks.
- */
-typedef struct YodelHardware {
-    yodel_ubx_mon_hw_t payload;	/* Payload from UBX-MON-HW message. */
-    uint8_t ticks;				/* Lifetime in application-defined ticks. */
-    uint8_t unused[3];
-} yodel_hardware_t;
-
-/**
- * @define YODEL_HARDWARE_INITIALIZER
- * Initialize a YodelHardware structure.
- */
-#define YODEL_HARDWARE_INITIALIZER \
-    { \
-	    YODEL_UBX_MON_HW_INITIALIZER, \
-		0, \
-		{ 0, } \
-    }
-
 /*******************************************************************************
  * PROCESSING UBX-NAV-STATUS MESSAGES
  ******************************************************************************/
@@ -570,26 +550,6 @@ enum YodelUbxNavStatusFLags2SpoolDetState {
  */
 extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ssize_t length);
 
-/**
- * Structure combining both a UBX-NAV-STATUS payload and its expiry time in ticks.
- */
-typedef struct YodelStatus {
-    yodel_ubx_nav_status_t payload;	/* Payload from UBX-NAV-STATUS message. */
-    uint8_t ticks;					/* Lifetime in application-defined ticks. */
-    uint8_t unused[3];
-} yodel_status_t;
-
-/**
- * @define YODEL_STATUS_INITIALIZER
- * Initialize a YodelStatus structure.
- */
-#define YODEL_STATUS_INITIALIZER \
-    { \
-	    YODEL_UBX_NAV_STATUS_INITIALIZER, \
-		0, \
-		{ 0, } \
-    }
-
 /*******************************************************************************
  * PROCESSING UBX-ACK-ACK and UBX-ACK-NAK MESSAGES
  ******************************************************************************/
@@ -598,10 +558,10 @@ typedef struct YodelStatus {
  * UBX-ACK constants.
  */
 enum YodelUbxAckConstants {
-    YODEL_UBX_ACK_Class			= 0x05,
-    YODEL_UBX_ACK_Length		= 2,
-    YODEL_UBX_ACK_NAK_Id		= 0x00,
-    YODEL_UBX_ACK_ACK_Id		= 0x01,
+    YODEL_UBX_ACK_Class		= 0x05,
+    YODEL_UBX_ACK_Length	= 2,
+    YODEL_UBX_ACK_NAK_Id	= 0x00,
+    YODEL_UBX_ACK_ACK_Id	= 0x01,
 };
 
 /**
@@ -705,7 +665,7 @@ typedef struct YodelUbxCfgValget {
  ******************************************************************************/
 
 /**
- * UBX-CFG-VALGET constants.
+ * UBX-MON-VER constants.
  */
 enum YodelUbxMonVerConstants {
     YODEL_UBX_MON_VER_Class				= 0x0a,
@@ -722,6 +682,123 @@ enum YodelUbxMonVerConstants {
  * @return 0 if the message was valid, <0 otherwise.
  */
 extern int yodel_ubx_mon_ver(const void * bp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-NAV-SVIN MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-NAV-SVIN constants.
+ */
+enum YodelUbxNavSvinConstants {
+	YODEL_UBX_NAV_SVIN_Class	= 0x01,
+	YODEL_UBX_NAV_SVIN_Id		= 0x3b,
+	YODEL_UBX_NAV_SVIN_Length	= 40,
+};
+
+/**
+ * UBX-NAV-SVIN (0x01, 0x3b) [40] indicates the state of the Survey-In,
+ * typically by the stationary Base.
+ */
+typedef struct YodelUbxNavSvin {
+	uint8_t version;
+	uint8_t reserved[3];
+	uint32_t iTOW;
+	uint32_t dur;
+	int32_t meanX;
+	int32_t meanY;
+	int32_t meanZ;
+	int8_t meanXHP;
+	int8_t meanYHP;
+	int8_t meanZHP;
+	int8_t reserved2[1];
+	int32_t meanAcc;
+	int32_t obs;
+	int8_t valid;
+	int8_t active;
+	int8_t reserved3[2];
+} yodel_ubx_nav_svin_t;
+
+/**
+ * @define YODEL_UBX_RXM_RTCM_INITIALIZER
+ * Initialize a YodelUbxAck structure.
+ */
+#define YODEL_UBX_NAV_SVIN_INITIALIZER \
+    { \
+		0, \
+		{ 0, }, \
+		0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		0, \
+		{ 0, }, \
+		0, \
+		0, \
+		0, \
+		0, \
+		{ 0, }, \
+    }
+
+/**
+ * Process a possible UBX-NAV-SVIN message.
+ * @param mp points to a UBX-NAV-SVIN structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-RXM-RTCM MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-RXM-RTCM constants.
+ */
+enum YodelUbxRxmRtcmConstants {
+    YODEL_UBX_RXM_RTCM_Class	= 0x02,
+    YODEL_UBX_RXM_RTCM_Id		= 0x32,
+	YODEL_UBX_RXM_RTCM_Length	= 8,
+};
+
+/**
+ * UBX-RXM-RTCM (0x02, 0x32) [8] indicates the reception of RTCM messages,
+ * typically by the mobile Rover.
+ * Ublox 9 R05, p. 181.
+ */
+typedef struct YodelUbxRxmRtcm {
+	uint8_t version;		/* Message version. */
+	uint8_t flags;			/* If true, crcFailed. */
+	uint16_t subType;		/* Message sub type if RTCM 4072. */
+	uint16_t refStation;	/* Reference station identification. */
+	uint16_t msgType;		/* Message type. */
+} yodel_ubx_rxm_rtcm_t;
+
+/**
+ * @define YODEL_UBX_RXM_RTCM_INITIALIZER
+ * Initialize a YodelUbxAck structure.
+ */
+#define YODEL_UBX_RXM_RTCM_INITIALIZER \
+    { \
+		0, \
+		0, \
+		0, \
+		0, \
+		0, \
+    }
+
+/**
+ * Process a possible UBX-RXM-RTCM message.
+ * @param mp points to a UBX-RXM-RTCM structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_t length);
 
 /******************************************************************************
  * ENDIAN CONVERSION
