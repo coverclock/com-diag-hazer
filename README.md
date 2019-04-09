@@ -1291,6 +1291,28 @@ core dumped with a segmentation violation.
 
 ### Base A7
 
+    $ simplertk2bbase /dev/ttyACM0
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    END gpstool: LAST.
+    END gpstool: END.
+
+    $ simplertk2bquery /dev/ttyACM0
     UBX gpstool: MON VER SW "EXT CORE 1.00 (94e56e)"
     UBX gpstool: MON VER HW "00190000"
     UBX gpstool: MON VER EX "ROM BASE 0x118B2060"
@@ -1333,11 +1355,29 @@ core dumped with a segmentation violation.
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x10760004 0x1
     UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091008b 0x01
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091026b 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
     END gpstool: LAST.
     END gpstool: END.
 
 ### Rover C9
 
+    $ simplertk2brover /dev/ttyACM1
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    UBX gpstool: ACK 0x06 0x8a (1)
+    END gpstool: LAST.
+    END gpstool: END.
+
+    $ simplertk2bquery /dev/ttyACM1
     UBX gpstool: MON VER SW "EXT CORE 1.00 (94e56e)"
     UBX gpstool: MON VER HW "00190000"
     UBX gpstool: MON VER EX "ROM BASE 0x118B2060"
@@ -1348,7 +1388,6 @@ core dumped with a segmentation violation.
     UBX gpstool: MON VER EX "QZSS"
     UBX gpstool: CFG VALGET v1 RAM [0] 0x20930001 0x29
     UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20030001 0x00
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x40030010 0x00000000
     UBX gpstool: ACK 0x06 0x8b (1)
@@ -1364,7 +1403,6 @@ core dumped with a segmentation violation.
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x10530005 0x1
     UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x209102bf 0x00
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x20910360 0x00
     UBX gpstool: ACK 0x06 0x8b (1)
@@ -1372,13 +1410,16 @@ core dumped with a segmentation violation.
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036a 0x00
     UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036f 0x00
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x20910305 0x00
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x10750004 0x1
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x10760004 0x0
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091008b 0x00
+    UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091026b 0x01
     UBX gpstool: ACK 0x06 0x8b (1)
     END gpstool: LAST.
     END gpstool: END.
