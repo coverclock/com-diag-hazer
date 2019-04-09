@@ -19,7 +19,7 @@ for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} -W ${OPTION}"
 done
 
-eval gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -x ${OPTIONS} 2> >(log -S -N ${PROGRAM})
+eval gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 ${OPTIONS} -W '' 2> >(log -S -N ${PROGRAM})
 
 mkfifo ${FIFO} 
 

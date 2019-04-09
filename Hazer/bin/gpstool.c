@@ -1056,7 +1056,6 @@ int main(int argc, char * argv[])
     int ignorechecksums = 0;
     int slow = 0;
     int expire = 0;
-    int exiting = 0;
     role_t role = ROLE;
     protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
@@ -1387,9 +1386,6 @@ int main(int argc, char * argv[])
         case 'v':
             verbose = !0;
             break;
-        case 'x':
-        	exiting = !0;
-        	break;
         case '?':
             fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
@@ -1427,7 +1423,6 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -s          Use XON/XOFF for DEVICE.\n");
             fprintf(errfp, "       -t SECONDS  Expire GNSS data after SECONDS seconds.\n");
             fprintf(errfp, "       -v          Display verbose output on standard error.\n");
-            fprintf(errfp, "       -x          Exit once all STRINGs written to DEVICE.\n");
             return 1;
             break;
         }
@@ -1778,15 +1773,7 @@ int main(int argc, char * argv[])
             } else if (acknakpending > 0) {
             	/* Do nothing. */
             } else if (diminuto_list_isempty(&head)) {
-            	/*
-            	 * If we are supposed to exit once we have written the
-            	 * initialization strings (if any), now is the time to
-            	 * do it.
-            	 */
-            	if (exiting) {
-                    fprintf(errfp, "END %s: LAST.\n", Program);
-            		break;
-            	}
+            	/* Do nothing. */
             } else {
                 node = diminuto_list_dequeue(&head);
                 assert(node != (diminuto_list_t *)0);
