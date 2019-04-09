@@ -1289,6 +1289,14 @@ core dumped with a segmentation violation.
 
 ## SimpleRTK2B Configurations
 
+The SimpleRTK2B board features a ZED-F9P "9th generation" U-Blox chip and
+be equipped with radios like the ZigBee-based XBee. This allows one SimpleRTK2B
+to be used as a stationary "base" in high-precision "survey-in" mode, and a
+second (or more) SimpleRTK2B in mobile "rover" mode, and the base to transmit
+position corrections to the rover via the radio using the RTCM protocol. This
+is a form of Differential GNSS and can, over time, achieve very high position
+(and time) accuracy and precision.
+
 ### Base A7
 
     $ simplertk2bbase /dev/ttyACM0
