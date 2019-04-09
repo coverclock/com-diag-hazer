@@ -865,15 +865,15 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
  */
 static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, const yodel_rover_t * rp)
 {
-	if ((bp->ticks != 0) || (rp->ticks != 0)) {
+	 if ((bp->ticks != 0) || (rp->ticks != 0)) {
 
         fputs("COR", fp);
 
-        fprintf(fp, " %c%c %10uobs %10udmm", bp->payload.active ? 'A' : ' ', bp->payload.valid ? 'V' : ' ', bp->payload.obs, bp->payload.meanAcc);
+        fprintf(fp, " %c%c %10usec %10uobs %10dum", bp->payload.active ? 'A' : ' ', bp->payload.valid ? 'V' : ' ', bp->payload.dur, bp->payload.obs, bp->payload.meanAcc * 100);
 
         fprintf(fp, " 0x%04x:0x%04x:0x%04x", rp->payload.refStation, rp->payload.msgType, rp->payload.subType);
 
-        fprintf(fp, "%6s", "");
+        fprintf(fp, "%2s", "");
 
         fprintf(fp, " %-8s", "RTCM");
 
