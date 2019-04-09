@@ -1297,6 +1297,12 @@ position corrections to the rover via the radio using the RTCM protocol. This
 is a form of Differential GNSS and can, over time, achieve very high position
 (and time) accuracy and precision.
 
+F9P connections: UART1 to Arduino (if present), UART2 to XBee (if present),
+USB to off board F9P USB connector.
+
+XBee connections: UART1 to Arduino (if present), UART2 to F9P, USB to off
+board XBee USB connector.
+
 ### Base A7
 
     $ simplertk2bbase /dev/ttyACM0
@@ -1335,7 +1341,7 @@ is a form of Differential GNSS and can, over time, achieve very high position
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x40030010 0x0000003c
     UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030011 0x0000c350
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030011 0x000186a0
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x40530001 0x00009600
     UBX gpstool: ACK 0x06 0x8b (1)
