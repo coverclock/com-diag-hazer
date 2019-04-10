@@ -555,16 +555,6 @@ extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ss
  ******************************************************************************/
 
 /**
- * UBX-ACK constants.
- */
-enum YodelUbxAckConstants {
-    YODEL_UBX_ACK_Class		= 0x05,
-    YODEL_UBX_ACK_Length	= 2,
-    YODEL_UBX_ACK_NAK_Id	= 0x00,
-    YODEL_UBX_ACK_ACK_Id	= 0x01,
-};
-
-/**
  * UBX-ACK-ACK (0x05, 0x01) [2] and UBX-ACK-NAK (0x05, 0x00) [2] are used to
  * indicate the success or failure of UBX messages sent to the device.
  * Ublox 8 R15, p. 145.
@@ -583,8 +573,18 @@ typedef struct YodelUbxAck {
     { \
 	    ~0, \
 		~0, \
-		0, \
+		~0, \
     }
+
+/**
+ * UBX-ACK constants.
+ */
+enum YodelUbxAckConstants {
+    YODEL_UBX_ACK_Class		= 0x05,
+    YODEL_UBX_ACK_Length	= 2,
+    YODEL_UBX_ACK_NAK_Id	= 0x00,
+    YODEL_UBX_ACK_ACK_Id	= 0x01,
+};
 
 /**
  * Process a possible UBX-ACK-ACK or UBX-ACK-NAK message.
@@ -598,6 +598,31 @@ extern int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length);
 /*******************************************************************************
  * PROCESSING UBX-CFG-VALGET MESSAGES
  ******************************************************************************/
+
+/**
+ * UBX-CFG-VALGET is how generation 9 handles device configuration queries.\
+ * N.B. The layer field here is an enumeration, but in a UBX-CFG-VALSET message
+ * it is a bit mask. You can only VALGET one layer at a time, but you can VALSET
+ * multiple layers in one message.
+ * Ublox 9, p. 85.
+ */
+typedef struct YodelUbxCfgValget {
+	uint8_t version;		/* Message version: send 0, receive 1. */
+	uint8_t layer;			/* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
+	uint8_t reserved[2];	/* Reserved. */
+	uint8_t cfgData[0];		/* Payload. */
+} yodel_ubx_cfg_valget_t;
+
+/**
+ * @define YODEL_UBX_CFG_VALGET_INITIALIZER
+ * Initialize the fixed portion of a YodelUbxCfgValget structure.
+ */
+#define YODEL_UBX_CFG_VALGET_INITIALIZER \
+    { \
+		0, \
+		0, \
+		{ 0, }, \
+    }
 
 /**
  * UBX-CFG-VALGET constants.
@@ -642,23 +667,14 @@ enum YodelUbxCfgValgetSize {
 typedef uint32_t yodel_ubx_cfg_valget_key_t;
 
 /**
- * Process a possible UBX-CFG-VALGET message.
+ * Process a possible UBX-CFG-VALGET message. The buffer is passed as non-const
+ * because the byte-swapping of the variable length payload is performed
+ * in-place.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_cfg_valget(const void * bp, ssize_t length);
-
-/**
- * UBX-CFG-VALGET is how generation 9 handles device configuration queries.
- * Ublox 9, p. 85.
- */
-typedef struct YodelUbxCfgValget {
-	uint8_t version;		/* Message version: send 0, receive 1. */
-	uint8_t layer;			/* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
-	uint8_t reserved[2];	/* Reserved. */
-	uint8_t cfgData[0];		/* Payload. */
-} yodel_ubx_cfg_valget_t;
+extern int yodel_ubx_cfg_valget(void * bp, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-MON-VER MESSAGES
@@ -686,15 +702,6 @@ extern int yodel_ubx_mon_ver(const void * bp, ssize_t length);
 /*******************************************************************************
  * PROCESSING UBX-NAV-SVIN MESSAGES
  ******************************************************************************/
-
-/**
- * UBX-NAV-SVIN constants.
- */
-enum YodelUbxNavSvinConstants {
-	YODEL_UBX_NAV_SVIN_Class	= 0x01,
-	YODEL_UBX_NAV_SVIN_Id		= 0x3b,
-	YODEL_UBX_NAV_SVIN_Length	= 40,
-};
 
 /**
  * UBX-NAV-SVIN (0x01, 0x3b) [40] indicates the state of the Survey-In,
@@ -744,6 +751,15 @@ typedef struct YodelUbxNavSvin {
     }
 
 /**
+ * UBX-NAV-SVIN constants.
+ */
+enum YodelUbxNavSvinConstants {
+	YODEL_UBX_NAV_SVIN_Class	= 0x01,
+	YODEL_UBX_NAV_SVIN_Id		= 0x3b,
+	YODEL_UBX_NAV_SVIN_Length	= 40,
+};
+
+/**
  * Process a possible UBX-NAV-SVIN message.
  * @param mp points to a UBX-NAV-SVIN structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
@@ -755,15 +771,6 @@ extern int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_
 /*******************************************************************************
  * PROCESSING UBX-RXM-RTCM MESSAGES
  ******************************************************************************/
-
-/**
- * UBX-RXM-RTCM constants.
- */
-enum YodelUbxRxmRtcmConstants {
-    YODEL_UBX_RXM_RTCM_Class	= 0x02,
-    YODEL_UBX_RXM_RTCM_Id		= 0x32,
-	YODEL_UBX_RXM_RTCM_Length	= 8,
-};
 
 /**
  * UBX-RXM-RTCM (0x02, 0x32) [8] indicates the reception of RTCM messages,
@@ -790,6 +797,15 @@ typedef struct YodelUbxRxmRtcm {
 		0, \
 		0, \
     }
+
+/**
+ * UBX-RXM-RTCM constants.
+ */
+enum YodelUbxRxmRtcmConstants {
+    YODEL_UBX_RXM_RTCM_Class	= 0x02,
+    YODEL_UBX_RXM_RTCM_Id		= 0x32,
+	YODEL_UBX_RXM_RTCM_Length	= 8,
+};
 
 /**
  * Process a possible UBX-RXM-RTCM message.

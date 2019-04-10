@@ -60,9 +60,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include <locale.h>
-#include "com/diag/hazer/hazer.h"
-#include "com/diag/hazer/yodel.h"
-#include "com/diag/hazer/gpstool.h"
+#include "gpstool.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
@@ -1405,9 +1403,11 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(errfp, "       -R          Print a report on standard output.\n");
             fprintf(errfp, "       -S SOURCE   Use SOURCE for input.\n");
-            fprintf(errfp, "       -U STRING   Collapse escapes, append checksum, write STRINGs to DEVICE, expect ACK/NAK.\n");
+            fprintf(errfp, "       -U STRING   Collapse STRING, append checksum, write to DEVICE, expect ACK.\n");
+            fprintf(errfp, "       -U ''       Exit when this empty STRING is processed.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
-            fprintf(errfp, "       -W STRING   Collapse escapes, append checksum, write STRINGs to DEVICE.\n");
+            fprintf(errfp, "       -W STRING   Collapse STRING, append checksum, write to DEVICE.\n");
+            fprintf(errfp, "       -W ''       Exit when this empty STRING is processed.\n");
             fprintf(errfp, "       -X          Enable message expiration test mode.\n");
             fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
@@ -2170,6 +2170,14 @@ int main(int argc, char * argv[])
 
             } else if (yodel_ubx_cfg_valget(ubx_buffer, length) == 0) {
 
+            	/*
+            	 * All of the validity checking and byte swapping is done in
+            	 * yodel_ubx_cfg_valget(). The parse function doesn't accept
+            	 * the message unless it checks out. This is also why the
+            	 * buffer is passed as non-const; the variable length payload
+            	 * is byteswapped in-place.
+            	 */
+
             	yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)&(ubx_buffer[YODEL_UBX_PAYLOAD]);
             	const char * bb = (const char *)0;
             	const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
@@ -2205,9 +2213,7 @@ int main(int argc, char * argv[])
 
             	for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
 
-					if ((bb + sizeof(kk)) > ee) { break; }
 					memcpy(&kk, bb, sizeof(kk));
-					kk = le32toh(kk);
 
 					ss = (kk >> YODEL_UBX_CFG_VALGET_Key_Size_SHIFT) & YODEL_UBX_CFG_VALGET_Key_Size_MASK;
 
@@ -2225,15 +2231,11 @@ int main(int argc, char * argv[])
 					case YODEL_UBX_CFG_VALGET_Size_EIGHT:
 						ll = 8;
 						break;
-					default:
-						ll = 0;
-						break;
 					}
 
 					if (ll == 0) { break; }
 
 					bb += sizeof(kk);
-					if ((bb + ll) > ee) { break; }
 
 					switch (ss) {
 					case YODEL_UBX_CFG_VALGET_Size_BIT:
@@ -2246,17 +2248,14 @@ int main(int argc, char * argv[])
 						break;
 					case YODEL_UBX_CFG_VALGET_Size_TWO:
 						memcpy(&vv16, bb, sizeof(vv16));
-						vv16 = le16toh(vv16);
 						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%04x\n", Program, pp->version, layer, ii, kk, vv16);
 						break;
 					case YODEL_UBX_CFG_VALGET_Size_FOUR:
 						memcpy(&vv32, bb, sizeof(vv32));
-						vv32 = le32toh(vv32);
 						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%08x\n", Program, pp->version,layer, ii, kk, vv32);
 						break;
 					case YODEL_UBX_CFG_VALGET_Size_EIGHT:
 						memcpy(&vv64, bb, sizeof(vv64));
-						vv64 = le64toh(vv64);
 						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%016llx\n", Program, pp->version, layer, ii, kk, (unsigned long long)vv64);
 						break;
 					}

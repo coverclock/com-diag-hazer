@@ -30,7 +30,7 @@ RATE=${2:-9600}
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-UART2OUTPROT-RTCM3X 1
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-UBX_NAV_SVIN_USB 1
 
-exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -R \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01' \
     -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x3c\x00\x00\x00' \
     -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40\xA0\x86\x01\x00' \

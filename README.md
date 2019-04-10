@@ -498,8 +498,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -s          Use XON/XOFF for DEVICE.
            -t SECONDS  Expire GNSS data after SECONDS seconds.
            -v          Display verbose output on standard error.
-           -x          Exit once all STRINGs written to DEVICE.
-
+ 
 # Dependencies
 
 The Hazer library itself is standlone other than the usual standard

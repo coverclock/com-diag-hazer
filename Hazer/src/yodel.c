@@ -377,10 +377,10 @@ int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length)
     return rc;
 }
 
-int yodel_ubx_cfg_valget(const void * bp, ssize_t length)
+int yodel_ubx_cfg_valget(void * bp, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)bp;
+    unsigned char * hp = (unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_CFG_VALGET_Class) {
         /* Do nothing. */
@@ -389,7 +389,87 @@ int yodel_ubx_cfg_valget(const void * bp, ssize_t length)
     } else if (length < (YODEL_UBX_SHORTEST + YODEL_UBX_CFG_VALGET_Length)) {
         /* Do nothing. */
     } else {
-        rc = 0;
+    	yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)0;
+    	char * bb = (char *)0;
+    	const char * ee = (const char *)0;
+    	yodel_ubx_cfg_valget_key_t kk = 0;
+    	size_t ss = 0;
+    	size_t ll = 0;
+    	uint8_t vv1 = 0;
+    	uint16_t vv16 = 0;
+    	uint32_t vv32 = 0;
+    	uint64_t vv64 = 0;
+
+    	rc = 0;
+
+    	pp = (yodel_ubx_cfg_valget_t *)&(hp[YODEL_UBX_PAYLOAD]);
+    	ee = &(hp[length - YODEL_UBX_CHECKSUM]);
+
+    	for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
+
+			if ((bb + sizeof(kk)) > ee) {
+				rc = -1;
+				break;
+			}
+
+			memcpy(&kk, bb, sizeof(kk));
+			kk = le32toh(kk);
+			memcpy(bb, &kk, sizeof(kk));
+
+			bb += sizeof(kk);
+
+			ss = (kk >> YODEL_UBX_CFG_VALGET_Key_Size_SHIFT) & YODEL_UBX_CFG_VALGET_Key_Size_MASK;
+
+			switch (ss) {
+			case YODEL_UBX_CFG_VALGET_Size_BIT:
+			case YODEL_UBX_CFG_VALGET_Size_ONE:
+				ll = 1;
+				break;
+			case YODEL_UBX_CFG_VALGET_Size_TWO:
+				ll = 2;
+				break;
+			case YODEL_UBX_CFG_VALGET_Size_FOUR:
+				ll = 4;
+				break;
+			case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+				ll = 8;
+				break;
+			default:
+				ll = 0;
+				break;
+			}
+
+			if (ll == 0) {
+				rc = -1;
+				break;
+			}
+
+			if ((bb + ll) > ee) {
+				rc = -1;
+				break;
+			}
+
+			switch (ss) {
+			case YODEL_UBX_CFG_VALGET_Size_TWO:
+				memcpy(&vv16, bb, sizeof(vv16));
+				vv16 = le16toh(vv16);
+				memcpy(bb, &vv16, sizeof(vv16));
+				break;
+			case YODEL_UBX_CFG_VALGET_Size_FOUR:
+				memcpy(&vv32, bb, sizeof(vv32));
+				vv32 = le32toh(vv32);
+				memcpy(bb, &vv32, sizeof(vv32));
+				break;
+			case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+				memcpy(&vv64, bb, sizeof(vv64));
+				vv64 = le64toh(vv64);
+				memcpy(bb, &vv64, sizeof(vv64));
+				break;
+			default:
+				break;
+			}
+
+		}
     }
 
     return rc;
@@ -424,6 +504,9 @@ int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_t lengt
         /* Do nothing. */
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
+        COM_DIAG_YODEL_LETOH(mp->subType);
+        COM_DIAG_YODEL_LETOH(mp->refStation);
+        COM_DIAG_YODEL_LETOH(mp->msgType);
         rc = 0;
     }
 
@@ -443,6 +526,13 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t lengt
         /* Do nothing. */
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
+        COM_DIAG_YODEL_LETOH(mp->iTOW);
+        COM_DIAG_YODEL_LETOH(mp->dur);
+        COM_DIAG_YODEL_LETOH(mp->meanX);
+        COM_DIAG_YODEL_LETOH(mp->meanY);
+        COM_DIAG_YODEL_LETOH(mp->meanZ);
+        COM_DIAG_YODEL_LETOH(mp->meanAcc);
+        COM_DIAG_YODEL_LETOH(mp->obs);
         rc = 0;
     }
 
