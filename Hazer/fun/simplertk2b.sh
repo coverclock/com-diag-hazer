@@ -12,11 +12,4 @@ RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-. $(readlink -e $(dirname ${0})/../fun)/ubx9
-
-OPTIONS=""
-for OPTION in ${COMMANDS}; do
-    OPTIONS="${OPTIONS} -W ${OPTION}"
-done
-
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 ${OPTIONS} 2> >(log -S -N ${PROGRAM})
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 2> >(log -S -N ${PROGRAM})

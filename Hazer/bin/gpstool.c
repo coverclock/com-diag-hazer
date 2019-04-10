@@ -867,9 +867,9 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
 
         fputs("BAS", fp);
 
-        fprintf(fp, " %dactive %dvalid %10usec %10uobs %10dum", !!bp->payload.active, !!bp->payload.valid, bp->payload.dur, bp->payload.obs, bp->payload.meanAcc * 100);
+        fprintf(fp, " %dactive %dvalid %10usec %10uobs %12.4lfm", !!bp->payload.active, !!bp->payload.valid, bp->payload.dur, bp->payload.obs, (double)bp->payload.meanAcc / 10000.0);
 
-        fprintf(fp, "%11s", "");
+        fprintf(fp, "%10s", "");
 
         fprintf(fp, " %-8s", "RTCM");
 
