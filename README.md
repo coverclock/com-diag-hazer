@@ -449,8 +449,9 @@ Optionally install Diminuto and Hazer in /usr/local.
 * gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
 * gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
 * simplertk2b - script that uses gpstool to exercise the Ardusimple SimpleRTK2B board.
-* simplertk2bbase - script that uses gpstool to exercise the Ardusimple SimpleRTK2B board in base (Survey-In) mode with RTK.
-* simplertk2brover - script that uses gpstool to exercise the Ardusimple SimpleRTK2B board in rover mode with RTK.
+* simplertk2bbase - script that uses gpstool to configure the Ardusimple SimpleRTK2B board as a stationary base.
+* simplertk2brover - script that uses gpstool to configure the Ardusimple SimpleRTK2B board as a mobile rover.
+* simplertk2bquery - script the uses gpstool to query the configuraiton of an Ardusimple SImpleRTK2B board.
 * sirfstar4 - script that uses gpstool to exercise any SiRF Star 4 device.
 * talkers - script that uses gpstool to process a file of synthetic input.
 * ublox7 - script that uses gpstool to exercise any Ublox 7 device.    
@@ -461,9 +462,8 @@ Optionally install Diminuto and Hazer in /usr/local.
 
 # Help
 
-    > gpstool -?
-
-    usage: gpstool [ -d ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W NMEA ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
+    $ gpstool -?
+    usage: gpstool [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -481,8 +481,11 @@ Optionally install Diminuto and Hazer in /usr/local.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
            -S SOURCE   Use SOURCE for input.
+           -U STRING   Collapse STRING, append checksum, write to DEVICE, expect ACK.
+           -U ''       Exit when this empty STRING is processed.
            -V          Print release, vintage, and revision on standard output.
-           -W STRING   Collapse escapes, append checksum, write STRINGs to DEVICE.
+           -W STRING   Collapse STRING, append checksum, write to DEVICE.
+           -W ''       Exit when this empty STRING is processed.
            -X          Enable message expiration test mode.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
@@ -497,6 +500,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -r          Reverse use of standard output and standard error.
            -s          Use XON/XOFF for DEVICE.
            -t SECONDS  Expire GNSS data after SECONDS seconds.
+           -u          Note unknown NMEA or UBX on standard error.
            -v          Display verbose output on standard error.
  
 # Dependencies
@@ -1286,23 +1290,44 @@ satellite, or the total count should be ten instead of eleven. My software
 has been modified to account for this malformed message; it originally
 core dumped with a segmentation violation.
 
-## SimpleRTK2B Configurations
+## Ardusimple SimpleRTK2B
 
-The SimpleRTK2B board features a ZED-F9P "9th generation" U-Blox chip and
-be equipped with radios like the ZigBee-based XBee. This allows one SimpleRTK2B
-to be used as a stationary "base" in high-precision "survey-in" mode, and a
-second (or more) SimpleRTK2B in mobile "rover" mode, and the base to transmit
-position corrections to the rover via the radio using the RTCM protocol. This
+The Ardusimple SimpleRTK2B board features a ZED-F9P "9th generation" U-Blox
+chip and be equipped with radios like the ZigBee-based XBee. This allows one
+SimpleRTK2B to be used as a stationary "base" in high-precision "survey-in"
+mode, and a second SimpleRTK2B in mobile "rover" mode; the base transmits
+position corrections to the rover via the radio using the RTCM protocol once
+the survey has been completed to the configured level of accuracy. This
 is a form of Differential GNSS and can, over time, achieve very high position
 (and time) accuracy and precision.
 
-F9P connections: UART1 to Arduino (if present), UART2 to XBee (if present),
-USB to off board F9P USB connector.
+### Block Diagram
 
-XBee connections: UART1 to Arduino (if present), UART2 to F9P, USB to off
-board XBee USB connector.
+Conceptually this how I think everything is connected. Note however that based
+on the XBee SX data sheet, and my own prior experience with XBee radios, I
+didn't think they had more than one serial port or a serial-over-USB port, even
+though the diagram below pretends that they do. A formal schematic for the
+SimpleRTK2B board would be really useful.
 
-### Base A7
+                                                               XCTU
+                                                                ^
+                                  Radio Antenna                 |
+                                        :                       v
+    Arduino connector <-- UART1 --> [ XBee SX ] <-- USB --> microUSB
+                                        ^
+                                        |
+                                      UART2
+                                        |
+                                      UART2
+                                        |
+                                        v
+    Arduino connector <-- UART1 --> [ ZED-F9P ] <-- USB --> microUSB
+                                        :                       ^
+                                    GPS Antenna                 |
+                                                                v
+                                                         u-center or gpstool
+
+### Base Configuration
 
     $ simplertk2bbase /dev/ttyACM0
     UBX gpstool: ACK 0x06 0x8a (1)
@@ -1375,7 +1400,7 @@ board XBee USB connector.
     END gpstool: LAST.
     END gpstool: END.
 
-### Rover C9
+### Rover Configuration
 
     $ simplertk2brover /dev/ttyACM1
     UBX gpstool: ACK 0x06 0x8a (1)
@@ -1401,6 +1426,7 @@ board XBee USB connector.
     UBX gpstool: MON VER EX "QZSS"
     UBX gpstool: CFG VALGET v1 RAM [0] 0x20930001 0x29
     UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x20030001 0x01
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x40030010 0x00000000
     UBX gpstool: ACK 0x06 0x8b (1)
@@ -1416,6 +1442,7 @@ board XBee USB connector.
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x10530005 0x1
     UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x209102bf 0x01
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x20910360 0x00
     UBX gpstool: ACK 0x06 0x8b (1)
@@ -1423,6 +1450,7 @@ board XBee USB connector.
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036a 0x00
     UBX gpstool: ACK 0x06 0x8b (1)
+    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036f 0x01
     UBX gpstool: ACK 0x06 0x8b (1)
     UBX gpstool: CFG VALGET v1 RAM [0] 0x20910305 0x00
     UBX gpstool: ACK 0x06 0x8b (1)

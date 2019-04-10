@@ -610,7 +610,7 @@ typedef struct YodelUbxCfgValget {
 	uint8_t version;		/* Message version: send 0, receive 1. */
 	uint8_t layer;			/* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
 	uint8_t reserved[2];	/* Reserved. */
-	uint8_t cfgData[0];		/* Payload. */
+	uint8_t cfgData[0];		/* Beginning of variable number key/value pairs. */
 } yodel_ubx_cfg_valget_t;
 
 /**
@@ -668,8 +668,8 @@ typedef uint32_t yodel_ubx_cfg_valget_key_t;
 
 /**
  * Process a possible UBX-CFG-VALGET message. The buffer is passed as non-const
- * because the byte-swapping of the variable length payload is performed
- * in-place.
+ * because the byte-swapping of the variable length payload, both key IDs and
+ * their values, is performed in-place.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
@@ -692,7 +692,8 @@ enum YodelUbxMonVerConstants {
 };
 
 /**
- * Process a possible UBX-MON-VER message.
+ * Process a possible UBX-MON-VER message. The UBX-MON-VER message is variable
+ * length containing a variable number of character strings.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
