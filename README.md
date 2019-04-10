@@ -1293,8 +1293,8 @@ core dumped with a segmentation violation.
 ## Ardusimple SimpleRTK2B
 
 The Ardusimple SimpleRTK2B board features a ZED-F9P "9th generation" U-Blox
-chip and be equipped with radios like the ZigBee-based XBee. This allows one
-SimpleRTK2B to be used as a stationary "base" in high-precision "survey-in"
+chip. It can be equipped with radios like the ZigBee-based XBee. This allows
+one SimpleRTK2B to be used as a stationary "base" in high-precision "survey-in"
 mode, and a second SimpleRTK2B in mobile "rover" mode; the base transmits
 position corrections to the rover via the radio using the RTCM protocol once
 the survey has been completed to the configured level of accuracy. This
