@@ -449,9 +449,9 @@ Optionally install Diminuto and Hazer in /usr/local.
 * gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
 * gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
 * simplertk2b - script that uses gpstool to exercise the Ardusimple SimpleRTK2B board.
-* simplertk2bbase - script that uses gpstool to configure the Ardusimple SimpleRTK2B board as a stationary base.
-* simplertk2brover - script that uses gpstool to configure the Ardusimple SimpleRTK2B board as a mobile rover.
-* simplertk2bquery - script the uses gpstool to query the configuraiton of an Ardusimple SImpleRTK2B board.
+* simplertk2bbase - script that uses gpstool to configure an Ardusimple SimpleRTK2B board as a base.
+* simplertk2bquery - script that uses gpstool to query the configuration of an Ardusimple SimpleRTK2B board.
+* simplertk2brover - script that uses gpstool to configure an Ardusimple SimpleRTK2B board as a rover.
 * sirfstar4 - script that uses gpstool to exercise any SiRF Star 4 device.
 * talkers - script that uses gpstool to process a file of synthetic input.
 * ublox7 - script that uses gpstool to exercise any Ublox 7 device.    
