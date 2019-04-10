@@ -1060,6 +1060,7 @@ int main(int argc, char * argv[])
     struct Command * command = (struct Command *)0;
     diminuto_list_t * node = (diminuto_list_t *)0;
     diminuto_list_t head = DIMINUTO_LIST_NULLINIT(&head);
+    int unknown = 0;
     /*
      * Source and sink I/O variables.
      */
@@ -1228,7 +1229,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RS:U:VW:Xb:cdehlmnop:rst:vx?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RS:U:VW:Xb:cdehlmnop:rst:uv?";
 
     /**
      ** PREINITIALIZATION
@@ -1381,11 +1382,14 @@ int main(int argc, char * argv[])
                 diminuto_perror(optarg);
             }
             break;
+        case 'u':
+        	unknown = !0;
+        	break;
         case 'v':
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", Program);
+            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1422,6 +1426,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -r          Reverse use of standard output and standard error.\n");
             fprintf(errfp, "       -s          Use XON/XOFF for DEVICE.\n");
             fprintf(errfp, "       -t SECONDS  Expire GNSS data after SECONDS seconds.\n");
+            fprintf(errfp, "       -u          Note unknown NMEA or UBX on standard error.\n");
             fprintf(errfp, "       -v          Display verbose output on standard error.\n");
             return 1;
             break;
@@ -2140,9 +2145,13 @@ int main(int argc, char * argv[])
 
                 fputs("\".\n", errfp);
 
+            } else if (unknown) {
+
+                fprintf(errfp, "ERR %s: NMEA \"%s\"\n", Program, vector[0]);
+
             } else {
 
-                /* Do nothing. */
+            	/* Do nothing. */
 
             }
 
@@ -2298,9 +2307,13 @@ int main(int argc, char * argv[])
                 rover.ticks = timeout;
             	refresh = !0;
 
+            } else if (unknown) {
+
+                fprintf(errfp, "ERR %s: UBX <0x%02x 0x%02x 0x%02x 0x%02x>\n", Program, ubx_buffer[0], ubx_buffer[1], ubx_buffer[2], ubx_buffer[3]);
+
             } else {
 
-                /* Do nothing. */
+            	/* Do nothing. */
 
             }
 
