@@ -300,6 +300,9 @@ v15-20.30.22-23.01, UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 u-blox 9, "ZED-F9P Interface Description", UBX-18010854-R05,
 ublox, 6cc4473, 2018-12-20
 
+u-blox 9 integration, "ZED-F9P Integration Manual", UBX-18010802-R03,
+ublox, 2018-12-20
+
 # Resources
 
 <http://www.catb.org/gpsd/NMEA.txt>
@@ -429,36 +432,38 @@ Optionally install Diminuto and Hazer in /usr/local.
 
 # Utilities
 
+* base - configures and runs an Ardusimple SimpleRTK2B board as a fixed base.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
-* consumer - uses gpstool to consume NMEA etc. datagrams and report on stdout.    
-* gpstool - C program that uses Diminuto and Hazer and implements scripts.    
-* hazerclient - MacOS file to run Google Maps API in Firefox browser.    
-* hazer - uses gpstool to consume NMEA etc. from serial port and report on stdout.    
-* pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.    
-* producer - uses gpstool to consume NMEA etc. from serial port and forward as datagrams.    
-* provider - uses gpstool to conume NMEA etc. datagrams and forward to serial port.    
+* consumer - consumes datagrams and reports on stdout.
+* gpstool - serves as Hazer's all purpose GNSS pocket tool.
+* hazerclient - runs Google Maps API in Firefox browser under MacOS.
+* hazer - consumes data from a serial port and reports on stdout.
+* pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
+* producer - consumes data from serial port and forwards as datagrams.
+* provider - consumes datagrams and forwards to serial port.
+* rover - configures and runs an Ardusimple SimpleRTK2B board as a mobile rover.
 
 # Functional Tests
 
-* bu353s4 - script that uses gpstool to exercise the GlobalSat BU-353S4 receiver.
-* bu353w10 - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver.
-* bu353w10F - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver with slow displays.
-* bu353w10M4 - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver logging PRN 4.
-* bu353w10S - script that uses socat to send data from GlobalSat BU-353W10 to gpstool over named pipe.
-* bu353W10X - script that uses gpstool to exercise the GlobalSat BU-353W10 receiver while testing data expiration.
-* gn803g - script that uses gpstool to exercise the TOPGNSS GN-803G receiver.
-* gr701w - script that uses gpstool to exercise the NaviSys GR701W receiver.    
-* simplertk2b - script that uses gpstool to exercise the Ardusimple SimpleRTK2B board.
-* simplertk2bbase - script that uses gpstool to configure an Ardusimple SimpleRTK2B board as a base.
-* simplertk2bquery - script that uses gpstool to query the configuration of an Ardusimple SimpleRTK2B board.
-* simplertk2brover - script that uses gpstool to configure an Ardusimple SimpleRTK2B board as a rover.
-* sirfstar4 - script that uses gpstool to exercise any SiRF Star 4 device.
-* talkers - script that uses gpstool to process a file of synthetic input.
-* ublox7 - script that uses gpstool to exercise any Ublox 7 device.    
-* ublox8 - script that uses gpstool to exercise any Ublox 8 device.
-* ublox9 - script that uses gpstool to exercise any Ublox 9 device.
-* ublox8debug - script that uses gpstool with debug enabled to exercise any Ublox 8 device.
-* uputronics - script that uses gpstool to exercise the Uputronics GPS board for the Rasperry Pi.
+* bu353s4 - exercises the GlobalSat BU-353S4 receiver.
+* bu353w10 - exercises the GlobalSat BU-353W10 receiver.
+* bu353w10F - exercises the GlobalSat BU-353W10 receiver with slow displays.
+* bu353w10M4 - exercises the GlobalSat BU-353W10 receiver logging PRN 4.
+* bu353w10S - uses socat to send data from GlobalSat BU-353W10 to gpstool over named pipe.
+* bu353W10X - exercises the GlobalSat BU-353W10 receiver while testing data expiration.
+* gn803g - exercises the TOPGNSS GN-803G receiver.
+* gr701w - exercises the NaviSys GR701W receiver.    
+* simplertk2b - exercises the Ardusimple SimpleRTK2B board.
+* simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
+* simplertk2bquery - queries the configuration of an Ardusimple SimpleRTK2B board.
+* simplertk2brover - configures an Ardusimple SimpleRTK2B board as a rover.
+* sirfstar4 - exercises any SiRF Star 4 device.
+* talkers - processes a file of synthetic input.
+* ublox7 - exercises any Ublox 7 device.    
+* ublox8 - exercises any Ublox 8 device.
+* ublox9 - exercises any Ublox 9 device.
+* ublox8debug - exercises any Ublox 8 device with gpstool debug enabled.
+* uputronics - exercises the Uputronics GPS board for the Rasperry Pi.
 
 # Help
 
