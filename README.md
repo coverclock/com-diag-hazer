@@ -1312,7 +1312,12 @@ Conceptually this how I think everything is connected. Note however that based
 on the XBee SX data sheet, and my own prior experience with XBee radios, I
 didn't think they had more than one serial port or a serial-over-USB port, even
 though the diagram below pretends that they do. A formal schematic for the
-SimpleRTK2B board would be really useful.
+SimpleRTK2B board would be really useful. (I notice there is an FTDI chip
+on the board; FTDI is my favorite vendor for serial-to-USB solutions. And using
+XCTU to communicate with the XBee SX at the same baud rate as the one that the
+hypothetical UART2 was set at eliminated the need to reset the radio using
+the on-board reset button to get XCTU to work. So I suspect UART1, UART2, and
+USB all ultimately connect to the same serial port on the XBee SX.)
 
                                                                XCTU
                                                                 ^
