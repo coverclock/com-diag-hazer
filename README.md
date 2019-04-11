@@ -1332,6 +1332,19 @@ SimpleRTK2B board would be really useful.
                                                                 v
                                                          u-center or gpstool
 
+In the diagram above I show where you would connect the XBee configuration tool
+XCTU, or the u-blox configuration tool u-center, but in normal use I only have
+a host running gpstool connected.
+
+I used XCTU to configure the XBee radio (setting it to Transparent mode, as a
+Zigbee Router, and a serial port baud rate of 38400 8N1) and persist that
+configuration in the XBee's non-volatile memory.
+
+The ZED-F9P is configured at run-time using gpstool to send it commands. This
+configuration is in volatile memory so that the GPS receiver reverts back to its
+factory defaults when it is power cycled. Among other things, this allows me to
+use SimpleRTK2B boards interchangeably in the field.
+
 ### Base Configuration
 
     $ simplertk2bbase /dev/ttyACM0
