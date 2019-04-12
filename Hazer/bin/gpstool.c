@@ -1804,8 +1804,17 @@ int main(int argc, char * argv[])
                 }
 				length = strlen(buffer) + 1;
 				size = diminuto_escape_collapse(buffer, buffer, length);
+				/*
+				 * size includes the trailing NUL character.
+				 */
 				size1 = size - 1;
-				rc = (size < length) ? emit_message(devfp, buffer, size1) : emit_sentence(devfp, buffer, size1);
+				if (buffer[0] == HAZER_STIMULUS_START) {
+					rc = emit_sentence(devfp, buffer, size1);
+				} else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
+					rc = emit_message(devfp, buffer, size1);
+				} else {
+					rc = -1;
+				}
 				if (rc < 0) {
 					fprintf(errfp, "ERR %s: FAILED!\n", Program);
 					print_buffer(errfp, buffer, size1, UNLIMITED);
