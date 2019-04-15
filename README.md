@@ -382,6 +382,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.digi.com/resources/documentation/Digidocs/90001456-13/concepts/c_transparent_mode_detailed.htm?tocpath=XBee%20transparent%20mode%7CXBee%20transparent%20mode%20in%20detail%7C_____0>
 
+<https://www.ngs.noaa.gov/NGSDataExplorer/>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
