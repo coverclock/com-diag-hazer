@@ -22,28 +22,28 @@
  *
  * EXAMPLES
  *
- *	gpstool -?
+ *  gpstool -?
  *
- *	gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -v
+ *  gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -v
  *
- *	gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E
+ *  gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -E
  *
- *	gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -L nmea.txt
+ *  gpstool -D /dev/ttyUSB0 -b 4800 -8 -n -1 -L nmea.txt
  *
- *	gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -6 -A ::1 -P 5555
+ *  gpstool -D /dev/ttyUSB0 -b 9600 -8 -n -1 -E -6 -A ::1 -P 5555
  *
- *	pstool -6 -P 5555 -E
+ *  gpstool -6 -P 5555 -E
  *
- *	gpstool -d -v
+ *  gpstool -d -v
  *
- *	gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -E -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0'
+ *  gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -E -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0'
  *
- *	gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -F -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0'
+ *  gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -F -t 10 -W '\$PUBX,40,GSV,0,0,0,1,0,0' -W '\$PUBX,40,VTG,0,0,0,1,0,0'
  *
  * You can log the standard error output to the system log using the Diminuto
  * log command.
  *
- *	gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -E 2> >(log -S)
+ *  gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -E 2> >(log -S)
  */
 
 #include <assert.h>
@@ -359,33 +359,33 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
 
         for (satellite = 0; satellite < limit; ++satellite) {
 
-        	if (va[system].sat[satellite].id == 0) { continue; }
+            if (va[system].sat[satellite].id == 0) { continue; }
 
-			ranged = INACTIVE;
-			if (aa[system].active > 0) {
-				for (active = 0; active < IDENTIFIERS; ++active) {
+            ranged = INACTIVE;
+            if (aa[system].active > 0) {
+                for (active = 0; active < IDENTIFIERS; ++active) {
 
-					if (active >= aa[system].active) { break; }
-					if (aa[system].id[active] == 0) { break; }
-					if (aa[system].id[active] == va[system].sat[satellite].id) { ranged = ACTIVE; }
+                    if (active >= aa[system].active) { break; }
+                    if (aa[system].id[active] == 0) { break; }
+                    if (aa[system].id[active] == va[system].sat[satellite].id) { ranged = ACTIVE; }
 
-				}
-			}
+                }
+            }
 
-			phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
-			untracked = va[system].sat[satellite].untracked ? UNTRACKED : INACTIVE;
+            phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
+            untracked = va[system].sat[satellite].untracked ? UNTRACKED : INACTIVE;
 
             sequence = satellite / HAZER_GNSS_VIEWS;
 
-			fputs("SAT", fp);
+            fputs("SAT", fp);
 
-			fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, DEGREE, va[system].sat[satellite].azm_degrees, DEGREE, va[system].sat[satellite].snr_dbhz, va[system].signal[sequence], ranged, phantom, untracked);
+            fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, DEGREE, va[system].sat[satellite].azm_degrees, DEGREE, va[system].sat[satellite].snr_dbhz, va[system].signal[sequence], ranged, phantom, untracked);
 
-			fprintf(fp, "%15s", "");
+            fprintf(fp, "%15s", "");
 
-			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-			fputc('\n', fp);
+            fputc('\n', fp);
 
         }
 
@@ -566,7 +566,7 @@ static void print_hardware(FILE * fp, FILE * ep, const yodel_hardware_t * hp)
         }
 
         if (jamming != jamming_prior) {
-        	diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx jamming %u indicator %u\n", Program, value, hp->payload.jamInd);
+            diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx jamming %u indicator %u\n", Program, value, hp->payload.jamInd);
             jamming_prior = jamming;
         }
 
@@ -634,7 +634,7 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
         }
 
         if (spoofing != spoofing_prior) {
-        	diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx spoofing %u\n", Program, value);
+            diminuto_log_syslog(DIMINUTO_LOG_PRIORITY_NOTICE, "%s: ubx spoofing %u\n", Program, value);
                 spoofing_prior = spoofing;
         }
 
@@ -863,7 +863,7 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
  */
 static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, const yodel_rover_t * rp)
 {
-	 if (bp->ticks != 0) {
+     if (bp->ticks != 0) {
 
         fputs("BAS", fp);
 
@@ -875,9 +875,9 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
 
         fputc('\n', fp);
 
-	}
+    }
 
-	 if (rp->ticks != 0) {
+     if (rp->ticks != 0) {
 
         fputs("ROV", fp);
 
@@ -889,7 +889,7 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
 
         fputc('\n', fp);
 
-	 }
+     }
 }
 
 /**
@@ -1020,13 +1020,13 @@ static void * gpiopoller(void * argp)
  */
 static inline void countdown(expiry_t * ep, diminuto_ticks_t elapsed)
 {
-	if (*ep == 0) {
-		/* Do nothing. */
-	} else if (*ep <= elapsed) {
-		*ep = 0;
-	} else {
-		*ep -= elapsed;
-	}
+    if (*ep == 0) {
+        /* Do nothing. */
+    } else if (*ep <= elapsed) {
+        *ep = 0;
+    } else {
+        *ep -= elapsed;
+    }
 }
 
 /**
@@ -1040,7 +1040,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options and parameters with defaults.
      */
-	const char * source = (const char *)0;
+    const char * source = (const char *)0;
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
@@ -1133,58 +1133,58 @@ int main(int argc, char * argv[])
      * NMEA state databases.
      */
     hazer_position_t position[HAZER_SYSTEM_TOTAL] = {
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
-    	HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
+        HAZER_POSITION_INITIALIZER,
     };
     hazer_active_t active[HAZER_SYSTEM_TOTAL] = {
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-    	HAZER_ACTIVE_INITIALIZER,
-	};
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+        HAZER_ACTIVE_INITIALIZER,
+    };
     hazer_view_t view[HAZER_SYSTEM_TOTAL] = {
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
-    	HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
+        HAZER_VIEW_INITIALIZER,
     };
     /*
      * UBX state databases.
@@ -1395,8 +1395,8 @@ int main(int argc, char * argv[])
             }
             break;
         case 'u':
-        	unknown = !0;
-        	break;
+            unknown = !0;
+            break;
         case 'v':
             verbose = !0;
             break;
@@ -1718,12 +1718,12 @@ int main(int argc, char * argv[])
      */
 
     if (escape) {
-    	fputs("\033[1;1H\033[0J", outfp);
+        fputs("\033[1;1H\033[0J", outfp);
         if (report) {
-        	fprintf(outfp, "INP [%3d]\n", 0);
-        	fprintf(outfp, "OUT [%3d]\n", 0);
+            fprintf(outfp, "INP [%3d]\n", 0);
+            fprintf(outfp, "OUT [%3d]\n", 0);
             print_local(outfp, errfp, timetofirstfix);
-        	fflush(outfp);
+            fflush(outfp);
         }
     }
 
@@ -1744,11 +1744,11 @@ int main(int argc, char * argv[])
      while (!0) {
 
         if (diminuto_interrupter_check()) {
-        	break;
+            break;
         }
 
         if (diminuto_terminator_check()) {
-        	break;
+            break;
         }
 
         /**
@@ -1783,14 +1783,14 @@ int main(int argc, char * argv[])
              * of the GPS device.
              */
 
-        	if (devfd < 0) {
+            if (devfd < 0) {
                 /* Do nothing. */
             } else if (diminuto_serial_available(devfd) > 0) {
                 /* Do nothing. */
             } else if (acknakpending > 0) {
-            	/* Do nothing. */
+                /* Do nothing. */
             } else if (diminuto_list_isempty(&head)) {
-            	/* Do nothing. */
+                /* Do nothing. */
             } else {
                 node = diminuto_list_dequeue(&head);
                 assert(node != (diminuto_list_t *)0);
@@ -1799,32 +1799,32 @@ int main(int argc, char * argv[])
                 assert(buffer != (unsigned char *)0);
                 if (buffer[0] == '\0') {
                     fprintf(errfp, "END %s: ZERO.\n", Program);
-	                free(node);
+                    free(node);
                     break;
                 }
-				length = strlen(buffer) + 1;
-				size = diminuto_escape_collapse(buffer, buffer, length);
-				/*
-				 * size includes the trailing NUL character.
-				 */
-				size1 = size - 1;
-				if (buffer[0] == HAZER_STIMULUS_START) {
-					rc = emit_sentence(devfp, buffer, size1);
-				} else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
-					rc = emit_message(devfp, buffer, size1);
-				} else {
-					rc = -1;
-				}
-				if (rc < 0) {
-					fprintf(errfp, "ERR %s: FAILED!\n", Program);
-					print_buffer(errfp, buffer, size1, UNLIMITED);
-				} else {
-	                if (command->acknak) { acknakpending += 1; }
-					if (verbose) { print_buffer(errfp, buffer, size1, UNLIMITED); }
-					if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-					if (report) { fprintf(outfp, "OUT [%3zd] ", size1); print_buffer(outfp, buffer, size1, limitation); fflush(outfp); }
-				}
-				free(node);
+                length = strlen(buffer) + 1;
+                size = diminuto_escape_collapse(buffer, buffer, length);
+                /*
+                 * size includes the trailing NUL character.
+                 */
+                size1 = size - 1;
+                if (buffer[0] == HAZER_STIMULUS_START) {
+                    rc = emit_sentence(devfp, buffer, size1);
+                } else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
+                    rc = emit_message(devfp, buffer, size1);
+                } else {
+                    rc = -1;
+                }
+                if (rc < 0) {
+                    fprintf(errfp, "ERR %s: FAILED!\n", Program);
+                    print_buffer(errfp, buffer, size1, UNLIMITED);
+                } else {
+                    if (command->acknak) { acknakpending += 1; }
+                    if (verbose) { print_buffer(errfp, buffer, size1, UNLIMITED); }
+                    if (escape) { fputs("\033[2;1H\033[0K", outfp); }
+                    if (report) { fprintf(outfp, "OUT [%3zd] ", size1); print_buffer(outfp, buffer, size1, limitation); fflush(outfp); }
+                }
+                free(node);
             }
 
             /*
@@ -1993,13 +1993,13 @@ int main(int argc, char * argv[])
 
         if (elapsed > 0) {
 
-        	for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
+            for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
                 countdown(&position[index].ticks, elapsed);
                 countdown(&active[index].ticks, elapsed);
                 countdown(&view[index].ticks, elapsed);
             }
 
-        	countdown(&hardware.ticks, elapsed);
+            countdown(&hardware.ticks, elapsed);
             countdown(&status.ticks, elapsed);
             countdown(&base.ticks, elapsed);
             countdown(&rover.ticks, elapsed);
@@ -2172,7 +2172,7 @@ int main(int argc, char * argv[])
 
             } else {
 
-            	/* Do nothing. */
+                /* Do nothing. */
 
             }
 
@@ -2192,141 +2192,141 @@ int main(int argc, char * argv[])
 
             } else if (yodel_ubx_ack(&acknak, ubx_buffer, length) == 0) {
 
-            	refresh = !0;
+                refresh = !0;
 
                 fprintf(errfp, "UBX %s: %s 0x%02x 0x%02x (%d)\n", Program, acknak.state ? "ACK" : "NAK", acknak.clsID, acknak.msgID, acknakpending);
 
-            	if (acknakpending > 0) { acknakpending -= 1; }
+                if (acknakpending > 0) { acknakpending -= 1; }
 
             } else if (yodel_ubx_cfg_valget(ubx_buffer, length) == 0) {
 
-            	/*
-            	 * All of the validity checking and byte swapping is done in
-            	 * yodel_ubx_cfg_valget(). The parse function doesn't accept
-            	 * the message unless it checks out. This is also why the
-            	 * buffer is passed as non-const; the variable length payload
-            	 * is byteswapped in-place.
-            	 */
+                /*
+                 * All of the validity checking and byte swapping is done in
+                 * yodel_ubx_cfg_valget(). The parse function doesn't accept
+                 * the message unless it checks out. This is also why the
+                 * buffer is passed as non-const; the variable length payload
+                 * is byteswapped in-place.
+                 */
 
-            	yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)&(ubx_buffer[YODEL_UBX_PAYLOAD]);
-            	const char * bb = (const char *)0;
-            	const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
-            	const char * layer = (const char *)0;
-            	int ii = 0;
-            	yodel_ubx_cfg_valget_key_t kk = 0;
-            	size_t ss = 0;
-            	size_t ll = 0;
-            	uint8_t vv1 = 0;
-            	uint16_t vv16 = 0;
-            	uint32_t vv32 = 0;
-            	uint64_t vv64 = 0;
+                yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)&(ubx_buffer[YODEL_UBX_PAYLOAD]);
+                const char * bb = (const char *)0;
+                const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
+                const char * layer = (const char *)0;
+                int ii = 0;
+                yodel_ubx_cfg_valget_key_t kk = 0;
+                size_t ss = 0;
+                size_t ll = 0;
+                uint8_t vv1 = 0;
+                uint16_t vv16 = 0;
+                uint32_t vv32 = 0;
+                uint64_t vv64 = 0;
 
-            	refresh = !0;
+                refresh = !0;
 
-            	switch (pp->layer) {
-            	case YODEL_UBX_CFG_VALGET_Layer_RAM:
-            		layer = "RAM";
-            		break;
-            	case YODEL_UBX_CFG_VALGET_Layer_BBR:
-            		layer = "BBR";
-            		break;
-            	case YODEL_UBX_CFG_VALGET_Layer_NVM:
-            		layer = "NVM";
-            		break;
-            	case YODEL_UBX_CFG_VALGET_Layer_ROM:
-            		layer = "ROM";
-            		break;
-            	default:
-            		layer = "INV";
-            		break;
-            	}
+                switch (pp->layer) {
+                case YODEL_UBX_CFG_VALGET_Layer_RAM:
+                    layer = "RAM";
+                    break;
+                case YODEL_UBX_CFG_VALGET_Layer_BBR:
+                    layer = "BBR";
+                    break;
+                case YODEL_UBX_CFG_VALGET_Layer_NVM:
+                    layer = "NVM";
+                    break;
+                case YODEL_UBX_CFG_VALGET_Layer_ROM:
+                    layer = "ROM";
+                    break;
+                default:
+                    layer = "INV";
+                    break;
+                }
 
-            	for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
+                for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
 
-					memcpy(&kk, bb, sizeof(kk));
+                    memcpy(&kk, bb, sizeof(kk));
 
-					ss = (kk >> YODEL_UBX_CFG_VALGET_Key_Size_SHIFT) & YODEL_UBX_CFG_VALGET_Key_Size_MASK;
+                    ss = (kk >> YODEL_UBX_CFG_VALGET_Key_Size_SHIFT) & YODEL_UBX_CFG_VALGET_Key_Size_MASK;
 
-					switch (ss) {
-					case YODEL_UBX_CFG_VALGET_Size_BIT:
-					case YODEL_UBX_CFG_VALGET_Size_ONE:
-						ll = 1;
-						break;
-					case YODEL_UBX_CFG_VALGET_Size_TWO:
-						ll = 2;
-						break;
-					case YODEL_UBX_CFG_VALGET_Size_FOUR:
-						ll = 4;
-						break;
-					case YODEL_UBX_CFG_VALGET_Size_EIGHT:
-						ll = 8;
-						break;
-					}
+                    switch (ss) {
+                    case YODEL_UBX_CFG_VALGET_Size_BIT:
+                    case YODEL_UBX_CFG_VALGET_Size_ONE:
+                        ll = 1;
+                        break;
+                    case YODEL_UBX_CFG_VALGET_Size_TWO:
+                        ll = 2;
+                        break;
+                    case YODEL_UBX_CFG_VALGET_Size_FOUR:
+                        ll = 4;
+                        break;
+                    case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+                        ll = 8;
+                        break;
+                    }
 
-					if (ll == 0) { break; }
+                    if (ll == 0) { break; }
 
-					bb += sizeof(kk);
+                    bb += sizeof(kk);
 
-					switch (ss) {
-					case YODEL_UBX_CFG_VALGET_Size_BIT:
-						memcpy(&vv1, bb, sizeof(vv1));
-						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%01x\n", Program, pp->version, layer, ii, kk, vv1);
-						break;
-					case YODEL_UBX_CFG_VALGET_Size_ONE:
-						memcpy(&vv1, bb, sizeof(vv1));
-						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%02x\n", Program, pp->version, layer, ii, kk, vv1);
-						break;
-					case YODEL_UBX_CFG_VALGET_Size_TWO:
-						memcpy(&vv16, bb, sizeof(vv16));
-						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%04x\n", Program, pp->version, layer, ii, kk, vv16);
-						break;
-					case YODEL_UBX_CFG_VALGET_Size_FOUR:
-						memcpy(&vv32, bb, sizeof(vv32));
-						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%08x\n", Program, pp->version,layer, ii, kk, vv32);
-						break;
-					case YODEL_UBX_CFG_VALGET_Size_EIGHT:
-						memcpy(&vv64, bb, sizeof(vv64));
-						fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%016llx\n", Program, pp->version, layer, ii, kk, (unsigned long long)vv64);
-						break;
-					}
+                    switch (ss) {
+                    case YODEL_UBX_CFG_VALGET_Size_BIT:
+                        memcpy(&vv1, bb, sizeof(vv1));
+                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%01x\n", Program, pp->version, layer, ii, kk, vv1);
+                        break;
+                    case YODEL_UBX_CFG_VALGET_Size_ONE:
+                        memcpy(&vv1, bb, sizeof(vv1));
+                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%02x\n", Program, pp->version, layer, ii, kk, vv1);
+                        break;
+                    case YODEL_UBX_CFG_VALGET_Size_TWO:
+                        memcpy(&vv16, bb, sizeof(vv16));
+                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%04x\n", Program, pp->version, layer, ii, kk, vv16);
+                        break;
+                    case YODEL_UBX_CFG_VALGET_Size_FOUR:
+                        memcpy(&vv32, bb, sizeof(vv32));
+                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%08x\n", Program, pp->version,layer, ii, kk, vv32);
+                        break;
+                    case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+                        memcpy(&vv64, bb, sizeof(vv64));
+                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%016llx\n", Program, pp->version, layer, ii, kk, (unsigned long long)vv64);
+                        break;
+                    }
 
-					++ii;
+                    ++ii;
 
-				}
+                }
 
             } else if (yodel_ubx_mon_ver(ubx_buffer, length) == 0) {
 
-            	const char * bb = &ubx_buffer[YODEL_UBX_PAYLOAD];
-            	const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
+                const char * bb = &ubx_buffer[YODEL_UBX_PAYLOAD];
+                const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
 
-            	refresh = !0;
+                refresh = !0;
 
-            	do {
+                do {
 
-                	if (bb >= ee) { break; }
-            		fprintf(errfp, "UBX %s: MON VER SW \"%s\"\n", Program, bb);
-            		bb += YODEL_UBX_MON_VER_swVersion_LENGTH;
+                    if (bb >= ee) { break; }
+                    fprintf(errfp, "UBX %s: MON VER SW \"%s\"\n", Program, bb);
+                    bb += YODEL_UBX_MON_VER_swVersion_LENGTH;
 
-            		if (bb >= ee) { break; }
-            		fprintf(errfp, "UBX %s: MON VER HW \"%s\"\n", Program, bb);
-            		bb += YODEL_UBX_MON_VER_hwVersion_LENGTH;
+                    if (bb >= ee) { break; }
+                    fprintf(errfp, "UBX %s: MON VER HW \"%s\"\n", Program, bb);
+                    bb += YODEL_UBX_MON_VER_hwVersion_LENGTH;
 
-            		while (bb < ee) {
-            			fprintf(errfp, "UBX %s: MON VER EX \"%s\"\n", Program, bb);
-            			bb += YODEL_UBX_MON_VER_extension_LENGTH;
-            		}
+                    while (bb < ee) {
+                        fprintf(errfp, "UBX %s: MON VER EX \"%s\"\n", Program, bb);
+                        bb += YODEL_UBX_MON_VER_extension_LENGTH;
+                    }
 
-            	} while (0);
+                } while (0);
 
             } else if (yodel_ubx_nav_svin(&base.payload, ubx_buffer, length) == 0) {
 
                 base.ticks = timeout;
-            	refresh = !0;
+                refresh = !0;
 
             } else if (yodel_ubx_rxm_rtcm(&rover.payload, ubx_buffer, length) == 0) {
 
                 rover.ticks = timeout;
-            	refresh = !0;
+                refresh = !0;
 
             } else if (unknown) {
 
@@ -2334,7 +2334,7 @@ int main(int argc, char * argv[])
 
             } else {
 
-            	/* Do nothing. */
+                /* Do nothing. */
 
             }
 
@@ -2383,9 +2383,9 @@ int main(int argc, char * argv[])
          */
 
         if (!expire) {
-        	/* Do nothing. */
+            /* Do nothing. */
         } else if (!refresh) {
-        	/* Do nothing. */
+            /* Do nothing. */
         } else {
             static int crowbar = 1000;
             if (crowbar <= 0) {
