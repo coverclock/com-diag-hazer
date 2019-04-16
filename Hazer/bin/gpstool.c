@@ -1242,7 +1242,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RS:U:VW:Xb:cdehlmnop:rst:uv?";
+    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RS:U:VW:Xb:cdehlmnop:rst:uvx?";
 
     /**
      ** PREINITIALIZATION
