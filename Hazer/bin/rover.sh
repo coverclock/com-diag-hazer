@@ -8,8 +8,12 @@
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
+ROWS=${3:-76}
+COLS=${4:-80}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
+
+stty rows ${ROWS} cols ${COLS} || exit 1
 
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE DISABLED
 # UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-UART2-BAUDRATE 38400
@@ -31,5 +35,6 @@ gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x75\x10\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x76\x10\x00' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x6b\x02\x91\x20\x01' \
-    -W '' && \
-exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 2> >(log -S -N ${PROGRAM})
+    -W '' && || exit 2
+
+exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -t 10 1> /dev/tty 2> >(log -S -N ${PROGRAM})

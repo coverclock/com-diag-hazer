@@ -19,8 +19,12 @@
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
+ROWS=${3:-76}
+COLS=${4:-80}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
+
+stty rows ${ROWS} cols ${COLS} || exit 1
 
 . $(readlink -e $(dirname ${0})/../fun)/ubx8
 
@@ -29,4 +33,4 @@ for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} -W ${OPTION}"
 done
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -t 10 ${OPTIONS} 2> >(log -S -N ${PROGRAM})
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -t 10 ${OPTIONS} 1> /dev/tty 2> >(log -S -N ${PROGRAM})
