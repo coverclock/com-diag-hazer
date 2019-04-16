@@ -19,12 +19,8 @@
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
-ROWS=${3:-76}
-COLS=${4:-80}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
-
-stty rows ${ROWS} cols ${COLS} || exit 1
 
 . $(readlink -e $(dirname ${0})/../fun)/ubx8
 
