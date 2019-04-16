@@ -1066,6 +1066,7 @@ int main(int argc, char * argv[])
     int ignorechecksums = 0;
     int slow = 0;
     int expire = 0;
+    int views = !0;
     role_t role = ROLE;
     protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
@@ -1400,8 +1401,11 @@ int main(int argc, char * argv[])
         case 'v':
             verbose = !0;
             break;
+        case 'x':
+            views = 0;
+            break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", Program);
+            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -x ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1440,6 +1444,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -t SECONDS  Expire GNSS data after SECONDS seconds.\n");
             fprintf(errfp, "       -u          Note unknown NMEA or UBX on standard error.\n");
             fprintf(errfp, "       -v          Display verbose output on standard error.\n");
+            fprintf(errfp, "       -x          Suppress displaying satellite views.\n");
             return 1;
             break;
         }
@@ -2449,7 +2454,7 @@ int main(int argc, char * argv[])
                 print_positions(outfp, errfp, position, onepps, dmyokay, totokay);
                 print_corrections(outfp, errfp, &base, &rover);
                 print_actives(outfp, errfp, active);
-                print_views(outfp, errfp, view, active);
+                if (views) { print_views(outfp, errfp, view, active); }
             }
             if (escape) { fputs("\033[0J", outfp); }
             if (report) { fflush(outfp); }
