@@ -47,6 +47,8 @@ gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x75\x10\x00' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x76\x10\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x8b\x00\x91\x20\x01' \
-    -W '' || exit 2
+    -W '' \
+     2> >(log -S -N ${PROGRAM}) || exit 1
 
-exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -x -t 10 1> /dev/tty 2> >(log -S -N ${PROGRAM})
+exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -x -t 10 \
+    1> /dev/tty 2> >(log -S -N ${PROGRAM})
