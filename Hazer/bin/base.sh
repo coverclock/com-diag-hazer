@@ -5,6 +5,11 @@
 # https://github.com/coverclock/com-diag-hazer
 # Configure and run the Ardusimple SimpleRTK2B as a fixed Base.
 
+# The SVIN-ACC-LIMIT is based on actual testing under not bad but less than
+# ideal conditions: the antenna in my front yard, but not on a roof. The
+# SVIN-MIN-DUR is laughably small; eight hours is a more realistic value
+# given the conditions under which I did the test.
+
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
