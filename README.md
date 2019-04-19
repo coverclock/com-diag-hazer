@@ -66,8 +66,14 @@ Hazer parses the following received NMEA sentences.
 
 Yodel recognizes the following received UBX messages.
 
-* UBX-MON-HW - Monitor Hardware can be used to detect jamming. (UBLOX 8 R15 p. 285)
-* UBX-NAV-STATUS - Navigation Status can be used to detect spoofing. (UBLOX 8 R15 p. 316)
+* UBX-ACK-ACK - Acknowledge UBX input and indicate success. (UBX 9 p. 38)
+* UBX-ACK-NAK - Acknowledge UBX input and indicate failure. (UBX 9 p. 38)
+* UBX-CFG-VALGET - Get Configuration Value. (UBLOX 9 p. 85)
+* UBX-MON-HW - Monitor Hardware to detect jamming. (UBLOX 8 R15 p. 285)
+* UBX-MON-VER - Monitor hardware and software Version. (UBLOX 9 p. 139)
+* UBX-NAV-STATUS - Navigation Status to detect spoofing. (UBLOX 8 R15 p. 316)
+* UBX-NAV-SVIN - Navigation Survey-in status on DGNSS Base. (UBLOX 9 p. 163)
+* UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (UBLOX 9 p. 181)
 
 # Talkers
 
