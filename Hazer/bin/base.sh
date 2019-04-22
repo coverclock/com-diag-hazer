@@ -16,6 +16,9 @@ RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
+LOG=$(readlink -e $(dirname ${0})/..)/log
+mkdir -p ${LOG}
+
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE SURVEY_IN
 # UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-SVIN-MIN-DUR 3600 (seconds = 1hour)
 # UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-SVIN-ACC-LIMIT 2500 (x 0.1mm = 0.25m =~ 10")
@@ -55,5 +58,5 @@ gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -W '' \
      2> >(log -S -N ${PROGRAM}) || exit 1
 
-exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -x -t 10 \
+exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${LOG}/${PROGRAM} -x -t 10 \
     1> /dev/tty 2> >(log -S -N ${PROGRAM})

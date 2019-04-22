@@ -11,6 +11,9 @@ RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
+LOG=$(readlink -e $(dirname ${0})/..)/log
+mkdir -p ${LOG}
+
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE DISABLED
 # UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-UART2-BAUDRATE 38400
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-UART2-STOPBITS 1 (1)
@@ -34,5 +37,5 @@ gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -W '' \
      2> >(log -S -N ${PROGRAM}) || exit 1
 
-exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -x -t 10 \
+exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${LOG}/${PROGRAM} -x -t 10 \
     1> /dev/tty 2> >(log -S -N ${PROGRAM})

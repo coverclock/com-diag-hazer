@@ -83,6 +83,7 @@
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_delay.h"
 #include "com/diag/diminuto/diminuto_containerof.h"
+#include "com/diag/diminuto/diminuto_observation.h"
 
 /*
  * ENUMERATIONS
@@ -1044,9 +1045,10 @@ int main(int argc, char * argv[])
     const char * device = (const char *)0;
     const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
-    const char * path = (const char *)0;
+    const char * logging = (const char *)0;
     const char * host = (const char *)0;
     const char * service = (const char *)0;
+    const char * headless = (const char *)0;
     int opt = -1;
     int debug = 0;
     int verbose = 0;
@@ -1084,7 +1086,6 @@ int main(int argc, char * argv[])
     FILE * logfp = (FILE *)0;
     FILE * strobefp = (FILE *)0;
     FILE * ppsfp = (FILE *)0;
-    int devfd = -1;
     /*
      * Datagram socket variables.
      */
@@ -1224,6 +1225,7 @@ int main(int argc, char * argv[])
     char lsn = '\0';
     int output = 0;
     FILE * fp = (FILE *)0;
+    int fd = -1;
     int refresh = !0;
     int index = -1;
     char * end = (char *)0;
@@ -1232,6 +1234,7 @@ int main(int argc, char * argv[])
     int totokay = 0;
     size_t limitation = 0;
     char * locale = (char *)0;
+    char * temporary = (char *)0;
     /*
      * External symbols.
      */
@@ -1242,7 +1245,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFI:L:OP:RS:U:VW:Xb:cdehlmnop:rst:uvx?";
+    static const char OPTIONS[] = "124678A:CD:EFH:I:L:OP:RS:U:VW:Xb:cdehlmnop:rst:uvx?";
 
     /**
      ** PREINITIALIZATION
@@ -1304,11 +1307,21 @@ int main(int argc, char * argv[])
             escape = !0;
             slow = !0;
             break;
+        case 'H':
+            report = !0;
+            escape = !0;
+            slow = !0;
+            headless = optarg;
+            fd = diminuto_observation_create(headless, 0600, &temporary);
+            assert(fd >= 0);
+            outfp = fdopen(fd, "w");
+            assert(outfp != (FILE *)0);
+            break;
         case 'I':
             pps = optarg;
             break;
         case 'L':
-            path = optarg;
+            logging = optarg;
             break;
         case 'O':
             readonly = 0;
@@ -1326,6 +1339,7 @@ int main(int argc, char * argv[])
         case 'U':
             readonly = 0;
             command = (struct Command *)malloc(sizeof(struct Command));
+            assert(command != (struct Command *)0);
             command->acknak = !0;
             node = &(command->link);
             diminuto_list_datainit(node, optarg);
@@ -1337,6 +1351,7 @@ int main(int argc, char * argv[])
         case 'W':
             readonly = 0;
             command = (struct Command *)malloc(sizeof(struct Command));
+            assert(command != (struct Command *)0);
             command->acknak = 0;
             node = &(command->link);
             diminuto_list_datainit(node, optarg);
@@ -1405,7 +1420,7 @@ int main(int argc, char * argv[])
             views = 0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -x ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]\n", Program);
+            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -x ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1417,12 +1432,13 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
             fprintf(errfp, "       -F          Like -E but refresh at 1Hz.\n");
+            fprintf(errfp, "       -H HEADLESS Like -F but writes screen to HEADLESS file.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
-            fprintf(errfp, "       -L FILE     Log sentences to FILE.\n");
+            fprintf(errfp, "       -L LOG      Write sentences to LOG file.\n");
             fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
             fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
             fprintf(errfp, "       -R          Print a report on standard output.\n");
-            fprintf(errfp, "       -S SOURCE   Use SOURCE for input.\n");
+            fprintf(errfp, "       -S SOURCE   Use SOURCE file for input.\n");
             fprintf(errfp, "       -U STRING   Collapse STRING, append checksum, write to DEVICE, expect ACK.\n");
             fprintf(errfp, "       -U ''       Exit when this empty STRING is processed.\n");
             fprintf(errfp, "       -V          Print release, vintage, and revision on standard output.\n");
@@ -1458,13 +1474,13 @@ int main(int argc, char * argv[])
      * Are we logging every valid sentence or packet to an output file?
      */
 
-    if (path == (const char *)0) {
+    if (logging == (const char *)0) {
         /* Do nothing. */
-    } else if (strcmp(path, "-") == 0) {
+    } else if (strcmp(logging, "-") == 0) {
         logfp = stdout;
     } else {
-        logfp = fopen(path, "ab");
-        if (logfp == (FILE *)0) { diminuto_perror(path); }
+        logfp = fopen(logging, "ab");
+        if (logfp == (FILE *)0) { diminuto_perror(logging); }
         assert(logfp != (FILE *)0);
     }
 
@@ -1651,17 +1667,17 @@ int main(int argc, char * argv[])
 
     if (device != (const char *)0) {
 
-        devfd = open(device, readonly ? O_RDONLY : O_RDWR);
-        if (devfd < 0) { diminuto_perror(device); }
-        assert(devfd >= 0);
+        fd = open(device, readonly ? O_RDONLY : O_RDWR);
+        if (fd < 0) { diminuto_perror(device); }
+        assert(fd >= 0);
 
-        rc = diminuto_serial_set(devfd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
+        rc = diminuto_serial_set(fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
         assert(rc == 0);
 
-        rc = diminuto_serial_raw(devfd);
+        rc = diminuto_serial_raw(fd);
         assert(rc == 0);
 
-        devfp = fdopen(devfd, readonly ? "r" : "a+");
+        devfp = fdopen(fd, readonly ? "r" : "a+");
         if (devfp == (FILE *)0) { diminuto_perror(device); }
         assert(devfp != (FILE *)0);
         infp = devfp;
@@ -1689,27 +1705,24 @@ int main(int argc, char * argv[])
      * it from our serial input.
      */
 
-    do {
         if (devfp == (FILE *)0) {
-            break;
+           /* Do nothing. */
+        } else if (!modemcontrol) {
+            /* Do nothing. */
+        } else if (!carrierdetect) {
+            /* Do nothing. */
+        } else {
+            poller.ppsfp = devfp;
+            poller.strobefp = strobefp;
+            poller.onepps = 0;
+            poller.done = 0;
+            pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
+            if (pthreadrc != 0) {
+                errno = pthreadrc;
+                diminuto_perror("pthread_create");
+            }
+            assert(pthreadrc == 0);
         }
-        if (!modemcontrol) {
-            break;
-        }
-        if (!carrierdetect) {
-            break;
-        }
-        poller.ppsfp = devfp;
-        poller.strobefp = strobefp;
-        poller.onepps = 0;
-        poller.done = 0;
-        pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
-        if (pthreadrc != 0) {
-            errno = pthreadrc;
-            diminuto_perror("pthread_create");
-        }
-        assert(pthreadrc == 0);
-    } while (0);
 
     /*
      * How much of each packet do we display? Depends on whether we're doing
@@ -1788,9 +1801,9 @@ int main(int argc, char * argv[])
              * of the GPS device.
              */
 
-            if (devfd < 0) {
+            if (devfp == (FILE *)0) {
                 /* Do nothing. */
-            } else if (diminuto_serial_available(devfd) > 0) {
+            } else if (diminuto_serial_available(fileno(devfp)) > 0) {
                 /* Do nothing. */
             } else if (acknakpending > 0) {
                 /* Do nothing. */
@@ -2361,7 +2374,9 @@ int main(int argc, char * argv[])
          * Google Earth, and perhaps other applications.
          */
 
-        if (!output) {
+        if (devfp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (!output) {
             /* Do nothing. */
         } else if (format != NMEA) {
             /* Do nothing. */
@@ -2437,7 +2452,7 @@ int main(int argc, char * argv[])
 
         if (!refresh) {
             /* Do nothing: nothing changed. */
-        } else if ((devfd >= 0) && (diminuto_serial_available(devfd) > 0)) {
+        } else if ((devfp != (FILE *)0) && (diminuto_serial_available(fileno(devfp)) > 0)) {
             /* Do nothing: we still have real-time input waiting. */
         } else if (slow && (was == now)) {
             /* Do nothing: slow display cannot handle real-time refresh rate. */
@@ -2458,6 +2473,14 @@ int main(int argc, char * argv[])
             }
             if (escape) { fputs("\033[0J", outfp); }
             if (report) { fflush(outfp); }
+            if (headless != (const char *)0) {
+                fd = diminuto_observation_commit(fileno(outfp), temporary);
+                assert(fd < 0);
+                fd = diminuto_observation_create(headless, 0600, &temporary);
+                assert(fd >= 0);
+                outfp = fdopen(fd, "w");
+                assert(outfp != (FILE *)0);
+            }
             refresh = 0;
         }
 
@@ -2518,8 +2541,14 @@ int main(int argc, char * argv[])
     rc = fclose(infp);
     assert(rc != EOF);
 
-    rc = fclose(outfp);
-    assert(rc != EOF);
+    if (headless != (const char *)0) {
+        fflush(outfp);
+        fd = diminuto_observation_commit(fileno(outfp), temporary);
+        assert(fd < 0);
+    } else {
+        rc = fclose(outfp);
+        assert(rc != EOF);
+    }
 
     rc = fclose(errfp);
     assert(rc != EOF);
