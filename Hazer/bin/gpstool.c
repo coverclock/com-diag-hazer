@@ -1312,7 +1312,7 @@ int main(int argc, char * argv[])
             escape = !0;
             slow = !0;
             headless = optarg;
-            fd = diminuto_observation_create(headless, 0600, &temporary);
+            fd = diminuto_observation_create(headless, &temporary);
             assert(fd >= 0);
             outfp = fdopen(fd, "w");
             assert(outfp != (FILE *)0);
@@ -2476,7 +2476,7 @@ int main(int argc, char * argv[])
             if (headless != (const char *)0) {
                 fd = diminuto_observation_commit(fileno(outfp), temporary);
                 assert(fd < 0);
-                fd = diminuto_observation_create(headless, 0600, &temporary);
+                fd = diminuto_observation_create(headless, &temporary);
                 assert(fd >= 0);
                 outfp = fdopen(fd, "w");
                 assert(outfp != (FILE *)0);
