@@ -489,8 +489,8 @@ Optionally install Diminuto and Hazer in /usr/local.
 
 # Help
 
-    $ gpstool -?
-    usage: gpstool [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S SOURCE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L FILE ] [ -t SECONDS ] [ -C ]
+    gpstool -?
+    usage: gpstool [ -d ] [ -u ] [ -v ] [ -x ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L LOG ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -4          Use IPv4 for ADDRESS, PORT.
@@ -502,12 +502,13 @@ Optionally install Diminuto and Hazer in /usr/local.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI escape sequences.
            -F          Like -E but refresh at 1Hz.
+           -H HEADLESS Like -F but writes screen to HEADLESS file.
            -I PIN      Take 1PPS from GPIO input PIN (requires -D).
-           -L FILE     Log sentences to FILE.
+           -L LOG      Write sentences to LOG file.
            -O          Output sentences to DEVICE.
            -P PORT     Send to or receive from PORT.
            -R          Print a report on standard output.
-           -S SOURCE   Use SOURCE for input.
+           -S SOURCE   Use SOURCE file for input.
            -U STRING   Collapse STRING, append checksum, write to DEVICE, expect ACK.
            -U ''       Exit when this empty STRING is processed.
            -V          Print release, vintage, and revision on standard output.
@@ -529,6 +530,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -t SECONDS  Expire GNSS data after SECONDS seconds.
            -u          Note unknown NMEA or UBX on standard error.
            -v          Display verbose output on standard error.
+           -x          Suppress displaying satellite views.
  
 # Dependencies
 
