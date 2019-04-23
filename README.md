@@ -462,6 +462,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 * gpstool - serves as Hazer's all purpose GNSS pocket tool.
 * hazerclient - runs Google Maps API in Firefox browser under MacOS.
 * hazer - consumes data from a serial port and reports on stdout.
+* headless - uses inotifywait to watch headless output.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
@@ -472,6 +473,7 @@ Optionally install Diminuto and Hazer in /usr/local.
 * bu353s4 - exercises the GlobalSat BU-353S4 receiver.
 * bu353w10 - exercises the GlobalSat BU-353W10 receiver.
 * bu353w10F - exercises the GlobalSat BU-353W10 receiver with slow displays.
+* bu353w10H - exercises the GlobalSat BU-353W10 receiver in headless mode.
 * bu353w10M4 - exercises the GlobalSat BU-353W10 receiver logging PRN 4.
 * bu353w10S - uses socat to send data from GlobalSat BU-353W10 to gpstool over named pipe.
 * bu353W10X - exercises the GlobalSat BU-353W10 receiver while testing data expiration.
