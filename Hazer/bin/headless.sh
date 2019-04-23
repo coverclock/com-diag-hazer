@@ -14,7 +14,7 @@
 PROGRAM=$(basename ${0})
 HEADLESS=${1:-"/dev/null"}
 
-CANONICAL=$(readlink -e ${HEADLESS})
+CANONICAL=$(readlink -f ${HEADLESS})
 DIRECTORY=$(dirname ${CANONICAL})
 FILE=$(basename ${CANONICAL})
 
