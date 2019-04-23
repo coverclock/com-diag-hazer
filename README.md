@@ -440,6 +440,8 @@ Optionally install Diminuto and Hazer in /usr/local.
 * src - feature implementation and private header source files.
 * tst - unit test source files (does not require a GPS receiver).
 
+# Artifacts
+
 * out/TARGET/arc - object file archives for static linking.
 * out/TARGET/bin - utility stripped binary executables and scripts.
 * out/TARGET/dep - make dependencies.
