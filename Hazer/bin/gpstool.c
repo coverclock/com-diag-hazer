@@ -1312,9 +1312,7 @@ int main(int argc, char * argv[])
             escape = !0;
             slow = !0;
             headless = optarg;
-            fd = diminuto_observation_create(headless, &temporary);
-            assert(fd >= 0);
-            outfp = fdopen(fd, "w");
+            outfp = diminuto_observation_create(headless, &temporary);
             assert(outfp != (FILE *)0);
             break;
         case 'I':
@@ -2474,11 +2472,9 @@ int main(int argc, char * argv[])
             if (escape) { fputs("\033[0J", outfp); }
             if (report) { fflush(outfp); }
             if (headless != (const char *)0) {
-                fd = diminuto_observation_commit(fileno(outfp), temporary);
-                assert(fd < 0);
-                fd = diminuto_observation_create(headless, &temporary);
-                assert(fd >= 0);
-                outfp = fdopen(fd, "w");
+                outfp = diminuto_observation_commit(outfp, &temporary);
+                assert(outfp == (FILE *)0);
+                outfp = diminuto_observation_create(headless, &temporary);
                 assert(outfp != (FILE *)0);
             }
             refresh = 0;
@@ -2542,9 +2538,8 @@ int main(int argc, char * argv[])
     assert(rc != EOF);
 
     if (headless != (const char *)0) {
-        fflush(outfp);
-        fd = diminuto_observation_commit(fileno(outfp), temporary);
-        assert(fd < 0);
+        outfp = diminuto_observation_commit(outfp, &temporary);
+        assert(outfp == (FILE *)0);
     } else {
         rc = fclose(outfp);
         assert(rc != EOF);
