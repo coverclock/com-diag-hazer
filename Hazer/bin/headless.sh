@@ -14,8 +14,11 @@
 PROGRAM=$(basename ${0})
 HEADLESS=${1:-"/dev/null"}
 
-DIRECTORY=$(dirname ${HEADLESS})
-FILE=$(basename ${HEADLESS})
+CANONICAL=$(readlink -e ${HEADLESS})
+DIRECTORY=$(dirname ${CANONICAL})
+FILE=$(basename ${CANONICAL})
+
+test -d ${DIRECTORY} || exit 1
 
 clear
 
