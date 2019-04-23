@@ -440,6 +440,18 @@ Optionally install Diminuto and Hazer in /usr/local.
 * src - feature implementation and private header source files.
 * tst - unit test source files (does not require a GPS receiver).
 
+* out/TARGET/arc - object file archives for static linking.
+* out/TARGET/bin - utility stripped binary executables and scripts.
+* out/TARGET/dep - make dependencies.
+* out/TARGET/fun - functional test binary executables and scripts.
+* out/TARGET/gen - generated source files.
+* out/TARGET/inc - include (header) files.
+* out/TARGET/lib - shared objects for dynamic linking.
+* out/TARGET/log - log files produced at run-time.
+* out/TARGET/obc - object files.
+* out/TARGET/sym - utility unstripped binary executables.
+* out/TARGET/tst - unit test binary executables and scripts.
+
 # Utilities
 
 * base - configures and runs an Ardusimple SimpleRTK2B board as a fixed base.
