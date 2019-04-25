@@ -8,7 +8,7 @@
 # in "headless" (-H FILE) mode in which the latest full screen update
 # is written to a file using the Diminuto Observation feature. See
 # the bin/base.sh and bin/rover.sh for examples of this. So you might
-# use the command "headless out/host/log/base" to watch the fill screen
+# use the command "headless out/host/log/base" to watch the full screen
 # updates performed by the Base Station script.
 
 PROGRAM=$(basename ${0})
