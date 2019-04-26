@@ -37,5 +37,5 @@ gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -W '' \
      2> >(log -S -N ${PROGRAM}) || exit 1
 
-exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${LOG}/${PROGRAM} -x -t 10 \
+exec gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -H ${LOG}/${PROGRAM} -t 10 \
     1> /dev/tty 2> >(log -S -N ${PROGRAM})

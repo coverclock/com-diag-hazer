@@ -11,8 +11,12 @@
 # use the command "headless out/host/log/base" to watch the full screen
 # updates performed by the Base Station script.
 
+# The optional LIMIT parameter is to deal with the vagaries of various
+# terminal emulators (in my case Beagle Term on an Acer Chromebook).
+
 PROGRAM=$(basename ${0})
 HEADLESS=${1:-"/dev/null"}
+LIMIT=${2:-$(($(stty size | cut -d ' ' -f 1) - 1))}
 
 CANONICAL=$(readlink -f ${HEADLESS})
 DIRECTORY=$(dirname ${CANONICAL})
@@ -22,10 +26,10 @@ TARGET="${DIRECTORY}/ MOVED_TO ${FILE}"
 test -d ${DIRECTORY} || exit 1
 
 clear
-
 # sudo sudo apt-get install inotify-tools
 while MOVED=$(inotifywait -e moved_to ${DIRECTORY} 2> /dev/null); do
     if [[ "${MOVED}" == "${TARGET}" ]]; then
-	   cat ${HEADLESS}
+        clear
+        head -n ${LIMIT} ${HEADLESS}
 	fi
 done

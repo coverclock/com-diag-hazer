@@ -1068,7 +1068,6 @@ int main(int argc, char * argv[])
     int ignorechecksums = 0;
     int slow = 0;
     int expire = 0;
-    int views = !0;
     role_t role = ROLE;
     protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
@@ -1245,7 +1244,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFH:I:L:OP:RS:U:VW:Xb:cdehlmnop:rst:uvx?";
+    static const char OPTIONS[] = "124678A:CD:EFH:I:L:OP:RS:U:VW:Xb:cdehlmnop:rst:uv?";
 
     /**
      ** PREINITIALIZATION
@@ -1309,8 +1308,6 @@ int main(int argc, char * argv[])
             break;
         case 'H':
             report = !0;
-            escape = !0;
-            slow = !0;
             headless = optarg;
             outfp = diminuto_observation_create(headless, &temporary);
             assert(outfp != (FILE *)0);
@@ -1414,11 +1411,8 @@ int main(int argc, char * argv[])
         case 'v':
             verbose = !0;
             break;
-        case 'x':
-            views = 0;
-            break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -x ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
+            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -H HEADLESS ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1430,7 +1424,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
             fprintf(errfp, "       -F          Like -E but refresh at 1Hz.\n");
-            fprintf(errfp, "       -H HEADLESS Like -F but writes screen to HEADLESS file.\n");
+            fprintf(errfp, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
             fprintf(errfp, "       -L LOG      Write sentences to LOG file.\n");
             fprintf(errfp, "       -O          Output sentences to DEVICE.\n");
@@ -1458,7 +1452,6 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -t SECONDS  Expire GNSS data after SECONDS seconds.\n");
             fprintf(errfp, "       -u          Note unknown NMEA or UBX on standard error.\n");
             fprintf(errfp, "       -v          Display verbose output on standard error.\n");
-            fprintf(errfp, "       -x          Suppress displaying satellite views.\n");
             return 1;
             break;
         }
@@ -2467,7 +2460,7 @@ int main(int argc, char * argv[])
                 print_positions(outfp, errfp, position, onepps, dmyokay, totokay);
                 print_corrections(outfp, errfp, &base, &rover);
                 print_actives(outfp, errfp, active);
-                if (views) { print_views(outfp, errfp, view, active); }
+                print_views(outfp, errfp, view, active);
             }
             if (escape) { fputs("\033[0J", outfp); }
             if (report) { fflush(outfp); }

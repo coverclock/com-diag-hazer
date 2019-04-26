@@ -506,7 +506,7 @@ Optionally install Diminuto and Hazer in /usr/local.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI escape sequences.
            -F          Like -E but refresh at 1Hz.
-           -H HEADLESS Like -F but writes screen to HEADLESS file.
+           -H HEADLESS Like -R but writes screen to HEADLESS file.
            -I PIN      Take 1PPS from GPIO input PIN (requires -D).
            -L LOG      Write sentences to LOG file.
            -O          Output sentences to DEVICE.
@@ -534,7 +534,6 @@ Optionally install Diminuto and Hazer in /usr/local.
            -t SECONDS  Expire GNSS data after SECONDS seconds.
            -u          Note unknown NMEA or UBX on standard error.
            -v          Display verbose output on standard error.
-           -x          Suppress displaying satellite views.
  
 # Dependencies
 
