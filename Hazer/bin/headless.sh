@@ -16,7 +16,7 @@
 
 PROGRAM=$(basename ${0})
 HEADLESS=${1:-"/dev/null"}
-LIMIT=${2:-$(($(stty size | cut -d ' ' -f 1) - 1))}
+LIMIT=${2:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 CANONICAL=$(readlink -f ${HEADLESS})
 DIRECTORY=$(dirname ${CANONICAL})
