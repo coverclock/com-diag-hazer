@@ -9,13 +9,17 @@
 # is written to a file using the Diminuto Observation feature. See
 # the bin/base.sh and bin/rover.sh for examples of this. So you might
 # use the command "headless out/host/log/base" to watch the full screen
-# updates performed by the Base Station script.
+# updates performed by the Base Station script. Multiple headless
+# instantiations for the same output file can be run at one time. Exiting
+# the script directly or indirectly (e.g. by logging off or exiting a
+# terminal emulator) should have no effect on the gpstool instance running
+# in the background.
+
+# gpstool should be run without the -E (ANSI Escape sequences) option.
+# -R (Report) and/or -F (Frequency) should be okay.
 
 # The optional LIMIT parameter is to deal with the vagaries of various
-# terminal emulators (in my case Beagle Term on an Acer Chromebook).
-
-# REFERENCES:
-# http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
+# terminal emulators (I'm lookin' at you, Beagle Term a Chromebook).
 
 PROGRAM=$(basename ${0})
 HEADLESS=${1:-"/dev/null"}
