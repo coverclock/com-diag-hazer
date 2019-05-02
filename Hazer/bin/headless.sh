@@ -33,15 +33,13 @@ clear
 while MOVED=$(inotifywait -e moved_to ${DIRECTORY} 2> /dev/null); do
   if [[ "${MOVED}" == "${TARGET}" ]]; then
     clear
-    cat ${CANONICAL} |
-      awk '
-        begin   { inp="INP [   ]"; out="OUT [   ]"; arm=1; }
-        /^INP / { inp=$0; arm=1; next; }
-        /^OUT / { out=$0; arm=1; next; }
-                { if (arm!=0) { print inp; print out; arm=0; } print $0; next; }
-        end     { if (arm!=0) { print inp; print out; arm=0; } }
-      ' |
-      head -n ${LIMIT}
+    awk '
+      begin   { inp="INP [   ]"; out="OUT [   ]"; arm=1; }
+      /^INP / { inp=$0; arm=1; next; }
+      /^OUT / { out=$0; arm=1; next; }
+              { if (arm!=0) { print inp; print out; arm=0; } print $0; next; }
+      end     { if (arm!=0) { print inp; print out; arm=0; } }
+    ' ${CANONICAL} | head -n ${LIMIT}
   fi
 done
 
