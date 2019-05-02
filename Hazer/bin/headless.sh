@@ -35,8 +35,8 @@ while MOVED=$(inotifywait -e moved_to ${DIRECTORY} 2> /dev/null); do
     clear
     awk '
       begin   { inp="INP [   ]"; out="OUT [   ]"; arm=1; }
-      /^INP / { inp=$0; arm=1; next; }
-      /^OUT / { out=$0; arm=1; next; }
+      /^INP / { inp=substr($0,0,79); arm=1; next; }
+      /^OUT / { out=substr($0,0,79); arm=1; next; }
               { if (arm!=0) { print inp; print out; arm=0; } print $0; next; }
       end     { if (arm!=0) { print inp; print out; arm=0; } }
     ' ${CANONICAL} | head -n ${LIMIT}
