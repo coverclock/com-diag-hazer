@@ -14,6 +14,9 @@
 # The optional LIMIT parameter is to deal with the vagaries of various
 # terminal emulators (in my case Beagle Term on an Acer Chromebook).
 
+# REFERENCES:
+# http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
+
 PROGRAM=$(basename ${0})
 HEADLESS=${1:-"/dev/null"}
 LIMIT=${2:-$(($(stty size | cut -d ' ' -f 1) - 2))}
@@ -28,8 +31,18 @@ test -d ${DIRECTORY} || exit 1
 clear
 # sudo sudo apt-get install inotify-tools
 while MOVED=$(inotifywait -e moved_to ${DIRECTORY} 2> /dev/null); do
-    if [[ "${MOVED}" == "${TARGET}" ]]; then
-        clear
-        head -n ${LIMIT} ${HEADLESS}
-	fi
+  if [[ "${MOVED}" == "${TARGET}" ]]; then
+    clear
+    cat ${CANONICAL} |
+      awk '
+        begin   { inp="INP [   ]"; out="OUT [   ]"; arm=1; }
+        /^INP / { inp=$0; arm=1; next; }
+        /^OUT / { out=$0; arm=1; next; }
+                { if (arm!=0) { print inp; print out; arm=0; } print $0; next; }
+        end     { if (arm!=0) { print inp; print out; arm=0; } }
+      ' |
+      head -n ${LIMIT}
+  fi
 done
+
+exit 0
