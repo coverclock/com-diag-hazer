@@ -1299,11 +1299,9 @@ int main(int argc, char * argv[])
         case 'E':
             report = !0;
             escape = !0;
-            slow = 0;
             break;
         case 'F':
             report = !0;
-            escape = !0;
             slow = !0;
             break;
         case 'H':
@@ -1412,7 +1410,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F ] [ -H HEADLESS ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
+            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
@@ -1423,7 +1421,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -C          Ignore bad checksums.\n");
             fprintf(errfp, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI escape sequences.\n");
-            fprintf(errfp, "       -F          Like -E but refresh at 1Hz.\n");
+            fprintf(errfp, "       -F          Like -R but refresh at 1Hz.\n");
             fprintf(errfp, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO input PIN (requires -D).\n");
             fprintf(errfp, "       -L LOG      Write sentences to LOG file.\n");
