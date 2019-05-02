@@ -1202,6 +1202,8 @@ int main(int argc, char * argv[])
     diminuto_sticks_t frequency = 0;
     diminuto_sticks_t was = 0;
     diminuto_sticks_t now = 0;
+    diminuto_sticks_t before = 0;
+    diminuto_sticks_t after = 0;
     diminuto_ticks_t elapsed = 0;
     /*
      * Monotonic time related variables.
@@ -2443,7 +2445,7 @@ int main(int argc, char * argv[])
             /* Do nothing: nothing changed. */
         } else if ((devfp != (FILE *)0) && (diminuto_serial_available(fileno(devfp)) > 0)) {
             /* Do nothing: we still have real-time input waiting. */
-        } else if (slow && (was == now)) {
+        } else if (slow && (before == (after = diminuto_time_elapsed() / frequency))) {
             /* Do nothing: slow display cannot handle real-time refresh rate. */
         } else {
             if (escape) { fputs("\033[3;1H", outfp); }
@@ -2468,6 +2470,7 @@ int main(int argc, char * argv[])
                 outfp = diminuto_observation_create(headless, &temporary);
                 assert(outfp != (FILE *)0);
             }
+            before = after;
             refresh = 0;
         }
 
