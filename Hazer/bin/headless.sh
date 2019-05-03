@@ -33,7 +33,7 @@ TARGET="${DIRECTORY}/ MOVED_TO ${FILE}"
 test -d ${DIRECTORY} || exit 1
 
 clear
-# sudo sudo apt-get install inotify-tools
+# sudo apt-get install inotify-tools
 while MOVED=$(inotifywait -e moved_to ${DIRECTORY} 2> /dev/null); do
   if [[ "${MOVED}" == "${TARGET}" ]]; then
     clear
