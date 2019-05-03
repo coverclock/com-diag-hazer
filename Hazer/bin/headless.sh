@@ -19,7 +19,7 @@
 # -R (Report) and/or -F (Frequency) should be okay.
 
 # The optional LIMIT parameter is to deal with the vagaries of various
-# terminal emulators (I'm lookin' at you, Beagle Term a Chromebook).
+# terminal emulators (I'm lookin' at you, Beagle Term on a Chromebook).
 
 PROGRAM=$(basename ${0})
 HEADLESS=${1:-"/dev/null"}
