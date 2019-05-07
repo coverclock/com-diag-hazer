@@ -107,11 +107,8 @@ static const size_t LIMIT = 80 - (sizeof("OUT ") - 1) - (sizeof("[123] ") - 1) -
 
 static const size_t UNLIMITED = ~(size_t)0;
 
-#if !0
 static const wchar_t DEGREE = 0x00B0;
-#else
-static const wchar_t DEGREE = 0x002A;
-#endif
+static const wchar_t PLUSMINUS = 0x00B1;
 
 /*
  * GLOBALS
@@ -904,6 +901,68 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
      }
 }
 
+static void print_solution(FILE * fp, FILE * ep, const yodel_solution_t * sp)
+{
+    int64_t value = 0;
+    int64_t whole = 0;
+    uint64_t fraction = 0;
+
+    if (sp->ticks != 0) {
+
+		fputs("HPP", fp);
+
+		value = sp->payload.lat;
+		value *= 100;
+		value += sp->payload.latHp;
+		whole = value / 1000000000LL;
+		fraction = abs64(value) % 1000000000ULL;
+		fprintf(fp, " %4lld.%09llu,", (long long signed int)whole, (long long unsigned int)fraction);
+
+		value = sp->payload.lon;
+		value *= 100;
+		value += sp->payload.lonHp;
+		whole = value / 1000000000LL;
+		fraction = abs64(value) % 1000000000ULL;
+		fprintf(fp, " %4lld.%09llu", (long long signed int)whole, (long long unsigned int)fraction);
+
+		// fprintf(fp, " hAcc=%d", sp->payload.hAcc);
+
+		value = sp->payload.hAcc;
+		whole = value / 10000LL;
+		fraction = abs64(value) % 10000ULL;
+		fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)whole, (long long unsigned int)fraction);
+
+		fprintf(fp, "%22s", "");
+
+		fprintf(fp, " %-8s", "GNSS");
+
+		fputc('\n', fp);
+
+		fputs("HPA", fp);
+
+		value = sp->payload.hMSL;
+		value *= 10;
+		value += sp->payload.hMSLHp;
+		whole = value / 10000LL;
+		fraction = abs64(value) % 10000ULL;
+		fprintf(fp, " %6lld.%04llum", (long long signed int)whole, (long long unsigned int)fraction);
+
+		// fprintf(fp, " vACC=%d", sp->payload.vAcc);
+
+		value = sp->payload.vAcc;
+		whole = value / 10000LL;
+		fraction = abs64(value) % 10000ULL;
+		fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)whole, (long long unsigned int)fraction);
+
+		fprintf(fp, "%40s", "");
+
+		fprintf(fp, " %-8s", "GNSS");
+
+		fputc('\n', fp);
+
+	}
+}
+
 /**
  * Implement a thread that polls for the data carrier detect (DCD) state for
  * 1PPS.
@@ -1201,6 +1260,7 @@ int main(int argc, char * argv[])
     /*
      * UBX state databases.
      */
+    yodel_solution_t solution = YODEL_SOLUTION_INITIALIZER;
     yodel_hardware_t hardware = YODEL_HARDWARE_INITIALIZER;
     yodel_status_t status = YODEL_STATUS_INITIALIZER;
     yodel_base_t base = YODEL_BASE_INITIALIZER;
@@ -2200,7 +2260,12 @@ int main(int argc, char * argv[])
 
             if (verbose) { diminuto_dump(errfp, buffer, length); }
 
-            if (yodel_ubx_mon_hw(&(hardware.payload), ubx_buffer, length) == 0) {
+            if (yodel_ubx_nav_hpposllh(&(solution.payload), ubx_buffer, length) == 0) {
+
+                solution.ticks = timeout;
+                refresh = !0;
+
+            } else if (yodel_ubx_mon_hw(&(hardware.payload), ubx_buffer, length) == 0) {
 
                 hardware.ticks = timeout;
                 refresh = !0;
@@ -2469,6 +2534,7 @@ int main(int argc, char * argv[])
                 print_status(outfp, errfp, &status);
                 print_local(outfp, errfp, timetofirstfix);
                 print_positions(outfp, errfp, position, onepps, dmyokay, totokay);
+                print_solution(outfp, errfp, &solution);
                 print_corrections(outfp, errfp, &base, &rover);
                 print_actives(outfp, errfp, active);
                 print_views(outfp, errfp, view, active);

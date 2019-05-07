@@ -18,6 +18,31 @@
 #include "com/diag/diminuto/diminuto_list.h"
 
 /*******************************************************************************
+ * HIGH PRECISION SOLUTION
+ ******************************************************************************/
+
+/**
+ * Structure combining both a UBX-NAV-HPPOSLLH payload and its expiry time in
+ * ticks.
+ */
+typedef struct YodelSolution {
+	yodel_ubx_nav_hpposllh_t payload;   /* Payload from UBX-NAV-HPPOSLLH message. */
+    expiry_t ticks;                     /* Lifetime in application-defined ticks. */
+    uint8_t unused[3];
+} yodel_solution_t;
+
+/**
+ * @define YODEL_SOLUTION_INITIALIZER
+ * Initialize a YodelSolution structure.
+ */
+#define YODEL_SOLUTION_INITIALIZER \
+    { \
+	    YODEL_UBX_NAV_HPPOSLLH_INITIALIZER, \
+		0, \
+		{ 0, } \
+    }
+
+/*******************************************************************************
  * HARDWARE MONITOR
  ******************************************************************************/
 

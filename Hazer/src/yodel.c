@@ -306,6 +306,32 @@ ssize_t yodel_length(const void * buffer, size_t size)
  *
  ******************************************************************************/
 
+int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_HPPOSLLH_Class) {
+        /* Do nothing. */
+    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_HPPOSLLH_Id) {
+        /* Do nothing. */
+    } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_HPPOSLLH_Length)) {
+        /* Do nothing. */
+    } else {
+        memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
+        COM_DIAG_YODEL_LETOH(mp->iTOW);
+        COM_DIAG_YODEL_LETOH(mp->lon);
+        COM_DIAG_YODEL_LETOH(mp->lat);
+        COM_DIAG_YODEL_LETOH(mp->height);
+        COM_DIAG_YODEL_LETOH(mp->hMSL);
+        COM_DIAG_YODEL_LETOH(mp->hAcc);
+        COM_DIAG_YODEL_LETOH(mp->vAcc);
+        rc = 0;
+    }
+
+    return rc;
+}
+
 int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length)
 {
     int rc = -1;

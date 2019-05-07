@@ -114,7 +114,7 @@ typedef struct YodelUbxHeader {
     uint8_t	id;
     uint16_t length;	/* little endian */
     uint8_t payload[0];
-} yodel_ubx_header_t __attribute__ ((__aligned__(2)));
+} yodel_ubx_header_t __attribute__((__aligned__(2)));
 
 /**
  * @define YODEL_UBX_HEADER_INITIALIZER
@@ -321,6 +321,69 @@ typedef enum YodelId {
 } yodel_id_t;
 
 /*******************************************************************************
+ * PROCESSING UBX-NAV-HPPOSLLH MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-NAV-HPPOSLLH (0x01, 0x14) [36] offers a high precision geodetic position
+ * solution.
+ */
+typedef struct YodelUbxNavHpposllh {
+    uint8_t version;
+    uint8_t reserved[3];
+    uint32_t iTOW;
+    int32_t lon;
+    int32_t lat;
+    int32_t height;
+    int32_t hMSL;
+    int8_t lonHp;
+    int8_t latHp;
+    int8_t heightHp;
+    int8_t hMSLHp;
+    uint32_t hAcc;
+    uint32_t vAcc;
+} yodel_ubx_nav_hpposllh_t __attribute__((aligned(4)));
+
+/**
+ * @define YODEL_UBX_NAV_HPPOSLLH_INITIALIZER
+ * Initialize a YodelUbxNavHpposllh structure.
+ */
+#define YODEL_UBX_NAV_HPPOSLLH_INITIALIZER \
+    { \
+        0, \
+        { 0, }, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+    }
+
+/**
+ * UBX-NAV-HPPOSLLH constants.
+ */
+enum YodelUbxNavHpposllhConstants {
+    YODEL_UBX_NAV_HPPOSLLH_Class	= 0x01,
+    YODEL_UBX_NAV_HPPOSLLH_Id		= 0x14,
+    YODEL_UBX_NAV_HPPOSLLH_Length	= 36,
+};
+
+/**
+ * Process a possible UBX-NAV-HPPOSLLH message.
+ * @param mp points to a UBX-NAV-HPPOSLLH structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * bp, ssize_t length);
+
+/*******************************************************************************
  * PROCESSING UBX-MON-HW MESSAGES
  ******************************************************************************/
 
@@ -346,7 +409,7 @@ typedef struct YodelUbxMonHw {
     uint32_t pinIrq;
     uint32_t pullH;
     uint32_t pullL;
-} yodel_ubx_mon_hw_t;
+} yodel_ubx_mon_hw_t __attribute__((aligned(4)));
 
 /**
  * @define YODEL_UBX_MON_HW_INITIALIZER
@@ -433,7 +496,7 @@ typedef struct YodelUbxNavStatus {
     uint8_t flags2;
     uint32_t ttff;
     uint32_t msss;
-} yodel_ubx_nav_status_t;
+} yodel_ubx_nav_status_t __attribute__((aligned(4)));
 
 /**
  * @define YODEL_UBX_NAV_STATUS_INITIALIZER
@@ -725,7 +788,7 @@ typedef struct YodelUbxNavSvin {
 	int8_t valid;
 	int8_t active;
 	int8_t reserved3[2];
-} yodel_ubx_nav_svin_t;
+} yodel_ubx_nav_svin_t __attribute__((aligned(4)));
 
 /**
  * @define YODEL_UBX_RXM_RTCM_INITIALIZER
@@ -784,7 +847,7 @@ typedef struct YodelUbxRxmRtcm {
 	uint16_t subType;		/* Message sub type if RTCM 4072. */
 	uint16_t refStation;	/* Reference station identification. */
 	uint16_t msgType;		/* Message type. */
-} yodel_ubx_rxm_rtcm_t;
+} yodel_ubx_rxm_rtcm_t __attribute__((aligned(2)));
 
 /**
  * @define YODEL_UBX_RXM_RTCM_INITIALIZER
