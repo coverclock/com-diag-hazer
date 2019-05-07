@@ -2073,12 +2073,14 @@ int main(int argc, char * argv[])
 
         if (elapsed > 0) {
 
+
             for (index = 0; index < HAZER_SYSTEM_TOTAL; ++index) {
                 countdown(&position[index].ticks, elapsed);
                 countdown(&active[index].ticks, elapsed);
                 countdown(&view[index].ticks, elapsed);
             }
 
+            countdown(&solution.ticks, elapsed);
             countdown(&hardware.ticks, elapsed);
             countdown(&status.ticks, elapsed);
             countdown(&base.ticks, elapsed);
