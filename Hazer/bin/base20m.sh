@@ -31,6 +31,7 @@ mkdir -p ${LOG}
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-UART2INPROT-RTCM3X 0
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-UART2OUTPROT-RTCM3X 1
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-UBX_NAV_SVIN_USB 1
+# UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
 gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01' \
@@ -50,6 +51,7 @@ gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x75\x10\x00' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x76\x10\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x8b\x00\x91\x20\x01' \
+    -U '\xb5\x62\x06\x01\x03\x00\x01\x14\x01' \
     -W '' \
      2> >(log -S -N ${PROGRAM}) || exit 1
 
