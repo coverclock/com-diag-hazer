@@ -662,16 +662,18 @@ it and it was enabled on the command line using -c (using data carrier detect
 or DCD) or -I (using general purpose input/output or GPIO).
 
 POS is the most recent position solution, latitude and longitude, in degrees,
-hours, minutes, and decimal seconds, and in decimal degrees. The latter format
-can be cut and pasted directly into Google Maps and Google Earth. The underlying
-position is stored as binary integers in billionths of a degree (nanodegrees),
-but the device under test may not provide that much accuracy; the actual number
-of significant digits for various data is reported by the INT line (below), but
-even this may be optimistic - or, for that matter, pessimistic - when compared
-to what the device is capable of. In particular, technologies like Wide Area
-Augmentation System (WAAS), multi-band GNSS, differential GPS, Real-Time
-Kinematics (RTK), and long-term surveying, can potentially achieve remarkable
-accuracy.
+hours, minutes, and decimal seconds, and in decimal degrees. Either format
+can be cut and pasted directly into Google Maps, and at least the latter
+into Google Earth.
+
+N.B. The underlying position data is stored as binary integers in billionths
+of a degree (nanodegrees). But the device under test may not provide that much
+accuracy; the actual number of significant digits for various data is reported
+by the INT line (below), but even this may be optimistic - or, for that matter,
+pessimistic - when compared to what the device is capable of. In particular,
+technologies like Wide Area Augmentation System (WAAS), multi-band GNSS,
+differential GPS, Real-Time Kinematics (RTK), and long-term surveying, can
+potentially achieve remarkable accuracy.
 
 ALT is the most recent altitude solution, in feet and meters. (Similar comments
 here regarding precision as those for POS.)
