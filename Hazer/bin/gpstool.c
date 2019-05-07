@@ -124,6 +124,16 @@ static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /**
+ * Return the absolute value of a signed sixty-four bit integer.
+ * @param datum is a signed sixty-four bit integer.
+ * @return an unsigned sixty-four bit integer.
+ */
+static inline uint64_t abs64(int64_t datum)
+{
+	return (datum >= 0) ? datum : -datum;
+}
+
+/**
  * Emit an NMEA sentences to the specified stream after adding the ending
  * matter consisting of the checksum delimiter, the two checksum characters,
  * a carriage return, and a line feed.
@@ -669,7 +679,8 @@ static void print_status(FILE * fp, FILE * ep, const yodel_status_t * sp)
 static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], int pps, int dmyokay, int totokay)
 {
     unsigned int system = 0;
-    double decimal = 0.0;
+    int64_t whole = 0;
+    uint64_t fraction = 0;
     uint64_t nanoseconds = 0;
     int year = 0;
     int month = 0;
@@ -737,15 +748,15 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
         fputc(' ', fp);
 
-        decimal = pa[system].lat_nanodegrees;
-        decimal /= 1000000000.0;
-        fprintf(fp, " %13.9lf,", decimal);
+        whole = pa[system].lat_nanodegrees / 1000000000LL;
+        fraction = abs64(pa[system].lat_nanodegrees) % 1000000000LLU;
+        fprintf(fp, " %4lld.%09llu,", (long long signed int)whole, (long long unsigned int)fraction);
 
-        decimal = pa[system].lon_nanodegrees;
-        decimal /= 1000000000.0;
-        fprintf(fp, " %14.9lf", decimal);
+        whole = pa[system].lon_nanodegrees / 1000000000LL;
+        fraction = abs64(pa[system].lon_nanodegrees) % 1000000000LLU;
+        fprintf(fp, " %4lld.%09llu", (long long signed int)whole, (long long unsigned int)fraction);
 
-        fprintf(fp, "%6s", "");
+        fprintf(fp, "%5s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -762,9 +773,9 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
         fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
 
-        decimal = pa[system].alt_millimeters;
-        decimal /= 1000.0;
-        fprintf(fp, " %10.3lfm", decimal);
+        whole = pa[system].alt_millimeters / 1000LL;
+        fraction = abs(pa[system].alt_millimeters) % 1000LLU;
+        fprintf(fp, " %6lld.%03llum", (long long signed int)whole, (long long unsigned int)fraction);
 
         fprintf(fp, "%43s", "");
 
@@ -788,15 +799,15 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
         assert(strlen(compass) <= 4);
         fprintf(fp, " %-2s", compass);
 
-        decimal = pa[system].cog_nanodegrees;
-        decimal /= 1000000000.0;
-        fprintf(fp, " %7.3lf%lcT", decimal, DEGREE);
+        whole = pa[system].cog_nanodegrees / 1000000000LL;
+        fraction = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
+        fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)whole, (long long unsigned int)fraction, DEGREE);
 
-        decimal = pa[system].mag_nanodegrees;
-        decimal /= 1000000000.0;
-        fprintf(fp, " %7.3lf%lcM", decimal, DEGREE);
+        whole = pa[system].mag_nanodegrees / 1000000000LL;
+        fraction = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
+        fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)whole, (long long unsigned int)fraction, DEGREE);
 
-        fprintf(fp, "%44s", "");
+        fprintf(fp, "%30s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -811,17 +822,17 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
         fputs("SOG", fp);
 
-        fprintf(fp, " %10.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
+        fprintf(fp, " %11.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
 
-        decimal = pa[system].sog_microknots;
-        decimal /= 1000000.0;
-        fprintf(fp, " %10.3lfknots", decimal);
+        whole = pa[system].sog_microknots / 1000000LL;
+        fraction = abs64(pa[system].sog_microknots) % 1000000ULL;
+        fprintf(fp, " %7lld.%06lluknots", (long long signed int)whole, (long long unsigned int)fraction);
 
-        decimal = pa[system].sog_millimeters;
-        decimal /= 1000000.0;
-        fprintf(fp, " %10.3lfkph", decimal);
+        whole = pa[system].sog_millimeters / 1000000LL;
+        fraction = abs64(pa[system].sog_millimeters) % 1000000ULL;
+        fprintf(fp, " %7lld.%06llukph", (long long signed int)whole, (long long unsigned int)fraction);
 
-        fprintf(fp, "%23s", "");
+        fprintf(fp, "%14s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
