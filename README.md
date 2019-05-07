@@ -390,6 +390,14 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.ngs.noaa.gov/NGSDataExplorer/>
 
+<https://github.com/digidotcom/xbee_ansic_library>
+
+# Media
+
+"John Sloan: Time and Space", <https://youtu.be/szoT23ZBcVU>
+
+"BBC History of the World: The Clock That Changed the World", <https://youtu.be/T-g27KS0yiY>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
@@ -655,7 +663,11 @@ or DCD) or -I (using general purpose input/output or GPIO).
 
 POS is the most recent position solution, latitude and longitude, in degrees,
 hours, minutes, and decimal seconds, and in decimal degrees. The latter format
-can be cut and pasted directly into Google Maps and Google Earth.
+can be cut and pasted directly into Google Maps and Google Earth. The underlying
+position is stored as binary integers in billionths of a degree (nanodegrees),
+but the device under test may not provide that much accuracy; the actual number
+of significant digits is reported in the INT line (below), but even this may be
+optimistic (or, for that matter, pessimistic).
 
 ALT is the most recent altitude solution, in feet and meters.
 

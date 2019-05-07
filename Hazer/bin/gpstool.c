@@ -739,13 +739,13 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
 
         decimal = pa[system].lat_nanodegrees;
         decimal /= 1000000000.0;
-        fprintf(fp, " %10.6lf,", decimal);
+        fprintf(fp, " %13.9lf,", decimal);
 
         decimal = pa[system].lon_nanodegrees;
         decimal /= 1000000000.0;
-        fprintf(fp, " %11.6lf", decimal);
+        fprintf(fp, " %14.9lf", decimal);
 
-        fprintf(fp, "%12s", "");
+        fprintf(fp, "%6s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
