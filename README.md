@@ -54,7 +54,7 @@ This software is an original work of its author(s).
 
 # Sentences
 
-Hazer parses the following received NMEA sentences.
+Hazer recognizes the following received NMEA sentences.
 
 * GGA - Global Positioning System Fix Data (NMEA 0183 Version 4.10 p. 68)
 * GLL - Geographic Position - Latitude/Longitude (NMEA 0183 Version 4.10 p. 87)
@@ -69,11 +69,12 @@ Yodel recognizes the following received UBX messages.
 * UBX-ACK-ACK - Acknowledge UBX input and indicate success. (UBX 9 p. 38)
 * UBX-ACK-NAK - Acknowledge UBX input and indicate failure. (UBX 9 p. 38)
 * UBX-CFG-VALGET - Get Configuration Value. (UBLOX 9 p. 85)
-* UBX-MON-HW - Monitor Hardware to detect jamming. (UBLOX 8 R15 p. 285)
 * UBX-MON-VER - Monitor hardware and software Version. (UBLOX 9 p. 139)
-* UBX-NAV-STATUS - Navigation Status to detect spoofing. (UBLOX 8 R15 p. 316)
-* UBX-NAV-SVIN - Navigation Survey-in status on DGNSS Base. (UBLOX 9 p. 163)
+* UBX-NAV-HPPOSLLH - Report high precision position and altitude. (UBX 9 p. 145)
+* UBX-NAV-SVIN - Report Survey-in status on DGNSS Base. (UBLOX 9 p. 163)
 * UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (UBLOX 9 p. 181)
+* UBX-MON-HW - Monitor Hardware to detect jamming. (UBLOX 8 R15 p. 285)
+* UBX-NAV-STATUS - Report Status to detect spoofing. (UBLOX 8 R15 p. 316)
 
 # Talkers
 
@@ -564,68 +565,72 @@ when using Ublox 9-based receiver,
 
 the display looks something like this snapshot as it is continually updated.
 
-    INP [ 68] \xb5b\n\t<\0\xc1\x81\0\0\0\0\x01\0\0\x80\0\0\xdfg\0\0Y\02\x13\x01\x02
+    INP [ 52] $GNGLL,3947.65220,N,10509.20236,W,194527.00,A,A*6B\r\n
     OUT [  0]
-    MON ?jamming  ?history   4indicator   6maximum
-    STA -spoofing -history      42039ms  331615734ms     0epoch
-    LOC 2019-02-26T09:09:14.260-07:00+00T          0/00:00:00.554 15.3.1   nickel
-    TIM 2019-02-26T16:09:14.000-00:00+00Z 0pps                             GNSS
-    POS 39°47'39.21"N, 105°09'12.19"W   39.794227, -105.153386             GNSS
-    ALT    5601.64'   1707.400m                                            GNSS
-    COG N    0.000°T   0.000°M                                             GNSS
-    SOG      0.024mph      0.021knots      0.038kph                        GNSS
+    LOC 2019-05-07T13:45:27.049-07:00+01T          0/00:00:00.895 18.0.0   nickel
+    TIM 2019-05-07T19:45:27.000-00:00+00Z 0pps                             GNSS
+    POS 39°47'39.13"N, 105°09'12.14"W    39.794203333, -105.153372666      GNSS
+    ALT    5595.40'   1705.500m                                            GNSS
+    COG N     0.000000000°T    0.000000000°M                               GNSS
+    SOG       0.026mph       0.023000knots       0.042000kph               GNSS
     INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    ACT [1]  {     3    22    23    25    18    14 } [ 6] [11] [27]        GPS
-    ACT [2]  {    32    31    16     1    26       } [ 5] [11] [27]        GPS
-    ACT [1]  {    71    65    72    75    74    73 } [ 6] [ 6] [27]        GLONASS
-    ACT [1]  {    26     3     7    30     2     8 } [ 6] [ 7] [27]        GALILEO
-    ACT [2]  {    25                               } [ 1] [ 7] [27]        GALILEO
-    ACT [1]  {    20    23    19                   } [ 3] [ 3] [27]        BEIDOU
-    DOP   0.96pdop   0.53hdop   0.80vdop                                   GPS
-    DOP   0.96pdop   0.53hdop   0.80vdop                                   GLONASS
-    DOP   0.96pdop   0.53hdop   0.80vdop                                   GALILEO
-    DOP   0.96pdop   0.53hdop   0.80vdop                                   BEIDOU
-    SAT [  1]     1id  29°elv  244°azm   31dBHz  6sig <                    GPS
-    SAT [  2]     3id  53°elv  307°azm   34dBHz  6sig <                    GPS
-    SAT [  3]    11id   4°elv  233°azm    0dBHz  6sig     !                GPS
-    SAT [  4]    14id  42°elv   72°azm    0dBHz  6sig <   !                GPS
-    SAT [  5]    16id  13°elv  168°azm    0dBHz  6sig <   !                GPS
-    SAT [  6]    18id  17°elv  215°azm    0dBHz  6sig <   !                GPS
-    SAT [  7]    22id  71°elv  272°azm    0dBHz  6sig <   !                GPS
-    SAT [  8]    23id  21°elv  287°azm    0dBHz  6sig <   !                GPS
-    SAT [  9]    25id  12°elv   38°azm   24dBHz  6sig <                    GPS
-    SAT [ 10]    26id  36°elv  146°azm   38dBHz  6sig <                    GPS
-    SAT [ 11]    31id  65°elv   48°azm   32dBHz  6sig <                    GPS
-    SAT [ 12]    32id  27°elv   84°azm   19dBHz  6sig <                    GPS
-    SAT [ 13]    65id  32°elv  322°azm   28dBHz  3sig <                    GLONASS
-    SAT [ 14]    71id  38°elv  109°azm   35dBHz  3sig <                    GLONASS
-    SAT [ 15]    72id  69°elv   19°azm   33dBHz  3sig <                    GLONASS
-    SAT [ 16]    73id  37°elv   37°azm   36dBHz  3sig <                    GLONASS
-    SAT [ 17]    74id  78°elv  111°azm   31dBHz  3sig <                    GLONASS
-    SAT [ 18]    75id  31°elv  197°azm   42dBHz  3sig <                    GLONASS
-    SAT [ 19]    81id   5°elv  338°azm   16dBHz  3sig                      GLONASS
-    SAT [ 20]    87id   0°elv  252°azm   10dBHz  3sig                      GLONASS
-    SAT [ 21]    88id   8°elv  293°azm    0dBHz  3sig     !                GLONASS
-    SAT [ 22]    89id  37°elv   37°azm    0dBHz  3sig     !                GLONASS
-    SAT [ 23]     2id  59°elv   88°azm   26dBHz  2sig <                    GALILEO
-    SAT [ 24]     3id  24°elv  105°azm   31dBHz  2sig <                    GALILEO
-    SAT [ 25]     7id  44°elv  307°azm   28dBHz  2sig <                    GALILEO
-    SAT [ 26]     8id  72°elv   64°azm    0dBHz  2sig <   !                GALILEO
-    SAT [ 27]    13id   7°elv  232°azm   24dBHz  2sig                      GALILEO
-    SAT [ 28]    25id  18°elv   39°azm   23dBHz  2sig <                    GALILEO
-    SAT [ 29]    26id  13°elv  280°azm   27dBHz  2sig <                    GALILEO
-    SAT [ 30]    30id  41°elv  176°azm   36dBHz  2sig <                    GALILEO
-    SAT [ 31]    33id   3°elv  328°azm    0dBHz  2sig     !                GALILEO
-    SAT [ 32]     8id   6°elv  338°azm    0dBHz  0sig     !                BEIDOU
-    SAT [ 33]    19id  28°elv  311°azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 34]    20id  82°elv  326°azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 35]    23id  30°elv   47°azm    0dBHz  0sig <   !                BEIDOU
+    HPP   39.794203348, -105.153372746 ±     4.3267m                       GNSS
+    HPA   1705.5121m ±     6.9854m                                         GNSS
+    BAS 1active 0valid         17sec         17obs      27.0312m           RTCM
+    ACT [1]  {    18    15    17    11     1    13 } [ 6] [10] [25]        GPS
+    ACT [2]  {    30    28    19     6             } [ 4] [10] [25]        GPS
+    ACT [1]  {    86    85    77    75    76    87 } [ 6] [ 6] [25]        GLONASS
+    ACT [1]  {     1    15    21    27    26    13 } [ 6] [ 6] [25]        GALILEO
+    ACT [1]  {    26    29    12                   } [ 3] [ 3] [25]        BEIDOU
+    DOP   0.95pdop   0.55hdop   0.78vdop                                   GPS
+    DOP   0.95pdop   0.55hdop   0.78vdop                                   GLONASS
+    DOP   0.95pdop   0.55hdop   0.78vdop                                   GALILEO
+    DOP   0.95pdop   0.55hdop   0.78vdop                                   BEIDOU
+    SAT [  1]     1id  34°elv   61°azm   27dBHz  6sig <                    GPS
+    SAT [  2]     6id  11°elv  183°azm   35dBHz  6sig <                    GPS
+    SAT [  3]     7id   9°elv  147°azm   29dBHz  6sig                      GPS
+    SAT [  4]    11id  26°elv   50°azm    0dBHz  6sig <   !                GPS
+    SAT [  5]    13id  30°elv  254°azm    0dBHz  6sig <   !                GPS
+    SAT [  6]    15id  16°elv  287°azm   21dBHz  6sig <                    GPS
+    SAT [  7]    17id  75°elv  247°azm   34dBHz  6sig <                    GPS
+    SAT [  8]    18id  15°elv   41°azm    0dBHz  6sig <   !                GPS
+    SAT [  9]    19id  49°elv  232°azm    0dBHz  6sig <   !                GPS
+    SAT [ 10]    22id   0°elv   78°azm    0dBHz  6sig     !                GPS
+    SAT [ 11]    24id   6°elv  319°azm   18dBHz  6sig                      GPS
+    SAT [ 12]    28id  65°elv   41°azm    0dBHz  6sig <   !                GPS
+    SAT [ 13]    30id  41°elv  154°azm   36dBHz  6sig <                    GPS
+    SAT [ 14]    67id   1°elv  283°azm    0dBHz  3sig     !                GLONASS
+    SAT [ 15]    68id   4°elv  332°azm    0dBHz  3sig     !                GLONASS
+    SAT [ 16]    75id  30°elv  119°azm   37dBHz  3sig <                    GLONASS
+    SAT [ 17]    76id  70°elv   78°azm    0dBHz  3sig <   !                GLONASS
+    SAT [ 18]    77id  33°elv  324°azm   21dBHz  3sig <                    GLONASS
+    SAT [ 19]    85id  20°elv   31°azm   23dBHz  3sig <                    GLONASS
+    SAT [ 20]    86id  77°elv   57°azm   26dBHz  3sig <                    GLONASS
+    SAT [ 21]    87id  37°elv  202°azm   17dBHz  3sig <                    GLONASS
+    SAT [ 22]     1id  43°elv  312°azm   32dBHz  2sig <                    GALILEO
+    SAT [ 23]     4id   9°elv  280°azm    0dBHz  2sig     !                GALILEO
+    SAT [ 24]     9id   1°elv  327°azm    0dBHz  2sig     !                GALILEO
+    SAT [ 25]    13id  62°elv   82°azm    0dBHz  2sig <   !                GALILEO
+    SAT [ 26]    14id  41°elv   55°azm   36dBHz  2sig                      GALILEO
+    SAT [ 27]    15id  19°elv   40°azm   19dBHz  2sig <                    GALILEO
+    SAT [ 28]    19id   3°elv  229°azm    0dBHz  2sig     !                GALILEO
+    SAT [ 29]    21id  73°elv   68°azm   31dBHz  2sig <                    GALILEO
+    SAT [ 30]    26id  45°elv  182°azm   35dBHz  2sig <                    GALILEO
+    SAT [ 31]    27id  24°elv  110°azm   31dBHz  2sig <                    GALILEO
+    SAT [ 32]    33id   0°elv  205°azm    0dBHz  2sig     !                GALILEO
+    SAT [ 33]     6id   3°elv  334°azm    0dBHz  0sig     !                BEIDOU
+    SAT [ 34]    12id  10°elv  219°azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 35]    16id   1°elv  341°azm    0dBHz  0sig     !                BEIDOU
+    SAT [ 36]    24id   2°elv  312°azm    0dBHz  0sig     !                BEIDOU
+    SAT [ 37]    26id  49°elv  311°azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 38]    29id  61°elv   53°azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 39]    30id   9°elv   45°azm    0dBHz  0sig     !                BEIDOU
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
 
 OUT is the most recent data written to the device, as specified on the command
-line using the -W option.
+line using the -W (NMEA sentence) or -U (UBX message)  options.
 
 MON displays some of the results received in the UBX-MON-HW message if enabled.
 Ublox 8 chips with firmware revision 18 and above can provide clues to jamming
@@ -694,6 +699,20 @@ received), an indication as to whether time is incrementing monotonically (it
 can appear to run backwards when receiving UDP packets because UDP may reorder
 them), and some metrics as to the number of significant digits provided for
 various datums provided by the device.
+
+HPP and HPA (if present and enabled) show the high precision position and
+altitude available from some Ublox devices, along with their estimated
+accuracy. This may differ (slightly) from the position and altitude
+reported via POS and ALT due to the conversion of units done to conform
+to the NMEA format. When available, the HPP and HPA is expected to be
+more precise.
+
+BAS or ROV (if present and enabled) show information about the Ublox
+device operating in base station or in rover modes. In base (stationary)
+mode, it shows if the device is actively surveying or if the survey has
+resolved to a valid location, how many seconds and observations have
+been consumed during the survey, and what the mean error is. In rover
+(mobile) mode, it shows what RTCM message was last received and from whom.
 
 ACT is the list of active satellites, typically provided seperately
 for each system or constellation by the device, showing each satellites
