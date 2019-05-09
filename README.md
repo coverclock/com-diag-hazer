@@ -255,31 +255,52 @@ Ubuntu 16.04.5 "Xenial Xerus"
 Linux 4.15.0    
 gcc 5.4.0    
 
-# Media
-
-"Hazer" album, <https://flic.kr/s/aHskRMLrx7>
-
-"Hazer Test 2017-02-15 15:45 UTC", <https://youtu.be/UluGfpqpiQw>
-
-"GN803G and Hazer 8.0.0", <https://youtu.be/ZXT_37PvmhE>
-
-"Time and Space" talk, <https://youtu.be/szoT23ZBcVU>
-
 # Articles
 
-<https://coverclock.blogspot.com/2018/11/gps-satellite-prn-4.html>
+Chip Overclock, "Better Never Than Late",
+<http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
 
-<https://coverclock.blogspot.com/2018/09/we-have-met-enemy-and-he-is-us.html>
-
-<https://coverclock.blogspot.com/2018/08/practical-geolocation-ii.html>
-
-<https://coverclock.blogspot.com/2018/08/practical-geolocation.html>
-
-<https://coverclock.blogspot.com/2018/04/a-menagerie-of-gps-devices-with-usb.html>
-
+Chip Overclock, "Time and Space",
 <https://coverclock.blogspot.com/2017/09/time-space.html>
 
-<http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
+Chip Overclock, "A Menagerie of GPS Devices",
+<https://coverclock.blogspot.com/2018/04/a-menagerie-of-gps-devices-with-usb.html>
+
+Chip Overclock, "Practical Geolocation",
+<https://coverclock.blogspot.com/2018/08/practical-geolocation.html>
+
+Chip Overclock, "Pratical Geolocation II",
+<https://coverclock.blogspot.com/2018/08/practical-geolocation-ii.html>
+
+Chip Overclock, "We Have Met the Enemy and He Is Us",
+<https://coverclock.blogspot.com/2018/09/we-have-met-enemy-and-he-is-us.html>
+
+Chip Overclock, "GPS Satellite PRN 4",
+<https://coverclock.blogspot.com/2018/11/gps-satellite-prn-4.html>
+
+# Media
+
+Adam Hart-Davis, "The Clock That Changed the World", A History of the World,
+BBC, video, <https://youtu.be/T-g27KS0yiY>
+
+John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
+
+John Sloan, "GPS Receiver Gallery", album, <https://flic.kr/s/aHsmvoXqSH>
+
+John Sloan, "Hazer", album, <https://flic.kr/s/aHskRMLrx7>
+
+John Sloan, "Hazer Test 2017-02-15 15:45 UTC", video,
+<https://youtu.be/UluGfpqpiQw>
+
+John Sloan, "NGS KK1770", album, <https://flic.kr/s/aHskTG9K1h>
+
+John Sloan, "NTP Clock Gallery, album, <https://flic.kr/s/aHsmgrizkL>
+
+John Sloan, "Time and Space", album, <https://flic.kr/s/aHsm3ghwxP>
+
+John Sloan, "Time and Space", video, <https://youtu.be/szoT23ZBcVU>
+
+John Sloan, "Tumbleweed", album, <https://flic.kr/s/aHsmcdEgq6>
 
 # References
 
@@ -412,14 +433,7 @@ astronomers in the audience, but it wasn't to me.
 
 <https://github.com/digidotcom/xbee_ansic_library>
 
-# Media
-
-"John Sloan: Time and Space", <https://youtu.be/szoT23ZBcVU>
-
-"BBC History of the World: The Clock That Changed the World", <https://youtu.be/T-g27KS0yiY>
-
 # Build
-
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
 
