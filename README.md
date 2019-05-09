@@ -52,6 +52,25 @@ evaluating GPS devices.
 
 This software is an original work of its author(s).
 
+# Dependencies
+
+The Hazer library (including both Hazer and Yodel) depends on no more than the
+usual standard C, GNU, and POSIX libraries.
+
+The gpstool utility is built on top of the Hazer library and also my Diminuto
+library. Diminuto is a general purpose C-based systems programming library that
+supports serial port configuration, socket-based communication, and a passle of
+other useful stuff. gpstool is an excellent example of how to leverage Diminuto
+to get a lot done in not so much C code. I use Diminuto in virtually all of my
+C-based projects, and sometimes in other languages too that support C-linkage.
+Portions of Diminuto have also shipped in products from several of my clients.
+
+# Repositories
+
+<https://github.com/coverclock/com-diag-hazer>
+
+<https://github.com/coverclock/com-diag-diminuto>
+
 # Sentences
 
 Hazer recognizes the following received NMEA sentences.
@@ -236,12 +255,6 @@ Ubuntu 16.04.5 "Xenial Xerus"
 Linux 4.15.0    
 gcc 5.4.0    
 
-# Repositories
-
-<https://github.com/coverclock/com-diag-hazer>
-
-<https://github.com/coverclock/com-diag-diminuto>
-
 # Media
 
 "Hazer" album, <https://flic.kr/s/aHskRMLrx7>
@@ -296,9 +309,15 @@ National Marine Electronics Association, 2012
 
 NovAtel, "An Introduction to GNSS", 2nd ed., NovAtel Inc., 2015
 
-SAE, "Requirements for a Terrestrial Based Positioning, Navigation, and Timing
-(PNT) System to Improve Nagivation Solutions and Ensure Critical Infrastructure
-Security", SAE6857, 2018-04
+RTCM 10403.3, "Differential GNSS (Global Navigation Satellite Systems) Services -
+Version 3", 141-2016-SC104-STD, 2016-10-07
+
+RTCM 10410.1, "Networked Transport of RTCM via Internet Protocol (NTRIP) -
+Version 2.0", 111-2009-SC104-STD + 139-2011-SC104-STD, 2011-06-28
+
+SAE 6857, "Requirements for a Terrestrial Based Positioning, Navigation, and
+Timing (PNT) System to Improve Nagivation Solutions and Ensure Critical
+Infrastructure Security", SAE6857, 2018-04
 
 u-blox 7, "Receiver Description Including Protocol Specification V14",
 GPS.G7-SW-12001-B, ublox, 65525, 2013-02-01
@@ -401,6 +420,7 @@ astronomers in the audience, but it wasn't to me.
 
 # Build
 
+
 Clone and build Diminuto (used by gpstool although not by libhazer).
 
     cd ~
@@ -410,7 +430,8 @@ Clone and build Diminuto (used by gpstool although not by libhazer).
     cd com-diag-diminuto/Diminuto
     make pristine depend all
 
-Clone and build Hazer.
+Clone and build Hazer. (If you don't build Diminuto where the Hazer Makefile
+expects it, some minor Makefile hacking might be required.)
 
     cd ~
     mkdir -p src
@@ -419,7 +440,8 @@ Clone and build Hazer.
     cd com-diag-hazer/Hazer
     make pristine depend all
 
-Set up environment and run tests and utilities.
+Set up environment and run tests and utilities. (This establishes the paths
+for both the Hazer and the Diminuto executables.)
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
@@ -430,7 +452,7 @@ Set up environment and run tests and utilities.
     unittest-tokenize
     gpstool -?
 
-Optionally install Diminuto and Hazer in /usr/local.
+Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 
     cd ~/src/com-diag-diminuto/Diminuto
     sudo make install
@@ -544,17 +566,6 @@ Optionally install Diminuto and Hazer in /usr/local.
            -u          Note unknown NMEA or UBX on standard error.
            -v          Display verbose output on standard error.
  
-# Dependencies
-
-The Hazer library itself is standlone other than for the usual standard
-C, GNU, and POSIX libraries. But gpstool is also built on top of the
-Digital Aggretates Corporation Diminuto library. Diminuto is a general
-purpose C-based systems programming library that supports serial
-port configuration, socket-based communication, and a passle of other
-useful stuff. If you don't build Diminuto where the Makefile expects it, some
-minor Makefile hacking might be required. (gpstool is an excellemt example of
-how to leverage Diminuto to get a lot done in not so much C code.)
-
 # Display
 
 When using the -E option with gpstool, so that it uses ASCII escape sequences
