@@ -40,6 +40,17 @@ stack called Yodel that is included in the Hazer project. gpstool uses both the
 Hazer stack and the Yodel stack to process both NMEA and UBX messages
 interleaved in the same data stream.
 
+You will seem some references to Tumbleweed. Tumbleweed is a project to apply
+Hazer and Yodel to Differential GNSS (DGNSS) using the Ardusimple SimpleRTK2B.
+The SimpleRTK2B board incorporates the U-Blox UBX-ZED-F9P multi-band GNSS
+receiver. The U-Blox 9 supports sending and receiving RTCM messages between
+peer receivers containing Real-Time Kinematic (RTK) measurements. This can
+potentially yield very accurate position fixes, possibly down to the centimeter
+level. While the SimpleRTK2B is marketed primarily to the drone enthusiasts, I
+am mostly interested in it for purposes of surveying and agriculture.
+Tumbleweed doesn't merit its own repository, but having its own project name
+made keeping track of it easier.
+
 If you're wondering why I don't use the excellent open source GPS Daemon
 (gpsd) and its GPS Monitor (gpsmon), the answer is: I have, in many projects,
 typically in conjunction with the open source NTPsec Daemon (ntpd). Hazer was
