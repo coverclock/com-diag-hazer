@@ -81,7 +81,7 @@ of it easier.
 
 Hazer (and Diminuto) have also been used in other Digital Aggregates
 projects that do have their own repositories, for example: Obelisk,
-Hourglass, Candleclock, and Astrolabe.
+Hourglass, Candleclock, Astrolabe, and Critter.
 
 # Repositories
 
