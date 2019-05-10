@@ -530,6 +530,7 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
 * rover - configures and runs an Ardusimple SimpleRTK2B board as a mobile rover.
+* tumbleweed-forwarder - Handles forwarding of RTCM messages from base to rover.
 
 # Functional Tests
 
