@@ -19,14 +19,10 @@
 
 ROOT=$(dirname ${0})
 PROGRAM=$(basename ${0})
-
 BASE=${1}
 ROVER=${2}
 PORT=${3:-2101}
 
 . $(readlink -e ${ROOT}/../bin)/setup
-
-# socat -u UDP4-RECV:${PORT} -
-# socat -u - UDP4-DATAGRAM:diag.ddns.net:${PORT}
 
 exec socat -u UDP4-RECV:${PORT},range=${BASE}/32 UDP4-SENDTO:${ROVER}:${PORT} 2> >(log -S -N ${PROGRAM})
