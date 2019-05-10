@@ -79,6 +79,10 @@ it for purposes of surveying and agriculture.  Tumbleweed doesn't merit
 its own repository, but having its own project name made keeping track
 of it easier.
 
+Hazer (and Diminuto) have also been used in other Digital Aggregates
+projects that do have their own repositories, for example: Obelisk,
+Hourglass, Candleclock, and Astrolabe.
+
 # Repositories
 
 <https://github.com/coverclock/com-diag-hazer>
