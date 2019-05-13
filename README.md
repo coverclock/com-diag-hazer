@@ -529,6 +529,7 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
+* proxy - receive UDP packets from the Base and forward to the Rover.
 * rover - configures and runs an Ardusimple SimpleRTK2B board as a mobile rover.
 * tumbleweed-forwarder - Handles forwarding of RTCM messages from base to rover.
 
@@ -547,7 +548,9 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 * simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
 * simplertk2bquery - queries the configuration of an Ardusimple SimpleRTK2B board.
 * simplertk2brover - configures an Ardusimple SimpleRTK2B board as a rover.
+* sink - received forwarded UDP packets and display.
 * sirfstar4 - exercises any SiRF Star 4 device.
+* source - send UDP packets to the proxy to be forwarded.
 * talkers - processes a file of synthetic input.
 * ublox7 - exercises any Ublox 7 device.    
 * ublox8 - exercises any Ublox 8 device.
