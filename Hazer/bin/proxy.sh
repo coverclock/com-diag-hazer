@@ -15,7 +15,7 @@
 # on a port - typically 2101 a.k.a. service "rtcm-sc104" (Special Committee 104)
 # - and forwards them to the same port to the Rover. The forwarding is
 # unidirectional (the Rover should never have anything to say to the Base).
-#
+# This is part of the Tumbleweed project, applying Hazer et al. to DGNSS.
 
 ROOT=$(dirname ${0})
 PROGRAM=$(basename ${0})
