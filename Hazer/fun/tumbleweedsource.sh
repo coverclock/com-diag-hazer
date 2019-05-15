@@ -10,7 +10,7 @@
 
 ROOT=$(dirname ${0})
 PROGRAM=$(basename ${0})
-HOST=${1-"diag.ddns.net"}
+HOST=${1-"localhost"}
 PORT=${2:-2101}
 
 . $(readlink -e ${ROOT}/../bin)/setup
