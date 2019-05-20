@@ -16,4 +16,4 @@ PORT=${2:-2101}
 . $(readlink -e ${ROOT}/../bin)/setup
 
 #exec socat -u - UDP4-DATAGRAM:${HOST}:${PORT}
-exec internettool -4 -u -p ${PORT} -A ${HOST} -P ${PORT}
+exec internettool -d -v -4 -u -p ${PORT} -A ${HOST} -P ${PORT}
