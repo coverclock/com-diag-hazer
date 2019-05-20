@@ -15,4 +15,5 @@ PORT=${1:-2101}
 
 . $(readlink -e ${ROOT}/../bin)/setup
 
-exec socat -u UDP4-RECV:${PORT} - | phex
+#exec socat -u UDP4-RECV:${PORT} - | phex
+exec internettool -4 -d -v -u -p ${PORT}
