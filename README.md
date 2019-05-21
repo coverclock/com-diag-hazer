@@ -1423,34 +1423,22 @@ is a form of Differential GNSS and can, over time, achieve very high position
 
 ### Block Diagram
 
-Conceptually this how I think everything is connected. Note however that based
-on the XBee SX data sheet, and my own prior experience with XBee radios, I
-didn't think they had more than one serial port or a serial-over-USB port, even
-though the diagram below pretends that they do. A formal schematic for the
-SimpleRTK2B board would be really useful. (I notice there is an FTDI chip
-on the board; FTDI is my favorite vendor for serial-to-USB solutions. And using
-XCTU to communicate with the XBee SX at the same baud rate as the one that the
-hypothetical UART2 was set at eliminated the need to reset the radio using
-the on-board reset button to get XCTU to work. So I suspect UART1, UART2, and
-USB all ultimately connect to the same serial port on the XBee SX.)
-
-                                                               XCTU
-                                                                ^
-                                  Radio Antenna                 |
-                                        :                       v
-    Arduino connector <-- UART1 --> [ XBee SX ] <-- USB --> microUSB
-                                        ^
-                                        |
-                                      UART2
-                                        |
-                                      UART2
-                                        |
-                                        v
-    Arduino connector <-- UART1 --> [ ZED-F9P ] <-- USB --> microUSB
-                                        :                       ^
-                                    GPS Antenna                 |
-                                                                v
-                                                         u-center or gpstool
+                                Radio Antenna
+                                      :
+                                [ XBee3 SX ]
+                                      ^ 
+                                      | 
+                                      v 
+                     Header <--> XBee UART <--> FTDI <--> USB <--> XCTU
+                                      ^
+                                      |
+                                      v
+                                  UBX UART2
+                                      |
+                                      v
+    Header <--> UBX UART1 <--> [ UBX-ZED-F9P ] <--> USB <--> u-center or gpstool
+                                      :
+                                  GPS Antenna
 
 In the diagram above I show where you would connect the XBee configuration tool
 XCTU, or the u-blox configuration tool u-center, but in normal use I only have

@@ -5,8 +5,9 @@
 # https://github.com/coverclock/com-diag-hazer
 #
 # This script tests the source or send side of the Tumbleweed UDP channel by
-# taking input from standard input, packaging it up in a datagram, and sending
-# it to the specified host and RTCM port.
+# taking input from standard input, packaging it up in a datagram, then sending
+# it to the specified host and RTCM port, and also receiving datagrams on the
+# same port and displaying them on standard error.
 
 ROOT=$(dirname ${0})
 PROGRAM=$(basename ${0})

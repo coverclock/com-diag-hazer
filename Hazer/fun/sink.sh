@@ -5,9 +5,8 @@
 # https://github.com/coverclock/com-diag-hazer
 #
 # This script tests the sink or receive side of the Tumbleweed UDP channel
-# by receiving packets on the RTCM port and then using the Diminuto phex
-# utility to display the received binary data on standard output in a
-# printable form.
+# by receiving packets on the RTCM port, displaying them on standard error,
+# and then echoing them back to the sender.
 
 ROOT=$(dirname ${0})
 PROGRAM=$(basename ${0})
