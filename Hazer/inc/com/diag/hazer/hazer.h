@@ -155,7 +155,7 @@ enum HazerNmeaConstants {
  * NMEA state machine states. The only states the application needs
  * to take action on are START (to initialize the state), EOF (end of file
  * on the input stream), and END (complete NMEA sentence in buffer). The
- * rest are transitory states. If the machine transitions from a non_START
+ * rest are transitory states. If the machine transitions from a non-START
  * state to the START state, that means the framing of the current sentence
  * failed; that might be of interest to the application.
  */

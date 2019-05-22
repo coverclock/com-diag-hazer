@@ -281,6 +281,7 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
 
 const void * hazer_checksum(const void * buffer, size_t size, uint8_t * ckp)
 {
+    const void * result = (void *)0;
     const unsigned char * bp = (const unsigned char *)0;
     uint8_t cs = 0;
     uint8_t ch = '\0';
@@ -300,9 +301,11 @@ const void * hazer_checksum(const void * buffer, size_t size, uint8_t * ckp)
 
         *ckp = cs;
 
+        result = bp;
+
     }
 
-    return (const void *)bp;
+    return result;
 }
 
 int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp)

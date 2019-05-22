@@ -129,11 +129,11 @@ typedef struct YodelUbxHeader {
     }
 
 /**
- * Yodel state machine states. The only states the application needs
+ * UBX state machine states. The only states the application needs
  * to take action on are START (to initialize the state), EOF (end of file
- * on the input stream), and END (complete NMEA sentence in buffer). The
- * rest are transitory states. If the machine transitions from a non_START
- * state to the START state, that means the framing of the current sentence
+ * on the input stream), and END (complete UBX packet in buffer). The
+ * rest are transitory states. If the machine transitions from a non-START
+ * state to the START state, that means the framing of the current packet
  * failed; that might be of interest to the application.
  */
 typedef enum YodelState {
@@ -151,7 +151,7 @@ typedef enum YodelState {
 } yodel_state_t;
 
 /**
- * Yodel state machine stimuli.
+ * UBX state machine stimuli.
  */
 enum YodelStimulus {
     YODEL_STIMULUS_SYNC_1		= 0xb5,	/* ISO 8859.1 for 'mu'. */
@@ -181,7 +181,7 @@ typedef enum YodelAction {
  * past the end of the NUL-terminated sentence, the size state variable
  * constrains the size of the sentence including the terminating NUL;
  * @param state is the prior state of the machine.
- * @param ch is the next character from the NMEA sentence stream.
+ * @param ch is the next character from the UBX packet stream.
  * @param buffer points to the beginning of the output buffer.
  * @param size is the size of the output buffer in bytes.
  * @param bp points to a character pointer state variable of no initial value.
