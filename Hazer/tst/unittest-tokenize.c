@@ -9,12 +9,8 @@
  */
 
 #include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <assert.h>
 #include "com/diag/hazer/hazer.h"
-
-// extern ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size);
+#include "./unittest.h"
 
 int main(void)
 {

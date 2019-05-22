@@ -9,10 +9,8 @@
  */
 
 #include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <assert.h>
 #include "com/diag/hazer/hazer.h"
+#include "./unittest.h"
 
 /**
  * Derived from "Points of the compass" in Wikipedia except that, remarkably, I don't think

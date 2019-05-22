@@ -60,7 +60,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include <locale.h>
-#include "gpstool.h"
+#include "./gpstool.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"

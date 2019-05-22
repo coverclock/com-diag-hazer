@@ -9,11 +9,9 @@
  */
 
 #include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <assert.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
+#include "./unittest.h"
 
 int main(void)
 {
