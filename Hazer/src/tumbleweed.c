@@ -8,9 +8,7 @@
  * https://github.com/coverclock/com-diag-hazer<BR>
  */
 
-#include <stdio.h>
 #include <string.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
@@ -117,7 +115,11 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * b
     	 */
         *lp |= (unsigned)ch; /* LSB */
         DEBUG("LENGTH2 0x%02x %zu.\n", ch, *lp);
-        state = TUMBLEWEED_STATE_PAYLOAD;
+        if (*lp > 0) {
+        	state = TUMBLEWEED_STATE_PAYLOAD;
+        } else {
+        	state = TUMBLEWEED_STATE_CRC_1;
+        }
         action = TUMBLEWEED_ACTION_SAVE;
         break;
 
@@ -369,3 +371,5 @@ int tumbleweed_message(const void * buffer, size_t size)
 
     return result;
 }
+
+const uint8_t TUMBLEWEED_KEEPALIVE[6] = { 0xd3, 0x00, 0x00, 0x47, 0xea, 0x4b, };

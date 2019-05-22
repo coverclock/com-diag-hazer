@@ -44,9 +44,11 @@ int main(void)
     		}
     	}
 
+    	printf("const uint32_t TUMBLEWEED_CRC24Q[%zu] = {\n", countof(table));
     	for (ii = 0; ii < countof(table); ++ii) {
     		printf("%s0x%08x,%s", ((ii % 4) == 0) ? "    ": " ", table[ii], ((ii % 4) == 3) ? "\n" : "");
     	}
+    	printf("};\n");
 
     	for (ii = 0; ii < countof(table); ++ii) {
     		assert(TUMBLEWEED_CRC24Q[ii] == table[ii]);
@@ -65,7 +67,8 @@ int main(void)
 			ss = tumbleweed_length(message, size);
 			fprintf(stderr, "\"%s\"[%zu] %zu %zu\n", string, length, size, ss);
 	    	diminuto_dump(stderr, message, size);
-			assert(ss == (0x13 + TUMBLEWEED_RTCM_SHORTEST));
+			assert(ss == (TUMBLEWEED_RTCM_SHORTEST + (message[TUMBLEWEED_RTCM_LENGTH_MSB] << 8) + message[TUMBLEWEED_RTCM_LENGTH_LSB]));
+
 		END;
 
 		BEGIN(EXAMPLE);
@@ -92,7 +95,7 @@ int main(void)
 
 		BEGIN(EXAMPLE);
 			tumbleweed_state_t state = TUMBLEWEED_STATE_START;
-			uint8_t buffer[TUMBLEWEED_RTCM_LONGEST];
+			uint8_t buffer[TUMBLEWEED_RTCM_LONGEST + 1];
 			char * bb = (char *)~(intptr_t)0;
 			size_t ss = ~(size_t)0;
 			size_t ll = ~(size_t)0;
@@ -141,7 +144,20 @@ int main(void)
     /**************************************************************************/
 
     {
-		static const uint8_t KEEPALIVE[] = "\\xD3\\x00\\x00\\x47\\xea\\x4b";
+		static const uint8_t KEEPALIVE[] = "\\xd3\\x00\\x00\\x47\\xea\\x4b";
+
+		BEGIN(KEEPALIVE);
+			assert(size == countof(TUMBLEWEED_KEEPALIVE));
+			assert(memcmp(message, TUMBLEWEED_KEEPALIVE, countof(TUMBLEWEED_KEEPALIVE)) == 0);
+		END;
+
+		BEGIN(KEEPALIVE);
+			ssize_t ss;
+			ss = tumbleweed_length(message, size);
+			fprintf(stderr, "\"%s\"[%zu] %zu %zu\n", string, length, size, ss);
+	    	diminuto_dump(stderr, message, size);
+			assert(ss == TUMBLEWEED_RTCM_SHORTEST);
+		END;
 
 		BEGIN(KEEPALIVE);
 			const void * bb;
@@ -155,6 +171,37 @@ int main(void)
 			assert(crc_2 == message[size - 2]);
 			assert(crc_3 == message[size - 1]);
 			assert((unsigned char *)bb == &(message[size - 3]));
+		END;
+
+		BEGIN(KEEPALIVE);
+			int mm;
+			mm = tumbleweed_message(message, size);
+			fprintf(stderr, "\"%s\"[%zu] %d %d\n", string, length, -1, mm);
+	    	diminuto_dump(stderr, message, size);
+			assert(mm < 0);
+		END;
+
+		BEGIN(KEEPALIVE);
+			tumbleweed_state_t state = TUMBLEWEED_STATE_START;
+			uint8_t buffer[TUMBLEWEED_RTCM_LONGEST + 1];
+			char * bb = (char *)~(intptr_t)0;
+			size_t ss = ~(size_t)0;
+			size_t ll = ~(size_t)0;
+			int ii;
+			tumbleweed_initialize();
+			for (ii = 0; ii < size; ++ii) {
+				state = tumbleweed_machine(state, message[ii], buffer, countof(buffer), &bb, &ss, &ll);
+				if (state == TUMBLEWEED_STATE_EOF) { break; }
+				if (state == TUMBLEWEED_STATE_END) { break; }
+			}
+			fprintf(stderr, "\"%s\"[%zu] %zu %d %d %p %zu %zu\n", string, length, size, state, ii, bb, ss, ll);
+	    	diminuto_dump(stderr, message, size);
+	    	diminuto_dump(stderr, buffer, ss);
+			assert(state == TUMBLEWEED_STATE_END);
+			assert(ss == (size + 1));
+			assert(buffer[ss - 1] == '\0');
+			assert(memcmp(message, buffer, size) == 0);
+			tumbleweed_finalize();
 		END;
     }
 

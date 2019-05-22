@@ -232,4 +232,10 @@ extern ssize_t tumbleweed_length(const void * buffer, size_t size);
  */
 extern int tumbleweed_message(const void * buffer, size_t size);
 
+/*******************************************************************************
+ * KEEPALIVE RTCM MESSAGE
+ ******************************************************************************/
+
+extern const uint8_t TUMBLEWEED_KEEPALIVE[6];
+
 #endif
