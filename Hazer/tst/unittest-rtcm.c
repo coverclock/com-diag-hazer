@@ -112,6 +112,30 @@ int main(void)
 			assert(memcmp(message, buffer, size) == 0);
 			tumbleweed_finalize();
 		END;
+
+		{
+			tumbleweed_state_t state = TUMBLEWEED_STATE_START;
+			uint8_t buffer[0];
+			char * bb = (char *)~(intptr_t)0;
+			size_t ss = ~(size_t)0;
+			size_t ll = ~(size_t)0;
+			state = tumbleweed_machine(state, EOF, buffer, 0, &bb, &ss, &ll);
+			assert(state == TUMBLEWEED_STATE_EOF);
+			assert(bb == (char *)buffer);
+			assert(ss == 0);
+		}
+
+		BEGIN(EXAMPLE);
+			tumbleweed_state_t state = TUMBLEWEED_STATE_START;
+			uint8_t buffer[0];
+			char * bb = (char *)~(intptr_t)0;
+			size_t ss = ~(size_t)0;
+			size_t ll = ~(size_t)0;
+			state = tumbleweed_machine(state, message[0], buffer, 0, &bb, &ss, &ll);
+			assert(state == TUMBLEWEED_STATE_START);
+			assert(bb == (char *)buffer);
+			assert(ss == 0);
+		END;
     }
 
     /**************************************************************************/
