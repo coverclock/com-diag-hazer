@@ -86,6 +86,12 @@ enum YodelUbxConstants {
 typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
 
 /**
+ * @define YODEL_BUFFER_INITIALIZER
+ * Initialize a YodelBuffer type.
+ */
+#define YODEL_BUFFER_INITIALIZER  { '\0', }
+
+/**
  * Yodel UBX offsets.
  * UBlox 7, p.73
  * UBlox 8 R15, p. 134

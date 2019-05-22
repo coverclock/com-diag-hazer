@@ -85,6 +85,12 @@ enum TumbleweedRtcmConstants {
 typedef unsigned char (tumbleweed_buffer_t)[TUMBLEWEED_RTCM_LONGEST + 1];
 
 /**
+ * @define TUMBLEWEED_BUFFER_INITIALIZER
+ * Initialize a TumbleweedBuffer type.
+ */
+#define TUMBLEWEED_BUFFER_INITIALIZER  { '\0', }
+
+/**
  * Tumbleweed RTCM offsets.
  * RTCM 10403.3 p. 263-265
  */

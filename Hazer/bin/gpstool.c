@@ -85,23 +85,9 @@
 #include "com/diag/diminuto/diminuto_containerof.h"
 #include "com/diag/diminuto/diminuto_observation.h"
 
-/*
- * ENUMERATIONS
- */
-
-typedef enum Role { ROLE = 0, PRODUCER = 1, CONSUMER = 2 } role_t;
-
-typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
-
-typedef enum Format { FORMAT = 0, NMEA = 1, UBX = 2 } format_t;
-
-typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*' } status_t;
-
-typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!' } marker_t;
-
-/*
+/*******************************************************************************
  * CONSTANTS
- */
+ ******************************************************************************/
 
 static const size_t LIMIT = 80 - (sizeof("OUT ") - 1) - (sizeof("[123] ") - 1) - (sizeof("\r\n") - 1) - 1;
 
@@ -110,15 +96,19 @@ static const size_t UNLIMITED = ~(size_t)0;
 static const wchar_t DEGREE = 0x00B0;
 static const wchar_t PLUSMINUS = 0x00B1;
 
-/*
+/*******************************************************************************
  * GLOBALS
- */
+ ******************************************************************************/
 
 static const char * Program = (const char *)0;
 
 static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+/*******************************************************************************
+ * FUNCTIONS
+ ******************************************************************************/
 
 /**
  * Return the absolute value of a signed sixty-four bit integer.
@@ -225,6 +215,26 @@ static void send_buffer(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, 
     }
 
 }
+
+/**
+ * Common function to count down the expiration fields in the database.
+ * @param ep points to the expiration field to count down.
+ * @param elapsed is the number of ticks to count down.
+ */
+static inline void countdown(expiry_t * ep, diminuto_ticks_t elapsed)
+{
+    if (*ep == 0) {
+        /* Do nothing. */
+    } else if (*ep <= elapsed) {
+        *ep = 0;
+    } else {
+        *ep -= elapsed;
+    }
+}
+
+/*******************************************************************************
+ * PRINTERS
+ ******************************************************************************/
 
 /**
  * Print an NMEA sentence or UBX message to a stream, expanding non-printable
@@ -869,19 +879,16 @@ static void print_positions(FILE * fp, FILE * ep, const hazer_position_t pa[], i
  * @param ep points to the FILE stream for errors.
  * @param bp points to the base structure.
  * @param rp points to the rover structure.
+ * @param mp points to the kinematics structure.
  */
-static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, const yodel_rover_t * rp)
+static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp)
 {
      if (bp->ticks != 0) {
 
         fputs("BAS", fp);
-
         fprintf(fp, " %dactive %dvalid %10usec %10uobs %12.4lfm", !!bp->payload.active, !!bp->payload.valid, bp->payload.dur, bp->payload.obs, (double)bp->payload.meanAcc / 10000.0);
-
         fprintf(fp, "%10s", "");
-
         fprintf(fp, " %-8s", "RTCM");
-
         fputc('\n', fp);
 
     }
@@ -889,16 +896,23 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
      if (rp->ticks != 0) {
 
         fputs("ROV", fp);
-
         fprintf(fp, " %5u: %5u (%5u)", rp->payload.refStation, rp->payload.msgType, rp->payload.subType);
-
         fprintf(fp, "%46s", "");
-
-        fprintf(fp, " %-7s", "RTCM");
-
+        fprintf(fp, " %-8s", "RTCM");
         fputc('\n', fp);
 
      }
+
+     if (kp->ticks != 0) {
+
+    	 fputs("RTK", fp);
+    	 fprintf(fp, " %4u", kp->number);
+    	 fprintf(fp, "%63s", "");
+    	 fprintf(fp, "%-8s", "RTCM");
+    	 fputc('\n', fp);
+
+     }
+
 }
 
 static void print_solution(FILE * fp, FILE * ep, const yodel_solution_t * sp)
@@ -962,6 +976,10 @@ static void print_solution(FILE * fp, FILE * ep, const yodel_solution_t * sp)
 
 	}
 }
+
+/*******************************************************************************
+ * THREADS
+ ******************************************************************************/
 
 /**
  * Implement a thread that polls for the data carrier detect (DCD) state for
@@ -1084,21 +1102,9 @@ static void * gpiopoller(void * argp)
     return xc;
 }
 
-/**
- * Common function to count down the expiration fields in the database.
- * @param ep points to the expiration field to count down.
- * @param elapsed is the number of ticks to count down.
- */
-static inline void countdown(expiry_t * ep, diminuto_ticks_t elapsed)
-{
-    if (*ep == 0) {
-        /* Do nothing. */
-    } else if (*ep <= elapsed) {
-        *ep = 0;
-    } else {
-        *ep -= elapsed;
-    }
-}
+/*******************************************************************************
+ * MAIN
+ ******************************************************************************/
 
 /**
  * Run the main program.
@@ -1183,12 +1189,23 @@ int main(int argc, char * argv[])
      * UBX parser state variables.
      */
     yodel_state_t ubx_state = YODEL_STATE_EOF;
-    yodel_buffer_t ubx_buffer = HAZER_BUFFER_INITIALIZER;
+    yodel_buffer_t ubx_buffer = YODEL_BUFFER_INITIALIZER;
     char * ubx_bb = (char *)0;
     size_t ubx_ss = 0;
     size_t ubx_ll = 0;
     uint8_t ubx_ck_a = 0;
     uint8_t ubx_ck_b = 0;
+    /*
+     * RTCM parser state variables.
+     */
+    tumbleweed_state_t rtcm_state = TUMBLEWEED_STATE_EOF;
+    tumbleweed_buffer_t rtcm_buffer = TUMBLEWEED_BUFFER_INITIALIZER;
+    char * rtcm_bb = (char *)0;
+    size_t rtcm_ss = 0;
+    size_t rtcm_ll = 0;
+    uint8_t rtcm_crc_1 = 0;
+    uint8_t rtcm_crc_2 = 0;
+    uint8_t rtcm_crc_3 = 0;
     /*
      * Processing variables.
      */
@@ -1267,6 +1284,10 @@ int main(int argc, char * argv[])
     yodel_rover_t rover = YODEL_ROVER_INITIALIZER;
     yodel_ubx_ack_t acknak = YODEL_UBX_ACK_INITIALIZER;
     int acknakpending = 0;
+    /*
+     * RTCM state databases.
+     */
+    tumbleweed_message_t kinematics = TUMBLEWEED_MESSAGE_INITIALIZER;
     /*
      * Real time related variables.
      */
@@ -1521,7 +1542,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -r          Reverse use of standard output and standard error.\n");
             fprintf(errfp, "       -s          Use XON/XOFF for DEVICE.\n");
             fprintf(errfp, "       -t SECONDS  Expire GNSS data after SECONDS seconds.\n");
-            fprintf(errfp, "       -u          Note unknown NMEA or UBX on standard error.\n");
+            fprintf(errfp, "       -u          Note unprocessed input on standard error.\n");
             fprintf(errfp, "       -v          Display verbose output on standard error.\n");
             return 1;
             break;
@@ -1706,9 +1727,13 @@ int main(int argc, char * argv[])
     rc = yodel_initialize();
     assert(rc == 0);
 
+    rc = tumbleweed_initialize();
+    assert(rc == 0);
+
     if (debug) {
         hazer_debug(errfp);
         yodel_debug(errfp);
+        tumbleweed_debug(errfp);
     }
 
     /*
@@ -1908,7 +1933,7 @@ int main(int argc, char * argv[])
             }
 
             /*
-             * The NMEA and UBX parsers can be thought of as a single
+             * The parsers can be thought of as a single
              * non-deterministic finite state machine: an automaton that
              * can be in more than one state at a time. The two state
              * machines must use different state variables and even
@@ -1921,6 +1946,7 @@ int main(int argc, char * argv[])
 
             nmea_state = HAZER_STATE_START;
             ubx_state = YODEL_STATE_START;
+            rtcm_state = TUMBLEWEED_STATE_START;
 
             while (!0) {
 
@@ -1930,10 +1956,11 @@ int main(int argc, char * argv[])
 
                 ubx_state = yodel_machine(ubx_state, ch, ubx_buffer, sizeof(ubx_buffer), &ubx_bb, &ubx_ss, &ubx_ll);
 
+                rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer, sizeof(rtcm_buffer), &rtcm_bb, &rtcm_ss, &rtcm_ll);
+
                 if (nmea_state == HAZER_STATE_END) {
                     break;
                 } else if  (nmea_state == HAZER_STATE_EOF) {
-                    fprintf(errfp, "EOF %s: NMEA.\n", Program);
                     break;
                 } else {
                     /* Do nothing. */
@@ -1942,17 +1969,29 @@ int main(int argc, char * argv[])
                 if (ubx_state == YODEL_STATE_END) {
                     break;
                 } else if  (ubx_state == YODEL_STATE_EOF) {
-                    fprintf(errfp, "EOF %s: UBX.\n", Program);
                     break;
                 } else {
                     /* Do nothing. */
                 }
 
+                if (rtcm_state == TUMBLEWEED_STATE_END) {
+                	break;
+                } else if (rtcm_state == TUMBLEWEED_STATE_EOF) {
+                	break;
+                } else {
+                	/* Do nothing. */
+                }
+
             }
 
             if (nmea_state == HAZER_STATE_EOF) {
+                fprintf(errfp, "EOF %s: NMEA.\n", Program);
                 break;
             } else if (ubx_state == YODEL_STATE_EOF) {
+                fprintf(errfp, "EOF %s: UBX.\n", Program);
+                break;
+            } else if (rtcm_state == TUMBLEWEED_STATE_EOF) {
+            	fprintf(errfp, "EOF %s: RTCM.\n", Program);
                 break;
             } else if (nmea_state == HAZER_STATE_END) {
                 buffer = nmea_buffer;
@@ -1960,7 +1999,10 @@ int main(int argc, char * argv[])
             } else if (ubx_state == YODEL_STATE_END) {
                 buffer = ubx_buffer;
                 size = ubx_ss;
-            } else {
+            } else if (rtcm_state == TUMBLEWEED_STATE_END) {
+                buffer = rtcm_buffer;
+                size = rtcm_ss;
+           } else {
                 assert(0);
             }
 
@@ -2025,6 +2067,19 @@ int main(int argc, char * argv[])
 
             format = UBX;
 
+        } else if ((length = tumbleweed_length(buffer, size)) > 0) {
+
+        	bp = (unsigned char *)tumbleweed_crc24q(buffer, size, &rtcm_crc_1, &rtcm_crc_2, &rtcm_crc_3);
+        	assert(bp != (unsigned char *)0);
+
+        	if ((rtcm_crc_1 != bp[0]) || (rtcm_crc_2 != bp[1]) || (rtcm_crc_3 != bp[2])) {
+                fprintf(errfp, "ERR %s: CHECKSUM! 0x%02x%02x%02x 0x%02x%02x%02x\n", Program, rtcm_crc_1, rtcm_crc_2, rtcm_crc_3, bp[0], bp[1], bp[2]);
+                print_buffer(errfp, buffer, size1, UNLIMITED);
+                if (!ignorechecksums) { continue; }
+        	}
+
+        	format = RTCM;
+
         } else {
 
             fprintf(errfp, "ERR %s: FORMAT! %zd\n", Program, length);
@@ -2085,6 +2140,7 @@ int main(int argc, char * argv[])
             countdown(&status.ticks, elapsed);
             countdown(&base.ticks, elapsed);
             countdown(&rover.ticks, elapsed);
+            countdown(&kinematics.ticks, elapsed);
 
         }
 
@@ -2092,7 +2148,9 @@ int main(int argc, char * argv[])
          ** PROCESS
          **/
 
-        if (format == NMEA) {
+       switch (format) {
+
+       case NMEA:
 
             /*
              * We tokenize the NMEA sentence so we can parse it later. Then
@@ -2258,7 +2316,9 @@ int main(int argc, char * argv[])
 
             }
 
-        } else if (format == UBX) {
+            break;
+
+        case UBX:
 
             if (verbose) { diminuto_dump(errfp, buffer, length); }
 
@@ -2417,7 +2477,7 @@ int main(int argc, char * argv[])
 
             } else if (unknown) {
 
-                fprintf(errfp, "ERR %s: UBX <0x%02x 0x%02x 0x%02x 0x%02x>\n", Program, ubx_buffer[0], ubx_buffer[1], ubx_buffer[2], ubx_buffer[3]);
+                fprintf(errfp, "ERR %s: UBX <0x%02x 0x%02x 0x%02x 0x%02x>\n", Program, ubx_buffer[YODEL_UBX_SYNC_1], ubx_buffer[YODEL_UBX_SYNC_2], ubx_buffer[YODEL_UBX_CLASS], ubx_buffer[YODEL_UBX_ID]);
 
             } else {
 
@@ -2425,9 +2485,31 @@ int main(int argc, char * argv[])
 
             }
 
-        } else {
+            break;
+
+        case RTCM:
+
+        	if ((kinematics.number = tumbleweed_message(rtcm_buffer, length)) >= 0) {
+
+        		kinematics.ticks = timeout;
+        		refresh = !0;
+
+        	} else if (unknown) {
+
+                fprintf(errfp, "ERR %s: RTCM <0x%02x 0x%02x>\n", Program, rtcm_buffer[TUMBLEWEED_RTCM_NUMBER_MSB], rtcm_buffer[TUMBLEWEED_RTCM_NUMBER_LSB]);
+
+        	} else {
+
+        		/* Do nothing. */
+        	}
+
+            break;
+
+        case FORMAT:
 
             /* Do nothing. */
+
+        	break;
 
         }
 
@@ -2498,6 +2580,15 @@ int main(int argc, char * argv[])
             if (crowbar <= 400) {
                 status.ticks = 0;
             }
+            if (crowbar <= 500) {
+                base.ticks = 0;
+            }
+            if (crowbar <= 600) {
+                rover.ticks = 0;
+            }
+            if (crowbar <= 700) {
+                kinematics.ticks = 0;
+            }
             if (crowbar > 0) {
                 crowbar -= 1;
             }
@@ -2537,7 +2628,7 @@ int main(int argc, char * argv[])
                 print_local(outfp, errfp, timetofirstfix);
                 print_positions(outfp, errfp, position, onepps, dmyokay, totokay);
                 print_solution(outfp, errfp, &solution);
-                print_corrections(outfp, errfp, &base, &rover);
+                print_corrections(outfp, errfp, &base, &rover, &kinematics);
                 print_actives(outfp, errfp, active);
                 print_views(outfp, errfp, view, active);
             }
@@ -2561,11 +2652,14 @@ int main(int argc, char * argv[])
 
     fprintf(errfp, "END %s: END.\n", Program);
 
+    rc = tumbleweed_finalize();
+    assert(rc == 0);
+
     rc = yodel_finalize();
-    assert(rc >= 0);
+    assert(rc == 0);
 
     rc = hazer_finalize();
-    assert(rc >= 0);
+    assert(rc == 0);
 
     if (pthreadrc == 0) {
         DIMINUTO_COHERENT_SECTION_BEGIN;

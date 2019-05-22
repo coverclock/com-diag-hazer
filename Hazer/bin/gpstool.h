@@ -15,6 +15,7 @@
 
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
+#include "com/diag/hazer/tumbleweed.h"
 #include "com/diag/diminuto/diminuto_list.h"
 
 /*******************************************************************************
@@ -139,6 +140,28 @@ typedef struct YodelRover {
     }
 
 /*******************************************************************************
+ * RTCM MESSAGE
+ ******************************************************************************/
+
+/**
+ * Structure combining both a RTCM message number and its expiry time in ticks.
+ */
+typedef struct TumbleweedMessage {
+	int number;			/* Message number e.g. 1005. */
+	expiry_t ticks;		/* Lifetime in application-defined ticks. */
+} tumbleweed_message_t;
+
+/**
+ * @define TUMBLEWEED_MESSAGE_INTIALIZER
+ * Initialize a TumbleweedMessage structure.
+ */
+#define TUMBLEWEED_MESSAGE_INITIALIZER \
+    { \
+        0, \
+		0, \
+    }
+
+/*******************************************************************************
  * STRUCTURES
  ******************************************************************************/
 
@@ -165,5 +188,19 @@ struct Command {
 	diminuto_list_t link;
 	int acknak;
 };
+
+/*******************************************************************************
+ * ENUMERATIONS
+ ******************************************************************************/
+
+typedef enum Role { ROLE = 0, PRODUCER = 1, CONSUMER = 2, } role_t;
+
+typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
+
+typedef enum Format { FORMAT = 0, NMEA = 1, UBX = 2, RTCM = 3, } format_t;
+
+typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*', } status_t;
+
+typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!', } marker_t;
 
 #endif
