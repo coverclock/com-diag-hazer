@@ -140,5 +140,25 @@ int main(void)
 
     /**************************************************************************/
 
+    {
+		static const uint8_t KEEPALIVE[] = "\\xD3\\x00\\x00\\x47\\xea\\x4b";
+
+		BEGIN(KEEPALIVE);
+			const void * bb;
+			uint8_t crc_1 = 0xaa;
+			uint8_t crc_2 = 0x55;
+			uint8_t crc_3 = 0xa5;
+			bb = tumbleweed_crc24q(message, size, &crc_1, &crc_2, &crc_3);
+			fprintf(stderr, "\"%s\"[%zu] 0x%02x 0x%02x 0x%02x\n", string, length, crc_1, crc_2, crc_3);
+	    	diminuto_dump(stderr, message, size);
+			assert(crc_1 == message[size - 3]);
+			assert(crc_2 == message[size - 2]);
+			assert(crc_3 == message[size - 1]);
+			assert((unsigned char *)bb == &(message[size - 3]));
+		END;
+    }
+
+    /**************************************************************************/
+
     return 0;
 }

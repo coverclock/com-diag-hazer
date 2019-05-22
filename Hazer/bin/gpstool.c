@@ -906,8 +906,8 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
      if (kp->ticks != 0) {
 
     	 fputs("RTK", fp);
-    	 fprintf(fp, " %4u", kp->number);
-    	 fprintf(fp, "%63s", "");
+    	 fprintf(fp, " %4u [%4zu] [%4zu]", kp->number, kp->length, kp->maximum);
+    	 fprintf(fp, "%49s", "");
     	 fprintf(fp, "%-8s", "RTCM");
     	 fputc('\n', fp);
 
@@ -2490,6 +2490,9 @@ int main(int argc, char * argv[])
         case RTCM:
 
         	if ((kinematics.number = tumbleweed_message(rtcm_buffer, length)) >= 0) {
+
+        		kinematics.length = length;
+        		if (length > kinematics.maximum) { kinematics.maximum = length; }
 
         		kinematics.ticks = timeout;
         		refresh = !0;

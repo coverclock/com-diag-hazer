@@ -148,6 +148,8 @@ typedef struct YodelRover {
  */
 typedef struct TumbleweedMessage {
 	int number;			/* Message number e.g. 1005. */
+	ssize_t length;
+	ssize_t maximum;
 	expiry_t ticks;		/* Lifetime in application-defined ticks. */
 } tumbleweed_message_t;
 
@@ -158,6 +160,8 @@ typedef struct TumbleweedMessage {
 #define TUMBLEWEED_MESSAGE_INITIALIZER \
     { \
         0, \
+		0, \
+		0, \
 		0, \
     }
 
