@@ -888,7 +888,7 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
         fputs("BAS", fp);
         fprintf(fp, " %dactive %dvalid %10usec %10uobs %12.4lfm", !!bp->payload.active, !!bp->payload.valid, bp->payload.dur, bp->payload.obs, (double)bp->payload.meanAcc / 10000.0);
         fprintf(fp, "%10s", "");
-        fprintf(fp, " %-8s", "RTCM");
+        fprintf(fp, " %-8s", "DGNSS");
         fputc('\n', fp);
 
     }
@@ -898,7 +898,7 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
         fputs("ROV", fp);
         fprintf(fp, " %5u: %5u (%5u)", rp->payload.refStation, rp->payload.msgType, rp->payload.subType);
         fprintf(fp, "%46s", "");
-        fprintf(fp, " %-8s", "RTCM");
+        fprintf(fp, " %-8s", "DGNSS");
         fputc('\n', fp);
 
      }
@@ -908,7 +908,7 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
     	 fputs("RTK", fp);
     	 fprintf(fp, " %4u [%4zu] [%4zu] [%4zu]", kp->number, kp->minimum, kp->length, kp->maximum);
     	 fprintf(fp, "%42s", "");
-    	 fprintf(fp, "%-8s", "RTCM");
+    	 fprintf(fp, "%-8s", "DGNSS");
     	 fputc('\n', fp);
 
      }
