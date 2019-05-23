@@ -585,47 +585,48 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 
 # Help
 
-    gpstool -?
-    usage: gpstool [ -d ] [ -u ] [ -v ] [ -x ] [ -V ] [ -X ] [ -M PRN ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L LOG ] [ -t SECONDS ] [ -C ]
+    usage: gpstool [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -A ADDRESS ] [ -P PORT [ -f MASK ] ] [ -O [ -w MASK ] ] [ -L LOG ] [ -t SECONDS ] [ -C ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
-           -4          Use IPv4 for ADDRESS, PORT.
-           -6          Use IPv6 for ADDRESS, PORT.
+           -4          Use IPv4 for ADDRESS.
+           -6          Use IPv6 for ADDRESS.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
            -A ADDRESS  Send sentences to ADDRESS.
-           -C          Ignore bad checksums.
+           -C          Ignore bad Checksums.
            -D DEVICE   Use DEVICE for input or output.
-           -E          Like -R but use ANSI escape sequences.
-           -F          Like -E but refresh at 1Hz.
-           -H HEADLESS Like -R but writes screen to HEADLESS file.
-           -I PIN      Take 1PPS from GPIO input PIN (requires -D).
+           -E          Like -R but use ANSI Escape sequences.
+           -F          Like -R but reFresh at 1Hz.
+           -H HEADLESS Like -R but writes each iteration to HEADLESS file.
+           -I PIN      Take 1PPS from GPIO Input PIN (requires -D).
            -L LOG      Write sentences to LOG file.
-           -O          Output sentences to DEVICE.
+           -O          Write sentences to Output DEVICE.
            -P PORT     Send to or receive from PORT.
-           -R          Print a report on standard output.
+           -R          Print a Report on standard output.
            -S SOURCE   Use SOURCE file for input.
-           -U STRING   Collapse STRING, append checksum, write to DEVICE, expect ACK.
-           -U ''       Exit when this empty STRING is processed.
-           -V          Print release, vintage, and revision on standard output.
-           -W STRING   Collapse STRING, append checksum, write to DEVICE.
-           -W ''       Exit when this empty STRING is processed.
-           -X          Enable message expiration test mode.
+           -U STRING   Like -W except expect UBX ACK or NAK response.
+           -U ''       Exit when this empty UBX STRING is processed.
+           -V          Print release, Vintage, and revision on standard output.
+           -W STRING   Collapse STRING, append checksum, Write to DEVICE.
+           -W ''       Exit when this empty Write STRING is processed.
+           -X          Enable message eXpiration test mode.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
-           -d          Display debug output on standard error.
-           -e          Use even parity for DEVICE.
-           -l          Use local control for DEVICE.
-           -m          Use modem control for DEVICE.
-           -o          Use odd parity for DEVICE.
+           -d          Display Debug output on standard error.
+           -e          Use Even parity for DEVICE.
+           -f MASK     Set Forwarding mask (NMEA=1, UBX=2, RTCM=4), default 1.
+           -h          Use RTS/CTS Hardware flow control for DEVICE.
+           -l          Use Local control for DEVICE.
+           -m          Use Modem control for DEVICE.
+           -o          Use Odd parity for DEVICE.
            -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).
-           -n          Use no parity for DEVICE.
-           -h          Use RTS/CTS for DEVICE.
+           -n          Use No parity for DEVICE.
            -r          Reverse use of standard output and standard error.
-           -s          Use XON/XOFF for DEVICE.
-           -t SECONDS  Expire GNSS data after SECONDS seconds.
-           -u          Note unknown NMEA or UBX on standard error.
-           -v          Display verbose output on standard error.
+           -s          Use XON/XOFF (control-Q/control-S) for DEVICE.
+           -t SECONDS  Timeout GNSS data after SECONDS seconds.
+           -u          Note Unprocessed input on standard error.
+           -v          Display Verbose output on standard error.
+           -w MASK     Set Writing mask (NMEA=1, UBX=2, RTCM=4), default 1.
  
 # Display
 
@@ -641,13 +642,13 @@ the display looks something like this snapshot as it is continually updated.
     OUT [  0]
     LOC 2019-05-07T13:45:27.049-07:00+01T          0/00:00:00.895 18.0.0   nickel
     TIM 2019-05-07T19:45:27.000-00:00+00Z 0pps                             GNSS
-    POS 39°47'39.13"N, 105°09'12.14"W    39.794203333, -105.153372666      GNSS
+    POS 39��47'39.13"N, 105��09'12.14"W    39.794203333, -105.153372666      GNSS
     ALT    5595.40'   1705.500m                                            GNSS
-    COG N     0.000000000°T    0.000000000°M                               GNSS
+    COG N     0.000000000��T    0.000000000��M                               GNSS
     SOG       0.026mph       0.023000knots       0.042000kph               GNSS
     INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    HPP   39.794203348, -105.153372746 ±     4.3267m                       GNSS
-    HPA   1705.5121m ±     6.9854m                                         GNSS
+    HPP   39.794203348, -105.153372746 ��     4.3267m                       GNSS
+    HPA   1705.5121m ��     6.9854m                                         GNSS
     BAS 1active 0valid         17sec         17obs      27.0312m           RTCM
     ACT [1]  {    18    15    17    11     1    13 } [ 6] [10] [25]        GPS
     ACT [2]  {    30    28    19     6             } [ 4] [10] [25]        GPS
@@ -658,45 +659,45 @@ the display looks something like this snapshot as it is continually updated.
     DOP   0.95pdop   0.55hdop   0.78vdop                                   GLONASS
     DOP   0.95pdop   0.55hdop   0.78vdop                                   GALILEO
     DOP   0.95pdop   0.55hdop   0.78vdop                                   BEIDOU
-    SAT [  1]     1id  34°elv   61°azm   27dBHz  6sig <                    GPS
-    SAT [  2]     6id  11°elv  183°azm   35dBHz  6sig <                    GPS
-    SAT [  3]     7id   9°elv  147°azm   29dBHz  6sig                      GPS
-    SAT [  4]    11id  26°elv   50°azm    0dBHz  6sig <   !                GPS
-    SAT [  5]    13id  30°elv  254°azm    0dBHz  6sig <   !                GPS
-    SAT [  6]    15id  16°elv  287°azm   21dBHz  6sig <                    GPS
-    SAT [  7]    17id  75°elv  247°azm   34dBHz  6sig <                    GPS
-    SAT [  8]    18id  15°elv   41°azm    0dBHz  6sig <   !                GPS
-    SAT [  9]    19id  49°elv  232°azm    0dBHz  6sig <   !                GPS
-    SAT [ 10]    22id   0°elv   78°azm    0dBHz  6sig     !                GPS
-    SAT [ 11]    24id   6°elv  319°azm   18dBHz  6sig                      GPS
-    SAT [ 12]    28id  65°elv   41°azm    0dBHz  6sig <   !                GPS
-    SAT [ 13]    30id  41°elv  154°azm   36dBHz  6sig <                    GPS
-    SAT [ 14]    67id   1°elv  283°azm    0dBHz  3sig     !                GLONASS
-    SAT [ 15]    68id   4°elv  332°azm    0dBHz  3sig     !                GLONASS
-    SAT [ 16]    75id  30°elv  119°azm   37dBHz  3sig <                    GLONASS
-    SAT [ 17]    76id  70°elv   78°azm    0dBHz  3sig <   !                GLONASS
-    SAT [ 18]    77id  33°elv  324°azm   21dBHz  3sig <                    GLONASS
-    SAT [ 19]    85id  20°elv   31°azm   23dBHz  3sig <                    GLONASS
-    SAT [ 20]    86id  77°elv   57°azm   26dBHz  3sig <                    GLONASS
-    SAT [ 21]    87id  37°elv  202°azm   17dBHz  3sig <                    GLONASS
-    SAT [ 22]     1id  43°elv  312°azm   32dBHz  2sig <                    GALILEO
-    SAT [ 23]     4id   9°elv  280°azm    0dBHz  2sig     !                GALILEO
-    SAT [ 24]     9id   1°elv  327°azm    0dBHz  2sig     !                GALILEO
-    SAT [ 25]    13id  62°elv   82°azm    0dBHz  2sig <   !                GALILEO
-    SAT [ 26]    14id  41°elv   55°azm   36dBHz  2sig                      GALILEO
-    SAT [ 27]    15id  19°elv   40°azm   19dBHz  2sig <                    GALILEO
-    SAT [ 28]    19id   3°elv  229°azm    0dBHz  2sig     !                GALILEO
-    SAT [ 29]    21id  73°elv   68°azm   31dBHz  2sig <                    GALILEO
-    SAT [ 30]    26id  45°elv  182°azm   35dBHz  2sig <                    GALILEO
-    SAT [ 31]    27id  24°elv  110°azm   31dBHz  2sig <                    GALILEO
-    SAT [ 32]    33id   0°elv  205°azm    0dBHz  2sig     !                GALILEO
-    SAT [ 33]     6id   3°elv  334°azm    0dBHz  0sig     !                BEIDOU
-    SAT [ 34]    12id  10°elv  219°azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 35]    16id   1°elv  341°azm    0dBHz  0sig     !                BEIDOU
-    SAT [ 36]    24id   2°elv  312°azm    0dBHz  0sig     !                BEIDOU
-    SAT [ 37]    26id  49°elv  311°azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 38]    29id  61°elv   53°azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 39]    30id   9°elv   45°azm    0dBHz  0sig     !                BEIDOU
+    SAT [  1]     1id  34��elv   61��azm   27dBHz  6sig <                    GPS
+    SAT [  2]     6id  11��elv  183��azm   35dBHz  6sig <                    GPS
+    SAT [  3]     7id   9��elv  147��azm   29dBHz  6sig                      GPS
+    SAT [  4]    11id  26��elv   50��azm    0dBHz  6sig <   !                GPS
+    SAT [  5]    13id  30��elv  254��azm    0dBHz  6sig <   !                GPS
+    SAT [  6]    15id  16��elv  287��azm   21dBHz  6sig <                    GPS
+    SAT [  7]    17id  75��elv  247��azm   34dBHz  6sig <                    GPS
+    SAT [  8]    18id  15��elv   41��azm    0dBHz  6sig <   !                GPS
+    SAT [  9]    19id  49��elv  232��azm    0dBHz  6sig <   !                GPS
+    SAT [ 10]    22id   0��elv   78��azm    0dBHz  6sig     !                GPS
+    SAT [ 11]    24id   6��elv  319��azm   18dBHz  6sig                      GPS
+    SAT [ 12]    28id  65��elv   41��azm    0dBHz  6sig <   !                GPS
+    SAT [ 13]    30id  41��elv  154��azm   36dBHz  6sig <                    GPS
+    SAT [ 14]    67id   1��elv  283��azm    0dBHz  3sig     !                GLONASS
+    SAT [ 15]    68id   4��elv  332��azm    0dBHz  3sig     !                GLONASS
+    SAT [ 16]    75id  30��elv  119��azm   37dBHz  3sig <                    GLONASS
+    SAT [ 17]    76id  70��elv   78��azm    0dBHz  3sig <   !                GLONASS
+    SAT [ 18]    77id  33��elv  324��azm   21dBHz  3sig <                    GLONASS
+    SAT [ 19]    85id  20��elv   31��azm   23dBHz  3sig <                    GLONASS
+    SAT [ 20]    86id  77��elv   57��azm   26dBHz  3sig <                    GLONASS
+    SAT [ 21]    87id  37��elv  202��azm   17dBHz  3sig <                    GLONASS
+    SAT [ 22]     1id  43��elv  312��azm   32dBHz  2sig <                    GALILEO
+    SAT [ 23]     4id   9��elv  280��azm    0dBHz  2sig     !                GALILEO
+    SAT [ 24]     9id   1��elv  327��azm    0dBHz  2sig     !                GALILEO
+    SAT [ 25]    13id  62��elv   82��azm    0dBHz  2sig <   !                GALILEO
+    SAT [ 26]    14id  41��elv   55��azm   36dBHz  2sig                      GALILEO
+    SAT [ 27]    15id  19��elv   40��azm   19dBHz  2sig <                    GALILEO
+    SAT [ 28]    19id   3��elv  229��azm    0dBHz  2sig     !                GALILEO
+    SAT [ 29]    21id  73��elv   68��azm   31dBHz  2sig <                    GALILEO
+    SAT [ 30]    26id  45��elv  182��azm   35dBHz  2sig <                    GALILEO
+    SAT [ 31]    27id  24��elv  110��azm   31dBHz  2sig <                    GALILEO
+    SAT [ 32]    33id   0��elv  205��azm    0dBHz  2sig     !                GALILEO
+    SAT [ 33]     6id   3��elv  334��azm    0dBHz  0sig     !                BEIDOU
+    SAT [ 34]    12id  10��elv  219��azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 35]    16id   1��elv  341��azm    0dBHz  0sig     !                BEIDOU
+    SAT [ 36]    24id   2��elv  312��azm    0dBHz  0sig     !                BEIDOU
+    SAT [ 37]    26id  49��elv  311��azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 38]    29id  61��elv   53��azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 39]    30id   9��elv   45��azm    0dBHz  0sig     !                BEIDOU
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
