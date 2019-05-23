@@ -149,6 +149,7 @@ typedef struct YodelRover {
 typedef struct TumbleweedMessage {
 	int number;			/* Message number e.g. 1005. */
 	ssize_t length;
+	ssize_t minimum;
 	ssize_t maximum;
 	expiry_t ticks;		/* Lifetime in application-defined ticks. */
 } tumbleweed_message_t;
@@ -161,6 +162,7 @@ typedef struct TumbleweedMessage {
     { \
         0, \
 		0, \
+		TUMBLEWEED_RTCM_LONGEST, \
 		0, \
 		0, \
     }
@@ -201,7 +203,7 @@ typedef enum Role { ROLE = 0, PRODUCER = 1, CONSUMER = 2, } role_t;
 
 typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
-typedef enum Format { FORMAT = 0, NMEA = 1, UBX = 2, RTCM = 3, } format_t;
+typedef enum Format { FORMAT = 0x0, NMEA = 0x1, UBX = 0x2, RTCM = 0x4, } format_t;
 
 typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*', } status_t;
 

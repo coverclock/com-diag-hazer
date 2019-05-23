@@ -906,8 +906,8 @@ static void print_corrections(FILE * fp, FILE * ep, const yodel_base_t * bp, con
      if (kp->ticks != 0) {
 
     	 fputs("RTK", fp);
-    	 fprintf(fp, " %4u [%4zu] [%4zu]", kp->number, kp->length, kp->maximum);
-    	 fprintf(fp, "%49s", "");
+    	 fprintf(fp, " %4u [%4zu] [%4zu] [%4zu]", kp->number, kp->minimum, kp->length, kp->maximum);
+    	 fprintf(fp, "%42s", "");
     	 fprintf(fp, "%-8s", "RTCM");
     	 fputc('\n', fp);
 
@@ -1168,6 +1168,7 @@ int main(int argc, char * argv[])
     diminuto_ipv6_t ipv6 = { 0 };
     diminuto_port_t port = 0;
     int sock = -1;
+    unsigned int forwarding = ~0;
     /*
      * 1PPS poller thread variables.
      */
@@ -1338,7 +1339,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFH:I:L:OP:RS:U:VW:Xb:cdehlmnop:rst:uv?";
+    static const char OPTIONS[] = "124678A:CD:EFH:I:L:OP:RS:U:VW:Xb:cdef:hlmnop:rst:uv?";
 
     /**
      ** PREINITIALIZATION
@@ -1464,6 +1465,9 @@ int main(int argc, char * argv[])
         case 'e':
             paritybit = 2;
             break;
+        case 'f':
+        	forwarding = strtoul(optarg, &end, 0);
+        	break;
         case 'h':
             rtscts = !0;
             break;
@@ -1504,11 +1508,11 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -A ADDRESS ] [ -P PORT ] [ -O ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
+            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -A ADDRESS ] [ -P PORT ] [ -f MASK ] [ -O ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
-            fprintf(errfp, "       -4          Use IPv4 for ADDRESS, PORT.\n");
-            fprintf(errfp, "       -6          Use IPv6 for ADDRESS, PORT.\n");
+            fprintf(errfp, "       -4          Use IPv4 for ADDRESS.\n");
+            fprintf(errfp, "       -6          Use IPv6 for ADDRESS.\n");
             fprintf(errfp, "       -7          Use seven data bits for DEVICE.\n");
             fprintf(errfp, "       -8          Use eight data bits for DEVICE.\n");
             fprintf(errfp, "       -A ADDRESS  Send sentences to ADDRESS.\n");
@@ -1533,6 +1537,7 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(errfp, "       -d          Display debug output on standard error.\n");
             fprintf(errfp, "       -e          Use even parity for DEVICE.\n");
+            fprintf(errfp, "       -f MASK     Set forwarding mask (NMEA=1, UBX=2, RTCM=4).\n");
             fprintf(errfp, "       -l          Use local control for DEVICE.\n");
             fprintf(errfp, "       -m          Use modem control for DEVICE.\n");
             fprintf(errfp, "       -o          Use odd parity for DEVICE.\n");
@@ -1940,8 +1945,9 @@ int main(int argc, char * argv[])
              * different buffers, since it is possible both could be active
              * at the same time until one of them determines that it has
              * collected a correct sentence or packet. The datagram
-             * code below use the UBX buffer, since it may ultimately
-             * receive either NMEA or UBX data from the far end.
+             * code below use the RTCM buffer, since it is the longest and
+             * the datagram may ultimately receive NMEA, UBX, or RTCM from
+             * the far end.
              */
 
             nmea_state = HAZER_STATE_START;
@@ -2008,17 +2014,17 @@ int main(int argc, char * argv[])
 
         } else if (protocol == IPV4) {
 
-            size = diminuto_ipc4_datagram_receive(sock, ubx_buffer, sizeof(ubx_buffer) - 1);
+            size = diminuto_ipc4_datagram_receive(sock, rtcm_buffer, sizeof(rtcm_buffer) - 1);
             if (size <= 0) { break; }
-            ubx_buffer[size++] = '\0';
-            buffer = ubx_buffer;
+            rtcm_buffer[size++] = '\0';
+            buffer = rtcm_buffer;
 
         } else if (protocol == IPV6) {
 
-            size = diminuto_ipc6_datagram_receive(sock, ubx_buffer, sizeof(ubx_buffer) - 1);
+            size = diminuto_ipc6_datagram_receive(sock, rtcm_buffer, sizeof(rtcm_buffer) - 1);
             if (size <= 0) { break; }
-            ubx_buffer[size++] = '\0';
-            buffer = ubx_buffer;
+            rtcm_buffer[size++] = '\0';
+            buffer = rtcm_buffer;
 
         } else {
 
@@ -2098,13 +2104,20 @@ int main(int argc, char * argv[])
         /**
          ** FORWARD AND LOG
          **
-         ** We forward and log anything we recognize: currently NMEA sentences
-         ** or UBX packets. Note that we don't forward the terminating NUL
-         ** (using length, instead of size) that terminate all input of any
-         ** format (whether that's useful or not).
+         ** We forward anything whose format is enabled in the forwarding
+         ** mask. Note that we don't forward the terminating NUL (using length,
+         ** instead of size) that terminate all input of any format (whether
+         ** that's useful or not).
          **/
 
-        if (role == PRODUCER) { send_buffer(sock, protocol, &ipv4, &ipv6, port, buffer, length); }
+        if (role != PRODUCER) {
+        	/* Do nothing. */
+        } else if ((forwarding & format) == 0) {
+        	/* Do nothing. */
+        } else {
+        	send_buffer(sock, protocol, &ipv4, &ipv6, port, buffer, length);
+        }
+
         if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
 
         /*
@@ -2489,22 +2502,14 @@ int main(int argc, char * argv[])
 
         case RTCM:
 
-        	if ((kinematics.number = tumbleweed_message(rtcm_buffer, length)) >= 0) {
+        	kinematics.number = tumbleweed_message(rtcm_buffer, length);
+        	if (kinematics.number < 0) { kinematics.number = 9999; }
+        	kinematics.length = length;
+        	if (length < kinematics.minimum) { kinematics.minimum = length; }
+        	if (length > kinematics.maximum) { kinematics.maximum = length; }
 
-        		kinematics.length = length;
-        		if (length > kinematics.maximum) { kinematics.maximum = length; }
-
-        		kinematics.ticks = timeout;
-        		refresh = !0;
-
-        	} else if (unknown) {
-
-                fprintf(errfp, "ERR %s: RTCM <0x%02x 0x%02x>\n", Program, rtcm_buffer[TUMBLEWEED_RTCM_NUMBER_MSB], rtcm_buffer[TUMBLEWEED_RTCM_NUMBER_LSB]);
-
-        	} else {
-
-        		/* Do nothing. */
-        	}
+        	kinematics.ticks = timeout;
+        	refresh = !0;
 
             break;
 
