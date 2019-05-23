@@ -1165,6 +1165,7 @@ int main(int argc, char * argv[])
      * Datagram socket variables.
      */
     role_t role = ROLE;
+    datagram_buffer_t datagram_buffer = DATAGRAM_BUFFER_INITIALIZER;
     const char * host = (const char *)0;
     const char * service = (const char *)0;
     protocol_t protocol = IPV4;
@@ -1949,10 +1950,7 @@ int main(int argc, char * argv[])
              * machines must use different state variables and even
              * different buffers, since it is possible both could be active
              * at the same time until one of them determines that it has
-             * collected a correct sentence or packet. The datagram
-             * code below use the RTCM buffer, since it is the longest and
-             * the datagram may ultimately receive NMEA, UBX, or RTCM from
-             * the far end.
+             * collected a correct sentence or packet.
              */
 
             nmea_state = HAZER_STATE_START;
@@ -2019,17 +2017,17 @@ int main(int argc, char * argv[])
 
         } else if (protocol == IPV4) {
 
-            size = diminuto_ipc4_datagram_receive(sock, rtcm_buffer, sizeof(rtcm_buffer) - 1);
+            size = diminuto_ipc4_datagram_receive(sock, datagram_buffer, sizeof(datagram_buffer) - 1);
             if (size <= 0) { break; }
-            rtcm_buffer[size++] = '\0';
-            buffer = rtcm_buffer;
+            datagram_buffer[size++] = '\0';
+            buffer = datagram_buffer;
 
         } else if (protocol == IPV6) {
 
-            size = diminuto_ipc6_datagram_receive(sock, rtcm_buffer, sizeof(rtcm_buffer) - 1);
+            size = diminuto_ipc6_datagram_receive(sock, datagram_buffer, sizeof(datagram_buffer) - 1);
             if (size <= 0) { break; }
-            rtcm_buffer[size++] = '\0';
-            buffer = rtcm_buffer;
+            datagram_buffer[size++] = '\0';
+            buffer = datagram_buffer;
 
         } else {
 
@@ -2146,7 +2144,7 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (direction != OUTPUT) {
             /* Do nothing. */
-        } else if ((forwarding & format) == 0) {
+        } else if ((writing & format) == 0) {
             /* Do nothing. */
         } else if (!dmyokay) {
             /* Do nothing. */
@@ -2379,22 +2377,22 @@ int main(int argc, char * argv[])
 
             if (verbose) { diminuto_dump(errfp, buffer, length); }
 
-            if (yodel_ubx_nav_hpposllh(&(solution.payload), ubx_buffer, length) == 0) {
+            if (yodel_ubx_nav_hpposllh(&(solution.payload), buffer, length) == 0) {
 
                 solution.ticks = timeout;
                 refresh = !0;
 
-            } else if (yodel_ubx_mon_hw(&(hardware.payload), ubx_buffer, length) == 0) {
+            } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 
                 hardware.ticks = timeout;
                 refresh = !0;
 
-            } else if (yodel_ubx_nav_status(&(status.payload), ubx_buffer, length) == 0) {
+            } else if (yodel_ubx_nav_status(&(status.payload), buffer, length) == 0) {
 
                 status.ticks = timeout;
                 refresh = !0;
 
-            } else if (yodel_ubx_ack(&acknak, ubx_buffer, length) == 0) {
+            } else if (yodel_ubx_ack(&acknak, buffer, length) == 0) {
 
                 refresh = !0;
 
@@ -2402,7 +2400,7 @@ int main(int argc, char * argv[])
 
                 if (acknakpending > 0) { acknakpending -= 1; }
 
-            } else if (yodel_ubx_cfg_valget(ubx_buffer, length) == 0) {
+            } else if (yodel_ubx_cfg_valget(buffer, length) == 0) {
 
                 /*
                  * All of the validity checking and byte swapping is done in
@@ -2412,9 +2410,9 @@ int main(int argc, char * argv[])
                  * is byteswapped in-place.
                  */
 
-                yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)&(ubx_buffer[YODEL_UBX_PAYLOAD]);
+                yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)&(buffer[YODEL_UBX_PAYLOAD]);
                 const char * bb = (const char *)0;
-                const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
+                const char * ee = &buffer[length - YODEL_UBX_CHECKSUM];
                 const char * layer = (const char *)0;
                 int ii = 0;
                 yodel_ubx_cfg_valget_key_t kk = 0;
@@ -2498,10 +2496,10 @@ int main(int argc, char * argv[])
 
                 }
 
-            } else if (yodel_ubx_mon_ver(ubx_buffer, length) == 0) {
+            } else if (yodel_ubx_mon_ver(buffer, length) == 0) {
 
-                const char * bb = &ubx_buffer[YODEL_UBX_PAYLOAD];
-                const char * ee = &ubx_buffer[length - YODEL_UBX_CHECKSUM];
+                const char * bb = &buffer[YODEL_UBX_PAYLOAD];
+                const char * ee = &buffer[length - YODEL_UBX_CHECKSUM];
 
                 refresh = !0;
 
@@ -2522,19 +2520,19 @@ int main(int argc, char * argv[])
 
                 } while (0);
 
-            } else if (yodel_ubx_nav_svin(&base.payload, ubx_buffer, length) == 0) {
+            } else if (yodel_ubx_nav_svin(&base.payload, buffer, length) == 0) {
 
                 base.ticks = timeout;
                 refresh = !0;
 
-            } else if (yodel_ubx_rxm_rtcm(&rover.payload, ubx_buffer, length) == 0) {
+            } else if (yodel_ubx_rxm_rtcm(&rover.payload, buffer, length) == 0) {
 
                 rover.ticks = timeout;
                 refresh = !0;
 
             } else if (unknown) {
 
-                fprintf(errfp, "ERR %s: UBX <0x%02x 0x%02x 0x%02x 0x%02x>\n", Program, ubx_buffer[YODEL_UBX_SYNC_1], ubx_buffer[YODEL_UBX_SYNC_2], ubx_buffer[YODEL_UBX_CLASS], ubx_buffer[YODEL_UBX_ID]);
+                fprintf(errfp, "ERR %s: UBX <0x%02x 0x%02x 0x%02x 0x%02x>\n", Program, buffer[YODEL_UBX_SYNC_1], buffer[YODEL_UBX_SYNC_2], buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             } else {
 
@@ -2546,7 +2544,7 @@ int main(int argc, char * argv[])
 
         case RTCM:
 
-        	kinematics.number = tumbleweed_message(rtcm_buffer, length);
+        	kinematics.number = tumbleweed_message(buffer, length);
         	if (kinematics.number < 0) { kinematics.number = 9999; }
         	kinematics.length = length;
         	if (length < kinematics.minimum) { kinematics.minimum = length; }

@@ -19,6 +19,33 @@
 #include "com/diag/diminuto/diminuto_list.h"
 
 /*******************************************************************************
+ * DATAGRAM BUFFER
+ ******************************************************************************/
+
+/**
+ * Datagram Constants.
+ */
+enum DatagramConstants {
+	DATAGRAM_LONGEST = ((HAZER_NMEA_LONGEST > YODEL_UBX_LONGEST)
+						? ((HAZER_NMEA_LONGEST > TUMBLEWEED_RTCM_LONGEST) ? HAZER_NMEA_LONGEST : TUMBLEWEED_RTCM_LONGEST)
+						: ((YODEL_UBX_LONGEST > TUMBLEWEED_RTCM_LONGEST) ? YODEL_UBX_LONGEST : TUMBLEWEED_RTCM_LONGEST)),
+};
+
+/**
+ * This buffer is large enough to the largest UDP datagram we are willing to
+ * support, plus a trailing NUL. It's not big enough to hold any datagram
+ * (that would be in the neighborhood of 65508 bytes). But it will for sure
+ * hold a NMEA, UBX, or RTCM payload.
+ */
+typedef unsigned char (datagram_buffer_t)[DATAGRAM_LONGEST + 1];
+
+/**
+ * @define DATAGRAM_BUFFER_INITIALIZER
+ * Initialize a DatagramBuffer type.
+ */
+#define DATAGRAM_BUFFER_INITIALIZER  { '\0', }
+
+/*******************************************************************************
  * HIGH PRECISION SOLUTION
  ******************************************************************************/
 
@@ -201,11 +228,11 @@ struct Command {
 
 typedef enum Role { ROLE = 0, PRODUCER = 1, CONSUMER = 2, } role_t;
 
-typedef enum Direction { DIRECTION = 0, INPUT = 1, OUTPUT = 2 } direction_t;
+typedef enum Direction { DIRECTION = 0, INPUT = (1<<0), OUTPUT = (1<<1) } direction_t;
 
 typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
-typedef enum Format { FORMAT = 0x0, NMEA = 0x1, UBX = 0x2, RTCM = 0x4, } format_t;
+typedef enum Format { FORMAT = 0, NMEA = (1<<0), UBX = (1<<1), RTCM = (1<<2), } format_t;
 
 typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*', } status_t;
 
