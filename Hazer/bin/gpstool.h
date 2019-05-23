@@ -226,16 +226,34 @@ struct Command {
  * ENUMERATIONS
  ******************************************************************************/
 
+/**
+ * Are we producing datagrams, consuming datagrams, or neither?
+ */
 typedef enum Role { ROLE = 0, PRODUCER = 1, CONSUMER = 2, } role_t;
 
+/**
+ * Are we inputting serial data, outputting serial data, or neither?
+ */
 typedef enum Direction { DIRECTION = 0, INPUT = (1<<0), OUTPUT = (1<<1) } direction_t;
 
+/**
+ * Are we using IPv4, IPv6, or not using IP at all?
+ */
 typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
+/**
+ * Are we processing an NMEA sentence, a UBX packet, an RTCM message, or none of the above?
+ */
 typedef enum Format { FORMAT = 0, NMEA = (1<<0), UBX = (1<<1), RTCM = (1<<2), } format_t;
 
+/**
+ * What is our jamming state?
+ */
 typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*', } status_t;
 
+/**
+ * How have we classified a satellite track?
+ */
 typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!', } marker_t;
 
 #endif
