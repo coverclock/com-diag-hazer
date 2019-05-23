@@ -1118,34 +1118,19 @@ int main(int argc, char * argv[])
      * Command line options and parameters with defaults.
      */
     const char * source = (const char *)0;
-    const char * device = (const char *)0;
     const char * strobe = (const char *)0;
-    const char * pps = (const char *)0;
     const char * logging = (const char *)0;
-    const char * host = (const char *)0;
-    const char * service = (const char *)0;
     const char * headless = (const char *)0;
     int opt = -1;
     int debug = 0;
     int verbose = 0;
     int escape = 0;
     int report = 0;
-    int bitspersecond = 9600;
-    int databits = 8;
-    int paritybit = 0;
-    int stopbits = 1;
-    int modemcontrol = 0;
-    int rtscts = 0;
-    int xonxoff = 0;
-    int readonly = !0;
-    int carrierdetect = 0;
     int strobepin = -1;
     int ppspin = -1;
     int ignorechecksums = 0;
     int slow = 0;
     int expire = 0;
-    role_t role = ROLE;
-    protocol_t protocol = IPV4;
     unsigned long timeout = HAZER_GNSS_TICKS;
     struct Command * command = (struct Command *)0;
     diminuto_list_t * node = (diminuto_list_t *)0;
@@ -1162,16 +1147,36 @@ int main(int argc, char * argv[])
     FILE * strobefp = (FILE *)0;
     FILE * ppsfp = (FILE *)0;
     /*
+     * Serial device variables.
+     */
+    direction_t direction = INPUT;
+    const char * device = (const char *)0;
+    int bitspersecond = 9600;
+    int databits = 8;
+    int paritybit = 0;
+    int stopbits = 1;
+    int modemcontrol = 0;
+    int rtscts = 0;
+    int xonxoff = 0;
+    int readonly = !0;
+    int carrierdetect = 0;
+    unsigned int writing = NMEA;
+    /*
      * Datagram socket variables.
      */
+    role_t role = ROLE;
+    const char * host = (const char *)0;
+    const char * service = (const char *)0;
+    protocol_t protocol = IPV4;
     diminuto_ipv4_t ipv4 = 0;
     diminuto_ipv6_t ipv6 = { 0 };
     diminuto_port_t port = 0;
     int sock = -1;
-    unsigned int forwarding = ~0;
+    unsigned int forwarding = NMEA;
     /*
      * 1PPS poller thread variables.
      */
+    const char * pps = (const char *)0;
     struct Poller poller = { 0 };
     void * result = (void *)0;
     pthread_t thread;
@@ -1317,7 +1322,6 @@ int main(int argc, char * argv[])
     ssize_t count = 0;
     char msn = '\0';
     char lsn = '\0';
-    int output = 0;
     FILE * fp = (FILE *)0;
     int fd = -1;
     int refresh = !0;
@@ -1339,7 +1343,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFH:I:L:OP:RS:U:VW:Xb:cdef:hlmnop:rst:uv?";
+    static const char OPTIONS[] = "124678A:CD:EFH:I:L:OP:RS:U:VW:Xb:cdef:hlmnop:rst:uvw:?";
 
     /**
      ** PREINITIALIZATION
@@ -1413,7 +1417,7 @@ int main(int argc, char * argv[])
             break;
         case 'O':
             readonly = 0;
-            output = !0;
+            direction = OUTPUT;
             break;
         case 'P':
             service = optarg;
@@ -1537,18 +1541,19 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(errfp, "       -d          Display debug output on standard error.\n");
             fprintf(errfp, "       -e          Use even parity for DEVICE.\n");
-            fprintf(errfp, "       -f MASK     Set forwarding mask (NMEA=1, UBX=2, RTCM=4).\n");
+            fprintf(errfp, "       -f MASK     Set forwarding mask (NMEA=%u, UBX=%u, RTCM=%u), default %u.\n", NMEA, UBX, RTCM, forwarding);
+            fprintf(errfp, "       -h          Use RTS/CTS for DEVICE.\n");
             fprintf(errfp, "       -l          Use local control for DEVICE.\n");
             fprintf(errfp, "       -m          Use modem control for DEVICE.\n");
             fprintf(errfp, "       -o          Use odd parity for DEVICE.\n");
             fprintf(errfp, "       -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).\n");
             fprintf(errfp, "       -n          Use no parity for DEVICE.\n");
-            fprintf(errfp, "       -h          Use RTS/CTS for DEVICE.\n");
             fprintf(errfp, "       -r          Reverse use of standard output and standard error.\n");
             fprintf(errfp, "       -s          Use XON/XOFF for DEVICE.\n");
             fprintf(errfp, "       -t SECONDS  Expire GNSS data after SECONDS seconds.\n");
             fprintf(errfp, "       -u          Note unprocessed input on standard error.\n");
             fprintf(errfp, "       -v          Display verbose output on standard error.\n");
+            fprintf(errfp, "       -w MASK     Set writing mask (NMEA=%u, UBX=%u, RTCM=%u), default %d.\n", NMEA, UBX, RTCM, writing);
             return 1;
             break;
         }
@@ -2102,15 +2107,25 @@ int main(int argc, char * argv[])
         if (report) { fprintf(outfp, "INP [%3zd] ", length); print_buffer(outfp, buffer, length, limitation); fflush(outfp); }
 
         /**
-         ** FORWARD AND LOG
+         ** FORWARD, WRITE, AND LOG
          **
-         ** We forward anything whose format is enabled in the forwarding
-         ** mask. Note that we don't forward the terminating NUL (using length,
-         ** instead of size) that terminate all input of any format (whether
-         ** that's useful or not).
+         ** We forward via UDP first to try to minimize the jitter in the
+         ** outgoing datagrams.
          **/
 
-        if (role != PRODUCER) {
+        /*
+         * We forward anything whose format is enabled in the forwarding
+         * mask. Note that we don't forward the terminating NUL (using length,
+         * instead of size) that terminate all input of any format (whether
+         * that's useful or not). This is kinda iffy since UDP can not only
+         * drop datagrams, but reorder them. But the ensured delivery of TCP
+         * can (had has, in testing over LTE networks) add substantial latency
+         * to the data. Sometimes it is better never than late.
+         */
+
+        if (sock < 0) {
+        	/* Do nothing. */
+        } else if (role != PRODUCER) {
         	/* Do nothing. */
         } else if ((forwarding & format) == 0) {
         	/* Do nothing. */
@@ -2118,7 +2133,36 @@ int main(int argc, char * argv[])
         	send_buffer(sock, protocol, &ipv4, &ipv6, port, buffer, length);
         }
 
-        if (logfp != (FILE *)0) { fwrite(buffer, length, 1, logfp); }
+        /*
+         * We write the validated input to the device in the case in which
+         * we received the original data via UDP or from standard input; in
+         * other cases the device is our input source. Time must monotonically
+         * increase (UDP can reorder packets), and we have to have gotten an
+         * RMC sentence to set the date before we pass the data along; doing
+         * anything else confuses Google Earth, and perhaps other applications.
+         */
+
+        if (devfp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (direction != OUTPUT) {
+            /* Do nothing. */
+        } else if ((forwarding & format) == 0) {
+            /* Do nothing. */
+        } else if (!dmyokay) {
+            /* Do nothing. */
+        } else if (!totokay) {
+            /* Do nothing. */
+        } else if (fwrite(buffer, length, 1, devfp) <= 0) {
+            fprintf(errfp, "ERR %s: OUT!\n", Program);
+        } else if (fflush(devfp) == EOF) {
+            fprintf(errfp, "ERR %s: OUT!\n", Program);
+        } else {
+            /* Do nothing. */
+        }
+
+        if (logfp != (FILE *)0) {
+        	fwrite(buffer, length, 1, logfp);
+        }
 
         /*
          * EXPIRATION
@@ -2519,38 +2563,6 @@ int main(int argc, char * argv[])
 
         	break;
 
-        }
-
-        /*
-         * We only output NMEA sentences to a device, and even then
-         * we output the regenerated sentence, not the original one.
-         * Note that this can only be done if we got the original
-         * sentence over the IP UDP port or from standard input, because
-         * that's the only circumstances in which we interpret DEVICE this
-         * way. Finally, time must monotonically increase (UDP can reorder
-         * packets), and we have to have gotten an RMC sentence to set the
-         * date before we forward fixes; doing anything else confuses
-         * Google Earth, and perhaps other applications.
-         */
-
-        if (devfp == (FILE *)0) {
-            /* Do nothing. */
-        } else if (!output) {
-            /* Do nothing. */
-        } else if (format != NMEA) {
-            /* Do nothing. */
-        } else if (!dmyokay) {
-            /* Do nothing. */
-        } else if (!totokay) {
-            /* Do nothing. */
-        } else if (fputs(synthesized, devfp) == EOF) {
-            fprintf(errfp, "ERR %s: OUT!\n", Program);
-            break;
-        } else if (fflush(devfp) == EOF) {
-            fprintf(errfp, "ERR %s: OUT!\n", Program);
-            break;
-        } else {
-            /* Do nothing. */
         }
 
         /*

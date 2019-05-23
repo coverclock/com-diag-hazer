@@ -201,6 +201,8 @@ struct Command {
 
 typedef enum Role { ROLE = 0, PRODUCER = 1, CONSUMER = 2, } role_t;
 
+typedef enum Direction { DIRECTION = 0, INPUT = 1, OUTPUT = 2 } direction_t;
+
 typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
 typedef enum Format { FORMAT = 0x0, NMEA = 0x1, UBX = 0x2, RTCM = 0x4, } format_t;
