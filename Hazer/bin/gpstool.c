@@ -2544,11 +2544,15 @@ int main(int argc, char * argv[])
 
         case RTCM:
 
+            if (verbose) { diminuto_dump(errfp, buffer, length); }
+
         	kinematics.number = tumbleweed_message(buffer, length);
         	if (kinematics.number < 0) { kinematics.number = 9999; }
         	kinematics.length = length;
         	if (length < kinematics.minimum) { kinematics.minimum = length; }
         	if (length > kinematics.maximum) { kinematics.maximum = length; }
+
+            if (verbose) { fprintf(errfp, "RTK %s: RTCM <%d> [%zd] [%zd] [%zd]\n", Program, kinematics.number, kinematics.minimum, kinematics.length, kinematics.maximum); }
 
         	kinematics.ticks = timeout;
         	refresh = !0;
