@@ -238,4 +238,36 @@ extern int tumbleweed_message(const void * buffer, size_t size);
 
 extern const uint8_t TUMBLEWEED_KEEPALIVE[6];
 
+/******************************************************************************
+ * ENDIAN CONVERSION
+ ******************************************************************************/
+
+#if !defined(_BSD_SOURCE)
+#define _BSD_SOURCE
+#endif
+#include <endian.h>
+
+/**
+ * @def COM_DIAG_TUMBLEWEED_BETOH
+ * Convert in-place variable @a _FIELD_ from Big Endian byte order to Host
+ * byte order. The field width, 16, 32, or 64 bits, in inferred automatically.
+ * The field must be appropriately aligned.
+ */
+#define COM_DIAG_TUMBLEWEED_BETOH(_FIELD_) \
+    do { \
+        switch (sizeof(_FIELD_)) { \
+        case sizeof(uint16_t): \
+            _FIELD_ = be16toh(_FIELD_); \
+            break; \
+        case sizeof(uint32_t): \
+            _FIELD_ = be32toh(_FIELD_); \
+            break; \
+        case sizeof(uint64_t): \
+            _FIELD_ = be64toh(_FIELD_); \
+            break; \
+        default: \
+            break; \
+        } \
+    } while (0)
+
 #endif

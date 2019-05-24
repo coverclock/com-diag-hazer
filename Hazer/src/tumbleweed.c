@@ -99,9 +99,9 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * b
 
     case TUMBLEWEED_STATE_LENGTH_1:
     	/*
-    	 * Remarkably, I don't find any mention of byte order or endianess
-    	 * in the RTCM specifications. But a dump of actual messages from a
-    	 * U-blox UBX-ZED-F9P chip suggests big endianess.
+    	 * RTCM 10403.3, 3.5: "Multi-byte values are expressed with the most
+    	 * significant byte transmitted first and the least significant byte
+    	 * transmitted last.", p. 108 (hence: big endian)
     	 */
         *lp = ((unsigned)ch) << 8; /* MSB */
         DEBUG("LENGTH1 0x%02x %zu.\n", ch, *lp);
@@ -111,7 +111,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * b
 
     case TUMBLEWEED_STATE_LENGTH_2:
     	/*
-    	 * See above.
+    	 * RTCM 10403.3, Ibid.
     	 */
         *lp |= (unsigned)ch; /* LSB */
         DEBUG("LENGTH2 0x%02x %zu.\n", ch, *lp);
@@ -335,8 +335,8 @@ ssize_t tumbleweed_length(const void * buffer, size_t size)
     } else if (message[TUMBLEWEED_RTCM_PREAMBLE] != TUMBLEWEED_STIMULUS_PREAMBLE) {
         /* Do nothing. */
     } else {
-        length = message[TUMBLEWEED_RTCM_LENGTH_MSB] << 8;
-        length |= message[TUMBLEWEED_RTCM_LENGTH_LSB];
+    	memcpy(&length, &message[TUMBLEWEED_RTCM_LENGTH_MSB], sizeof(length));
+    	COM_DIAG_TUMBLEWEED_BETOH(length);
         if (((length & TUMBLEWEED_RTCM_MASK_RESERVED) >> TUMBLEWEED_RTCM_SHIFT_RESERVED) != TUMBLEWEED_STIMULUS_RESERVED) {
         	/* Do nothing. */
         } else if (length > (size - TUMBLEWEED_RTCM_SHORTEST)) {
@@ -363,8 +363,8 @@ int tumbleweed_message(const void * buffer, size_t size)
     } else if (message[TUMBLEWEED_RTCM_PREAMBLE] != TUMBLEWEED_STIMULUS_PREAMBLE) {
         /* Do nothing. */
     } else {
-        number = message[TUMBLEWEED_RTCM_NUMBER_MSB] << 8;
-        number |= message[TUMBLEWEED_RTCM_NUMBER_LSB];
+    	memcpy(&number, &message[TUMBLEWEED_RTCM_NUMBER_MSB], sizeof(number));
+    	COM_DIAG_TUMBLEWEED_BETOH(number);
         number >>= TUMBLEWEED_RTCM_SHIFT_NUMBER;
 		result = number;
     }

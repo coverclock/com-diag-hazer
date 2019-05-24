@@ -897,7 +897,7 @@ extern int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_
 
 /**
  * @def COM_DIAG_YODEL_LETOH
- * Convert in-place variable @a _FIELD_ from Little Endian byte order TO Host
+ * Convert in-place variable @a _FIELD_ from Little Endian byte order to Host
  * byte order. The field width, 16, 32, or 64 bits, in inferred automatically.
  * The field must be appropriately aligned.
  */
