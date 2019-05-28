@@ -414,7 +414,8 @@ static void print_views(FILE *fp, FILE * ep, const hazer_view_t va[], const haze
          * field is one more than the total number of satellites 
          * reported in the aggregate GSV sentences. I upgraded the
          * FW to 1.11 and still get this message _thousands_ of
-         * times, _always_ on the GLONASS constellation.
+         * times, _always_ on the GLONASS constellation. I reported what
+         * I believe is a bug to U-blox.
          */
         if (va[system].pending > 0) {
             /* Do nothing. */
@@ -1137,7 +1138,7 @@ int main(int argc, char * argv[])
     diminuto_list_t head = DIMINUTO_LIST_NULLINIT(&head);
     int unknown = 0;
     /*
-     * Source and sink I/O variables.
+     * FILE pointer variables.
      */
     FILE * infp = stdin;
     FILE * outfp = stdout;
@@ -1341,7 +1342,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278CD:EFG:H:I:L:ORS:U:VW:Xb:cdef:hlmnop:rst:uvw:?";
+    static const char OPTIONS[] = "1278CD:EFG:H:I:KL:ORS:U:VW:Xb:cdeg:hk:lmnop:rst:uv?";
 
     /**
      ** PREINITIALIZATION
@@ -1398,18 +1399,16 @@ int main(int argc, char * argv[])
         case 'H':
             report = !0;
             headless = optarg;
-            outfp = diminuto_observation_create(headless, &temporary);
-            assert(outfp != (FILE *)0);
             break;
         case 'I':
             pps = optarg;
             break;
-        case 'L':
-            logging = optarg;
-            break;
-        case 'O':
+        case 'K':
             readonly = 0;
             direction = OUTPUT;
+            break;
+        case 'L':
+            logging = optarg;
             break;
         case 'R':
             report = !0;
@@ -1427,7 +1426,7 @@ int main(int argc, char * argv[])
             diminuto_list_enqueue(&head, node);
             break;
         case 'V':
-            fprintf(outfp, "com-diag-hazer %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            fprintf(errfp, "com-diag-hazer %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
             readonly = 0;
@@ -1458,12 +1457,15 @@ int main(int argc, char * argv[])
         case 'e':
             paritybit = 2;
             break;
-        case 'f':
+        case 'g':
         	forwarding = strtoul(optarg, &end, 0);
         	break;
         case 'h':
             rtscts = !0;
             break;
+        case 'k':
+        	writing = strtoul(optarg, &end, 0);
+        	break;
         case 'l':
             modemcontrol = 0;
             break;
@@ -1501,7 +1503,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -G [ IP:PORT | PORT [ -f MASK ] ] ] [ -O [ -w MASK ] ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
+            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -G [ IP:PORT | PORT [ -g MASK ] ] ] [ -O [ -w MASK ] ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(errfp, "       -7          Use seven data bits for DEVICE.\n");
@@ -1513,8 +1515,8 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -G IP:PORT  Use IP:PORT as dataGram source or sink.\n");
             fprintf(errfp, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
+            fprintf(errfp, "       -K          Write sentences to DEVICE sinK from datagram source.\n");
             fprintf(errfp, "       -L LOG      Write sentences to LOG file.\n");
-            fprintf(errfp, "       -O          Write sentences to Output DEVICE from datagram source.\n");
             fprintf(errfp, "       -R          Print a Report on standard output.\n");
             fprintf(errfp, "       -S SOURCE   Use SOURCE file for input.\n");
             fprintf(errfp, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
@@ -1527,8 +1529,9 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(errfp, "       -d          Display Debug output on standard error.\n");
             fprintf(errfp, "       -e          Use Even parity for DEVICE.\n");
-            fprintf(errfp, "       -f MASK     Set Forwarding mask (NMEA=%u, UBX=%u, RTCM=%u), default %u.\n", NMEA, UBX, RTCM, forwarding);
+            fprintf(errfp, "       -g MASK     Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u), default %u.\n", NMEA, UBX, RTCM, forwarding);
             fprintf(errfp, "       -h          Use RTS/CTS Hardware flow control for DEVICE.\n");
+            fprintf(errfp, "       -k MASK     Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u), default %d.\n", NMEA, UBX, RTCM, writing);
             fprintf(errfp, "       -l          Use Local control for DEVICE.\n");
             fprintf(errfp, "       -m          Use Modem control for DEVICE.\n");
             fprintf(errfp, "       -o          Use Odd parity for DEVICE.\n");
@@ -1539,7 +1542,6 @@ int main(int argc, char * argv[])
             fprintf(errfp, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
             fprintf(errfp, "       -u          Note Unprocessed input on standard error.\n");
             fprintf(errfp, "       -v          Display Verbose output on standard error.\n");
-            fprintf(errfp, "       -w MASK     Set Writing mask (NMEA=%u, UBX=%u, RTCM=%u), default %d.\n", NMEA, UBX, RTCM, writing);
             return 1;
             break;
         }
@@ -1755,6 +1757,12 @@ int main(int argc, char * argv[])
         devfp = fdopen(fd, readonly ? "r" : "a+");
         if (devfp == (FILE *)0) { diminuto_perror(device); }
         assert(devfp != (FILE *)0);
+
+        /*
+         * Note that we set our input file pointer provisionally; we may
+         * change it below.
+         */
+
         infp = devfp;
 
     }
@@ -1773,6 +1781,17 @@ int main(int argc, char * argv[])
     }
 
     /*
+     * If we are running headless, create our temporary output file using the
+     * provided prefix.
+     */
+
+    if (headless != (const char *)0) {
+    	outfp = diminuto_observation_create(headless, &temporary);
+        if (outfp == (FILE *)0) { diminuto_perror(headless); }
+    	assert(outfp != (FILE *)0);
+    }
+
+    /*
      * Are we monitoring 1PPS via Data Carrier Detect (DCD) on a serial line?
      * A thread blocks until it is asserted. The GR-701W asserts DCD just
      * before it unloads a block of sentences. The leading edge of DCD
@@ -1780,24 +1799,24 @@ int main(int argc, char * argv[])
      * it from our serial input.
      */
 
-        if (devfp == (FILE *)0) {
-           /* Do nothing. */
-        } else if (!modemcontrol) {
-            /* Do nothing. */
-        } else if (!carrierdetect) {
-            /* Do nothing. */
-        } else {
-            poller.ppsfp = devfp;
-            poller.strobefp = strobefp;
-            poller.onepps = 0;
-            poller.done = 0;
-            pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
-            if (pthreadrc != 0) {
-                errno = pthreadrc;
-                diminuto_perror("pthread_create");
-            }
-            assert(pthreadrc == 0);
-        }
+	if (devfp == (FILE *)0) {
+	   /* Do nothing. */
+	} else if (!modemcontrol) {
+		/* Do nothing. */
+	} else if (!carrierdetect) {
+		/* Do nothing. */
+	} else {
+		poller.ppsfp = devfp;
+		poller.strobefp = strobefp;
+		poller.onepps = 0;
+		poller.done = 0;
+		pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
+		if (pthreadrc != 0) {
+			errno = pthreadrc;
+			diminuto_perror("pthread_create");
+		}
+		assert(pthreadrc == 0);
+	}
 
     /*
      * How much of each packet do we display? Depends on whether we're doing
@@ -1992,23 +2011,28 @@ int main(int argc, char * argv[])
                 assert(0);
             }
 
-        } else if (protocol == IPV4) {
+        } else {
 
-            size = diminuto_ipc4_datagram_receive(sock, datagram_buffer, sizeof(datagram_buffer) - 1);
-            if (size <= 0) { break; }
-            datagram_buffer[size++] = '\0';
-            buffer = datagram_buffer;
-
-        } else if (protocol == IPV6) {
+        	/*
+        	 * Even if this datagram was received via IPv4, we can do an
+        	 * IPv6 receive on it; the sending address (if we bothered to
+        	 * look at it) would be an IPv4 address expressed in the form
+        	 * of an IPv6 address: e.g. ::ffff:192.168.1.190 if we printed
+        	 * it out in canonical form.
+        	 */
 
             size = diminuto_ipc6_datagram_receive(sock, datagram_buffer, sizeof(datagram_buffer) - 1);
             if (size <= 0) { break; }
             datagram_buffer[size++] = '\0';
             buffer = datagram_buffer;
 
-        } else {
-
-            assert(0);
+            /*
+             * We make a rule that the datagram must be a complete NMEA
+             * sentence, UBX packet, or RTCM message, complete with a valid
+             * checksum or cyclic redundancy check, with no extra leading or
+             * trailing bytes; we don't collected it piecemeal via one of the
+             * parser state machines. But we *do* validate it below.
+             */
 
         }
 
