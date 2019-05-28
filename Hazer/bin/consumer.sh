@@ -16,4 +16,4 @@ PORT=${1:-"5555"}
 stty sane
 clear
 
-exec coreable gpstool -6 -P ${PORT} -E
+exec coreable gpstool -G :${PORT} -E

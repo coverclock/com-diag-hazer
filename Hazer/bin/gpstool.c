@@ -1166,12 +1166,9 @@ int main(int argc, char * argv[])
      */
     role_t role = ROLE;
     datagram_buffer_t datagram_buffer = DATAGRAM_BUFFER_INITIALIZER;
-    const char * host = (const char *)0;
-    const char * service = (const char *)0;
-    protocol_t protocol = IPV4;
-    diminuto_ipv4_t ipv4 = 0;
-    diminuto_ipv6_t ipv6 = { 0 };
-    diminuto_port_t port = 0;
+    const char * rendezvous = (const char *)0;
+    diminuto_ipc_endpoint_t endpoint = { 0, };
+    protocol_t protocol = PROTOCOL;
     int sock = -1;
     unsigned int forwarding = NMEA;
     /*
@@ -1344,7 +1341,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:CD:EFH:I:L:OP:RS:U:VW:Xb:cdef:hlmnop:rst:uvw:?";
+    static const char OPTIONS[] = "1278CD:EFG:H:I:L:ORS:U:VW:Xb:cdef:hlmnop:rst:uvw:?";
 
     /**
      ** PREINITIALIZATION
@@ -1375,20 +1372,11 @@ int main(int argc, char * argv[])
         case '2':
             stopbits = 2;
             break;
-        case '4':
-            protocol = IPV4;
-            break;
-        case '6':
-            protocol = IPV6;
-            break;
         case '7':
             databits = 7;
             break;
         case '8':
             databits = 8;
-            break;
-        case 'A':
-            host = optarg;
             break;
         case 'C':
             ignorechecksums = !0;
@@ -1403,6 +1391,9 @@ int main(int argc, char * argv[])
         case 'F':
             report = !0;
             slow = !0;
+            break;
+        case 'G':
+            rendezvous = optarg;
             break;
         case 'H':
             report = !0;
@@ -1419,9 +1410,6 @@ int main(int argc, char * argv[])
         case 'O':
             readonly = 0;
             direction = OUTPUT;
-            break;
-        case 'P':
-            service = optarg;
             break;
         case 'R':
             report = !0;
@@ -1513,23 +1501,20 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -A ADDRESS ] [ -P PORT [ -f MASK ] ] [ -O [ -w MASK ] ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
+            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -G [ IP:PORT | PORT [ -f MASK ] ] ] [ -O [ -w MASK ] ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
             fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
-            fprintf(errfp, "       -4          Use IPv4 for ADDRESS.\n");
-            fprintf(errfp, "       -6          Use IPv6 for ADDRESS.\n");
             fprintf(errfp, "       -7          Use seven data bits for DEVICE.\n");
             fprintf(errfp, "       -8          Use eight data bits for DEVICE.\n");
-            fprintf(errfp, "       -A ADDRESS  Send sentences to ADDRESS.\n");
             fprintf(errfp, "       -C          Ignore bad Checksums.\n");
             fprintf(errfp, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(errfp, "       -E          Like -R but use ANSI Escape sequences.\n");
             fprintf(errfp, "       -F          Like -R but reFresh at 1Hz.\n");
+            fprintf(errfp, "       -G IP:PORT  Use IP:PORT as dataGram source or sink.\n");
             fprintf(errfp, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(errfp, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
             fprintf(errfp, "       -L LOG      Write sentences to LOG file.\n");
-            fprintf(errfp, "       -O          Write sentences to Output DEVICE.\n");
-            fprintf(errfp, "       -P PORT     Send to or receive from PORT.\n");
+            fprintf(errfp, "       -O          Write sentences to Output DEVICE from datagram source.\n");
             fprintf(errfp, "       -R          Print a Report on standard output.\n");
             fprintf(errfp, "       -S SOURCE   Use SOURCE file for input.\n");
             fprintf(errfp, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
@@ -1579,67 +1564,59 @@ int main(int argc, char * argv[])
     }
 
     /*
-     * Are we consuming GPS data from an IP port, or producing GPS data on an
+     * Are we consuming GPS data from an IP port, or producing GPS data to an
      * IP host and port?
      */
 
-    if (service == (const char *)0) {
+    if (rendezvous != (const char *)0) {
 
-        role = ROLE;
+    	rc = diminuto_ipc_endpoint(rendezvous, &endpoint);
+        if (rc < 0) { diminuto_perror(rendezvous); }
+    	assert(rc >= 0);
 
-    } else if (host == (const char *)0) {
+    	if (endpoint.udp == 0) {
 
-        switch (protocol) {
-        case IPV4:
-            port = diminuto_ipc4_port(service, "udp");
-            if (port == 0) { diminuto_perror(service); break; }
-            sock = diminuto_ipc4_datagram_peer(port);
-            if (sock < 0) { diminuto_perror(service); break; }
-            break;
-        case IPV6:
-            port = diminuto_ipc6_port(service, "udp");
-            if (port == 0) { diminuto_perror(service); break; }
-            sock = diminuto_ipc6_datagram_peer(port);
-            if (sock < 0) { diminuto_perror(service); break; }
-            break;
-        default:
-            break;
-        }
-        assert(port > 0);
-        assert(sock >= 0);
+    		/* Do nothing. */
 
-        role = CONSUMER;
+    	} else if (!diminuto_ipc6_is_unspecified(&endpoint.ipv6)) {
 
-    } else {
+    		protocol = IPV6;
 
-        switch (protocol) {
-        case IPV4:
-            ipv4 = diminuto_ipc4_address(host);
-            if (diminuto_ipc4_is_unspecified(&ipv4)) { diminuto_perror(host); break; }
-            port = diminuto_ipc4_port(service, "udp");
-            if (port == 0) { diminuto_perror(service); break; }
-            sock = diminuto_ipc4_datagram_peer(0);
-            if (sock < 0) { diminuto_perror(service); break; }
-            break;
-        case IPV6:
-            ipv6 = diminuto_ipc6_address(host);
-            if (diminuto_ipc6_is_unspecified(&ipv6)) { diminuto_perror(host); break; }
-            port = diminuto_ipc6_port(service, "udp");
-            if (port == 0) { diminuto_perror(service); break; }
-            sock = diminuto_ipc6_datagram_peer(0);
-            if (sock < 0) { diminuto_perror(service); break; }
-            break;
-        default:
-            break;
-        }
-        assert(port > 0);
-        assert(sock >= 0);
+    		sock = diminuto_ipc6_datagram_peer(0);
+            if (sock < 0) { diminuto_perror(rendezvous); }
+            assert(sock >= 0);
 
-        rc = diminuto_ipc_set_nonblocking(sock, !0);
-        if (rc < 0) { diminuto_perror(service); }
-        assert(rc >= 0);
+            rc = diminuto_ipc_set_nonblocking(sock, !0);
+            if (rc < 0) { diminuto_perror(rendezvous); }
+            assert(rc >= 0);
 
-        role = PRODUCER;
+            role = PRODUCER;
+
+    	} else if (!diminuto_ipc4_is_unspecified(&endpoint.ipv4)) {
+
+    		protocol = IPV4;
+
+    		sock = diminuto_ipc4_datagram_peer(0);
+            if (sock < 0) { diminuto_perror(rendezvous); }
+            assert(sock >= 0);
+
+            rc = diminuto_ipc_set_nonblocking(sock, !0);
+            if (rc < 0) { diminuto_perror(rendezvous); }
+            assert(rc >= 0);
+
+            role = PRODUCER;
+
+    	} else {
+
+    		protocol = IPV6;
+
+    		sock = diminuto_ipc6_datagram_peer(endpoint.udp);
+            if (sock < 0) { diminuto_perror(rendezvous); }
+            assert(sock >= 0);
+
+            role = CONSUMER;
+
+    	}
 
     }
 
@@ -2128,7 +2105,7 @@ int main(int argc, char * argv[])
         } else if ((forwarding & format) == 0) {
         	/* Do nothing. */
         } else {
-        	send_buffer(sock, protocol, &ipv4, &ipv6, port, buffer, length);
+        	send_buffer(sock, protocol, &endpoint.ipv4, &endpoint.ipv6, endpoint.udp, buffer, length);
         }
 
         /*
