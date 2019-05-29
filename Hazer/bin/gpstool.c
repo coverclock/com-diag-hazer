@@ -107,6 +107,24 @@ static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /*******************************************************************************
+ * HACKS
+ ******************************************************************************/
+
+/**
+ * Return true of the FILE object has data available in its buffer. Fails to
+ * compile with other C libraries like UlibC or perhaps Bionic. Compiles but
+ * yields the wrong result if even a minor change is made to GLIBC. Makes Chip
+ * wonder why the stdio library doesn't have something like this available.
+ * Based on a similar hack in the com-diag-grandote C++ project.
+ * @param fp points to the FILE object.
+ * @return true if data is available to be read, false otherwise.
+ */
+static inline int fready(const FILE * fp)
+{
+	return (fp->_IO_read_ptr < fp->_IO_read_end);
+}
+
+/*******************************************************************************
  * FUNCTIONS
  ******************************************************************************/
 
@@ -1140,13 +1158,13 @@ int main(int argc, char * argv[])
     /*
      * FILE pointer variables.
      */
-    FILE * infp = stdin;
-    FILE * outfp = stdout;
-    FILE * errfp = stderr;
-    FILE * devfp = stdout;
-    FILE * logfp = (FILE *)0;
-    FILE * strobefp = (FILE *)0;
-    FILE * ppsfp = (FILE *)0;
+    FILE * in_fp = stdin;
+    FILE * out_fp = stdout;
+    FILE * err_fp = stderr;
+    FILE * dev_fp = stdout;
+    FILE * log_fp = (FILE *)0;
+    FILE * strobe_fp = (FILE *)0;
+    FILE * pps_fp = (FILE *)0;
     /*
      * Serial device variables.
      */
@@ -1161,17 +1179,28 @@ int main(int argc, char * argv[])
     int xonxoff = 0;
     int readonly = !0;
     int carrierdetect = 0;
-    unsigned int writing = NMEA;
+    unsigned int device_mask = NMEA;
     /*
-     * Datagram socket variables.
+     * Datagram variables.
      */
     role_t role = ROLE;
-    datagram_buffer_t datagram_buffer = DATAGRAM_BUFFER_INITIALIZER;
-    const char * rendezvous = (const char *)0;
-    diminuto_ipc_endpoint_t endpoint = { 0, };
     protocol_t protocol = PROTOCOL;
-    int sock = -1;
-    unsigned int forwarding = NMEA;
+    datagram_buffer_t datagram_buffer = DATAGRAM_BUFFER_INITIALIZER;
+    const char * datagram_option = (const char *)0;
+    diminuto_ipc_endpoint_t datagram_endpoint = { 0, };
+    unsigned int datagram_mask = NMEA;
+    /*
+     * Surveyor variables.
+     */
+    datagram_buffer_t surveyor_buffer = DATAGRAM_BUFFER_INITIALIZER;
+    const char * surveyor_option = (const char *)0;
+    diminuto_ipc_endpoint_t surveyor_endpoint = { 0, };
+    /*
+     * File Descriptor variables.
+     */
+    int in_fd = -1;
+    int datagram_fd = -1;
+    int surveyor_fd = -1;
     /*
      * 1PPS poller thread variables.
      */
@@ -1212,7 +1241,7 @@ int main(int argc, char * argv[])
     uint8_t rtcm_crc_2 = 0;
     uint8_t rtcm_crc_3 = 0;
     /*
-     * Processing variables.
+     * NMEA processing variables.
      */
     unsigned char * buffer = (unsigned char *)0;
     unsigned char * bp = (char *)0;
@@ -1332,6 +1361,7 @@ int main(int argc, char * argv[])
     size_t limitation = 0;
     char * locale = (char *)0;
     char * temporary = (char *)0;
+    diminuto_mux_t mux;
     /*
      * External symbols.
      */
@@ -1342,7 +1372,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278CD:EFG:H:I:KL:ORS:U:VW:Xb:cdeg:hk:lmnop:rst:uv?";
+    static const char OPTIONS[] = "1278CD:EFG:H:I:KL:ORS:U:VW:XY:b:cdeg:hk:lmnop:rst:uv?"; /* Unused: ABJNPQTXYZ afijqwxyz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1360,6 +1390,8 @@ int main(int argc, char * argv[])
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
 
     epoch = diminuto_time_elapsed();
+
+    diminuto_mux_init(&mux);
 
     /*
      * Parse the command line.
@@ -1394,7 +1426,7 @@ int main(int argc, char * argv[])
             slow = !0;
             break;
         case 'G':
-            rendezvous = optarg;
+            datagram_option = optarg;
             break;
         case 'H':
             report = !0;
@@ -1426,7 +1458,7 @@ int main(int argc, char * argv[])
             diminuto_list_enqueue(&head, node);
             break;
         case 'V':
-            fprintf(errfp, "com-diag-hazer %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            fprintf(err_fp, "com-diag-hazer %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
             readonly = 0;
@@ -1440,6 +1472,10 @@ int main(int argc, char * argv[])
         case 'X':
             expire = !0;
             break;
+        case 'Y':
+        	readonly = 0;
+        	surveyor_option = optarg;
+        	break;
         case 'b':
             bitspersecond = strtoul(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (bitspersecond == 0)) {
@@ -1458,13 +1494,13 @@ int main(int argc, char * argv[])
             paritybit = 2;
             break;
         case 'g':
-        	forwarding = strtoul(optarg, &end, 0);
+        	datagram_mask = strtoul(optarg, &end, 0);
         	break;
         case 'h':
             rtscts = !0;
             break;
         case 'k':
-        	writing = strtoul(optarg, &end, 0);
+        	device_mask = strtoul(optarg, &end, 0);
         	break;
         case 'l':
             modemcontrol = 0;
@@ -1482,9 +1518,9 @@ int main(int argc, char * argv[])
             strobe = optarg;
             break;
         case 'r':
-            fp = outfp;
-            outfp = errfp;
-            errfp = fp;
+            fp = out_fp;
+            out_fp = err_fp;
+            err_fp = fp;
             break;
         case 's':
             xonxoff = !0;
@@ -1503,45 +1539,58 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(errfp, "usage: %s [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -G [ IP:PORT | PORT [ -g MASK ] ] ] [ -O [ -w MASK ] ] [ -L LOG ] [ -t SECONDS ] [ -C ]\n", Program);
-            fprintf(errfp, "       -1          Use one stop bit for DEVICE.\n");
-            fprintf(errfp, "       -2          Use two stop bits for DEVICE.\n");
-            fprintf(errfp, "       -7          Use seven data bits for DEVICE.\n");
-            fprintf(errfp, "       -8          Use eight data bits for DEVICE.\n");
-            fprintf(errfp, "       -C          Ignore bad Checksums.\n");
-            fprintf(errfp, "       -D DEVICE   Use DEVICE for input or output.\n");
-            fprintf(errfp, "       -E          Like -R but use ANSI Escape sequences.\n");
-            fprintf(errfp, "       -F          Like -R but reFresh at 1Hz.\n");
-            fprintf(errfp, "       -G IP:PORT  Use IP:PORT as dataGram source or sink.\n");
-            fprintf(errfp, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
-            fprintf(errfp, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
-            fprintf(errfp, "       -K          Write sentences to DEVICE sinK from datagram source.\n");
-            fprintf(errfp, "       -L LOG      Write sentences to LOG file.\n");
-            fprintf(errfp, "       -R          Print a Report on standard output.\n");
-            fprintf(errfp, "       -S SOURCE   Use SOURCE file for input.\n");
-            fprintf(errfp, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
-            fprintf(errfp, "       -U ''       Exit when this empty UBX STRING is processed.\n");
-            fprintf(errfp, "       -V          Print release, Vintage, and revision on standard output.\n");
-            fprintf(errfp, "       -W STRING   Collapse STRING, append checksum, Write to DEVICE.\n");
-            fprintf(errfp, "       -W ''       Exit when this empty Write STRING is processed.\n");
-            fprintf(errfp, "       -X          Enable message eXpiration test mode.\n");
-            fprintf(errfp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
-            fprintf(errfp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
-            fprintf(errfp, "       -d          Display Debug output on standard error.\n");
-            fprintf(errfp, "       -e          Use Even parity for DEVICE.\n");
-            fprintf(errfp, "       -g MASK     Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u), default %u.\n", NMEA, UBX, RTCM, forwarding);
-            fprintf(errfp, "       -h          Use RTS/CTS Hardware flow control for DEVICE.\n");
-            fprintf(errfp, "       -k MASK     Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u), default %d.\n", NMEA, UBX, RTCM, writing);
-            fprintf(errfp, "       -l          Use Local control for DEVICE.\n");
-            fprintf(errfp, "       -m          Use Modem control for DEVICE.\n");
-            fprintf(errfp, "       -o          Use Odd parity for DEVICE.\n");
-            fprintf(errfp, "       -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).\n");
-            fprintf(errfp, "       -n          Use No parity for DEVICE.\n");
-            fprintf(errfp, "       -r          Reverse use of standard output and standard error.\n");
-            fprintf(errfp, "       -s          Use XON/XOFF (control-Q/control-S) for DEVICE.\n");
-            fprintf(errfp, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
-            fprintf(errfp, "       -u          Note Unprocessed input on standard error.\n");
-            fprintf(errfp, "       -v          Display Verbose output on standard error.\n");
+            fprintf(err_fp, "usage: %s "
+            		       "[ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] "
+            		       "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] "
+            		       "[ -t SECONDS ] "
+            		       "[ -I PIN | -c ] [ -p PIN ] "
+            		       "[ -U STRING ... ] [ -W STRING ... ] "
+            		       "[ -R | -E | -F | -H HEADLESS ] "
+            		       "[ -L LOG ] "
+            		       "[ -G [ IP:PORT | :PORT [ -g MASK ] ] ] "
+                           "[ -Y :PORT ] "
+            		       "[ -K [ -k MASK ] ] "
+            		       "\n", Program);
+            fprintf(err_fp, "       -1          Use one stop bit for DEVICE.\n");
+            fprintf(err_fp, "       -2          Use two stop bits for DEVICE.\n");
+            fprintf(err_fp, "       -7          Use seven data bits for DEVICE.\n");
+            fprintf(err_fp, "       -8          Use eight data bits for DEVICE.\n");
+            fprintf(err_fp, "       -C          Ignore bad Checksums.\n");
+            fprintf(err_fp, "       -D DEVICE   Use DEVICE for input or output.\n");
+            fprintf(err_fp, "       -E          Like -R but use ANSI Escape sequences.\n");
+            fprintf(err_fp, "       -F          Like -R but reFresh at 1Hz.\n");
+            fprintf(err_fp, "       -G IP:PORT  Use IP and PORT as dataGram sink.\n");
+            fprintf(err_fp, "       -G :PORT    Use PORT as dataGram source.\n");
+            fprintf(err_fp, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
+            fprintf(err_fp, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
+            fprintf(err_fp, "       -K          Write input to DEVICE sinK from datagram source.\n");
+            fprintf(err_fp, "       -L LOG      Write input to LOG file.\n");
+            fprintf(err_fp, "       -R          Print a Report on standard output.\n");
+            fprintf(err_fp, "       -S SOURCE   Use SOURCE file or FIFO for input.\n");
+            fprintf(err_fp, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
+            fprintf(err_fp, "       -U ''       Exit when this empty UBX STRING is processed.\n");
+            fprintf(err_fp, "       -V          Print release, Vintage, and revision on standard output.\n");
+            fprintf(err_fp, "       -W STRING   Collapse STRING, append checksum, Write to DEVICE.\n");
+            fprintf(err_fp, "       -W ''       Exit when this empty Write STRING is processed.\n");
+            fprintf(err_fp, "       -X          Enable message eXpiration test mode.\n");
+            fprintf(err_fp, "       -Y :PORT    Use PORT as surveYor source.\n");
+            fprintf(err_fp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
+            fprintf(err_fp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
+            fprintf(err_fp, "       -d          Display Debug output on standard error.\n");
+            fprintf(err_fp, "       -e          Use Even parity for DEVICE.\n");
+            fprintf(err_fp, "       -g MASK     Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u), default %u.\n", NMEA, UBX, RTCM, datagram_mask);
+            fprintf(err_fp, "       -h          Use RTS/CTS Hardware flow control for DEVICE.\n");
+            fprintf(err_fp, "       -k MASK     Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u), default %d.\n", NMEA, UBX, RTCM, device_mask);
+            fprintf(err_fp, "       -l          Use Local control for DEVICE.\n");
+            fprintf(err_fp, "       -m          Use Modem control for DEVICE.\n");
+            fprintf(err_fp, "       -o          Use Odd parity for DEVICE.\n");
+            fprintf(err_fp, "       -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).\n");
+            fprintf(err_fp, "       -n          Use No parity for DEVICE.\n");
+            fprintf(err_fp, "       -r          Reverse use of standard output and standard error.\n");
+            fprintf(err_fp, "       -s          Use XON/XOFF (control-Q/control-S) for DEVICE.\n");
+            fprintf(err_fp, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
+            fprintf(err_fp, "       -u          Note Unprocessed input on standard error.\n");
+            fprintf(err_fp, "       -v          Display Verbose output on standard error.\n");
             return 1;
             break;
         }
@@ -1558,11 +1607,11 @@ int main(int argc, char * argv[])
     if (logging == (const char *)0) {
         /* Do nothing. */
     } else if (strcmp(logging, "-") == 0) {
-        logfp = stdout;
+        log_fp = stdout;
     } else {
-        logfp = fopen(logging, "ab");
-        if (logfp == (FILE *)0) { diminuto_perror(logging); }
-        assert(logfp != (FILE *)0);
+        log_fp = fopen(logging, "ab");
+        if (log_fp == (FILE *)0) { diminuto_perror(logging); }
+        assert(log_fp != (FILE *)0);
     }
 
     /*
@@ -1570,40 +1619,40 @@ int main(int argc, char * argv[])
      * IP host and port?
      */
 
-    if (rendezvous != (const char *)0) {
+    if (datagram_option != (const char *)0) {
 
-    	rc = diminuto_ipc_endpoint(rendezvous, &endpoint);
-        if (rc < 0) { diminuto_perror(rendezvous); }
+    	rc = diminuto_ipc_endpoint(datagram_option, &datagram_endpoint);
+        if (rc < 0) { diminuto_perror(datagram_option); }
     	assert(rc >= 0);
 
-    	if (endpoint.udp == 0) {
+    	if (datagram_endpoint.udp == 0) {
 
     		/* Do nothing. */
 
-    	} else if (!diminuto_ipc6_is_unspecified(&endpoint.ipv6)) {
+    	} else if (!diminuto_ipc6_is_unspecified(&datagram_endpoint.ipv6)) {
 
     		protocol = IPV6;
 
-    		sock = diminuto_ipc6_datagram_peer(0);
-            if (sock < 0) { diminuto_perror(rendezvous); }
-            assert(sock >= 0);
+    		datagram_fd = diminuto_ipc6_datagram_peer(0);
+            if (datagram_fd < 0) { diminuto_perror(datagram_option); }
+            assert(datagram_fd >= 0);
 
-            rc = diminuto_ipc_set_nonblocking(sock, !0);
-            if (rc < 0) { diminuto_perror(rendezvous); }
+            rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
+            if (rc < 0) { diminuto_perror(datagram_option); }
             assert(rc >= 0);
 
             role = PRODUCER;
 
-    	} else if (!diminuto_ipc4_is_unspecified(&endpoint.ipv4)) {
+    	} else if (!diminuto_ipc4_is_unspecified(&datagram_endpoint.ipv4)) {
 
     		protocol = IPV4;
 
-    		sock = diminuto_ipc4_datagram_peer(0);
-            if (sock < 0) { diminuto_perror(rendezvous); }
-            assert(sock >= 0);
+    		datagram_fd = diminuto_ipc4_datagram_peer(0);
+            if (datagram_fd < 0) { diminuto_perror(datagram_option); }
+            assert(datagram_fd >= 0);
 
-            rc = diminuto_ipc_set_nonblocking(sock, !0);
-            if (rc < 0) { diminuto_perror(rendezvous); }
+            rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
+            if (rc < 0) { diminuto_perror(datagram_option); }
             assert(rc >= 0);
 
             role = PRODUCER;
@@ -1612,11 +1661,40 @@ int main(int argc, char * argv[])
 
     		protocol = IPV6;
 
-    		sock = diminuto_ipc6_datagram_peer(endpoint.udp);
-            if (sock < 0) { diminuto_perror(rendezvous); }
-            assert(sock >= 0);
+    		datagram_fd = diminuto_ipc6_datagram_peer(datagram_endpoint.udp);
+            if (datagram_fd < 0) { diminuto_perror(datagram_option); }
+            assert(datagram_fd >= 0);
+
+            rc = diminuto_mux_register_read(&mux, datagram_fd);
+            if (rc < 0) { diminuto_perror(datagram_option); }
+            assert(rc >= 0);
 
             role = CONSUMER;
+
+    	}
+
+    }
+
+    /*
+     * Are we receiving RTK updates for DGNSS in the form of RTCM messages
+     * from a surveyor base station?
+     */
+
+    if (surveyor_option != (const char *)0) {
+
+    	rc = diminuto_ipc_endpoint(surveyor_option, &surveyor_endpoint);
+        if (rc < 0) { diminuto_perror(surveyor_option); }
+    	assert(rc >= 0);
+
+    	if (surveyor_endpoint.udp != 0) {
+
+    	    surveyor_fd = diminuto_ipc6_datagram_peer(surveyor_endpoint.udp);
+            if (surveyor_fd < 0) { diminuto_perror(surveyor_option); }
+            assert(surveyor_fd >= 0);
+
+            rc = diminuto_mux_register_read(&mux, surveyor_fd);
+            if (rc < 0) { diminuto_perror(surveyor_option); }
+            assert(rc >= 0);
 
     	}
 
@@ -1631,9 +1709,9 @@ int main(int argc, char * argv[])
     if (strobe != (const char *)0) {
         strobepin = strtol(strobe, (char **)0, 0);
         if (strobepin >= 0) {
-            strobefp = diminuto_pin_output(strobepin);
-            if (strobefp != (FILE *)0) {
-                diminuto_pin_clear(strobefp);
+            strobe_fp = diminuto_pin_output(strobepin);
+            if (strobe_fp != (FILE *)0) {
+                diminuto_pin_clear(strobe_fp);
             }
         }
     }
@@ -1662,12 +1740,12 @@ int main(int argc, char * argv[])
         assert(rc >= 0);
         rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_BOTH);
         assert(rc >= 0);
-        ppsfp = diminuto_pin_open(ppspin);
-        assert (ppsfp != (FILE *)0);
-        rc = diminuto_pin_get(ppsfp);
+        pps_fp = diminuto_pin_open(ppspin);
+        assert (pps_fp != (FILE *)0);
+        rc = diminuto_pin_get(pps_fp);
         assert(rc >= 0);
-        poller.ppsfp = ppsfp;
-        poller.strobefp = strobefp;
+        poller.ppsfp = pps_fp;
+        poller.strobefp = strobe_fp;
         poller.onepps = 0;
         poller.done = 0;
         pthreadrc = pthread_create(&thread, 0, gpiopoller, &poller);
@@ -1721,9 +1799,9 @@ int main(int argc, char * argv[])
     assert(rc == 0);
 
     if (debug) {
-        hazer_debug(errfp);
-        yodel_debug(errfp);
-        tumbleweed_debug(errfp);
+        hazer_debug(err_fp);
+        yodel_debug(err_fp);
+        tumbleweed_debug(err_fp);
     }
 
     /*
@@ -1754,16 +1832,16 @@ int main(int argc, char * argv[])
         rc = diminuto_serial_raw(fd);
         assert(rc == 0);
 
-        devfp = fdopen(fd, readonly ? "r" : "a+");
-        if (devfp == (FILE *)0) { diminuto_perror(device); }
-        assert(devfp != (FILE *)0);
+        dev_fp = fdopen(fd, readonly ? "r" : "a+");
+        if (dev_fp == (FILE *)0) { diminuto_perror(device); }
+        assert(dev_fp != (FILE *)0);
 
         /*
          * Note that we set our input file pointer provisionally; we may
          * change it below.
          */
 
-        infp = devfp;
+        in_fp = dev_fp;
 
     }
 
@@ -1772,13 +1850,34 @@ int main(int argc, char * argv[])
      * open it here.
      */
 
-    if (source != (const char *)0) {
+    if (source == (const char *)0) {
 
-        infp = fopen(source, "r");
-        if (infp == (FILE *)0) { diminuto_perror(source); }
-        assert(infp != (FILE *)0);
+    	/* Do nothing. */
+
+    } else if (strcmp(source, "-") == 0) {
+
+    	in_fp = stdin;
+
+    } else {
+
+        in_fp = fopen(source, "r");
+        if (in_fp == (FILE *)0) { diminuto_perror(source); }
+        assert(in_fp != (FILE *)0);
 
     }
+
+    /*
+     * Our input source is either standard input (either implicitly or
+     * explicitly), a serial(ish) device, or a file or maybe a FIFO
+     * a.k.a. a named pipe, remarkably useful BTW, see mkfifo(1). So
+     * now we can get its underlying file descriptor.
+     */
+
+    in_fd = fileno(in_fp);
+
+    rc = diminuto_mux_register_read(&mux, in_fd);
+    if (rc < 0) { diminuto_perror(source ? source : device ? device : "stdin"); }
+    assert(rc >= 0);
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -1786,9 +1885,9 @@ int main(int argc, char * argv[])
      */
 
     if (headless != (const char *)0) {
-    	outfp = diminuto_observation_create(headless, &temporary);
-        if (outfp == (FILE *)0) { diminuto_perror(headless); }
-    	assert(outfp != (FILE *)0);
+    	out_fp = diminuto_observation_create(headless, &temporary);
+        if (out_fp == (FILE *)0) { diminuto_perror(headless); }
+    	assert(out_fp != (FILE *)0);
     }
 
     /*
@@ -1799,15 +1898,15 @@ int main(int argc, char * argv[])
      * it from our serial input.
      */
 
-	if (devfp == (FILE *)0) {
+	if (dev_fp == (FILE *)0) {
 	   /* Do nothing. */
 	} else if (!modemcontrol) {
 		/* Do nothing. */
 	} else if (!carrierdetect) {
 		/* Do nothing. */
 	} else {
-		poller.ppsfp = devfp;
-		poller.strobefp = strobefp;
+		poller.ppsfp = dev_fp;
+		poller.strobefp = strobe_fp;
 		poller.onepps = 0;
 		poller.done = 0;
 		pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
@@ -1830,12 +1929,12 @@ int main(int argc, char * argv[])
      */
 
     if (escape) {
-        fputs("\033[1;1H\033[0J", outfp);
+        fputs("\033[1;1H\033[0J", out_fp);
         if (report) {
-            fprintf(outfp, "INP [%3d]\n", 0);
-            fprintf(outfp, "OUT [%3d]\n", 0);
-            print_local(outfp, errfp, timetofirstfix);
-            fflush(outfp);
+            fprintf(out_fp, "INP [%3d]\n", 0);
+            fprintf(out_fp, "OUT [%3d]\n", 0);
+            print_local(out_fp, err_fp, timetofirstfix);
+            fflush(out_fp);
         }
     }
 
@@ -1895,9 +1994,9 @@ int main(int argc, char * argv[])
              * of the GPS device.
              */
 
-            if (devfp == (FILE *)0) {
+            if (dev_fp == (FILE *)0) {
                 /* Do nothing. */
-            } else if (diminuto_serial_available(fileno(devfp)) > 0) {
+            } else if (diminuto_serial_available(fileno(dev_fp)) > 0) {
                 /* Do nothing. */
             } else if (acknakpending > 0) {
                 /* Do nothing. */
@@ -1910,7 +2009,7 @@ int main(int argc, char * argv[])
                 buffer = diminuto_list_data(node);
                 assert(buffer != (unsigned char *)0);
                 if (buffer[0] == '\0') {
-                    fprintf(errfp, "END %s: ZERO.\n", Program);
+                    fprintf(err_fp, "END %s: ZERO.\n", Program);
                     free(node);
                     break;
                 }
@@ -1921,20 +2020,20 @@ int main(int argc, char * argv[])
                  */
                 size1 = size - 1;
                 if (buffer[0] == HAZER_STIMULUS_START) {
-                    rc = emit_sentence(devfp, buffer, size1);
+                    rc = emit_sentence(dev_fp, buffer, size1);
                 } else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
-                    rc = emit_message(devfp, buffer, size1);
+                    rc = emit_message(dev_fp, buffer, size1);
                 } else {
                     rc = -1;
                 }
                 if (rc < 0) {
-                    fprintf(errfp, "ERR %s: FAILED!\n", Program);
-                    print_buffer(errfp, buffer, size1, UNLIMITED);
+                    fprintf(err_fp, "ERR %s: FAILED!\n", Program);
+                    print_buffer(err_fp, buffer, size1, UNLIMITED);
                 } else {
                     if (command->acknak) { acknakpending += 1; }
-                    if (verbose) { print_buffer(errfp, buffer, size1, UNLIMITED); }
-                    if (escape) { fputs("\033[2;1H\033[0K", outfp); }
-                    if (report) { fprintf(outfp, "OUT [%3zd] ", size1); print_buffer(outfp, buffer, size1, limitation); fflush(outfp); }
+                    if (verbose) { print_buffer(err_fp, buffer, size1, UNLIMITED); }
+                    if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
+                    if (report) { fprintf(out_fp, "OUT [%3zd] ", size1); print_buffer(out_fp, buffer, size1, limitation); fflush(out_fp); }
                 }
                 free(node);
             }
@@ -1955,7 +2054,7 @@ int main(int argc, char * argv[])
 
             while (!0) {
 
-                ch = fgetc(infp);
+                ch = fgetc(in_fp);
 
                 nmea_state = hazer_machine(nmea_state, ch, nmea_buffer, sizeof(nmea_buffer), &nmea_bb, &nmea_ss);
 
@@ -1990,13 +2089,13 @@ int main(int argc, char * argv[])
             }
 
             if (nmea_state == HAZER_STATE_EOF) {
-                fprintf(errfp, "EOF %s: NMEA.\n", Program);
+                fprintf(err_fp, "EOF %s: NMEA.\n", Program);
                 break;
             } else if (ubx_state == YODEL_STATE_EOF) {
-                fprintf(errfp, "EOF %s: UBX.\n", Program);
+                fprintf(err_fp, "EOF %s: UBX.\n", Program);
                 break;
             } else if (rtcm_state == TUMBLEWEED_STATE_EOF) {
-            	fprintf(errfp, "EOF %s: RTCM.\n", Program);
+            	fprintf(err_fp, "EOF %s: RTCM.\n", Program);
                 break;
             } else if (nmea_state == HAZER_STATE_END) {
                 buffer = nmea_buffer;
@@ -2021,7 +2120,7 @@ int main(int argc, char * argv[])
         	 * it out in canonical form.
         	 */
 
-            size = diminuto_ipc6_datagram_receive(sock, datagram_buffer, sizeof(datagram_buffer) - 1);
+            size = diminuto_ipc6_datagram_receive(datagram_fd, datagram_buffer, sizeof(datagram_buffer) - 1);
             if (size <= 0) { break; }
             datagram_buffer[size++] = '\0';
             buffer = datagram_buffer;
@@ -2057,8 +2156,8 @@ int main(int argc, char * argv[])
             assert(rc >= 0);
 
             if (nmea_ck != nmea_cs) {
-                fprintf(errfp, "ERR %s: CHECKSUM! 0x%02x 0x%02x\n", Program, nmea_cs, nmea_ck);
-                print_buffer(errfp, buffer, size1, UNLIMITED);
+                fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x 0x%02x\n", Program, nmea_cs, nmea_ck);
+                print_buffer(err_fp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
             }
 
@@ -2070,8 +2169,8 @@ int main(int argc, char * argv[])
             assert(bp != (unsigned char *)0);
 
             if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
-                fprintf(errfp, "ERR %s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", Program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
-                print_buffer(errfp, buffer, size1, UNLIMITED);
+                fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x%02x 0x%02x%02x\n", Program, ubx_ck_a, ubx_ck_b, bp[0], bp[1]);
+                print_buffer(err_fp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
             }
 
@@ -2083,8 +2182,8 @@ int main(int argc, char * argv[])
         	assert(bp != (unsigned char *)0);
 
         	if ((rtcm_crc_1 != bp[0]) || (rtcm_crc_2 != bp[1]) || (rtcm_crc_3 != bp[2])) {
-                fprintf(errfp, "ERR %s: CHECKSUM! 0x%02x%02x%02x 0x%02x%02x%02x\n", Program, rtcm_crc_1, rtcm_crc_2, rtcm_crc_3, bp[0], bp[1], bp[2]);
-                print_buffer(errfp, buffer, size1, UNLIMITED);
+                fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x%02x%02x 0x%02x%02x%02x\n", Program, rtcm_crc_1, rtcm_crc_2, rtcm_crc_3, bp[0], bp[1], bp[2]);
+                print_buffer(err_fp, buffer, size1, UNLIMITED);
                 if (!ignorechecksums) { continue; }
         	}
 
@@ -2092,8 +2191,8 @@ int main(int argc, char * argv[])
 
         } else {
 
-            fprintf(errfp, "ERR %s: FORMAT! %zd\n", Program, length);
-            print_buffer(errfp, buffer, size1, UNLIMITED);
+            fprintf(err_fp, "ERR %s: FORMAT! %zd\n", Program, length);
+            print_buffer(err_fp, buffer, size1, UNLIMITED);
 
             format = FORMAT;
 
@@ -2101,9 +2200,9 @@ int main(int argc, char * argv[])
 
         }
 
-        if (verbose) { print_buffer(errfp, buffer, size1, UNLIMITED); }
-        if (escape) { fputs("\033[1;1H\033[0K", outfp); }
-        if (report) { fprintf(outfp, "INP [%3zd] ", length); print_buffer(outfp, buffer, length, limitation); fflush(outfp); }
+        if (verbose) { print_buffer(err_fp, buffer, size1, UNLIMITED); }
+        if (escape) { fputs("\033[1;1H\033[0K", out_fp); }
+        if (report) { fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation); fflush(out_fp); }
 
         /**
          ** FORWARD, WRITE, AND LOG
@@ -2122,14 +2221,14 @@ int main(int argc, char * argv[])
          * to the data. Sometimes it is better never than late.
          */
 
-        if (sock < 0) {
+        if (datagram_fd < 0) {
         	/* Do nothing. */
         } else if (role != PRODUCER) {
         	/* Do nothing. */
-        } else if ((forwarding & format) == 0) {
+        } else if ((datagram_mask & format) == 0) {
         	/* Do nothing. */
         } else {
-        	send_buffer(sock, protocol, &endpoint.ipv4, &endpoint.ipv6, endpoint.udp, buffer, length);
+        	send_buffer(datagram_fd, protocol, &datagram_endpoint.ipv4, &datagram_endpoint.ipv6, datagram_endpoint.udp, buffer, length);
         }
 
         /*
@@ -2141,26 +2240,26 @@ int main(int argc, char * argv[])
          * anything else confuses Google Earth, and perhaps other applications.
          */
 
-        if (devfp == (FILE *)0) {
+        if (dev_fp == (FILE *)0) {
             /* Do nothing. */
         } else if (direction != OUTPUT) {
             /* Do nothing. */
-        } else if ((writing & format) == 0) {
+        } else if ((device_mask & format) == 0) {
             /* Do nothing. */
         } else if (!dmyokay) {
             /* Do nothing. */
         } else if (!totokay) {
             /* Do nothing. */
-        } else if (fwrite(buffer, length, 1, devfp) <= 0) {
-            fprintf(errfp, "ERR %s: OUT!\n", Program);
-        } else if (fflush(devfp) == EOF) {
-            fprintf(errfp, "ERR %s: OUT!\n", Program);
+        } else if (fwrite(buffer, length, 1, dev_fp) <= 0) {
+            fprintf(err_fp, "ERR %s: OUT!\n", Program);
+        } else if (fflush(dev_fp) == EOF) {
+            fprintf(err_fp, "ERR %s: OUT!\n", Program);
         } else {
             /* Do nothing. */
         }
 
-        if (logfp != (FILE *)0) {
-        	fwrite(buffer, length, 1, logfp);
+        if (log_fp != (FILE *)0) {
+        	fwrite(buffer, length, 1, log_fp);
         }
 
         /*
@@ -2252,14 +2351,14 @@ int main(int argc, char * argv[])
                 continue;
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-                    fprintf(errfp, "UNK %s: TALKER? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
-                    print_buffer(errfp, buffer, size - 1, UNLIMITED);
+                    fprintf(err_fp, "UNK %s: TALKER? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
+                    print_buffer(err_fp, buffer, size - 1, UNLIMITED);
                 }
                 continue;
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-                    fprintf(errfp, "UNK %s: SYSTEM? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
-                    print_buffer(errfp, buffer, size - 1, UNLIMITED);
+                    fprintf(err_fp, "UNK %s: SYSTEM? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
+                    print_buffer(err_fp, buffer, size - 1, UNLIMITED);
                 }
                 continue;
             } else {
@@ -2354,17 +2453,17 @@ int main(int argc, char * argv[])
                 size_t current = 0;
                 int end = 0;
 
-                fprintf(errfp, "TXT %s: TXT [%2d][%2d][%2d] \"", Program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
+                fprintf(err_fp, "TXT %s: TXT [%2d][%2d][%2d] \"", Program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
 
                 while ((*bb != HAZER_STIMULUS_NUL) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
-                    diminuto_phex_emit(errfp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
+                    diminuto_phex_emit(err_fp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
                 }
 
-                fputs("\".\n", errfp);
+                fputs("\".\n", err_fp);
 
             } else if (unknown) {
 
-                fprintf(errfp, "ERR %s: NMEA \"%s\"\n", Program, vector[0]);
+                fprintf(err_fp, "ERR %s: NMEA \"%s\"\n", Program, vector[0]);
 
             } else {
 
@@ -2376,7 +2475,7 @@ int main(int argc, char * argv[])
 
         case UBX:
 
-            if (verbose) { diminuto_dump(errfp, buffer, length); }
+            if (verbose) { diminuto_dump(err_fp, buffer, length); }
 
             if (yodel_ubx_nav_hpposllh(&(solution.payload), buffer, length) == 0) {
 
@@ -2397,7 +2496,7 @@ int main(int argc, char * argv[])
 
                 refresh = !0;
 
-                fprintf(errfp, "UBX %s: %s 0x%02x 0x%02x (%d)\n", Program, acknak.state ? "ACK" : "NAK", acknak.clsID, acknak.msgID, acknakpending);
+                fprintf(err_fp, "UBX %s: %s 0x%02x 0x%02x (%d)\n", Program, acknak.state ? "ACK" : "NAK", acknak.clsID, acknak.msgID, acknakpending);
 
                 if (acknakpending > 0) { acknakpending -= 1; }
 
@@ -2473,23 +2572,23 @@ int main(int argc, char * argv[])
                     switch (ss) {
                     case YODEL_UBX_CFG_VALGET_Size_BIT:
                         memcpy(&vv1, bb, sizeof(vv1));
-                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%01x\n", Program, pp->version, layer, ii, kk, vv1);
+                        fprintf(err_fp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%01x\n", Program, pp->version, layer, ii, kk, vv1);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_ONE:
                         memcpy(&vv1, bb, sizeof(vv1));
-                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%02x\n", Program, pp->version, layer, ii, kk, vv1);
+                        fprintf(err_fp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%02x\n", Program, pp->version, layer, ii, kk, vv1);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_TWO:
                         memcpy(&vv16, bb, sizeof(vv16));
-                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%04x\n", Program, pp->version, layer, ii, kk, vv16);
+                        fprintf(err_fp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%04x\n", Program, pp->version, layer, ii, kk, vv16);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_FOUR:
                         memcpy(&vv32, bb, sizeof(vv32));
-                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%08x\n", Program, pp->version,layer, ii, kk, vv32);
+                        fprintf(err_fp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%08x\n", Program, pp->version,layer, ii, kk, vv32);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_EIGHT:
                         memcpy(&vv64, bb, sizeof(vv64));
-                        fprintf(errfp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%016llx\n", Program, pp->version, layer, ii, kk, (unsigned long long)vv64);
+                        fprintf(err_fp, "UBX %s: CFG VALGET v%d %s [%d] 0x%08x 0x%016llx\n", Program, pp->version, layer, ii, kk, (unsigned long long)vv64);
                         break;
                     }
 
@@ -2507,15 +2606,15 @@ int main(int argc, char * argv[])
                 do {
 
                     if (bb >= ee) { break; }
-                    fprintf(errfp, "UBX %s: MON VER SW \"%s\"\n", Program, bb);
+                    fprintf(err_fp, "UBX %s: MON VER SW \"%s\"\n", Program, bb);
                     bb += YODEL_UBX_MON_VER_swVersion_LENGTH;
 
                     if (bb >= ee) { break; }
-                    fprintf(errfp, "UBX %s: MON VER HW \"%s\"\n", Program, bb);
+                    fprintf(err_fp, "UBX %s: MON VER HW \"%s\"\n", Program, bb);
                     bb += YODEL_UBX_MON_VER_hwVersion_LENGTH;
 
                     while (bb < ee) {
-                        fprintf(errfp, "UBX %s: MON VER EX \"%s\"\n", Program, bb);
+                        fprintf(err_fp, "UBX %s: MON VER EX \"%s\"\n", Program, bb);
                         bb += YODEL_UBX_MON_VER_extension_LENGTH;
                     }
 
@@ -2533,7 +2632,7 @@ int main(int argc, char * argv[])
 
             } else if (unknown) {
 
-                fprintf(errfp, "ERR %s: UBX <0x%02x 0x%02x 0x%02x 0x%02x>\n", Program, buffer[YODEL_UBX_SYNC_1], buffer[YODEL_UBX_SYNC_2], buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
+                fprintf(err_fp, "ERR %s: UBX <0x%02x 0x%02x 0x%02x 0x%02x>\n", Program, buffer[YODEL_UBX_SYNC_1], buffer[YODEL_UBX_SYNC_2], buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             } else {
 
@@ -2545,7 +2644,7 @@ int main(int argc, char * argv[])
 
         case RTCM:
 
-            if (verbose) { diminuto_dump(errfp, buffer, length); }
+            if (verbose) { diminuto_dump(err_fp, buffer, length); }
 
         	kinematics.number = tumbleweed_message(buffer, length);
         	if (kinematics.number < 0) { kinematics.number = 9999; }
@@ -2553,7 +2652,7 @@ int main(int argc, char * argv[])
         	if (length < kinematics.minimum) { kinematics.minimum = length; }
         	if (length > kinematics.maximum) { kinematics.maximum = length; }
 
-            if (verbose) { fprintf(errfp, "RTK %s: RTCM <%d> [%zd] [%zd] [%zd]\n", Program, kinematics.number, kinematics.minimum, kinematics.length, kinematics.maximum); }
+            if (verbose) { fprintf(err_fp, "RTK %s: RTCM <%d> [%zd] [%zd] [%zd]\n", Program, kinematics.number, kinematics.minimum, kinematics.length, kinematics.maximum); }
 
         	kinematics.ticks = timeout;
         	refresh = !0;
@@ -2624,7 +2723,7 @@ int main(int argc, char * argv[])
         if (fix < 0) {
             /* Do nothing. */
         } else if (timetofirstfix >= 0) {
-            /* Do nnothing. */
+            /* Do nothing. */
         } else {
             timetofirstfix = fix - epoch;
         }
@@ -2635,33 +2734,33 @@ int main(int argc, char * argv[])
 
         if (!refresh) {
             /* Do nothing: nothing changed. */
-        } else if ((devfp != (FILE *)0) && (diminuto_serial_available(fileno(devfp)) > 0)) {
+        } else if ((dev_fp != (FILE *)0) && (diminuto_serial_available(fileno(dev_fp)) > 0)) {
             /* Do nothing: we still have real-time input waiting. */
         } else if (slow && (before == (after = diminuto_time_elapsed() / frequency))) {
             /* Do nothing: slow display cannot handle real-time refresh rate. */
         } else {
-            if (escape) { fputs("\033[3;1H", outfp); }
+            if (escape) { fputs("\033[3;1H", out_fp); }
             if (report) {
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
                     onepps = poller.onepps;
                     poller.onepps = 0;
                 DIMINUTO_CRITICAL_SECTION_END;
-                print_hardware(outfp, errfp, &hardware);
-                print_status(outfp, errfp, &status);
-                print_local(outfp, errfp, timetofirstfix);
-                print_positions(outfp, errfp, position, onepps, dmyokay, totokay);
-                print_solution(outfp, errfp, &solution);
-                print_corrections(outfp, errfp, &base, &rover, &kinematics);
-                print_actives(outfp, errfp, active);
-                print_views(outfp, errfp, view, active);
+                print_hardware(out_fp, err_fp, &hardware);
+                print_status(out_fp, err_fp, &status);
+                print_local(out_fp, err_fp, timetofirstfix);
+                print_positions(out_fp, err_fp, position, onepps, dmyokay, totokay);
+                print_solution(out_fp, err_fp, &solution);
+                print_corrections(out_fp, err_fp, &base, &rover, &kinematics);
+                print_actives(out_fp, err_fp, active);
+                print_views(out_fp, err_fp, view, active);
             }
-            if (escape) { fputs("\033[0J", outfp); }
-            if (report) { fflush(outfp); }
+            if (escape) { fputs("\033[0J", out_fp); }
+            if (report) { fflush(out_fp); }
             if (headless != (const char *)0) {
-                outfp = diminuto_observation_commit(outfp, &temporary);
-                assert(outfp == (FILE *)0);
-                outfp = diminuto_observation_create(headless, &temporary);
-                assert(outfp != (FILE *)0);
+                out_fp = diminuto_observation_commit(out_fp, &temporary);
+                assert(out_fp == (FILE *)0);
+                out_fp = diminuto_observation_create(headless, &temporary);
+                assert(out_fp != (FILE *)0);
             }
             before = after;
             refresh = 0;
@@ -2673,7 +2772,7 @@ int main(int argc, char * argv[])
      ** FINIALIZATION
      **/
 
-    fprintf(errfp, "END %s: END.\n", Program);
+    fprintf(err_fp, "END %s: END.\n", Program);
 
     rc = tumbleweed_finalize();
     assert(rc == 0);
@@ -2683,6 +2782,8 @@ int main(int argc, char * argv[])
 
     rc = hazer_finalize();
     assert(rc == 0);
+
+    diminuto_mux_fini(&mux);
 
     if (pthreadrc == 0) {
         DIMINUTO_COHERENT_SECTION_BEGIN;
@@ -2700,42 +2801,42 @@ int main(int argc, char * argv[])
         }
     }
 
-    if (ppsfp != (FILE *)0) {
-        ppsfp = diminuto_pin_unused(ppsfp, ppspin);
-        assert(ppsfp == (FILE *)0);
+    if (pps_fp != (FILE *)0) {
+        pps_fp = diminuto_pin_unused(pps_fp, ppspin);
+        assert(pps_fp == (FILE *)0);
     }
 
-    if (strobefp != (FILE *)0) {
-        strobefp = diminuto_pin_unused(strobefp, strobepin);
-        assert(strobefp == (FILE *)0);
+    if (strobe_fp != (FILE *)0) {
+        strobe_fp = diminuto_pin_unused(strobe_fp, strobepin);
+        assert(strobe_fp == (FILE *)0);
     }
 
-    if (sock >= 0) {
-        rc = diminuto_ipc_close(sock);
+    if (datagram_fd >= 0) {
+        rc = diminuto_ipc_close(datagram_fd);
         assert(rc >= 0);
     }
 
-    if (logfp == (FILE *)0) {
+    if (log_fp == (FILE *)0) {
         /* Do nothing. */
-    } else if (logfp == stdout) {
+    } else if (log_fp == stdout) {
         /* Do nothing. */
     } else {
-        rc = fclose(logfp);
+        rc = fclose(log_fp);
         assert(rc != EOF);
     }
 
-    rc = fclose(infp);
+    rc = fclose(in_fp);
     assert(rc != EOF);
 
     if (headless != (const char *)0) {
-        outfp = diminuto_observation_commit(outfp, &temporary);
-        assert(outfp == (FILE *)0);
+        out_fp = diminuto_observation_commit(out_fp, &temporary);
+        assert(out_fp == (FILE *)0);
     } else {
-        rc = fclose(outfp);
+        rc = fclose(out_fp);
         assert(rc != EOF);
     }
 
-    rc = fclose(errfp);
+    rc = fclose(err_fp);
     assert(rc != EOF);
 
     return 0;

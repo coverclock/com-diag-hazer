@@ -1,7 +1,7 @@
 com-diag-hazer
 ==============
 
-Parse common NMEA strings and some UBX messages from GNSS devices.
+Parse common NMEA strings and other typical output from GNSS devices.
 
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/coverclock)
 
@@ -585,25 +585,23 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 
 # Help
 
-    usage: gpstool [ -d ] [ -u ] [ -v ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -I PIN ] [ -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R ] [ -E ] [ -F ] [ -H HEADLESS ] [ -A ADDRESS ] [ -P PORT [ -f MASK ] ] [ -O [ -w MASK ] ] [ -L LOG ] [ -t SECONDS ] [ -C ]
+    usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -K [ -k MASK ] ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
-           -4          Use IPv4 for ADDRESS.
-           -6          Use IPv6 for ADDRESS.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
-           -A ADDRESS  Send sentences to ADDRESS.
            -C          Ignore bad Checksums.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
            -F          Like -R but reFresh at 1Hz.
+           -G IP:PORT  Use IP and PORT as dataGram sink.
+           -G :PORT    Use PORT as dataGram source.
            -H HEADLESS Like -R but writes each iteration to HEADLESS file.
            -I PIN      Take 1PPS from GPIO Input PIN (requires -D).
-           -L LOG      Write sentences to LOG file.
-           -O          Write sentences to Output DEVICE.
-           -P PORT     Send to or receive from PORT.
+           -K          Write input to DEVICE sinK from datagram source.
+           -L LOG      Write input to LOG file.
            -R          Print a Report on standard output.
-           -S SOURCE   Use SOURCE file for input.
+           -S SOURCE   Use SOURCE file or FIFO for input.
            -U STRING   Like -W except expect UBX ACK or NAK response.
            -U ''       Exit when this empty UBX STRING is processed.
            -V          Print release, Vintage, and revision on standard output.
@@ -614,8 +612,9 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
            -c          Take 1PPS from DCD (requires -D and implies -m).
            -d          Display Debug output on standard error.
            -e          Use Even parity for DEVICE.
-           -f MASK     Set Forwarding mask (NMEA=1, UBX=2, RTCM=4), default 1.
+           -g MASK     Set dataGram sink mask (NMEA=1, UBX=2, RTCM=4), default 1.
            -h          Use RTS/CTS Hardware flow control for DEVICE.
+           -k MASK     Set device sinK mask (NMEA=1, UBX=2, RTCM=4), default 1.
            -l          Use Local control for DEVICE.
            -m          Use Modem control for DEVICE.
            -o          Use Odd parity for DEVICE.
@@ -626,7 +625,6 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
-           -w MASK     Set Writing mask (NMEA=1, UBX=2, RTCM=4), default 1.
  
 # Display
 
