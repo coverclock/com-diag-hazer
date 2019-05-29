@@ -94,6 +94,7 @@ static const size_t LIMIT = 80 - (sizeof("OUT ") - 1) - (sizeof("[123] ") - 1) -
 static const size_t UNLIMITED = ~(size_t)0;
 
 static const wchar_t DEGREE = 0x00B0;
+
 static const wchar_t PLUSMINUS = 0x00B1;
 
 /*******************************************************************************
@@ -117,7 +118,7 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  * wonder why the stdio library doesn't have something like this available.
  * Based on a similar hack in the com-diag-grandote C++ project.
  * @param fp points to the FILE object.
- * @return true if data is available to be read, false otherwise.
+ * @return !0 if data is available to be read, 0 otherwise.
  */
 static inline int fready(const FILE * fp)
 {
@@ -125,7 +126,7 @@ static inline int fready(const FILE * fp)
 }
 
 /*******************************************************************************
- * FUNCTIONS
+ * HELPERS
  ******************************************************************************/
 
 /**
@@ -251,7 +252,7 @@ static inline void countdown(expiry_t * ep, diminuto_ticks_t elapsed)
 }
 
 /*******************************************************************************
- * PRINTERS
+ * REPORTERS
  ******************************************************************************/
 
 /**
@@ -1705,13 +1706,14 @@ int main(int argc, char * argv[])
      * Detect (DCD) on the serial line?
      */
 
-    if (strobe != (const char *)0) {
-        strobepin = strtol(strobe, (char **)0, 0);
-        if (strobepin >= 0) {
-            strobe_fp = diminuto_pin_output(strobepin);
-            if (strobe_fp != (FILE *)0) {
-                diminuto_pin_clear(strobe_fp);
-            }
+    if (strobe == (const char *)0) {
+        /* Do nothing. */
+    } else if ((strobepin = strtol(strobe, (char **)0, 0)) < 0) {
+        /* Do nothing. */
+    } else {
+        strobe_fp = diminuto_pin_output(strobepin);
+        if (strobe_fp != (FILE *)0) {
+            diminuto_pin_clear(strobe_fp);
         }
     }
 
@@ -1723,37 +1725,44 @@ int main(int argc, char * argv[])
      * I/O sufficient. So it's interrogated in a separate thread.
      */
 
-    do {
-        if (pps == (const char *)0) {
-            break;
-        }
-        ppspin = strtol(pps, (char **)0, 0);
-        if (ppspin < 0) {
-            break;
-        }
+    if (pps == (const char *)0) {
+        /* Do nothing. */
+    } else if ((ppspin = strtol(pps, (char **)0, 0)) < 0) {
+        /* Do nothing. */
+    } else {
+
         rc = diminuto_pin_export(ppspin);
         assert(rc >= 0);
+
         rc = diminuto_pin_direction(ppspin, 0);
         assert(rc >= 0);
+
         rc = diminuto_pin_active(ppspin, !0);
         assert(rc >= 0);
+
         rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_BOTH);
         assert(rc >= 0);
+
         pps_fp = diminuto_pin_open(ppspin);
-        assert (pps_fp != (FILE *)0);
+        assert(pps_fp != (FILE *)0);
+
         rc = diminuto_pin_get(pps_fp);
         assert(rc >= 0);
+
         poller.ppsfp = pps_fp;
         poller.strobefp = strobe_fp;
         poller.onepps = 0;
         poller.done = 0;
+
         pthreadrc = pthread_create(&thread, 0, gpiopoller, &poller);
         if (pthreadrc != 0) {
             errno = pthreadrc;
             diminuto_perror("pthread_create");
         }
+
         assert(pthreadrc == 0);
-    } while (0);
+
+    }
 
     /*
      * Are we using a GPS receiver with a serial port instead of a IP datagram
@@ -1802,19 +1811,13 @@ int main(int argc, char * argv[])
      */
 
     if (source == (const char *)0) {
-
         /* Do nothing. */
-
     } else if (strcmp(source, "-") == 0) {
-
         in_fp = stdin;
-
     } else {
-
         in_fp = fopen(source, "r");
         if (in_fp == (FILE *)0) { diminuto_perror(source); }
         assert(in_fp != (FILE *)0);
-
     }
 
     /*
@@ -1850,22 +1853,25 @@ int main(int argc, char * argv[])
      */
 
     if (dev_fp == (FILE *)0) {
-       /* Do nothing. */
+        /* Do nothing. */
     } else if (!modemcontrol) {
         /* Do nothing. */
     } else if (!carrierdetect) {
         /* Do nothing. */
     } else {
+
         poller.ppsfp = dev_fp;
         poller.strobefp = strobe_fp;
         poller.onepps = 0;
         poller.done = 0;
+
         pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
         if (pthreadrc != 0) {
             errno = pthreadrc;
             diminuto_perror("pthread_create");
         }
         assert(pthreadrc == 0);
+
     }
 
     /*
@@ -2171,7 +2177,7 @@ int main(int argc, char * argv[])
         if (report) { fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation); fflush(out_fp); }
 
         /**
-         ** FORWARDING
+         ** FORWARD
          **/
 
         /*
@@ -2180,7 +2186,7 @@ int main(int argc, char * argv[])
          * instead of size) that terminate all input of any format (whether
          * that's useful or not). This is kinda iffy since UDP can not only
          * drop datagrams, but reorder them. But the ensured delivery of TCP
-         * can (had has, in testing over LTE networks) add substantial latency
+         * can (and has, in testing over LTE networks) add substantial latency
          * to the data. Sometimes it is better never than late.
          */
 
@@ -2195,7 +2201,7 @@ int main(int argc, char * argv[])
         }
 
         /**
-         ** WRITING
+         ** WRITE
          **/
 
         /*
@@ -2226,7 +2232,7 @@ int main(int argc, char * argv[])
         }
 
         /**
-         ** LOGGING
+         ** LOG
          **/
 
         if (log_fp != (FILE *)0) {
@@ -2234,7 +2240,7 @@ int main(int argc, char * argv[])
         }
 
         /**
-         ** EXPIRATION
+         ** EXPIRE
          **/
 
         /*
@@ -2274,12 +2280,16 @@ int main(int argc, char * argv[])
         }
 
         /**
-         ** PROCESSING
+         ** PROCESS
          **/
 
         switch (format) {
 
         case NMEA:
+
+            /*
+             * NMEA SENTENCES
+             */
 
             /*
              * We tokenize the NMEA sentence so we can parse it later. Then
@@ -2448,6 +2458,10 @@ int main(int argc, char * argv[])
             break;
 
         case UBX:
+
+            /*
+             * UBX PACKETS
+             */
 
             if (verbose) { diminuto_dump(err_fp, buffer, length); }
 
@@ -2618,6 +2632,10 @@ int main(int argc, char * argv[])
 
         case RTCM:
 
+            /*
+             * RTCM MESSAGES
+             */
+
             if (verbose) { diminuto_dump(err_fp, buffer, length); }
 
             kinematics.number = tumbleweed_message(buffer, length);
@@ -2703,7 +2721,7 @@ int main(int argc, char * argv[])
         }
 
         /**
-         ** CONFIGURING
+         ** CONFIGURATION
          **/
 
         /*
@@ -2808,7 +2826,7 @@ int main(int argc, char * argv[])
         }
 
         /**
-         ** REPEATING
+         ** REPEAT
          **/
 
         buffer = (unsigned char *)0;
