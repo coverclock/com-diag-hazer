@@ -242,7 +242,8 @@ typedef enum Direction { DIRECTION = 0, INPUT = (1<<0), OUTPUT = (1<<1) } direct
 typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
 
 /**
- * Are we processing an NMEA sentence, a UBX packet, an RTCM message, or none of the above?
+ * Are we processing an NMEA sentence, a UBX packet, an RTCM message, or none
+ * of the above?
  */
 typedef enum Format { FORMAT = 0, NMEA = (1<<0), UBX = (1<<1), RTCM = (1<<2), } format_t;
 
@@ -255,5 +256,10 @@ typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CR
  * How have we classified a satellite track?
  */
 typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!', } marker_t;
+
+/**
+ * Is our file descriptor in a special state?
+ */
+typedef enum Descriptor { UNUSED = -1, SKIP = -2, } descriptor_t;
 
 #endif

@@ -301,10 +301,6 @@ const void * tumbleweed_crc24q(const void * buffer, size_t size, uint8_t * crc_1
     length |= ((uint8_t)(bp[TUMBLEWEED_RTCM_LENGTH_LSB]));
     length += TUMBLEWEED_RTCM_SUMMED;
 
-#if 0
-    fprintf(stderr, "TUMBLEWEED_CHECKSUM 0x%x 0x%x 0x%x 0x%x 0x%lx\n", bp[TUMBLEWEED_RTCM_LENGTH_MSB], bp[TUMBLEWEED_RTCM_LENGTH_LSB], TUMBLEWEED_RTCM_SUMMED, length, size);
-#endif
-
     if ((length + TUMBLEWEED_RTCM_UNSUMMED) <= size) {
 
     	for (ii = 0; ii < length; ++ii) {

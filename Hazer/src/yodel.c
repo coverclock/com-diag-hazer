@@ -250,10 +250,6 @@ const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, u
     length |= ((uint8_t)(bp[YODEL_UBX_LENGTH_LSB]));
     length += YODEL_UBX_SUMMED;
 
-#if 0
-    fprintf(stderr, "YODEL_CHECKSUM 0x%x 0x%x 0x%x 0x%x 0x%lx\n", bp[YODEL_UBX_LENGTH_MSB], bp[YODEL_UBX_LENGTH_LSB], YODEL_UBX_SUMMED, length, size);
-#endif
-
     if ((length + YODEL_UBX_UNSUMMED) <= size) {
 
         for (bp += YODEL_UBX_CLASS; length > 0; --length) {
