@@ -1618,19 +1618,14 @@ use SimpleRTK2B boards interchangeably in the field.
     END gpstool: LAST.
     END gpstool: END.
 
-## Suspected Bug in gpstool in 20.0.0
+# Bugs I Have Known
 
-I see frequent checksum failures in input from the U-blox UBX-ZED-F9P chip
-when I have NMEA sentences, UBX messages, and RTCM packets all directed to
-the USB interface. Below is an example.
+I am of course assuming that these are somehow in my code. But I described both
+of them on the U-Blox customer portal.
 
-    ERR gpstool: CHECKSUM! 0xf04416 0x2c3138 [777] [777]
-    \xd3\x03\x03\x8d-\0\0\xfdP\0\0\f\xd3\xb5b\x01;(\0\0\0\0\0\xc0v3\x1d9\xae\x02\0\xbb\x14Z\xf8ni\xc2\xe3\x13j5\x18\x1b\x01\x19\0\x05\x8f\x01\0:\xae\x02\0\0\x01\0\0\xef\x83$GNRMC,160454.00,A,3947.65315,N,10509.20240,W,0.017,,310519,,,A,V*09\r\n$GNVTG,,T,,M,0.017,N,0.031,K,A*39\r\n$GNGGA,160454.00,3947.65315,N,10509.20240,W,1,12,0.51,1709.4,M,-21.5,M,,*41\r\n$GNGSA,A,3,28,07,18,30,11,09,13,17,01,08,,,1.07,0.51,0.94,1*0D\r\n$GNGSA,A,3,65,75,86,76,85,74,84,66,,,,,1.07,0.51,0.94,2*01\r\n$GNGSA,A,3,36,27,02,07,30,08,15,,,,,,1.07,0.51,0.94,3*06\r\n$GNGSA,A,3,25,23,28,11,,,,,,,,,1.07,0.51,0.94,4*07\r\n$GPGSV,3,1,12,01,17,122,36,04,,,40,07,62,108,35,08,37,049,30,1*58\r\n$GPGSV,3,2,12,09,20,180,37,11,41,113,40,13,24,314,33,17,18,203,40,1*6A\r\n$GPGSV,3,3,12,18,23,097,25,27,05,038,19,28,54,278,34,30,79,345,34,1*6C\r\n$GPGSV,3,1,12,01,17,122,22,04,,,39,07,62,108,20,08,37,049,29,6*58\r\n$GPGSV,3,2,12,09,20,18\0
+<https://portal.u-blox.com/s/question/0D52p00008WRsgMCAT/ubxzedf9p-incorrect-number-of-satellites-in-view-for-nmea-gsv-for-glonass>
 
-It sure looks like the length field in the RTCM packets are occasionally bogus.
-I'm assuming, of course, that this is somehow a bug in my code. But I also
-wonder if there's a race condition in the device when multiple protocol types
-are directed to the same output interface. 
+<https://portal.u-blox.com/s/question/0D52p00008WRsgLCAT/ubxzedf9p-occasional-incorrect-length-in-rtcm-message>
 
 # Acknowledgements
 
