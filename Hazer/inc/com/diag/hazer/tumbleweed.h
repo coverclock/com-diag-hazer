@@ -67,13 +67,14 @@ extern int tumbleweed_finalize(void);
  * RTCM 10403.3 p. 263-265
  */
 enum TumbleweedRtcmConstants {
-	TUMBLEWEED_RTCM_SHORTEST	= 6,	/* Preamble[8b] + Zeros[6b] + Length[10b] + CRC[24b]. */
-	TUMBLEWEED_RTCM_UNSUMMED	= 3,	/* CRC24Q[0], CRC24Q[1], CRC24Q[2]. */
-	TUMBLEWEED_RTCM_SUMMED		= 3,	/* Preamble[8b] + Zeros[6b] + Length[10b]. */
-	TUMBLEWEED_RTCM_CRC			= 3,	/* CRC24Q[0], CRC24Q[1], CRC24Q[2]. */
-	TUMBLEWEED_RTCM_LENGTH		= 2,	/* Length[10b]. */
-	TUMBLEWEED_RTCM_NUMBER		= 2,	/* Number[12b]. */
-	TUMBLEWEED_RTCM_LONGEST		= 1029,	/* Shortest + Length=0x03FF. */
+	TUMBLEWEED_RTCM_SHORTEST		= 6,	/* Preamble[8b] + Zeros[6b] + Length[10b] + CRC[24b]. */
+	TUMBLEWEED_RTCM_UNSUMMED		= 3,	/* CRC24Q[0], CRC24Q[1], CRC24Q[2]. */
+	TUMBLEWEED_RTCM_SUMMED			= 3,	/* Preamble[8b] + Zeros[6b] + Length[10b]. */
+	TUMBLEWEED_RTCM_CRC				= 3,	/* CRC24Q[0], CRC24Q[1], CRC24Q[2]. */
+	TUMBLEWEED_RTCM_LENGTH			= 2,	/* Length[10b]. */
+	TUMBLEWEED_RTCM_NUMBER			= 2,	/* Number[12b]. */
+	TUMBLEWEED_RTCM_LONGEST			= 1029,	/* Shortest + Length=0x03FF. */
+	TUMBLEWEED_KEEPALIVE_SECONDS	= 25,	/* Typical SIP UDP keepalive. */
 };
 
 /**

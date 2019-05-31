@@ -46,6 +46,7 @@
  *  gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -E 2> >(log -S)
  */
 
+#undef NDEBUG
 #include <assert.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -139,100 +140,9 @@ static inline uint64_t abs64(int64_t datum)
     return (datum >= 0) ? datum : -datum;
 }
 
-/**
- * Emit an NMEA sentences to the specified stream after adding the ending
- * matter consisting of the checksum delimiter, the two checksum characters,
- * a carriage return, and a line feed.
- * @param fp points to the FILE stream.
- * @param string points to the NUL-terminated sentence minus the ending matter.
- * @param size is the size of the NMEA sentence.
- * @return 0 for success, <0 if an error occurred.
- */
-static int emit_sentence(FILE * fp, const char * string, size_t size)
+static inline diminuto_sticks_t ticktock(diminuto_sticks_t frequency)
 {
-    int rc = -1;
-    uint8_t cs = 0;
-    char msn = '\0';
-    char lsn = '\0';
-
-    do {
-
-        (void)hazer_checksum(string, size, &cs);
-        if (hazer_checksum2characters(cs, &msn, &lsn) < 0) { break; }
-
-        if (fprintf(fp, "%s%c%c%c\r\n", string, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) { break; }
-        if (fflush(fp) == EOF) { break; }
-
-        rc = 0;
-
-    } while (0);
-
-    return rc;
-}
-
-/**
- * Emit a UBX message to the specified stream after adding the ending matter
- * consisting of the two Fletcher checksum bytes.
- * @param fp points to the FILE stream.
- * @param packet points to the packet minus the ending matter.
- * @param size is the size of the UBX packet.
- * @return 0 for success, <0 if an error occurred.
- */
-static int emit_message(FILE * fp, const void * packet, size_t size)
-{
-    int rc = -1;
-    const void * bp = (const void *)0;
-    uint8_t ck_a = 0;
-    uint8_t ck_b = 0;
-    size_t length = 0;
-
-    do {
-
-        bp = yodel_checksum(packet, size, &ck_a, &ck_b);
-        if (bp == (void *)0) { break; }
-        length = (const char *)bp - (const char *)packet;
-
-        if (fwrite(packet, length, 1, fp) < 1) { break; }
-        if (fwrite(&ck_a, sizeof(ck_a), 1, fp) < 1) { break; }
-        if (fwrite(&ck_b, sizeof(ck_b), 1, fp) < 1) { break; }
-        if (fflush(fp) == EOF) { break; }
-
-        rc = 0;
-
-    } while (0);
-
-    return rc;
-}
-
-/**
- * Forward an NMEA sentence or a UBX message to a remote IPv4 or IPv6 host and
- * UDP port.
- * @param sock is an open socket.
- * @param protocol indicates either IPv4 or IPv6.
- * @param ipv4p points to an IPv4 address (if IPv4).
- * @param ipv6p points to an IPv6 address (if IPv6).
- * @param port is an IP UDP port.
- * @param buffer points to the sentence or packet.
- * @param size is the size of the sentence or packet.
- */
-static void send_buffer(int sock, protocol_t protocol, diminuto_ipv4_t * ipv4p, diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
-{
-    int rc = 0;
-
-    switch (protocol) {
-    case IPV4:
-        rc = diminuto_ipc4_datagram_send(sock, buffer, size, *ipv4p, port);
-        if (rc < 0) { diminuto_perror("diminuto_ipc4_datagram_send"); }
-        break;
-    case IPV6:
-        rc = diminuto_ipc6_datagram_send(sock, buffer, size, *ipv6p, port);
-        if (rc < 0) { diminuto_perror("diminuto_ipc6_datagram_send"); }
-        break;
-    default:
-        assert(0);
-        break;
-    }
-
+    return diminuto_time_elapsed() / frequency;
 }
 
 /**
@@ -244,12 +154,151 @@ static inline void countdown(expiry_t * ep, diminuto_sticks_t elapsed)
 {
     if (*ep == 0) {
         /* Do nothing. */
+    } else if (elapsed <= 0) {
+        /* Do nothing. */
     } else if (*ep <= elapsed) {
         *ep = 0;
     } else {
         *ep -= elapsed;
     }
 }
+
+/*******************************************************************************
+ * WRITERS
+ ******************************************************************************/
+
+/**
+ * Emit an NMEA configuration sentence to the specified stream after adding the
+ * ending matter consisting of the checksum delimiter, the two checksum
+ * characters, a carriage return, and a line feed.
+ * @param fp points to the FILE stream.
+ * @param string points to the NUL-terminated sentence minus the ending matter.
+ * @param size is the size of the NMEA sentence in bytes.
+ */
+static void emit_sentence(FILE * fp, const char * string, size_t size)
+{
+    uint8_t cs = 0;
+    char msn = '\0';
+    char lsn = '\0';
+
+    if (hazer_checksum(string, size, &cs) == (void *)0) {
+        errno = EIO;
+        diminuto_perror("emit_sentence: checksum");
+    } else if (hazer_checksum2characters(cs, &msn, &lsn) < 0) {
+        errno = EIO;
+        diminuto_perror("emit_sentence: checksum2characters");
+    } else if (fprintf(fp, "%s%c%c%c\r\n", string, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) {
+        errno = EIO;
+        diminuto_perror("emit_sentence: fprintf");
+    } else if (fflush(fp) == EOF) {
+        errno = EIO;
+        diminuto_perror("emit_sentence: fflush");
+   } else {
+        /* Do nothing. */
+   }
+}
+
+/**
+ * Emit a UBX configuration packet to the specified stream after adding the
+ * ending matter consisting of the two Fletcher checksum bytes.
+ * @param fp points to the FILE stream.
+ * @param packet points to the packet minus the ending matter.
+ * @param size is the size of the UBX packet in bytes.
+ */
+static void emit_packet(FILE * fp, const void * packet, size_t size)
+{
+    const void * bp = (const void *)0;
+    uint8_t ck_a = 0;
+    uint8_t ck_b = 0;
+    size_t length = 0;
+
+    if ((bp = yodel_checksum(packet, size, &ck_a, &ck_b)) == (void *)0) {
+        errno = EIO;
+        diminuto_perror("emit_packet: checksum");
+    } else if (fwrite(packet, length = (const char *)bp - (const char *)packet, 1, fp) < 1) {
+        errno = EIO;
+        diminuto_perror("emit_packet: fwrite 1");
+    } else if (fwrite(&ck_a, sizeof(ck_a), 1, fp) < 1) {
+        errno = EIO;
+        diminuto_perror("emit_packet: fwrite 2");
+    } else if (fwrite(&ck_b, sizeof(ck_b), 1, fp) < 1) {
+        errno = EIO;
+        diminuto_perror("emit_packet: fwrite 3");
+    } else if (fflush(fp) == EOF) {
+        errno = EIO;
+        diminuto_perror("emit_packet: fflush");
+    } else {
+        /* Do nothing. */
+    }
+}
+
+/**
+ * Write a buffer to the specified stream.
+ * @param fp points to the output stream.
+ * @param ep points to the error stream.
+ * @param buffer points to the buffer.
+ * @param size is the number of bytes to write.
+ */
+static void write_buffer(FILE * fp, const void * buffer, size_t size)
+{
+    if (fwrite(buffer, size, 1, fp) < 1) {
+        errno = EIO;
+        diminuto_perror("write_buffer: fwrite");
+    } else if (fflush(fp) == EOF) {
+        errno = EIO;
+        diminuto_perror("write_buffer: fflush");
+    } else {
+        /* Do nothing. */
+    }
+}
+
+/**
+ * Send an datagram to a remote IPv4 or IPv6 host and UDP port.
+ * @param fd is an open socket.
+ * @param protocol indicates either IPv4 or IPv6.
+ * @param ipv4p points to an IPv4 address (if IPv4).
+ * @param ipv6p points to an IPv6 address (if IPv6).
+ * @param port is an IP UDP port.
+ * @param buffer points to the sentence or packet.
+ * @param size is the size of the sentence or packet.
+ */
+static void send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
+{
+    if (size <= 0) {
+        /* Do nothing. */
+    } else if (protocol == IPV4) {
+        (void)diminuto_ipc4_datagram_send(fd, buffer, size, *ipv4p, port);
+    } else if (protocol == IPV6) {
+        (void)diminuto_ipc6_datagram_send(fd, buffer, size, *ipv6p, port);
+    } else {
+        /* Do nothing. */
+    }
+}
+
+/**
+ * Receive a datagram from a UDP port. The datagram will be NUL terminated.
+ * The provided buffer must be sized one more byte than the received datagram.
+ * @param fd is an open socket.
+ * @param buffer points to the buffer.
+ * @param size is the size of the buffer in bytes.
+ * @return the size of the received datagram plus the terminating NUL in bytes.
+ */
+static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
+    ssize_t length = 0;
+
+    if (size <= 1) {
+        /* Do nothing. */
+    } else if ((length = diminuto_ipc6_datagram_receive(fd, buffer, size - 1)) <= 0) {
+        /* Do nothing. */
+    } else if (length >= size) {
+        /* Should be impossible. */
+    } else {
+        ((char *)buffer)[length++] = '\0';
+    }
+
+    return length;
+}
+
 
 /*******************************************************************************
  * REPORTERS
@@ -1164,8 +1213,8 @@ int main(int argc, char * argv[])
     diminuto_list_t * node = (diminuto_list_t *)0;
     diminuto_list_t head = DIMINUTO_LIST_NULLINIT(&head);
     int unknown = 0;
-    long timeout = HAZER_GNSS_TICKS;
-    long keepalive = 10;
+    long timeout = HAZER_GNSS_SECONDS;
+    long keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
     /*
      * FILE pointer variables.
      */
@@ -1194,15 +1243,16 @@ int main(int argc, char * argv[])
     /*
      * Datagram variables.
      */
-    role_t role = ROLE;
-    protocol_t protocol = PROTOCOL;
+    protocol_t datagram_protocol = PROTOCOL;
     datagram_buffer_t datagram_buffer = DATAGRAM_BUFFER_INITIALIZER;
     const char * datagram_option = (const char *)0;
     diminuto_ipc_endpoint_t datagram_endpoint = { 0, };
     long datagram_mask = NMEA;
+    role_t role = ROLE;
     /*
      * Surveyor variables.
      */
+    protocol_t surveyor_protocol = PROTOCOL;
     datagram_buffer_t surveyor_buffer = DATAGRAM_BUFFER_INITIALIZER;
     const char * surveyor_option = (const char *)0;
     diminuto_ipc_endpoint_t surveyor_endpoint = { 0, };
@@ -1339,10 +1389,12 @@ int main(int argc, char * argv[])
      * Real time related variables.
      */
     diminuto_sticks_t frequency = 0;
-    diminuto_sticks_t was = 0;
-    diminuto_sticks_t now = 0;
-    diminuto_sticks_t before = 0;
-    diminuto_sticks_t after = 0;
+    diminuto_sticks_t expiration_was = 0;
+    diminuto_sticks_t expiration_now = 0;
+    diminuto_sticks_t display_was = 0;
+    diminuto_sticks_t display_now = 0;
+    diminuto_sticks_t keepalive_was = 0;
+    diminuto_sticks_t keepalive_now = 0;
     diminuto_sticks_t elapsed = 0;
     diminuto_sticks_t epoch = 0;
     diminuto_sticks_t fix = -1;
@@ -1546,7 +1598,7 @@ int main(int argc, char * argv[])
             break;
         case 't':
             timeout = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (timeout < 0) || (timeout > HAZER_GNSS_TICKS)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0') || (timeout < 0) || (timeout > HAZER_GNSS_SECONDS)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case 'u':
             unknown = !0;
@@ -1618,7 +1670,7 @@ int main(int argc, char * argv[])
     }
 
     if (error) {
-    	return 1;
+        return 1;
     }
 
     /**
@@ -1648,73 +1700,116 @@ int main(int argc, char * argv[])
      */
 
     if (datagram_option == (const char *)0) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if (datagram_endpoint.udp == 0) {
-		/* Do nothing. */
-	} else if (!diminuto_ipc6_is_unspecified(&datagram_endpoint.ipv6)) {
+        /* Do nothing. */
+    } else if (!diminuto_ipc6_is_unspecified(&datagram_endpoint.ipv6)) {
 
-		protocol = IPV6;
+        datagram_protocol = IPV6;
 
-		datagram_fd = diminuto_ipc6_datagram_peer(0);
-		if (datagram_fd < 0) { diminuto_perror(datagram_option); }
-		assert(datagram_fd >= 0);
+        datagram_fd = diminuto_ipc6_datagram_peer(0);
+        if (datagram_fd < 0) { diminuto_perror(datagram_option); }
+        assert(datagram_fd >= 0);
 
-		rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
-		if (rc < 0) { diminuto_perror(datagram_option); }
-		assert(rc >= 0);
+        rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
+        if (rc < 0) { diminuto_perror(datagram_option); }
+        assert(rc >= 0);
 
-		role = PRODUCER;
+        role = PRODUCER;
 
-	} else if (!diminuto_ipc4_is_unspecified(&datagram_endpoint.ipv4)) {
+    } else if (!diminuto_ipc4_is_unspecified(&datagram_endpoint.ipv4)) {
 
-		protocol = IPV4;
+        datagram_protocol = IPV4;
 
-		datagram_fd = diminuto_ipc4_datagram_peer(0);
-		if (datagram_fd < 0) { diminuto_perror(datagram_option); }
-		assert(datagram_fd >= 0);
+        datagram_fd = diminuto_ipc4_datagram_peer(0);
+        if (datagram_fd < 0) { diminuto_perror(datagram_option); }
+        assert(datagram_fd >= 0);
 
-		rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
-		if (rc < 0) { diminuto_perror(datagram_option); }
-		assert(rc >= 0);
+        rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
+        if (rc < 0) { diminuto_perror(datagram_option); }
+        assert(rc >= 0);
 
-		role = PRODUCER;
+        role = PRODUCER;
 
-	} else {
+    } else {
 
-		protocol = IPV6;
+        datagram_fd = diminuto_ipc6_datagram_peer(datagram_endpoint.udp);
+        if (datagram_fd < 0) { diminuto_perror(datagram_option); }
+        assert(datagram_fd >= 0);
 
-		datagram_fd = diminuto_ipc6_datagram_peer(datagram_endpoint.udp);
-		if (datagram_fd < 0) { diminuto_perror(datagram_option); }
-		assert(datagram_fd >= 0);
+        rc = diminuto_mux_register_read(&mux, datagram_fd);
+        if (rc < 0) { diminuto_perror(datagram_option); }
+        assert(rc >= 0);
 
-		rc = diminuto_mux_register_read(&mux, datagram_fd);
-		if (rc < 0) { diminuto_perror(datagram_option); }
-		assert(rc >= 0);
+        role = CONSUMER;
 
-		role = CONSUMER;
-
-	}
+    }
 
     /*
      * Are we receiving RTK corrections in the form of RTCM messages from a
      * stationary base station doing a survey? This is useful for DGNSS (DGPS),
      * which can achieve a very high degree of precision (centimeters, or even
-     * less).
+     * less). If an optional host or address is also specified, then we are
+     * presumably sending keepalives too. Note that it is possible that a
+     * DNS resolved a FQDN to both an IPv6 and an IPv4 address, which is why
+     * we check the IPv6 form - our preferred form - first.
      */
 
     if (surveyor_option == (const char *)0) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if (surveyor_endpoint.udp == 0) {
-    	/* Do nothing. */
+        /* Do nothing. */
+    } else if (!diminuto_ipc6_is_unspecified(&surveyor_endpoint.ipv6)) {
+
+        /*
+         * Sending keepalives and receiving updates via IPv6.
+         */
+
+        surveyor_protocol = IPV6;
+
+        surveyor_fd = diminuto_ipc6_datagram_peer(0);
+        if (surveyor_fd < 0) { diminuto_perror(surveyor_option); }
+        assert(surveyor_fd >= 0);
+
+        rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
+        if (rc < 0) { diminuto_perror(surveyor_option); }
+        assert(rc >= 0);
+
+    } else if (!diminuto_ipc4_is_unspecified(&surveyor_endpoint.ipv4)) {
+
+        /*
+         * Sending keepalives and receiving updates via IPv4.
+         */
+
+        surveyor_protocol = IPV4;
+
+        surveyor_fd = diminuto_ipc4_datagram_peer(0);
+        if (surveyor_fd < 0) { diminuto_perror(surveyor_option); }
+        assert(surveyor_fd >= 0);
+
+        rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
+        if (rc < 0) { diminuto_perror(surveyor_option); }
+        assert(rc >= 0);
+
     } else {
 
-		surveyor_fd = diminuto_ipc6_datagram_peer(surveyor_endpoint.udp);
-		if (surveyor_fd < 0) { diminuto_perror(surveyor_option); }
-		assert(surveyor_fd >= 0);
+        /*
+         * Receiving updates via IPv6.
+         */
 
-		rc = diminuto_mux_register_read(&mux, surveyor_fd);
-		if (rc < 0) { diminuto_perror(surveyor_option); }
-		assert(rc >= 0);
+        surveyor_fd = diminuto_ipc6_datagram_peer(surveyor_endpoint.udp);
+        if (surveyor_fd < 0) { diminuto_perror(surveyor_option); }
+        assert(surveyor_fd >= 0);
+
+        rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
+        if (rc < 0) { diminuto_perror(surveyor_option); }
+        assert(rc >= 0);
+
+        rc = diminuto_mux_register_read(&mux, surveyor_fd);
+        if (rc < 0) { diminuto_perror(surveyor_option); }
+        assert(rc >= 0);
+
+        keepalive = -1;
 
     }
 
@@ -1727,7 +1822,7 @@ int main(int argc, char * argv[])
 
     if (strobe != (const char *)0) {
 
-    	strobe_fp = diminuto_pin_output(strobepin);
+        strobe_fp = diminuto_pin_output(strobepin);
         assert(strobe_fp != (FILE *)0);
 
         rc = diminuto_pin_clear(strobe_fp);
@@ -1966,9 +2061,7 @@ int main(int argc, char * argv[])
      * Start the clock.
      */
 
-    frequency = diminuto_frequency();
-
-    now = diminuto_time_elapsed() / frequency;
+    display_now = display_was = expiration_now = expiration_was = keepalive_now = keepalive_was = ticktock(frequency = diminuto_frequency());
 
     /**
      ** WORK LOOP
@@ -1999,14 +2092,14 @@ int main(int argc, char * argv[])
          */
 
         if (fready(in_fp)) {
-        	/* Do nothing. */
+            /* Do nothing. */
         } else if ((rc = diminuto_mux_wait(&mux, frequency)) >= 0) {
             /* Do nothing. */
-		} else if (errno == EINTR) {
-			continue; /* Interrupted by a signal, perhaps SIGINT or SIGTERM. */
-		} else {
-			assert(0);
-		}
+        } else if (errno == EINTR) {
+            continue; /* Interrupted by a signal, perhaps SIGINT or SIGTERM. */
+        } else {
+            assert(0);
+        }
 
         /**
          ** INPUT
@@ -2024,13 +2117,13 @@ int main(int argc, char * argv[])
 
         while (fready(in_fp) || ((fd = diminuto_mux_ready_read(&mux)) >= 0)) {
 
-        	buffer = (unsigned char *)0;
+            buffer = (unsigned char *)0;
 
             if (fready(in_fp) || (fd == in_fd)) {
 
-            	/*
-            	 * Read NMEA, UBX, or RTCM from the serial(ish) device.
-            	 */
+                /*
+                 * Read NMEA, UBX, or RTCM from the serial(ish) device.
+                 */
 
                 do {
 
@@ -2084,18 +2177,18 @@ int main(int argc, char * argv[])
                 } while (fready(in_fp));
 
                 if (eof) {
-                	break;
+                    break;
                 }
 
                 if (buffer != (unsigned char *)0) {
-                	break;
+                    break;
                 }
 
             } else if (fd == datagram_fd) {
 
-            	/*
-            	 * Receive a NMEA, UBX, or RTCM datagram from a remote gpstool.
-            	 */
+                /*
+                 * Receive a NMEA, UBX, or RTCM datagram from a remote gpstool.
+                 */
 
                 /*
                  * Even if this datagram was received via IPv4, we can do an
@@ -2105,8 +2198,7 @@ int main(int argc, char * argv[])
                  * it out in canonical form.
                  */
 
-                if ((size = diminuto_ipc6_datagram_receive(datagram_fd, datagram_buffer, sizeof(datagram_buffer) - 1)) > 0) {
-                    datagram_buffer[size++] = '\0';
+                if ((size = receive_datagram(datagram_fd, datagram_buffer, sizeof(datagram_buffer))) > 0) {
                     buffer = datagram_buffer;
                     break;
                 }
@@ -2121,9 +2213,9 @@ int main(int argc, char * argv[])
 
             } else if (fd == surveyor_fd) {
 
-            	/*
-            	 * Receive an RTCM message from a remote gpstool doing a survey.
-            	 */
+                /*
+                 * Receive an RTCM message from a remote gpstool doing a survey.
+                 */
 
                 /*
                  * We only accept whole RTCM messages from the surveyor that
@@ -2135,47 +2227,70 @@ int main(int argc, char * argv[])
                  * delays the processing of incoming data from other sources.
                  */
 
-                if ((size = diminuto_ipc6_datagram_receive(surveyor_fd, surveyor_buffer, sizeof(surveyor_buffer) - 1)) <= 0) {
+                if ((size1 = receive_datagram(surveyor_fd, surveyor_buffer, sizeof(surveyor_buffer))) <= 0) {
                     /* Do nothing. */
-                } else if ((length = tumbleweed_length(surveyor_buffer, size)) <= 0) {
+                } else if ((length = tumbleweed_length(surveyor_buffer, size1)) <= 0) {
                     /* Do nothing. */
                 } else if ((bp = (unsigned char *)tumbleweed_crc24q(surveyor_buffer, length, &rtcm_crc_1, &rtcm_crc_2, &rtcm_crc_3)) == (unsigned char *)0) {
                     /* Do nothing. */
                 } else if ((rtcm_crc_1 != bp[0]) || (rtcm_crc_2 != bp[1]) || (rtcm_crc_3 != bp[2])) {
-                    /* Do nothing. */
+                    fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x%02x%02x 0x%02x%02x%02x [%zd] [%zd]\n", Program, rtcm_crc_1, rtcm_crc_2, rtcm_crc_3, bp[0], bp[1], bp[2], size1, length);
                 } else if ((number = tumbleweed_message(surveyor_buffer, length)) <= 0) {
-                	/* Do nothing. */
+                    fprintf(err_fp, "ERR %s: NUMBER! <%d> [%zd]\n", Program, number, length);
                 } else if (dev_fp == (FILE *)0) {
                     /* Do nothing. */
-                } else if (fwrite(surveyor_buffer, length, 1, dev_fp) <= 0) {
-                    fprintf(err_fp, "ERR %s: OUT!\n", Program);
-                } else if (fflush(dev_fp) == EOF) {
-                    fprintf(err_fp, "ERR %s: OUT!\n", Program);
-                } else if (verbose) {
-                    fprintf(err_fp, "RTK %s: RTCM <%d> [%zd]\n", Program, number, length);
                 } else {
-                    /* Do nothing. */
+                    if (verbose) { fprintf(err_fp, "RTK %s: RTCM <%d> [%zd]\n", Program, number, length); }
+                    write_buffer(dev_fp, surveyor_buffer, length);
                 }
 
             } else {
 
-            	/*
-            	 * The select(2) system call returned a file descriptor which
-            	 * was not one we know about; that should be impossible.
-            	 */
+                /*
+                 * The select(2) system call returned a file descriptor which
+                 * was not one we know about; that should be impossible.
+                 */
 
-            	fprintf(err_fp, "ERR %s: MUX %d ( %d %d %d ) FD!\n", Program, fd, dev_fd, datagram_fd, surveyor_fd);
+                fprintf(err_fp, "ERR %s: FD! %d ( %d %d %d )\n", Program, fd, dev_fd, datagram_fd, surveyor_fd);
                 assert(0);
 
             }
 
         }
 
+        /*
+         * If one of the state mahines indicated end of file, we're done.
+         */
+
         if (eof) {
             break;
         }
 
-        /* TODO KEEPALIVE */
+        /*
+         * If our keep alive interval has expired, send a keep alive
+         * (a zero-length RTCM message) to the surveyor. This is necessary
+         * to establish and maintain the return path for UDP "connections"
+         * that go through NATting firewalls. The surveyor we are talking to
+         * probably isn't another gpstool instance; it's an rtktool that has
+         * a static address, or at least a dynamic DNS address, and which
+         * handles the routing of RTK updates from the stationary base station
+         * in survey mode and one or more  mobile rover.
+         */
+
+        if (surveyor_fd < 0) {
+            /* Do nothing. */
+        } else if (keepalive < 0) {
+            /* Do nothing. */
+        } else if (((keepalive_now = ticktock(frequency)) - keepalive_was) < keepalive) {
+            /* Do nothing. */
+        } else {
+            send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, TUMBLEWEED_KEEPALIVE, sizeof(TUMBLEWEED_KEEPALIVE));
+            keepalive_was = keepalive_now;
+        }
+
+        /*
+         * If we don't have a buffer to process, keep trying.
+         */
 
         if (buffer == (unsigned char *)0) {
             continue;
@@ -2237,11 +2352,11 @@ int main(int argc, char * argv[])
 
         } else {
 
-        	/*
-        	 * It's entirely possible that the device is generating some kind
-        	 * of proprietary format that we don't recognize yet somehow
-        	 * passed through our state machines.
-        	 */
+            /*
+             * It's entirely possible that the device is generating some kind
+             * of proprietary format that we don't recognize yet somehow
+             * passed through our state machines.
+             */
 
             format = FORMAT;
 
@@ -2296,7 +2411,7 @@ int main(int argc, char * argv[])
         } else if ((datagram_mask & format) == 0) {
             /* Do nothing. */
         } else {
-            send_buffer(datagram_fd, protocol, &datagram_endpoint.ipv4, &datagram_endpoint.ipv6, datagram_endpoint.udp, buffer, length);
+            send_datagram(datagram_fd, datagram_protocol, &datagram_endpoint.ipv4, &datagram_endpoint.ipv6, datagram_endpoint.udp, buffer, length);
         }
 
         /**
@@ -2322,12 +2437,8 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (!totokay) {
             /* Do nothing. */
-        } else if (fwrite(buffer, length, 1, dev_fp) <= 0) {
-            fprintf(err_fp, "ERR %s: OUT!\n", Program);
-        } else if (fflush(dev_fp) == EOF) {
-            fprintf(err_fp, "ERR %s: OUT!\n", Program);
         } else {
-            /* Do nothing. */
+            write_buffer(dev_fp, buffer, length);
         }
 
         /**
@@ -2335,7 +2446,7 @@ int main(int argc, char * argv[])
          **/
 
         if (log_fp != (FILE *)0) {
-            fwrite(buffer, length, 1, log_fp);
+            write_buffer(log_fp, buffer, length);
         }
 
         /**
@@ -2356,9 +2467,9 @@ int main(int argc, char * argv[])
          * eliminate what is almost certainly a partial second.)
          */
 
-        was = now;
-        now = diminuto_time_elapsed() / frequency;
-        elapsed = (now > was) ? now - was : 0;
+        expiration_was = expiration_now;
+        expiration_now = ticktock(frequency);
+        elapsed = (expiration_now > expiration_was) ? expiration_now - expiration_was : 0;
 
         if (elapsed > 0) {
 
@@ -2547,7 +2658,7 @@ int main(int argc, char * argv[])
 
             } else if (unknown) {
 
-                fprintf(err_fp, "ERR %s: NMEA \"%s\"\n", Program, vector[0]);
+                fprintf(err_fp, "ERR %s: NMEA! \"%s\"\n", Program, vector[0]);
 
             } else {
 
@@ -2720,7 +2831,7 @@ int main(int argc, char * argv[])
 
             } else if (unknown) {
 
-                fprintf(err_fp, "ERR %s: UBX <0x%02x 0x%02x 0x%02x 0x%02x>\n", Program, buffer[YODEL_UBX_SYNC_1], buffer[YODEL_UBX_SYNC_2], buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
+                fprintf(err_fp, "ERR %s: UBX! <0x%02x 0x%02x 0x%02x 0x%02x>\n", Program, buffer[YODEL_UBX_SYNC_1], buffer[YODEL_UBX_SYNC_2], buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             } else {
 
@@ -2868,16 +2979,17 @@ int main(int argc, char * argv[])
                  */
                 size1 = size - 1;
                 if (buffer[0] == HAZER_STIMULUS_START) {
-                    rc = emit_sentence(dev_fp, buffer, size1);
+                    emit_sentence(dev_fp, buffer, size1);
+                    rc = 0;
                 } else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
-                    rc = emit_message(dev_fp, buffer, size1);
+                    emit_packet(dev_fp, buffer, size1);
+                    rc = 0;
                 } else {
+                    fprintf(err_fp, "ERR %s: EMIT!\n", Program);
+                    print_buffer(err_fp, buffer, size1, UNLIMITED);
                     rc = -1;
                 }
-                if (rc < 0) {
-                    fprintf(err_fp, "ERR %s: FAILED!\n", Program);
-                    print_buffer(err_fp, buffer, size1, UNLIMITED);
-                } else {
+                if (rc == 0) {
                     if (command->acknak) { acknakpending += 1; }
                     if (verbose) { print_buffer(err_fp, buffer, size1, UNLIMITED); }
                     if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
@@ -2895,7 +3007,7 @@ int main(int argc, char * argv[])
             /* Do nothing: nothing changed. */
         } else if ((dev_fp != (FILE *)0) && (diminuto_serial_available(fileno(dev_fp)) > 0)) {
             /* Do nothing: we still have real-time input waiting. */
-        } else if (slow && (before == (after = diminuto_time_elapsed() / frequency))) {
+        } else if (slow && (display_was == (display_now = ticktock(frequency)))) {
             /* Do nothing: slow display cannot handle real-time refresh rate. */
         } else {
             if (escape) { fputs("\033[3;1H", out_fp); }
@@ -2921,7 +3033,7 @@ int main(int argc, char * argv[])
                 out_fp = diminuto_observation_create(headless, &temporary);
                 assert(out_fp != (FILE *)0);
             }
-            before = after;
+            display_was = display_now;
             refresh = 0;
         }
 

@@ -126,7 +126,7 @@ enum HazerGnssConstants {
     HAZER_GNSS_SATELLITES   = 32,	/* Per constellation or system. */
     HAZER_GNSS_VIEWS        = 4,	/* Per NMEA GSV message. */
     HAZER_GNSS_ACTIVES		= 12,	/* Per NMEA GSA message. */
-    HAZER_GNSS_TICKS		= 255,	/* Maximum lifetime. */
+    HAZER_GNSS_SECONDS		= 255,	/* Maximum lifetime. */
     HAZER_GNSS_DOP			= 9999,	/* Maximum DOP in units * 100 */
 };
 
