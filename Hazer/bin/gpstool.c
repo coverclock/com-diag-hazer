@@ -328,10 +328,12 @@ static void send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * i
  */
 static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
     ssize_t length = 0;
+    diminuto_ipv6_t address = { 0, };
+	diminuto_port_t port = 0;
 
     if (size <= 1) {
         /* Do nothing. */
-    } else if ((length = diminuto_ipc6_datagram_receive(fd, buffer, size - 1)) <= 0) {
+    } else if ((length = diminuto_ipc6_datagram_receive_generic(fd, buffer, size - 1, &address, &port, 0)) <= 0) {
         /* Do nothing. */
     } else if (length >= size) {
         /* Should be impossible. */
