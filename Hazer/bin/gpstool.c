@@ -90,22 +90,45 @@
  * CONSTANTS
  ******************************************************************************/
 
+/**
+ * If we're displaying in real-time using full screen control, we try to limit
+ * our output lines to this many bytes.
+ */
 static const size_t LIMIT = 80 - (sizeof("OUT ") - 1) - (sizeof("[123] ") - 1) - (sizeof("\r\n") - 1) - 1;
 
+/**
+ * If we're just scrolling our output continuously, we don't limit the line
+ * length.
+ */
 static const size_t UNLIMITED = ~(size_t)0;
 
+/**
+ * This is the Unicode for the degree symbol.
+ */
 static const wchar_t DEGREE = 0x00B0;
 
+/**
+ * This is the Unicode for the plus&minus symbol.
+ */
 static const wchar_t PLUSMINUS = 0x00B1;
 
 /*******************************************************************************
  * GLOBALS
  ******************************************************************************/
 
+/**
+ * This is our program name as provided by the run-time system.
+ */
 static const char * Program = (const char *)0;
 
+/**
+ * This is our host name as provided by the run-time system.
+ */
 static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 
+/**
+ * This is our POSIX thread mutual exclusion semaphore.
+ */
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /*******************************************************************************
@@ -163,8 +186,28 @@ static inline void countdown(expiry_t * ep, diminuto_sticks_t elapsed)
     }
 }
 
+#if 0
+/**
+ * Display the particulars of a UDP "connection". Useful when debugging.
+ * @param label is a string that gets displayed to identify the connection.
+ * @param fd is the socket.
+ * @param protocol is the protocol in use: IPV4, IPV6, or PROTOCOL.
+ * @param ipv4p points to an IPv4 address or NULL.
+ * @param ipv6p points to an IPv6 address or NULL.
+ * @param port is a port number.
+ * @param buffer points to a buffer or NULL.
+ * @param size is the size of the buffer in bytes.
+ */
+static void show_connection(const char * label, int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
+{
+    diminuto_ipv4_buffer_t ipv4;
+    diminuto_ipv6_buffer_t ipv6;
+    fprintf(stderr, "%s: (%d) {%d} \"%s\" \"%s\" :%d %p [%zu]\n", label, fd, protocol, ipv4p ? diminuto_ipc4_address2string(*ipv4p, ipv4, sizeof(ipv4)) : "", ipv6p ? diminuto_ipc6_address2string(*ipv6p, ipv6, sizeof(ipv6)): "", port, buffer, size);
+}
+#endif
+
 /*******************************************************************************
- * WRITERS
+ * EMITTERS
  ******************************************************************************/
 
 /**
@@ -1426,6 +1469,7 @@ int main(int argc, char * argv[])
     diminuto_mux_t mux;
     int eof = 0;
     int error = 0;
+    int ready = 0;
     /*
      * External symbols.
      */
@@ -1452,8 +1496,6 @@ int main(int argc, char * argv[])
     diminuto_log_setmask();
 
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
-
-    epoch = diminuto_time_elapsed();
 
     diminuto_mux_init(&mux);
 
@@ -1784,7 +1826,7 @@ int main(int argc, char * argv[])
     } else {
 
         /*
-         * Receiving updates via IPv6.
+         * Receiving updates passively via IPv6 with keepalives disabled.
          */
 
         surveyor_fd = diminuto_ipc6_datagram_peer(surveyor_endpoint.udp);
@@ -2043,7 +2085,7 @@ int main(int argc, char * argv[])
      * Start the clock.
      */
 
-    display_now = display_was = expiration_now = expiration_was = keepalive_now = keepalive_was = ticktock(frequency = diminuto_frequency());
+    display_now = display_was = expiration_now = expiration_was = keepalive_now = keepalive_was = (epoch = diminuto_time_elapsed()) / (frequency = diminuto_frequency());
 
     /**
      ** WORK LOOP
@@ -2073,9 +2115,11 @@ int main(int argc, char * argv[])
          * below will return nothing.
          */
 
+        ready = 0;
+
         if (fready(in_fp)) {
             /* Do nothing. */
-        } else if ((rc = diminuto_mux_wait(&mux, frequency)) >= 0) {
+        } else if ((ready = diminuto_mux_wait(&mux, frequency)) >= 0) {
             /* Do nothing. */
         } else if (errno == EINTR) {
             continue; /* Interrupted by a signal, perhaps SIGINT or SIGTERM. */
@@ -2097,7 +2141,7 @@ int main(int argc, char * argv[])
 
         fd = SKIP;
 
-        while (fready(in_fp) || ((fd = diminuto_mux_ready_read(&mux)) >= 0)) {
+        while (fready(in_fp) || ((ready > 0) && ((fd = diminuto_mux_ready_read(&mux)) >= 0))) {
 
             buffer = (unsigned char *)0;
 
@@ -2165,6 +2209,10 @@ int main(int argc, char * argv[])
                 if (buffer != (unsigned char *)0) {
                     break;
                 }
+
+            } else if (ready == 0) {
+
+                /* Do nothing. */
 
             } else if (fd == datagram_fd) {
 
@@ -2248,16 +2296,24 @@ int main(int argc, char * argv[])
             break;
         }
 
+        /**
+         ** KEEPALIVE
+         **/
+
         /*
          * If our keep alive interval has expired, send a keep alive
-         * (a zero-length RTCM message) to the surveyor. This is necessary
-         * to establish and maintain the return path for UDP "connections"
-         * that go through NATting firewalls. The surveyor we are talking to
-         * probably isn't another gpstool instance; it's an rtktool that has
-         * a static address, or at least a dynamic DNS address, and which
+         * (an RTCM message with a zero-length payload) to the surveyor. This
+         * is necessary to establish and maintain the return path for datagram
+         * streams that go through NATting firewalls. The surveyor we are
+         * talking to probably isn't another gpstool; it's an rtktool that has
+         * a static address, or at least a dynamic DNS (DDNS) address, and which
          * handles the routing of RTK updates from the stationary base station
-         * in survey mode and one or more  mobile rover.
+         * in survey mode and one or more mobile rovers. I borrowed this
+         * technique from SIP, where VoIP phones issue keepalives to PBXen like
+         * Asterisk every twenty-five seconds, under the assumption that a
+         * typical firewall UDP "connection" timeout is thirty seconds.
          */
+
         if (surveyor_fd < 0) {
             /* Do nothing. */
         } else if (keepalive < 0) {
@@ -2277,17 +2333,29 @@ int main(int argc, char * argv[])
             continue;
         }
 
+        /*
+         * All of our input mechanisms terminate their buffers with a NUL
+         * character for consistency and safety, even for those formats that
+         * deliver binary data (the input mechanism doesn't necessarily know
+         * whether the input format is binary or character). The size set
+         * by the input mechanism reflects this. We use the size minus the
+         * trailing NUL so often that we dedicate a variable just for that
+         * value.
+         */
+
         size1 = size - 1;
 
         /**
-         ** VALIDATION
-         **
-         ** We know how to validate an NMEA sentence and a UBX message. We
-         ** sanity check the data format in either case, and compute the
-         ** appropriate checksum and verify it. The state machines know what
-         ** the format of the data is when we got it directly from the device,
-         ** but in the case of IP datagrams, we haven't figured that out yet.
+         ** VALIDATE
          **/
+
+        /*
+         * We know how to validate an NMEA sentence and a UBX message. We
+         * sanity check the data format in either case, and compute the
+         * appropriate checksum and verify it. The state machines know what
+         * the format of the data is when we got it directly from the device,
+         * but in the case of IP datagrams, we haven't figured that out yet.
+         */
 
         if ((length = hazer_length(buffer, size)) > 0) {
 
@@ -2524,19 +2592,27 @@ int main(int argc, char * argv[])
              */
 
             if (count < 1) {
+
                 continue;
+
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
+
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
                     fprintf(err_fp, "UNK %s: TALKER? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
                     print_buffer(err_fp, synthesized, size - 1, UNLIMITED);
                 }
+
                 continue;
+
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
+
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
                     fprintf(err_fp, "UNK %s: SYSTEM? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
                     print_buffer(err_fp, synthesized, size - 1, UNLIMITED);
                 }
+
                 continue;
+
             } else {
                 /* Do nothing. */
             }
@@ -2991,6 +3067,7 @@ int main(int argc, char * argv[])
         } else if (slow && (display_was == (display_now = ticktock(frequency)))) {
             /* Do nothing: slow display cannot handle real-time refresh rate. */
         } else {
+
             if (escape) { fputs("\033[3;1H", out_fp); }
             if (report) {
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
@@ -3008,13 +3085,21 @@ int main(int argc, char * argv[])
             }
             if (escape) { fputs("\033[0J", out_fp); }
             if (report) { fflush(out_fp); }
+
+            /*
+             * If we're running headless, commit this observation to the
+             * file system and start a new observation in a temporary file.
+             */
+
             if (headless != (const char *)0) {
                 out_fp = diminuto_observation_commit(out_fp, &temporary);
                 assert(out_fp == (FILE *)0);
                 out_fp = diminuto_observation_create(headless, &temporary);
                 assert(out_fp != (FILE *)0);
             }
+
             display_was = display_now;
+
             refresh = 0;
         }
 
