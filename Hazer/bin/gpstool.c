@@ -1708,11 +1708,9 @@ int main(int argc, char * argv[])
         datagram_protocol = IPV6;
 
         datagram_fd = diminuto_ipc6_datagram_peer(0);
-        if (datagram_fd < 0) { diminuto_perror(datagram_option); }
         assert(datagram_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
-        if (rc < 0) { diminuto_perror(datagram_option); }
         assert(rc >= 0);
 
         role = PRODUCER;
@@ -1722,11 +1720,9 @@ int main(int argc, char * argv[])
         datagram_protocol = IPV4;
 
         datagram_fd = diminuto_ipc4_datagram_peer(0);
-        if (datagram_fd < 0) { diminuto_perror(datagram_option); }
         assert(datagram_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
-        if (rc < 0) { diminuto_perror(datagram_option); }
         assert(rc >= 0);
 
         role = PRODUCER;
@@ -1734,11 +1730,9 @@ int main(int argc, char * argv[])
     } else {
 
         datagram_fd = diminuto_ipc6_datagram_peer(datagram_endpoint.udp);
-        if (datagram_fd < 0) { diminuto_perror(datagram_option); }
         assert(datagram_fd >= 0);
 
         rc = diminuto_mux_register_read(&mux, datagram_fd);
-        if (rc < 0) { diminuto_perror(datagram_option); }
         assert(rc >= 0);
 
         role = CONSUMER;
@@ -1768,11 +1762,9 @@ int main(int argc, char * argv[])
         surveyor_protocol = IPV6;
 
         surveyor_fd = diminuto_ipc6_datagram_peer(0);
-        if (surveyor_fd < 0) { diminuto_perror(surveyor_option); }
         assert(surveyor_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
-        if (rc < 0) { diminuto_perror(surveyor_option); }
         assert(rc >= 0);
 
     } else if (!diminuto_ipc4_is_unspecified(&surveyor_endpoint.ipv4)) {
@@ -1784,11 +1776,9 @@ int main(int argc, char * argv[])
         surveyor_protocol = IPV4;
 
         surveyor_fd = diminuto_ipc4_datagram_peer(0);
-        if (surveyor_fd < 0) { diminuto_perror(surveyor_option); }
         assert(surveyor_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
-        if (rc < 0) { diminuto_perror(surveyor_option); }
         assert(rc >= 0);
 
     } else {
@@ -1798,15 +1788,9 @@ int main(int argc, char * argv[])
          */
 
         surveyor_fd = diminuto_ipc6_datagram_peer(surveyor_endpoint.udp);
-        if (surveyor_fd < 0) { diminuto_perror(surveyor_option); }
         assert(surveyor_fd >= 0);
 
-        rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
-        if (rc < 0) { diminuto_perror(surveyor_option); }
-        assert(rc >= 0);
-
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
-        if (rc < 0) { diminuto_perror(surveyor_option); }
         assert(rc >= 0);
 
         keepalive = -1;
@@ -1939,7 +1923,6 @@ int main(int argc, char * argv[])
     in_fd = fileno(in_fp);
 
     rc = diminuto_mux_register_read(&mux, in_fd);
-    if (rc < 0) { diminuto_perror(source ? source : device ? device : "stdin"); }
     assert(rc >= 0);
 
     /*
@@ -1949,7 +1932,6 @@ int main(int argc, char * argv[])
 
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_create(headless, &temporary);
-        if (out_fp == (FILE *)0) { diminuto_perror(headless); }
         assert(out_fp != (FILE *)0);
     }
 
@@ -2276,7 +2258,6 @@ int main(int argc, char * argv[])
          * handles the routing of RTK updates from the stationary base station
          * in survey mode and one or more  mobile rover.
          */
-
         if (surveyor_fd < 0) {
             /* Do nothing. */
         } else if (keepalive < 0) {
