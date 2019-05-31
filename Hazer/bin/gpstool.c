@@ -1674,7 +1674,7 @@ int main(int argc, char * argv[])
             fprintf(err_fp, "       -E          Like -R but use ANSI Escape sequences.\n");
             fprintf(err_fp, "       -F          Like -R but reFresh at 1Hz.\n");
             fprintf(err_fp, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
-            fprintf(err_fp, "       -G :PORT    Use local PORT as dataGram source.\n");
+            fprintf(err_fp, "       -G PORT     Use local PORT as dataGram source.\n");
             fprintf(err_fp, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(err_fp, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
             fprintf(err_fp, "       -K          Write input to DEVICE sinK from datagram source.\n");
@@ -1687,7 +1687,8 @@ int main(int argc, char * argv[])
             fprintf(err_fp, "       -W STRING   Collapse STRING, append checksum, Write to DEVICE.\n");
             fprintf(err_fp, "       -W ''       Exit when this empty Write STRING is processed.\n");
             fprintf(err_fp, "       -X          Enable message eXpiration test mode.\n");
-            fprintf(err_fp, "       -Y IP:PORT  Use remote IP and PORT and local PORT as surveYor source.\n");
+            fprintf(err_fp, "       -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.\n");
+            fprintf(err_fp, "       -Y PORT     Use local PORT as surveYor source.\n");
             fprintf(err_fp, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(err_fp, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(err_fp, "       -d          Display Debug output on standard error.\n");

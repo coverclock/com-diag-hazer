@@ -585,7 +585,7 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 
 # Help
 
-    usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -W STRING ... ] [ -U STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -K [ -k MASK ] ]
+    usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
@@ -594,37 +594,40 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
            -F          Like -R but reFresh at 1Hz.
-           -G IP:PORT  Use IP and PORT as dataGram sink.
-           -G :PORT    Use PORT as dataGram source.
+           -G IP:PORT  Use remote IP and PORT as dataGram sink.
+           -G PORT     Use local PORT as dataGram source.
            -H HEADLESS Like -R but writes each iteration to HEADLESS file.
            -I PIN      Take 1PPS from GPIO Input PIN (requires -D).
            -K          Write input to DEVICE sinK from datagram source.
            -L LOG      Write input to LOG file.
            -R          Print a Report on standard output.
-           -S SOURCE   Use SOURCE file or FIFO for input.
+           -S SOURCE   Use SOURCE file or named pipe for input.
            -U STRING   Like -W except expect UBX ACK or NAK response.
            -U ''       Exit when this empty UBX STRING is processed.
            -V          Print release, Vintage, and revision on standard output.
            -W STRING   Collapse STRING, append checksum, Write to DEVICE.
            -W ''       Exit when this empty Write STRING is processed.
            -X          Enable message eXpiration test mode.
+           -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.
+           -Y PORT     Use local PORT as surveYor source.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
            -d          Display Debug output on standard error.
            -e          Use Even parity for DEVICE.
-           -g MASK     Set dataGram sink mask (NMEA=1, UBX=2, RTCM=4), default 1.
+           -g MASK     Set dataGram sink mask (NMEA=1, UBX=2, RTCM=4) default NMEA.
            -h          Use RTS/CTS Hardware flow control for DEVICE.
-           -k MASK     Set device sinK mask (NMEA=1, UBX=2, RTCM=4), default 1.
+           -k MASK     Set device sinK mask (NMEA=1, UBX=2, RTCM=4) default NMEA.
            -l          Use Local control for DEVICE.
            -m          Use Modem control for DEVICE.
            -o          Use Odd parity for DEVICE.
-           -p PIN      Assert GPIO output PIN with 1PPS (requires -D and -I or -c).
+           -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c).
            -n          Use No parity for DEVICE.
            -r          Reverse use of standard output and standard error.
            -s          Use XON/XOFF (control-Q/control-S) for DEVICE.
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
+           -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
  
 # Display
 
