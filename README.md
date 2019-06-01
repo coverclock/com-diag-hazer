@@ -1630,11 +1630,10 @@ use SimpleRTK2B boards interchangeably in the field.
 
 # Bugs I Have Known
 
-I am of course assuming that these are somehow in my code. But I described both
-of them on the U-Blox customer portal.
-
+This is likely to be a bug in the receiver firmware, but I'm keeping an eye out in my code:
 <https://portal.u-blox.com/s/question/0D52p00008WRsgMCAT/ubxzedf9p-incorrect-number-of-satellites-in-view-for-nmea-gsv-for-glonass>
 
+This for sure is a bug in my code, which I am working to resolve: 
 <https://portal.u-blox.com/s/question/0D52p00008WRsgLCAT/ubxzedf9p-occasional-incorrect-length-in-rtcm-message>
 
 # Acknowledgements
