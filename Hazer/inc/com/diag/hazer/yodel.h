@@ -203,6 +203,18 @@ extern yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, s
  ******************************************************************************/
 
 /**
+ * Update a running UBX Fletcher checksum with the latest input character.
+ * @param ch is the input character.
+ * @param csap points to the A running checksum character.
+ * @param csbp points to the B running checksum character.
+ */
+static inline void yodel_checksum(uint8_t ch, uint8_t * csap, uint8_t * csbp)
+{
+    *csap += ch;
+    *csbp += *csap;
+}
+
+/**
  * Compute the Fletcher checksum used by UBX for the specified buffer. The
  * buffer points to the beginning of the UBX packet, not to the subset that
  * is checksummed, and the sentence must contain a valid length field. A pointer
@@ -210,11 +222,11 @@ extern yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, s
  * checksum will be stored in a correctly formed packet.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
- * @param ck_ap points to where the ck_a value will be stored.
- * @param ck_bp points to where the ck_b value will be stored.
+ * @param csap points to where the ck_a value will be stored.
+ * @param csbp points to where the ck_b value will be stored.
  * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
-extern const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp);
+extern const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * csap, uint8_t * csbp);
 
 /**
  * Return the length of the completed packet in bytes.

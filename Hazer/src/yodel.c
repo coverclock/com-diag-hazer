@@ -235,12 +235,12 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
  * eight-bit checksum, but the result is really sixteen bits (CK_A and
  * CK_B), although it is performed eight-bits at a time on the input data.
  */
-const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
+const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * csap, uint8_t * csbp)
 {
     const void * result = (void *)0;
     const uint8_t * bp = (const uint8_t *)buffer;
-    uint8_t ck_a = 0;
-    uint8_t ck_b = 0;
+    uint8_t csa = 0;
+    uint8_t csb = 0;
     uint16_t length = 0;
 
     /*
@@ -253,12 +253,11 @@ const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * c
     if ((length + YODEL_UBX_UNSUMMED) <= size) {
 
         for (bp += YODEL_UBX_CLASS; length > 0; --length) {
-            ck_a += *(bp++);
-            ck_b += ck_a;
+        	yodel_checksum(*(bp++), &csa, &csb);
         }
 
-        *ck_ap = ck_a;
-        *ck_bp = ck_b;
+        *csap = csa;
+        *csbp = csb;
 
         result = bp;
 

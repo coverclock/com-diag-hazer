@@ -413,15 +413,13 @@ extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, s
  ******************************************************************************/
 
 /**
- * Update a checksum with the latest input character and return the new value.
+ * Update a running NMEA XOR checksum with the latest input character.
  * @param ch is the input character.
- * @param cs is the old checksum.
- * @return the new checksum.
+ * @param csp points to the running checksum character.
  */
-static inline uint8_t hazer_checksum(uint8_t ch, uint8_t cs)
+static inline void hazer_checksum(uint8_t ch, uint8_t * csp)
 {
-	cs ^= ch;
-	return cs;
+	*csp ^= ch;
 }
 
 /**

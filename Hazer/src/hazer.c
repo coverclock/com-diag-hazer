@@ -294,7 +294,7 @@ const void * hazer_checksum_buffer(const void * buffer, size_t size, uint8_t * c
         --size;
 
         while ((size > 0) && (*bp != HAZER_STIMULUS_CHECKSUM) && (*bp != '\0')) {
-        	cs = hazer_checksum(*(bp++), cs);
+        	hazer_checksum(*(bp++), &cs);
             --size;
         }
 
