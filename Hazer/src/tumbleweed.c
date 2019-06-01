@@ -289,7 +289,7 @@ const uint32_t TUMBLEWEED_CRC24Q[256] = {
  * Daemon) repository at https://github.com/ukyg9e5r6k7gubiekd6/gpsd. Since
  * I completely rewrote it for Tumbleweed, any bugs are strictly mine.
  */
-const void * tumbleweed_crc24q(const void * buffer, size_t size, uint8_t * crc_1p, uint8_t * crc_2p, uint8_t * crc_3p)
+const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_t * crc_1p, uint8_t * crc_2p, uint8_t * crc_3p)
 {
     const void * result = (void *)0;
     const uint8_t * bp = (const uint8_t *)buffer;

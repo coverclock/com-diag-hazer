@@ -37,7 +37,7 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
@@ -96,7 +96,7 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
@@ -158,7 +158,7 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
@@ -216,7 +216,7 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
@@ -274,7 +274,7 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
@@ -346,7 +346,7 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
@@ -430,7 +430,7 @@ int main(void)
             length = hazer_length(buffer, sizeof(buffer));
             assert(length == strlen(buffer));
 
-            pointer = (char *)hazer_checksum(buffer, length, &cs);
+            pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
             assert(pointer != (char *)0);
             assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
@@ -581,7 +581,7 @@ int main(void)
             length = hazer_length(buffer, sizeof(buffer));
             assert(length == strlen(buffer));
 
-            pointer = (char *)hazer_checksum(buffer, length, &cs);
+            pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
             assert(pointer != (char *)0);
             assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 

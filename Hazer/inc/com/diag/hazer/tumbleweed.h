@@ -141,6 +141,7 @@ typedef enum TumbleweedState {
     TUMBLEWEED_STATE_CRC_2,
 	TUMBLEWEED_STATE_CRC_3,
     TUMBLEWEED_STATE_END,
+	TUMBLEWEED_STATE_ERR,
 } tumbleweed_state_t;
 
 /**
@@ -190,7 +191,7 @@ extern tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, v
 
 /**
  * This is the cyclic redundancy check table generated from the CRC-24Q
- * polynomial. It is exposed for unit testing.
+ * polynomial.
  *
  * p(X) = X^23 + X^17 + X^13 + X^12 + X^11 + X^9 + X^8 + X^7 + X^5 + X^3 + 1
  *
@@ -201,9 +202,9 @@ extern const uint32_t TUMBLEWEED_CRC24Q[256];
 /**
  * Compute the CRC-24Q used by RTCM for the specified buffer. The
  * buffer points to the beginning of the UBX packet, not to the subset that
- * is CRCed, and the sentence must contain a valid length field. A pointer
- * is returned pointing just past the CRCed portion; this is where the
- * CRC-24Q will be stored in a correctly formed packet.
+ * is cyclic redundance checked, and the sentence must contain a valid length
+ * field. A pointer is returned pointing just past the CRCed portion; this is
+ * where the CRC-24Q will be stored in a correctly formed packet.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
  * @param crc_1p points to where the CRC-24Q[0] value will be stored.
@@ -211,7 +212,7 @@ extern const uint32_t TUMBLEWEED_CRC24Q[256];
  * @param crc_3p points to where the CRC-24Q[2] value will be stored.
  * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
-extern const void * tumbleweed_crc24q(const void * buffer, size_t size, uint8_t * crc_1p, uint8_t * crc_2p, uint8_t * crc_3p);
+extern const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_t * crc_1p, uint8_t * crc_2p, uint8_t * crc_3p);
 
 /**
  * Return the length of the completed message in bytes.

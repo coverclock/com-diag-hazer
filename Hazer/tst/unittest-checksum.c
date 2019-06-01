@@ -55,60 +55,60 @@ int main(void)
         }
 
         cs = '?';
-        bp = hazer_checksum((const void *)0, 0, &cs);
+        bp = hazer_checksum_buffer((const void *)0, 0, &cs);
         assert(bp == (const void *)0);
         assert(cs == '?');
 
         cs = '!';
-        bp = hazer_checksum("", 0, &cs);
+        bp = hazer_checksum_buffer("", 0, &cs);
         assert(bp == (const void *)0);
         assert(cs == '!');
 
         cs = ~0;
-        bp = hazer_checksum("$", 1, &cs);
+        bp = hazer_checksum_buffer("$", 1, &cs);
         assert(bp != (const void *)0);
         assert(*(unsigned char *)bp == '\0');
         assert(cs == 0x00);
 
         cs = ~0;
-        bp = hazer_checksum("$", 2, &cs);
+        bp = hazer_checksum_buffer("$", 2, &cs);
         assert(bp != (const void *)0);
         assert(*(unsigned char *)bp == '\0');
         assert(cs == 0x00);
 
         cs = ~0;
-        bp = hazer_checksum("$*", 2, &cs);
+        bp = hazer_checksum_buffer("$*", 2, &cs);
         assert(bp != (const void *)0);
         assert(*(unsigned char *)bp == '*');
         assert(cs == 0x00);
 
         cs = ~0;
-        bp = hazer_checksum("$*", 3, &cs);
+        bp = hazer_checksum_buffer("$*", 3, &cs);
         assert(bp != (const void *)0);
         assert(*(unsigned char *)bp == '*');
         assert(cs == 0x00);
 
-        bp = hazer_checksum("$V*TU\r\n", 8, &cs);
+        bp = hazer_checksum_buffer("$V*TU\r\n", 8, &cs);
         assert(bp != (const void *)0);
         assert(*(unsigned char *)bp == '*');
         assert(cs == 0x56);
 
-        bp = hazer_checksum("$VW*TU\r\n", 9, &cs);
+        bp = hazer_checksum_buffer("$VW*TU\r\n", 9, &cs);
         assert(bp != (const void *)0);
         assert(*(unsigned char *)bp == '*');
         assert(cs == 0x01);
 
-        bp = hazer_checksum("$VWX*TU\r\n", 10, &cs);
+        bp = hazer_checksum_buffer("$VWX*TU\r\n", 10, &cs);
         assert(bp != (const void *)0);
         assert(*(unsigned char *)bp == '*');
         assert(cs == 0x59);
 
-        bp = hazer_checksum("$VWXY*TU\r\n", 11, &cs);
+        bp = hazer_checksum_buffer("$VWXY*TU\r\n", 11, &cs);
         assert(bp != (const void *)0);
         assert(*(unsigned char *)bp == '*');
         assert(cs == 0x00);
 
-        bp = hazer_checksum("$VWXYZ*TU\r\n", 12, & cs);
+        bp = hazer_checksum_buffer("$VWXYZ*TU\r\n", 12, & cs);
         assert(bp != (const void *)0);
         assert(*(unsigned char *)bp == '*');
         assert(cs == 0x5A);
@@ -129,7 +129,7 @@ int main(void)
         size = hazer_length(NMEA, sizeof(NMEA));
         assert(size == (sizeof(NMEA) - 1));
 
-        bp = hazer_checksum(NMEA, sizeof(NMEA), &cs);
+        bp = hazer_checksum_buffer(NMEA, sizeof(NMEA), &cs);
         assert(bp == &NMEA[sizeof(NMEA) - 6]);
 
         assert(bp[0] == '*');
@@ -162,7 +162,7 @@ int main(void)
         size = hazer_length(NMEA, sizeof(NMEA));
         assert(size == (sizeof(NMEA) - 1));
 
-        bp = hazer_checksum(NMEA, sizeof(NMEA), &cs);
+        bp = hazer_checksum_buffer(NMEA, sizeof(NMEA), &cs);
         assert(bp == &NMEA[sizeof(NMEA) - 6]);
 
         assert(bp[0] == '*');
@@ -200,7 +200,7 @@ int main(void)
         size = yodel_length(UBX, sizeof(UBX));
         assert(size == (sizeof(UBX) - 1));
 
-        here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a == here[0]) && (ck_b == here[1]));
     }
@@ -218,7 +218,7 @@ int main(void)
         size = yodel_length(UBX, sizeof(UBX));
         assert(size == (sizeof(UBX) - 1));
 
-        here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a != here[0]) || (ck_b != here[1]));
     }
@@ -236,7 +236,7 @@ int main(void)
         size = yodel_length(UBX, sizeof(UBX));
         assert(size == (sizeof(UBX) - 1));
 
-        here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a != here[0]) || (ck_b != here[1]));
     }
@@ -254,7 +254,7 @@ int main(void)
         size = yodel_length(UBX, sizeof(UBX));
         assert(size == (sizeof(UBX) - 1));
 
-        here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a != here[0]) || (ck_b != here[1]));
     }
@@ -283,7 +283,7 @@ int main(void)
         size = yodel_length(UBX, sizeof(UBX)); /* Length not correct. */
         assert(size >= 0);
 
-        here = (const char *)yodel_checksum(UBX, size, &ck_a, &ck_b);
+        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a != here[0]) || (ck_b != here[1]));
     }

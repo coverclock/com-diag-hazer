@@ -76,7 +76,7 @@ int main(void)
 			uint8_t crc_1 = 0xaa;
 			uint8_t crc_2 = 0x55;
 			uint8_t crc_3 = 0xa5;
-			bb = tumbleweed_crc24q(message, size, &crc_1, &crc_2, &crc_3);
+			bb = tumbleweed_checksum_buffer(message, size, &crc_1, &crc_2, &crc_3);
 			fprintf(stderr, "\"%s\"[%zu] 0x%02x 0x%02x 0x%02x\n", string, length, crc_1, crc_2, crc_3);
 	    	diminuto_dump(stderr, message, size);
 			assert(crc_1 == message[size - 3]);
@@ -164,7 +164,7 @@ int main(void)
 			uint8_t crc_1 = 0xaa;
 			uint8_t crc_2 = 0x55;
 			uint8_t crc_3 = 0xa5;
-			bb = tumbleweed_crc24q(message, size, &crc_1, &crc_2, &crc_3);
+			bb = tumbleweed_checksum_buffer(message, size, &crc_1, &crc_2, &crc_3);
 			fprintf(stderr, "\"%s\"[%zu] 0x%02x 0x%02x 0x%02x\n", string, length, crc_1, crc_2, crc_3);
 	    	diminuto_dump(stderr, message, size);
 			assert(crc_1 == message[size - 3]);

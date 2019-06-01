@@ -235,7 +235,7 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
  * eight-bit checksum, but the result is really sixteen bits (CK_A and
  * CK_B), although it is performed eight-bits at a time on the input data.
  */
-const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
+const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp)
 {
     const void * result = (void *)0;
     const uint8_t * bp = (const uint8_t *)buffer;

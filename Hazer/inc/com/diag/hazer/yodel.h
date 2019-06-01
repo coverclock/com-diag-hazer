@@ -154,6 +154,7 @@ typedef enum YodelState {
     YODEL_STATE_CK_A,
     YODEL_STATE_CK_B,
     YODEL_STATE_END,
+	YODEL_STATE_ERR,
 } yodel_state_t;
 
 /**
@@ -213,7 +214,7 @@ extern yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, s
  * @param ck_bp points to where the ck_b value will be stored.
  * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
-extern const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp);
+extern const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp);
 
 /**
  * Return the length of the completed packet in bytes.

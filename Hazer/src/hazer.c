@@ -279,7 +279,7 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
  *
  ******************************************************************************/
 
-const void * hazer_checksum(const void * buffer, size_t size, uint8_t * ckp)
+const void * hazer_checksum_buffer(const void * buffer, size_t size, uint8_t * ckp)
 {
     const void * result = (void *)0;
     const unsigned char * bp = (const unsigned char *)0;
@@ -294,8 +294,7 @@ const void * hazer_checksum(const void * buffer, size_t size, uint8_t * ckp)
         --size;
 
         while ((size > 0) && (*bp != HAZER_STIMULUS_CHECKSUM) && (*bp != '\0')) {
-            ch = *(bp++);
-            cs ^= ch;
+        	cs = hazer_checksum(*(bp++), cs);
             --size;
         }
 

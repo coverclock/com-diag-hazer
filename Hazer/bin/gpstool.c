@@ -224,7 +224,7 @@ static void emit_sentence(FILE * fp, const char * string, size_t size)
     char msn = '\0';
     char lsn = '\0';
 
-    if (hazer_checksum(string, size, &cs) == (void *)0) {
+    if (hazer_checksum_buffer(string, size, &cs) == (void *)0) {
         errno = EIO;
         diminuto_perror("emit_sentence: checksum");
     } else if (hazer_checksum2characters(cs, &msn, &lsn) < 0) {
@@ -255,7 +255,7 @@ static void emit_packet(FILE * fp, const void * packet, size_t size)
     uint8_t ck_b = 0;
     size_t length = 0;
 
-    if ((bp = yodel_checksum(packet, size, &ck_a, &ck_b)) == (void *)0) {
+    if ((bp = yodel_checksum_buffer(packet, size, &ck_a, &ck_b)) == (void *)0) {
         errno = EIO;
         diminuto_perror("emit_packet: checksum");
     } else if (fwrite(packet, length = (const char *)bp - (const char *)packet, 1, fp) < 1) {
@@ -2264,7 +2264,7 @@ int main(int argc, char * argv[])
                     /* Do nothing. */
                 } else if ((length = tumbleweed_length(surveyor_buffer, size1)) <= 0) {
                     /* Do nothing. */
-                } else if ((bp = (unsigned char *)tumbleweed_crc24q(surveyor_buffer, length, &rtcm_crc_1, &rtcm_crc_2, &rtcm_crc_3)) == (unsigned char *)0) {
+                } else if ((bp = (unsigned char *)tumbleweed_checksum_buffer(surveyor_buffer, length, &rtcm_crc_1, &rtcm_crc_2, &rtcm_crc_3)) == (unsigned char *)0) {
                     /* Do nothing. */
                 } else if ((rtcm_crc_1 != bp[0]) || (rtcm_crc_2 != bp[1]) || (rtcm_crc_3 != bp[2])) {
                     fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x%02x%02x 0x%02x%02x%02x [%zd] [%zd]\n", Program, rtcm_crc_1, rtcm_crc_2, rtcm_crc_3, bp[0], bp[1], bp[2], size1, length);
@@ -2362,7 +2362,7 @@ int main(int argc, char * argv[])
 
         if ((length = hazer_length(buffer, size)) > 0) {
 
-            bp = (unsigned char *)hazer_checksum(buffer, size, &nmea_cs);
+            bp = (unsigned char *)hazer_checksum_buffer(buffer, size, &nmea_cs);
             assert(bp != (unsigned char *)0);
 
             rc = hazer_characters2checksum(bp[1], bp[2], &nmea_ck);
@@ -2378,7 +2378,7 @@ int main(int argc, char * argv[])
 
         } else if ((length = yodel_length(buffer, size)) > 0) {
 
-            bp = (unsigned char *)yodel_checksum(buffer, size, &ubx_ck_a, &ubx_ck_b);
+            bp = (unsigned char *)yodel_checksum_buffer(buffer, size, &ubx_ck_a, &ubx_ck_b);
             assert(bp != (unsigned char *)0);
 
             if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
@@ -2391,7 +2391,7 @@ int main(int argc, char * argv[])
 
         } else if ((length = tumbleweed_length(buffer, size)) > 0) {
 
-            bp = (unsigned char *)tumbleweed_crc24q(buffer, size, &rtcm_crc_1, &rtcm_crc_2, &rtcm_crc_3);
+            bp = (unsigned char *)tumbleweed_checksum_buffer(buffer, size, &rtcm_crc_1, &rtcm_crc_2, &rtcm_crc_3);
             assert(bp != (unsigned char *)0);
 
             if ((rtcm_crc_1 != bp[0]) || (rtcm_crc_2 != bp[1]) || (rtcm_crc_3 != bp[2])) {
@@ -2574,7 +2574,7 @@ int main(int argc, char * argv[])
             assert(synthesized[size - 2] == HAZER_STIMULUS_CHECKSUM);
             assert(synthesized[size - 1] == HAZER_STIMULUS_NUL);
 
-            bp = (unsigned char *)hazer_checksum(synthesized, size, &nmea_cs);
+            bp = (unsigned char *)hazer_checksum_buffer(synthesized, size, &nmea_cs);
             hazer_checksum2characters(nmea_cs, &msn, &lsn);
             assert(bp[0] == HAZER_STIMULUS_CHECKSUM);
 

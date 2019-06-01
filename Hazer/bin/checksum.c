@@ -60,7 +60,7 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
     char * buffer = (char *)0;
 
     do {
-        bp = hazer_checksum(sentence, size, &cs);
+        bp = hazer_checksum_buffer(sentence, size, &cs);
         if (bp == (char *)0) { break; }
         if (hazer_checksum2characters(cs, &msn, &lsn) < 0) { break; }
         length = (const char *)bp - (const char *)sentence;
@@ -102,7 +102,7 @@ static int print_message(FILE * fp, const void * message, size_t size)
     do {
         payload = yodel_length(message, size);
         if (payload == 0) { break; }
-        bp = yodel_checksum(message, payload, &ck_a, &ck_b);
+        bp = yodel_checksum_buffer(message, payload, &ck_a, &ck_b);
         if (bp == (void *)0) { break; }
         length = (const char *)bp - (const char *)message;
         buffer = malloc(length + 3);

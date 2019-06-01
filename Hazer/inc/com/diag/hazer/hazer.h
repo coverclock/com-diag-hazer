@@ -168,6 +168,7 @@ typedef enum HazerState {
     HAZER_STATE_CR,
     HAZER_STATE_LF,
     HAZER_STATE_END,
+	HAZER_STATE_ERR,
 } hazer_state_t;
 
 /**
@@ -412,6 +413,18 @@ extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, s
  ******************************************************************************/
 
 /**
+ * Update a checksum with the latest input character and return the new value.
+ * @param ch is the input character.
+ * @param cs is the old checksum.
+ * @return the new checksum.
+ */
+static inline uint8_t hazer_checksum(uint8_t ch, uint8_t cs)
+{
+	cs ^= ch;
+	return cs;
+}
+
+/**
  * Compute the eight-bit checksum of an NMEA sentence. The buffer points to the
  * beginning of the NMEA sentence, including the '$', not to the subset that
  * is checksummed. A pointer is returned pointing just past the checksummed
@@ -422,7 +435,7 @@ extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, s
  * @param ckp points to where the checksum value will be stored.
  * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
-extern const void * hazer_checksum(const void * buffer, size_t size, uint8_t * ckp);
+extern const void * hazer_checksum_buffer(const void * buffer, size_t size, uint8_t * ckp);
 
 /**
  * Given two checksum characters, convert to an eight-bit checksum.
