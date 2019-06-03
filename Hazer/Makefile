@@ -700,10 +700,11 @@ install-include:
 	tar -C $(OUT)/$(INC_DIR) -cvf - . | tar -C $(INSTALL_INC) -xvf -
 	tar -C $(INC_DIR) -cvf - . | tar -C $(INSTALL_INC) -xvf -
 
-########## Unit test
+########## Unit Test
 
 unit-test:
+	R="PASSED."; \
 	for U in $(TARGETUNITTESTS); do \
-		echo -n "UNIT TEST $$U "; \
-		test -f $$U && $$U && echo "PASS." || echo "FAIL!"; \
-	done
+		$$U || R="FAILED!"; \
+	done; \
+	echo $$R 1>&2

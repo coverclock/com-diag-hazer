@@ -289,7 +289,7 @@ const uint32_t TUMBLEWEED_CRC24Q[256] = {
  * Daemon) repository at https://github.com/ukyg9e5r6k7gubiekd6/gpsd. Since
  * I completely rewrote it for Tumbleweed, any bugs are strictly mine.
  */
-const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_t * crc_1p, uint8_t * crc_2p, uint8_t * crc_3p)
+const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_t * crc1p, uint8_t * crc2p, uint8_t * crc3p)
 {
     const void * result = (void *)0;
     const uint8_t * bp = (const uint8_t *)buffer;
@@ -304,12 +304,10 @@ const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_
     if ((length + TUMBLEWEED_RTCM_UNSUMMED) <= size) {
 
     	for (ii = 0; ii < length; ++ii) {
-    		crc = (crc << 8) ^ TUMBLEWEED_CRC24Q[*(bp++) ^ (uint8_t)(crc >> 16)];
+    		tumbleweed_checksum(*(bp++), &crc);
     	}
 
-        *crc_1p = (uint8_t)((crc >> (8 * 2)) & 0xff);
-        *crc_2p = (uint8_t)((crc >> (8 * 1)) & 0xff);
-        *crc_3p = (uint8_t)((crc >> (8 * 0)) & 0xff);
+    	tumbleweed_checksum2characters(crc, crc1p, crc2p, crc3p);
 
         result = bp;
 

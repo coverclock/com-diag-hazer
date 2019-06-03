@@ -41,8 +41,7 @@ int main(void)
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
-        rc = hazer_checksum2characters(cs, &msn, &lsn);
-        assert(rc == 0);
+        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
@@ -100,8 +99,7 @@ int main(void)
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
-        rc = hazer_checksum2characters(cs, &msn, &lsn);
-        assert(rc == 0);
+        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
@@ -162,8 +160,7 @@ int main(void)
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
-        rc = hazer_checksum2characters(cs, &msn, &lsn);
-        assert(rc == 0);
+        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
@@ -220,8 +217,7 @@ int main(void)
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
-        rc = hazer_checksum2characters(cs, &msn, &lsn);
-        assert(rc == 0);
+        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
@@ -278,8 +274,7 @@ int main(void)
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
-        rc = hazer_checksum2characters(cs, &msn, &lsn);
-        assert(rc == 0);
+        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
@@ -351,8 +346,7 @@ int main(void)
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
         /*
-        rc = hazer_checksum2characters(cs, &msn, &lsn);
-        assert(rc == 0);
+        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
@@ -434,8 +428,7 @@ int main(void)
             assert(pointer != (char *)0);
             assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
-            rc = hazer_checksum2characters(cs, &msn, &lsn);
-            assert(rc == 0);
+            hazer_checksum2characters(cs, &msn, &lsn);
             assert(pointer[1] == msn);
             assert(pointer[2] == lsn);
             assert(pointer[3] == '\r');
@@ -586,8 +579,7 @@ int main(void)
             assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
 
             /*
-            rc = hazer_checksum2characters(cs, &msn, &lsn);
-            assert(rc == 0);
+            hazer_checksum2characters(cs, &msn, &lsn);
             assert(pointer[1] == msn);
             assert(pointer[2] == lsn);
             assert(pointer[3] == '\r');

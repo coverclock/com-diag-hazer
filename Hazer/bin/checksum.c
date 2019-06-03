@@ -62,7 +62,7 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
     do {
         bp = hazer_checksum_buffer(sentence, size, &cs);
         if (bp == (char *)0) { break; }
-        if (hazer_checksum2characters(cs, &msn, &lsn) < 0) { break; }
+        hazer_checksum2characters(cs, &msn, &lsn);
         length = (const char *)bp - (const char *)sentence;
         buffer = malloc(length + 6);
         if (buffer == (char *)0) { break; }

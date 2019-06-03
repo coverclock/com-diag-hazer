@@ -47,8 +47,7 @@ int main(void)
                 rc = hazer_characters2checksum(NIB[msn], NIB[lsn], &cs);
                 assert(rc == 0);
                 assert(ck == cs);
-                rc = hazer_checksum2characters(ck, &msc, &lsc);
-                assert(rc == 0);
+                hazer_checksum2characters(ck, &msc, &lsc);
                 assert(msc == NIB[msn]);
                 assert(lsc == NIB[lsn]);
             }
@@ -141,8 +140,7 @@ int main(void)
         assert(ck == 0x78);
         assert(cs == ck);
 
-        rc = hazer_checksum2characters(ck, &msn, &lsn);
-        assert(rc == 0);
+        hazer_checksum2characters(ck, &msn, &lsn);
         assert(msn == bp[1]);
         assert(lsn == bp[2]);
     }
@@ -174,8 +172,7 @@ int main(void)
         assert(ck == 0x89);
         assert(cs != ck);
 
-        rc = hazer_checksum2characters(ck, &msn, &lsn);
-        assert(rc == 0);
+        hazer_checksum2characters(ck, &msn, &lsn);
         assert(msn == bp[1]);
         assert(lsn == bp[2]);
     }

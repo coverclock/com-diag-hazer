@@ -211,6 +211,30 @@ static void show_connection(const char * label, int fd, protocol_t protocol, con
  ******************************************************************************/
 
 /**
+ * Compute the eight-bit checksum of an NMEA sentence.
+ * @param buffer points to the beginning of the buffer.
+ * @param size is the size of the buffer in bytes.
+ * @param mnsp points where the most significant character is stored.
+ * @param lnsp points where the least significant character is stored.
+ * @return 0 for success, <0 otherwise.
+ */
+static int checksum_buffer(const void * buffer, size_t size, char * msnp, char * lsnp)
+{
+	int rc = -1;
+    uint8_t cs = 0;
+
+    if (hazer_checksum_buffer(buffer, size, &cs) == (void *)0) {
+        errno = EIO;
+        diminuto_perror("checksum_buffer: checksum");
+    } else {
+    	hazer_checksum2characters(cs, msnp, lsnp);
+    	rc = 0;
+    }
+
+    return rc;
+}
+
+/**
  * Emit an NMEA configuration sentence to the specified stream after adding the
  * ending matter consisting of the checksum delimiter, the two checksum
  * characters, a carriage return, and a line feed.
@@ -220,16 +244,11 @@ static void show_connection(const char * label, int fd, protocol_t protocol, con
  */
 static void emit_sentence(FILE * fp, const char * string, size_t size)
 {
-    uint8_t cs = 0;
     char msn = '\0';
     char lsn = '\0';
 
-    if (hazer_checksum_buffer(string, size, &cs) == (void *)0) {
-        errno = EIO;
-        diminuto_perror("emit_sentence: checksum");
-    } else if (hazer_checksum2characters(cs, &msn, &lsn) < 0) {
-        errno = EIO;
-        diminuto_perror("emit_sentence: checksum2characters");
+    if (checksum_buffer(string, size, &msn, &lsn) < 0) {
+    	/* Do nothing. */
     } else if (fprintf(fp, "%s%c%c%c\r\n", string, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) {
         errno = EIO;
         diminuto_perror("emit_sentence: fprintf");

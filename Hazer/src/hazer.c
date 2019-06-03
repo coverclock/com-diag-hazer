@@ -334,9 +334,8 @@ int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp)
     return rc;
 }
 
-int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
+void hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
 {
-    int rc = 0;
     uint8_t msn = 0;
     uint8_t lsn = 0;
 
@@ -347,7 +346,7 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     } else if ((0xa <= msn) && (msn <= 0xf)) {
         *msnp = 'A' + msn - 10;
     } else {
-        rc = -1; /* Impossible. */
+        /* Impossible. */
     }
 
     lsn = ck & 0xf;
@@ -357,10 +356,8 @@ int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
     } else if ((0xa <= lsn) && (lsn <= 0xf)) {
         *lsnp = 'A' + lsn - 10;
     } else {
-        rc = -1; /* Impossible. */
+        /* Impossible. */
     }
-
-    return rc;
 }
 
 ssize_t hazer_length(const void * buffer, size_t size)

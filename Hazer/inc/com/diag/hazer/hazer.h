@@ -449,9 +449,8 @@ extern int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp);
  * @param ck is the checksum.
  * @param mnsp points where the most significant character is stored.
  * @param lnsp points where the least significant character is stored.
- * @return 0 for success, <0 if an error occurred.
  */
-extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
+extern void hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
 
 /**
  * Return the length of the completed sentence in bytes.

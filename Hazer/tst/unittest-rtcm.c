@@ -58,6 +58,23 @@ int main(void)
     /**************************************************************************/
 
     {
+    	uint8_t crc1 = 0x11;
+    	uint8_t crc2 = 0x22;
+    	uint8_t crc3 = 0x44;
+    	uint32_t crc = 0x776655;
+
+    	tumbleweed_checksum2characters(0xa55a55, &crc1, &crc2, &crc3);
+    	assert(crc1 == 0xa5);
+    	assert(crc2 == 0x5a);
+    	assert(crc3 == 0x55);
+
+    	tumbleweed_characters2checksum(crc1, crc2, crc3, &crc);
+    	assert(crc == 0xa55a55);
+    }
+
+    /**************************************************************************/
+
+    {
     	/* RTCM 10403.3, p. 265 */
 		static const uint8_t EXAMPLE[] = "\\xD3\\x00\\x13\\x3E\\xD7\\xD3\\x02\\x02\\x98\\x0E\\xDE\\xEF\\x34\\xB4\\xBD\\x62\\xAC\\x09\\x41\\x98\\x6F\\x33\\x36\\x0B\\x98";
 		static const int NUMBER = 1005;

@@ -200,6 +200,42 @@ extern tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, v
 extern const uint32_t TUMBLEWEED_CRC24Q[256];
 
 /**
+ * Update a running RTCM CRC24Q CRC with the latest input character.
+ * @param ch is the input character.
+ * @param crcp points to the running CRC value.
+ */
+static inline void tumbleweed_checksum(uint8_t ch, uint32_t * crcp)
+{
+	*crcp = ((*crcp) << 8) ^ TUMBLEWEED_CRC24Q[ch ^ (uint8_t)((*crcp) >> 16)];
+}
+
+/**
+ * Given three CRC characters, convert to an thirty-two bit CRC.
+ * @param crc1 is the most significant byte.
+ * @param crc2 is the middle significant byte.
+ * @param crc2 is the least significant byte.
+ * @param crcp points to where the CRC is stored.
+ */
+static inline void tumbleweed_characters2checksum(uint8_t crc1, uint8_t crc2, uint8_t crc3, uint32_t * crcp)
+{
+	*crcp = (((uint32_t)crc1) << (8 * 2)) | (((uint32_t)crc2) << (8 * 1)) | (((uint32_t)crc3) << (8 * 0));
+}
+
+/**
+ * Given an thirty-two bit CRC, concert into the three CRC bytes.
+ * @param crc is the CRC.
+ * @param crc1p points where the most significant byte is stored.
+ * @param crc2p points where the middle significant byte is stored.
+ * @param crc2p points where the least significant byte is stored.
+ */
+static inline void tumbleweed_checksum2characters(uint32_t crc, uint8_t * crc1p, uint8_t * crc2p, uint8_t * crc3p)
+{
+	*crc1p = (uint8_t)((crc >> (8 * 2)) & 0xff);
+	*crc2p = (uint8_t)((crc >> (8 * 1)) & 0xff);
+	*crc3p = (uint8_t)((crc >> (8 * 0)) & 0xff);
+}
+
+/**
  * Compute the CRC-24Q used by RTCM for the specified buffer. The
  * buffer points to the beginning of the UBX packet, not to the subset that
  * is cyclic redundance checked, and the sentence must contain a valid length
@@ -207,12 +243,12 @@ extern const uint32_t TUMBLEWEED_CRC24Q[256];
  * where the CRC-24Q will be stored in a correctly formed packet.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
- * @param crc_1p points to where the CRC-24Q[0] value will be stored.
- * @param crc_2p points to where the CRC-24Q[1] value will be stored.
- * @param crc_3p points to where the CRC-24Q[2] value will be stored.
+ * @param crc1p points to where the most significant byte will be stored.
+ * @param crc2p points to where the middle significant byte will be stored.
+ * @param crc3p points to where the least significant byte will be stored.
  * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
-extern const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_t * crc_1p, uint8_t * crc_2p, uint8_t * crc_3p);
+extern const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_t * crc1p, uint8_t * crc2p, uint8_t * crc3p);
 
 /**
  * Return the length of the completed message in bytes.
