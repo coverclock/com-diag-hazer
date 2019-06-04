@@ -83,7 +83,7 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         if (ch == HAZER_STIMULUS_START) {
             DEBUG("START 0x%02x.\n", ch);
             pp->bp = (uint8_t *)buffer;
-            pp->sz = 0;
+            pp->sz = size;
             pp->tot = 0;
             pp->cs = 0;
             pp->msn = '\0';
@@ -93,7 +93,7 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         } else if (ch == HAZER_STIMULUS_ENCAPSULATION) {
             DEBUG("ENCAPSULATE 0x%02x.\n", ch);
             pp->bp = (uint8_t *)buffer;
-            pp->sz = 0;
+            pp->sz = size;
             pp->cs = 0;
             pp->msn = '\0';
             pp->lsn = '\0';
