@@ -446,7 +446,7 @@ static void print_buffer(FILE * fp, const void * buffer, size_t size, size_t lim
     int end = 0;
 
     for (bb = buffer; size > 0; --size) {
-        diminuto_phex_emit(fp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
+        diminuto_phex_emit(fp, *(bb++), UNLIMITED, 0, !0, 0, &current, &end, 0);
         if (current >= limit) { break; }
     }
     fputc('\n', fp);
@@ -2699,7 +2699,7 @@ int main(int argc, char * argv[])
                 fprintf(err_fp, "TXT %s: TXT [%2d][%2d][%2d] \"", Program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
 
                 while ((*bb != HAZER_STIMULUS_CHECKSUM) && (*bb != HAZER_STIMULUS_CR)) {
-                    diminuto_phex_emit(err_fp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
+                    diminuto_phex_emit(err_fp, *(bb++), UNLIMITED, 0, !0, 0, &current, &end, 0);
                 }
 
                 fputs("\".\n", err_fp);

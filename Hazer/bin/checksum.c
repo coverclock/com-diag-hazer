@@ -31,7 +31,7 @@ static const size_t UNLIMITED = ~(size_t)0;
  */
 static void print_buffer(FILE * fp, const void * buffer, size_t size, int canonical)
 {
-    const char * bb = (const char *)0;
+    const uint8_t * bb = (const uint8_t *)0;
     size_t current = 0;
     int end = 0;
 
@@ -53,18 +53,18 @@ static void print_buffer(FILE * fp, const void * buffer, size_t size, int canoni
 static int print_sentence(FILE * fp, const char * sentence, size_t size)
 {
     int rc = -1;
-    const char * bp = (const char *)0;
+    const uint8_t * bp = (const uint8_t *)0;
     char msn = '\0';
     char lsn = '\0';
     size_t length = 0;
-    char * buffer = (char *)0;
+    uint8_t * buffer = (char *)0;
 
     do {
         bp = hazer_checksum_buffer(sentence, size, &msn, &lsn);
-        if (bp == (char *)0) { break; }
-        length = (const char *)bp - (const char *)sentence;
+        if (bp == (uint8_t *)0) { break; }
+        length = (const uint8_t *)bp - (const uint8_t *)sentence;
         buffer = malloc(length + 5);
-        if (buffer == (char *)0) { break; }
+        if (buffer == (uint8_t *)0) { break; }
         strncpy(buffer, sentence, length);
         buffer[length++] = HAZER_STIMULUS_CHECKSUM;
         buffer[length++] = msn;
@@ -74,7 +74,7 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
         print_buffer(stdout, buffer, length, 0);
         rc = 0;
     } while (0);
-    if (buffer != (char *)0) { free(buffer); }
+    if (buffer != (uint8_t *)0) { free(buffer); }
 
     return rc;
 }
@@ -95,23 +95,23 @@ static int print_packet(FILE * fp, const void * packet, size_t size)
     uint8_t ck_a = 0;
     uint8_t ck_b = 0;
     size_t length = 0;
-    char * buffer = (char *)0;
+    uint8_t * buffer = (uint8_t *)0;
 
     do {
         payload = yodel_length(packet, size);
         if (payload == 0) { break; }
         bp = yodel_checksum_buffer(packet, payload, &ck_a, &ck_b);
         if (bp == (void *)0) { break; }
-        length = (const char *)bp - (const char *)packet;
+        length = (const uint8_t *)bp - (const uint8_t *)packet;
         buffer = malloc(length + 2);
-        if (buffer == (char *)0) { break; }
+        if (buffer == (uint8_t *)0) { break; }
         memcpy(buffer, packet, length);
         buffer[length++] = ck_a;
         buffer[length++] = ck_b;
         print_buffer(stdout, buffer, length, !0);
         rc = 0;
     } while (0);
-    if (buffer != (char *)0) { free(buffer); }
+    if (buffer != (uint8_t *)0) { free(buffer); }
 
     return rc;
 }
@@ -133,16 +133,16 @@ static int print_message(FILE * fp, const void * message, size_t size)
     uint8_t crc2 = 0;
     uint8_t crc3 = 0;
     size_t length = 0;
-    char * buffer = (char *)0;
+    uint8_t * buffer = (char *)0;
 
     do {
         payload = tumbleweed_length(message, size);
         if (payload == 0) { break; }
         bp = tumbleweed_checksum_buffer(message, payload, &crc1, &crc2, &crc3);
         if (bp == (void *)0) { break; }
-        length = (const char *)bp - (const char *)message;
+        length = (const uint8_t *)bp - (const uint8_t *)message;
         buffer = malloc(length + 3);
-        if (buffer == (char *)0) { break; }
+        if (buffer == (uint8_t *)0) { break; }
         memcpy(buffer, message, length);
         buffer[length++] = crc1;
         buffer[length++] = crc2;
@@ -150,7 +150,7 @@ static int print_message(FILE * fp, const void * message, size_t size)
         print_buffer(stdout, buffer, length, !0);
         rc = 0;
     } while (0);
-    if (buffer != (char *)0) { free(buffer); }
+    if (buffer != (uint8_t *)0) { free(buffer); }
 
     return rc;
 }
@@ -161,7 +161,7 @@ static int print_message(FILE * fp, const void * message, size_t size)
 int main(int argc, char * argv[])
 {
     int index = 0;
-    char * buffer = (char *)0;
+    uint8_t * buffer = (char *)0;
     size_t length = 0;
     ssize_t size = 0;
     int rc = 0;
@@ -180,11 +180,12 @@ int main(int argc, char * argv[])
         }
         if (buffer[0] == HAZER_STIMULUS_START) {
             rc = print_sentence(stdout, buffer, size - 1);
-        } else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_1)) {
+        } else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
             rc = print_packet(stdout, buffer, size - 1);
         } else if (buffer[0] == TUMBLEWEED_STIMULUS_PREAMBLE) {
         	rc = print_message(stdout, buffer, size - 1);
         } else {
+        	fprintf(stderr, "OTHER! 0x%x 0x%x\n", buffer[0], buffer[1]);
         	rc = -2;
         }
         if (rc < 0) {
