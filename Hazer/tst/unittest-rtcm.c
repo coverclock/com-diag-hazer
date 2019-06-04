@@ -137,7 +137,7 @@ int main(void)
 			uint8_t buffer[0];
 			tumbleweed_context_t context;
 			state = tumbleweed_machine(state, message[0], buffer, 0, &context);
-			assert(state == TUMBLEWEED_STATE_START);
+			assert(state == TUMBLEWEED_STATE_STOP);
 			assert(tumbleweed_size(&context) == 0);
 		END;
     }
