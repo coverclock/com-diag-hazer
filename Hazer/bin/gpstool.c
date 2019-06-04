@@ -207,32 +207,94 @@ static void show_connection(const char * label, int fd, protocol_t protocol, con
 #endif
 
 /*******************************************************************************
- * EMITTERS
+ * VALIDATORS
  ******************************************************************************/
 
 /**
- * Compute the eight-bit checksum of an NMEA sentence.
- * @param buffer points to the beginning of the buffer.
- * @param size is the size of the buffer in bytes.
- * @param mnsp points where the most significant character is stored.
- * @param lnsp points where the least significant character is stored.
+ * Validate the contents of an buffer as a valid NMEA sentence.
+ * @param buffer points to the buffer.
+ * @param size is the number of bytes in the buffer.
  * @return 0 for success, <0 otherwise.
  */
-static int checksum_buffer(const void * buffer, size_t size, char * msnp, char * lsnp)
+static int validate_nmea(void * buffer, size_t size)
 {
 	int rc = -1;
-    uint8_t cs = 0;
+	size_t length = 0;
+	uint8_t * bp = (uint8_t *)0;
+	uint8_t msn = 0;
+	uint8_t lsn = 0;
 
-    if (hazer_checksum_buffer(buffer, size, &cs) == (void *)0) {
-        errno = EIO;
-        diminuto_perror("checksum_buffer: checksum");
+	if ((length = hazer_length(buffer, size)) <= 0) {
+		/* Do nothing. */
+    } else if ((bp = (uint8_t *)hazer_checksum_buffer(buffer, length, &msn, &lsn)) == (unsigned char *)0) {
+        /* Do nothing. */
+    } else if ((msn != bp[1]) || (lsn != bp[2])) {
+        /* Do nothing. */
     } else {
-    	hazer_checksum2characters(cs, msnp, lsnp);
     	rc = 0;
     }
 
-    return rc;
+	return rc;
 }
+
+/**
+ * Validate the contents of an buffer as a valid UBX packet.
+ * @param buffer points to the buffer.
+ * @param size is the number of bytes in the buffer.
+ * @return 0 for success, <0 otherwise.
+ */
+static ssize_t validate_ubx(void * buffer, size_t size)
+{
+	int rc = -1;
+	size_t length = 0;
+	uint8_t * bp = (uint8_t *)0;
+	uint8_t csa = 0;
+	uint8_t csb = 0;
+
+	if ((length = yodel_length(buffer, size)) <= 0) {
+		/* Do nothing. */
+    } else if ((bp = (uint8_t *)yodel_checksum_buffer(buffer, length, &csa, &csb)) == (unsigned char *)0) {
+        /* Do nothing. */
+    } else if ((csa != bp[0]) || (csb != bp[1])) {
+        /* Do nothing. */
+    } else {
+    	rc = 0;
+    }
+
+	return rc;
+}
+
+/**
+ * Validate the contents of an buffer as a valid RTCM message.
+ * @param buffer points to the buffer.
+ * @param size is the number of bytes in the buffer.
+ * @return 0 for success, <0 otherwise.
+ */
+static ssize_t validate_rtcm(void * buffer, size_t size)
+{
+	int rc = -1;
+	size_t length = 0;
+	uint8_t * bp = (uint8_t *)0;
+	uint8_t crc1 = 0;
+	uint8_t crc2 = 0;
+	uint8_t crc3 = 0;
+
+	if ((length = tumbleweed_length(buffer, size)) <= 0) {
+		/* Do nothing. */
+    } else if ((bp = (uint8_t *)tumbleweed_checksum_buffer(buffer, length, &crc1, &crc2, &crc3)) == (unsigned char *)0) {
+        /* Do nothing. */
+    } else if ((crc1 != bp[0]) || (crc2 != bp[1]) || (crc3 != bp[2])) {
+        /* Do nothing. */
+    } else {
+    	rc = 0;
+    }
+
+	return rc;
+}
+
+/*******************************************************************************
+ * EMITTERS
+ ******************************************************************************/
 
 /**
  * Emit an NMEA configuration sentence to the specified stream after adding the
@@ -247,8 +309,9 @@ static void emit_sentence(FILE * fp, const char * string, size_t size)
     char msn = '\0';
     char lsn = '\0';
 
-    if (checksum_buffer(string, size, &msn, &lsn) < 0) {
-    	/* Do nothing. */
+    if (hazer_checksum_buffer(string, size, &msn, &lsn) == (void *)0) {
+        errno = EIO;
+        diminuto_perror("emit_sentence: checksum");
     } else if (fprintf(fp, "%s%c%c%c\r\n", string, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) {
         errno = EIO;
         diminuto_perror("emit_sentence: fprintf");
@@ -362,7 +425,6 @@ static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
 
     return length;
 }
-
 
 /*******************************************************************************
  * REPORTERS
@@ -1320,7 +1382,9 @@ int main(int argc, char * argv[])
     datagram_buffer_t surveyor_buffer = DATAGRAM_BUFFER_INITIALIZER;
     const char * surveyor_option = (const char *)0;
     diminuto_ipc_endpoint_t surveyor_endpoint = { 0, };
-    int number = -1;
+    uint8_t surveyor_crc1 = 0;
+    uint8_t surveyor_crc2 = 0;
+    uint8_t surveyor_crc3 = 0;
     /*
      * File Descriptor variables.
      */
@@ -1340,44 +1404,29 @@ int main(int argc, char * argv[])
     /*
      * NMEA parser state variables.
      */
-    hazer_state_t nmea_state = HAZER_STATE_START;
+    hazer_state_t nmea_state = HAZER_STATE_STOP;
     hazer_buffer_t nmea_buffer = HAZER_BUFFER_INITIALIZER;
-    char * nmea_pointer = (char *)0;
-    size_t nmea_size = 0;
-    uint8_t nmea_cs = 0;
-    uint8_t nmea_ck = 0;
+    hazer_context_t nmea_context = { 0, };
     /*
      * UBX parser state variables.
      */
-    yodel_state_t ubx_state = YODEL_STATE_START;
+    yodel_state_t ubx_state = YODEL_STATE_STOP;
     yodel_buffer_t ubx_buffer = YODEL_BUFFER_INITIALIZER;
-    char * ubx_pointer = (char *)0;
-    size_t ubx_size = 0;
-    size_t ubx_length = 0;
-    uint8_t ubx_ck_a = 0;
-    uint8_t ubx_ck_b = 0;
+    yodel_context_t ubx_context = { 0, };
     /*
      * RTCM parser state variables.
      */
-    tumbleweed_state_t rtcm_state = TUMBLEWEED_STATE_START;
+    tumbleweed_state_t rtcm_state = TUMBLEWEED_STATE_STOP;
     tumbleweed_buffer_t rtcm_buffer = TUMBLEWEED_BUFFER_INITIALIZER;
-    char * rtcm_pointer = (char *)0;
-    size_t rtcm_size = 0;
-    size_t rtcm_length = 0;
-    uint8_t rtcm_crc_1 = 0;
-    uint8_t rtcm_crc_2 = 0;
-    uint8_t rtcm_crc_3 = 0;
+	tumbleweed_context_t rtcm_context = { 0, };
     /*
      * NMEA processing variables.
      */
-    unsigned char * buffer = (unsigned char *)0;
-    unsigned char * bp = (char *)0;
+    hazer_buffer_t tokenized = HAZER_BUFFER_INITIALIZER;
+    hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
     hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
-    hazer_buffer_t synthesized = HAZER_BUFFER_INITIALIZER;
-    hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-    format_t format = FORMAT;
     /*
      * NMEA state databases.
      */
@@ -1468,9 +1517,8 @@ int main(int argc, char * argv[])
      */
     int rc = 0;
     int ch = EOF;
-    ssize_t size = 0;
-    ssize_t size1 = 0; /* size - 1 */
-    ssize_t length = 0;
+    ssize_t size = 0; /* Includes trailing NUL. */
+    ssize_t length = 0; /* Does not include trailing NUL. */
     size_t current = 0;
     ssize_t check = 0;
     ssize_t count = 0;
@@ -1491,6 +1539,9 @@ int main(int argc, char * argv[])
     int eof = 0;
     int error = 0;
     int ready = 0;
+    unsigned char * buffer = (unsigned char *)0;
+    unsigned char * bp = (char *)0;
+    format_t format = FORMAT;
     /*
      * External symbols.
      */
@@ -2118,6 +2169,10 @@ int main(int argc, char * argv[])
      * we are interrupted by a SIGINT or terminated by a SIGTERM.
      */
 
+    nmea_state = HAZER_STATE_START;
+    ubx_state = YODEL_STATE_START;
+    rtcm_state = TUMBLEWEED_STATE_START;
+
     while (!eof) {
 
         if (diminuto_interrupter_check()) {
@@ -2165,7 +2220,7 @@ int main(int argc, char * argv[])
 
         while (fready(in_fp) || ((ready > 0) && ((fd = diminuto_mux_ready_read(&mux)) >= 0))) {
 
-            buffer = (unsigned char *)0;
+        	buffer = (unsigned char *)0;
 
             if (fready(in_fp) || (fd == in_fd)) {
 
@@ -2176,51 +2231,37 @@ int main(int argc, char * argv[])
                 do {
 
                     ch = fgetc(in_fp);
+                    if (ch == EOF) {
+                    	eof = !0;
+                    	break;
+                    }
 
-                    nmea_state = hazer_machine(nmea_state, ch, nmea_buffer, sizeof(nmea_buffer), &nmea_pointer, &nmea_size);
-
-                    ubx_state = yodel_machine(ubx_state, ch, ubx_buffer, sizeof(ubx_buffer), &ubx_pointer, &ubx_size, &ubx_length);
-
-                    rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer, sizeof(rtcm_buffer), &rtcm_pointer, &rtcm_size, &rtcm_length);
+                    nmea_state = hazer_machine(nmea_state, ch, nmea_buffer, sizeof(nmea_buffer), &nmea_context);
 
                     if (nmea_state == HAZER_STATE_END) {
                         buffer = nmea_buffer;
-                        size = nmea_size;
-                        nmea_state = HAZER_STATE_START;
+                        size = hazer_size(&nmea_context);
+                        format = NMEA;
                         break;
-                    } else if  (nmea_state == HAZER_STATE_EOF) {
-                        fprintf(err_fp, "EOF %s: NMEA.\n", Program);
-                        eof = !0;
-                        break;
-                    } else {
-                        /* Do nothing. */
                     }
+
+                    ubx_state = yodel_machine(ubx_state, ch, ubx_buffer, sizeof(ubx_buffer), &ubx_context);
 
                     if (ubx_state == YODEL_STATE_END) {
                         buffer = ubx_buffer;
-                        size = ubx_size;
-                        ubx_state = YODEL_STATE_START;
+                        size = yodel_size(&ubx_context);
+                        format = UBX;
                         break;
-                    } else if  (ubx_state == YODEL_STATE_EOF) {
-                        fprintf(err_fp, "EOF %s: UBX.\n", Program);
-                        eof = !0;
-                        break;
-                    } else {
-                        /* Do nothing. */
-                    }
+                   }
+
+                    rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer, sizeof(rtcm_buffer), &rtcm_context);
 
                     if (rtcm_state == TUMBLEWEED_STATE_END) {
                         buffer = rtcm_buffer;
-                        size = rtcm_size;
-                        rtcm_state = TUMBLEWEED_STATE_START;
+                        size = tumbleweed_size(&rtcm_context);
+                        format = RTCM;
                         break;
-                    } else if (rtcm_state == TUMBLEWEED_STATE_EOF) {
-                        fprintf(err_fp, "EOF %s: RTCM.\n", Program);
-                        eof = !0;
-                        break;
-                    } else {
-                        /* Do nothing. */
-                    }
+                     }
 
                 } while (fready(in_fp));
 
@@ -2229,6 +2270,9 @@ int main(int argc, char * argv[])
                 }
 
                 if (buffer != (unsigned char *)0) {
+                    nmea_state = HAZER_STATE_START;
+                    ubx_state = YODEL_STATE_START;
+                    rtcm_state = TUMBLEWEED_STATE_START;
                     break;
                 }
 
@@ -2240,28 +2284,46 @@ int main(int argc, char * argv[])
 
                 /*
                  * Receive a NMEA, UBX, or RTCM datagram from a remote gpstool.
-                 */
-
-                /*
-                 * Even if this datagram was received via IPv4, we can do an
-                 * IPv6 receive on it; the sending address (if we bothered to
-                 * look at it) would be an IPv4 address expressed in the form
-                 * of an IPv6 address: e.g. ::ffff:192.168.1.190 if we printed
-                 * it out in canonical form.
-                 */
-
-                if ((size = receive_datagram(datagram_fd, datagram_buffer, sizeof(datagram_buffer))) > 0) {
-                    buffer = datagram_buffer;
-                    break;
-                }
-
-                /*
                  * We make a rule that the datagram must be a complete NMEA
                  * sentence, UBX packet, or RTCM message, complete with a valid
                  * checksum or cyclic redundancy check, with no extra leading or
-                 * trailing bytes; we don't collected it piecemeal via one of the
-                 * parser state machines. But we *do* validate it below.
+                 * trailing bytes; we don't collected it piecemeal via one of
+                 * the parser state machines. But we *do* validate it.
                  */
+
+                if ((size = receive_datagram(datagram_fd, datagram_buffer, sizeof(datagram_buffer))) > 0) {
+
+                    if ((length = hazer_length(datagram_buffer, size)) > 0) {
+
+                    	buffer = datagram_buffer;
+                        format = NMEA;
+
+                    } else if ((length = yodel_length(datagram_buffer, size)) > 0) {
+
+                    	buffer = datagram_buffer;
+                        format = UBX;
+
+                    } else if ((length = tumbleweed_length(datagram_buffer, size)) > 0) {
+
+                    	buffer = datagram_buffer;
+                        format = RTCM;
+
+                    } else {
+
+                        /*
+                         * It's entirely possible that the device is generating some kind
+                         * of proprietary format that we don't recognize yet somehow
+                         * passed through our state machines.
+                         */
+
+                        format = FORMAT;
+
+                        continue;
+
+                    }
+                    buffer = datagram_buffer;
+                    break;
+                }
 
             } else if (fd == surveyor_fd) {
 
@@ -2279,20 +2341,24 @@ int main(int argc, char * argv[])
                  * delays the processing of incoming data from other sources.
                  */
 
-                if ((size1 = receive_datagram(surveyor_fd, surveyor_buffer, sizeof(surveyor_buffer))) <= 0) {
+                if ((size = receive_datagram(surveyor_fd, surveyor_buffer, sizeof(surveyor_buffer))) <= 0) {
                     /* Do nothing. */
-                } else if ((length = tumbleweed_length(surveyor_buffer, size1)) <= 0) {
+                } else if ((length = tumbleweed_length(surveyor_buffer, size)) <= 0) {
                     /* Do nothing. */
-                } else if ((bp = (unsigned char *)tumbleweed_checksum_buffer(surveyor_buffer, length, &rtcm_crc_1, &rtcm_crc_2, &rtcm_crc_3)) == (unsigned char *)0) {
+                } else if ((bp = (unsigned char *)tumbleweed_checksum_buffer(surveyor_buffer, length, &surveyor_crc1, &surveyor_crc2, &surveyor_crc3)) == (unsigned char *)0) {
                     /* Do nothing. */
-                } else if ((rtcm_crc_1 != bp[0]) || (rtcm_crc_2 != bp[1]) || (rtcm_crc_3 != bp[2])) {
-                    fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x%02x%02x 0x%02x%02x%02x [%zd] [%zd]\n", Program, rtcm_crc_1, rtcm_crc_2, rtcm_crc_3, bp[0], bp[1], bp[2], size1, length);
-                } else if ((number = tumbleweed_message(surveyor_buffer, length)) <= 0) {
-                    fprintf(err_fp, "ERR %s: NUMBER! <%d> [%zd]\n", Program, number, length);
+                } else if ((surveyor_crc1 != bp[0]) || (surveyor_crc2 != bp[1]) || (surveyor_crc3 != bp[2])) {
+                	/*
+                	 * Unlike the parser, where we expect to get checksum
+                	 * errors without there actually necessarily being an
+                	 * error, when we receive a surveyor datagram we expect
+                	 * it to be correct.
+                	 */
+                    fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x%02x%02x 0x%02x%02x%02x [%zd] [%zd]\n", Program, surveyor_crc1, surveyor_crc2, surveyor_crc3, bp[0], bp[1], bp[2], size, length);
                 } else if (dev_fp == (FILE *)0) {
                     /* Do nothing. */
                 } else {
-                    if (verbose) { fprintf(err_fp, "RTK %s: RTCM <%d> [%zd]\n", Program, number, length); }
+                    if (verbose) { fprintf(err_fp, "RTK %s: RTCM <%d> [%zd]\n", Program, tumbleweed_message(surveyor_buffer, length), length); }
                     write_buffer(dev_fp, surveyor_buffer, length);
                 }
 
@@ -2355,87 +2421,11 @@ int main(int argc, char * argv[])
             continue;
         }
 
-        /*
-         * All of our input mechanisms terminate their buffers with a NUL
-         * character for consistency and safety, even for those formats that
-         * deliver binary data (the input mechanism doesn't necessarily know
-         * whether the input format is binary or character). The size set
-         * by the input mechanism reflects this. We use the size minus the
-         * trailing NUL so often that we dedicate a variable just for that
-         * value.
-         */
-
-        size1 = size - 1;
-
         /**
          ** VALIDATE
          **/
 
-        /*
-         * We know how to validate an NMEA sentence and a UBX message. We
-         * sanity check the data format in either case, and compute the
-         * appropriate checksum and verify it. The state machines know what
-         * the format of the data is when we got it directly from the device,
-         * but in the case of IP datagrams, we haven't figured that out yet.
-         */
-
-        if ((length = hazer_length(buffer, size)) > 0) {
-
-            bp = (unsigned char *)hazer_checksum_buffer(buffer, size, &nmea_cs);
-            assert(bp != (unsigned char *)0);
-
-            rc = hazer_characters2checksum(bp[1], bp[2], &nmea_ck);
-            assert(rc >= 0);
-
-            if (nmea_ck != nmea_cs) {
-                fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x 0x%02x [%zd] [%zd]\n", Program, nmea_cs, nmea_ck, size1, length);
-                print_buffer(err_fp, buffer, size, UNLIMITED);
-                if (!ignorechecksums) { continue; }
-            }
-
-            format = NMEA;
-
-        } else if ((length = yodel_length(buffer, size)) > 0) {
-
-            bp = (unsigned char *)yodel_checksum_buffer(buffer, size, &ubx_ck_a, &ubx_ck_b);
-            assert(bp != (unsigned char *)0);
-
-            if ((ubx_ck_a != bp[0]) || (ubx_ck_b != bp[1])) {
-                fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x%02x 0x%02x%02x [%zd] [%zd]\n", Program, ubx_ck_a, ubx_ck_b, bp[0], bp[1], size1, length);
-                print_buffer(err_fp, buffer, size, UNLIMITED);
-                if (!ignorechecksums) { continue; }
-            }
-
-            format = UBX;
-
-        } else if ((length = tumbleweed_length(buffer, size)) > 0) {
-
-            bp = (unsigned char *)tumbleweed_checksum_buffer(buffer, size, &rtcm_crc_1, &rtcm_crc_2, &rtcm_crc_3);
-            assert(bp != (unsigned char *)0);
-
-            if ((rtcm_crc_1 != bp[0]) || (rtcm_crc_2 != bp[1]) || (rtcm_crc_3 != bp[2])) {
-                fprintf(err_fp, "ERR %s: CHECKSUM! 0x%02x%02x%02x 0x%02x%02x%02x [%zd] [%zd]\n", Program, rtcm_crc_1, rtcm_crc_2, rtcm_crc_3, bp[0], bp[1], bp[2], size1, length);
-                print_buffer(err_fp, buffer, size, UNLIMITED);
-                if (!ignorechecksums) { continue; }
-            }
-
-            format = RTCM;
-
-        } else {
-
-            /*
-             * It's entirely possible that the device is generating some kind
-             * of proprietary format that we don't recognize yet somehow
-             * passed through our state machines.
-             */
-
-            format = FORMAT;
-
-            continue;
-
-        }
-
-        if (verbose) { print_buffer(err_fp, buffer, size1, UNLIMITED); }
+        if (verbose) { print_buffer(err_fp, buffer, length, UNLIMITED); }
         if (escape) { fputs("\033[1;1H\033[0K", out_fp); }
         if (report) { fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation); fflush(out_fp); }
 
@@ -2573,38 +2563,17 @@ int main(int argc, char * argv[])
              */
 
             /*
-             * We tokenize the NMEA sentence so we can parse it later. Then
-             * we regenerate the sentence, mostly to test the underlying API.
-             * But the regenerated sentence can be useful since the original
-             * was mutated in-place by the tokenization in which the field
-             * delimiters were replaced by NUL characters to terminate each
-             * field.
+             * We tokenize the a copy of the NMEA sentence so we can parse it.
+             * We make a copy because the tokenization modifies the body
+             * of the sentence in place and we may want to display the original
+             * sentence later.
              */
 
-            count = hazer_tokenize(vector, countof(vector), buffer, length);
+        	strncpy(tokenized, buffer, sizeof(tokenized));
+            count = hazer_tokenize(vector, countof(vector), tokenized, length);
             assert(count >= 0);
             assert(vector[count - 1] == (char *)0);
             assert(count <= countof(vector));
-
-            size = hazer_serialize(synthesized, sizeof(synthesized), vector, count);
-            assert(size >= 3);
-            assert(size <= (sizeof(synthesized) - 4 /* Terminating NUL already accounted for. */));
-            assert(synthesized[0] == HAZER_STIMULUS_START);
-            assert(synthesized[size - 2] == HAZER_STIMULUS_CHECKSUM);
-            assert(synthesized[size - 1] == HAZER_STIMULUS_NUL);
-
-            bp = (unsigned char *)hazer_checksum_buffer(synthesized, size, &nmea_cs);
-            hazer_checksum2characters(nmea_cs, &msn, &lsn);
-            assert(bp[0] == HAZER_STIMULUS_CHECKSUM);
-
-            bp[1] = msn;
-            bp[2] = lsn;
-            bp[3] = HAZER_STIMULUS_CR;
-            bp[4] = HAZER_STIMULUS_LF;
-            bp[5] = HAZER_STIMULUS_NUL;
-
-            size += 4; /* Terminating NUL already accounted for. */
-            assert(size <= sizeof(synthesized));
 
             /*
              * Make sure it's a talker and a GNSS that we care about.
@@ -2621,7 +2590,7 @@ int main(int argc, char * argv[])
 
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
                     fprintf(err_fp, "UNK %s: TALKER? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
-                    print_buffer(err_fp, synthesized, size - 1, UNLIMITED);
+                    print_buffer(err_fp, buffer, size - 1, UNLIMITED);
                 }
 
                 continue;
@@ -2630,7 +2599,7 @@ int main(int argc, char * argv[])
 
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
                     fprintf(err_fp, "UNK %s: SYSTEM? \"%c%c\"\n", Program, vector[0][1], vector[0][2]);
-                    print_buffer(err_fp, synthesized, size - 1, UNLIMITED);
+                    print_buffer(err_fp, buffer, size - 1, UNLIMITED);
                 }
 
                 continue;
@@ -2729,7 +2698,7 @@ int main(int argc, char * argv[])
 
                 fprintf(err_fp, "TXT %s: TXT [%2d][%2d][%2d] \"", Program, atoi(vector[1]), atoi(vector[2]), atoi(vector[3]));
 
-                while ((*bb != HAZER_STIMULUS_NUL) && (*bb != HAZER_STIMULUS_CHECKSUM)) {
+                while ((*bb != HAZER_STIMULUS_CHECKSUM) && (*bb != HAZER_STIMULUS_CR)) {
                     diminuto_phex_emit(err_fp, *(bb++), UNLIMITED, 0, 0, 0, &current, &end, 0);
                 }
 
@@ -3051,28 +3020,24 @@ int main(int argc, char * argv[])
                 free(node);
                 eof = !0;
             } else {
-                length = strlen(buffer) + 1;
-                size = diminuto_escape_collapse(buffer, buffer, length);
-                /*
-                 * size includes the trailing NUL character.
-                 */
-                size1 = size - 1;
+                size = strlen(buffer) + 1;
+                length = diminuto_escape_collapse(buffer, buffer, size);
                 if (buffer[0] == HAZER_STIMULUS_START) {
-                    emit_sentence(dev_fp, buffer, size1);
+                    emit_sentence(dev_fp, buffer, length);
                     rc = 0;
                 } else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
-                    emit_packet(dev_fp, buffer, size1);
+                    emit_packet(dev_fp, buffer, length);
                     rc = 0;
                 } else {
                     fprintf(err_fp, "ERR %s: EMIT!\n", Program);
-                    print_buffer(err_fp, buffer, size1, UNLIMITED);
+                    print_buffer(err_fp, buffer, length, UNLIMITED);
                     rc = -1;
                 }
                 if (rc == 0) {
                     if (command->acknak) { acknakpending += 1; }
-                    if (verbose) { print_buffer(err_fp, buffer, size1, UNLIMITED); }
+                    if (verbose) { print_buffer(err_fp, buffer, length, UNLIMITED); }
                     if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
-                    if (report) { fprintf(out_fp, "OUT [%3zd] ", size1); print_buffer(out_fp, buffer, size1, limitation); fflush(out_fp); }
+                    if (report) { fprintf(out_fp, "OUT [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation); fflush(out_fp); }
                 }
                 free(node);
             }

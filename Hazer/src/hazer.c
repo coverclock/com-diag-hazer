@@ -64,58 +64,10 @@ int hazer_finalize(void)
  *
  ******************************************************************************/
 
-hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp)
+hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size_t size, hazer_context_t * pp)
 {
     int done = !0;
     hazer_action_t action = HAZER_ACTION_SKIP;
-
-    /*
-     * Short circuit state machine for some characters.
-     */
-
-    switch (ch) {
-
-    case EOF:
-        DEBUG("EOF %d!\n", ch);
-        state = HAZER_STATE_EOF;
-        break;
-
-    case HAZER_STIMULUS_NUL:
-        DEBUG("STARTING 0x%02x?\n", ch);
-        state = HAZER_STATE_START;
-        break;
-
-    case HAZER_STIMULUS_START:
-        DEBUG("STARTING 0x%02x?\n", ch);
-        state = HAZER_STATE_START;
-        break;
-
-    case HAZER_STIMULUS_ENCAPSULATION:
-        DEBUG("STARTING 0x%02x?\n", ch);
-        state = HAZER_STATE_START;
-        break;
-
-    case HAZER_STIMULUS_CR:
-        /* Do nothing. */
-        break;
-
-    case HAZER_STIMULUS_LF:
-        /* Do nothing. */
-        break;
-
-    default:
-        /*
-         * This will specifically reject the SYNC1 and SYNC2 characters from
-         * UBX binary packets in additional to garbage on the serial line that
-         * corrupts NMEA sentences.
-         */
-        if (!((HAZER_STIMULUS_MINIMUM <= ch) && (ch <= HAZER_STIMULUS_MAXIMUM))) {
-            DEBUG("STARTING 0x%02x!\n", ch);
-            state = HAZER_STATE_START;
-        }
-        break;
-
-    }
 
     /*
      * Advance state machine based on stimulus.
@@ -123,24 +75,30 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
 
     switch (state) {
 
-    case HAZER_STATE_EOF:
-        *bp = (char *)buffer;
-        *sp = 0;
-        break;
+    case HAZER_STATE_STOP:
+    	/* Do nothing. */
+    	break;
 
     case HAZER_STATE_START:
         if (ch == HAZER_STIMULUS_START) {
             DEBUG("START 0x%02x.\n", ch);
+            pp->bp = (uint8_t *)buffer;
+            pp->sz = 0;
+            pp->tot = 0;
+            pp->cs = 0;
+            pp->msn = '\0';
+            pp->lsn = '\0';
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
-            *bp = (char *)buffer;
-            *sp = size;
         } else if (ch == HAZER_STIMULUS_ENCAPSULATION) {
             DEBUG("ENCAPSULATE 0x%02x.\n", ch);
+            pp->bp = (uint8_t *)buffer;
+            pp->sz = 0;
+            pp->cs = 0;
+            pp->msn = '\0';
+            pp->lsn = '\0';
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
-            *bp = (char *)buffer;
-            *sp = size;
         } else {
             /* Do nothing. */
         }
@@ -148,40 +106,38 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
 
     case HAZER_STATE_BODY:
         if (ch == HAZER_STIMULUS_CHECKSUM) {
+            hazer_checksum2characters(pp->cs, &(pp->msn), &(pp->lsn));
             state = HAZER_STATE_MSN;
+            action = HAZER_ACTION_SAVE;
+        } else if (ch == HAZER_STIMULUS_CR) {
+            state = HAZER_STATE_LF;
+            action = HAZER_ACTION_SAVESPECIAL;
+        } else if ((HAZER_STIMULUS_MINIMUM <= ch) && (ch <= HAZER_STIMULUS_MAXIMUM)) {
+        	hazer_checksum(ch, &(pp->cs));
+            action = HAZER_ACTION_SAVE;
+        } else {
+            DEBUG("INV 0x%02x!\n", ch);
+            state = HAZER_STATE_STOP;
         }
-        action = HAZER_ACTION_SAVE;
         break;
 
     case HAZER_STATE_MSN:
-        if ((HAZER_STIMULUS_DECMIN <= ch) && (ch <= HAZER_STIMULUS_DECMAX)) {
-            state = HAZER_STATE_LSN;
-            action = HAZER_ACTION_SAVE;
-        } else if ((HAZER_STIMULUS_HEXMIN_LC <= ch) && (ch <= HAZER_STIMULUS_HEXMAX_LC)) {
-            state = HAZER_STATE_LSN;
-            action = HAZER_ACTION_SAVE;
-        } else if ((HAZER_STIMULUS_HEXMIN_UC <= ch) && (ch <= HAZER_STIMULUS_HEXMAX_UC)) {
-            state = HAZER_STATE_LSN;
-            action = HAZER_ACTION_SAVE;
+    	if (ch == pp->msn) {
+    		state = HAZER_STATE_LSN;
+    		action = HAZER_ACTION_SAVE;
         } else {
-            DEBUG("STARTING 0x%02x!\n", ch);
-            state = HAZER_STATE_START;
+            DEBUG("MSN 0x%02x 0x%02x!\n", ch, pp->msn);
+            state = HAZER_STATE_STOP;
         }
         break;
 
     case HAZER_STATE_LSN:
-        if ((HAZER_STIMULUS_DECMIN <= ch) && (ch <= HAZER_STIMULUS_DECMAX)) {
-            state = HAZER_STATE_CR;
-            action = HAZER_ACTION_SAVE;
-        } else if ((HAZER_STIMULUS_HEXMIN_LC <= ch) && (ch <= HAZER_STIMULUS_HEXMAX_LC)) {
-            state = HAZER_STATE_CR;
-            action = HAZER_ACTION_SAVE;
-        } else if ((HAZER_STIMULUS_HEXMIN_UC <= ch) && (ch <= HAZER_STIMULUS_HEXMAX_UC)) {
-            state = HAZER_STATE_CR;
-            action = HAZER_ACTION_SAVE;
+    	if (ch == pp->lsn) {
+    		state = HAZER_STATE_CR;
+    		action = HAZER_ACTION_SAVE;
         } else {
-            DEBUG("STARTING 0x%02x!\n", ch);
-            state = HAZER_STATE_START;
+            DEBUG("LSN 0x%02x 0x%02x!\n", ch, pp->lsn);
+            state = HAZER_STATE_STOP;
         }
         break;
 
@@ -190,8 +146,8 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
             state = HAZER_STATE_LF;
             action = HAZER_ACTION_SAVESPECIAL;
         } else {
-            DEBUG("STARTING 0x%02x!\n", ch);
-            state = HAZER_STATE_START;
+            DEBUG("CR 0x%02x!\n", ch);
+            state = HAZER_STATE_STOP;
         }
         break;
 
@@ -200,8 +156,8 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
             state = HAZER_STATE_END;
             action = HAZER_ACTION_TERMINATE;
         } else {
-            DEBUG("STARTING 0x%02x!\n", ch);
-            state = HAZER_STATE_START;
+            DEBUG("LF 0x%02x!\n", ch);
+            state = HAZER_STATE_STOP;
         }
         break;
 
@@ -226,39 +182,40 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
         break;
 
     case HAZER_ACTION_SAVE:
-        if ((*sp) > 0) {
-            *((*bp)++) = ch;
-            (*sp) -= 1;
+        if (pp->sz > 0) {
+            *(pp->bp++) = ch;
+            pp->sz -= 1;
             DEBUG("SAVE 0x%02x.\n", ch);
         } else {
-            state = HAZER_STATE_START;
-            DEBUG("LONG!\n");
+            DEBUG("OVERRUN!\n");
+            state = HAZER_STATE_STOP;
         }
         break;
 
     case HAZER_ACTION_SAVESPECIAL:
-        if ((*sp) > 0) {
-            *((*bp)++) = ch;
-            (*sp) -= 1;
+        if (pp->sz > 0) {
+            *(pp->bp++) = ch;
+            pp->sz -= 1;
             DEBUG("SAVE 0x%02x.\n", ch);
         } else {
-            state = HAZER_STATE_START;
-            DEBUG("LONG!\n");
+            DEBUG("OVERRUN!\n");
+            state = HAZER_STATE_STOP;
         }
         break;
 
     case HAZER_ACTION_TERMINATE:
-        if ((*sp) > 1) {
-            *((*bp)++) = ch;
-            (*sp) -= 1;
+        if (pp->sz > 1) {
+            *(pp->bp++) = ch;
+            pp->sz -= 1;
             DEBUG("SAVE 0x%02x.\n", ch);
-            *((*bp)++) = '\0';
-            (*sp) -= 1;
+            *(pp->bp++) = '\0';
+            pp->sz -= 1;
             DEBUG("SAVE 0x%02x.\n", '\0');
-            (*sp) = size - (*sp);
+            pp->tot = size - pp->sz;
+            DEBUG("SIZE %zu.\n", pp->tot);
         } else {
-            state = HAZER_STATE_START;
-            DEBUG("LONG!\n");
+            DEBUG("OVERRUN!\n");
+            state = HAZER_STATE_STOP;
         }
         break;
 
@@ -279,12 +236,11 @@ hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t s
  *
  ******************************************************************************/
 
-const void * hazer_checksum_buffer(const void * buffer, size_t size, uint8_t * ckp)
+const void * hazer_checksum_buffer(const void * buffer, size_t size, uint8_t * msnp, uint8_t * lsnp)
 {
     const void * result = (void *)0;
     const unsigned char * bp = (const unsigned char *)0;
     uint8_t cs = 0;
-    uint8_t ch = '\0';
 
     if (size > 0) {
 
@@ -298,7 +254,7 @@ const void * hazer_checksum_buffer(const void * buffer, size_t size, uint8_t * c
             --size;
         }
 
-        *ckp = cs;
+        hazer_checksum2characters(cs, msnp, lsnp);
 
         result = bp;
 
@@ -307,7 +263,7 @@ const void * hazer_checksum_buffer(const void * buffer, size_t size, uint8_t * c
     return result;
 }
 
-int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp)
+int hazer_characters2checksum(uint8_t msn, uint8_t lsn, uint8_t * ckp)
 {
     int rc = 0;
 
@@ -334,7 +290,7 @@ int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp)
     return rc;
 }
 
-void hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp)
+void hazer_checksum2characters(uint8_t ck, uint8_t * msnp, uint8_t * lsnp)
 {
     uint8_t msn = 0;
     uint8_t lsn = 0;
@@ -364,23 +320,26 @@ ssize_t hazer_length(const void * buffer, size_t size)
 {
     ssize_t result = -1;
     size_t length = 0;
-    const char * sentence = (const char *)0;
+    const char * bp = (const char *)0;
 
-    sentence = (const char *)buffer;
+    bp = (const char *)buffer;
 
-    if (sentence[0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
+    if (size < HAZER_NMEA_SHORTEST) {
+    	/* Do nothing. */
+    } else if (*bp != HAZER_STIMULUS_START) {
+    	/* Do nothing. */
     } else {
-        length = strnlen(sentence, size);
-        if (length >= size) {
+    	while (size > 0) {
+    		if (*bp == '\0') { break; }
+    		size -= 1;
+    		length += 1;
+    		if (*(bp++) == HAZER_STIMULUS_LF) { break; }
+    	}
+    	if (length < HAZER_NMEA_SHORTEST) {
             /* Do nothing. */
-        } else if (sentence[length] != HAZER_STIMULUS_NUL) {
+    	} else if (*(--bp) != HAZER_STIMULUS_LF) {
             /* Do nothing. */
-        } else if (sentence[length - 1] != HAZER_STIMULUS_LF) {
-            /* Do nothing. */
-        } else if (sentence[length - 2] != HAZER_STIMULUS_CR) {
-            /* Do nothing. */
-        } else if (sentence[length - 5] != HAZER_STIMULUS_CHECKSUM) {
+        } else if (*(--bp) != HAZER_STIMULUS_CR) {
             /* Do nothing. */
         } else {
             result = length;

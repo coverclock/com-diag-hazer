@@ -40,7 +40,7 @@
  * @param now is the new file pointer used for debugging, or NULL.
  * @return the prior debug file pointer (which may be NULL).
  */
-extern FILE * tumbleweed_debug(FILE *now);
+extern FILE * tumbleweed_debug(FILE * now);
 
 /*******************************************************************************
  * STARTING UP AND SHUTTING DOWN
@@ -125,14 +125,13 @@ enum TumbleweedRtcmShifts {
 
 /**
  * RTCM state machine states. The only states the application needs
- * to take action on are START (to initialize the state), EOF (end of file
- * on the input stream), and END (complete RTCM message in buffer). The
+ * to take action on is END (complete RTCM message in buffer). The
  * rest are transitory states. If the machine transitions from a non-START
  * state to the START state, that means the framing of the current message
  * failed; that might be of interest to the application.
  */
 typedef enum TumbleweedState {
-    TUMBLEWEED_STATE_EOF					= 0,
+	TUMBLEWEED_STATE_STOP		= 0,
     TUMBLEWEED_STATE_START,
     TUMBLEWEED_STATE_LENGTH_1,
     TUMBLEWEED_STATE_LENGTH_2,
@@ -141,7 +140,6 @@ typedef enum TumbleweedState {
     TUMBLEWEED_STATE_CRC_2,
 	TUMBLEWEED_STATE_CRC_3,
     TUMBLEWEED_STATE_END,
-	TUMBLEWEED_STATE_ERR,
 } tumbleweed_state_t;
 
 /**
@@ -162,6 +160,20 @@ typedef enum TumbleweedAction {
 } tumbleweed_action_t;
 
 /**
+ * Tumbleweed RTCM parser state machine context (which needs no initial value).
+ */
+typedef struct TumbleweedContext {
+	uint8_t * bp;		/* Current buffer pointer. */
+	size_t sz;			/* Remaining buffer size in bytes. */
+	size_t tot;			/* Total size once message is complete. */
+	uint32_t crc;		/* Running cyclic redundancy check. */
+	uint16_t ln;		/* Payload length in bytes. */
+	uint8_t crc1;		/* CRC most significant byte. */
+	uint8_t crc2;		/* CRC middle significant byte. */
+	uint8_t crc3;		/* CRC lest significant byte. */
+} tumbleweed_context_t;
+
+/**
  * Process a single character of stimulus for the state machine that is
  * assembling a single RTCM message in the caller provided buffer. State
  * is maintained in a character pointer and a size variable, pointers to
@@ -178,12 +190,20 @@ typedef enum TumbleweedAction {
  * @param ch is the next character from the RTCM message stream.
  * @param buffer points to the beginning of the output buffer.
  * @param size is the size of the output buffer in bytes.
- * @param bp points to a character pointer state variable of no initial value.
- * @param sp points to a size state variable of no initial value.
- * @param lp points to the length state variable of no initial value.
+ * @param pp points to the context structure (which needs no initialization).
  * @return the next state of the machine.
  */
-extern tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp);
+extern tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void * buffer, size_t size, tumbleweed_context_t * pp);
+
+/**
+ * Return the total size of the complete RTCM message as computed by the parser.
+ * @param pp points to the context structure.
+ * @return the final size.
+ */
+static inline size_t tumbleweed_size(const tumbleweed_context_t * pp)
+{
+	return pp->tot;
+}
 
 /*******************************************************************************
  * VALIDATING AN RTCM MESSAGE

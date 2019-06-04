@@ -54,27 +54,10 @@ int yodel_finalize(void)
 /*
  * Ublox 8, p. 134
  */
-yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp)
+yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size_t size, yodel_context_t * pp)
 {
     int done = !0;
     yodel_action_t action = YODEL_ACTION_SKIP;
-
-    /*
-     * Short circuit state machine for some characters.
-     */
-
-    switch (ch) {
-
-    case EOF:
-        DEBUG("EOF %d!\n", ch);
-        state = YODEL_STATE_EOF;
-        break;
-
-    default:
-        /* Do nothing. */
-        break;
-
-    }
 
     /*
      * Advance state machine based on stimulus.
@@ -82,19 +65,21 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
 
     switch (state) {
 
-    case YODEL_STATE_EOF:
-        *bp = (char *)buffer;
-        *sp = 0;
-        break;
+    case YODEL_STATE_STOP:
+    	/* Do nothing. */
+    	break;
 
     case YODEL_STATE_START:
         if (ch == YODEL_STIMULUS_SYNC_1) {
             DEBUG("UBX 0x%02x.\n", ch);
+            pp->bp = (uint8_t *)buffer;
+            pp->sz = size;
+            pp->tot = 0;
+            pp->ln = 0;
+            pp->csa = 0;
+            pp->csb = 0;
             state = YODEL_STATE_SYNC_2;
             action = YODEL_ACTION_SAVE;
-            *bp = (char *)buffer;
-            *sp = size;
-            *lp = 0;
         }
         break;
 
@@ -103,42 +88,51 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
             state = YODEL_STATE_CLASS;
             action = YODEL_ACTION_SAVE;
         } else {
-            state = YODEL_STATE_START;
+            state = YODEL_STATE_STOP;
         }
         break;
 
     case YODEL_STATE_CLASS:
+        yodel_checksum(ch, &(pp->csa), &(pp->csb));
         state = YODEL_STATE_ID;
         action = YODEL_ACTION_SAVE;
         break;
 
     case YODEL_STATE_ID:
+        yodel_checksum(ch, &(pp->csa), &(pp->csb));
         state = YODEL_STATE_LENGTH_1;
         action = YODEL_ACTION_SAVE;
         break;
 
     case YODEL_STATE_LENGTH_1:
+        yodel_checksum(ch, &(pp->csa), &(pp->csb));
         /*
          * Ublox8, p. 134: "little endian"
          */
-        *lp = ((unsigned)ch); /* LSB */
-        DEBUG("LENGTH1 0x%02x %zu.\n", ch, *lp);
+    	pp->ln = ((uint16_t)ch); /* LSB */
+        DEBUG("LENGTH1 0x%02x %u.\n", ch, pp->ln);
         state = YODEL_STATE_LENGTH_2;
         action = YODEL_ACTION_SAVE;
         break;
 
     case YODEL_STATE_LENGTH_2:
+        yodel_checksum(ch, &(pp->csa), &(pp->csb));
         /*
          * Ublox8, p. 134: "little endian"
          */
-        *lp |= ((unsigned)ch) << 8; /* MSB */
-        DEBUG("LENGTH2 0x%02x %zu.\n", ch, *lp);
-        state = YODEL_STATE_PAYLOAD;
+    	pp->ln |= ((uint16_t)ch) << 8; /* MSB */
+        DEBUG("LENGTH2 0x%02x %u.\n", ch, pp->ln);
+        if (pp->ln > 0) {
+        	state = YODEL_STATE_PAYLOAD;
+        } else {
+        	state = YODEL_STATE_CK_A;
+        }
         action = YODEL_ACTION_SAVE;
         break;
 
     case YODEL_STATE_PAYLOAD:
-        if (((*lp)--) > 1) {
+        yodel_checksum(ch, &(pp->csa), &(pp->csb));
+        if ((pp->ln--) > 1) {
             state = YODEL_STATE_PAYLOAD;
         } else {
             state = YODEL_STATE_CK_A;
@@ -147,13 +141,23 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
         break;
 
     case YODEL_STATE_CK_A:
-        state = YODEL_STATE_CK_B;
-        action = YODEL_ACTION_SAVE;
+    	if ((uint8_t)ch == pp->csa) {
+    		state = YODEL_STATE_CK_B;
+    		action = YODEL_ACTION_SAVE;
+    	} else {
+            DEBUG("CKA 0x%02x 0x%02x!\n", ch, pp->csa);
+            state = YODEL_STATE_STOP;
+    	}
         break;
 
     case YODEL_STATE_CK_B:
-        state = YODEL_STATE_END;
-        action = YODEL_ACTION_TERMINATE;
+    	if ((uint8_t)ch == pp->csb) {
+    		state = YODEL_STATE_END;
+    		action = YODEL_ACTION_TERMINATE;
+    	} else {
+            DEBUG("CKB 0x%02x 0x%02x!\n", ch, pp->csb);
+            state = YODEL_STATE_STOP;
+    	}
         break;
 
     case YODEL_STATE_END:
@@ -177,13 +181,13 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
         break;
 
     case YODEL_ACTION_SAVE:
-        if ((*sp) > 0) {
-            *((*bp)++) = ch;
-            (*sp) -= 1;
+        if (pp->sz > 0) {
+            *(pp->bp++) = ch;
+            pp->sz -= 1;
             DEBUG("SAVE 0x%02x.\n", ch);
         } else {
-            state = YODEL_STATE_START;
-            DEBUG("LONG!\n");
+            DEBUG("OVERRUN!\n");
+            state = YODEL_STATE_STOP;
         }
         break;
 
@@ -196,17 +200,18 @@ yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t s
          * some UBX messages (like UBX-MON-VER) that contain null terminated
          * strings in their payloads.
          */
-        if ((*sp) > 1) {
-            *((*bp)++) = ch;
-            (*sp) -= 1;
+        if (pp->sz > 1) {
+            *(pp->bp++) = ch;
+            pp->sz -= 1;
             DEBUG("SAVE 0x%02x.\n", ch);
-            *((*bp)++) = '\0';
-            (*sp) -= 1;
+            *(pp->bp++) = '\0';
+            pp->sz -= 1;
             DEBUG("SAVE 0x%02x.\n", '\0');
-            (*sp) = size - (*sp);
+            pp->tot = size - pp->sz;
+            DEBUG("SIZE %zu.\n", pp->tot);
         } else {
-            state = YODEL_STATE_START;
-            DEBUG("LONG!\n");
+            DEBUG("OVERRUN!\n");
+            state = YODEL_STATE_STOP;
         }
         break;
 

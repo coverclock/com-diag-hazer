@@ -42,7 +42,7 @@
  * @param now is the new file pointer used for debugging, or NULL.
  * @return the prior debug file pointer (which may be NULL).
  */
-extern FILE * yodel_debug(FILE *now);
+extern FILE * yodel_debug(FILE * now);
 
 /*******************************************************************************
  * STARTING UP AND SHUTTING DOWN
@@ -136,14 +136,13 @@ typedef struct YodelUbxHeader {
 
 /**
  * UBX state machine states. The only states the application needs
- * to take action on are START (to initialize the state), EOF (end of file
- * on the input stream), and END (complete UBX packet in buffer). The
+ * to take action on is END (complete UBX packet in buffer). The
  * rest are transitory states. If the machine transitions from a non-START
  * state to the START state, that means the framing of the current packet
  * failed; that might be of interest to the application.
  */
 typedef enum YodelState {
-    YODEL_STATE_EOF					= 0,
+	YODEL_STATE_STOP		= 0,
     YODEL_STATE_START,
     YODEL_STATE_SYNC_2,
     YODEL_STATE_CLASS,
@@ -154,7 +153,6 @@ typedef enum YodelState {
     YODEL_STATE_CK_A,
     YODEL_STATE_CK_B,
     YODEL_STATE_END,
-	YODEL_STATE_ERR,
 } yodel_state_t;
 
 /**
@@ -175,6 +173,18 @@ typedef enum YodelAction {
 } yodel_action_t;
 
 /**
+ * Yodel UBX parser state machine context (which needs no initial value).
+ */
+typedef struct YodelContext {
+	uint8_t * bp;		/* Current buffer pointer. */
+	size_t sz;			/* Remaining buffer size in bytes. */
+	size_t tot;			/* Total size once packet is complete. */
+	uint16_t ln;		/* Payload length in bytes. */
+	uint8_t csa;		/* Running Fletcher checksum A. */
+	uint8_t csb;		/* Running Fletcher checksum B. */
+} yodel_context_t;
+
+/**
  * Process a single character of stimulus for the state machine that is
  * assembling a single UBX packet in the caller provided buffer. State
  * is maintained in a character pointer and a size variable, pointers to
@@ -191,12 +201,20 @@ typedef enum YodelAction {
  * @param ch is the next character from the UBX packet stream.
  * @param buffer points to the beginning of the output buffer.
  * @param size is the size of the output buffer in bytes.
- * @param bp points to a character pointer state variable of no initial value.
- * @param sp points to a size state variable of no initial value.
- * @param lp points to the length state variable of no initial value.
+ * @param pp points to the context structure (which needs no initialization).
  * @return the next state of the machine.
  */
-extern yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp);
+extern yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size_t size, yodel_context_t * pp);
+
+/**
+ * Return the total size of the complete UBX message as computed by the parser.
+ * @param pp points to the context structure.
+ * @return the final size.
+ */
+static inline size_t yodel_size(const yodel_context_t * pp)
+{
+	return pp->tot;
+}
 
 /*******************************************************************************
  * VALIDATING A UBX PACKET

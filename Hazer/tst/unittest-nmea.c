@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2018 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-hazer<BR>
@@ -15,6 +15,8 @@
 
 int main(void)
 {
+	hazer_debug(stderr);
+
     {
         static const char * DATA = "$GNGGA,135627.00,3947.65338,N,10509.20216,W,2,12,0.67,1708.6,M,-21.5,M,,0000*4E\r\n";
         hazer_buffer_t buffer = { 0 };
@@ -24,10 +26,8 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        uint8_t cs = 0;
         char msn = 0;
         char lsn = 0;
-        uint8_t ck = 0;
         hazer_buffer_t temporary = { 0 };
 
         strncpy(buffer, DATA, sizeof(buffer));
@@ -37,19 +37,13 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
-
-        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
-
-        rc = hazer_characters2checksum(msn, lsn, &ck);
-        assert(rc == 0);
-        assert(ck == cs);
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 16);
@@ -82,10 +76,8 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        uint8_t cs = 0;
         char msn = 0;
         char lsn = 0;
-        uint8_t ck = 0;
         hazer_buffer_t temporary = { 0 };
 
         strncpy(buffer, DATA, sizeof(buffer));
@@ -95,19 +87,13 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
-
-        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
-
-        rc = hazer_characters2checksum(msn, lsn, &ck);
-        assert(rc == 0);
-        assert(ck == cs);
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 14);
@@ -143,10 +129,8 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        uint8_t cs = 0;
         char msn = 0;
         char lsn = 0;
-        uint8_t ck = 0;
         hazer_buffer_t temporary = { 0 };
 
         strncpy(buffer, DATA, sizeof(buffer));
@@ -156,19 +140,13 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
-
-        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
-
-        rc = hazer_characters2checksum(msn, lsn, &ck);
-        assert(rc == 0);
-        assert(ck == cs);
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 9);
@@ -200,10 +178,8 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        uint8_t cs = 0;
         char msn = 0;
         char lsn = 0;
-        uint8_t ck = 0;
         hazer_buffer_t temporary = { 0 };
 
         strncpy(buffer, DATA, sizeof(buffer));
@@ -213,19 +189,13 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
-
-        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
-
-        rc = hazer_characters2checksum(msn, lsn, &ck);
-        assert(rc == 0);
-        assert(ck == cs);
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 11);
@@ -257,11 +227,9 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        uint8_t cs = 0;
         uint8_t msn = 0;
         uint8_t lsn = 0;
-        uint8_t ck = 0;
-        hazer_buffer_t temporary = { 0 };
+       hazer_buffer_t temporary = { 0 };
 
         strncpy(buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
@@ -270,19 +238,13 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
-
-        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
-
-        rc = hazer_characters2checksum(msn, lsn, &ck);
-        assert(rc == 0);
-        assert(ck == cs);
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 19);
@@ -328,10 +290,8 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        uint8_t cs = 0;
         uint8_t msn = 0;
         uint8_t lsn = 0;
-        uint8_t ck = 0;
         hazer_buffer_t temporary = { 0 };
 
         strncpy(buffer, DATA, sizeof(buffer));
@@ -341,21 +301,13 @@ int main(void)
         length = hazer_length(buffer, sizeof(buffer));
         assert(length == strlen(buffer));
 
-        pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
         assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
-
-        /*
-        hazer_checksum2characters(cs, &msn, &lsn);
         assert(pointer[1] == msn);
         assert(pointer[2] == lsn);
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
-
-        rc = hazer_characters2checksum(msn, lsn, &ck);
-        assert(rc == 0);
-        assert(ck == cs);
-        */
 
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 20);
@@ -408,10 +360,8 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        uint8_t cs = 0;
         char msn = 0;
         char lsn = 0;
-        uint8_t ck = 0;
         hazer_buffer_t temporary = { 0 };
         int ii = 0;
 
@@ -424,19 +374,13 @@ int main(void)
             length = hazer_length(buffer, sizeof(buffer));
             assert(length == strlen(buffer));
 
-            pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
+            pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
             assert(pointer != (char *)0);
             assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
-
-            hazer_checksum2characters(cs, &msn, &lsn);
             assert(pointer[1] == msn);
             assert(pointer[2] == lsn);
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
-
-            rc = hazer_characters2checksum(msn, lsn, &ck);
-            assert(rc == 0);
-            assert(ck == cs);
 
             count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
             assert(((ii == 3) && (count == 17)) || (count == 21));
@@ -558,10 +502,8 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        uint8_t cs = 0;
         char msn = 0;
         char lsn = 0;
-        uint8_t ck = 0;
         hazer_buffer_t temporary = { 0 };
         int ii = 0;
 
@@ -574,26 +516,17 @@ int main(void)
             length = hazer_length(buffer, sizeof(buffer));
             assert(length == strlen(buffer));
 
-            pointer = (char *)hazer_checksum_buffer(buffer, length, &cs);
+            pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
             assert(pointer != (char *)0);
             assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
-
-            /*
-            hazer_checksum2characters(cs, &msn, &lsn);
             assert(pointer[1] == msn);
             assert(pointer[2] == lsn);
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
 
-            rc = hazer_characters2checksum(msn, lsn, &ck);
-            assert(rc == 0);
-            assert(ck == cs);
-            */
-
             count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
             assert(((ii == 3) && (count == 18)) || (count == 22));
 
-            /*
             length = hazer_serialize(temporary, sizeof(temporary), vector, count);
             assert(length == (strlen(temporary) + 1));
             temporary[length - 1] = msn;
@@ -602,7 +535,6 @@ int main(void)
             temporary[length + 2] = '\n';
             temporary[length + 3] = '\0';
             assert(strcmp(DATA[ii], temporary) == 0);
-            */
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(((ii == 3) && (rc == 0)) || (rc > 0));
