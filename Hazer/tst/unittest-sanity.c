@@ -15,6 +15,7 @@
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/tumbleweed.h"
 #include "com/diag/diminuto/diminuto_countof.h"
+#include "com/diag/diminuto/diminuto_dump.h"
 #include "./unittest.h"
 
 int main(void)
@@ -69,7 +70,11 @@ int main(void)
 
         for (ii = 0; ii < countof(DATA); ++ii) {
 
+        	fprintf(stderr, "Sentence %d\n", ii);
+
         	size = strlen(DATA[ii]);
+        	diminuto_dump(stderr, DATA[ii], size);
+
         	length = hazer_length(DATA[ii], size);
         	assert(length == size);
 
@@ -102,7 +107,7 @@ int main(void)
         	assert(strncmp(DATA[ii], buffer, size) == 0);
 
         	length = hazer_size(&context);
-        	length -= 1;
+        	length -= 1; /* Included trailing NUL. */
 			assert(size == length);
         }
 
@@ -143,6 +148,10 @@ int main(void)
 		for (ii = 0; ii < countof(DATA); ++ii) {
 			BEGIN(DATA[ii]);
 
+        	    fprintf(stderr, "Packet %d\n", ii);
+
+			    diminuto_dump(stderr, message, size);
+
 				length = yodel_length(message, size);
 				assert(length == size);
 
@@ -164,7 +173,7 @@ int main(void)
 				assert(memcmp(message, buffer, size) == 0);
 
 				length = yodel_size(&context);
-	        	length -= 1;
+	        	length -= 1; /* Included trailing NUL. */
 	        	assert(size == length);
 
 			END;
@@ -181,17 +190,17 @@ int main(void)
 		 */
 		static const uint8_t * DATA[] = {
             "\\xd3\\0\\x98C \\08\\a\\xb0b\\0\\0A\\x14p\\n\\0\\0\\0\\0 \\0\\x80\\0}ui)\\x89)H\\xc9\\x89H\\xa8\\xb0\\x85\\xfc\\xfa\\x1a\\x85\\x93w\\xbf\\xb5\\x1e/\\xcd\\xaf\\xd1C\\x0e\\xc6p\\xf5y\\x13\\xd6q \\xe2y\\x98\\x1d\\xe7\\x1a[\\xc3\\x87\\b\\x01\\xfd\\x8f\\xc4\\0\\xd3\\xf0]\\x05\\x81\\xc2\\xe5\\xfa`\\xc0\\x15K \\xdf\\xe1\\x03y\\xcc\\x0ea\\x13\\xddv/C\\xfd@\\xe8z\\x04\\x1bZ\\xb7v7w7w@\\x01\\x133@\\xdc\\x14H\\xec\\xb3_0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xa4\\xad\\x1a",
-	        //"\\xd3\\0{C\\xc0\\0Qf\\xe5\"\\0\\0\\x01A\\xf0\\0\\0\\0\\0\\0 \\x80\\0\\0V\\xfa\\x9c\\x9a\\x8a\\x82\\x8e\\x80\\x8f\\xe0*\\xda\\x02\\b>\\xa0\\x8b\\x897?\\x1b\\xfa\\x92\\xb6\\x14n\\xb4\\xe2\\xdd\\xc8\\xe0\\xf7Y\\xf6\\xb2\\x87\\x816z\\xfe\\xc5\\xab\\xeb\\x8c\\xdf\\xb2\\xfe\\xbe\\xef\\xa9\\xfc'5\\xf1\\x80xt^B\\x10\\x80\\x85\\x03#5\\xbb\\xbb\\xb9\\xba\\06\\xfc\\x8fE\\x14P\\xb90\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xefzm",
-	        //"\\xd3\\0^D`\\08\\a\\xb0`\\0\\0 \\x90\\0@\\b\\0\\0\\0 \\x01\\0\\0oi\\xca\\x89\\xca)\\xf0\\xb5\\xc9\\xac\\xa3\\xe7\\xf8\\xdf\\xa2\\n\\xda!\\x01z\\x83\\x97\\x1a\\xe7\\x95\\x13?P8d!\\t\\x19z\\x1d\\xf2\\05\\xb8\\x0f\\x82\\xc0\\xd4\\x1e\\xf9\\x0f\\xdb\\xe7\\x95n\\xec\\xde^`\\x04\\xd1\\xba\\xe3\\xd1U@\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0IDS",
 	        "\\xd3\\0\\bL\\xe0\\0\\x8a\\0\\0\\0\\0\\xa8\\xf7*",
 	        "\\xd3\\0\\x98C \\08\\a\\xc0\\x02\\0\\0A\\x14p\\n\\0\\0\\0\\0 \\0\\x80\\0}ui)\\x89)H\\xc9\\x89H\\xa8\\xb0\\x86\\0\\xfa\\x9a\\xa5\\x8by\\xbe\\xb5\\x1e7\\x91\\xefW\\xc5\\x8f\\vw}\\xac\\xd4\\x82k\\xfc\\xd81\\xb3\\x1dB[>\\x8eR\\x1d\\x9b\\xfb\\xaa\\v\\xf9=\\xb0\\xad\\x05\\x03\\x02\\xe7\\xfex\\xfb\\xd5\\xee \\xd5\\x92\\x03P\\x96\\x0f5\\xf3\\xd3)\\x9f`e\\x03\\x9bX\\x0e\\xe6\\xe6\\xb7v7w7w@\\x01\\x13S@\\xe4\\x14J\\xec\\xb3_0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xbc\\0\\xa7",
-	        //"\\xd3\\0{C\\xc0\\0Qf\\xf4\\xc2\\0\\0\\x01A\\xf0\\0\\0\\0\\0\\0 \\x80\\0\\0V\\xfa\\x9c\\x9a\\x8a\\x82\\x8e\\x80\\x8f\\xe0\\xaa\\x9a\\n\\x06?\\xa0\\x8by5\\xad. \\xb0\\x02H\\x82]\\xf0\\x99\\xe4lr\\0\\xeb\\xbe\\x81\\xc18\\x17z\\xe76\\x04\\0\\xc0\\x14\\xcc@*X}\\xe15\\xf8h81\\x95a\\x05c\\xfc\\xf7[5\\xbb\\xbb\\xb9\\xba\\06\\xfc\\x8fE\\x14p\\xbb0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x97\\x96\\xb4",
 	        "\\xd3\\0^D`\\08\\a\\xc0\\0\\0\\0 \\x90\\0@\\b\\0\\0\\0 \\x01\\0\\0oi\\xca\\x89\\xca)\\xf0\\xb5\\xcb\\xad$\\a\\xf7\">\\x90!\\x83\\x80v\\x01:\\x12\\xb5\\xb63\\x81\\x7f\\xc9\\x13?K\\xcc\\x01~3\\xfd\\xde(\\x06\\x1f\\xc0\\x94V{!\\xa1\\xef\\xdcv\\xec\\xe6^`\\x04\\xd1\\xba\\xdb\\xd1U@\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x8c\\xa8T",
 	        "\\xd3\\0\\bL\\xe0\\0\\x8a\\0\\0\\0\\0\\xa8\\xf7*",
 	        "\\xd3\\0\\x98C \\08\\a\\xcf\\xa2\\0\\0A\\x14p\\n\\0\\0\\0\\0 \\0\\x80\\0}ui)\\x89)H\\xc9\\x89H\\xa8\\xb0\\x86\\x06\\xfb\\x1a\\xa5\\x83{\\xbd\\xb5\\x1eGV\\xbe\\xdf\\x18\\x0e\\xb0~\\x85\\x97\\x15,f\\xe4\\xce\\x19\\xce\\xbc\\x9e\\\\!\\xb9 s3\\xf9\\xc8\\xc7\\xf1\\xb7\\xfe\\xfd$|Cc\\x02\\x95D\\x16\\x9f@\\xcbs\\xc3(\\x1d\\x10\\x0e\\xcb\\xc8\\xe5\\xcf|\\xe0>N\\xfb\\xf9\\xb5n\\xb7v7w7w@\\x01\\x13S@\\xe44J\\xec\\xb3_8\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xcc\\xf21",
 	        "\\xd3\\0{C\\xc0\\0Qg\\x04b\\0\\0\\x01A\\xf0\\0\\0\\0\\0\\0 \\x80\\0\\0W\\xfa\\x9c\\x9a\\x8a\\x82\\x8e\\x80\\x8f\\xe1*:\\x12\\x04@\\xa0\\x8ba;S?\\xe6\\xceN\\x85\\x15u,!\\xfc\\xd4\\0W\\xd9O\\xc2$\\xf9\\x02tZ\\x0e\\x11\\xe48\\xf4 \\xedd\\x02\\xad\\xed\\v*\\xe7\\xfc\\xe6\\x9f\\xfa\\xb2?w\\xae\\xff\\xd7('gI\\xad\\xd7\\xdd\\xdc\\xdd\\0\\x0e?#\\xcd\\xc5\\x14P\\xbb0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0C\\xa0\\xf9",
 	        "\\xd3\\0^D`\\08\\a\\xcf\\xa0\\0\\0 \\x90\\0@\\b\\0\\0\\0 \\x01\\0\\0oi\\xca\\x89\\xca)\\xf0\\xad\\xcf\\xad\\xa4'\\xe9d\\xb3\\x16\\xf8\\xe5?P~\\xef\\n\\xd5\\xd7{\\xc3\\xc0Y\\xcd\\x01\\x8e\\xb6x\\xde\\xf5\\xfb\\x8c?\\xfc\\xd8@T\\xb3}4\\xd7\\xf8)f\\xec\\xe6^`\\x04\\xd1\\xba\\xe3\\xd1U@\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0p\\x9a\\x8a",
 	        "\\xd3\\0\\bL\\xe0\\0\\x8a\\0\\0\\0\\0\\xa8\\xf7*",
+			"\\xd3\\0mD`\\08\\vy\"\\0\\0!\\x90\\0@\\b\\0\\0\\0 \\x01\\0\\0j\\xdar\\xe2\\xa2r\\x8a{\\xf6\\xe2g\\xdc\\xaa\\xb4d\\x9d\\xae@hHl\\xd8\\xa1,\\\\]\"_\\xc69\\x87w\\xfe X(H+\\xe1\\xb0\\xc3\\x84\\xbc\\xb1\\xe4\\x19\\xe8\"\\xcc\\x80\\xc0\\x8d\\xf6\\xbb\\xe6n\\x80M\\x1bN\\xbc\\xf5\\x14\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0ze\\xf0",
+			"\\xd3\\0\\x1eF@\\08\\n\\x9e`\\0\\0\\0\\0\\0 \\0\\0\\0\\0 \\0\\0\\0S\\xac\\xfc\\xcc~e\\xd8Z`X=\\xae",
+			"\\xd3\\0\\0\\x47\\xea\\x4b",
 		};
         const uint8_t * pointer;
         uint8_t crc1;
@@ -209,16 +218,17 @@ int main(void)
 		for (ii = 0; ii < countof(DATA); ++ii) {
 			BEGIN(DATA[ii]);
 
+        	    fprintf(stderr, "Message %d\n", ii);
+
+		        diminuto_dump(stderr, message, size);
+
 				length = tumbleweed_length(message, size);
-fprintf(stderr, "i=%d l=%zd s=%zu\n", ii, length, size);
 				assert(length == size);
 
 				crc1 = 0;
 				crc2 = 0;
 				crc3 = 0;
 				pointer = (char *)tumbleweed_checksum_buffer(message, size, &crc1, &crc2, &crc3);
-fprintf(stderr, "m=%p p=%p p0=0x%x p1=0x%x p2=0x%x c1=0x%x c2=0x%x c3=0x%x\n",
-message, pointer, pointer[0], pointer[1], pointer[2], crc1, crc2, crc3);
 				assert(pointer != (uint8_t *)0);
 				assert(pointer[0] == crc1);
 				assert(pointer[1] == crc2);
@@ -235,7 +245,7 @@ message, pointer, pointer[0], pointer[1], pointer[2], crc1, crc2, crc3);
 				assert(memcmp(message, buffer, size) == 0);
 
 				length = tumbleweed_size(&context);
-	        	length -= 1;
+	        	length -= 1; /* Included trailing NUL. */
 	        	assert(size == length);
 
 			END;
