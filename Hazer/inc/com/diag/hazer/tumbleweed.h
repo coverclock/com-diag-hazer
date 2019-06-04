@@ -273,10 +273,20 @@ extern const void * tumbleweed_checksum_buffer(const void * buffer, size_t size,
 /**
  * Return the length of the completed message in bytes.
  * @param buffer points to buffer containing the completed packet.
- * @param size is the size of the buffer containing the packet.
+ * @param size is the number of bytes in the buffer.
  * @return the length of the packet in bytes or <0 if an error occurred.
  */
 extern ssize_t tumbleweed_length(const void * buffer, size_t size);
+
+/**
+ * Validate the contents of an buffer as a valid RTCM message.
+ * @param buffer points to the buffer. This combines
+ * the tumbleweed_length() and tumbleweed_checksum_buffer() functions along with
+ * the cyclic redundancy check comparison.
+ * @param size is the number of bytes in the buffer.
+ * @return the length of the message in bytes or <0 if an error occurred.
+ */
+extern ssize_t tumbleweed_validate(const void * buffer, size_t size);
 
 /**
  * Return the RTCM message number from the completed message. It will be in the
@@ -285,7 +295,7 @@ extern ssize_t tumbleweed_length(const void * buffer, size_t size);
  * be proprietary messages. Production messages are in the range 1001..1230
  * with some omissions.
  * @param buffer points to buffer containing the completed packet.
- * @param size is the size of the buffer containing the packet.
+ * @param size is the number of bytes in the buffer.
  * @return the message number or <0 if an error occurred.
  */
 extern int tumbleweed_message(const void * buffer, size_t size);

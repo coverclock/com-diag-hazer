@@ -349,6 +349,27 @@ ssize_t hazer_length(const void * buffer, size_t size)
     return result;
 }
 
+ssize_t hazer_validate(const void * buffer, size_t size)
+{
+	ssize_t result = -1;
+	size_t length = 0;
+	const uint8_t * bp = (uint8_t *)0;
+	uint8_t msn = 0;
+	uint8_t lsn = 0;
+
+	if ((length = hazer_length(buffer, size)) <= 0) {
+		/* Do nothing. */
+    } else if ((bp = (uint8_t *)hazer_checksum_buffer(buffer, length, &msn, &lsn)) == (unsigned char *)0) {
+        /* Do nothing. */
+    } else if ((msn != bp[1]) || (lsn != bp[2])) {
+        /* Do nothing. */
+    } else {
+    	result = length;
+    }
+
+	return result;
+}
+
 /******************************************************************************
  *
  ******************************************************************************/

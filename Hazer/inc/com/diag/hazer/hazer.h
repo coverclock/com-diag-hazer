@@ -475,10 +475,20 @@ extern void hazer_checksum2characters(uint8_t ck, uint8_t * msnp, uint8_t * lsnp
 /**
  * Return the length of the completed sentence in bytes.
  * @param buffer points to buffer containing the completed sentence.
- * @param size is the size of the buffer containing the sentence.
+ * @param size is the number of bytes in the buffer.
  * @return the length in bytes or <0 if an error occurred.
  */
 extern ssize_t hazer_length(const void * buffer, size_t size);
+
+/**
+ * Validate the contents of an buffer as a valid NMEA sentence. This combines
+ * the hazer_length() and hazer_checksum_buffer() functions along with the
+ * checksum comparison.
+ * @param buffer points to the buffer.
+ * @param size is the number of bytes in the buffer.
+ * @return the length of the sentence in bytes or <0 if an error occurred.
+ */
+extern ssize_t hazer_validate(const void * buffer, size_t size);
 
 /*******************************************************************************
  * BREAKING UP AN NMEA SENTENCE INTO FIELDS

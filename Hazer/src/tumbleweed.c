@@ -375,4 +375,30 @@ int tumbleweed_message(const void * buffer, size_t size)
     return result;
 }
 
+ssize_t tumbleweed_validate(const void * buffer, size_t size)
+{
+	ssize_t result = -1;
+	size_t length = 0;
+	const uint8_t * bp = (uint8_t *)0;
+	uint8_t crc1 = 0;
+	uint8_t crc2 = 0;
+	uint8_t crc3 = 0;
+
+	if ((length = tumbleweed_length(buffer, size)) <= 0) {
+		/* Do nothing. */
+    } else if ((bp = (uint8_t *)tumbleweed_checksum_buffer(buffer, length, &crc1, &crc2, &crc3)) == (unsigned char *)0) {
+        /* Do nothing. */
+    } else if ((crc1 != bp[0]) || (crc2 != bp[1]) || (crc3 != bp[2])) {
+        /* Do nothing. */
+    } else {
+    	result = length;
+    }
+
+	return result;
+}
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 const uint8_t TUMBLEWEED_KEEPALIVE[6] = { 0xd3, 0x00, 0x00, 0x47, 0xea, 0x4b, };

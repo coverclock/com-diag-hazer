@@ -109,6 +109,9 @@ int main(void)
         	length = hazer_size(&context);
         	length -= 1; /* Included trailing NUL. */
 			assert(size == length);
+
+			length = hazer_validate(DATA[ii], size);
+			assert(length == size);
         }
 
         hazer_finalize();
@@ -175,6 +178,9 @@ int main(void)
 				length = yodel_size(&context);
 	        	length -= 1; /* Included trailing NUL. */
 	        	assert(size == length);
+
+				length = yodel_validate(message, size);
+				assert(length == size);
 
 			END;
 		}
@@ -247,6 +253,9 @@ int main(void)
 				length = tumbleweed_size(&context);
 	        	length -= 1; /* Included trailing NUL. */
 	        	assert(size == length);
+
+				length = tumbleweed_validate(message, size);
+				assert(length == size);
 
 			END;
 		}

@@ -302,6 +302,27 @@ ssize_t yodel_length(const void * buffer, size_t size)
        return result;
 }
 
+ssize_t yodel_validate(const void * buffer, size_t size)
+{
+	ssize_t result = -1;
+	size_t length = 0;
+	const uint8_t * bp = (uint8_t *)0;
+	uint8_t csa = 0;
+	uint8_t csb = 0;
+
+	if ((length = yodel_length(buffer, size)) <= 0) {
+		/* Do nothing. */
+    } else if ((bp = (uint8_t *)yodel_checksum_buffer(buffer, length, &csa, &csb)) == (unsigned char *)0) {
+        /* Do nothing. */
+    } else if ((csa != bp[0]) || (csb != bp[1])) {
+        /* Do nothing. */
+    } else {
+    	result = length;
+    }
+
+	return result;
+}
+
 /******************************************************************************
  *
  ******************************************************************************/

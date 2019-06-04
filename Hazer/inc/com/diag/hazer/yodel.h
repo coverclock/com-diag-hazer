@@ -254,6 +254,16 @@ extern const void * yodel_checksum_buffer(const void * buffer, size_t size, uint
  */
 extern ssize_t yodel_length(const void * buffer, size_t size);
 
+/**
+ * Validate the contents of an buffer as a valid UBX packet.
+ * @param buffer points to the buffer. This combines
+ * the yodel_length() and yodel_checksum_buffer() functions along with the
+ * checksum comparison.
+ * @param size is the number of bytes in the buffer.
+ * @return the length of the packet in bytes or <0 if an error occurred.
+ */
+extern ssize_t yodel_validate(const void * buffer, size_t size);
+
 /******************************************************************************
  *
  ******************************************************************************/
