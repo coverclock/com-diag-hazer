@@ -282,7 +282,7 @@ int main(void)
     }
 
     {
-        static const char * DATA = "$GNGSA,A,3,07,11,15,18,19,13,30,28,51,01,48,17,1.27,0.64,1.10,15*1C\r\n";
+        static const char * DATA = "$GNGSA,A,3,07,11,15,18,19,13,30,28,51,01,48,17,1.27,0.64,1.10,15*34\r\n";
         hazer_buffer_t buffer = { 0 };
         hazer_vector_t vector = { 0 };
         hazer_active_t active = { 0 };
@@ -312,7 +312,6 @@ int main(void)
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 20);
 
-        /*
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
         assert(length == (strlen(temporary) + 1));
         temporary[length - 1] = msn;
@@ -321,7 +320,6 @@ int main(void)
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
-        */
 
         rc = hazer_parse_gsa(&active, vector, count);
         assert(rc == 0);
@@ -490,10 +488,10 @@ int main(void)
 
     {
         static const char * DATA[] = {
-            "$GPGSV,4,1,15,01,37,078,36,06,02,184,29,07,28,143,44,08,00,048,22,1*7A\r\n",
-            "$GPGSV,4,2,15,11,36,059,30,13,36,270,37,15,15,304,28,17,63,226,40,2*7B\r\n",
-            "$GPGSV,4,3,15,18,24,052,32,19,32,223,36,28,67,020,28,30,59,149,38,*77\r\n",
-            "$GPGSV,4,4,15,46,38,215,40,48,36,220,34,51,44,183,45,3*47\r\n",
+            "$GPGSV,4,1,15,01,37,078,36,06,02,184,29,07,28,143,44,08,00,048,22,1*67\r\n",
+            "$GPGSV,4,2,15,11,36,059,30,13,36,270,37,15,15,304,28,17,63,226,40,2*65\r\n",
+            "$GPGSV,4,3,15,18,24,052,32,19,32,223,36,28,67,020,28,30,59,149,38,*5B\r\n",
+            "$GPGSV,4,4,15,46,38,215,40,48,36,220,34,51,44,183,45,3*58\r\n",
         };
         hazer_buffer_t buffer = { 0 };
         hazer_vector_t vector = { 0 };
