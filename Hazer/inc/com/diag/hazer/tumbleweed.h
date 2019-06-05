@@ -83,7 +83,7 @@ enum TumbleweedRtcmConstants {
  * protocol, but is useful in some edge cases in which the data format has not
  * yet been determined (e.g. incoming UDP datagrams).
  */
-typedef unsigned char (tumbleweed_buffer_t)[TUMBLEWEED_RTCM_LONGEST + 1];
+typedef uint8_t (tumbleweed_buffer_t)[TUMBLEWEED_RTCM_LONGEST + 1];
 
 /**
  * @define TUMBLEWEED_BUFFER_INITIALIZER

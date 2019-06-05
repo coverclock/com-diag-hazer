@@ -105,18 +105,23 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         break;
 
     case HAZER_STATE_BODY:
+    	/*
+    	 * According to [NMEA 0183, 4.10, 2012] the checksum field is "required
+    	 * on all sentences". According to [Wikipedia, "NMEA 0183", 2019-05-27]
+    	 * the checksum field is optional on all but a handful of sentences.
+    	 * I'm assuming Wikipedia is referencing an earlier version of the
+    	 * standard. I've never tested an NMEA device that didn't provide
+    	 * checksums on all sentences.
+    	 */
         if (ch == HAZER_STIMULUS_CHECKSUM) {
             hazer_checksum2characters(pp->cs, &(pp->msn), &(pp->lsn));
             state = HAZER_STATE_MSN;
             action = HAZER_ACTION_SAVE;
-        } else if (ch == HAZER_STIMULUS_CR) {
-            state = HAZER_STATE_LF;
-            action = HAZER_ACTION_SAVESPECIAL;
         } else if ((HAZER_STIMULUS_MINIMUM <= ch) && (ch <= HAZER_STIMULUS_MAXIMUM)) {
         	hazer_checksum(ch, &(pp->cs));
             action = HAZER_ACTION_SAVE;
         } else {
-            DEBUG("INV 0x%02x!\n", ch);
+            DEBUG("INVALID 0x%02x!\n", ch);
             state = HAZER_STATE_STOP;
         }
         break;

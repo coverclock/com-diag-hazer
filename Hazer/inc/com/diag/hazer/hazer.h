@@ -374,7 +374,7 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
  * according to the NMEA spec, plus a trailing NUL (and then some).
  * NMEA 0183 4.10, 5.3, p. 11
  */
-typedef unsigned char (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
+typedef uint8_t (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
 
 /**
  * @define HAZER_BUFFER_INITIALIZER

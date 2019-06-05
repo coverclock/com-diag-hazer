@@ -83,7 +83,7 @@ enum YodelUbxConstants {
  * protocol, but is useful in some edge cases in which the data format has not
  * yet been determined (e.g. incoming UDP datagrams).
  */
-typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
+typedef uint8_t (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
 
 /**
  * @define YODEL_BUFFER_INITIALIZER
