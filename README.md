@@ -595,11 +595,13 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 
 # Help
 
-    usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]
+    $ gpstool -?
+    usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
+           -B BYTES    Set the input Buffer size to BYTES bytes.
            -C          Ignore bad Checksums.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
@@ -632,7 +634,6 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
            -o          Use Odd parity for DEVICE.
            -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c).
            -n          Use No parity for DEVICE.
-           -r          Reverse use of standard output and standard error.
            -s          Use XON/XOFF (control-Q/control-S) for DEVICE.
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.

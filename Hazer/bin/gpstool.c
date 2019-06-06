@@ -1465,8 +1465,6 @@ int main(int argc, char * argv[])
 
     diminuto_log_setmask();
 
-    DIMINUTO_LOG_INFORMATION("Start");
-
     (void)gethostname(Hostname, sizeof(Hostname));
     Hostname[sizeof(Hostname) - 1] = '\0';
 
@@ -1693,6 +1691,8 @@ int main(int argc, char * argv[])
     /**
      ** INITIALIZATION
      **/
+
+    DIMINUTO_LOG_INFORMATION("Begin");
 
     /*
      * Are we logging every valid sentence or packet to an output file?
@@ -2091,7 +2091,7 @@ int main(int argc, char * argv[])
      * Enter the work loop.
      */
 
-    DIMINUTO_LOG_INFORMATION("Begin");
+    DIMINUTO_LOG_INFORMATION("Start");
 
 	while (!0) {
 
