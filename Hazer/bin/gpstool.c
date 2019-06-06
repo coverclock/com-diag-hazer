@@ -1210,7 +1210,7 @@ int main(int argc, char * argv[])
     long timeout = HAZER_GNSS_SECONDS;
     long keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
     /*
-     * Configuring variables.
+     * Configuration command variables.
      */
     struct Command * command = (struct Command *)0;
     diminuto_list_t * command_node = (diminuto_list_t *)0;
@@ -1393,7 +1393,14 @@ int main(int argc, char * argv[])
     diminuto_sticks_t fix = -1;
     diminuto_sticks_t timetofirstfix = -1;
     /*
-     * Inputting variables.
+     * I/O buffer variables.
+     */
+    void * io_buffer = (void *)0;
+    size_t io_size = BUFSIZ;
+    ssize_t io_available = 0;
+    size_t io_maximum = 0;
+    /*
+     * Source variables.
      */
     diminuto_mux_t mux;
     int ch = EOF;
@@ -1405,12 +1412,12 @@ int main(int argc, char * argv[])
     ssize_t size = 0;
     ssize_t length = 0;
     /*
-     * Outputting variables.
+     * Display variables.
      */
     char * temporary = (char *)0;
     size_t limitation = 0;
     /**
-     * Controlling variables.
+     * Control variables.
      */
     int eof = 0;		/** If true then the input stream hit end of file. */
     int sync = 0;		/** If true then the input stream is synchronized. */
@@ -1445,7 +1452,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278CD:EFG:H:I:KL:ORS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ABJNPQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:CD:EFG:H:I:KL:ORS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: AJNPQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1483,6 +1490,10 @@ int main(int argc, char * argv[])
             break;
         case '8':
             databits = 8;
+            break;
+        case 'B':
+            io_size = strtoul(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0') || (io_size < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case 'C':
             ignorechecksums = !0;
@@ -1617,7 +1628,7 @@ int main(int argc, char * argv[])
         case '?':
             fprintf(stderr, "usage: %s "
                            "[ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] "
-                           "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] "
+                           "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
                            "[ -t SECONDS ] "
                            "[ -I PIN | -c ] [ -p PIN ] "
                            "[ -U STRING ... ] [ -W STRING ... ] "
@@ -1631,6 +1642,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(stderr, "       -7          Use seven data bits for DEVICE.\n");
             fprintf(stderr, "       -8          Use eight data bits for DEVICE.\n");
+            fprintf(stderr, "       -B BYTES    Set the input Buffer size to BYTES bytes.\n");
             fprintf(stderr, "       -C          Ignore bad Checksums.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
@@ -1925,13 +1937,18 @@ int main(int argc, char * argv[])
      * Our input source is either standard input (either implicitly or
      * explicitly), a serial(ish) device, or a file or maybe a FIFO
      * a.k.a. a named pipe, remarkably useful BTW, see mkfifo(1). So
-     * now we can get its underlying file descriptor.
+     * now we can get its underlying file descriptor. We also mess around
+     * with the input stream standard I/O buffer.
      */
 
     in_fd = fileno(in_fp);
 
     rc = diminuto_mux_register_read(&mux, in_fd);
     assert(rc >= 0);
+
+    io_buffer = malloc(io_size);
+    assert(io_buffer != (void *)0);
+    setvbuf(in_fp, io_buffer, _IOFBF, io_size);
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -2109,7 +2126,7 @@ int main(int argc, char * argv[])
 		 * signal handlers.
 		 */
 
-		if (diminuto_file_ready(in_fp) > 0) {
+		if ((io_available = diminuto_file_ready(in_fp)) > 0) {
 			fd = in_fd;
 		} else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
 			/* Do nothing. */
@@ -2141,12 +2158,15 @@ int main(int argc, char * argv[])
 
 			do {
 
+				if (io_available > io_maximum) { io_maximum = io_available; }
+
 				ch = fgetc(in_fp);
 				if (ch == EOF) {
 		        	DIMINUTO_LOG_INFORMATION("EOF");
 					eof = !0;
 					break;
 				}
+
 
 				/*
 				 * We just received a character from the input stream.
@@ -2269,7 +2289,7 @@ int main(int argc, char * argv[])
 				    rtcm_state = TUMBLEWEED_STATE_START;
 				}
 
-			} while (diminuto_file_ready(in_fp) > 0);
+			} while ((io_available = diminuto_file_ready(in_fp)) > 0);
 
 			/*
 			 * If we detected End Of File from our input source, we're
@@ -3117,12 +3137,21 @@ int main(int argc, char * argv[])
     rc = fclose(in_fp);
     assert(rc != EOF);
 
+    DIMINUTO_LOG_INFORMATION("Buffer size=%llu maximum=%llu\n", io_size, io_maximum);
+    free(io_buffer);
+
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_commit(out_fp, &temporary);
         assert(out_fp == (FILE *)0);
     } else {
         rc = fclose(out_fp);
         assert(rc != EOF);
+    }
+
+    while (!diminuto_list_isempty(&command_list)) {
+    	command_node = diminuto_list_dequeue(&command_list);
+    	assert(command_node != (diminuto_list_t *)0);
+    	free(command_node);
     }
 
     fflush(stderr);
