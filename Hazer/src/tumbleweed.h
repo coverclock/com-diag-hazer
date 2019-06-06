@@ -12,10 +12,4 @@
  * These are the private definitions for the tumbleweed API.
  */
 
-#if 1
-#   define DEBUG(...)   ((debug != (FILE *)0) ? fprintf(debug, "RTCM " __VA_ARGS__) : 0)
-#else
-#   define DEBUG(...)   ((void)0)
-#endif
-
 #endif

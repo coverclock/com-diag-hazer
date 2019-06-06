@@ -68,6 +68,7 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
 {
     int done = !0;
     hazer_action_t action = HAZER_ACTION_SKIP;
+    hazer_state_t old = state;
 
     /*
      * Advance state machine based on stimulus.
@@ -81,7 +82,6 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
 
     case HAZER_STATE_START:
         if (ch == HAZER_STIMULUS_START) {
-            DEBUG("START 0x%02x.\n", ch);
             pp->bp = (uint8_t *)buffer;
             pp->sz = size;
             pp->tot = 0;
@@ -91,7 +91,6 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
         } else if (ch == HAZER_STIMULUS_ENCAPSULATION) {
-            DEBUG("ENCAPSULATE 0x%02x.\n", ch);
             pp->bp = (uint8_t *)buffer;
             pp->sz = size;
             pp->cs = 0;
@@ -121,7 +120,6 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         	hazer_checksum(ch, &(pp->cs));
             action = HAZER_ACTION_SAVE;
         } else {
-            DEBUG("INVALID 0x%02x!\n", ch);
             state = HAZER_STATE_STOP;
         }
         break;
@@ -131,7 +129,6 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     		state = HAZER_STATE_LSN;
     		action = HAZER_ACTION_SAVE;
         } else {
-            DEBUG("MSN 0x%02x 0x%02x!\n", ch, pp->msn);
             state = HAZER_STATE_STOP;
         }
         break;
@@ -141,7 +138,6 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     		state = HAZER_STATE_CR;
     		action = HAZER_ACTION_SAVE;
         } else {
-            DEBUG("LSN 0x%02x 0x%02x!\n", ch, pp->lsn);
             state = HAZER_STATE_STOP;
         }
         break;
@@ -149,9 +145,8 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     case HAZER_STATE_CR:
         if (ch == HAZER_STIMULUS_CR) {
             state = HAZER_STATE_LF;
-            action = HAZER_ACTION_SAVESPECIAL;
+            action = HAZER_ACTION_SAVE;
         } else {
-            DEBUG("CR 0x%02x!\n", ch);
             state = HAZER_STATE_STOP;
         }
         break;
@@ -161,13 +156,11 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             state = HAZER_STATE_END;
             action = HAZER_ACTION_TERMINATE;
         } else {
-            DEBUG("LF 0x%02x!\n", ch);
             state = HAZER_STATE_STOP;
         }
         break;
 
     case HAZER_STATE_END:
-        DEBUG("END 0x%02x!\n", ch);
         break;
 
     /*
@@ -183,27 +176,13 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     switch (action) {
 
     case HAZER_ACTION_SKIP:
-        DEBUG("SKIP 0x%02x?\n", ch);
         break;
 
     case HAZER_ACTION_SAVE:
         if (pp->sz > 0) {
             *(pp->bp++) = ch;
             pp->sz -= 1;
-            DEBUG("SAVE 0x%02x.\n", ch);
         } else {
-            DEBUG("OVERRUN!\n");
-            state = HAZER_STATE_STOP;
-        }
-        break;
-
-    case HAZER_ACTION_SAVESPECIAL:
-        if (pp->sz > 0) {
-            *(pp->bp++) = ch;
-            pp->sz -= 1;
-            DEBUG("SAVE 0x%02x.\n", ch);
-        } else {
-            DEBUG("OVERRUN!\n");
             state = HAZER_STATE_STOP;
         }
         break;
@@ -212,15 +191,11 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         if (pp->sz > 1) {
             *(pp->bp++) = ch;
             pp->sz -= 1;
-            DEBUG("SAVE 0x%02x.\n", ch);
             *(pp->bp++) = '\0';
             pp->sz -= 1;
-            DEBUG("SAVE 0x%02x.\n", '\0');
             pp->tot = size - pp->sz;
-            DEBUG("SIZE %zu.\n", pp->tot);
         } else {
-            DEBUG("OVERRUN!\n");
-            state = HAZER_STATE_STOP;
+             state = HAZER_STATE_STOP;
         }
         break;
 
@@ -233,6 +208,16 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     /*
      * Done.
      */
+
+    if (debug == (FILE *)0) {
+    	/* Do nothing. */
+    } else if (old == HAZER_STATE_STOP) {
+    	/* Do nothing. */
+    } else if ((' ' <= ch) && (ch <= '~')) {
+    	fprintf(debug, "NMEA %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
+    } else {
+    	fprintf(debug, "NMEA %c %c %c 0x%02x\n", old, state, action, ch);
+    }
 
     return state;
 }
@@ -394,7 +379,6 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
         while ((size--) > 0) {
             if (*bb == ',') {
                 *(bb++) = '\0';
-                DEBUG("TOK \"%s\" [%zd].\n", *tt, nn);
                 if (count <= 1) {
                     break;
                 }
@@ -404,7 +388,6 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
                 --count;
             } else if (*bb == '*') {
                 *(bb++) = '\0';
-                DEBUG("TOK \"%s\" [%zd].\n", *tt, nn);
                 break;
             } else {
                 ++bb;
@@ -416,7 +399,6 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
         tt = vv;
         *(vv++) = (char *)0;
         ++nn;
-        DEBUG("TOK %p [%zd].\n", *tt, nn);
         --count;
     }
 
@@ -435,7 +417,6 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
             break;
         }
         strcpy(bb, *vv);
-        DEBUG("STR \"%s\".\n", *vv);
         bb += ss;
         size -= ss;
         if (size < 2) {
@@ -443,10 +424,8 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
         }
         if (count > 2) {
             *(bb++) = HAZER_STIMULUS_DELIMITER;
-            DEBUG("CHR 0x%02x.\n", HAZER_STIMULUS_DELIMITER);
         } else {
             *(bb++) = HAZER_STIMULUS_CHECKSUM;
-            DEBUG("CHR 0x%02x.\n", HAZER_STIMULUS_CHECKSUM);
         }
         --count;
         --size;
@@ -455,7 +434,6 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
 
     if (size > 0) {
         *(bb++) = '\0';
-        DEBUG("CHR '\\0'.\n");
         --size;
     }
 

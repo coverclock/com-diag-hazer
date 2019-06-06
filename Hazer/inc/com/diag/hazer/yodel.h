@@ -142,17 +142,17 @@ typedef struct YodelUbxHeader {
  * failed; that might be of interest to the application.
  */
 typedef enum YodelState {
-	YODEL_STATE_STOP		= 0,
-    YODEL_STATE_START,
-    YODEL_STATE_SYNC_2,
-    YODEL_STATE_CLASS,
-    YODEL_STATE_ID,
-    YODEL_STATE_LENGTH_1,
-    YODEL_STATE_LENGTH_2,
-    YODEL_STATE_PAYLOAD,
-    YODEL_STATE_CK_A,
-    YODEL_STATE_CK_B,
-    YODEL_STATE_END,
+	YODEL_STATE_STOP		= 'X',
+    YODEL_STATE_START		= 'S',
+    YODEL_STATE_SYNC_2		= 'Y',
+    YODEL_STATE_CLASS		= 'C',
+    YODEL_STATE_ID			= 'I',
+    YODEL_STATE_LENGTH_1	= 'L',
+    YODEL_STATE_LENGTH_2	= 'M',
+    YODEL_STATE_PAYLOAD		= 'P',
+    YODEL_STATE_CK_A		= 'A',
+    YODEL_STATE_CK_B		= 'B',
+    YODEL_STATE_END			= 'E',
 } yodel_state_t;
 
 /**
@@ -167,9 +167,9 @@ enum YodelStimulus {
  * UBX state machine actions.
  */
 typedef enum YodelAction {
-    YODEL_ACTION_SKIP               = 0,
-    YODEL_ACTION_SAVE,
-    YODEL_ACTION_TERMINATE,
+    YODEL_ACTION_SKIP		= 'X',
+    YODEL_ACTION_SAVE		= 'S',
+    YODEL_ACTION_TERMINATE	= 'T',
 } yodel_action_t;
 
 /**

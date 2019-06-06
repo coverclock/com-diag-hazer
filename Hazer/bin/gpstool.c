@@ -86,6 +86,7 @@
 #include "com/diag/diminuto/diminuto_delay.h"
 #include "com/diag/diminuto/diminuto_containerof.h"
 #include "com/diag/diminuto/diminuto_observation.h"
+#include "com/diag/diminuto/diminuto_file.h"
 
 /*******************************************************************************
  * CONSTANTS
@@ -131,24 +132,6 @@ static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
  * This is our POSIX thread mutual exclusion semaphore.
  */
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
-/*******************************************************************************
- * HACKS
- ******************************************************************************/
-
-/**
- * Return true of the FILE object has data available in its buffer. Fails to
- * compile with other C libraries like UlibC or perhaps Bionic. Compiles but
- * yields the wrong result if even a minor change is made to GLIBC. Makes Chip
- * wonder why the stdio library doesn't have something like this available.
- * Based on a similar hack in the com-diag-grandote C++ project.
- * @param fp points to the FILE object.
- * @return !0 if data is available to be read, 0 otherwise.
- */
-static inline int fready(const FILE * fp)
-{
-    return (fp->_IO_read_ptr < fp->_IO_read_end);
-}
 
 /*******************************************************************************
  * HELPERS
@@ -2126,7 +2109,7 @@ int main(int argc, char * argv[])
 		 * signal handlers.
 		 */
 
-		if (fready(in_fp)) {
+		if (diminuto_file_ready(in_fp) > 0) {
 			fd = in_fd;
 		} else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
 			/* Do nothing. */
@@ -2286,7 +2269,7 @@ int main(int argc, char * argv[])
 				    rtcm_state = TUMBLEWEED_STATE_START;
 				}
 
-			} while (fready(in_fp));
+			} while (diminuto_file_ready(in_fp) > 0);
 
 			/*
 			 * If we detected End Of File from our input source, we're

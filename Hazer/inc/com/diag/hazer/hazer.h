@@ -159,14 +159,14 @@ enum HazerNmeaConstants {
  * failed; that might be of interest to the application.
  */
 typedef enum HazerState {
-	HAZER_STATE_STOP		= 0,
-    HAZER_STATE_START,
-    HAZER_STATE_BODY,
-    HAZER_STATE_MSN,
-    HAZER_STATE_LSN,
-    HAZER_STATE_CR,
-    HAZER_STATE_LF,
-    HAZER_STATE_END,
+	HAZER_STATE_STOP		= 'X',
+    HAZER_STATE_START		= 'S',
+    HAZER_STATE_BODY		= 'P',
+    HAZER_STATE_MSN			= 'M',
+    HAZER_STATE_LSN			= 'L',
+    HAZER_STATE_CR			= 'R',
+    HAZER_STATE_LF			= 'N',
+    HAZER_STATE_END			= 'E',
 } hazer_state_t;
 
 /**
@@ -205,11 +205,9 @@ enum HazerStimulus {
  * NMEA state machine actions.
  */
 typedef enum HazerAction {
-    HAZER_ACTION_SKIP               = 0,
-    HAZER_ACTION_SAVE,
-    HAZER_ACTION_SAVESPECIAL,
-    HAZER_ACTION_TERMINATE,
-    HAZER_ACTION_FINAL,
+    HAZER_ACTION_SKIP               = 'X',
+    HAZER_ACTION_SAVE				= 'S',
+    HAZER_ACTION_TERMINATE			= 'T',
 } hazer_action_t;
 
 /**

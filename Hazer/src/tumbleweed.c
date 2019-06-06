@@ -57,6 +57,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
 {
     int done = !0;
     tumbleweed_action_t action = TUMBLEWEED_ACTION_SKIP;
+    tumbleweed_state_t old = state;
 
     /*
      * Advance state machine based on stimulus.
@@ -70,7 +71,6 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
 
     case TUMBLEWEED_STATE_START:
         if (ch == TUMBLEWEED_STIMULUS_PREAMBLE) {
-            DEBUG("RTCM 0x%02x.\n", ch);
             pp->bp = (uint8_t *)buffer;
             pp->sz = size;
             pp->tot = 0;
@@ -94,7 +94,6 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     	 */
     	pp->ln = (uint16_t)ch << 8; /* MSB */
     	pp->ln &= TUMBLEWEED_RTCM_MASK_LENGTH;
-        DEBUG("LENGTH1 0x%02x %u.\n", ch, pp->ln);
         state = TUMBLEWEED_STATE_LENGTH_2;
         action = TUMBLEWEED_ACTION_SAVE;
         break;
@@ -105,7 +104,6 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     	 * RTCM 10403.3, Ibid.
     	 */
     	pp->ln |= (uint16_t)ch; /* LSB */
-        DEBUG("LENGTH2 0x%02x %u.\n", ch, pp->ln);
         if (pp->ln > 0) {
         	state = TUMBLEWEED_STATE_PAYLOAD;
         } else {
@@ -130,7 +128,6 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     		state = TUMBLEWEED_STATE_CRC_2;
     		action = TUMBLEWEED_ACTION_SAVE;
     	} else {
-            DEBUG("crc1 0x%02x 0x%02x!\n", ch, pp->crc1);
             state = TUMBLEWEED_STATE_STOP;
     	}
         break;
@@ -140,7 +137,6 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     		state = TUMBLEWEED_STATE_CRC_3;
     		action = TUMBLEWEED_ACTION_SAVE;
     	} else {
-            DEBUG("crc2 0x%02x 0x%02x!\n", ch, pp->crc2);
             state = TUMBLEWEED_STATE_STOP;
     	}
         break;
@@ -150,13 +146,11 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     		state = TUMBLEWEED_STATE_END;
     		action = TUMBLEWEED_ACTION_TERMINATE;
     	} else {
-            DEBUG("crc3 0x%02x 0x%02x!\n", ch, pp->crc3);
             state = TUMBLEWEED_STATE_STOP;
     	}
         break;
 
     case TUMBLEWEED_STATE_END:
-        DEBUG("END 0x%02x!\n", ch);
         break;
 
     /*
@@ -172,17 +166,14 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     switch (action) {
 
     case TUMBLEWEED_ACTION_SKIP:
-        DEBUG("SKIP 0x%02x?\n", ch);
         break;
 
     case TUMBLEWEED_ACTION_SAVE:
         if (pp->sz > 0) {
             *(pp->bp++) = ch;
             pp->sz -= 1;
-            DEBUG("SAVE 0x%02x.\n", ch);
         } else {
             state = TUMBLEWEED_STATE_STOP;
-            DEBUG("OVERRUN!\n");
         }
         break;
 
@@ -196,15 +187,11 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
         if (pp->sz > 1) {
             *(pp->bp++) = ch;
             pp->sz -= 1;
-            DEBUG("SAVE 0x%02x.\n", ch);
             *(pp->bp++) = '\0';
             pp->sz -= 1;
-            DEBUG("SAVE 0x%02x.\n", '\0');
             pp->tot = size - pp->sz;
-            DEBUG("SIZE %zu.\n", pp->tot);
         } else {
             state = TUMBLEWEED_STATE_STOP;
-            DEBUG("OVERRUN!\n");
         }
         break;
 
@@ -217,6 +204,16 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     /*
      * Done.
      */
+
+    if (debug == (FILE *)0) {
+    	/* Do nothing. */
+    } else if (old == TUMBLEWEED_STATE_STOP) {
+    	/* Do nothing. */
+    } else if ((' ' <= ch) && (ch <= '~')) {
+    	fprintf(debug, "RTCM %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
+    } else {
+    	fprintf(debug, "RTCM %c %c %c 0x%02x\n", old, state, action, ch);
+    }
 
     return state;
 }

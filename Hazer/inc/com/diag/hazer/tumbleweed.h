@@ -131,15 +131,15 @@ enum TumbleweedRtcmShifts {
  * failed; that might be of interest to the application.
  */
 typedef enum TumbleweedState {
-	TUMBLEWEED_STATE_STOP		= 0,
-    TUMBLEWEED_STATE_START,
-    TUMBLEWEED_STATE_LENGTH_1,
-    TUMBLEWEED_STATE_LENGTH_2,
-    TUMBLEWEED_STATE_PAYLOAD,
-    TUMBLEWEED_STATE_CRC_1,
-    TUMBLEWEED_STATE_CRC_2,
-	TUMBLEWEED_STATE_CRC_3,
-    TUMBLEWEED_STATE_END,
+	TUMBLEWEED_STATE_STOP		= 'X',
+    TUMBLEWEED_STATE_START		= 'S',
+    TUMBLEWEED_STATE_LENGTH_1	= 'M',
+    TUMBLEWEED_STATE_LENGTH_2	= 'L',
+    TUMBLEWEED_STATE_PAYLOAD	= 'P',
+    TUMBLEWEED_STATE_CRC_1		= '1',
+    TUMBLEWEED_STATE_CRC_2		= '2',
+	TUMBLEWEED_STATE_CRC_3		= '3',
+    TUMBLEWEED_STATE_END		= 'E',
 } tumbleweed_state_t;
 
 /**
@@ -154,9 +154,9 @@ enum TumbleweedStimulus {
  * UBX state machine actions.
  */
 typedef enum TumbleweedAction {
-    TUMBLEWEED_ACTION_SKIP               = 0,
-    TUMBLEWEED_ACTION_SAVE,
-    TUMBLEWEED_ACTION_TERMINATE,
+    TUMBLEWEED_ACTION_SKIP		= 'X',
+    TUMBLEWEED_ACTION_SAVE		= 'S',
+    TUMBLEWEED_ACTION_TERMINATE	= 'T',
 } tumbleweed_action_t;
 
 /**
