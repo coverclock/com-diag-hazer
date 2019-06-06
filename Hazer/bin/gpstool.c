@@ -187,26 +187,6 @@ static inline void countdown(expiry_t * ep, diminuto_sticks_t elapsed)
     }
 }
 
-#if 0
-/**
- * Display the particulars of a UDP "connection". Useful when debugging.
- * @param label is a string that gets displayed to identify the connection.
- * @param fd is the socket.
- * @param protocol is the protocol in use: IPV4, IPV6, or PROTOCOL.
- * @param ipv4p points to an IPv4 address or NULL.
- * @param ipv6p points to an IPv6 address or NULL.
- * @param port is a port number.
- * @param buffer points to a buffer or NULL.
- * @param size is the size of the buffer in bytes.
- */
-static void show_connection(const char * label, int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
-{
-    diminuto_ipv4_buffer_t ipv4;
-    diminuto_ipv6_buffer_t ipv6;
-    fprintf(stderr, "%s: connection %s (%d) {%d} \"%s\" \"%s\" :%d %p [%zu]\n", Program, label, fd, protocol, ipv4p ? diminuto_ipc4_address2string(*ipv4p, ipv4, sizeof(ipv4)) : "", ipv6p ? diminuto_ipc6_address2string(*ipv6p, ipv6, sizeof(ipv6)): "", port, buffer, size);
-}
-#endif
-
 /*******************************************************************************
  * EMITTERS
  ******************************************************************************/
@@ -221,8 +201,8 @@ static void show_connection(const char * label, int fd, protocol_t protocol, con
  */
 static void emit_sentence(FILE * fp, const char * string, size_t size)
 {
-    char msn = '\0';
-    char lsn = '\0';
+    uint8_t msn = '\0';
+    uint8_t lsn = '\0';
 
     if (hazer_checksum_buffer(string, size, &msn, &lsn) == (void *)0) {
         errno = EIO;
@@ -335,7 +315,7 @@ static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
     } else if (length >= size) {
         /* Should be impossible. */
     } else {
-        ((char *)buffer)[length++] = '\0';
+        ((uint8_t *)buffer)[length++] = '\0';
     }
 
     return length;
@@ -1459,7 +1439,7 @@ int main(int argc, char * argv[])
     int error = 0;
     char * end = (char *)0;
     /*
-     * Input processing variables.
+     * Data processing variables.
      */
     ssize_t count = 0;
     hazer_active_t cache = HAZER_ACTIVE_INITIALIZER;
@@ -1470,6 +1450,8 @@ int main(int argc, char * argv[])
      */
     int rc = 0;
     char * locale = (char *)0;
+    diminuto_ipv4_buffer_t ipv4;
+    diminuto_ipv6_buffer_t ipv6;
     /*
      * External symbols.
      */
@@ -1778,6 +1760,8 @@ int main(int argc, char * argv[])
 
     }
 
+    if (datagram_fd >= 0) { DIMINUTO_LOG_INFORMATION("Datagram (%d) IPv%d \"%s\" %s:%d", datagram_fd, datagram_protocol, datagram_option, (datagram_protocol == IPV6) ? diminuto_ipc6_address2string(datagram_endpoint.ipv6, ipv6, sizeof(ipv6)) : (datagram_protocol == IPV4) ? diminuto_ipc4_address2string(datagram_endpoint.ipv4, ipv4, sizeof(ipv4)) : "", datagram_endpoint.udp); }
+
     /*
      * Are we receiving RTK corrections in the form of RTCM messages from a
      * stationary base station doing a survey? This is useful for DGNSS (DGPS),
@@ -1835,6 +1819,8 @@ int main(int argc, char * argv[])
         keepalive = -1;
 
     }
+
+    if (surveyor_fd >= 0) { DIMINUTO_LOG_INFORMATION("Surveyor (%d) IPv%d \"%s\" %s:%d", surveyor_fd, surveyor_protocol, surveyor_option, (surveyor_protocol == IPV6) ? diminuto_ipc6_address2string(surveyor_endpoint.ipv6, ipv6, sizeof(ipv6)) : (surveyor_protocol == IPV4) ? diminuto_ipc4_address2string(surveyor_endpoint.ipv4, ipv4, sizeof(ipv4)) : "", surveyor_endpoint.udp); }
 
     /*
      * Are we strobing a GPIO pin with the one pulse per second (1PPS)
