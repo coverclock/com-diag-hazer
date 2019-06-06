@@ -53,27 +53,11 @@ int tumbleweed_finalize(void)
  *
  ******************************************************************************/
 
-tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp)
+tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void * buffer, size_t size, tumbleweed_context_t * pp)
 {
     int done = !0;
     tumbleweed_action_t action = TUMBLEWEED_ACTION_SKIP;
-
-    /*
-     * Short circuit state machine for some characters.
-     */
-
-    switch (ch) {
-
-    case EOF:
-        DEBUG("EOF %d!\n", ch);
-        state = TUMBLEWEED_STATE_EOF;
-        break;
-
-    default:
-        /* Do nothing. */
-        break;
-
-    }
+    tumbleweed_state_t old = state;
 
     /*
      * Advance state machine based on stimulus.
@@ -81,41 +65,46 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * b
 
     switch (state) {
 
-    case TUMBLEWEED_STATE_EOF:
-        *bp = (char *)buffer;
-        *sp = 0;
-        break;
+    case TUMBLEWEED_STATE_STOP:
+    	/* Do nothing. */
+    	break;
 
     case TUMBLEWEED_STATE_START:
         if (ch == TUMBLEWEED_STIMULUS_PREAMBLE) {
-            DEBUG("RTCM 0x%02x.\n", ch);
+            pp->bp = (uint8_t *)buffer;
+            pp->sz = size;
+            pp->tot = 0;
+            pp->crc = 0;
+            pp->ln = 0;
+            pp->crc1 = 0;
+            pp->crc2 = 0;
+            pp->crc3 = 0;
+            tumbleweed_checksum(ch, &(pp->crc));
             state = TUMBLEWEED_STATE_LENGTH_1;
             action = TUMBLEWEED_ACTION_SAVE;
-            *bp = (char *)buffer;
-            *sp = size;
-            *lp = 0;
         }
         break;
 
     case TUMBLEWEED_STATE_LENGTH_1:
+        tumbleweed_checksum(ch, &(pp->crc));
     	/*
     	 * RTCM 10403.3, 3.5: "Multi-byte values are expressed with the most
     	 * significant byte transmitted first and the least significant byte
-    	 * transmitted last.", p. 108 (hence: big endian)
+    	 * transmitted last.", p. 108 (i.e.: big endian)
     	 */
-        *lp = ((unsigned)ch) << 8; /* MSB */
-        DEBUG("LENGTH1 0x%02x %zu.\n", ch, *lp);
+    	pp->ln = (uint16_t)ch << 8; /* MSB */
+    	pp->ln &= TUMBLEWEED_RTCM_MASK_LENGTH;
         state = TUMBLEWEED_STATE_LENGTH_2;
         action = TUMBLEWEED_ACTION_SAVE;
         break;
 
     case TUMBLEWEED_STATE_LENGTH_2:
+        tumbleweed_checksum(ch, &(pp->crc));
     	/*
     	 * RTCM 10403.3, Ibid.
     	 */
-        *lp |= (unsigned)ch; /* LSB */
-        DEBUG("LENGTH2 0x%02x %zu.\n", ch, *lp);
-        if (*lp > 0) {
+    	pp->ln |= (uint16_t)ch; /* LSB */
+        if (pp->ln > 0) {
         	state = TUMBLEWEED_STATE_PAYLOAD;
         } else {
         	state = TUMBLEWEED_STATE_CRC_1;
@@ -124,7 +113,8 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * b
         break;
 
     case TUMBLEWEED_STATE_PAYLOAD:
-        if (((*lp)--) > 1) {
+        tumbleweed_checksum(ch, &(pp->crc));
+        if ((pp->ln--) > 1) {
             state = TUMBLEWEED_STATE_PAYLOAD;
         } else {
             state = TUMBLEWEED_STATE_CRC_1;
@@ -133,22 +123,34 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * b
         break;
 
     case TUMBLEWEED_STATE_CRC_1:
-        state = TUMBLEWEED_STATE_CRC_2;
-        action = TUMBLEWEED_ACTION_SAVE;
+        tumbleweed_checksum2characters(pp->crc, &(pp->crc1), &(pp->crc2), &(pp->crc3));
+    	if (ch == pp->crc1) {
+    		state = TUMBLEWEED_STATE_CRC_2;
+    		action = TUMBLEWEED_ACTION_SAVE;
+    	} else {
+            state = TUMBLEWEED_STATE_STOP;
+    	}
         break;
 
     case TUMBLEWEED_STATE_CRC_2:
-        state = TUMBLEWEED_STATE_CRC_3;
-        action = TUMBLEWEED_ACTION_SAVE;
+    	if (ch == pp->crc2) {
+    		state = TUMBLEWEED_STATE_CRC_3;
+    		action = TUMBLEWEED_ACTION_SAVE;
+    	} else {
+            state = TUMBLEWEED_STATE_STOP;
+    	}
         break;
 
     case TUMBLEWEED_STATE_CRC_3:
-        state = TUMBLEWEED_STATE_END;
-        action = TUMBLEWEED_ACTION_TERMINATE;
+    	if (ch == pp->crc3) {
+    		state = TUMBLEWEED_STATE_END;
+    		action = TUMBLEWEED_ACTION_TERMINATE;
+    	} else {
+            state = TUMBLEWEED_STATE_STOP;
+    	}
         break;
 
     case TUMBLEWEED_STATE_END:
-        DEBUG("END 0x%02x!\n", ch);
         break;
 
     /*
@@ -164,17 +166,14 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * b
     switch (action) {
 
     case TUMBLEWEED_ACTION_SKIP:
-        DEBUG("SKIP 0x%02x?\n", ch);
         break;
 
     case TUMBLEWEED_ACTION_SAVE:
-        if ((*sp) > 0) {
-            *((*bp)++) = ch;
-            (*sp) -= 1;
-            DEBUG("SAVE 0x%02x.\n", ch);
+        if (pp->sz > 0) {
+            *(pp->bp++) = ch;
+            pp->sz -= 1;
         } else {
-            state = TUMBLEWEED_STATE_START;
-            DEBUG("LONG!\n");
+            state = TUMBLEWEED_STATE_STOP;
         }
         break;
 
@@ -185,17 +184,14 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * b
          * know yet the format of the data in the buffer, e.g. in the case of
          * IP datagrams.
          */
-        if ((*sp) > 1) {
-            *((*bp)++) = ch;
-            (*sp) -= 1;
-            DEBUG("SAVE 0x%02x.\n", ch);
-            *((*bp)++) = '\0';
-            (*sp) -= 1;
-            DEBUG("SAVE 0x%02x.\n", '\0');
-            (*sp) = size - (*sp);
+        if (pp->sz > 1) {
+            *(pp->bp++) = ch;
+            pp->sz -= 1;
+            *(pp->bp++) = '\0';
+            pp->sz -= 1;
+            pp->tot = size - pp->sz;
         } else {
-            state = TUMBLEWEED_STATE_START;
-            DEBUG("LONG!\n");
+            state = TUMBLEWEED_STATE_STOP;
         }
         break;
 
@@ -208,6 +204,16 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, int ch, void * b
     /*
      * Done.
      */
+
+    if (debug == (FILE *)0) {
+    	/* Do nothing. */
+    } else if (old == TUMBLEWEED_STATE_STOP) {
+    	/* Do nothing. */
+    } else if ((' ' <= ch) && (ch <= '~')) {
+    	fprintf(debug, "RTCM %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
+    } else {
+    	fprintf(debug, "RTCM %c %c %c 0x%02x\n", old, state, action, ch);
+    }
 
     return state;
 }
@@ -289,7 +295,7 @@ const uint32_t TUMBLEWEED_CRC24Q[256] = {
  * Daemon) repository at https://github.com/ukyg9e5r6k7gubiekd6/gpsd. Since
  * I completely rewrote it for Tumbleweed, any bugs are strictly mine.
  */
-const void * tumbleweed_crc24q(const void * buffer, size_t size, uint8_t * crc_1p, uint8_t * crc_2p, uint8_t * crc_3p)
+const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_t * crc1p, uint8_t * crc2p, uint8_t * crc3p)
 {
     const void * result = (void *)0;
     const uint8_t * bp = (const uint8_t *)buffer;
@@ -304,12 +310,10 @@ const void * tumbleweed_crc24q(const void * buffer, size_t size, uint8_t * crc_1
     if ((length + TUMBLEWEED_RTCM_UNSUMMED) <= size) {
 
     	for (ii = 0; ii < length; ++ii) {
-    		crc = (crc << 8) ^ TUMBLEWEED_CRC24Q[*(bp++) ^ (uint8_t)(crc >> 16)];
+    		tumbleweed_checksum(*(bp++), &crc);
     	}
 
-        *crc_1p = (uint8_t)((crc >> (8 * 2)) & 0xff);
-        *crc_2p = (uint8_t)((crc >> (8 * 1)) & 0xff);
-        *crc_3p = (uint8_t)((crc >> (8 * 0)) & 0xff);
+    	tumbleweed_checksum2characters(crc, crc1p, crc2p, crc3p);
 
         result = bp;
 
@@ -367,5 +371,31 @@ int tumbleweed_message(const void * buffer, size_t size)
 
     return result;
 }
+
+ssize_t tumbleweed_validate(const void * buffer, size_t size)
+{
+	ssize_t result = -1;
+	size_t length = 0;
+	const uint8_t * bp = (uint8_t *)0;
+	uint8_t crc1 = 0;
+	uint8_t crc2 = 0;
+	uint8_t crc3 = 0;
+
+	if ((length = tumbleweed_length(buffer, size)) <= 0) {
+		/* Do nothing. */
+    } else if ((bp = (uint8_t *)tumbleweed_checksum_buffer(buffer, length, &crc1, &crc2, &crc3)) == (unsigned char *)0) {
+        /* Do nothing. */
+    } else if ((crc1 != bp[0]) || (crc2 != bp[1]) || (crc3 != bp[2])) {
+        /* Do nothing. */
+    } else {
+    	result = length;
+    }
+
+	return result;
+}
+
+/******************************************************************************
+ *
+ ******************************************************************************/
 
 const uint8_t TUMBLEWEED_KEEPALIVE[6] = { 0xd3, 0x00, 0x00, 0x47, 0xea, 0x4b, };

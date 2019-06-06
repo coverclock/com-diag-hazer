@@ -97,7 +97,7 @@ typedef uint8_t expiry_t;
  * @param now is the new file pointer used for debugging, or NULL.
  * @return the prior debug file pointer (which may be NULL).
  */
-extern FILE * hazer_debug(FILE *now);
+extern FILE * hazer_debug(FILE * now);
 
 /*******************************************************************************
  * STARTING UP AND SHUTTING DOWN
@@ -144,7 +144,7 @@ enum HazerGnssConstants {
  * PUBX messages longer than the NMEA spec.
  */
 enum HazerNmeaConstants {
-    HAZER_NMEA_SHORTEST    = sizeof("$ccccc*hh\r\n") - 1,
+    HAZER_NMEA_SHORTEST    = sizeof("$GGAXX\r\n") - 1,
     HAZER_NMEA_LONGEST     = 512, /* Longer than spec. */
     HAZER_NMEA_TALKER      = sizeof("GP") - 1,
     HAZER_NMEA_MESSAGE     = sizeof("GGAXX") - 1, /* Adjusted. */
@@ -152,22 +152,21 @@ enum HazerNmeaConstants {
 };
 
 /**
- * NMEA state machine states. The only states the application needs
- * to take action on are START (to initialize the state), EOF (end of file
- * on the input stream), and END (complete NMEA sentence in buffer). The
+ * NMEA state machine states. The only state the application needs
+ * to take action on is END (complete NMEA sentence in buffer). The
  * rest are transitory states. If the machine transitions from a non-START
  * state to the START state, that means the framing of the current sentence
  * failed; that might be of interest to the application.
  */
 typedef enum HazerState {
-    HAZER_STATE_EOF					= 0,
-    HAZER_STATE_START,
-    HAZER_STATE_BODY,
-    HAZER_STATE_MSN,
-    HAZER_STATE_LSN,
-    HAZER_STATE_CR,
-    HAZER_STATE_LF,
-    HAZER_STATE_END,
+	HAZER_STATE_STOP		= 'X',
+    HAZER_STATE_START		= 'S',
+    HAZER_STATE_BODY		= 'P',
+    HAZER_STATE_MSN			= 'M',
+    HAZER_STATE_LSN			= 'L',
+    HAZER_STATE_CR			= 'R',
+    HAZER_STATE_LF			= 'N',
+    HAZER_STATE_END			= 'E',
 } hazer_state_t;
 
 /**
@@ -177,7 +176,6 @@ typedef enum HazerState {
  * NMEA 0183 4.10, 6.1.1, Table 3
  */
 enum HazerStimulus {
-    HAZER_STIMULUS_NUL              = '\0',
     HAZER_STIMULUS_MINIMUM          = ' ',
     HAZER_STIMULUS_ENCAPSULATION    = '!',
     HAZER_STIMULUS_START            = '$',
@@ -207,11 +205,9 @@ enum HazerStimulus {
  * NMEA state machine actions.
  */
 typedef enum HazerAction {
-    HAZER_ACTION_SKIP               = 0,
-    HAZER_ACTION_SAVE,
-    HAZER_ACTION_SAVESPECIAL,
-    HAZER_ACTION_TERMINATE,
-    HAZER_ACTION_FINAL,
+    HAZER_ACTION_SKIP               = 'X',
+    HAZER_ACTION_SAVE				= 'S',
+    HAZER_ACTION_TERMINATE			= 'T',
 } hazer_action_t;
 
 /**
@@ -376,13 +372,25 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
  * according to the NMEA spec, plus a trailing NUL (and then some).
  * NMEA 0183 4.10, 5.3, p. 11
  */
-typedef unsigned char (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
+typedef uint8_t (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
 
 /**
  * @define HAZER_BUFFER_INITIALIZER
  * Initialize a HazerBuffer type.
  */
 #define HAZER_BUFFER_INITIALIZER  { '\0', }
+
+/**
+ * Hazer NMEA parser state machine context (which needs no initial value).
+ */
+typedef struct HazerContext {
+	uint8_t * bp;		/* Current buffer pointer. */
+	size_t sz;			/* Remaining buffer size in bytes. */
+	size_t tot;			/* Total size once sentence is complete. */
+	uint8_t cs;			/* Running checksum. */
+	uint8_t msn;		/* Most significant checksum nibble character. */
+	uint8_t lsn;		/* Least significant checksum nibble character. */
+} hazer_context_t;
 
 /**
  * Process a single character of stimulus for the state machine that is
@@ -401,15 +409,35 @@ typedef unsigned char (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
  * @param ch is the next character from the NMEA sentence stream.
  * @param buffer points to the beginning of the output buffer.
  * @param size is the size of the output buffer in bytes.
- * @param bp points to a character pointer state variable of no initial value.
- * @param sp points to a size state variable of no initial value.
+ * @param pp points to the context structure (which needs no initialization).
  * @return the next state of the machine.
  */
-extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp);
+extern hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size_t size, hazer_context_t * pp);
+
+/**
+ * Return the total size of the complete NMEA sentence as computed by the
+ * parser.
+ * @param pp points to the context structure.
+ * @return the final size.
+ */
+static inline size_t hazer_size(const hazer_context_t * pp)
+{
+	return pp->tot;
+}
 
 /*******************************************************************************
  * VALIDATING AN NMEA SENTENCE
  ******************************************************************************/
+
+/**
+ * Update a running NMEA XOR checksum with the latest input character.
+ * @param ch is the input character.
+ * @param csp points to the running checksum character.
+ */
+static inline void hazer_checksum(uint8_t ch, uint8_t * csp)
+{
+	*csp ^= ch;
+}
 
 /**
  * Compute the eight-bit checksum of an NMEA sentence. The buffer points to the
@@ -419,10 +447,11 @@ extern hazer_state_t hazer_machine(hazer_state_t state, int ch, void * buffer, s
  * formed packet.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
- * @param ckp points to where the checksum value will be stored.
+ * @param msnp points where the most significant nibble character is stored.
+ * @param lsnp points where the least significant nibble character is stored.
  * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
-extern const void * hazer_checksum(const void * buffer, size_t size, uint8_t * ckp);
+extern const void * hazer_checksum_buffer(const void * buffer, size_t size, uint8_t * msnp, uint8_t * lsnp);
 
 /**
  * Given two checksum characters, convert to an eight-bit checksum.
@@ -431,24 +460,33 @@ extern const void * hazer_checksum(const void * buffer, size_t size, uint8_t * c
  * @param ckp points to a variable in which the checksum is stored.
  * @return 0 for success, <0 if an error occurred.
  */
-extern int hazer_characters2checksum(char msn, char lsn, uint8_t * ckp);
+extern int hazer_characters2checksum(uint8_t msn, uint8_t lsn, uint8_t * ckp);
 
 /**
  * Given an eight-bit checksum, concert into the two checksum characters.
  * @param ck is the checksum.
  * @param mnsp points where the most significant character is stored.
  * @param lnsp points where the least significant character is stored.
- * @return 0 for success, <0 if an error occurred.
  */
-extern int hazer_checksum2characters(uint8_t ck, char * msnp, char * lsnp);
+extern void hazer_checksum2characters(uint8_t ck, uint8_t * msnp, uint8_t * lsnp);
 
 /**
  * Return the length of the completed sentence in bytes.
  * @param buffer points to buffer containing the completed sentence.
- * @param size is the size of the buffer containing the sentence.
+ * @param size is the number of bytes in the buffer.
  * @return the length in bytes or <0 if an error occurred.
  */
 extern ssize_t hazer_length(const void * buffer, size_t size);
+
+/**
+ * Validate the contents of an buffer as a valid NMEA sentence. This combines
+ * the hazer_length() and hazer_checksum_buffer() functions along with the
+ * checksum comparison.
+ * @param buffer points to the buffer.
+ * @param size is the number of bytes in the buffer.
+ * @return the length of the sentence in bytes or <0 if an error occurred.
+ */
+extern ssize_t hazer_validate(const void * buffer, size_t size);
 
 /*******************************************************************************
  * BREAKING UP AN NMEA SENTENCE INTO FIELDS

@@ -42,7 +42,7 @@
  * @param now is the new file pointer used for debugging, or NULL.
  * @return the prior debug file pointer (which may be NULL).
  */
-extern FILE * yodel_debug(FILE *now);
+extern FILE * yodel_debug(FILE * now);
 
 /*******************************************************************************
  * STARTING UP AND SHUTTING DOWN
@@ -83,7 +83,7 @@ enum YodelUbxConstants {
  * protocol, but is useful in some edge cases in which the data format has not
  * yet been determined (e.g. incoming UDP datagrams).
  */
-typedef unsigned char (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
+typedef uint8_t (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
 
 /**
  * @define YODEL_BUFFER_INITIALIZER
@@ -136,24 +136,23 @@ typedef struct YodelUbxHeader {
 
 /**
  * UBX state machine states. The only states the application needs
- * to take action on are START (to initialize the state), EOF (end of file
- * on the input stream), and END (complete UBX packet in buffer). The
+ * to take action on is END (complete UBX packet in buffer). The
  * rest are transitory states. If the machine transitions from a non-START
  * state to the START state, that means the framing of the current packet
  * failed; that might be of interest to the application.
  */
 typedef enum YodelState {
-    YODEL_STATE_EOF					= 0,
-    YODEL_STATE_START,
-    YODEL_STATE_SYNC_2,
-    YODEL_STATE_CLASS,
-    YODEL_STATE_ID,
-    YODEL_STATE_LENGTH_1,
-    YODEL_STATE_LENGTH_2,
-    YODEL_STATE_PAYLOAD,
-    YODEL_STATE_CK_A,
-    YODEL_STATE_CK_B,
-    YODEL_STATE_END,
+	YODEL_STATE_STOP		= 'X',
+    YODEL_STATE_START		= 'S',
+    YODEL_STATE_SYNC_2		= 'Y',
+    YODEL_STATE_CLASS		= 'C',
+    YODEL_STATE_ID			= 'I',
+    YODEL_STATE_LENGTH_1	= 'L',
+    YODEL_STATE_LENGTH_2	= 'M',
+    YODEL_STATE_PAYLOAD		= 'P',
+    YODEL_STATE_CK_A		= 'A',
+    YODEL_STATE_CK_B		= 'B',
+    YODEL_STATE_END			= 'E',
 } yodel_state_t;
 
 /**
@@ -168,10 +167,22 @@ enum YodelStimulus {
  * UBX state machine actions.
  */
 typedef enum YodelAction {
-    YODEL_ACTION_SKIP               = 0,
-    YODEL_ACTION_SAVE,
-    YODEL_ACTION_TERMINATE,
+    YODEL_ACTION_SKIP		= 'X',
+    YODEL_ACTION_SAVE		= 'S',
+    YODEL_ACTION_TERMINATE	= 'T',
 } yodel_action_t;
+
+/**
+ * Yodel UBX parser state machine context (which needs no initial value).
+ */
+typedef struct YodelContext {
+	uint8_t * bp;		/* Current buffer pointer. */
+	size_t sz;			/* Remaining buffer size in bytes. */
+	size_t tot;			/* Total size once packet is complete. */
+	uint16_t ln;		/* Payload length in bytes. */
+	uint8_t csa;		/* Running Fletcher checksum A. */
+	uint8_t csb;		/* Running Fletcher checksum B. */
+} yodel_context_t;
 
 /**
  * Process a single character of stimulus for the state machine that is
@@ -190,16 +201,36 @@ typedef enum YodelAction {
  * @param ch is the next character from the UBX packet stream.
  * @param buffer points to the beginning of the output buffer.
  * @param size is the size of the output buffer in bytes.
- * @param bp points to a character pointer state variable of no initial value.
- * @param sp points to a size state variable of no initial value.
- * @param lp points to the length state variable of no initial value.
+ * @param pp points to the context structure (which needs no initialization).
  * @return the next state of the machine.
  */
-extern yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, size_t size, char ** bp, size_t * sp, size_t * lp);
+extern yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size_t size, yodel_context_t * pp);
+
+/**
+ * Return the total size of the complete UBX message as computed by the parser.
+ * @param pp points to the context structure.
+ * @return the final size.
+ */
+static inline size_t yodel_size(const yodel_context_t * pp)
+{
+	return pp->tot;
+}
 
 /*******************************************************************************
  * VALIDATING A UBX PACKET
  ******************************************************************************/
+
+/**
+ * Update a running UBX Fletcher checksum with the latest input character.
+ * @param ch is the input character.
+ * @param csap points to the A running checksum character.
+ * @param csbp points to the B running checksum character.
+ */
+static inline void yodel_checksum(uint8_t ch, uint8_t * csap, uint8_t * csbp)
+{
+    *csap += ch;
+    *csbp += *csap;
+}
 
 /**
  * Compute the Fletcher checksum used by UBX for the specified buffer. The
@@ -209,11 +240,11 @@ extern yodel_state_t yodel_machine(yodel_state_t state, int ch, void * buffer, s
  * checksum will be stored in a correctly formed packet.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
- * @param ck_ap points to where the ck_a value will be stored.
- * @param ck_bp points to where the ck_b value will be stored.
+ * @param csap points to where the ck_a value will be stored.
+ * @param csbp points to where the ck_b value will be stored.
  * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
-extern const void * yodel_checksum(const void * buffer, size_t size, uint8_t * ck_ap, uint8_t * ck_bp);
+extern const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * csap, uint8_t * csbp);
 
 /**
  * Return the length of the completed packet in bytes.
@@ -222,6 +253,16 @@ extern const void * yodel_checksum(const void * buffer, size_t size, uint8_t * c
  * @return the length of the packet in bytes or <0 if an error occurred.
  */
 extern ssize_t yodel_length(const void * buffer, size_t size);
+
+/**
+ * Validate the contents of an buffer as a valid UBX packet.
+ * @param buffer points to the buffer. This combines
+ * the yodel_length() and yodel_checksum_buffer() functions along with the
+ * checksum comparison.
+ * @param size is the number of bytes in the buffer.
+ * @return the length of the packet in bytes or <0 if an error occurred.
+ */
+extern ssize_t yodel_validate(const void * buffer, size_t size);
 
 /******************************************************************************
  *

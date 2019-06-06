@@ -15,6 +15,8 @@
 
 int main(void)
 {
+	tumbleweed_debug(stderr);
+
     /**************************************************************************/
 
 	/*
@@ -58,6 +60,23 @@ int main(void)
     /**************************************************************************/
 
     {
+    	uint8_t crc1 = 0x11;
+    	uint8_t crc2 = 0x22;
+    	uint8_t crc3 = 0x44;
+    	uint32_t crc = 0x776655;
+
+    	tumbleweed_checksum2characters(0xa55a55, &crc1, &crc2, &crc3);
+    	assert(crc1 == 0xa5);
+    	assert(crc2 == 0x5a);
+    	assert(crc3 == 0x55);
+
+    	tumbleweed_characters2checksum(crc1, crc2, crc3, &crc);
+    	assert(crc == 0xa55a55);
+    }
+
+    /**************************************************************************/
+
+    {
     	/* RTCM 10403.3, p. 265 */
 		static const uint8_t EXAMPLE[] = "\\xD3\\x00\\x13\\x3E\\xD7\\xD3\\x02\\x02\\x98\\x0E\\xDE\\xEF\\x34\\xB4\\xBD\\x62\\xAC\\x09\\x41\\x98\\x6F\\x33\\x36\\x0B\\x98";
 		static const int NUMBER = 1005;
@@ -76,7 +95,7 @@ int main(void)
 			uint8_t crc_1 = 0xaa;
 			uint8_t crc_2 = 0x55;
 			uint8_t crc_3 = 0xa5;
-			bb = tumbleweed_crc24q(message, size, &crc_1, &crc_2, &crc_3);
+			bb = tumbleweed_checksum_buffer(message, size, &crc_1, &crc_2, &crc_3);
 			fprintf(stderr, "\"%s\"[%zu] 0x%02x 0x%02x 0x%02x\n", string, length, crc_1, crc_2, crc_3);
 	    	diminuto_dump(stderr, message, size);
 			assert(crc_1 == message[size - 3]);
@@ -96,48 +115,30 @@ int main(void)
 		BEGIN(EXAMPLE);
 			tumbleweed_state_t state = TUMBLEWEED_STATE_START;
 			uint8_t buffer[TUMBLEWEED_RTCM_LONGEST + 1];
-			char * bb = (char *)~(intptr_t)0;
-			size_t ss = ~(size_t)0;
-			size_t ll = ~(size_t)0;
+			tumbleweed_context_t context;
 			int ii;
 			tumbleweed_initialize();
 			for (ii = 0; ii < size; ++ii) {
-				state = tumbleweed_machine(state, message[ii], buffer, countof(buffer), &bb, &ss, &ll);
-				if (state == TUMBLEWEED_STATE_EOF) { break; }
+				state = tumbleweed_machine(state, message[ii], buffer, countof(buffer), &context);
 				if (state == TUMBLEWEED_STATE_END) { break; }
 			}
-			fprintf(stderr, "\"%s\"[%zu] %zu %d %d %p %zu %zu\n", string, length, size, state, ii, bb, ss, ll);
+			fprintf(stderr, "\"%s\"[%zu] %zu %d %d %zu\n", string, length, size, state, ii, tumbleweed_size(&context));
 	    	diminuto_dump(stderr, message, size);
-	    	diminuto_dump(stderr, buffer, ss);
+	    	diminuto_dump(stderr, buffer, tumbleweed_size(&context));
 			assert(state == TUMBLEWEED_STATE_END);
-			assert(ss == (size + 1));
-			assert(buffer[ss - 1] == '\0');
+			assert(tumbleweed_size(&context) == (size + 1));
+			assert(buffer[tumbleweed_size(&context) - 1] == '\0');
 			assert(memcmp(message, buffer, size) == 0);
 			tumbleweed_finalize();
 		END;
 
-		{
-			tumbleweed_state_t state = TUMBLEWEED_STATE_START;
-			uint8_t buffer[0];
-			char * bb = (char *)~(intptr_t)0;
-			size_t ss = ~(size_t)0;
-			size_t ll = ~(size_t)0;
-			state = tumbleweed_machine(state, EOF, buffer, 0, &bb, &ss, &ll);
-			assert(state == TUMBLEWEED_STATE_EOF);
-			assert(bb == (char *)buffer);
-			assert(ss == 0);
-		}
-
 		BEGIN(EXAMPLE);
 			tumbleweed_state_t state = TUMBLEWEED_STATE_START;
 			uint8_t buffer[0];
-			char * bb = (char *)~(intptr_t)0;
-			size_t ss = ~(size_t)0;
-			size_t ll = ~(size_t)0;
-			state = tumbleweed_machine(state, message[0], buffer, 0, &bb, &ss, &ll);
-			assert(state == TUMBLEWEED_STATE_START);
-			assert(bb == (char *)buffer);
-			assert(ss == 0);
+			tumbleweed_context_t context;
+			state = tumbleweed_machine(state, message[0], buffer, 0, &context);
+			assert(state == TUMBLEWEED_STATE_STOP);
+			assert(tumbleweed_size(&context) == 0);
 		END;
     }
 
@@ -164,7 +165,7 @@ int main(void)
 			uint8_t crc_1 = 0xaa;
 			uint8_t crc_2 = 0x55;
 			uint8_t crc_3 = 0xa5;
-			bb = tumbleweed_crc24q(message, size, &crc_1, &crc_2, &crc_3);
+			bb = tumbleweed_checksum_buffer(message, size, &crc_1, &crc_2, &crc_3);
 			fprintf(stderr, "\"%s\"[%zu] 0x%02x 0x%02x 0x%02x\n", string, length, crc_1, crc_2, crc_3);
 	    	diminuto_dump(stderr, message, size);
 			assert(crc_1 == message[size - 3]);
@@ -184,22 +185,19 @@ int main(void)
 		BEGIN(KEEPALIVE);
 			tumbleweed_state_t state = TUMBLEWEED_STATE_START;
 			uint8_t buffer[TUMBLEWEED_RTCM_LONGEST + 1];
-			char * bb = (char *)~(intptr_t)0;
-			size_t ss = ~(size_t)0;
-			size_t ll = ~(size_t)0;
+			tumbleweed_context_t context;
 			int ii;
 			tumbleweed_initialize();
 			for (ii = 0; ii < size; ++ii) {
-				state = tumbleweed_machine(state, message[ii], buffer, countof(buffer), &bb, &ss, &ll);
-				if (state == TUMBLEWEED_STATE_EOF) { break; }
+				state = tumbleweed_machine(state, message[ii], buffer, countof(buffer), &context);
 				if (state == TUMBLEWEED_STATE_END) { break; }
 			}
-			fprintf(stderr, "\"%s\"[%zu] %zu %d %d %p %zu %zu\n", string, length, size, state, ii, bb, ss, ll);
+			fprintf(stderr, "\"%s\"[%zu] %zu %d %d %zu\n", string, length, size, state, ii, tumbleweed_size(&context));
 	    	diminuto_dump(stderr, message, size);
-	    	diminuto_dump(stderr, buffer, ss);
+	    	diminuto_dump(stderr, buffer, tumbleweed_size(&context));
 			assert(state == TUMBLEWEED_STATE_END);
-			assert(ss == (size + 1));
-			assert(buffer[ss - 1] == '\0');
+			assert(tumbleweed_size(&context) == (size + 1));
+			assert(buffer[tumbleweed_size(&context) - 1] == '\0');
 			assert(memcmp(message, buffer, size) == 0);
 			tumbleweed_finalize();
 		END;

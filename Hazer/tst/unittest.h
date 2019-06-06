@@ -19,6 +19,14 @@
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 
+/**
+ * @define BEGIN
+ * Begin a unit test using a test string that may contain escape sequences.
+ * string points to the expanded _MESSAGE_. size is the number of bytes in the
+ * expanded _MESSAGE_ including the terminating NUL. message points to the
+ * collapsed and perhaps unprintable message. size is the number of bytes in
+ * the collapsed message and does not include any terminating NUL.
+ */
 #define BEGIN(_MESSAGE_) \
 	do { \
 		const char * string = (const char *)0; \
@@ -33,9 +41,15 @@
 		do { \
 			(void)0
 
+/**
+ * @define END
+ * End a unit test using a test string.
+ */
 #define END \
 		} while (0); \
 		free(message); \
 	} while (0)
+
+#undef NDEBUG
 
 #endif
