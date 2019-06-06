@@ -1399,6 +1399,7 @@ int main(int argc, char * argv[])
     size_t io_size = BUFSIZ;
     ssize_t io_available = 0;
     size_t io_maximum = 0;
+    size_t io_total = 0;
     /*
      * Source variables.
      */
@@ -2090,6 +2091,7 @@ int main(int argc, char * argv[])
      * Enter the work loop.
      */
 
+    DIMINUTO_LOG_INFORMATION("Begin");
 
 	while (!0) {
 
@@ -2167,6 +2169,7 @@ int main(int argc, char * argv[])
 					break;
 				}
 
+				io_total += 1;
 
 				/*
 				 * We just received a character from the input stream.
@@ -2189,15 +2192,11 @@ int main(int argc, char * argv[])
 
 				} else if ((ch == HAZER_STIMULUS_START) || (ch == HAZER_STIMULUS_ENCAPSULATION)) {
 
-					frame = 0;
-
 					nmea_state = HAZER_STATE_START;
 					ubx_state = YODEL_STATE_STOP;
 					rtcm_state = TUMBLEWEED_STATE_STOP;
 
 				} else if (ch == YODEL_STIMULUS_SYNC_1) {
-
-					frame = 0;
 
 					nmea_state = HAZER_STATE_STOP;
 					ubx_state = YODEL_STATE_START;
@@ -2205,18 +2204,15 @@ int main(int argc, char * argv[])
 
 				} else if (ch == TUMBLEWEED_STIMULUS_PREAMBLE) {
 
-					frame = 0;
-
 					nmea_state = HAZER_STATE_STOP;
 					ubx_state = YODEL_STATE_STOP;
 					rtcm_state = TUMBLEWEED_STATE_START;
 
 				} else {
 
-					DIMINUTO_LOG_WARNING("Sync Lost 0x%02x\n", ch);
+					DIMINUTO_LOG_WARNING("Sync Lost 0x%08llx 0x%02x\n", (unsigned long long)io_total, ch);
 
 					sync = 0;
-					frame = 0;
 
 					nmea_state = HAZER_STATE_START;
 					ubx_state = YODEL_STATE_START;
@@ -2224,16 +2220,15 @@ int main(int argc, char * argv[])
 
 				}
 
+				frame = 0;
+
 				nmea_state = hazer_machine(nmea_state, ch, nmea_buffer, sizeof(nmea_buffer), &nmea_context);
 				if (nmea_state == HAZER_STATE_END) {
 					buffer = nmea_buffer;
 					size = hazer_size(&nmea_context);
 					length = size - 1;
 					format = NMEA;
-					if (!sync) {
-						DIMINUTO_LOG_NOTICE("Sync NMEA\n");
-						sync = !0;
-					}
+					if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%08llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 					break;
 				}
@@ -2244,10 +2239,7 @@ int main(int argc, char * argv[])
 					size = yodel_size(&ubx_context);
 					length = size - 1;
 					format = UBX;
-					if (!sync) {
-						DIMINUTO_LOG_NOTICE("Sync UBX\n");
-						sync = !0;
-					}
+					if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%08llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 					break;
 				}
@@ -2258,10 +2250,7 @@ int main(int argc, char * argv[])
 					size = tumbleweed_size(&rtcm_context);
 					length = size - 1;
 					format = RTCM;
-					if (!sync) {
-						DIMINUTO_LOG_NOTICE("Sync RTCM\n");
-						sync = !0;
-					}
+					if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%08llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 					break;
 				 }
@@ -2279,10 +2268,7 @@ int main(int argc, char * argv[])
 				} else if (rtcm_state != TUMBLEWEED_STATE_STOP) {
 					/* Do nothing. */
 				} else {
-					if (sync) {
-						DIMINUTO_LOG_WARNING("Sync Stop\n");
-						sync = 0;
-					}
+					if (sync) { DIMINUTO_LOG_WARNING("Sync Stop 0x%08llx 0x%02x\n", (unsigned long long)io_total, ch); sync = 0; }
 				    frame = 0;
 				    nmea_state = HAZER_STATE_START;
 				    ubx_state = YODEL_STATE_START;
@@ -2290,6 +2276,8 @@ int main(int argc, char * argv[])
 				}
 
 			} while ((io_available = diminuto_file_ready(in_fp)) > 0);
+
+			assert((io_available == 0) || (buffer != (void *)0) || eof);
 
 			/*
 			 * If we detected End Of File from our input source, we're
@@ -2966,16 +2954,8 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * Calculate our time to first fix.
+         * DISPLAY
          */
-
-        if (fix < 0) {
-            /* Do nothing. */
-        } else if (timetofirstfix >= 0) {
-            /* Do nothing. */
-        } else {
-            timetofirstfix = fix - epoch;
-        }
 
         /*
          * This code is just for testing the expiration feature.
@@ -3029,13 +3009,19 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * DISPLAY
+         * Calculate our time to first fix.
          */
+
+        if (fix < 0) {
+            /* Do nothing. */
+        } else if (timetofirstfix >= 0) {
+            /* Do nothing. */
+        } else {
+            timetofirstfix = fix - epoch;
+        }
 
         if (!refresh) {
             /* Do nothing: nothing changed. */
-        } else if ((dev_fp != (FILE *)0) && (diminuto_serial_available(fileno(dev_fp)) > 0)) {
-            /* Do nothing: we still have real-time input waiting. */
         } else if (slow && (display_was == (display_now = ticktock(frequency)))) {
             /* Do nothing: slow display cannot handle real-time refresh rate. */
         } else {
@@ -3137,7 +3123,7 @@ int main(int argc, char * argv[])
     rc = fclose(in_fp);
     assert(rc != EOF);
 
-    DIMINUTO_LOG_INFORMATION("Buffer size=%llu maximum=%llu\n", io_size, io_maximum);
+    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)));
     free(io_buffer);
 
     if (headless != (const char *)0) {
