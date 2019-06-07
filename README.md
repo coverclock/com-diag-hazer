@@ -31,16 +31,6 @@ Hazer project includes parsers for three different output formats, NMEA,
 UBX, and RTCM, and interprets many of the messages typically represented
 in those formats into C structures.
 
-> N.B. In the process of incorporating RTCM parsing in the Hazer project
-> I uncovered a serious flaw in my implementation of the integration of
-> the NMEA, UBX, and RTCM parsers that results in artifacts like spurious
-> checksum errors and the possibility of lost UBX and RTCM messages on
-> devices which generate both in the same input stream. Since such devices
-> are in the tiny minority, Hazer is still perfectly usable for most
-> applications - but not for mine. I'm working to resolve this. But the
-> result, being done in a separate branch, will require substantial changes
-> to the existing Hazer, Yodel, and Tumbleweed libraries.
-
 NMEA "sentences" are printable ASCII messages that conform
 to the National Marine Electronics Association (NMEA) 0183 4.10
 specification. NMEA 0183 describes the output produced by most receiving
