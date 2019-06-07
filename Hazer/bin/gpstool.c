@@ -1746,6 +1746,8 @@ int main(int argc, char * argv[])
 
     } else {
 
+        datagram_protocol = IPV6;
+
         datagram_fd = diminuto_ipc6_datagram_peer(datagram_endpoint.udp);
         assert(datagram_fd >= 0);
 
@@ -1756,7 +1758,7 @@ int main(int argc, char * argv[])
 
     }
 
-    if (datagram_fd >= 0) { DIMINUTO_LOG_INFORMATION("Datagram (%d) IPv%d \"%s\" %s:%d", datagram_fd, datagram_protocol, datagram_option, (datagram_protocol == IPV6) ? diminuto_ipc6_address2string(datagram_endpoint.ipv6, ipv6, sizeof(ipv6)) : (datagram_protocol == IPV4) ? diminuto_ipc4_address2string(datagram_endpoint.ipv4, ipv4, sizeof(ipv4)) : "", datagram_endpoint.udp); }
+    if (datagram_fd >= 0) { DIMINUTO_LOG_INFORMATION("Datagram (%d) IPv%d \"%s\" %s%s%s:%d", datagram_fd, datagram_protocol, datagram_option, (datagram_protocol == IPV6) ? "[" : "", (datagram_protocol == IPV6) ? diminuto_ipc6_address2string(datagram_endpoint.ipv6, ipv6, sizeof(ipv6)) : (datagram_protocol == IPV4) ? diminuto_ipc4_address2string(datagram_endpoint.ipv4, ipv4, sizeof(ipv4)) : "", (datagram_protocol == IPV6) ? "]" : "", datagram_endpoint.udp); }
 
     /*
      * Are we receiving RTK corrections in the form of RTCM messages from a
@@ -1816,7 +1818,7 @@ int main(int argc, char * argv[])
 
     }
 
-    if (surveyor_fd >= 0) { DIMINUTO_LOG_INFORMATION("Surveyor (%d) IPv%d \"%s\" %s:%d", surveyor_fd, surveyor_protocol, surveyor_option, (surveyor_protocol == IPV6) ? diminuto_ipc6_address2string(surveyor_endpoint.ipv6, ipv6, sizeof(ipv6)) : (surveyor_protocol == IPV4) ? diminuto_ipc4_address2string(surveyor_endpoint.ipv4, ipv4, sizeof(ipv4)) : "", surveyor_endpoint.udp); }
+    if (surveyor_fd >= 0) { DIMINUTO_LOG_INFORMATION("Surveyor (%d) IPv%d \"%s\" %s%s%s:%d", surveyor_fd, surveyor_protocol, surveyor_option, (surveyor_protocol == IPV6) ? "[" : "", (surveyor_protocol == IPV6) ? diminuto_ipc6_address2string(surveyor_endpoint.ipv6, ipv6, sizeof(ipv6)) : (surveyor_protocol == IPV4) ? diminuto_ipc4_address2string(surveyor_endpoint.ipv4, ipv4, sizeof(ipv4)) : "", (surveyor_protocol == IPV6) ? "]" : "", surveyor_endpoint.udp); }
 
     /*
      * Are we strobing a GPIO pin with the one pulse per second (1PPS)
