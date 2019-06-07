@@ -171,7 +171,7 @@ static inline void countdown(expiry_t * ep, diminuto_sticks_t elapsed)
 }
 
 /*******************************************************************************
- * EMITTERS
+ * TRANSCEIVERS
  ******************************************************************************/
 
 /**
@@ -3067,7 +3067,7 @@ int main(int argc, char * argv[])
      ** FINIALIZATION
      **/
 
-	DIMINUTO_LOG_INFORMATION("End");
+	DIMINUTO_LOG_INFORMATION("Stop");
 
     rc = tumbleweed_finalize();
     assert(rc == 0);
@@ -3142,7 +3142,7 @@ int main(int argc, char * argv[])
 
     fflush(stderr);
 
-	DIMINUTO_LOG_INFORMATION("Exit");
+	DIMINUTO_LOG_INFORMATION("End");
 
     return 0;
 }
