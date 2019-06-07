@@ -1418,7 +1418,7 @@ snapshot this information before it is lost.
     D2=D2A
     F2=F2A
 
-## U-Blox ZED-F9P Bug
+## U-Blox UBX-ZED-F9P Bug: wrong number of satellites reported for GLONASS
 
 The Ardusimple SimpleRTK2B board uses the U-Blox ZED-F9P GPS receiver.
 I'm pretty sure the firmware in the ZED-F9P-00B-01 chip on my SimpleRTK2B
@@ -1447,6 +1447,8 @@ I think either there should be a third set of four fields for the eleventh
 satellite, or the total count should be ten instead of eleven. My software
 has been modified to account for this malformed message; it originally
 core dumped with a segmentation violation.
+
+(2019-06-06: U-Blox says this FW bug will be fixed in a subsequent release.)
 
 ## Ardusimple SimpleRTK2B
 
@@ -1629,13 +1631,31 @@ use SimpleRTK2B boards interchangeably in the field.
     END gpstool: LAST.
     END gpstool: END.
 
-# Bugs I Have Known
+## USB Issues With Nickel And Cadmium
 
-This is likely to be a bug in the receiver firmware, but I'm keeping an eye out in my code:
-<https://portal.u-blox.com/s/question/0D52p00008WRsgMCAT/ubxzedf9p-incorrect-number-of-satellites-in-view-for-nmea-gsv-for-glonass>
+I spent several days troubleshooting what I assumed to be a bug in
+my SW regarding the synchronization of the NMEA, UBX, and RTCM state
+machines with the input stream from the UBX-ZED-F9P receiver on Nickel
+(Intel NUC5i7RYH, Ubuntu 18.04.1).  I tested the same code on Cadmium
+(NUC7i7BNH, Ubuntu 16.04.5) and saw the same symptom: every tens
+of seconds or so my SW  would loose sync with the input stream than
+regain it.  But I couldn't reproduce the problem on Gold, an ARM-based
+Raspberry Pi (Broadcom BCM2837B0, Raspbian 9.4).
 
-This for sure is a bug in my code, which I am working to resolve: 
-<https://portal.u-blox.com/s/question/0D52p00008WRsgLCAT/ubxzedf9p-occasional-incorrect-length-in-rtcm-message>
+So I ran the standard Linux utility socat on Nickel to save about
+a minute's worth of NMEA data (UBX and RTCM weren't enabled on the
+F9P for this test). I ran my SW against the file (so: no real-time
+requirements) and recorded the Sync Lost messages that included the
+offset into the data where the errors occurred. Then I did a hex dump
+of the original file, checked at those offsets, and sure enough the NMEA
+stream was corrupted: it appears periodically a spurious handful of bytes
+(looking suspiciously like a fragment of an NMEA sentence) was inserted
+at the end of a valid NMEA sentence.
+
+This appears to be an issue either with the Intel hardware on both of
+the NUC boxes, or with the different versions of Linux each box is
+running. Running a build of exactly the same version of my SW on the Pi,
+with the Broadcom SOC's USB HW, I don't see this issue.
 
 # Acknowledgements
 

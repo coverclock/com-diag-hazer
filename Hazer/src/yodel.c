@@ -303,7 +303,7 @@ ssize_t yodel_length(const void * buffer, size_t size)
 ssize_t yodel_validate(const void * buffer, size_t size)
 {
 	ssize_t result = -1;
-	size_t length = 0;
+	ssize_t length = 0;
 	const uint8_t * bp = (uint8_t *)0;
 	uint8_t csa = 0;
 	uint8_t csb = 0;

@@ -2032,20 +2032,6 @@ int main(int argc, char * argv[])
     limitation = escape ? LIMIT : UNLIMITED;
 
     /*
-     * Initialize screen.
-     */
-
-    if (escape) {
-        fputs("\033[1;1H\033[0J", out_fp);
-        if (report) {
-            fprintf(out_fp, "INP [%3d]\n", 0);
-            fprintf(out_fp, "OUT [%3d]\n", 0);
-            print_local(out_fp, timetofirstfix);
-            fflush(out_fp);
-        }
-    }
-
-    /*
      * Initialize the NMEA (Hazer) and UBX (Yodel) parsers. If you're into this
      * kind of thing, these parsers are effectively a single non-deterministic
      * finite state automata, an FSA that can be in more than one state at a
@@ -2086,6 +2072,20 @@ int main(int argc, char * argv[])
     sync = 0;
 
     frame = 0;
+
+    /*
+     * Initialize screen.
+     */
+
+    if (escape) {
+        fputs("\033[1;1H\033[0J", out_fp);
+        if (report) {
+            fprintf(out_fp, "INP [%3d]\n", 0);
+            fprintf(out_fp, "OUT [%3d]\n", 0);
+            print_local(out_fp, timetofirstfix);
+            fflush(out_fp);
+        }
+    }
 
     /*
      * Enter the work loop.
@@ -2309,7 +2309,6 @@ int main(int argc, char * argv[])
 				size = datagram_size;
 				length = datagram_length;
 				format = NMEA;
-				break;
 
 			} else if ((datagram_length = yodel_validate(datagram_buffer, datagram_size)) > 0) {
 
@@ -2317,7 +2316,6 @@ int main(int argc, char * argv[])
 				size = datagram_size;
 				length = datagram_length;
 				format = UBX;
-				break;
 
 			} else if ((datagram_length = tumbleweed_validate(datagram_buffer, datagram_size)) > 0) {
 
@@ -2325,7 +2323,6 @@ int main(int argc, char * argv[])
 				size = datagram_size;
 				length = datagram_length;
 				format = RTCM;
-				break;
 
 			} else {
 
@@ -2405,6 +2402,7 @@ int main(int argc, char * argv[])
         } else {
             send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, TUMBLEWEED_KEEPALIVE, sizeof(TUMBLEWEED_KEEPALIVE));
             keepalive_was = keepalive_now;
+            DIMINUTO_LOG_DEBUG("Surveyor Keepalive");
         }
 
         /**
