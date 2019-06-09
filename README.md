@@ -55,12 +55,7 @@ parallel stack called Tumbleweed.
 
 Hazer includes a gpstool utility to display the interpreted GNSS
 data. gpstool accepts data streams from standard input, from serial(ish)
-devices, or from a UDP socket. gpstool recognizes input in NMEA (Hazer),
-UBX (Yodel), and RTCM (Tumbleweed) formats. You don't need to tell it what
-to expect; the tool parses the input data stream using three non-deterministic
-finite state automata running in parallel. Which ever parser wins the race to
-reach an end state marks the type of the accumulated data. A successful
-parse resets all three state machines to their starting state.
+devices, or from a UDP socket.
 
 If you're wondering why I don't use the excellent open source GPS Daemon
 (gpsd) and its GPS Monitor (gpsmon), the answer is: I have, in many
