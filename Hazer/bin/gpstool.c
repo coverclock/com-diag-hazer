@@ -256,6 +256,39 @@ static void write_buffer(FILE * fp, const void * buffer, size_t size)
 }
 
 /**
+ * Log connection information.
+ * @param label is a label prepended to the output.
+ * @param option is the command line endpoint option argument.
+ * @param fd is the socket.
+ * @param protocol is selects which address to show.
+ * @param ipv6p points to an IPv6 address.
+ * @param ipv4p points to an IPv4 address.
+ * @param port is a port number.
+ */
+static void show_connection(const char * label, const char * option, int fd, protocol_t protocol, const diminuto_ipv6_t * ipv6p, const diminuto_ipv4_t * ipv4p, diminuto_port_t port)
+{
+    diminuto_ipv4_buffer_t ipv4;
+    diminuto_ipv6_buffer_t ipv6;
+
+    switch (protocol) {
+
+    case IPV6:
+        DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\" [%s]:%d", label, fd, option, diminuto_ipc6_address2string(*ipv6p, ipv6, sizeof(ipv6)), port);
+        break;
+
+    case IPV4:
+        DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\" %s:%d", label, fd, option, diminuto_ipc4_address2string(*ipv4p, ipv4, sizeof(ipv4)), port);
+        break;
+
+    case PROTOCOL:
+        DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\"", label, fd, option);
+        break;
+
+    }
+
+}
+
+/**
  * Send an datagram to a remote IPv4 or IPv6 host and UDP port.
  * @param fd is an open socket.
  * @param protocol indicates either IPv4 or IPv6.
@@ -1441,8 +1474,6 @@ int main(int argc, char * argv[])
      */
     int rc = 0;
     char * locale = (char *)0;
-    diminuto_ipv4_buffer_t ipv4;
-    diminuto_ipv6_buffer_t ipv6;
     /*
      * External symbols.
      */
@@ -1758,7 +1789,7 @@ int main(int argc, char * argv[])
 
     }
 
-    if (datagram_fd >= 0) { DIMINUTO_LOG_INFORMATION("Datagram (%d) IPv%d \"%s\" %s%s%s:%d", datagram_fd, datagram_protocol, datagram_option, (datagram_protocol == IPV6) ? "[" : "", (datagram_protocol == IPV6) ? diminuto_ipc6_address2string(datagram_endpoint.ipv6, ipv6, sizeof(ipv6)) : (datagram_protocol == IPV4) ? diminuto_ipc4_address2string(datagram_endpoint.ipv4, ipv4, sizeof(ipv4)) : "", (datagram_protocol == IPV6) ? "]" : "", datagram_endpoint.udp); }
+    if (datagram_fd >= 0) { show_connection("Datagram", datagram_option, datagram_fd, datagram_protocol, &datagram_endpoint.ipv6, &datagram_endpoint.ipv4, datagram_endpoint.udp); }
 
     /*
      * Are we receiving RTK corrections in the form of RTCM messages from a
@@ -1818,7 +1849,7 @@ int main(int argc, char * argv[])
 
     }
 
-    if (surveyor_fd >= 0) { DIMINUTO_LOG_INFORMATION("Surveyor (%d) IPv%d \"%s\" %s%s%s:%d", surveyor_fd, surveyor_protocol, surveyor_option, (surveyor_protocol == IPV6) ? "[" : "", (surveyor_protocol == IPV6) ? diminuto_ipc6_address2string(surveyor_endpoint.ipv6, ipv6, sizeof(ipv6)) : (surveyor_protocol == IPV4) ? diminuto_ipc4_address2string(surveyor_endpoint.ipv4, ipv4, sizeof(ipv4)) : "", (surveyor_protocol == IPV6) ? "]" : "", surveyor_endpoint.udp); }
+    if (surveyor_fd >= 0) { show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp); }
 
     /*
      * Are we strobing a GPIO pin with the one pulse per second (1PPS)
