@@ -11,4 +11,4 @@ PORT=${1:-"2101"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-exec coreable gpstool -G ${PORT} -v
+exec coreable gpstool -Y ${PORT} -v
