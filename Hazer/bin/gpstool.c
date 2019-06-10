@@ -2460,7 +2460,7 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else {
         	stamp_datagram(&keepalive_buffer, &keepalive_sequence);
-            send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
+            send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(datagram_sequence_t) + sizeof(TUMBLEWEED_KEEPALIVE));
             keepalive_was = keepalive_now;
             DIMINUTO_LOG_DEBUG("Surveyor Keepalive");
         }
