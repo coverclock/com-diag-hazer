@@ -11,7 +11,7 @@
 # given the conditions under which I did the test.
 
 PROGRAM=$(basename ${0})
-ROUTER=${1:-"localhost"}
+ROUTER=${1:-"localhost:2101"}
 DEVICE=${2:-"/dev/ttyACM0"}
 RATE=${3:-115200}
 
@@ -36,7 +36,7 @@ mkdir -p ${LOG}
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
 exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
-    -G ${ROUTER}:2101 -g 4 \
+    -G ${ROUTER} -g 4 \
     -F -H ${LOG}/${PROGRAM}.out -t 10 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01' \
     -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00' \

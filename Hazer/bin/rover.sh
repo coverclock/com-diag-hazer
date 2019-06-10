@@ -6,7 +6,7 @@
 # Configure and run the Ardusimple SimpleRTK2B as a mobile Rover.
 
 PROGRAM=$(basename ${0})
-ROUTER=${1:-"localhost"}
+ROUTER=${1:-"localhost:2101"}
 DEVICE=${2:-"/dev/ttyACM0"}
 RATE=${3:-115200}
 
@@ -23,7 +23,7 @@ mkdir -p ${LOG}
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
 exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
-    -Y ${ROUTER}:2101 -y 20 \
+    -Y ${ROUTER} -y 20 \
     -F -H ${LOG}/${PROGRAM}.out -t 10 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x00' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x05\x00\x53\x10\x00' \
