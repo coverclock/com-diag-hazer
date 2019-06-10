@@ -2356,7 +2356,7 @@ int main(int argc, char * argv[])
 
 			} else if ((remote_size = validate_datagram(&remote_sequence, &remote_buffer, remote_total)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Remote order (%d) [%zd] %lu %lu\n", remote_fd, remote_total, (unsigned long)remote_sequence, (unsigned long)remote_buffer.sequence);
+				DIMINUTO_LOG_NOTICE("Remote order (%d) [%zd] %lu %lu\n", remote_fd, remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.sequence));
 
 			} else if ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0) {
 
@@ -2397,7 +2397,7 @@ int main(int argc, char * argv[])
 
 			} else if ((surveyor_size = validate_datagram(&surveyor_sequence, &surveyor_buffer, surveyor_total)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Surveyor order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)surveyor_buffer.sequence);
+				DIMINUTO_LOG_NOTICE("Surveyor order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.sequence));
 
 			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) <= 0) {
 
@@ -2563,10 +2563,9 @@ int main(int argc, char * argv[])
          * We forward anything whose format is enabled in the forwarding
          * mask. Note that we don't forward the terminating NUL (using length
          * instead of size) that terminate all input of any format (whether
-         * that's useful or not). This is kinda iffy since UDP can not only
-         * drop datagrams, but reorder them. But the ensured delivery of TCP
-         * can (and has, in testing over LTE networks) add substantial latency
-         * to the data. Sometimes it is truly "better never than late".
+         * that's useful or not). The ensured delivery of TCP can (and has, in
+         * testing over LTE networks) add substantial latency to the data.
+         * Sometimes it is truly "better never than late".
          */
 
         if (remote_fd < 0) {

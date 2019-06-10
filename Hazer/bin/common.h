@@ -68,6 +68,14 @@ typedef struct DatagramBuffer {
  */
 #define DATAGRAM_BUFFER_INITIALIZER  { 0, { { '\0', } }, }
 
+/**
+ * Check to see if this datagram came out of order (it's okay if there are gaps
+ * in the sequence, we expect that).
+ * @param sequencep points to the expected sequence counter.
+ * @param buffer points to the datagram buffer.
+ * @param length is the number of bytes in the datagram buffer.
+ * @return the size of the actual payload of the buffer or <0 if out of order.
+ */
 static inline ssize_t validate_datagram(datagram_sequence_t * sequencep, datagram_buffer_t * buffer, ssize_t length)
 {
 	ssize_t result = -1;
@@ -85,12 +93,16 @@ static inline ssize_t validate_datagram(datagram_sequence_t * sequencep, datagra
 	return result;
 }
 
-static inline datagram_buffer_t * stamp_datagram(datagram_buffer_t * buffer, datagram_sequence_t * sequencep)
+/**
+ * Generate a sequence number and store it in the sequence field of the
+ * datagram and update the expected sequence counter.
+ * @param buffer points to the datagram buffer.
+ * @param sequencep points to the expected sequence counter.
+ */
+static inline void stamp_datagram(datagram_buffer_t * buffer, datagram_sequence_t * sequencep)
 {
 	buffer->sequence = htonl(*sequencep);
 	*sequencep += 1;
-
-	return buffer;
 }
 
 #endif
