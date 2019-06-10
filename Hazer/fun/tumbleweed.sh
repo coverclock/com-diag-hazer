@@ -7,8 +7,8 @@
 # This script is specific to the Ardusimple SimpleRTK2B.
 
 PROGRAM=$(basename ${0})
-DATAGRAM=${1:-"localhost"}
-SURVEYOR=${2:-"localhost"}
+DATAGRAM=${1:-"localhost:5555"}
+SURVEYOR=${2:-"localhost:2101"}
 DEVICE=${3:-"/dev/ttyACM0"}
 RATE=${4:-115200}
 
@@ -17,4 +17,4 @@ RATE=${4:-115200}
 DIR=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${DIR}
 
-exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -G ${DATAGRAM}:5555 -g 4 -Y ${SURVEYOR}:2101 -y 10 -E -F -t 10 2> ${DIR}/${PROGRAM}.log
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -G ${DATAGRAM} -g 4 -Y ${SURVEYOR} -y 10 -E -F -t 10 2> ${DIR}/${PROGRAM}.log

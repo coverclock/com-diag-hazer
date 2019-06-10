@@ -7,8 +7,8 @@
 # This script is specific to the Ardusimple SimpleRTK2B.
 
 PROGRAM=$(basename ${0})
+PORT=${1:-"5555"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-exec coreable gpstool -G :5555 -v
-
+exec coreable gpstool -G ${PORT} -v
