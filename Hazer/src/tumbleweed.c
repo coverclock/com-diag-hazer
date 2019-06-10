@@ -381,7 +381,7 @@ ssize_t tumbleweed_validate(const void * buffer, size_t size)
 	uint8_t crc2 = 0;
 	uint8_t crc3 = 0;
 
-	if ((length = tumbleweed_length(buffer, size)) <= 0) {
+	if ((length = tumbleweed_length(buffer, size)) < TUMBLEWEED_RTCM_SHORTEST) {
 		/* Do nothing. */
     } else if ((bp = (uint8_t *)tumbleweed_checksum_buffer(buffer, length, &crc1, &crc2, &crc3)) == (unsigned char *)0) {
         /* Do nothing. */

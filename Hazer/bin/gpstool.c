@@ -2399,9 +2399,13 @@ int main(int argc, char * argv[])
 
 				DIMINUTO_LOG_NOTICE("Surveyor order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.sequence));
 
-			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) <= 0) {
+			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
 
 				DIMINUTO_LOG_WARNING("Surveyor data (%d) [%zd] [%zd] [%zd] 0x%02x\n", surveyor_fd, surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
+
+			} else if (surveyor_length == TUMBLEWEED_RTCM_SHORTEST) {
+
+	            DIMINUTO_LOG_DEBUG("Surveyor keepalive received");
 
 			} else if (dev_fp == (FILE *)0) {
 
@@ -2462,7 +2466,7 @@ int main(int argc, char * argv[])
         	stamp_datagram(&keepalive_buffer, &keepalive_sequence);
             send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(datagram_sequence_t) + sizeof(TUMBLEWEED_KEEPALIVE));
             keepalive_was = keepalive_now;
-            DIMINUTO_LOG_DEBUG("Surveyor Keepalive");
+            DIMINUTO_LOG_DEBUG("Surveyor keepalive sent");
         }
 
         /**
