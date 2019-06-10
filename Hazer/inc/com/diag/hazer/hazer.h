@@ -85,7 +85,7 @@
  * TYPES
  ******************************************************************************/
 
-typedef uint8_t expiry_t;
+typedef uint8_t hazer_expiry_t;
 
 /******************************************************************************
  * DEBUGGING
@@ -768,7 +768,7 @@ typedef struct HazerPosition {
     uint8_t smm_digits;			/* Significant digits of SOG mm/h. */
     uint8_t cog_digits;         /* Significant digits of Course On Ground. */
     uint8_t mag_digits;         /* Significant digits of Magnetic bearing. */
-    expiry_t ticks;				/* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;		/* Lifetime in application-defined ticks. */
     uint8_t unused[1];          /* Unused. */
 } hazer_position_t;
 
@@ -841,7 +841,7 @@ typedef struct HazerActive {
     uint16_t vdop;				/* Vertical Dilution Of Precision * 100. */
     uint8_t system;				/* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
     uint8_t active;             /* Number of satellites active. */
-    expiry_t ticks;				/* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;		/* Lifetime in application-defined ticks. */
     uint8_t unused[1];          /* Unused. */
 } hazer_active_t;
 
@@ -932,7 +932,7 @@ typedef struct HazerView {
     uint8_t view;               /* Number of satellites in view. */
     uint8_t channels;           /* Number of channels used in view. */
     uint8_t pending;			/* Number of updates pending. */
-    expiry_t ticks;				/* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;		/* Lifetime in application-defined ticks. */
 } hazer_view_t;
 
 /**

@@ -62,6 +62,7 @@
 #include <pthread.h>
 #include <locale.h>
 #include "./gpstool.h"
+#include "./common.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
@@ -157,7 +158,7 @@ static inline diminuto_sticks_t ticktock(diminuto_sticks_t frequency)
  * @param ep points to the expiration field to count down.
  * @param elapsed is the number of ticks to count down.
  */
-static inline void countdown(expiry_t * ep, diminuto_sticks_t elapsed)
+static inline void countdown(hazer_expiry_t * ep, diminuto_sticks_t elapsed)
 {
     if (*ep == 0) {
         /* Do nothing. */
@@ -370,7 +371,7 @@ static void print_buffer(FILE * fp, const void * buffer, size_t size, size_t lim
  */
 static void print_actives(FILE * fp, const hazer_active_t aa[])
 {
-    static const unsigned int IDENTIFIERS = countof(aa[0].id);
+    static const unsigned int IDENTIFIERS = diminuto_countof(aa[0].id);
     unsigned int system = 0;
     unsigned int satellite = 0;
     unsigned int count = 0;
@@ -458,8 +459,8 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
  */
 static void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
 {
-    static const unsigned int SATELLITES = countof(va[0].sat);
-    static const unsigned int IDENTIFIERS = countof(aa[0].id);
+    static const unsigned int SATELLITES = diminuto_countof(va[0].sat);
+    static const unsigned int IDENTIFIERS = diminuto_countof(aa[0].id);
     unsigned int system = 0;
     unsigned int channel = 0;
     unsigned int satellite = 0;
@@ -1248,7 +1249,7 @@ int main(int argc, char * argv[])
     struct Command * command = (struct Command *)0;
     diminuto_list_t * command_node = (diminuto_list_t *)0;
     diminuto_list_t command_list = DIMINUTO_LIST_NULLINIT(&command_list);
-    uint8_t * command_payload = (uint8_t *)0;
+    uint8_t * command_string = (uint8_t *)0;
     ssize_t command_size = 0;
     ssize_t command_length = 0;
     /*
@@ -1276,21 +1277,25 @@ int main(int argc, char * argv[])
     int carrierdetect = 0;
     long device_mask = NMEA;
     /*
-     * Datagram variables.
+     * Remote variables.
      */
-    protocol_t datagram_protocol = PROTOCOL;
-    datagram_buffer_t datagram_buffer = DATAGRAM_BUFFER_INITIALIZER;
-    const char * datagram_option = (const char *)0;
-    diminuto_ipc_endpoint_t datagram_endpoint = { 0, };
-    ssize_t datagram_size = 0;
-    ssize_t datagram_length = 0;
-    long datagram_mask = NMEA;
+    protocol_t remote_protocol = PROTOCOL;
+    datagram_buffer_t remote_buffer = DATAGRAM_BUFFER_INITIALIZER;
+    ssize_t remote_total = 0;
+    datagram_sequence_t remote_sequence = 0;
+    const char * remote_option = (const char *)0;
+    diminuto_ipc_endpoint_t remote_endpoint = { 0, };
+    ssize_t remote_size = 0;
+    ssize_t remote_length = 0;
+    long remote_mask = NMEA;
     role_t role = ROLE;
     /*
      * Surveyor variables.
      */
     protocol_t surveyor_protocol = PROTOCOL;
     datagram_buffer_t surveyor_buffer = DATAGRAM_BUFFER_INITIALIZER;
+    ssize_t surveyor_total = 0;
+    datagram_sequence_t surveyor_sequence = 0;
     const char * surveyor_option = (const char *)0;
     diminuto_ipc_endpoint_t surveyor_endpoint = { 0, };
     ssize_t surveyor_size = 0;
@@ -1299,11 +1304,16 @@ int main(int argc, char * argv[])
     uint8_t surveyor_crc2 = 0;
     uint8_t surveyor_crc3 = 0;
     /*
+     * Keepalive variables.
+     */
+    datagram_buffer_t keepalive_buffer = DATAGRAM_BUFFER_INITIALIZER;
+    datagram_sequence_t keepalive_sequence = 0;
+    /*
      * File Descriptor variables.
      */
     int in_fd = -1;
     int dev_fd = -1;
-    int datagram_fd = -1;
+    int remote_fd = -1;
     int surveyor_fd = -1;
     /*
      * 1PPS poller thread variables.
@@ -1318,20 +1328,20 @@ int main(int argc, char * argv[])
      * NMEA parser state variables.
      */
     hazer_state_t nmea_state = HAZER_STATE_STOP;
-    hazer_buffer_t nmea_buffer = HAZER_BUFFER_INITIALIZER;
     hazer_context_t nmea_context = { 0, };
+    datagram_buffer_t nmea_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * UBX parser state variables.
      */
     yodel_state_t ubx_state = YODEL_STATE_STOP;
-    yodel_buffer_t ubx_buffer = YODEL_BUFFER_INITIALIZER;
     yodel_context_t ubx_context = { 0, };
+    datagram_buffer_t ubx_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * RTCM parser state variables.
      */
     tumbleweed_state_t rtcm_state = TUMBLEWEED_STATE_STOP;
-    tumbleweed_buffer_t rtcm_buffer = TUMBLEWEED_BUFFER_INITIALIZER;
 	tumbleweed_context_t rtcm_context = { 0, };
+    datagram_buffer_t rtcm_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * NMEA processing variables.
      */
@@ -1540,8 +1550,8 @@ int main(int argc, char * argv[])
             slow = !0;
             break;
         case 'G':
-            datagram_option = optarg;
-            rc = diminuto_ipc_endpoint(optarg, &datagram_endpoint);
+            remote_option = optarg;
+            rc = diminuto_ipc_endpoint(optarg, &remote_endpoint);
             if (rc < 0) { diminuto_perror(optarg); error = !0; }
             break;
         case 'H':
@@ -1611,7 +1621,7 @@ int main(int argc, char * argv[])
             paritybit = 2;
             break;
         case 'g':
-            datagram_mask = strtol(optarg, &end, 0);
+            remote_mask = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case 'h':
@@ -1747,49 +1757,49 @@ int main(int argc, char * argv[])
      * remotely.
      */
 
-    if (datagram_option == (const char *)0) {
+    if (remote_option == (const char *)0) {
         /* Do nothing. */
-    } else if (datagram_endpoint.udp == 0) {
+    } else if (remote_endpoint.udp == 0) {
         /* Do nothing. */
-    } else if (!diminuto_ipc6_is_unspecified(&datagram_endpoint.ipv6)) {
+    } else if (!diminuto_ipc6_is_unspecified(&remote_endpoint.ipv6)) {
 
-        datagram_protocol = IPV6;
+        remote_protocol = IPV6;
 
-        datagram_fd = diminuto_ipc6_datagram_peer(0);
-        assert(datagram_fd >= 0);
+        remote_fd = diminuto_ipc6_datagram_peer(0);
+        assert(remote_fd >= 0);
 
-        rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
+        rc = diminuto_ipc_set_nonblocking(remote_fd, !0);
         assert(rc >= 0);
 
         role = PRODUCER;
 
-    } else if (!diminuto_ipc4_is_unspecified(&datagram_endpoint.ipv4)) {
+    } else if (!diminuto_ipc4_is_unspecified(&remote_endpoint.ipv4)) {
 
-        datagram_protocol = IPV4;
+        remote_protocol = IPV4;
 
-        datagram_fd = diminuto_ipc4_datagram_peer(0);
-        assert(datagram_fd >= 0);
+        remote_fd = diminuto_ipc4_datagram_peer(0);
+        assert(remote_fd >= 0);
 
-        rc = diminuto_ipc_set_nonblocking(datagram_fd, !0);
+        rc = diminuto_ipc_set_nonblocking(remote_fd, !0);
         assert(rc >= 0);
 
         role = PRODUCER;
 
     } else {
 
-        datagram_protocol = IPV6;
+        remote_protocol = IPV6;
 
-        datagram_fd = diminuto_ipc6_datagram_peer(datagram_endpoint.udp);
-        assert(datagram_fd >= 0);
+        remote_fd = diminuto_ipc6_datagram_peer(remote_endpoint.udp);
+        assert(remote_fd >= 0);
 
-        rc = diminuto_mux_register_read(&mux, datagram_fd);
+        rc = diminuto_mux_register_read(&mux, remote_fd);
         assert(rc >= 0);
 
         role = CONSUMER;
 
     }
 
-    if (datagram_fd >= 0) { show_connection("Datagram", datagram_option, datagram_fd, datagram_protocol, &datagram_endpoint.ipv6, &datagram_endpoint.ipv4, datagram_endpoint.udp); }
+    if (remote_fd >= 0) { show_connection("Datagram", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp); }
 
     /*
      * Are we receiving RTK corrections in the form of RTCM messages from a
@@ -1850,6 +1860,14 @@ int main(int argc, char * argv[])
     }
 
     if (surveyor_fd >= 0) { show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp); }
+
+    /*
+     * One time initialization of our keepalive datagram, in case we use it.
+     * This is kinda a gross misuse of space since we're storing a tiny datum
+     * in a buffer big enough to store the largest datagram.
+     */
+
+    memcpy(keepalive_buffer.payload.data, TUMBLEWEED_KEEPALIVE, sizeof(TUMBLEWEED_KEEPALIVE));
 
     /*
      * Are we strobing a GPIO pin with the one pulse per second (1PPS)
@@ -2255,9 +2273,9 @@ int main(int argc, char * argv[])
 
 				frame = 0;
 
-				nmea_state = hazer_machine(nmea_state, ch, nmea_buffer, sizeof(nmea_buffer), &nmea_context);
+				nmea_state = hazer_machine(nmea_state, ch, nmea_buffer.payload.nmea, sizeof(nmea_buffer.payload.nmea), &nmea_context);
 				if (nmea_state == HAZER_STATE_END) {
-					buffer = nmea_buffer;
+					buffer = nmea_buffer.payload.nmea;
 					size = hazer_size(&nmea_context);
 					length = size - 1;
 					format = NMEA;
@@ -2266,9 +2284,9 @@ int main(int argc, char * argv[])
 					break;
 				}
 
-				ubx_state = yodel_machine(ubx_state, ch, ubx_buffer, sizeof(ubx_buffer), &ubx_context);
+				ubx_state = yodel_machine(ubx_state, ch, ubx_buffer.payload.ubx, sizeof(ubx_buffer.payload.ubx), &ubx_context);
 				if (ubx_state == YODEL_STATE_END) {
-					buffer = ubx_buffer;
+					buffer = ubx_buffer.payload.ubx;
 					size = yodel_size(&ubx_context);
 					length = size - 1;
 					format = UBX;
@@ -2277,9 +2295,9 @@ int main(int argc, char * argv[])
 					break;
 				}
 
-				rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer, sizeof(rtcm_buffer), &rtcm_context);
+				rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer.payload.rtcm, sizeof(rtcm_buffer.payload.rtcm), &rtcm_context);
 				if (rtcm_state == TUMBLEWEED_STATE_END) {
-					buffer = rtcm_buffer;
+					buffer = rtcm_buffer.payload.rtcm;
 					size = tumbleweed_size(&rtcm_context);
 					length = size - 1;
 					format = RTCM;
@@ -2321,7 +2339,7 @@ int main(int argc, char * argv[])
 				break;
 			}
 
-		} else if (fd == datagram_fd) {
+		} else if (fd == remote_fd) {
 
 			/*
 			 * Receive a NMEA, UBX, or RTCM datagram from a remote gpstool.
@@ -2332,34 +2350,38 @@ int main(int argc, char * argv[])
 			 * is a serious bug either in this software or in the transport.
 			 */
 
-			if ((datagram_size = receive_datagram(datagram_fd, datagram_buffer, sizeof(datagram_buffer))) <= 0) {
+			if ((remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer))) <= 0) {
 
-				/* Do nothing. */
+				DIMINUTO_LOG_WARNING("Remote socket (%d) [%zd]\n", remote_fd, remote_total);
 
-			} else if ((datagram_length = hazer_validate(datagram_buffer, datagram_size)) > 0) {
+			} else if ((remote_size = validate_datagram(&remote_sequence, &remote_buffer, remote_total)) < 0) {
 
-				buffer = datagram_buffer;
-				size = datagram_size;
-				length = datagram_length;
+				DIMINUTO_LOG_NOTICE("Remote order (%d) [%zd] %lu %lu\n", remote_fd, remote_total, (unsigned long)remote_sequence, (unsigned long)remote_buffer.sequence);
+
+			} else if ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0) {
+
+				buffer = remote_buffer.payload.nmea;
+				size = remote_size;
+				length = remote_length;
 				format = NMEA;
 
-			} else if ((datagram_length = yodel_validate(datagram_buffer, datagram_size)) > 0) {
+			} else if ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0) {
 
-				buffer = datagram_buffer;
-				size = datagram_size;
-				length = datagram_length;
+				buffer = remote_buffer.payload.ubx;
+				size = remote_size;
+				length = remote_length;
 				format = UBX;
 
-			} else if ((datagram_length = tumbleweed_validate(datagram_buffer, datagram_size)) > 0) {
+			} else if ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0) {
 
-				buffer = datagram_buffer;
-				size = datagram_size;
-				length = datagram_length;
+				buffer = remote_buffer.payload.rtcm;
+				size = remote_size;
+				length = remote_length;
 				format = RTCM;
 
 			} else {
 
-				DIMINUTO_LOG_WARNING("Remote (%d) [%zd] [%zd] 0x%02x\n", datagram_fd, datagram_size, datagram_length, datagram_buffer[0]);
+				DIMINUTO_LOG_WARNING("Remote data (%d) [%zd] [%zd] [%zd] 0x%02x\n", remote_fd, remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
 
 			}
 
@@ -2369,13 +2391,17 @@ int main(int argc, char * argv[])
 			 * Receive an RTCM message from a remote gpstool doing a survey.
 			 */
 
-			if ((surveyor_size = receive_datagram(surveyor_fd, surveyor_buffer, sizeof(surveyor_buffer))) <= 0) {
+			if ((surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer))) <= 0) {
 
-				/* Do nothing. */
+				DIMINUTO_LOG_WARNING("Surveyor socket (%d) [%zd]\n", surveyor_fd, surveyor_total);
 
-			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer, surveyor_size)) <= 0) {
+			} else if ((surveyor_size = validate_datagram(&surveyor_sequence, &surveyor_buffer, surveyor_total)) < 0) {
 
-				DIMINUTO_LOG_WARNING("Surveyor (%d) [%zd] [%zd] 0x%02x\n", surveyor_fd, surveyor_size, surveyor_length, surveyor_buffer[0]);
+				DIMINUTO_LOG_NOTICE("Surveyor order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)surveyor_buffer.sequence);
+
+			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) <= 0) {
+
+				DIMINUTO_LOG_WARNING("Surveyor data (%d) [%zd] [%zd] [%zd] 0x%02x\n", surveyor_fd, surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
 
 			} else if (dev_fp == (FILE *)0) {
 
@@ -2383,8 +2409,8 @@ int main(int argc, char * argv[])
 
 			} else {
 
-				if (verbose) { fprintf(stderr, "%s: RTCM <%d> [%zd]\n", Program, tumbleweed_message(surveyor_buffer, surveyor_length), surveyor_length); }
-				write_buffer(dev_fp, surveyor_buffer, surveyor_length);
+				if (verbose) { fprintf(stderr, "%s: RTCM <%d> [%zd]\n", Program, tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length), surveyor_length); }
+				write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
 
 			}
 
@@ -2395,7 +2421,7 @@ int main(int argc, char * argv[])
 			 * was not one we know about; that should be impossible.
 			 */
 
-			DIMINUTO_LOG_ERROR("Multiplexing %d ( %d %d %d )\n", fd, dev_fd, datagram_fd, surveyor_fd);
+			DIMINUTO_LOG_ERROR("Mux (%d) <%d %d %d>\n", fd, dev_fd, remote_fd, surveyor_fd);
 			assert(0);
 
 		}
@@ -2433,7 +2459,8 @@ int main(int argc, char * argv[])
         } else if (((keepalive_now = ticktock(frequency)) - keepalive_was) < keepalive) {
             /* Do nothing. */
         } else {
-            send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, TUMBLEWEED_KEEPALIVE, sizeof(TUMBLEWEED_KEEPALIVE));
+        	stamp_datagram(&keepalive_buffer, &keepalive_sequence);
+            send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             keepalive_was = keepalive_now;
             DIMINUTO_LOG_DEBUG("Surveyor Keepalive");
         }
@@ -2469,30 +2496,30 @@ int main(int argc, char * argv[])
             command_node = diminuto_list_dequeue(&command_list);
             assert(command_node != (diminuto_list_t *)0);
             command = diminuto_containerof(struct Command, link, command_node);
-            command_payload = diminuto_list_data(command_node);
-            assert(command_payload != (uint8_t *)0);
-            if (command_payload[0] == '\0') {
+            command_string = diminuto_list_data(command_node);
+            assert(command_string != (uint8_t *)0);
+            if (command_string[0] == '\0') {
                 DIMINUTO_LOG_INFORMATION("Zero");
                 free(command_node);
                 eof = !0;
             } else {
-                command_size = strlen(command_payload) + 1;
-                command_length = diminuto_escape_collapse(command_payload, command_payload, command_size);
-                if (command_payload[0] == HAZER_STIMULUS_START) {
-                    emit_sentence(dev_fp, command_payload, command_length);
+                command_size = strlen(command_string) + 1;
+                command_length = diminuto_escape_collapse(command_string, command_string, command_size);
+                if (command_string[0] == HAZER_STIMULUS_START) {
+                    emit_sentence(dev_fp, command_string, command_length);
                     rc = 0;
-                } else if ((command_payload[0] == YODEL_STIMULUS_SYNC_1) && (command_payload[1] == YODEL_STIMULUS_SYNC_2)) {
-                    emit_packet(dev_fp, command_payload, command_length);
+                } else if ((command_string[0] == YODEL_STIMULUS_SYNC_1) && (command_string[1] == YODEL_STIMULUS_SYNC_2)) {
+                    emit_packet(dev_fp, command_string, command_length);
                     rc = 0;
                 } else {
-                	DIMINUTO_LOG_WARNING("Command 0x%02x%02x [%zd]", command_payload[0], command_payload[1], command_length);
+                	DIMINUTO_LOG_WARNING("Command 0x%02x%02x [%zd]", command_string[0], command_string[1], command_length);
                     rc = -1;
                 }
                 if (rc == 0) {
                     if (command->acknak) { acknakpending += 1; }
-                    if (verbose) { print_buffer(stderr, command_payload, command_length, UNLIMITED); }
+                    if (verbose) { print_buffer(stderr, command_string, command_length, UNLIMITED); }
                     if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
-                    if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_payload, command_length, limitation); fflush(out_fp); }
+                    if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }
                 }
                 free(command_node);
             }
@@ -2542,14 +2569,17 @@ int main(int argc, char * argv[])
          * to the data. Sometimes it is truly "better never than late".
          */
 
-        if (datagram_fd < 0) {
+        if (remote_fd < 0) {
             /* Do nothing. */
         } else if (role != PRODUCER) {
             /* Do nothing. */
-        } else if ((datagram_mask & format) == 0) {
+        } else if ((remote_mask & format) == 0) {
             /* Do nothing. */
         } else {
-            send_datagram(datagram_fd, datagram_protocol, &datagram_endpoint.ipv4, &datagram_endpoint.ipv6, datagram_endpoint.udp, buffer, length);
+        	datagram_buffer_t * dp;
+        	dp = diminuto_containerof(datagram_buffer_t, payload, buffer);
+        	stamp_datagram(dp, &remote_sequence);
+            send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->sequence) + length);
         }
 
         /**
@@ -2648,10 +2678,10 @@ int main(int argc, char * argv[])
 
         	strncpy(tokenized, buffer, sizeof(tokenized));
         	tokenized[sizeof(tokenized) - 1] = '\0';
-            count = hazer_tokenize(vector, countof(vector), tokenized, length);
+            count = hazer_tokenize(vector, diminuto_countof(vector), tokenized, length);
             assert(count >= 0);
             assert(vector[count - 1] == (char *)0);
-            assert(count <= countof(vector));
+            assert(count <= diminuto_countof(vector));
 
             /*
              * Make sure it's a talker and a GNSS that we care about.
@@ -3137,8 +3167,8 @@ int main(int argc, char * argv[])
         assert(strobe_fp == (FILE *)0);
     }
 
-    if (datagram_fd >= 0) {
-        rc = diminuto_ipc_close(datagram_fd);
+    if (remote_fd >= 0) {
+        rc = diminuto_ipc_close(remote_fd);
         assert(rc >= 0);
     }
 

@@ -19,33 +19,6 @@
 #include "com/diag/diminuto/diminuto_list.h"
 
 /*******************************************************************************
- * DATAGRAM BUFFER
- ******************************************************************************/
-
-/**
- * Datagram Constants.
- */
-enum DatagramConstants {
-	DATAGRAM_LONGEST = ((HAZER_NMEA_LONGEST > YODEL_UBX_LONGEST)
-						? ((HAZER_NMEA_LONGEST > TUMBLEWEED_RTCM_LONGEST) ? HAZER_NMEA_LONGEST : TUMBLEWEED_RTCM_LONGEST)
-						: ((YODEL_UBX_LONGEST > TUMBLEWEED_RTCM_LONGEST) ? YODEL_UBX_LONGEST : TUMBLEWEED_RTCM_LONGEST)),
-};
-
-/**
- * This buffer is large enough to the largest UDP datagram we are willing to
- * support, plus a trailing NUL. It's not big enough to hold any datagram
- * (that would be in the neighborhood of 65508 bytes). But it will for sure
- * hold a NMEA, UBX, or RTCM payload.
- */
-typedef unsigned char (datagram_buffer_t)[DATAGRAM_LONGEST + 1];
-
-/**
- * @define DATAGRAM_BUFFER_INITIALIZER
- * Initialize a DatagramBuffer type.
- */
-#define DATAGRAM_BUFFER_INITIALIZER  { '\0', }
-
-/*******************************************************************************
  * HIGH PRECISION SOLUTION
  ******************************************************************************/
 
@@ -55,7 +28,7 @@ typedef unsigned char (datagram_buffer_t)[DATAGRAM_LONGEST + 1];
  */
 typedef struct YodelSolution {
 	yodel_ubx_nav_hpposllh_t payload;   /* Payload from UBX-NAV-HPPOSLLH message. */
-    expiry_t ticks;                     /* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;               /* Lifetime in application-defined ticks. */
     uint8_t unused[3];
 } yodel_solution_t;
 
@@ -79,7 +52,7 @@ typedef struct YodelSolution {
  */
 typedef struct YodelHardware {
     yodel_ubx_mon_hw_t payload;	/* Payload from UBX-MON-HW message. */
-    expiry_t ticks;				/* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;				/* Lifetime in application-defined ticks. */
     uint8_t unused[3];
 } yodel_hardware_t;
 
@@ -103,7 +76,7 @@ typedef struct YodelHardware {
  */
 typedef struct YodelStatus {
     yodel_ubx_nav_status_t payload;	/* Payload from UBX-NAV-STATUS message. */
-    expiry_t ticks;					/* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
     uint8_t unused[3];
 } yodel_status_t;
 
@@ -127,7 +100,7 @@ typedef struct YodelStatus {
  */
 typedef struct YodelBase {
     yodel_ubx_nav_svin_t payload;	/* Payload from UBX-NAV-SVIN message. */
-    expiry_t ticks;					/* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;					/* Lifetime in application-defined ticks. */
     uint8_t unused[7];
 } yodel_base_t;
 
@@ -151,7 +124,7 @@ typedef struct YodelBase {
  */
 typedef struct YodelRover {
     yodel_ubx_rxm_rtcm_t payload;	/* Payload from UBX-RXM-RTCM message. */
-    expiry_t ticks;					/* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
     uint8_t unused[7];
 } yodel_rover_t;
 
@@ -174,11 +147,11 @@ typedef struct YodelRover {
  * Structure combining both a RTCM message number and its expiry time in ticks.
  */
 typedef struct TumbleweedMessage {
-	int number;			/* Message number e.g. 1005. */
+	int number;				/* Message number e.g. 1005. */
 	ssize_t length;
 	ssize_t minimum;
 	ssize_t maximum;
-	expiry_t ticks;		/* Lifetime in application-defined ticks. */
+	hazer_expiry_t ticks;	/* Lifetime in application-defined ticks. */
 } tumbleweed_message_t;
 
 /**
@@ -229,17 +202,17 @@ struct Command {
 /**
  * Are we producing datagrams, consuming datagrams, or neither?
  */
-typedef enum Role { ROLE = 0, PRODUCER = 1, CONSUMER = 2, } role_t;
+typedef enum Role { ROLE = '?', PRODUCER = 'P', CONSUMER = 'C', } role_t;
 
 /**
  * Are we inputting serial data, outputting serial data, or neither?
  */
-typedef enum Direction { DIRECTION = 0, INPUT = (1<<0), OUTPUT = (1<<1) } direction_t;
+typedef enum Direction { DIRECTION = '?', INPUT = 'I', OUTPUT = 'O' } direction_t;
 
 /**
  * Are we using IPv4, IPv6, or not using IP at all?
  */
-typedef enum Protocol { PROTOCOL = 0, IPV4 = 4, IPV6 = 6, } protocol_t;
+typedef enum Protocol { PROTOCOL = '?', IPV4 = '4', IPV6 = '6', } protocol_t;
 
 /**
  * Are we processing an NMEA sentence, a UBX packet, an RTCM message, or none
