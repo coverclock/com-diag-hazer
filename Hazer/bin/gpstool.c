@@ -3003,8 +3003,6 @@ int main(int argc, char * argv[])
             if (length < kinematics.minimum) { kinematics.minimum = length; }
             if (length > kinematics.maximum) { kinematics.maximum = length; }
 
-            DIMINUTO_LOG_DEBUG("Parse RTCM Update <%d> [%zd] [%zd] [%zd]\n", kinematics.number, kinematics.minimum, kinematics.length, kinematics.maximum);
-
             kinematics.ticks = timeout;
             refresh = !0;
 
