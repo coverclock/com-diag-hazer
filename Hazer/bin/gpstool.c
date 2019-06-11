@@ -274,15 +274,15 @@ static void show_connection(const char * label, const char * option, int fd, pro
     switch (protocol) {
 
     case IPV6:
-        DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\" [%s]:%d", label, fd, option, diminuto_ipc6_address2string(*ipv6p, ipv6, sizeof(ipv6)), port);
+        DIMINUTO_LOG_INFORMATION("Connection %s (%d) \"%s\" [%s]:%d", label, fd, option, diminuto_ipc6_address2string(*ipv6p, ipv6, sizeof(ipv6)), port);
         break;
 
     case IPV4:
-        DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\" %s:%d", label, fd, option, diminuto_ipc4_address2string(*ipv4p, ipv4, sizeof(ipv4)), port);
+        DIMINUTO_LOG_INFORMATION("Connection %s (%d) \"%s\" %s:%d", label, fd, option, diminuto_ipc4_address2string(*ipv4p, ipv4, sizeof(ipv4)), port);
         break;
 
     case PROTOCOL:
-        DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\"", label, fd, option);
+        DIMINUTO_LOG_INFORMATION("Connection %s (%d) \"%s\"", label, fd, option);
         break;
 
     }
@@ -688,7 +688,7 @@ static void print_hardware(FILE * fp, const yodel_hardware_t * hp)
         }
 
         if (jamming != jamming_prior) {
-            DIMINUTO_LOG_NOTICE("UBX MON jamming %u indicator %u\n", value, hp->payload.jamInd);
+            DIMINUTO_LOG_NOTICE("Signal UBX MON jamming %u indicator %u\n", value, hp->payload.jamInd);
             jamming_prior = jamming;
         }
 
@@ -755,7 +755,7 @@ static void print_status(FILE * fp, const yodel_status_t * sp)
         }
 
         if (spoofing != spoofing_prior) {
-            DIMINUTO_LOG_NOTICE("UBX NAV spoofing %u\n", value);
+            DIMINUTO_LOG_NOTICE("Signal UBX NAV spoofing %u\n", value);
             spoofing_prior = spoofing;
         }
 
@@ -2209,7 +2209,7 @@ int main(int argc, char * argv[])
 
 				ch = fgetc(in_fp);
 				if (ch == EOF) {
-		        	DIMINUTO_LOG_INFORMATION("EOF");
+		        	DIMINUTO_LOG_NOTICE("EOF");
 					eof = !0;
 					break;
 				}
@@ -2346,11 +2346,11 @@ int main(int argc, char * argv[])
 
 			if ((remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer))) <= 0) {
 
-				DIMINUTO_LOG_WARNING("Remote socket (%d) [%zd]\n", remote_fd, remote_total);
+				DIMINUTO_LOG_WARNING("Remote Socket (%d) [%zd]\n", remote_fd, remote_total);
 
 			} else if ((remote_size = validate_datagram(&remote_sequence, &remote_buffer.header, remote_total)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Remote order (%d) [%zd] %lu %lu\n", remote_fd, remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
+				DIMINUTO_LOG_NOTICE("Remote Order (%d) [%zd] %lu %lu\n", remote_fd, remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
 			} else if ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0) {
 
@@ -2375,7 +2375,7 @@ int main(int argc, char * argv[])
 
 			} else {
 
-				DIMINUTO_LOG_WARNING("Remote data (%d) [%zd] [%zd] [%zd] 0x%02x\n", remote_fd, remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
+				DIMINUTO_LOG_ERROR("Remote Other (%d) [%zd] [%zd] [%zd] 0x%02x\n", remote_fd, remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
 
 			}
 
@@ -2387,19 +2387,19 @@ int main(int argc, char * argv[])
 
 			if ((surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer))) <= 0) {
 
-				DIMINUTO_LOG_WARNING("Surveyor socket (%d) [%zd]\n", surveyor_fd, surveyor_total);
+				DIMINUTO_LOG_WARNING("Surveyor Socket (%d) [%zd]\n", surveyor_fd, surveyor_total);
 
 			} else if ((surveyor_size = validate_datagram(&surveyor_sequence, &surveyor_buffer.header, surveyor_total)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Surveyor order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
+				DIMINUTO_LOG_NOTICE("Surveyor Order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
 
 			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
 
-				DIMINUTO_LOG_WARNING("Surveyor data (%d) [%zd] [%zd] [%zd] 0x%02x\n", surveyor_fd, surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
+				DIMINUTO_LOG_ERROR("Surveyor Invalid (%d) [%zd] [%zd] [%zd] 0x%02x\n", surveyor_fd, surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
 
 			} else if (surveyor_length == TUMBLEWEED_RTCM_SHORTEST) {
 
-	            DIMINUTO_LOG_DEBUG("Surveyor keepalive received");
+	            DIMINUTO_LOG_DEBUG("Surveyor RTCM (%d) keepalive received", surveyor_fd);
 
 			} else if (dev_fp == (FILE *)0) {
 
@@ -2407,7 +2407,7 @@ int main(int argc, char * argv[])
 
 			} else {
 
-				if (verbose) { fprintf(stderr, "%s: RTCM <%d> [%zd]\n", Program, tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length), surveyor_length); }
+				DIMINUTO_LOG_DEBUG("Surveyor RTCM (%d) <%d> [%zd]\n", surveyor_fd, tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length), surveyor_length);
 				write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
 
 			}
@@ -2419,7 +2419,7 @@ int main(int argc, char * argv[])
 			 * was not one we know about; that should be impossible.
 			 */
 
-			DIMINUTO_LOG_ERROR("Mux (%d) <%d %d %d>\n", fd, dev_fd, remote_fd, surveyor_fd);
+			DIMINUTO_LOG_ERROR("Multiplex Invalid (%d) <%d %d %d>\n", fd, dev_fd, remote_fd, surveyor_fd);
 			assert(0);
 
 		}
@@ -2467,7 +2467,7 @@ int main(int argc, char * argv[])
         	stamp_datagram(&keepalive_buffer.header, &keepalive_sequence);
             send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             keepalive_was = keepalive_now;
-            DIMINUTO_LOG_DEBUG("Surveyor keepalive sent");
+            DIMINUTO_LOG_DEBUG("Surveyor RTCM (%d) keepalive sent", surveyor_fd);
         }
 
         /**
@@ -2504,7 +2504,7 @@ int main(int argc, char * argv[])
             command_string = diminuto_list_data(command_node);
             assert(command_string != (uint8_t *)0);
             if (command_string[0] == '\0') {
-                DIMINUTO_LOG_INFORMATION("Zero");
+                DIMINUTO_LOG_NOTICE("Command Null");
                 free(command_node);
                 eof = !0;
             } else {
@@ -2517,7 +2517,7 @@ int main(int argc, char * argv[])
                     emit_packet(dev_fp, command_string, command_length);
                     rc = 0;
                 } else {
-                	DIMINUTO_LOG_WARNING("Command 0x%02x%02x [%zd]", command_string[0], command_string[1], command_length);
+                	DIMINUTO_LOG_WARNING("Command Other 0x%02x%02x [%zd]", command_string[0], command_string[1], command_length);
                     rc = -1;
                 }
                 if (rc == 0) {
@@ -2701,7 +2701,7 @@ int main(int argc, char * argv[])
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
 
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-                    DIMINUTO_LOG_WARNING("Talker \"%c%c\"", vector[0][1], vector[0][2]);
+                    DIMINUTO_LOG_WARNING("Parse NMEA Talker Other \"%c%c\"", vector[0][1], vector[0][2]);
                 }
 
                 continue;
@@ -2709,7 +2709,7 @@ int main(int argc, char * argv[])
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
-                    DIMINUTO_LOG_WARNING("Constellation \"%c%c\"\n", vector[0][1], vector[0][2]);
+                    DIMINUTO_LOG_WARNING("Parse NMEA System Other \"%c%c\"\n", vector[0][1], vector[0][2]);
                 }
 
                 continue;
@@ -2802,11 +2802,11 @@ int main(int argc, char * argv[])
 
             } else if (hazer_parse_txt(vector, count) == 0) {
 
-                DIMINUTO_LOG_INFORMATION("TXT \"%*s\"", length - 2 /* Exclude CR and LF. */, buffer);
+                DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%*s\"", length - 2 /* Exclude CR and LF. */, buffer);
 
             } else if (unknown) {
 
-                DIMINUTO_LOG_WARNING("NMEA \"%s\"\n", vector[0]);
+                DIMINUTO_LOG_WARNING("Parse NMEA Other \"%s\"\n", vector[0]);
 
             } else {
 
@@ -2843,7 +2843,7 @@ int main(int argc, char * argv[])
 
                 refresh = !0;
 
-                DIMINUTO_LOG_INFORMATION("UBX %s 0x%02x 0x%02x (%d)\n", acknak.state ? "ACK" : "NAK", acknak.clsID, acknak.msgID, acknakpending);
+                DIMINUTO_LOG_INFORMATION("Parse UBX %s 0x%02x 0x%02x (%d)\n", acknak.state ? "ACK" : "NAK", acknak.clsID, acknak.msgID, acknakpending);
 
                 if (acknakpending > 0) { acknakpending -= 1; }
 
@@ -2919,23 +2919,23 @@ int main(int argc, char * argv[])
                     switch (ss) {
                     case YODEL_UBX_CFG_VALGET_Size_BIT:
                         memcpy(&vv1, bb, sizeof(vv1));
-                        DIMINUTO_LOG_INFORMATION("UBX CFG VALGET v%d %s [%d] 0x%08x 0x%01x\n", pp->version, layer, ii, kk, vv1);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%01x\n", pp->version, layer, ii, kk, vv1);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_ONE:
                         memcpy(&vv1, bb, sizeof(vv1));
-                        DIMINUTO_LOG_INFORMATION("UBX CFG VALGET v%d %s [%d] 0x%08x 0x%02x\n", pp->version, layer, ii, kk, vv1);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%02x\n", pp->version, layer, ii, kk, vv1);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_TWO:
                         memcpy(&vv16, bb, sizeof(vv16));
-                        DIMINUTO_LOG_INFORMATION("UBX CFG VALGET v%d %s [%d] 0x%08x 0x%04x\n", pp->version, layer, ii, kk, vv16);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%04x\n", pp->version, layer, ii, kk, vv16);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_FOUR:
                         memcpy(&vv32, bb, sizeof(vv32));
-                        DIMINUTO_LOG_INFORMATION("UBX CFG VALGET v%d %s [%d] 0x%08x 0x%08x\n", pp->version,layer, ii, kk, vv32);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%08x\n", pp->version,layer, ii, kk, vv32);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_EIGHT:
                         memcpy(&vv64, bb, sizeof(vv64));
-                        DIMINUTO_LOG_INFORMATION("UBX CFG VALGET v%d %s [%d] 0x%08x 0x%016llx\n", pp->version, layer, ii, kk, (unsigned long long)vv64);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%016llx\n", pp->version, layer, ii, kk, (unsigned long long)vv64);
                         break;
                     }
 
@@ -2953,15 +2953,15 @@ int main(int argc, char * argv[])
                 do {
 
                     if (bb >= ee) { break; }
-                    DIMINUTO_LOG_INFORMATION("UBX MON VER SW \"%s\"\n", bb);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON VER SW \"%s\"\n", bb);
                     bb += YODEL_UBX_MON_VER_swVersion_LENGTH;
 
                     if (bb >= ee) { break; }
-                    DIMINUTO_LOG_INFORMATION("UBX MON VER HW \"%s\"\n", bb);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON VER HW \"%s\"\n", bb);
                     bb += YODEL_UBX_MON_VER_hwVersion_LENGTH;
 
                     while (bb < ee) {
-                        DIMINUTO_LOG_INFORMATION("UBX MON VER EX \"%s\"\n", bb);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX MON VER EX \"%s\"\n", bb);
                         bb += YODEL_UBX_MON_VER_extension_LENGTH;
                     }
 
@@ -2979,7 +2979,7 @@ int main(int argc, char * argv[])
 
             } else if (unknown) {
 
-                DIMINUTO_LOG_WARNING("UBX 0x%02x%02x%02x%02x\n", buffer[YODEL_UBX_SYNC_1], buffer[YODEL_UBX_SYNC_2], buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
+                DIMINUTO_LOG_WARNING("Parse UBX Other 0x%02x%02x%02x%02x\n", buffer[YODEL_UBX_SYNC_1], buffer[YODEL_UBX_SYNC_2], buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             } else {
 
@@ -3003,7 +3003,7 @@ int main(int argc, char * argv[])
             if (length < kinematics.minimum) { kinematics.minimum = length; }
             if (length > kinematics.maximum) { kinematics.maximum = length; }
 
-            if (verbose) { fprintf(stderr, "%s: RTCM <%d> [%zd] [%zd] [%zd]\n", Program, kinematics.number, kinematics.minimum, kinematics.length, kinematics.maximum); }
+            DIMINUTO_LOG_DEBUG("Parse RTCM Update <%d> [%zd] [%zd] [%zd]\n", kinematics.number, kinematics.minimum, kinematics.length, kinematics.maximum);
 
             kinematics.ticks = timeout;
             refresh = !0;
