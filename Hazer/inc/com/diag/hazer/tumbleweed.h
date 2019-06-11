@@ -304,6 +304,15 @@ extern int tumbleweed_message(const void * buffer, size_t size);
  * KEEPALIVE RTCM MESSAGE
  ******************************************************************************/
 
+/**
+ * @edefine TUMBLEWEED_KEEPALIVE_INITIALIZER
+ * This is what a keepalive message looks like.
+ */
+#define TUMBLEWEED_KEEPALIVE_INITIALIZER { 0xd3, 0x00, 0x00, 0x47, 0xea, 0x4b, }
+
+/**
+ * This is a preallocated and preinitialized keepalive message.
+ */
 extern const uint8_t TUMBLEWEED_KEEPALIVE[6];
 
 /******************************************************************************

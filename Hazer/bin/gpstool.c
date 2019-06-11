@@ -61,8 +61,8 @@
 #include <signal.h>
 #include <pthread.h>
 #include <locale.h>
-#include "./gpstool.h"
 #include "./common.h"
+#include "./gpstool.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
@@ -148,7 +148,7 @@ static inline uint64_t abs64(int64_t datum)
     return (datum >= 0) ? datum : -datum;
 }
 
-static inline diminuto_sticks_t ticktock(diminuto_sticks_t frequency)
+static inline long ticktock(diminuto_sticks_t frequency)
 {
     return diminuto_time_elapsed() / frequency;
 }
@@ -1237,7 +1237,6 @@ int main(int argc, char * argv[])
     int report = 0;
     int strobepin = -1;
     int ppspin = -1;
-    int ignorechecksums = 0;
     int slow = 0;
     int expire = 0;
     int unknown = 0;
@@ -1306,7 +1305,7 @@ int main(int argc, char * argv[])
     /*
      * Keepalive variables.
      */
-    datagram_buffer_t keepalive_buffer = DATAGRAM_BUFFER_INITIALIZER;
+    struct { datagram_header_t header; uint8_t payload[sizeof(TUMBLEWEED_KEEPALIVE)]; } keepalive_buffer = { { 0, }, TUMBLEWEED_KEEPALIVE_INITIALIZER };
     datagram_sequence_t keepalive_sequence = 0;
     /*
      * File Descriptor variables.
@@ -1425,16 +1424,16 @@ int main(int argc, char * argv[])
      * Time keeping variables.
      */
     diminuto_sticks_t frequency = 0;
-    diminuto_sticks_t expiration_was = 0;
-    diminuto_sticks_t expiration_now = 0;
-    diminuto_sticks_t display_was = 0;
-    diminuto_sticks_t display_now = 0;
-    diminuto_sticks_t keepalive_was = 0;
-    diminuto_sticks_t keepalive_now = 0;
     diminuto_sticks_t elapsed = 0;
     diminuto_sticks_t epoch = 0;
     diminuto_sticks_t fix = -1;
     diminuto_sticks_t timetofirstfix = -1;
+    long expiration_was = 0;
+    long expiration_now = 0;
+    long display_was = 0;
+    long display_now = 0;
+    long keepalive_was = 0;
+    long keepalive_now = 0;
     /*
      * I/O buffer variables.
      */
@@ -1446,7 +1445,7 @@ int main(int argc, char * argv[])
     /*
      * Source variables.
      */
-    diminuto_mux_t mux;
+    diminuto_mux_t mux = { 0 };
     int ch = EOF;
     int ready = 0;
     int fd = -1;
@@ -1494,7 +1493,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:CD:EFG:H:I:KL:ORS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: AJNPQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:ORS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNPQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1510,8 +1509,6 @@ int main(int argc, char * argv[])
     Hostname[sizeof(Hostname) - 1] = '\0';
 
     locale = setlocale(LC_ALL, "");
-
-    diminuto_mux_init(&mux);
 
     /*
      * OPTIONS
@@ -1534,9 +1531,6 @@ int main(int argc, char * argv[])
         case 'B':
             io_size = strtoul(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (io_size < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
-            break;
-        case 'C':
-            ignorechecksums = !0;
             break;
         case 'D':
             device = optarg;
@@ -1750,6 +1744,12 @@ int main(int argc, char * argv[])
     }
 
     /*
+     * Initialize the multiplexer.
+     */
+
+    diminuto_mux_init(&mux);
+
+    /*
      * Are we consuming GPS data from an IP port, or producing GPS data to an
      * IP host and port? This feature is useful for forwarding data from a
      * mobile receiver to a stationary server, for example a vehicle tracking
@@ -1860,14 +1860,6 @@ int main(int argc, char * argv[])
     }
 
     if (surveyor_fd >= 0) { show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp); }
-
-    /*
-     * One time initialization of our keepalive datagram, in case we use it.
-     * This is kinda a gross misuse of space since we're storing a tiny datum
-     * in a buffer big enough to store the largest datagram.
-     */
-
-    memcpy(keepalive_buffer.payload.data, TUMBLEWEED_KEEPALIVE, sizeof(TUMBLEWEED_KEEPALIVE));
 
     /*
      * Are we strobing a GPIO pin with the one pulse per second (1PPS)
@@ -2109,7 +2101,9 @@ int main(int argc, char * argv[])
      * Start the clock.
      */
 
-    display_now = display_was = expiration_now = expiration_was = keepalive_now = keepalive_was = (epoch = diminuto_time_elapsed()) / (frequency = diminuto_frequency());
+    display_now = display_was = expiration_now = expiration_was = keepalive_now = (epoch = diminuto_time_elapsed()) / (frequency = diminuto_frequency());
+
+    keepalive_was = keepalive_now - keepalive;
 
     /*
      * Initialize all state machines to attempt synchronization with the
@@ -2183,7 +2177,7 @@ int main(int argc, char * argv[])
 			fd = in_fd;
 		} else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
 			/* Do nothing. */
-		} else if ((ready = diminuto_mux_wait(&mux, 0 /* frequency */)) == 0) {
+		} else if ((ready = diminuto_mux_wait(&mux, frequency)) == 0) {
 			fd = -1;
 		} else if (ready > 0) {
 			fd = diminuto_mux_ready_read(&mux);
@@ -2354,9 +2348,9 @@ int main(int argc, char * argv[])
 
 				DIMINUTO_LOG_WARNING("Remote socket (%d) [%zd]\n", remote_fd, remote_total);
 
-			} else if ((remote_size = validate_datagram(&remote_sequence, &remote_buffer, remote_total)) < 0) {
+			} else if ((remote_size = validate_datagram(&remote_sequence, &remote_buffer.header, remote_total)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Remote order (%d) [%zd] %lu %lu\n", remote_fd, remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.sequence));
+				DIMINUTO_LOG_NOTICE("Remote order (%d) [%zd] %lu %lu\n", remote_fd, remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
 			} else if ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0) {
 
@@ -2395,9 +2389,9 @@ int main(int argc, char * argv[])
 
 				DIMINUTO_LOG_WARNING("Surveyor socket (%d) [%zd]\n", surveyor_fd, surveyor_total);
 
-			} else if ((surveyor_size = validate_datagram(&surveyor_sequence, &surveyor_buffer, surveyor_total)) < 0) {
+			} else if ((surveyor_size = validate_datagram(&surveyor_sequence, &surveyor_buffer.header, surveyor_total)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Surveyor order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.sequence));
+				DIMINUTO_LOG_NOTICE("Surveyor order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
 
 			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
 
@@ -2453,18 +2447,25 @@ int main(int argc, char * argv[])
          * in survey mode and one or more mobile rovers. I borrowed this
          * technique from SIP, where VoIP phones issue keepalives to PBXen like
          * Asterisk every twenty-five seconds, under the assumption that a
-         * typical firewall UDP "connection" timeout is thirty seconds.
+         * typical firewall UDP "connection" timeout is thirty seconds. Also:
+         * we delay sending keepalives until we have completed initializing
+         * the device with any configuration, since it might not be ready to
+         * receive RTCM messages until then.
          */
 
         if (surveyor_fd < 0) {
             /* Do nothing. */
         } else if (keepalive < 0) {
             /* Do nothing. */
+        } else if (acknakpending > 0) {
+            /* Do nothing. */
+        } else if (!diminuto_list_isempty(&command_list)) {
+            /* Do nothing. */
         } else if (((keepalive_now = ticktock(frequency)) - keepalive_was) < keepalive) {
             /* Do nothing. */
         } else {
-        	stamp_datagram(&keepalive_buffer, &keepalive_sequence);
-            send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(datagram_sequence_t) + sizeof(TUMBLEWEED_KEEPALIVE));
+        	stamp_datagram(&keepalive_buffer.header, &keepalive_sequence);
+            send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             keepalive_was = keepalive_now;
             DIMINUTO_LOG_DEBUG("Surveyor keepalive sent");
         }
@@ -2581,8 +2582,8 @@ int main(int argc, char * argv[])
         } else {
         	datagram_buffer_t * dp;
         	dp = diminuto_containerof(datagram_buffer_t, payload, buffer);
-        	stamp_datagram(dp, &remote_sequence);
-            send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->sequence) + length);
+        	stamp_datagram(&(dp->header), &remote_sequence);
+            send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
         }
 
         /**
@@ -3024,9 +3025,9 @@ int main(int argc, char * argv[])
         /*
          * This code is just for testing the expiration feature.
          * It turns out to be remarkably difficult to block the most recent
-         * GPS receivers, e.g. the UBlox 8. Multiple RF-shielded bags will not
-         * block the GPS frequencies. Makes me wish I still had access to those
-         * gigantic walk-in Faraday cages that several of my clients have.
+         * GPS receivers, e.g. the UBlox 8. Makes me wish I still had access
+         * to those gigantic walk-in Faraday cages that several of my clients
+         * have.
          */
 
         if (!expire) {

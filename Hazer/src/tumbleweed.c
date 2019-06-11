@@ -398,4 +398,4 @@ ssize_t tumbleweed_validate(const void * buffer, size_t size)
  *
  ******************************************************************************/
 
-const uint8_t TUMBLEWEED_KEEPALIVE[6] = { 0xd3, 0x00, 0x00, 0x47, 0xea, 0x4b, };
+const uint8_t TUMBLEWEED_KEEPALIVE[6] = TUMBLEWEED_KEEPALIVE_INITIALIZER;

@@ -31,6 +31,15 @@
 typedef uint32_t datagram_sequence_t;
 
 /**
+ * All UDP datagrams that this application sends or receives starts with
+ * a header containing a thirty-two bit sequence number.
+ */
+typedef struct DatagramHeader {
+	datagram_sequence_t sequence;
+	uint8_t data[0];
+} datagram_header_t;
+
+/**
  * This is mostly just so the initializer zeros everything.
  */
 enum {
@@ -53,7 +62,7 @@ enum {
  * field that is transmitted over wire or air in network byte order.
  */
 typedef struct DatagramBuffer {
-	datagram_sequence_t sequence;
+	datagram_header_t header;
 	union {
 		uint8_t data[DATAGRAM_SIZE + 1];
 		hazer_buffer_t nmea;
@@ -66,7 +75,7 @@ typedef struct DatagramBuffer {
  * @define DATAGRAM_BUFFER_INITIALIZER
  * Initialize a DatagramBuffer type.
  */
-#define DATAGRAM_BUFFER_INITIALIZER  { 0, { { '\0', } }, }
+#define DATAGRAM_BUFFER_INITIALIZER  { { 0, }, { { '\0', } }, }
 
 /**
  * Check to see if this datagram came out of order (it's okay if there are gaps
@@ -76,17 +85,17 @@ typedef struct DatagramBuffer {
  * @param length is the number of bytes in the datagram buffer.
  * @return the size of the actual payload of the buffer or <0 if out of order.
  */
-static inline ssize_t validate_datagram(datagram_sequence_t * sequencep, datagram_buffer_t * buffer, ssize_t length)
+static inline ssize_t validate_datagram(datagram_sequence_t * sequencep, datagram_header_t * buffer, ssize_t length)
 {
 	ssize_t result = -1;
 	datagram_sequence_t sequence = 0;
 
-	if (length < sizeof(datagram_sequence_t)) {
+	if (length < sizeof(datagram_header_t)) {
 		/* Do nothing. */
 	} else if ((sequence = ntohl(buffer->sequence)) < *sequencep) {
 		/* Do nothing. */
 	} else {
-		result = length - sizeof(datagram_sequence_t);
+		result = length - sizeof(datagram_header_t);
 		*sequencep = sequence + 1;
 	}
 
@@ -99,7 +108,7 @@ static inline ssize_t validate_datagram(datagram_sequence_t * sequencep, datagra
  * @param buffer points to the datagram buffer.
  * @param sequencep points to the expected sequence counter.
  */
-static inline void stamp_datagram(datagram_buffer_t * buffer, datagram_sequence_t * sequencep)
+static inline void stamp_datagram(datagram_header_t * buffer, datagram_sequence_t * sequencep)
 {
 	buffer->sequence = htonl(*sequencep);
 	*sequencep += 1;
