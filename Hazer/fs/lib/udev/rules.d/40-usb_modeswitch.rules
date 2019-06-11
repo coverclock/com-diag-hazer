@@ -1,0 +1,4 @@
+# Novatel Generic MiFi USB620L v1410p9020
+ACTION=="add" ATTR{idVendor}=="1410", ATTR{idProduct}=="9020", RUN+="/usr/local/sbin/novatelusb620l"
+# Novatel Generic MiFi USB730L v1410p9030
+ACTION=="add" ATTR{idVendor}=="1410", ATTR{idProduct}=="9030", RUN+="/usr/local/sbin/novatelusb730l"
