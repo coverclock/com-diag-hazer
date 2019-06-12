@@ -300,7 +300,7 @@ int main(int argc, char * argv[])
 			}
 
             if (verbose) {
-				fprintf(stderr, "[%s]:%d [%zd]", diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port, total);
+				fprintf(stderr, "[%s]:%d [%zd]", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
             	diminuto_dump(stderr, &buffer, total);
             }
 
