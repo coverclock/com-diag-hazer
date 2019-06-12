@@ -119,6 +119,7 @@ int main(int argc, char * argv[])
     diminuto_tree_t * node = DIMINUTO_TREE_NULL;
     diminuto_tree_t * last = DIMINUTO_TREE_NULL;
     diminuto_tree_t * next = DIMINUTO_TREE_NULL;
+    diminuto_tree_t * temp = DIMINUTO_TREE_NULL;
     client_t * this = (client_t *)0;
     client_t * that = (client_t *)0;
     client_t * base = (client_t *)0;
@@ -288,6 +289,8 @@ int main(int argc, char * argv[])
 			if (this == (client_t *)0) {
 			    this = (client_t *)calloc(1, sizeof(client_t));
 			    assert(this != (client_t *)0);
+			    temp = diminuto_tree_nullinit(&(this->node));
+			    assert(temp != (diminuto_tree_t *)0);
 			}
 
 			/*
