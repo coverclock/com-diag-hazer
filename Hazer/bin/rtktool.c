@@ -429,6 +429,7 @@ int main(int argc, char * argv[])
 					that = diminuto_containerof(client_t, node, node);
 					if (that->role == ROVER) {
 						(void)diminuto_ipc6_datagram_send(sock, &buffer, size, that->address, that->port);
+						if (debug) { DIMINUTO_LOG_DEBUG("Client Sent %s [%s]:%d", "rover", diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port); }
 					}
 					if (node == last) { break; }
 					node = diminuto_tree_next(node);
