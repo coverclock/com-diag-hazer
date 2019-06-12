@@ -214,6 +214,8 @@ int main(int argc, char * argv[])
 
     sock = diminuto_ipc6_datagram_peer(endpoint.udp);
     assert(sock >= 0);
+    DIMINUTO_LOG_INFORMATION("Connection (%d) \"%s\" [%s]:%d", sock, rendezvous, diminuto_ipc6_address2string(endpoint.ipv6, ipv6, sizeof(ipv6)), endpoint.udp);
+
 
     rc = diminuto_mux_register_interrupt(&mux, sock);
     assert(rc >= 0);
@@ -293,7 +295,7 @@ int main(int argc, char * argv[])
 			 */
 
 			if ((total = diminuto_ipc6_datagram_receive_generic(sock, &buffer, sizeof(buffer), &(this->address), &(this->port), 0)) < sizeof(buffer.header)) {
-				DIMINUTO_LOG_WARNING("Router Length (%d) [%zd]\n", sock, total);
+				DIMINUTO_LOG_WARNING("Datagram Length (%d) [%zd]\n", sock, total);
 				continue;
 			}
 
@@ -328,12 +330,12 @@ int main(int argc, char * argv[])
 
 			if ((size = validate_datagram(&(that->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Router Order [%zd] {%lu} {%lu}\n", total, (unsigned long)(that->sequence), (unsigned long)ntohl(buffer.header.sequence));
+				DIMINUTO_LOG_NOTICE("Datagram Order [%zd] {%lu} {%lu}\n", total, (unsigned long)(that->sequence), (unsigned long)ntohl(buffer.header.sequence));
 				continue;
 
 			} else if ((length = tumbleweed_validate(buffer.payload.rtcm, size)) < TUMBLEWEED_RTCM_SHORTEST) {
 
-				DIMINUTO_LOG_WARNING("Router Data [%zd] [%zd] [%zd] 0x%02x\n", total, size, length, buffer.payload.data[0]);
+				DIMINUTO_LOG_WARNING("Datagram Data [%zd] [%zd] [%zd] 0x%02x\n", total, size, length, buffer.payload.data[0]);
 				continue;
 
 			} else if (length > TUMBLEWEED_RTCM_SHORTEST) {
@@ -349,7 +351,7 @@ int main(int argc, char * argv[])
 			}
 
 			if (this == (client_t *)0) {
-				DIMINUTO_LOG_NOTICE("Router New %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
+				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
 			}
 
 			/*
@@ -370,7 +372,7 @@ int main(int argc, char * argv[])
 			} else if (base == (client_t *)0) {
 				base = that;
 			} else {
-				DIMINUTO_LOG_WARNING("Router Was %s [%s]:%d", "base", diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
+				DIMINUTO_LOG_WARNING("Client Was %s [%s]:%d", "base", diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
 				node = diminuto_tree_remove(&(base->node));
 				assert(node != (diminuto_tree_t *)0);
 				free(base);
@@ -387,7 +389,7 @@ int main(int argc, char * argv[])
 			} else if (base != that) {
 				/* Do nothing. */
 			} else {
-				DIMINUTO_LOG_WARNING("Router Now %s [%s]:%d", "rover", diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
+				DIMINUTO_LOG_WARNING("Client Now %s [%s]:%d", "rover", diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
 				base = (client_t *)0;
 			}
 
@@ -453,7 +455,7 @@ int main(int argc, char * argv[])
 					} else {
 						label = "rover";
 					}
-					DIMINUTO_LOG_NOTICE("Router Old %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
+					DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
 					next = diminuto_tree_next(node);
 					node = diminuto_tree_remove(&(that->node));
 					assert(node != (diminuto_tree_t *)0);
@@ -506,6 +508,8 @@ int main(int argc, char * argv[])
 		}
 
 	}
+
+	DIMINUTO_LOG_INFORMATION("Exit");
 
     return 0;
 }
