@@ -1804,7 +1804,7 @@ int main(int argc, char * argv[])
 
     }
 
-    if (remote_fd >= 0) { show_connection("Datagram", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp); }
+    if (remote_fd >= 0) { show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp); }
 
     /*
      * Are we receiving RTK corrections in the form of RTCM messages from a
