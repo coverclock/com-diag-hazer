@@ -11,7 +11,7 @@
 # given the conditions under which I did the test.
 
 PROGRAM=$(basename ${0})
-ROUTER=${1:-"localhost:2101"}
+ROUTER=${1:-"localhost:21010"}
 DEVICE=${2:-"/dev/ttyACM0"}
 RATE=${3:-115200}
 

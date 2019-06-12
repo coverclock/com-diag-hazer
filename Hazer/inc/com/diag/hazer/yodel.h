@@ -1,6 +1,6 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
-#ifndef _H_COM_DIAG_YODEL_
-#define _H_COM_DIAG_YODEL_
+#ifndef _H_COM_DIAG_HAZER_YODEL_
+#define _H_COM_DIAG_HAZER_YODEL_
 
 /**
  * @file

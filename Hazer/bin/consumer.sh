@@ -11,7 +11,7 @@
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-PORT=${1:-"5555"}
+PORT=${1:-"29470"}
 
 stty sane
 clear

@@ -35,7 +35,6 @@
 #include "com/diag/hazer/hazer_vintage.h"
 #include "com/diag/hazer/tumbleweed.h"
 #include "com/diag/diminuto/diminuto_fd.h"
-#include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_mux.h"
 #include "com/diag/diminuto/diminuto_log.h"
@@ -62,6 +61,32 @@ static const char * Program = (const char *)0;
  */
 static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 
+static const client_t CLIENT = CLIENT_INITIALIZER;
+
+/*******************************************************************************
+ * HELPERS
+ ******************************************************************************/
+
+static int comparator(diminuto_tree_t * tap, diminuto_tree_t * tbp)
+{
+	int rc = 0;
+	client_t * cap = (client_t *)0;
+	client_t * cbp = (client_t *)0;
+
+	cap = diminuto_containerof(client_t, node, tap);
+	cbp = diminuto_containerof(client_t, node, tbp);
+
+	if ((rc = diminuto_ipc6_compare(&(cap->address), &(cbp->address))) != 0) {
+		/* Do nothing. */
+	} else if ((rc = cap->port - cbp->port) != 0) {
+		/* Do nothing. */
+	} else {
+		/* Do nothing. */
+	}
+
+	return rc;
+}
+
 /*******************************************************************************
  * MAIN
  ******************************************************************************/
@@ -83,19 +108,31 @@ int main(int argc, char * argv[])
     char * end = (char *)0;
     int rc = 0;
     char * locale = (char *)0;
-    diminuto_port_t rendezvous = 2101;
-    diminuto_ipv6_t address = { 0, };
-    diminuto_port_t port = 0;
+    const char * rendezvous = (const char *)0;
+    diminuto_ipc_endpoint_t endpoint = { 0, };
     diminuto_ipv6_buffer_t ipv6 = { 0, };
-    datagram_buffer_t datagram = DATAGRAM_BUFFER_INITIALIZER;
+    datagram_buffer_t buffer = DATAGRAM_BUFFER_INITIALIZER;
+    ssize_t total = 0;
+    ssize_t size = 0;
     ssize_t length = 0;
     diminuto_tree_t * root = DIMINUTO_TREE_EMPTY;
-    diminuto_tree_t node = DIMINUTO_TREE_NULLINIT;
+    diminuto_tree_t * node = DIMINUTO_TREE_NULL;
+    diminuto_tree_t * last = DIMINUTO_TREE_NULL;
+    diminuto_tree_t * next = DIMINUTO_TREE_NULL;
+    client_t * this = (client_t *)0;
+    client_t * that = (client_t *)0;
+    client_t * base = (client_t *)0;
+    role_t role = ROLE;
+    const char * label = (const char *)0;
     diminuto_mux_t mux = { 0 };
     int ready = 0;
     int fd = -1;
     diminuto_sticks_t frequency = 0;
-    static const char OPTIONS[] = "P:Vdt:v?";
+    long now = 0;
+    long was = 0;
+    unsigned int outoforder = 0;
+    unsigned int missing = 0;
+    static const char OPTIONS[] = "Vdp:t:v?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -122,16 +159,17 @@ int main(int argc, char * argv[])
 
     while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
-        case 'P':
-        	rendezvous = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (rendezvous < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
-        	break;
         case 'V':
             fprintf(stderr, "%s: version com-diag-hazer %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'd':
             debug = !0;
             break;
+        case 'p':
+            rendezvous = optarg;
+            rc = diminuto_ipc_endpoint(rendezvous, &endpoint);
+            if (rc < 0) { diminuto_perror(optarg); error = !0; }
+        	break;
         case 't':
             timeout = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (timeout < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
@@ -140,11 +178,10 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -V ] [ -P PORT ]"
-                           "\n", Program);
-            fprintf(stderr, "       -P PORT     Use PORT as the RTCM source and sink port.\n");
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -V ] [ -p PORT ]\n", Program);
             fprintf(stderr, "       -V          Print release, Vintage, and revision on standard output.\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
+            fprintf(stderr, "       -p PORT     Use PORT as the RTCM source and sink port.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
             return 1;
             break;
@@ -172,7 +209,7 @@ int main(int argc, char * argv[])
 
     diminuto_mux_init(&mux);
 
-    sock = diminuto_ipc6_datagram_peer(port);
+    sock = diminuto_ipc6_datagram_peer(endpoint.udp);
     assert(sock >= 0);
 
     rc = diminuto_mux_register_interrupt(&mux, sock);
@@ -181,23 +218,36 @@ int main(int argc, char * argv[])
     frequency = diminuto_frequency();
     assert(frequency > 0);
 
+    now = was = diminuto_time_elapsed() / frequency;
+    assert(now >= 0);
+
     /***************************************************************************
      * WORK
      **************************************************************************/
 
     while (!0) {
 
+    	/*
+    	 * Check our signal handlers.
+    	 */
+
 		if (diminuto_terminator_check()) {
+			DIMINUTO_LOG_NOTICE("SIGTERM");
 			break;
 		}
 
 		if (diminuto_interrupter_check()) {
+			DIMINUTO_LOG_NOTICE("SIGINT");
 			break;
 		}
 
 		if (diminuto_hangup_check()) {
-			/* Do nothing. */
+			DIMINUTO_LOG_NOTICE("SIGHUP OutOfOrder=%u Missing=%u", outoforder, missing);
 		}
+
+		/*
+		 * Wait until our socket needs to be serviced... or we time out.
+		 */
 
 		if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
 			/* Fall through. */
@@ -211,40 +261,200 @@ int main(int argc, char * argv[])
 			assert(0); /* Should be impossible! */
 		}
 
-		if (fd != sock) {
+		/*
+		 * Get a timestamp.
+		 */
 
-			/* TODO */
+		now = diminuto_time_elapsed() / frequency;
+
+		/*
+		 * Service the socket.
+		 */
+
+		if (fd == sock) {
+
+			/*
+			 * If we don't have a new node handy, make a new one and zero
+			 * it out.
+			 */
+
+			if (this == (client_t *)0) {
+			    this = (client_t *)calloc(1, sizeof(client_t));
+			    assert(this != (client_t *)0);
+			}
+
+			/*
+			 * Receive the pending datagram.
+			 */
+
+			if ((total = diminuto_ipc6_datagram_receive_generic(sock, &buffer, sizeof(buffer), &(this->address), &(this->port), 0)) < sizeof(buffer.header)) {
+				DIMINUTO_LOG_WARNING("Router Length (%d) [%zd]\n", sock, total);
+				continue;
+			}
+
+			/*
+			 * See if we know about this client.
+			 */
+
+			node = diminuto_tree_search(root, &(this->node), &comparator, &rc);
+
+			/*
+			 * If we don't, add it to the database.
+			 */
+
+			if (node == (diminuto_tree_t *)0) {
+				node = diminuto_tree_insert_root(&(this->node), &root);
+				this = (client_t *)0;
+			} else if (rc < 0) {
+				node = diminuto_tree_insert_left(&(this->node), node);
+				this = (client_t *)0;
+			} else if (rc > 0) {
+				node = diminuto_tree_insert_right(&(this->node), node);
+				this = (client_t *)0;
+			} else {
+				/* Do nothing. */
+			}
+
+			that = diminuto_containerof(client_t, node, node);
+
+			/*
+			 * Validate the datagram.
+			 */
+
+			if ((size = validate_datagram(&(that->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {
+
+				DIMINUTO_LOG_NOTICE("Router Order [%zd] {%lu} {%lu}\n", total, (unsigned long)(that->sequence), (unsigned long)ntohl(buffer.header.sequence));
+				continue;
+
+			} else if ((length = tumbleweed_validate(buffer.payload.rtcm, size)) < TUMBLEWEED_RTCM_SHORTEST) {
+
+				DIMINUTO_LOG_WARNING("Router Data [%zd] [%zd] [%zd] 0x%02x\n", total, size, length, buffer.payload.data[0]);
+				continue;
+
+			} else if (length > TUMBLEWEED_RTCM_SHORTEST) {
+
+				role = BASE;
+				label = "base";
+
+			} else {
+
+				role = ROVER;
+				label = "rover";
+
+			}
+
+			if (this == (client_t *)0) {
+				DIMINUTO_LOG_NOTICE("Router New %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
+			}
+
+			/*
+			 * Timestamp the client.
+			 */
+
+			that->then = now;
+
+			/*
+			 * If this is a base, check if it is the first one, or replaces the
+			 * existing one. Like the Highlander, there can only be one!
+			 */
+
+			if (role != BASE) {
+				/* Do nothing. */
+			} else if (base == that) {
+				/* Do nothing. */
+			} else if (base == (client_t *)0) {
+				base = that;
+			} else {
+				DIMINUTO_LOG_WARNING("Router Was %s [%s]:%d", "base", diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
+				node = diminuto_tree_remove(&(base->node));
+				assert(node != (diminuto_tree_t *)0);
+				free(base);
+				base = that;
+			}
+
+			/*
+			 * If this is a rover, check that the base didn't become a rover.
+			 * Sadly, this is also possible with NATting firewalls.
+			 */
+
+			if (role != ROVER) {
+				/* Do nothing. */
+			} else if (base != that) {
+				/* Do nothing. */
+			} else {
+				DIMINUTO_LOG_WARNING("Router Now %s [%s]:%d", "rover", diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
+				base = (client_t *)0;
+			}
+
+			/*
+			 * If this was a base, forward the datagram to all rovers. Note
+			 * that if it is truly a new base, its sequence numbers will
+			 * likely be behind that of the old base, and all of the rovers
+			 * will need to be restarted manually. But it is also possible
+			 * that the base is the same and some darn NATting firewall just
+			 * changed its address (I've seen this happen), in which case the
+			 * sequence numbers are fine.
+			 */
+
+			if (role == BASE) {
+
+				node = diminuto_tree_first(&root);
+				assert(node != (diminuto_tree_t *)0);
+
+				last = diminuto_tree_last(&root);
+				assert(last != (diminuto_tree_t *)0);
+
+				while (!0) {
+					that = diminuto_containerof(client_t, node, node);
+					if (that->role == ROVER) {
+						(void)diminuto_ipc6_datagram_send(sock, &buffer, size, that->address, that->port);
+					}
+					if (node == last) { break; }
+					node = diminuto_tree_next(node);
+				}
+
+			}
 
 		}
-#if 0
-		if ((total = diminuto_ipc6_datagram_receive_generic(sock, &datagram, sizeof(datagram - 1), &address, &port, 0)) <= 0) {
 
-			DIMINUTO_LOG_WARNING("Surveyor socket (%d) [%zd]\n", sock, total);
+		/*
+		 * Once a second or so, step through all of the clients in the database
+		 * and see if any of them have timed out. We time out both rovers and
+		 * bases (so we need to check if its a base).
+		 */
 
-		} else if ((size = validate_datagram(&surveyor_sequence, &surveyor_buffer, surveyor_total)) < 0) {
+		if ((now - was) > 0) {
 
-			DIMINUTO_LOG_NOTICE("Surveyor order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.sequence));
+			node = diminuto_tree_first(&root);
+			assert(node != (diminuto_tree_t *)0);
 
-		} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
+			last = diminuto_tree_last(&root);
+			assert(last != (diminuto_tree_t *)0);
 
-			DIMINUTO_LOG_WARNING("Surveyor data (%d) [%zd] [%zd] [%zd] 0x%02x\n", surveyor_fd, surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
+			while (!0) {
+				that = diminuto_containerof(client_t, node, node);
+				if ((now - that->then) > timeout) {
+					if (that->role == BASE) {
+						base = (client_t *)0;
+						label = "base";
+					} else {
+						label = "rover";
+					}
+					DIMINUTO_LOG_NOTICE("Router Old %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
+					next = diminuto_tree_next(node);
+					node = diminuto_tree_remove(&(that->node));
+					assert(node != (diminuto_tree_t *)0);
+					free(that);
+				} else {
+					next = diminuto_tree_next(node);
+				}
+				if (node == last) { break; }
+				node = next;
+			}
 
-		} else if (surveyor_length == TUMBLEWEED_RTCM_SHORTEST) {
-
-            DIMINUTO_LOG_DEBUG("Surveyor keepalive received");
-
-		if ((length = diminuto_ipc6_datagram_receive_generic(sock, &datagram, sizeof(datagram - 1), &address, &port, 0)) <= 0) {
-			/* Do nothing. */
-			/* TODO */
-
-		} else {
+			was = now;
 
 		}
-
-    	//DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\" [%s]:%d", label, fd, option, diminuto_ipc6_address2string(*ipv6p, ipv6, sizeof(ipv6)), port);
-
-    	//(void)diminuto_ipc6_datagram_send(fd, buffer, size, *ipv6p, port);
-#endif
 
     }
 

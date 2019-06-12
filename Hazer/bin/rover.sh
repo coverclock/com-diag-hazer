@@ -6,7 +6,7 @@
 # Configure and run the Ardusimple SimpleRTK2B as a mobile Rover.
 
 PROGRAM=$(basename ${0})
-ROUTER=${1:-"localhost:2101"}
+ROUTER=${1:-"localhost:21010"}
 DEVICE=${2:-"/dev/ttyACM0"}
 RATE=${3:-115200}
 

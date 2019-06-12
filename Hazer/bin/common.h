@@ -81,22 +81,30 @@ typedef struct DatagramBuffer {
  * Check to see if this datagram came out of order (it's okay if there are gaps
  * in the sequence, we expect that).
  * @param sequencep points to the expected sequence counter.
- * @param buffer points to the datagram buffer.
- * @param length is the number of bytes in the datagram buffer.
+ * @param header points to the datagram header.
+ * @param length is the total number of received bytes including the header.
+ * @param outoforderp points to the Out Of Order counter.
+ * @param missingp points to the Missing counter.
  * @return the size of the actual payload of the buffer or <0 if out of order.
  */
-static inline ssize_t validate_datagram(datagram_sequence_t * sequencep, datagram_header_t * buffer, ssize_t length)
+static inline ssize_t validate_datagram(datagram_sequence_t * sequencep, datagram_header_t * header, ssize_t length, unsigned int * outoforderp, unsigned int * missingp)
 {
 	ssize_t result = -1;
 	datagram_sequence_t sequence = 0;
 
-	if (length < sizeof(datagram_header_t)) {
-		/* Do nothing. */
-	} else if ((sequence = ntohl(buffer->sequence)) < *sequencep) {
-		/* Do nothing. */
+	sequence = ntohl(header->sequence);
+	if (sequence < *sequencep) {
+		*outoforderp += 1;
 	} else {
-		result = length - sizeof(datagram_header_t);
+		if (*sequencep == 0) {
+			/* Do nothing. */
+		} else if (sequence == *sequencep) {
+			/* Do nothing. */
+		} else {
+			*missingp += sequence - *sequencep - 1;
+		}
 		*sequencep = sequence + 1;
+		result = length - sizeof(datagram_header_t);
 	}
 
 	return result;

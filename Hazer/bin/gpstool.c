@@ -1479,6 +1479,11 @@ int main(int argc, char * argv[])
     int dmyokay = 0;
     int totokay = 0;
     /*
+     * Counters.
+     */
+    unsigned int outoforder_counter = 0;
+    unsigned int missing_counter = 0;
+    /*
      * Miscellaneous variables.
      */
     int rc = 0;
@@ -2101,9 +2106,9 @@ int main(int argc, char * argv[])
      * Start the clock.
      */
 
-    display_now = display_was = expiration_now = expiration_was = keepalive_now = (epoch = diminuto_time_elapsed()) / (frequency = diminuto_frequency());
+    display_now = display_was = expiration_now = expiration_was = keepalive_now = keepalive_was = (epoch = diminuto_time_elapsed()) / (frequency = diminuto_frequency());
 
-    keepalive_was = keepalive_now - keepalive;
+    keepalive_was -= keepalive;
 
     /*
      * Initialize all state machines to attempt synchronization with the
@@ -2148,15 +2153,17 @@ int main(int argc, char * argv[])
 	     */
 
 		if (diminuto_terminator_check()) {
+			DIMINUTO_LOG_NOTICE("SIGTERM");
 			break;
 		}
 
 		if (diminuto_interrupter_check()) {
+			DIMINUTO_LOG_NOTICE("SIGINT");
 			break;
 		}
 
 		if (diminuto_hangup_check()) {
-			/* Do nothing. */
+			DIMINUTO_LOG_NOTICE("SIGHUP OutOfOrder=%u Missing=%u", outoforder_counter, missing_counter);
 		}
 
 		/**
@@ -2344,11 +2351,11 @@ int main(int argc, char * argv[])
 			 * is a serious bug either in this software or in the transport.
 			 */
 
-			if ((remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer))) <= 0) {
+			if ((remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer))) < sizeof(remote_buffer.header)) {
 
-				DIMINUTO_LOG_WARNING("Remote Socket (%d) [%zd]\n", remote_fd, remote_total);
+				DIMINUTO_LOG_WARNING("Remote Length (%d) [%zd]\n", remote_fd, remote_total);
 
-			} else if ((remote_size = validate_datagram(&remote_sequence, &remote_buffer.header, remote_total)) < 0) {
+			} else if ((remote_size = validate_datagram(&remote_sequence, &remote_buffer.header, remote_total, &outoforder_counter, &missing_counter)) < 0) {
 
 				DIMINUTO_LOG_NOTICE("Remote Order (%d) [%zd] %lu %lu\n", remote_fd, remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
@@ -2385,11 +2392,11 @@ int main(int argc, char * argv[])
 			 * Receive an RTCM message from a remote gpstool doing a survey.
 			 */
 
-			if ((surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer))) <= 0) {
+			if ((surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer))) < sizeof(surveyor_buffer.header)) {
 
-				DIMINUTO_LOG_WARNING("Surveyor Socket (%d) [%zd]\n", surveyor_fd, surveyor_total);
+				DIMINUTO_LOG_WARNING("Surveyor Length (%d) [%zd]\n", surveyor_fd, surveyor_total);
 
-			} else if ((surveyor_size = validate_datagram(&surveyor_sequence, &surveyor_buffer.header, surveyor_total)) < 0) {
+			} else if ((surveyor_size = validate_datagram(&surveyor_sequence, &surveyor_buffer.header, surveyor_total, &outoforder_counter, &missing_counter)) < 0) {
 
 				DIMINUTO_LOG_NOTICE("Surveyor Order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
 
@@ -3131,6 +3138,8 @@ int main(int argc, char * argv[])
      **/
 
 	DIMINUTO_LOG_INFORMATION("Stop");
+
+	DIMINUTO_LOG_INFORMATION("Counters OutOfOrder=%u Missing=%u", outoforder_counter, missing_counter);
 
     rc = tumbleweed_finalize();
     assert(rc == 0);
