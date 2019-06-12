@@ -1954,7 +1954,7 @@ int main(int argc, char * argv[])
         rc = diminuto_serial_raw(dev_fd);
         assert(rc == 0);
 
-        dev_fp = fdopen(dev_fd, readonly ? "r" : "a+");
+        dev_fp = fdopen(dev_fd, readonly ? "r" : "w+");
         if (dev_fp == (FILE *)0) { diminuto_perror(device); }
         assert(dev_fp != (FILE *)0);
 
