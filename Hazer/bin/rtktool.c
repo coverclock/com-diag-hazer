@@ -303,7 +303,7 @@ int main(int argc, char * argv[])
 			}
 
             if (verbose) {
-				fprintf(stderr, "[%s]:%d [%zd]", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
+				fprintf(stderr, "[%s]:%d [%zd]\n", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
             	diminuto_dump(stderr, &buffer, total);
             }
 
@@ -318,15 +318,18 @@ int main(int argc, char * argv[])
 			 */
 
 			if (node == (diminuto_tree_t *)0) {
+				assert(root == (diminuto_tree_t *)0);
 				node = diminuto_tree_insert_root(&(this->node), &root);
 				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0;
 			} else if (rc < 0) {
-				node = diminuto_tree_insert_left(&(this->node), node);
+				assert(root != (diminuto_tree_t *)0);
+				node = diminuto_tree_insert_right(&(this->node), node);
 				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0;
 			} else if (rc > 0) {
-				node = diminuto_tree_insert_right(&(this->node), node);
+				assert(root != (diminuto_tree_t *)0);
+				node = diminuto_tree_insert_left(&(this->node), node);
 				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0;
 			} else {
