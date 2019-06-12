@@ -299,6 +299,11 @@ int main(int argc, char * argv[])
 				continue;
 			}
 
+            if (verbose) {
+				fprintf(stderr, "[%s]:%d [%zd]", diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port, total);
+            	diminuto_dump(stderr, &buffer, total);
+            }
+
 			/*
 			 * See if we know about this client.
 			 */
