@@ -178,10 +178,11 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -V ] [ -p PORT ]\n", Program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -V ] [ -p PORT ] [ -t SECONDS ]\n", Program);
             fprintf(stderr, "       -V          Print release, Vintage, and revision on standard output.\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
             fprintf(stderr, "       -p PORT     Use PORT as the RTCM source and sink port.\n");
+            fprintf(stderr, "       -t SECONDS  Set the client timeout to SECONDS seconds.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
             return 1;
             break;
@@ -250,15 +251,15 @@ int main(int argc, char * argv[])
 		 */
 
 		if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
-			/* Fall through. */
-		} else if ((ready = diminuto_mux_wait(&mux, frequency)) < 0) {
-			assert(0); /* Failed! */
-		} else if (ready == 0) {
-			fd = -1; /* Timed out. */
-		} else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
-			/* Fall through. */
+			/* Do nothing. */
+		} else if ((ready = diminuto_mux_wait(&mux, frequency)) == 0) {
+			fd = -1;
+		} else if (ready > 0) {
+			fd = diminuto_mux_ready_read(&mux);
+		} else if (errno == EINTR) {
+			continue;
 		} else {
-			assert(0); /* Should be impossible! */
+			assert(0);
 		}
 
 		/*
@@ -423,7 +424,15 @@ int main(int argc, char * argv[])
 		 * bases (so we need to check if its a base).
 		 */
 
-		if ((now - was) > 0) {
+		if (diminuto_tree_isempty(&root)) {
+
+			/* Do nothing. */
+
+		} else if ((now - was) <= 0) {
+
+			/* Do nothing. */
+
+		} else {
 
 			node = diminuto_tree_first(&root);
 			assert(node != (diminuto_tree_t *)0);
