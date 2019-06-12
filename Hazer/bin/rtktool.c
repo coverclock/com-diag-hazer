@@ -197,6 +197,8 @@ int main(int argc, char * argv[])
      * INITIALIZATION
      **************************************************************************/
 
+    DIMINUTO_LOG_INFORMATION("Begin");
+
     rc = diminuto_terminator_install(0);
     assert(rc >= 0);
 
@@ -225,6 +227,8 @@ int main(int argc, char * argv[])
     /***************************************************************************
      * WORK
      **************************************************************************/
+
+    DIMINUTO_LOG_INFORMATION("Start");
 
     while (!0) {
 
@@ -458,6 +462,7 @@ int main(int argc, char * argv[])
 					next = diminuto_tree_next(node);
 				}
 				if (node == last) { break; }
+				assert(next != (diminuto_tree_t *)0);
 				node = next;
 			}
 
@@ -470,6 +475,37 @@ int main(int argc, char * argv[])
     /***************************************************************************
      * FINALIZATION
      **************************************************************************/
+
+	DIMINUTO_LOG_INFORMATION("Stop");
+
+	DIMINUTO_LOG_INFORMATION("Counters OutOfOrder=%u Missing=%u", outoforder, missing);
+
+    diminuto_mux_fini(&mux);
+
+    rc = diminuto_ipc_close(sock);
+    assert(rc >= 0);
+
+
+	if (!diminuto_tree_isempty(&root)) {
+
+		node = diminuto_tree_first(&root);
+		assert(node != (diminuto_tree_t *)0);
+
+		last = diminuto_tree_last(&root);
+		assert(last != (diminuto_tree_t *)0);
+
+		while (!0) {
+			that = diminuto_containerof(client_t, node, node);
+			next = diminuto_tree_next(node);
+			node = diminuto_tree_remove(&(that->node));
+			assert(node != (diminuto_tree_t *)0);
+			free(that);
+			if (node == last) { break; }
+			assert(next != (diminuto_tree_t *)0);
+			node = next;
+		}
+
+	}
 
     return 0;
 }
