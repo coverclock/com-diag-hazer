@@ -316,12 +316,15 @@ int main(int argc, char * argv[])
 
 			if (node == (diminuto_tree_t *)0) {
 				node = diminuto_tree_insert_root(&(this->node), &root);
+				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0;
 			} else if (rc < 0) {
 				node = diminuto_tree_insert_left(&(this->node), node);
+				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0;
 			} else if (rc > 0) {
 				node = diminuto_tree_insert_right(&(this->node), node);
+				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0;
 			} else {
 				/* Do nothing. */
