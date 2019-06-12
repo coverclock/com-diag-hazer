@@ -364,15 +364,30 @@ int main(int argc, char * argv[])
 
 			}
 
-			if (this == (client_t *)0) {
-				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
-			}
-
 			/*
-			 * Timestamp the client.
+			 * Timestamp the client now that we know that the datagram is
+			 * valid;
 			 */
 
 			that->then = now;
+
+			/*
+			 * If this is a new client, establish its role. Otherwise,
+			 * check that the role hasn't changed. Sadly, this is possible
+			 * with NATting firewalls in which addresses can change midstream
+			 * (I've seen it happen).
+			 */
+
+			if (this == (client_t *)0) {
+				that->role = role;
+				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
+			} else if (role != that->role) {
+				that->role = role;
+				DIMINUTO_LOG_WARNING("Client Now %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
+				if (role == ROVER) { base = (client_t *)0; }
+			} else  {
+				/* Do nothing. */
+			}
 
 			/*
 			 * If this is a base, check if it is the first one, or replaces the
@@ -391,20 +406,6 @@ int main(int argc, char * argv[])
 				assert(node != (diminuto_tree_t *)0);
 				free(base);
 				base = that;
-			}
-
-			/*
-			 * If this is a rover, check that the base didn't become a rover.
-			 * Sadly, this is also possible with NATting firewalls.
-			 */
-
-			if (role != ROVER) {
-				/* Do nothing. */
-			} else if (base != that) {
-				/* Do nothing. */
-			} else {
-				DIMINUTO_LOG_WARNING("Client Now %s [%s]:%d", "rover", diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
-				base = (client_t *)0;
 			}
 
 			/*
