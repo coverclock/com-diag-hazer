@@ -78,7 +78,7 @@ static int comparator(diminuto_tree_t * tap, diminuto_tree_t * tbp)
 
 	if ((rc = diminuto_ipc6_compare(&(cap->address), &(cbp->address))) != 0) {
 		/* Do nothing. */
-	} else if ((rc = cap->port - cbp->port) != 0) {
+	} else if ((rc = (cap->port < cbp->port) ? -1 : (cap->port > cbp->port) ? 1 : 0) != 0) {
 		/* Do nothing. */
 	} else {
 		/* Do nothing. */
