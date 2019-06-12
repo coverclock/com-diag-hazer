@@ -217,7 +217,7 @@ int main(int argc, char * argv[])
     DIMINUTO_LOG_INFORMATION("Connection (%d) \"%s\" [%s]:%d", sock, rendezvous, diminuto_ipc6_address2string(endpoint.ipv6, ipv6, sizeof(ipv6)), endpoint.udp);
 
 
-    rc = diminuto_mux_register_interrupt(&mux, sock);
+    rc = diminuto_mux_register_read(&mux, sock);
     assert(rc >= 0);
 
     frequency = diminuto_frequency();
