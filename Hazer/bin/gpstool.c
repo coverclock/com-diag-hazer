@@ -2523,8 +2523,8 @@ int main(int argc, char * argv[])
 
             if (command_string[0] == '\0') {
 
-            	DIMINUTO_LOG_NOTICE("Command Null");
                 free(command_node);
+            	DIMINUTO_LOG_NOTICE("Done");
                 eof = !0;
 
             } else {
@@ -2556,6 +2556,8 @@ int main(int argc, char * argv[])
                 }
 
                 free(command_node);
+
+                if (diminuto_list_isempty(&command_list)) { DIMINUTO_LOG_NOTICE("Ready"); }
 
             }
 
