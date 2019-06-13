@@ -1834,6 +1834,9 @@ int main(int argc, char * argv[])
         rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
         assert(rc >= 0);
 
+        rc = diminuto_mux_register_read(&mux, surveyor_fd);
+        assert(rc >= 0);
+
     } else if (!diminuto_ipc4_is_unspecified(&surveyor_endpoint.ipv4)) {
 
         /*
@@ -1846,6 +1849,9 @@ int main(int argc, char * argv[])
         assert(surveyor_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
+        assert(rc >= 0);
+
+        rc = diminuto_mux_register_read(&mux, surveyor_fd);
         assert(rc >= 0);
 
     } else {
