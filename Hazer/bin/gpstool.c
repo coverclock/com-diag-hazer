@@ -984,7 +984,8 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
  */
 static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp)
 {
-     if (bp->ticks != 0) {
+
+	if (bp->ticks != 0) {
 
         fputs("BAS", fp);
         fprintf(fp, " %dactive %dvalid %10usec %10uobs %12.4lfm", !!bp->payload.active, !!bp->payload.valid, bp->payload.dur, bp->payload.obs, (double)bp->payload.meanAcc / 10000.0);
@@ -1007,8 +1008,8 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
      if (kp->ticks != 0) {
 
          fputs("RTK", fp);
-         fprintf(fp, " %4u [%4zu] [%4zu] [%4zu]", kp->number, kp->minimum, kp->length, kp->maximum);
-         fprintf(fp, "%42s", "");
+         fprintf(fp, " %4u [%4zu] [%4zu] [%4zu] %-8s", kp->number, kp->minimum, kp->length, kp->maximum, (kp->source == BASE) ? "base" : (kp->source == ROVER) ? "rover" : "unknown");
+         fprintf(fp, "%33s", "");
          fprintf(fp, "%-8s", "DGNSS");
          fputc('\n', fp);
 
@@ -2420,7 +2421,20 @@ int main(int argc, char * argv[])
 
 			} else {
 
-				DIMINUTO_LOG_DEBUG("Surveyor RTCM (%d) <%d> [%zd]\n", surveyor_fd, tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length), surveyor_length);
+	            kinematics.source = ROVER;
+
+				kinematics.number = tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length);
+	            if (kinematics.number < 0) { kinematics.number = 9999; }
+
+	            kinematics.length = surveyor_length;
+	            if (surveyor_length < kinematics.minimum) { kinematics.minimum = surveyor_length; }
+	            if (surveyor_length > kinematics.maximum) { kinematics.maximum = surveyor_length; }
+
+	            kinematics.ticks = timeout;
+	            refresh = !0;
+
+				DIMINUTO_LOG_DEBUG("Surveyor RTCM (%d) <%d> [%zd]\n", surveyor_fd, kinematics.number, kinematics.length);
+	            if (verbose) { diminuto_dump(stderr, &surveyor_buffer, surveyor_total); }
 				write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
 
 			}
@@ -3030,8 +3044,11 @@ int main(int argc, char * argv[])
 
             if (verbose) { diminuto_dump(stderr, buffer, length); }
 
+            kinematics.source = BASE;
+
             kinematics.number = tumbleweed_message(buffer, length);
             if (kinematics.number < 0) { kinematics.number = 9999; }
+
             kinematics.length = length;
             if (length < kinematics.minimum) { kinematics.minimum = length; }
             if (length > kinematics.maximum) { kinematics.maximum = length; }

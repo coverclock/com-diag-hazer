@@ -18,6 +18,48 @@
 #include "com/diag/diminuto/diminuto_list.h"
 
 /*******************************************************************************
+ * ENUMERATIONS
+ ******************************************************************************/
+
+/**
+ * Are we producing datagrams, consuming datagrams, or neither?
+ */
+typedef enum Role { ROLE = '?', PRODUCER = 'P', CONSUMER = 'C', } role_t;
+
+/**
+ * Are we inputting serial data, outputting serial data, or neither?
+ */
+typedef enum Direction { DIRECTION = '?', INPUT = 'I', OUTPUT = 'O' } direction_t;
+
+/**
+ * Are we using IPv4, IPv6, or not using IP at all?
+ */
+typedef enum Protocol { PROTOCOL = '?', IPV4 = '4', IPV6 = '6', } protocol_t;
+
+/**
+ * Are we processing an NMEA sentence, a UBX packet, an RTCM message, or none
+ * of the above?
+ */
+typedef enum Format { FORMAT = 0, NMEA = (1<<0), UBX = (1<<1), RTCM = (1<<2), ANY = NMEA | UBX | RTCM, } format_t;
+
+/**
+ * Are we receiving RTCM updates from the device (in which case we are a fixed
+ * base station in survey mode) or from the network (in which case we are a
+ * mobile rover)?
+ */
+typedef enum Source { SOURCE = '?', BASE = 'B', ROVER = 'R', } source_t;
+
+/**
+ * What is our jamming state?
+ */
+typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*', } status_t;
+
+/**
+ * How have we classified a satellite track?
+ */
+typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!', } marker_t;
+
+/*******************************************************************************
  * HIGH PRECISION SOLUTION
  ******************************************************************************/
 
@@ -146,10 +188,11 @@ typedef struct YodelRover {
  * Structure combining both a RTCM message number and its expiry time in ticks.
  */
 typedef struct TumbleweedMessage {
-	int number;				/* Message number e.g. 1005. */
 	ssize_t length;
 	ssize_t minimum;
 	ssize_t maximum;
+	int number;				/* Message number e.g. 1005. */
+	source_t source;
 	hazer_expiry_t ticks;	/* Lifetime in application-defined ticks. */
 } tumbleweed_message_t;
 
@@ -159,10 +202,11 @@ typedef struct TumbleweedMessage {
  */
 #define TUMBLEWEED_MESSAGE_INITIALIZER \
     { \
-        0, \
 		0, \
 		TUMBLEWEED_RTCM_LONGEST, \
 		0, \
+        0, \
+		SOURCE, \
 		0, \
     }
 
@@ -193,40 +237,5 @@ struct Command {
 	diminuto_list_t link;
 	int acknak;
 };
-
-/*******************************************************************************
- * ENUMERATIONS
- ******************************************************************************/
-
-/**
- * Are we producing datagrams, consuming datagrams, or neither?
- */
-typedef enum Role { ROLE = '?', PRODUCER = 'P', CONSUMER = 'C', } role_t;
-
-/**
- * Are we inputting serial data, outputting serial data, or neither?
- */
-typedef enum Direction { DIRECTION = '?', INPUT = 'I', OUTPUT = 'O' } direction_t;
-
-/**
- * Are we using IPv4, IPv6, or not using IP at all?
- */
-typedef enum Protocol { PROTOCOL = '?', IPV4 = '4', IPV6 = '6', } protocol_t;
-
-/**
- * Are we processing an NMEA sentence, a UBX packet, an RTCM message, or none
- * of the above?
- */
-typedef enum Format { FORMAT = 0, NMEA = (1<<0), UBX = (1<<1), RTCM = (1<<2), ANY = NMEA | UBX | RTCM, } format_t;
-
-/**
- * What is our jamming state?
- */
-typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*', } status_t;
-
-/**
- * How have we classified a satellite track?
- */
-typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!', } marker_t;
 
 #endif
