@@ -2176,7 +2176,7 @@ int main(int argc, char * argv[])
 		}
 
 		if (diminuto_hangup_check()) {
-			DIMINUTO_LOG_NOTICE("SIGHUP OutOfOrder=%u Missing=%u", outoforder_counter, missing_counter);
+			diminuto_log_mask ^= DIMINUTO_LOG_MASK_DEBUG;
 		}
 
 		/**
