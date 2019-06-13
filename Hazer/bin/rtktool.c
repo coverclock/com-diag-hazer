@@ -10,7 +10,8 @@
  * ABSTRACT
  *
  * rtktool is a point-to-multipoint router that distributes RTK updates to
- * mobile rovers via RTCM messages received from a base station.
+ * mobile rovers via RTCM datagrams received from a stationary base station
+ * running in survey mode.
  */
 
 #undef NDEBUG
@@ -115,6 +116,7 @@ int main(int argc, char * argv[])
     ssize_t total = 0;
     ssize_t size = 0;
     ssize_t length = 0;
+    ssize_t result = 0;
     diminuto_tree_t * root = DIMINUTO_TREE_EMPTY;
     diminuto_tree_t * node = DIMINUTO_TREE_NULL;
     diminuto_tree_t * last = DIMINUTO_TREE_NULL;
@@ -343,25 +345,17 @@ int main(int argc, char * argv[])
 			 */
 
 			if ((size = validate_datagram(&(that->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {
-
 				DIMINUTO_LOG_NOTICE("Datagram Order [%zd] {%lu} {%lu}\n", total, (unsigned long)(that->sequence), (unsigned long)ntohl(buffer.header.sequence));
 				continue;
-
 			} else if ((length = tumbleweed_validate(buffer.payload.rtcm, size)) < TUMBLEWEED_RTCM_SHORTEST) {
-
 				DIMINUTO_LOG_WARNING("Datagram Data [%zd] [%zd] [%zd] 0x%02x\n", total, size, length, buffer.payload.data[0]);
 				continue;
-
 			} else if (length > TUMBLEWEED_RTCM_SHORTEST) {
-
 				role = BASE;
 				label = "base";
-
 			} else {
-
 				role = ROVER;
 				label = "rover";
-
 			}
 
 			/*
@@ -429,8 +423,8 @@ int main(int argc, char * argv[])
 				while (!0) {
 					that = diminuto_containerof(client_t, node, node);
 					if (that->role == ROVER) {
-						(void)diminuto_ipc6_datagram_send(sock, &buffer, size, that->address, that->port);
-						if (debug) { DIMINUTO_LOG_DEBUG("Client Sent %s [%s]:%d", "rover", diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port); }
+						result = diminuto_ipc6_datagram_send(sock, &buffer, size, that->address, that->port);
+						if (debug) { DIMINUTO_LOG_DEBUG("Client Sent %s [%s]:%d %zd", "rover", diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port, result); }
 					}
 					if (node == last) { break; }
 					node = diminuto_tree_next(node);
