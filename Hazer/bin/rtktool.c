@@ -10,8 +10,10 @@
  * ABSTRACT
  *
  * rtktool is a point-to-multipoint router that distributes RTK updates to
- * mobile rovers via RTCM datagrams received from a stationary base station
- * running in survey mode.
+ * mobile rovers via datagrams containing RTCM messages received from a
+ * stationary base station running in survey mode. The datagrams are sent to
+ * the port identified as the source of periodic keepalives sent from each
+ * rover to the router.
  */
 
 #undef NDEBUG
@@ -300,7 +302,7 @@ int main(int argc, char * argv[])
 			 */
 
 			if ((total = diminuto_ipc6_datagram_receive_generic(sock, &buffer, sizeof(buffer), &(this->address), &(this->port), 0)) < sizeof(buffer.header)) {
-				DIMINUTO_LOG_WARNING("Datagram Length (%d) [%zd]\n", sock, total);
+				DIMINUTO_LOG_ERROR("Datagram Length [%zd] [%s]:%d", total, diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port);
 				continue;
 			}
 
@@ -345,12 +347,20 @@ int main(int argc, char * argv[])
 			 */
 
 			if ((size = validate_datagram(&(that->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {
-				DIMINUTO_LOG_NOTICE("Datagram Order [%zd] {%lu} {%lu}\n", total, (unsigned long)(that->sequence), (unsigned long)ntohl(buffer.header.sequence));
+				DIMINUTO_LOG_NOTICE("Datagram Order {%lu} {%lu} [%s]:%d", (unsigned long)(that->sequence), (unsigned long)ntohl(buffer.header.sequence), diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
 				continue;
 			} else if ((length = tumbleweed_validate(buffer.payload.rtcm, size)) < TUMBLEWEED_RTCM_SHORTEST) {
-				DIMINUTO_LOG_WARNING("Datagram Data [%zd] [%zd] [%zd] 0x%02x\n", total, size, length, buffer.payload.data[0]);
+				DIMINUTO_LOG_WARNING("Datagram Data [%zd] 0x%02x [%s]:%d", length, buffer.payload.data[0], diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
 				continue;
-			} else if (length > TUMBLEWEED_RTCM_SHORTEST) {
+			} else {
+				/* Do nothing. */
+			}
+
+			/*
+			 * Determine this client's role.
+			 */
+
+			if (length > TUMBLEWEED_RTCM_SHORTEST) {
 				role = BASE;
 				label = "base";
 			} else {
@@ -359,48 +369,55 @@ int main(int argc, char * argv[])
 			}
 
 			/*
-			 * Timestamp the client now that we know that the datagram is
-			 * valid;
-			 */
-
-			that->then = now;
-
-			/*
-			 * If this is a new client, establish its role. Otherwise,
-			 * check that the role hasn't changed. Sadly, this is possible
-			 * with NATting firewalls in which addresses can change midstream
-			 * (I've seen it happen).
+			 * If this is a new client, save its role.
 			 */
 
 			if (this == (client_t *)0) {
 				that->role = role;
 				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
-			} else if (role != that->role) {
-				that->role = role;
-				DIMINUTO_LOG_WARNING("Client Now %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
-				if (role == ROVER) { base = (client_t *)0; }
-			} else  {
-				/* Do nothing. */
 			}
 
 			/*
-			 * If this is a base, check if it is the first one, or replaces the
-			 * existing one. Like the Highlander, there can only be one!
+			 * If this client's role has changed, we reject it. If it's in fact
+			 * legitimate (somehow), its existing entry will eventually time
+			 * out, be removed, and can be registered anew on reception of its
+			 * subsequent datagram.
+			 */
+
+			if (role != that->role) {
+				DIMINUTO_LOG_WARNING("Client Role %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
+				continue;
+			}
+
+			/*
+			 * If this is a base, but we already have a base, we reject it.
+			 * Again, the existing base will time out if it is no longer
+			 * sending, we'll remove it, and the new one can be reregistered.
 			 */
 
 			if (role != BASE) {
 				/* Do nothing. */
-			} else if (base == that) {
-				/* Do nothing. */
 			} else if (base == (client_t *)0) {
 				base = that;
+				DIMINUTO_LOG_NOTICE("Client Set %s [%s]:%d", label, diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
+			} else if (base != that) {
+				DIMINUTO_LOG_WARNING("Client Bad %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
+				continue;
 			} else {
-				DIMINUTO_LOG_WARNING("Client Was %s [%s]:%d", "base", diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
-				node = diminuto_tree_remove(&(base->node));
-				assert(node != (diminuto_tree_t *)0);
-				free(base);
-				base = that;
+				/* Do nothing. */
 			}
+
+			/*
+			 * Timestamp the client now that we know that the client ant its
+			 * datagram is valid. If we haven't heard from a client within the
+			 * timeout period, we'll remove it. As a useful side effect, if a
+			 * client gets restarted such that its sequence numbers are
+			 * unexpected, or if a client changes roles from base to rover or
+			 * vice versa, we will eventually remove it and reregister its
+			 * connection as a new one.
+			 */
+
+			that->then = now;
 
 			/*
 			 * If this was a base, forward the datagram to all rovers. Note
@@ -441,13 +458,9 @@ int main(int argc, char * argv[])
 		 */
 
 		if (diminuto_tree_isempty(&root)) {
-
 			/* Do nothing. */
-
 		} else if ((now - was) <= 0) {
-
 			/* Do nothing. */
-
 		} else {
 
 			node = diminuto_tree_first(&root);
@@ -458,20 +471,13 @@ int main(int argc, char * argv[])
 
 			while (!0) {
 				that = diminuto_containerof(client_t, node, node);
+				next = diminuto_tree_next(node);
 				if ((now - that->then) > timeout) {
-					if (that->role == BASE) {
-						base = (client_t *)0;
-						label = "base";
-					} else {
-						label = "rover";
-					}
-					DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
-					next = diminuto_tree_next(node);
+					DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", (that->role == BASE) ? "base" : "rover", diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
 					node = diminuto_tree_remove(&(that->node));
 					assert(node != (diminuto_tree_t *)0);
+					if (that == base) { base = (client_t *)0; }
 					free(that);
-				} else {
-					next = diminuto_tree_next(node);
 				}
 				if (node == last) { break; }
 				assert(next != (diminuto_tree_t *)0);
