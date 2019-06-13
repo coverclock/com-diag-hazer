@@ -14,4 +14,6 @@ RATE=${3:-115200}
 LOG=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${LOG}
 
+export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+
 exec coreable rtktool -p ${ROUTER} -t 30 < /dev/null 1> /dev/null 2> ${LOG}/${PROGRAM}.err
