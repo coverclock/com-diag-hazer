@@ -1606,31 +1606,39 @@ use SimpleRTK2B boards interchangeably in the field.
     END gpstool: LAST.
     END gpstool: END.
 
-## USB Issues With Nickel And Cadmium
+## USB Weirdness With Nickel And Cadmium
 
-I spent several days troubleshooting what I assumed to be a bug in
-my SW regarding the synchronization of the NMEA, UBX, and RTCM state
-machines with the input stream from the UBX-ZED-F9P receiver on Nickel
-(Intel NUC5i7RYH, Ubuntu 18.04.1).  I tested the same code on Cadmium
-(NUC7i7BNH, Ubuntu 16.04.5) and saw the same symptom: every tens
-of seconds or so my SW  would loose sync with the input stream than
-regain it.  But I couldn't reproduce the problem on Gold, an ARM-based
-Raspberry Pi (Broadcom BCM2837B0, Raspbian 9.4).
+I spent several days troubleshooting what I assumed to be a bug in my SW
+regarding the synchronization of the NMEA, UBX, and RTCM state machines
+with the input stream from the UBX-ZED-F9P receiver (a U-Blox 9 device)
+on Nickel (Intel NUC5i7RYH, Ubuntu 18.04.1).
 
-So I ran the standard Linux utility socat on Nickel to save about
-a minute's worth of NMEA data (UBX and RTCM weren't enabled on the
-F9P for this test). I ran my SW against the file (so: no real-time
-requirements) and recorded the Sync Lost messages that included the
-offset into the data where the errors occurred. Then I did a hex dump
-of the original file, checked at those offsets, and sure enough the NMEA
-stream was corrupted: it appears periodically a spurious handful of bytes
-(looking suspiciously like a fragment of an NMEA sentence) was inserted
-at the end of a valid NMEA sentence.
+I tested the same code on Cadmium (NUC7i7BNH, Ubuntu 16.04.5) and saw the
+same symptom: every tens of seconds or so my SW  would loose sync with
+the input stream than regain it. 
+
+I couldn't reproduce the problem on Gold, an ARM-based Raspberry Pi
+(Broadcom BCM2837B0, Raspbian 9.4) using exactly the same application
+SW and the same receiver HW.
+
+So I ran the standard Linux utility socat on Nickel to save about a
+minute's worth of NMEA data (UBX and RTCM weren't enabled on the F9P for
+this test). I ran my SW against the file (so: no real-time requirements)
+and recorded the Sync Lost messages that included the offset into the data
+where the errors occurred. Then I did a hex dump of the original file,
+checked at those offsets, and sure enough the NMEA stream was corrupted:
+it appears periodically a spurious handful of bytes (looking suspiciously
+like a fragment of an NMEA sentence) was inserted at the end of a valid
+NMEA sentence. So this corruption occurs without my SW being involved
+at all.
+
+Finally I ran my SW on Nickel using the BU353W10 receiver (a U-Blox 8
+device),  and I saw similar occasional loss of sync due to corruption
+of the NMEA stream.
 
 This appears to be an issue either with the Intel hardware on both of
 the NUC boxes, or with the different versions of Linux each box is
-running. Running a build of exactly the same version of my SW on the Pi,
-with the Broadcom SOC's USB HW, I don't see this issue.
+running.
 
 # Acknowledgements
 
