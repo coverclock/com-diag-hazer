@@ -1961,7 +1961,13 @@ int main(int argc, char * argv[])
         rc = diminuto_serial_raw(dev_fd);
         assert(rc == 0);
 
-        dev_fp = fdopen(dev_fd, readonly ? "r" : "w+");
+        /*
+         * Remarkably, below, some USB receivers will work with a mode of "w+"
+         * and some will return a fatal I/O error and require "a+". "a+" seems
+         * to work in either case. Weird.
+         */
+
+        dev_fp = fdopen(dev_fd, readonly ? "r" : "a+");
         if (dev_fp == (FILE *)0) { diminuto_perror(device); }
         assert(dev_fp != (FILE *)0);
 
@@ -3235,11 +3241,18 @@ int main(int argc, char * argv[])
         assert(rc != EOF);
     }
 
-    rc = fclose(in_fp);
-    assert(rc != EOF);
+    if (dev_fp != (FILE *)0) {
+    	rc = fclose(dev_fp);
+    	assert(rc != EOF);
+    }
 
     DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)));
     free(io_buffer);
+
+    if (in_fp != dev_fp) {
+        rc = fclose(in_fp);
+        assert(rc != EOF);
+    }
 
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_commit(out_fp, &temporary);
@@ -3255,9 +3268,9 @@ int main(int argc, char * argv[])
     	free(command_node);
     }
 
-    fflush(stderr);
-
 	DIMINUTO_LOG_INFORMATION("End");
+
+    fflush(stderr);
 
     return 0;
 }

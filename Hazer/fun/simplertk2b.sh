@@ -12,4 +12,9 @@ RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 2> >(log -S -N ${PROGRAM})
+LOG=$(readlink -e $(dirname ${0})/..)/log
+mkdir -p ${LOG}
+
+export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 2> ${LOG}/${PROGRAM}.err

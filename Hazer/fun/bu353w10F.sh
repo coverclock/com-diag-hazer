@@ -24,9 +24,14 @@ RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../fun)/ubx8
 
+LOG=$(readlink -e $(dirname ${0})/..)/log
+mkdir -p ${LOG}
+
+export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+
 OPTIONS=""
 for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} -W ${OPTION}"
 done
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -F -t 10 ${OPTIONS} 1> /dev/tty 2> >(log -S -N ${PROGRAM})
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -F -t 10 ${OPTIONS} 1> /dev/tty 2> ${LOG}/${PROGRAM}.err
