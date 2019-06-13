@@ -2849,7 +2849,7 @@ int main(int argc, char * argv[])
 
             } else if (hazer_parse_txt(vector, count) == 0) {
 
-                DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%*s\"", length - 2 /* Exclude CR and LF. */, buffer);
+                DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
 
             } else if (unknown) {
 
