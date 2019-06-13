@@ -384,9 +384,13 @@ int main(int argc, char * argv[])
 			 * subsequent datagram.
 			 */
 
-			if (role != that->role) {
+			if (that->role == ROLE) {
+				/* Do nothing. */
+			} else if (role == that->role) {
+				/* Do nothing. */
+			} else {
+				that->role = ROLE;
 				DIMINUTO_LOG_WARNING("Client Role %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
-				continue;
 			}
 
 			/*
@@ -401,14 +405,14 @@ int main(int argc, char * argv[])
 				base = that;
 				DIMINUTO_LOG_NOTICE("Client Set %s [%s]:%d", label, diminuto_ipc6_address2string(base->address, ipv6, sizeof(ipv6)), base->port);
 			} else if (base != that) {
+				that->role = ROLE;
 				DIMINUTO_LOG_WARNING("Client Bad %s [%s]:%d", label, diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
-				continue;
 			} else {
 				/* Do nothing. */
 			}
 
 			/*
-			 * Timestamp the client now that we know that the client ant its
+			 * Timestamp the client now that we know that the client and its
 			 * datagram is valid. If we haven't heard from a client within the
 			 * timeout period, we'll remove it. As a useful side effect, if a
 			 * client gets restarted such that its sequence numbers are
@@ -417,7 +421,7 @@ int main(int argc, char * argv[])
 			 * connection as a new one.
 			 */
 
-			that->then = now;
+			if (that->role != ROLE) { that->then = now; }
 
 			/*
 			 * If this was a base, forward the datagram to all rovers. Note
@@ -429,7 +433,7 @@ int main(int argc, char * argv[])
 			 * sequence numbers are fine.
 			 */
 
-			if (role == BASE) {
+			if (that->role == BASE) {
 
 				node = diminuto_tree_first(&root);
 				assert(node != (diminuto_tree_t *)0);
@@ -473,7 +477,7 @@ int main(int argc, char * argv[])
 				that = diminuto_containerof(client_t, node, node);
 				next = diminuto_tree_next(node);
 				if ((now - that->then) > timeout) {
-					DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", (that->role == BASE) ? "base" : "rover", diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
+					DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", (that->role == BASE) ? "base" : (that->role == ROVER) ? "rover" : "unknown", diminuto_ipc6_address2string(that->address, ipv6, sizeof(ipv6)), that->port);
 					node = diminuto_tree_remove(&(that->node));
 					assert(node != (diminuto_tree_t *)0);
 					if (that == base) { base = (client_t *)0; }

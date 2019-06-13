@@ -83,18 +83,6 @@ so much C code. I use Diminuto in virtually all of my C-based projects,
 and sometimes in other languages too that support C-linkage.  Portions of
 Diminuto have also shipped in products from several of my clients.
 
-You will seem some references to Tumbleweed. Tumbleweed is a project to
-apply Hazer and Yodel to Differential GNSS (DGNSS) using the Ardusimple
-SimpleRTK2B.  The SimpleRTK2B board incorporates the U-Blox UBX-ZED-F9P
-multi-band GNSS receiver. The U-Blox 9 supports sending and receiving
-RTCM messages between peer receivers containing Real-Time Kinematic
-(RTK) measurements. This can potentially yield very accurate position
-fixes, possibly down to the centimeter level. While the SimpleRTK2B is
-marketed primarily to the drone enthusiasts, I am mostly interested in
-it for purposes of surveying and agriculture.  Tumbleweed doesn't merit
-its own repository, but having its own project name made keeping track
-of it easier.
-
 Hazer (and Diminuto) have also been used in other Digital Aggregates
 projects that do have their own repositories, for example: Obelisk,
 Hourglass, Candleclock, Astrolabe, and Critter.
@@ -128,6 +116,10 @@ Yodel recognizes the following received UBX messages.
 * UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (UBLOX 9 p. 181)
 * UBX-MON-HW - Monitor Hardware to detect jamming. (UBLOX 8 R15 p. 285)
 * UBX-NAV-STATUS - Report Status to detect spoofing. (UBLOX 8 R15 p. 316)
+
+Tumbleweed recognizes RTCM messages with a valid CRC but does not process
+their contents. As a special case, an RTCM message with a zero payload length
+is used by gpstool and rtktool as a keep alive message.
 
 # Talkers
 
@@ -554,7 +546,9 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
 * proxy - receive UDP packets from the Base and forward to the Rover.
+* router - routes UDP packets received from a base to all rovers.
 * rover - configures and runs an Ardusimple SimpleRTK2B board as a mobile rover.
+* rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 
 # Functional Tests
 
@@ -565,26 +559,36 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
 * bu353w10M4 - exercises the GlobalSat BU-353W10 receiver logging PRN 4.
 * bu353w10S - uses socat to send data from GlobalSat BU-353W10 to gpstool over named pipe.
 * bu353W10X - exercises the GlobalSat BU-353W10 receiver while testing data expiration.
+* checksums - exercises the checksum utility.
+* collect - collects output of a device into a file.
+* datagramsink - exercises a datagram source.
+* datagramsource - exercises a datagram sink.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
 * gr701w - exercises the NaviSys GR701W receiver.    
-* simplertk2b - exercises the Ardusimple SimpleRTK2B board.
 * simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
+* simplertk2b - exercises the Ardusimple SimpleRTK2B board.
 * simplertk2bquery - queries the configuration of an Ardusimple SimpleRTK2B board.
 * simplertk2brover - configures an Ardusimple SimpleRTK2B board as a rover.
+* simplertk2brtcm - collects RTCM messages into a file.
+* simplertk2bsurvey - runs a Ardusimple SimpleRTK2B in survey mode.
 * sink - received UDP packets from the source.
 * sirfstar4 - exercises any SiRF Star 4 device.
 * source - send UDP packets to the sink.
 * talkers - processes a file of synthetic input.
+* tumbleweedkeepalives - serves as a Tumbleweed keepalive sink.
+* tumbleweedpi - Another Tumbleweed functioanal test.
+* tumbleweedremote - serves as a Tumbleweed RTCM sink.
+* tumbleweed - Tumbleweed functional test.
 * ublox7 - exercises any Ublox 7 device.    
+* ublox8debug - exercises any Ublox 8 device with gpstool debug enabled.
 * ublox8 - exercises any Ublox 8 device.
 * ublox9 - exercises any Ublox 9 device.
-* ublox8debug - exercises any Ublox 8 device with gpstool debug enabled.
 * uputronics - exercises the Uputronics GPS board for the Rasperry Pi.
 
 # Help
 
-    $ gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]
+    > gpstool -?
+    usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] 
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
@@ -627,77 +631,60 @@ Optionally install Diminuto and Hazer in /usr/local. (I never do this myself.)
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
- 
+
+    > rtktool -?
+    usage: rtktool [ -d ] [ -v ] [ -V ] [ -p PORT ] [ -t SECONDS ]
+           -V          Print release, Vintage, and revision on standard output.
+           -d          Display Debug output on standard error.
+           -p PORT     Use PORT as the RTCM source and sink port.
+           -t SECONDS  Set the client timeout to SECONDS seconds.
+           -v          Display Verbose output on standard error.
+
 # Display
 
-When using the -E option with gpstool, so that it uses ASCII escape sequences
-to do cursor control for its report on standard output, as this example does
-when using Ublox 9-based receiver,
+When using the -E option with gpstool, so that it uses ASCII escape
+sequences to do cursor control for its report on standard output, as
+this example does when using Ublox 9-based receiver, the display looks
+something like this snapshot as it is continually updated.
 
     > gpstool -D devttyACM0 -b 9600 -8 -n -1 -E -t 10
-
-the display looks something like this snapshot as it is continually updated.
-
-    INP [ 52] $GNGLL,3947.65220,N,10509.20236,W,194527.00,A,A*6B\r\n
-    OUT [  0]
-    LOC 2019-05-07T13:45:27.049-07:00+01T          0/00:00:00.895 18.0.0   nickel
-    TIM 2019-05-07T19:45:27.000-00:00+00Z 0pps                             GNSS
-    POS 39��47'39.13"N, 105��09'12.14"W    39.794203333, -105.153372666      GNSS
-    ALT    5595.40'   1705.500m                                            GNSS
-    COG N     0.000000000��T    0.000000000��M                               GNSS
-    SOG       0.026mph       0.023000knots       0.042000kph               GNSS
-    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    HPP   39.794203348, -105.153372746 ��     4.3267m                       GNSS
-    HPA   1705.5121m ��     6.9854m                                         GNSS
-    BAS 1active 0valid         17sec         17obs      27.0312m           RTCM
-    ACT [1]  {    18    15    17    11     1    13 } [ 6] [10] [25]        GPS
-    ACT [2]  {    30    28    19     6             } [ 4] [10] [25]        GPS
-    ACT [1]  {    86    85    77    75    76    87 } [ 6] [ 6] [25]        GLONASS
-    ACT [1]  {     1    15    21    27    26    13 } [ 6] [ 6] [25]        GALILEO
-    ACT [1]  {    26    29    12                   } [ 3] [ 3] [25]        BEIDOU
-    DOP   0.95pdop   0.55hdop   0.78vdop                                   GPS
-    DOP   0.95pdop   0.55hdop   0.78vdop                                   GLONASS
-    DOP   0.95pdop   0.55hdop   0.78vdop                                   GALILEO
-    DOP   0.95pdop   0.55hdop   0.78vdop                                   BEIDOU
-    SAT [  1]     1id  34��elv   61��azm   27dBHz  6sig <                    GPS
-    SAT [  2]     6id  11��elv  183��azm   35dBHz  6sig <                    GPS
-    SAT [  3]     7id   9��elv  147��azm   29dBHz  6sig                      GPS
-    SAT [  4]    11id  26��elv   50��azm    0dBHz  6sig <   !                GPS
-    SAT [  5]    13id  30��elv  254��azm    0dBHz  6sig <   !                GPS
-    SAT [  6]    15id  16��elv  287��azm   21dBHz  6sig <                    GPS
-    SAT [  7]    17id  75��elv  247��azm   34dBHz  6sig <                    GPS
-    SAT [  8]    18id  15��elv   41��azm    0dBHz  6sig <   !                GPS
-    SAT [  9]    19id  49��elv  232��azm    0dBHz  6sig <   !                GPS
-    SAT [ 10]    22id   0��elv   78��azm    0dBHz  6sig     !                GPS
-    SAT [ 11]    24id   6��elv  319��azm   18dBHz  6sig                      GPS
-    SAT [ 12]    28id  65��elv   41��azm    0dBHz  6sig <   !                GPS
-    SAT [ 13]    30id  41��elv  154��azm   36dBHz  6sig <                    GPS
-    SAT [ 14]    67id   1��elv  283��azm    0dBHz  3sig     !                GLONASS
-    SAT [ 15]    68id   4��elv  332��azm    0dBHz  3sig     !                GLONASS
-    SAT [ 16]    75id  30��elv  119��azm   37dBHz  3sig <                    GLONASS
-    SAT [ 17]    76id  70��elv   78��azm    0dBHz  3sig <   !                GLONASS
-    SAT [ 18]    77id  33��elv  324��azm   21dBHz  3sig <                    GLONASS
-    SAT [ 19]    85id  20��elv   31��azm   23dBHz  3sig <                    GLONASS
-    SAT [ 20]    86id  77��elv   57��azm   26dBHz  3sig <                    GLONASS
-    SAT [ 21]    87id  37��elv  202��azm   17dBHz  3sig <                    GLONASS
-    SAT [ 22]     1id  43��elv  312��azm   32dBHz  2sig <                    GALILEO
-    SAT [ 23]     4id   9��elv  280��azm    0dBHz  2sig     !                GALILEO
-    SAT [ 24]     9id   1��elv  327��azm    0dBHz  2sig     !                GALILEO
-    SAT [ 25]    13id  62��elv   82��azm    0dBHz  2sig <   !                GALILEO
-    SAT [ 26]    14id  41��elv   55��azm   36dBHz  2sig                      GALILEO
-    SAT [ 27]    15id  19��elv   40��azm   19dBHz  2sig <                    GALILEO
-    SAT [ 28]    19id   3��elv  229��azm    0dBHz  2sig     !                GALILEO
-    SAT [ 29]    21id  73��elv   68��azm   31dBHz  2sig <                    GALILEO
-    SAT [ 30]    26id  45��elv  182��azm   35dBHz  2sig <                    GALILEO
-    SAT [ 31]    27id  24��elv  110��azm   31dBHz  2sig <                    GALILEO
-    SAT [ 32]    33id   0��elv  205��azm    0dBHz  2sig     !                GALILEO
-    SAT [ 33]     6id   3��elv  334��azm    0dBHz  0sig     !                BEIDOU
-    SAT [ 34]    12id  10��elv  219��azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 35]    16id   1��elv  341��azm    0dBHz  0sig     !                BEIDOU
-    SAT [ 36]    24id   2��elv  312��azm    0dBHz  0sig     !                BEIDOU
-    SAT [ 37]    26id  49��elv  311��azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 38]    29id  61��elv   53��azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 39]    30id   9��elv   45��azm    0dBHz  0sig     !                BEIDOU
+    INP [ 68] \xb5b\n\t<\0\0\xf4\x01\0\0\0\0\0\0\0\x01\0\xaf\xff\0\0_\0\x94\v\x02
+    OUT [  7] \xb5b\x06>\0\0\0
+    MON -jamming  -history   6indicator  24maximum
+    STA -spoofing -history      39973ms    5859871ms     0epoch
+    LOC 2019-06-13T12:24:32.119-07:00+01T          0/00:00:00.691 22.1.0   nickel
+    TIM 2019-06-13T18:24:32.000-00:00+00Z 0pps                             GNSS
+    POS 39°47'39.04"N, 105°09'12.26"W    39.794177999, -105.153405666      GNSS
+    ALT    5636.09'   1717.900m                                            GNSS
+    COG N     0.000000000°T    0.000000000°M                               GNSS
+    SOG       0.142mph       0.123000knots       0.228000kph               GNSS
+    INT GGA [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
+    ACT [1]  {    28     1    19    30    17    13 } [ 6] [12] [18]        GPS
+    ACT [2]  {    51    48     6    24     3     2 } [ 6] [12] [18]        GPS
+    ACT [1]  {    73    74    83    84    85    75 } [ 6] [ 6] [18]        GLONASS
+    DOP   1.10pdop   0.70hdop   0.85vdop                                   GPS
+    DOP   1.10pdop   0.70hdop   0.85vdop                                   GLONASS
+    SAT [  1]     1id  13°elv   38°azm   26dBHz  0sig <                    GPS
+    SAT [  2]     2id  12°elv  202°azm   39dBHz  0sig <                    GPS
+    SAT [  3]     3id  11°elv   73°azm   18dBHz  0sig <                    GPS
+    SAT [  4]     6id  45°elv  177°azm   38dBHz  0sig <                    GPS
+    SAT [  5]    12id   3°elv  297°azm   17dBHz  0sig                      GPS
+    SAT [  6]    13id   9°elv  227°azm   32dBHz  0sig <                    GPS
+    SAT [  7]    15id   4°elv  259°azm   22dBHz  0sig                      GPS
+    SAT [  8]    17id  70°elv   19°azm   33dBHz  0sig <                    GPS
+    SAT [  9]    19id  74°elv  297°azm   29dBHz  0sig <                    GPS
+    SAT [ 10]    22id   7°elv   53°azm   20dBHz  0sig                      GPS
+    SAT [ 11]    24id  31°elv  307°azm   25dBHz  0sig <                    GPS
+    SAT [ 12]    28id  48°elv   92°azm   27dBHz  0sig <                    GPS
+    SAT [ 13]    30id   8°elv  159°azm   31dBHz  0sig <                    GPS
+    SAT [ 14]    48id  36°elv  220°azm   31dBHz  0sig <                    GPS
+    SAT [ 15]    51id  44°elv  183°azm   37dBHz  0sig <                    GPS
+    SAT [ 16]    73id  57°elv  139°azm   35dBHz  0sig <                    GLONASS
+    SAT [ 17]    74id  72°elv  337°azm   23dBHz  0sig <                    GLONASS
+    SAT [ 18]    75id  16°elv  325°azm   26dBHz  0sig <                    GLONASS
+    SAT [ 19]    83id  30°elv   33°azm   17dBHz  0sig <                    GLONASS
+    SAT [ 20]    84id  82°elv  296°azm   21dBHz  0sig <                    GLONASS
+    SAT [ 21]    85id  28°elv  225°azm   33dBHz  0sig <                    GLONASS
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
@@ -1438,7 +1425,7 @@ core dumped with a segmentation violation.
 
 (2019-06-06: U-Blox says this FW bug will be fixed in a subsequent release.)
 
-## Ardusimple SimpleRTK2B
+## Ardusimple SimpleRTK2B (OBSOLETE)
 
 The Ardusimple SimpleRTK2B board features a ZED-F9P "9th generation" U-Blox
 chip. It can be equipped with radios like the ZigBee-based XBee. This allows
@@ -1449,7 +1436,7 @@ the survey has been completed to the configured level of accuracy. This
 is a form of Differential GNSS and can, over time, achieve very high position
 (and time) accuracy and precision.
 
-### Block Diagram
+### Block Diagram (OBSOLETE)
 
                                 Radio Antenna
                                       :
@@ -1481,7 +1468,7 @@ configuration is in volatile memory so that the GPS receiver reverts back to its
 factory defaults when it is power cycled. Among other things, this allows me to
 use SimpleRTK2B boards interchangeably in the field.
 
-### Base Configuration
+### Base Configuration (OBSOLETE)
 
     $ simplertk2bbase /dev/ttyACM0
     UBX gpstool: ACK 0x06 0x8a (1)
@@ -1554,7 +1541,7 @@ use SimpleRTK2B boards interchangeably in the field.
     END gpstool: LAST.
     END gpstool: END.
 
-### Rover Configuration
+### Rover Configuration (OBSOLETE)
 
     $ simplertk2brover /dev/ttyACM1
     UBX gpstool: ACK 0x06 0x8a (1)
