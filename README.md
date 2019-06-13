@@ -1634,11 +1634,12 @@ at all.
 
 Finally I ran my SW on Nickel using the BU353W10 receiver (a U-Blox 8
 device),  and I saw similar occasional loss of sync due to corruption
-of the NMEA stream.
+of the NMEA stream. Similarly, the same SW and GPS HW on the Pi worked
+without problems.
 
-This appears to be an issue either with the Intel hardware on both of
-the NUC boxes, or with the different versions of Linux each box is
-running.
+This appears to be an issue either with the Intel USB hardware on both
+of the NUC boxes, or with the USB stack in both of the different versions
+of Linux each box is running.
 
 # Acknowledgements
 
