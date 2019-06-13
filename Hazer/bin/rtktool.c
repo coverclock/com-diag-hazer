@@ -444,7 +444,11 @@ int main(int argc, char * argv[])
 			 * sequence numbers are fine.
 			 */
 
-			if (thou->role == BASE) {
+			if (diminuto_tree_isempty(&root)) {
+				/* Do nothing. */
+			} else if (thou->role != BASE) {
+				/* Do nothing. */
+			} else {
 
 				node = diminuto_tree_first(&root);
 				assert(node != (diminuto_tree_t *)0);
@@ -514,7 +518,9 @@ int main(int argc, char * argv[])
 					DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", (thee->role == BASE) ? "base" : (thee->role == ROVER) ? "rover" : "unknown", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port);
 					node = diminuto_tree_remove(&(thee->node));
 					assert(node != (diminuto_tree_t *)0);
-					if (thee == base) { base = (client_t *)0; }
+					if (thee == base) {
+						base = (client_t *)0;
+					}
 					free(thee);
 				}
 				if (node == last) { break; }
