@@ -2408,7 +2408,7 @@ int main(int argc, char * argv[])
 
 			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
 
-				DIMINUTO_LOG_ERROR("Surveyor Invalid (%d) [%zd] [%zd] [%zd] 0x%02x\n", surveyor_fd, surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
+				DIMINUTO_LOG_ERROR("Surveyor Data (%d) [%zd] [%zd] [%zd] 0x%02x\n", surveyor_fd, surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
 
 			} else if (surveyor_length == TUMBLEWEED_RTCM_SHORTEST) {
 
@@ -2477,10 +2477,12 @@ int main(int argc, char * argv[])
         } else if (((keepalive_now = ticktock(frequency)) - keepalive_was) < keepalive) {
             /* Do nothing. */
         } else {
+
         	stamp_datagram(&keepalive_buffer.header, &keepalive_sequence);
             send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             keepalive_was = keepalive_now;
             DIMINUTO_LOG_DEBUG("Surveyor RTCM (%d) keepalive sent", surveyor_fd);
+
         }
 
         /**
@@ -2511,36 +2513,52 @@ int main(int argc, char * argv[])
         } else if (diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
         } else {
-            command_node = diminuto_list_dequeue(&command_list);
+
+        	command_node = diminuto_list_dequeue(&command_list);
             assert(command_node != (diminuto_list_t *)0);
+
             command = diminuto_containerof(struct Command, link, command_node);
             command_string = diminuto_list_data(command_node);
             assert(command_string != (uint8_t *)0);
+
             if (command_string[0] == '\0') {
-                DIMINUTO_LOG_NOTICE("Command Null");
+
+            	DIMINUTO_LOG_NOTICE("Command Null");
                 free(command_node);
                 eof = !0;
+
             } else {
-                command_size = strlen(command_string) + 1;
+
+            	command_size = strlen(command_string) + 1;
                 command_length = diminuto_escape_collapse(command_string, command_string, command_size);
                 if (command_string[0] == HAZER_STIMULUS_START) {
-                    emit_sentence(dev_fp, command_string, command_length);
+
+                	emit_sentence(dev_fp, command_string, command_length);
                     rc = 0;
+
                 } else if ((command_string[0] == YODEL_STIMULUS_SYNC_1) && (command_string[1] == YODEL_STIMULUS_SYNC_2)) {
-                    emit_packet(dev_fp, command_string, command_length);
+
+                	emit_packet(dev_fp, command_string, command_length);
                     rc = 0;
+
                 } else {
+
                 	DIMINUTO_LOG_WARNING("Command Other 0x%02x%02x [%zd]", command_string[0], command_string[1], command_length);
                     rc = -1;
+
                 }
+
                 if (rc == 0) {
                     if (command->acknak) { acknakpending += 1; }
                     if (verbose) { print_buffer(stderr, command_string, command_length, UNLIMITED); }
                     if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
                     if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }
                 }
+
                 free(command_node);
+
             }
+
         }
 
         /*
