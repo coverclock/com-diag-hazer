@@ -307,11 +307,11 @@ int main(int argc, char * argv[])
 			 */
 
 			if ((total = diminuto_ipc6_datagram_receive_generic(sock, &buffer, sizeof(buffer), &(this->address), &(this->port), 0)) < sizeof(buffer.header)) {
-				DIMINUTO_LOG_ERROR("Datagram Length [%zd] [%s]:%d", total, diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port);
+				DIMINUTO_LOG_ERROR("Datagram Length [%s]:%d [%zd]", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
 				continue;
 			}
 
-			DIMINUTO_LOG_DEBUG("Datagram Received [%s]:%d [%zd]", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port, total);
+			DIMINUTO_LOG_DEBUG("Datagram Received [%s]:%d [%zd]", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
 
             if (verbose) {
 				fprintf(stderr, "Datagram [%s]:%d [%zd]\n", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
@@ -451,7 +451,7 @@ int main(int argc, char * argv[])
 					thee = (client_t *)diminuto_tree_data(node);
 					if (thee->classification == ROVER) {
 						result = diminuto_ipc6_datagram_send(sock, &buffer, total, thee->address, thee->port);
-						DIMINUTO_LOG_DEBUG("Datagram Sent [%s]:%d %zd", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port, result);
+						DIMINUTO_LOG_DEBUG("Datagram Sent [%s]:%d [%zd]", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port, result);
 					}
 					if (node == last) { break; }
 					node = diminuto_tree_next(node);
