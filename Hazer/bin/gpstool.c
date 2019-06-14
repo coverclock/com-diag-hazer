@@ -2289,34 +2289,47 @@ int main(int argc, char * argv[])
 
 				nmea_state = hazer_machine(nmea_state, ch, nmea_buffer.payload.nmea, sizeof(nmea_buffer.payload.nmea), &nmea_context);
 				if (nmea_state == HAZER_STATE_END) {
+
 					buffer = nmea_buffer.payload.nmea;
 					size = hazer_size(&nmea_context);
 					length = size - 1;
 					format = NMEA;
 					if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%08llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
+
+					DIMINUTO_LOG_DEBUG("Device NMEA [%zd] [%zd]", size, length);
+
 					break;
+
 				}
 
 				ubx_state = yodel_machine(ubx_state, ch, ubx_buffer.payload.ubx, sizeof(ubx_buffer.payload.ubx), &ubx_context);
 				if (ubx_state == YODEL_STATE_END) {
+
 					buffer = ubx_buffer.payload.ubx;
 					size = yodel_size(&ubx_context);
 					length = size - 1;
 					format = UBX;
 					if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%08llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
+
+					DIMINUTO_LOG_DEBUG("Device UBX [%zd] [%zd]", size, length);
+
 					break;
 				}
 
 				rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer.payload.rtcm, sizeof(rtcm_buffer.payload.rtcm), &rtcm_context);
 				if (rtcm_state == TUMBLEWEED_STATE_END) {
+
 					buffer = rtcm_buffer.payload.rtcm;
 					size = tumbleweed_size(&rtcm_context);
 					length = size - 1;
 					format = RTCM;
 					if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%08llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
+
+					DIMINUTO_LOG_DEBUG("Device RTCM [%zd] [%zd]", size, length);
+
 					break;
 				 }
 
@@ -2366,11 +2379,11 @@ int main(int argc, char * argv[])
 
 			if ((remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer))) < sizeof(remote_buffer.header)) {
 
-				DIMINUTO_LOG_WARNING("Remote Length (%d) [%zd]\n", remote_fd, remote_total);
+				DIMINUTO_LOG_WARNING("Remote Length [%zd]\n", remote_total);
 
 			} else if ((remote_size = validate_datagram(&remote_sequence, &remote_buffer.header, remote_total, &outoforder_counter, &missing_counter)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Remote Order (%d) [%zd] %lu %lu\n", remote_fd, remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
+				DIMINUTO_LOG_NOTICE("Remote Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
 			} else if ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0) {
 
@@ -2379,12 +2392,16 @@ int main(int argc, char * argv[])
 				length = remote_length;
 				format = NMEA;
 
+				DIMINUTO_LOG_DEBUG("Remote NMEA [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+
 			} else if ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0) {
 
 				buffer = remote_buffer.payload.ubx;
 				size = remote_size;
 				length = remote_length;
 				format = UBX;
+
+				DIMINUTO_LOG_DEBUG("Remote UBX [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
 			} else if ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0) {
 
@@ -2393,9 +2410,11 @@ int main(int argc, char * argv[])
 				length = remote_length;
 				format = RTCM;
 
+				DIMINUTO_LOG_DEBUG("Remote RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+
 			} else {
 
-				DIMINUTO_LOG_ERROR("Remote Other (%d) [%zd] [%zd] [%zd] 0x%02x\n", remote_fd, remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
+				DIMINUTO_LOG_ERROR("Remote Other [%zd] [%zd] [%zd] 0x%02x\n", remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
 
 			}
 
@@ -2407,19 +2426,19 @@ int main(int argc, char * argv[])
 
 			if ((surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer))) < sizeof(surveyor_buffer.header)) {
 
-				DIMINUTO_LOG_WARNING("Surveyor Length (%d) [%zd]\n", surveyor_fd, surveyor_total);
+				DIMINUTO_LOG_WARNING("Surveyor Length [%zd]\n", surveyor_total);
 
 			} else if ((surveyor_size = validate_datagram(&surveyor_sequence, &surveyor_buffer.header, surveyor_total, &outoforder_counter, &missing_counter)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Surveyor Order (%d) [%zd] {%lu} {%lu}\n", surveyor_fd, surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
+				DIMINUTO_LOG_NOTICE("Surveyor Order [%zd] {%lu} {%lu}\n", surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
 
 			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
 
-				DIMINUTO_LOG_ERROR("Surveyor Data (%d) [%zd] [%zd] [%zd] 0x%02x\n", surveyor_fd, surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
+				DIMINUTO_LOG_ERROR("Surveyor Data [%zd] [%zd] [%zd] 0x%02x\n", surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
 
 			} else if (surveyor_length == TUMBLEWEED_RTCM_SHORTEST) {
 
-	            DIMINUTO_LOG_DEBUG("Surveyor RTCM (%d) keepalive received", surveyor_fd);
+	            DIMINUTO_LOG_DEBUG("Surveyor RTCM keepalive received");
 
 			} else if (dev_fp == (FILE *)0) {
 
@@ -2439,8 +2458,9 @@ int main(int argc, char * argv[])
 	            kinematics.ticks = timeout;
 	            refresh = !0;
 
-				DIMINUTO_LOG_DEBUG("Surveyor RTCM (%d) <%d> [%zd]\n", surveyor_fd, kinematics.number, kinematics.length);
-	            if (verbose) { diminuto_dump(stderr, &surveyor_buffer, surveyor_total); }
+				DIMINUTO_LOG_DEBUG("Surveyor RTCM [%zd] [%zd] [%zd] <%d>\n", surveyor_total, surveyor_size, surveyor_length, kinematics.number);
+
+				if (verbose) { diminuto_dump(stderr, &surveyor_buffer, surveyor_total); }
 				write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
 
 			}
@@ -2501,7 +2521,8 @@ int main(int argc, char * argv[])
         	stamp_datagram(&keepalive_buffer.header, &keepalive_sequence);
             send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             keepalive_was = keepalive_now;
-            DIMINUTO_LOG_DEBUG("Surveyor RTCM (%d) keepalive sent", surveyor_fd);
+
+            DIMINUTO_LOG_DEBUG("Surveyor RTCM keepalive sent");
 
         }
 
