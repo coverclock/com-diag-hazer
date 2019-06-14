@@ -396,9 +396,9 @@ int main(int argc, char * argv[])
 				thou->classification = classification;
 				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
 				if (debug) {
-					fprintf(stderr, "Client [%s]:%d [%zd]\n", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
-	            	diminuto_dump(stderr, &(thee->address), sizeof(thee->address));
-	            	diminuto_dump(stderr, &(thee->port), sizeof(thee->port));
+					fprintf(stderr, "Client [%s]:%d [%zd]\n", diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port, total);
+	            	diminuto_dump(stderr, &(thou->address), sizeof(thou->address));
+	            	diminuto_dump(stderr, &(thou->port), sizeof(thou->port));
 				}
 			}
 
