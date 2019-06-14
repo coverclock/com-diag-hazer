@@ -410,17 +410,20 @@ int main(int argc, char * argv[])
 			 * it can flood the log.
 			 */
 
-			if (this->classification != BASE) {
+			if (thou->classification != BASE) {
 				/* Do nothing. */
 			} else if (base == (client_t *)0) {
-				base = thou; /* Cannot reject now. */
-				DIMINUTO_LOG_NOTICE("Client Set %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
-			} else if (base != thou) {
-				DIMINUTO_LOG_DEBUG("Client Bad %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
-				continue; /* REJECT */
-			} else {
 				/* Do nothing. */
+			} else if (base == thou) {
+				/* Do nothing. */
+			} else {
+				DIMINUTO_LOG_DEBUG("Client Conflict %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+				continue; /* REJECT */
 			}
+
+			/*
+			 * Cannot REJECT after this point.
+			 */
 
 			/*
 			 * If this is a base, forward the datagram to all rovers. Note
@@ -432,7 +435,7 @@ int main(int argc, char * argv[])
 			 * sequence numbers are fine.
 			 */
 
-			if (this->classification != BASE) {
+			if (thou->classification != BASE) {
 				/* Do nothing. */
 			} else if (diminuto_tree_isempty(&root)) {
 				/* Do nothing. */
@@ -462,6 +465,10 @@ int main(int argc, char * argv[])
 
 			if (that == (client_t *)0) {
 				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d ", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+				if (thou->classification == BASE) {
+					base = thou;
+					DIMINUTO_LOG_NOTICE("Client Set %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+				}
 				if (debug) {
 					fprintf(stderr, "Client [%s]:%d [%zd] %p %p %p %d\n", diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port, total, root, node, then, comparison);
 	            	diminuto_dump(stderr, &(thou->address), sizeof(thou->address));
@@ -489,7 +496,7 @@ int main(int argc, char * argv[])
 				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0; /* CONSUMED */
 			} else {
-				/* Do nothing. */
+				assert(0);
 			}
 
 			if (debug) {
