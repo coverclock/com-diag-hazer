@@ -460,6 +460,15 @@ int main(int argc, char * argv[])
 			 * If this a new client, add it to the database.
 			 */
 
+			if (that == (client_t *)0) {
+				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d ", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+				if (debug) {
+					fprintf(stderr, "Client [%s]:%d [%zd] %p %p %p %d\n", diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port, total, root, node, then, comparison);
+	            	diminuto_dump(stderr, &(thou->address), sizeof(thou->address));
+	            	diminuto_dump(stderr, &(thou->port), sizeof(thou->port));
+				}
+			}
+
 			if (that != (client_t *)0) {
 				/* Do nothing. */
 			} else if (diminuto_tree_isempty(&root)) {
