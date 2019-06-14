@@ -61,6 +61,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include <locale.h>
+#include <wchar.h>
 #include "./common.h"
 #include "./gpstool.h"
 #include "com/diag/hazer/hazer_release.h"

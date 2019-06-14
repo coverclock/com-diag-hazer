@@ -316,7 +316,7 @@ int main(int argc, char * argv[])
 			DIMINUTO_LOG_DEBUG("Datagram Received [%s]:%d [%zd]", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port, total);
 
             if (verbose) {
-				fprintf(stderr, "[%s]:%d [%zd]\n", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
+				fprintf(stderr, "Datagram [%s]:%d [%zd]\n", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
             	diminuto_dump(stderr, &buffer, total);
             }
 
@@ -395,6 +395,11 @@ int main(int argc, char * argv[])
 			if (that == (client_t *)0) {
 				thou->classification = classification;
 				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+				if (debug) {
+					fprintf(stderr, "Client [%s]:%d [%zd]\n", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
+	            	diminuto_dump(stderr, &(thee->address), sizeof(thee->address));
+	            	diminuto_dump(stderr, &(thee->port), sizeof(thee->port));
+				}
 			}
 
 			/*
