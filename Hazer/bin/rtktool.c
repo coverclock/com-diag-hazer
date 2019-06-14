@@ -48,7 +48,6 @@
 #include "com/diag/diminuto/diminuto_frequency.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_delay.h"
-#include "com/diag/diminuto/diminuto_containerof.h"
 
 /*******************************************************************************
  * GLOBALS
@@ -131,7 +130,6 @@ int main(int argc, char * argv[])
     client_t * thee = (client_t *)0;
     client_t * then = (client_t *)0;
     client_t * base = (client_t *)0;
-    classification_t classification = CLASSIFICATION;
     const char * label = (const char *)0;
     diminuto_mux_t mux = { 0 };
     int ready = 0;
@@ -385,36 +383,22 @@ int main(int argc, char * argv[])
 			 */
 
 			if (length > TUMBLEWEED_RTCM_SHORTEST) {
-				classification = BASE;
+				this->classification = BASE;
 				label = "base";
 			} else {
-				classification = ROVER;
+				this->classification = ROVER;
 				label = "rover";
 			}
 
 			/*
-			 * If this is a new client, save its classification.
+			 * If this client's classification has changed, we reject it.
+			 * If it's in fact legitimate (somehow), its existing entry will
+			 * eventually time out, be removed, and can be registered anew on
+			 * reception of a subsequent datagram.
 			 */
 
-			if (that == (client_t *)0) {
-				thou->classification = classification;
-				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
-				if (debug) {
-					fprintf(stderr, "Client [%s]:%d [%zd]\n", diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port, total);
-	            	diminuto_dump(stderr, &(thou->address), sizeof(thou->address));
-	            	diminuto_dump(stderr, &(thou->port), sizeof(thou->port));
-				}
-			}
-
-			/*
-			 * If this client's classification has changed, we reject it. If it's in fact
-			 * legitimate (somehow), its existing entry will eventually time
-			 * out, be removed, and can be registered anew on reception of a
-			 * subsequent datagram.
-			 */
-
-			if (classification != thou->classification) {
-				DIMINUTO_LOG_WARNING("Client Role %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+			if (this->classification != thou->classification) {
+				DIMINUTO_LOG_WARNING("Client Change %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
 				continue; /* REJECT */
 			}
 
@@ -426,10 +410,10 @@ int main(int argc, char * argv[])
 			 * it can flood the log.
 			 */
 
-			if (classification != BASE) {
+			if (this->classification != BASE) {
 				/* Do nothing. */
 			} else if (base == (client_t *)0) {
-				base = thou;
+				base = thou; /* Cannot reject now. */
 				DIMINUTO_LOG_NOTICE("Client Set %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
 			} else if (base != thou) {
 				DIMINUTO_LOG_DEBUG("Client Bad %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
@@ -448,7 +432,7 @@ int main(int argc, char * argv[])
 			 * sequence numbers are fine.
 			 */
 
-			if (thou->classification != BASE) {
+			if (this->classification != BASE) {
 				/* Do nothing. */
 			} else if (diminuto_tree_isempty(&root)) {
 				/* Do nothing. */
@@ -461,7 +445,7 @@ int main(int argc, char * argv[])
 				assert(last != (diminuto_tree_t *)0);
 
 				while (!0) {
-					thee = diminuto_containerof(client_t, node, node);
+					thee = (client_t *)diminuto_tree_data(node);
 					if (thee->classification == ROVER) {
 						result = diminuto_ipc6_datagram_send(sock, &buffer, total, thee->address, thee->port);
 						DIMINUTO_LOG_DEBUG("Datagram Sent [%s]:%d %zd", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port, result);
@@ -479,19 +463,29 @@ int main(int argc, char * argv[])
 			if (that != (client_t *)0) {
 				/* Do nothing. */
 			} else if (diminuto_tree_isempty(&root)) {
+				assert(this != (client_t *)0);
 				node = diminuto_tree_insert_root(&(this->node), &root);
 				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0; /* CONSUMED */
 			} else if (comparison < 0) {
+				assert(this != (client_t *)0);
+				assert(then != (client_t *)0);
 				node = diminuto_tree_insert_right(&(this->node), &(then->node));
 				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0; /* CONSUMED */
 			} else if (comparison > 0) {
+				assert(this != (client_t *)0);
+				assert(then != (client_t *)0);
 				node = diminuto_tree_insert_left(&(this->node), &(then->node));
 				assert(node != (diminuto_tree_t *)0);
 				this = (client_t *)0; /* CONSUMED */
 			} else {
 				/* Do nothing. */
+			}
+
+			if (debug) {
+				node = diminuto_tree_audit(&root);
+				assert(node == (diminuto_tree_t *)0);
 			}
 
 			/*
@@ -527,7 +521,7 @@ int main(int argc, char * argv[])
 			assert(last != (diminuto_tree_t *)0);
 
 			while (!0) {
-				thee = diminuto_containerof(client_t, node, node);
+				thee = (client_t *)diminuto_tree_data(node);
 				next = diminuto_tree_next(node);
 				if ((now - thee->last) > timeout) {
 					DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", (thee->classification == BASE) ? "base" : (thee->classification == ROVER) ? "rover" : "unknown", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port);
@@ -572,7 +566,7 @@ int main(int argc, char * argv[])
 		assert(last != (diminuto_tree_t *)0);
 
 		while (!0) {
-			thee = diminuto_containerof(client_t, node, node);
+			thee = (client_t *)diminuto_tree_data(node);
 			next = diminuto_tree_next(node);
 			node = diminuto_tree_remove(&(thee->node));
 			assert(node != (diminuto_tree_t *)0);
