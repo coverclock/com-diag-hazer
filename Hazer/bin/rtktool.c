@@ -64,8 +64,6 @@ static const char * Program = (const char *)0;
  */
 static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 
-static const client_t CLIENT = CLIENT_INITIALIZER;
-
 /*******************************************************************************
  * HELPERS
  ******************************************************************************/
@@ -76,13 +74,15 @@ static int comparator(diminuto_tree_t * tap, diminuto_tree_t * tbp)
 	client_t * cap = (client_t *)0;
 	client_t * cbp = (client_t *)0;
 
-	cap = diminuto_containerof(client_t, node, tap);
-	cbp = diminuto_containerof(client_t, node, tbp);
+	cap = (client_t *)diminuto_tree_data(tap);
+	cbp = (client_t *)diminuto_tree_data(tbp);
 
 	if ((rc = diminuto_ipc6_compare(&(cap->address), &(cbp->address))) != 0) {
 		/* Do nothing. */
-	} else if ((rc = (cap->port < cbp->port) ? -1 : (cap->port > cbp->port) ? 1 : 0) != 0) {
-		/* Do nothing. */
+	} else if (cap->port < cbp->port) {
+		rc = -1;
+	} else if (cap->port > cbp->port) {
+		rc = 1;
 	} else {
 		/* Do nothing. */
 	}
@@ -334,10 +334,12 @@ int main(int argc, char * argv[])
 			} else if (comparison != 0) {
 				that = (client_t *)0;
 				then = (client_t *)diminuto_tree_data(node);
+				assert(then != (client_t *)0);
 				thou = this;
 				this->sequence = 0; /* RESET */
 			} else {
 				that = (client_t *)diminuto_tree_data(node);
+				assert(that != (client_t *)0);
 				then = (client_t *)0;
 				thou = that;
 			}
@@ -346,17 +348,19 @@ int main(int argc, char * argv[])
 			 * At this point in our story:
 			 *
 			 * this points to the client we allocated and which may become a
-			 * new entry in the database;
+			 * new entry in the database or may be later reused;
 			 *
 			 * that points to the matching client we found in the database or
 			 * NULL if we didn't find a matching client;
 			 *
-			 * then points to the nearest client in the tree that we will use
-			 * to insert the new client when we didn't find a match.
+			 * then points to the nearest non-match in the tree that we will
+			 * use to insert the new client when we didn't find a match or NULL
+			 * if we didn't find a nearest match because the database was
+			 * empty;
 			 *
 			 * thou points to the client we're going to use to validate the
 			 * datagram we just received, and it will either be equal to either
-			 * this or that;
+			 * this or that and will always be non-NULL;
 			 *
 			 * thee will temporarily point to clients as we traverse through
 			 * the database for one reason or another.
