@@ -260,7 +260,7 @@ Raspbian 8.0 "Jessie"
 Linux 4.4.34    
 gcc 4.9.2    
 
-"Zinc" or "Lead"    
+"Zinc" and "Lead"    
 Raspberry Pi 3 Model B    
 Broadcom BCM2837 Cortex-A53 ARMv7 @ 1.2GHz x 4    
 Raspbian 8.0 "Jessie"    
@@ -274,12 +274,33 @@ Raspbian 9.4 "Stretch"
 Linux 4.14.34    
 gcc 6.3.0    
 
+"Bodega" and "Mochila"    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 9.8 "Stretch"    
+Linux 4.14.98    
+gcc 6.3.0    
+
+"Jefe"    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 9.9 "Stretch"    
+Linux 4.19.42    
+gcc 6.3.0    
+
 "Cadmium"    
 Intel NUC7i7BNH    
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
 Ubuntu 16.04.5 "Xenial Xerus"    
 Linux 4.15.0    
 gcc 5.4.0    
+
+"Cadmium" (updated)    
+Intel NUC7i7BNH    
+Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
+Ubuntu 19.04 "Disco Dingo"   
+Linux 5.0.0    
+gcc 8.3.0    
 
 # Articles
 
@@ -774,6 +795,11 @@ resolved to a valid location, how many seconds and observations have
 been consumed during the survey, and what the mean error is. In rover
 (mobile) mode, it shows what RTCM message was last received and from whom.
 
+RTK (if present) show the latest RTCM message received, either from the
+device when operating in base mode, or from the base when operating in
+rover mode. The lengths of the shortest, most recent, and longest RTCM
+message is shown. The mode of the system, base or rover, is shown.
+
 ACT is the list of active satellites, typically provided seperately
 for each system or constellation by the device, showing each satellites
 identifying number (for GPS, this is its pseudo-random noise or PRN code
@@ -813,14 +839,13 @@ not in the transmitted almanac), and an '!' indicates that the signal
 strength was empty but displays as zero (some receivers use this to
 indicate the satellite is not being tracked).
 
-While NMEA (and UBX too for that matter) is good about updating the
-application with new information, it is not so good about letting the
+While NMEA (and UBX amd RTCM too for that matter) is good about updating
+the application with new information, it is not so good about letting the
 application know when that data is no longer relevant. For that reason,
-all of the data read from the GPS devices has associated with it an
-expiration time in seconds. This can be set from the command line, in
-the range 0 to the default of 255. If the data is not updated within
-that duration by new sentences or messages from the GPS device, it is
-no longer displayed.
+all of the data read from the device has associated with it an expiration
+time in seconds. This can be set from the command line, in the range 0
+to the default of 255. If the data is not updated within that duration by
+new sentences or messages from the GPS device, it is no longer displayed.
 
 # Notes
 
@@ -1425,7 +1450,7 @@ core dumped with a segmentation violation.
 
 (2019-06-06: U-Blox says this FW bug will be fixed in a subsequent release.)
 
-## Ardusimple SimpleRTK2B (OBSOLETE)
+## Ardusimple SimpleRTK2B
 
 The Ardusimple SimpleRTK2B board features a ZED-F9P "9th generation" U-Blox
 chip. It can be equipped with radios like the ZigBee-based XBee. This allows
@@ -1436,22 +1461,20 @@ the survey has been completed to the configured level of accuracy. This
 is a form of Differential GNSS and can, over time, achieve very high position
 (and time) accuracy and precision.
 
-### Block Diagram (OBSOLETE)
-
                                 Radio Antenna
                                       :
                                 [ XBee3 SX ]
                                       ^ 
                                       | 
                                       v 
-                     Header <--> XBee UART <--> FTDI <--> USB <--> XCTU
+                     Header <--> XBee UART <--> FTDI <--> USB <--> { XCTU }
                                       ^
                                       |
                                       v
                                   UBX UART2
                                       |
                                       v
-    Header <--> UBX UART1 <--> [ UBX-ZED-F9P ] <--> USB <--> u-center or gpstool
+    Header <--> UBX UART1 <--> [ UBX-ZED-F9P ] <--> USB <--> { u-center or gpstool }
                                       :
                                   GPS Antenna
 
@@ -1467,144 +1490,6 @@ The ZED-F9P is configured at run-time using gpstool to send it commands. This
 configuration is in volatile memory so that the GPS receiver reverts back to its
 factory defaults when it is power cycled. Among other things, this allows me to
 use SimpleRTK2B boards interchangeably in the field.
-
-### Base Configuration (OBSOLETE)
-
-    $ simplertk2bbase /dev/ttyACM0
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    END gpstool: LAST.
-    END gpstool: END.
-
-    $ simplertk2bquery /dev/ttyACM0
-    UBX gpstool: MON VER SW "EXT CORE 1.00 (94e56e)"
-    UBX gpstool: MON VER HW "00190000"
-    UBX gpstool: MON VER EX "ROM BASE 0x118B2060"
-    UBX gpstool: MON VER EX "FWVER=HPG 1.11"
-    UBX gpstool: MON VER EX "PROTVER=27.10"
-    UBX gpstool: MON VER EX "MOD=ZED-F9P"
-    UBX gpstool: MON VER EX "GPS;GLO;GAL;BDS"
-    UBX gpstool: MON VER EX "QZSS"
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20930001 0x29
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20030001 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030010 0x0000003c
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030011 0x000186a0
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x40530001 0x00009600
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530002 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530003 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530004 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x10530005 0x1
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x209102bf 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910360 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910365 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036a 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036f 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910305 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x10750004 0x0
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x10760004 0x1
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091008b 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091026b 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    END gpstool: LAST.
-    END gpstool: END.
-
-### Rover Configuration (OBSOLETE)
-
-    $ simplertk2brover /dev/ttyACM1
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    UBX gpstool: ACK 0x06 0x8a (1)
-    END gpstool: LAST.
-    END gpstool: END.
-
-    $ simplertk2bquery /dev/ttyACM1
-    UBX gpstool: MON VER SW "EXT CORE 1.00 (94e56e)"
-    UBX gpstool: MON VER HW "00190000"
-    UBX gpstool: MON VER EX "ROM BASE 0x118B2060"
-    UBX gpstool: MON VER EX "FWVER=HPG 1.11"
-    UBX gpstool: MON VER EX "PROTVER=27.10"
-    UBX gpstool: MON VER EX "MOD=ZED-F9P"
-    UBX gpstool: MON VER EX "GPS;GLO;GAL;BDS"
-    UBX gpstool: MON VER EX "QZSS"
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20930001 0x29
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20030001 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030010 0x00000000
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x40030011 0x00000000
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x40530001 0x00009600
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530002 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530003 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20530004 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x10530005 0x1
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x209102bf 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910360 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910365 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036a 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091036f 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x20910305 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x10750004 0x1
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x10760004 0x0
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091008b 0x00
-    UBX gpstool: ACK 0x06 0x8b (1)
-    UBX gpstool: CFG VALGET v1 RAM [0] 0x2091026b 0x01
-    UBX gpstool: ACK 0x06 0x8b (1)
-    END gpstool: LAST.
-    END gpstool: END.
 
 ## USB Weirdness With Nickel And Cadmium
 
@@ -1632,14 +1517,16 @@ like a fragment of an NMEA sentence) was inserted at the end of a valid
 NMEA sentence. So this corruption occurs without my SW being involved
 at all.
 
-Finally I ran my SW on Nickel using the BU353W10 receiver (a U-Blox 8
+I ran my SW on Nickel using the BU353W10 receiver (a U-Blox 8
 device),  and I saw similar occasional loss of sync due to corruption
 of the NMEA stream. Similarly, the same SW and GPS HW on the Pi worked
 without problems.
 
+I updated Cadmium to Ubuntu 19.04 and observed the same misbehavior.
+
 This appears to be an issue either with the Intel USB hardware on both
-of the NUC boxes, or with the USB stack in both of the different versions
-of Linux each box is running.
+of the NUC boxes, or with the USB stacks in all of the different versions
+of Ubuntu I tested. Both seem unlikely.
 
 # Acknowledgements
 
