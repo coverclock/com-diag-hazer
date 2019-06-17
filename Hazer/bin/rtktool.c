@@ -431,8 +431,13 @@ int main(int argc, char * argv[])
 			 * likely be behind that of the old base, and all of the rovers
 			 * will need to be restarted manually. But it is also possible
 			 * that the base is the same and some darn NATting firewall just
-			 * changed its address (I've seen this happen), in which case the
-			 * sequence numbers are fine.
+			 * changed the client's address, in which case the sequence
+			 * numbers are fine. (Rover clients that are truly mobile may
+			 * see their IPv4 addresses change as they switch from cell site
+			 * to cell site. But it can happen to non-mobile rovers and even
+			 * stationary bases, because of a particular cell site becoming
+			 * overloaded and the network deciding to switch a client to a
+			 * different, perhaps slightly more distant, cell site.)
 			 */
 
 			if (thou->classification != BASE) {

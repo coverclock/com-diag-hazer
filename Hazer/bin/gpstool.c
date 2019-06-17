@@ -1237,6 +1237,7 @@ int main(int argc, char * argv[])
     int verbose = 0;
     int escape = 0;
     int report = 0;
+    int process = 0;
     int strobepin = -1;
     int ppspin = -1;
     int slow = 0;
@@ -1426,6 +1427,7 @@ int main(int argc, char * argv[])
      * Time keeping variables.
      */
     diminuto_sticks_t frequency = 0;
+    diminuto_sticks_t delay = 0;
     diminuto_sticks_t elapsed = 0;
     diminuto_sticks_t epoch = 0;
     diminuto_sticks_t fix = -1;
@@ -1500,7 +1502,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:ORS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNPQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:OPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1545,10 +1547,12 @@ int main(int argc, char * argv[])
         case 'E':
             report = !0;
             escape = !0;
+        	process = !0;
             break;
         case 'F':
             report = !0;
             slow = !0;
+        	process = !0;
             break;
         case 'G':
             remote_option = optarg;
@@ -1558,6 +1562,7 @@ int main(int argc, char * argv[])
         case 'H':
             report = !0;
             headless = optarg;
+        	process = !0;
             break;
         case 'I':
             pps = optarg;
@@ -1571,8 +1576,12 @@ int main(int argc, char * argv[])
         case 'L':
             logging = optarg;
             break;
+        case 'P':
+        	process = !0;
+        	break;
         case 'R':
             report = !0;
+        	process = !0;
             break;
         case 'S':
             source = optarg;
@@ -1673,7 +1682,7 @@ int main(int argc, char * argv[])
                            "[ -t SECONDS ] "
                            "[ -I PIN | -c ] [ -p PIN ] "
                            "[ -U STRING ... ] [ -W STRING ... ] "
-                           "[ -R | -E | -F | -H HEADLESS ] "
+                           "[ -R | -E | -F | -H HEADLESS | -P ] "
                            "[ -L LOG ] "
                            "[ -G [ IP:PORT | :PORT [ -g MASK ] ] ] "
                            "[ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] "
@@ -1694,6 +1703,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
             fprintf(stderr, "       -L LOG      Write input to LOG file.\n");
+            fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S SOURCE   Use SOURCE file or named pipe for input.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
@@ -2122,6 +2132,8 @@ int main(int argc, char * argv[])
 
     display_now = display_was = expiration_now = expiration_was = keepalive_now = keepalive_was = (epoch = diminuto_time_elapsed()) / (frequency = diminuto_frequency());
 
+    delay = frequency; /* May be mutatable some day. */
+
     keepalive_was -= keepalive;
 
     /*
@@ -2151,9 +2163,9 @@ int main(int argc, char * argv[])
         }
     }
 
-    /*
-     * Enter the work loop.
-     */
+    /**
+     ** LOOP
+     **/
 
     DIMINUTO_LOG_INFORMATION("Start");
 
@@ -2198,7 +2210,7 @@ int main(int argc, char * argv[])
 			fd = in_fd;
 		} else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
 			/* Do nothing. */
-		} else if ((ready = diminuto_mux_wait(&mux, frequency)) == 0) {
+		} else if ((ready = diminuto_mux_wait(&mux, delay)) == 0) {
 			fd = -1;
 		} else if (ready > 0) {
 			fd = diminuto_mux_ready_read(&mux);
@@ -2358,15 +2370,6 @@ int main(int argc, char * argv[])
 
 			assert((io_available == 0) || (buffer != (void *)0) || eof);
 
-			/*
-			 * If we detected End Of File from our input source, we're
-			 * done.
-			 */
-
-			if (eof) {
-				break;
-			}
-
 		} else if (fd == remote_fd) {
 
 			/*
@@ -2469,8 +2472,8 @@ int main(int argc, char * argv[])
 		} else {
 
 			/*
-			 * The select(2) system call returned a file descriptor which
-			 * was not one we know about; that should be impossible.
+			 * The multiplexor returned a file descriptor which was not one we
+			 * know about; that should be impossible.
 			 */
 
 			DIMINUTO_LOG_ERROR("Multiplex Invalid (%d) <%d %d %d>\n", fd, dev_fd, remote_fd, surveyor_fd);
@@ -2479,12 +2482,10 @@ int main(int argc, char * argv[])
 		}
 
         /*
-         * If one of the state machines indicated end of file, we're done.
+         * If one of the input sources indicated end of file, we're done.
          */
 
-        if (eof) {
-            break;
-        }
+        if (eof) { break; }
 
         /**
          ** KEEPALIVE
@@ -2631,10 +2632,6 @@ int main(int argc, char * argv[])
          * it (none currently do), it does not include the trailing NUL.
          */
 
-        if (verbose) { print_buffer(stderr, buffer, length, UNLIMITED); }
-        if (escape) { fputs("\033[1;1H\033[0K", out_fp); }
-        if (report) { fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation); fflush(out_fp); }
-
         /**
          ** FORWARD
          **/
@@ -2692,9 +2689,21 @@ int main(int argc, char * argv[])
          ** LOG
          **/
 
-        if (log_fp != (FILE *)0) {
-            write_buffer(log_fp, buffer, length);
-        }
+        if (log_fp != (FILE *)0) {  write_buffer(log_fp, buffer, length); }
+
+        if (verbose) { print_buffer(stderr, buffer, length, UNLIMITED); }
+
+        /*
+         * At this point, if we are not generating a report or not otherwise
+         * required to process the incoming data (maybe we're only forwarding
+         * data to a remote via datagrams, or writing incoming datagrams to
+         * a device), there is no point in continuing.
+         */
+
+        if (!process) { continue; }
+
+        if (escape) { fputs("\033[1;1H\033[0K", out_fp); }
+        if (report) { fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation); fflush(out_fp); }
 
         /**
          ** EXPIRE
@@ -3094,9 +3103,29 @@ int main(int argc, char * argv[])
 
         }
 
+        /**
+         ** REPORT
+         **/
+
         /*
-         * DISPLAY
+         * We always give priority to reading input from the device or the
+         * socket. Generating the report can take a long time, particularly
+         * with slow displays or serial consoles (partly what the -F flag is
+         * all about). So if there is still data waiting to be read, we
+         * short circuit the report code and instead try to assemble another
+         * complete sentence, packet, or message that we can forward, write,
+         * log, or use to update our databases.
          */
+
+        if ((ready = diminuto_mux_wait(&mux, 0)) == 0) {
+        	/* Do nothing. */
+        } else if (ready > 0) {
+        	continue;
+		} else if (errno == EINTR) {
+			continue;
+		} else {
+			assert(0);
+		}
 
         /*
          * This code is just for testing the expiration feature.
@@ -3210,7 +3239,7 @@ int main(int argc, char * argv[])
 
 	DIMINUTO_LOG_INFORMATION("Stop");
 
-	DIMINUTO_LOG_INFORMATION("Counters OutOfOrder=%u Missing=%u", outoforder_counter, missing_counter);
+	DIMINUTO_LOG_INFORMATION("Counters Remote=%lu Surveyor=%lu Keepalive=%lu OutOfOrder=%u Missing=%u", (unsigned long)remote_sequence, (unsigned long)surveyor_sequence, (unsigned long)keepalive_sequence, outoforder_counter, missing_counter);
 
     rc = tumbleweed_finalize();
     assert(rc == 0);

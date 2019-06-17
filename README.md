@@ -325,6 +325,9 @@ Chip Overclock, "We Have Met the Enemy and He Is Us",
 Chip Overclock, "GPS Satellite PRN 4",
 <https://coverclock.blogspot.com/2018/11/gps-satellite-prn-4.html>
 
+Chip Overclock, "This Is What You Have To Deal With",
+<https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
+
 # Media
 
 Adam Hart-Davis, "The Clock That Changed the World", A History of the World,
@@ -1490,43 +1493,6 @@ The ZED-F9P is configured at run-time using gpstool to send it commands. This
 configuration is in volatile memory so that the GPS receiver reverts back to its
 factory defaults when it is power cycled. Among other things, this allows me to
 use SimpleRTK2B boards interchangeably in the field.
-
-## USB Weirdness With Nickel And Cadmium
-
-I spent several days troubleshooting what I assumed to be a bug in my SW
-regarding the synchronization of the NMEA, UBX, and RTCM state machines
-with the input stream from the UBX-ZED-F9P receiver (a U-Blox 9 device)
-on Nickel (Intel NUC5i7RYH, Ubuntu 18.04.1).
-
-I tested the same code on Cadmium (NUC7i7BNH, Ubuntu 16.04.5) and saw the
-same symptom: every tens of seconds or so my SW  would loose sync with
-the input stream than regain it. 
-
-I couldn't reproduce the problem on Gold, an ARM-based Raspberry Pi
-(Broadcom BCM2837B0, Raspbian 9.4) using exactly the same application
-SW and the same receiver HW.
-
-So I ran the standard Linux utility socat on Nickel to save about a
-minute's worth of NMEA data (UBX and RTCM weren't enabled on the F9P for
-this test). I ran my SW against the file (so: no real-time requirements)
-and recorded the Sync Lost messages that included the offset into the data
-where the errors occurred. Then I did a hex dump of the original file,
-checked at those offsets, and sure enough the NMEA stream was corrupted:
-it appears periodically a spurious handful of bytes (looking suspiciously
-like a fragment of an NMEA sentence) was inserted at the end of a valid
-NMEA sentence. So this corruption occurs without my SW being involved
-at all.
-
-I ran my SW on Nickel using the BU353W10 receiver (a U-Blox 8
-device),  and I saw similar occasional loss of sync due to corruption
-of the NMEA stream. Similarly, the same SW and GPS HW on the Pi worked
-without problems.
-
-I updated Cadmium to Ubuntu 19.04 and observed the same misbehavior.
-
-This appears to be an issue either with the Intel USB hardware on both
-of the NUC boxes, or with the USB stacks in all of the different versions
-of Ubuntu I tested. Both seem unlikely.
 
 # Acknowledgements
 
