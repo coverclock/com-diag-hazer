@@ -221,7 +221,7 @@ int main(int argc, char * argv[])
 
     sock = diminuto_ipc6_datagram_peer(endpoint.udp);
     assert(sock >= 0);
-    DIMINUTO_LOG_INFORMATION("Connection (%d) \"%s\" [%s]:%d", sock, rendezvous, diminuto_ipc6_address2string(endpoint.ipv6, ipv6, sizeof(ipv6)), endpoint.udp);
+    DIMINUTO_LOG_INFORMATION("Router (%d) \"%s\" [%s]:%d", sock, rendezvous, diminuto_ipc6_address2string(endpoint.ipv6, ipv6, sizeof(ipv6)), endpoint.udp);
 
 
     rc = diminuto_mux_register_read(&mux, sock);
