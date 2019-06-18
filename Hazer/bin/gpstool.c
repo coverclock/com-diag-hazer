@@ -315,15 +315,15 @@ static void show_connection(const char * label, const char * option, int fd, pro
     switch (protocol) {
 
     case IPV6:
-        DIMINUTO_LOG_INFORMATION("Connection %s (%d) \"%s\" [%s]:%d", label, fd, option, diminuto_ipc6_address2string(*ipv6p, ipv6, sizeof(ipv6)), port);
+        DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\" [%s]:%d", label, fd, option, diminuto_ipc6_address2string(*ipv6p, ipv6, sizeof(ipv6)), port);
         break;
 
     case IPV4:
-        DIMINUTO_LOG_INFORMATION("Connection %s (%d) \"%s\" %s:%d", label, fd, option, diminuto_ipc4_address2string(*ipv4p, ipv4, sizeof(ipv4)), port);
+        DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\" %s:%d", label, fd, option, diminuto_ipc4_address2string(*ipv4p, ipv4, sizeof(ipv4)), port);
         break;
 
     case PROTOCOL:
-        DIMINUTO_LOG_INFORMATION("Connection %s (%d) \"%s\"", label, fd, option);
+        DIMINUTO_LOG_INFORMATION("%s (%d) \"%s\"", label, fd, option);
         break;
 
     }
@@ -2021,7 +2021,7 @@ int main(int argc, char * argv[])
 
         if (serial) {
 
-			DIMINUTO_LOG_INFORMATION("Device \"%s\" %s (%d) %d %d%c%d%s%s%s\n", device, readonly ? "ro" : "rw", dev_fd, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
+			DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s %d %d%c%d%s%s%s\n", dev_fd, device, readonly ? "ro" : "rw", bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
 
         	rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
         	assert(rc == 0);
@@ -2031,7 +2031,7 @@ int main(int argc, char * argv[])
 
         } else {
 
-			DIMINUTO_LOG_INFORMATION("Device \"%s\" %s (%d)\n", device, readonly ? "ro" : "rw", dev_fd);
+			DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s\n", dev_fd, device, readonly ? "ro" : "rw");
 
         }
 
