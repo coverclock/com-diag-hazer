@@ -22,7 +22,7 @@
  * station sending RTK updates, or a mobile (maybe) rover sending keepalives
  * and receiving RTK updates.
  */
-typedef enum Classification { CLASSIFICATION = '?', BASE = 'B', ROVER = 'R', } classification_t;
+typedef enum Class { CLASS = '?', BASE = 'B', ROVER = 'R', } class_t;
 
 /**
  * This structure describes the state we have to maintain about clients.
@@ -31,7 +31,7 @@ typedef struct Client {
 	diminuto_tree_t node;
     long last;
     datagram_sequence_t sequence;
-	classification_t classification;
+	class_t classification;
     diminuto_ipv6_t address;
     diminuto_port_t port;
 } client_t;

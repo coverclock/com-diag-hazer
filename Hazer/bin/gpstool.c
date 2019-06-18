@@ -1009,7 +1009,7 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
      if (kp->ticks != 0) {
 
          fputs("RTK", fp);
-         fprintf(fp, " %4u [%4zu] [%4zu] [%4zu] %-8s", kp->number, kp->minimum, kp->length, kp->maximum, (kp->source == BASE) ? "base" : (kp->source == ROVER) ? "rover" : "unknown");
+         fprintf(fp, " %4u [%4zu] [%4zu] [%4zu] %-8s", kp->number, kp->minimum, kp->length, kp->maximum, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown");
          fprintf(fp, "%33s", "");
          fprintf(fp, "%-8s", "DGNSS");
          fputc('\n', fp);
@@ -1443,7 +1443,6 @@ int main(int argc, char * argv[])
      */
     void * io_buffer = (void *)0;
     size_t io_size = BUFSIZ;
-    ssize_t io_available = 0;
     size_t io_maximum = 0;
     size_t io_total = 0;
     /*
@@ -1453,6 +1452,7 @@ int main(int argc, char * argv[])
     int ch = EOF;
     int ready = 0;
     int fd = -1;
+    ssize_t available = 0;
     format_t format = FORMAT;
     FILE * fp = (FILE *)0;
     uint8_t * buffer = (uint8_t *)0;
@@ -2208,29 +2208,34 @@ int main(int argc, char * argv[])
 
 		fd = -1;
 
-		if ((io_available = diminuto_file_ready(in_fp)) > 0) {
-			fd = in_fd;
+		if ((available = diminuto_file_ready(in_fp)) > 0) {
+			/* Do nothing. */
 		} else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
 			/* Do nothing. */
-		} else if ((ready = diminuto_mux_wait(&mux, delay)) == 0) {
-			fd = -1;
+		} else if ((ready = diminuto_mux_wait(&mux, delay /* BLOCK */)) == 0) {
+			/* Do nothing. */
 		} else if (ready > 0) {
 			fd = diminuto_mux_ready_read(&mux);
+			assert(fd >= 0);
 		} else if (errno == EINTR) {
 			continue;
 		} else {
 			assert(0);
 		}
 
+		/*
+		 * At this point, either available > 0 (there is pending data in
+		 * the input stream buffer) or fd >= 0 (there is a file descriptor or
+		 * socket with pending data), or fd < 0 (there is no data pending).
+		 * The latter case is very unlikely since there was a long timeout in
+		 * the multiplexor wait unless our device has stopped generating data.
+		 */
+
 		buffer = (uint8_t *)0;
 
-		if (fd < 0) {
+		if ((available > 0) || (fd == in_fd)) {
 
-			/*
-			 * No input, so do something else.
-			 */
-
-		} else if (fd == in_fd) {
+			if (available > io_maximum) { io_maximum = available; }
 
 			/*
 			 * Consume bytes of NMEA, UBX, or RTCM from the input stream until
@@ -2239,8 +2244,6 @@ int main(int argc, char * argv[])
 			 */
 
 			do {
-
-				if (io_available > io_maximum) { io_maximum = io_available; }
 
 				ch = fgetc(in_fp);
 				if (ch == EOF) {
@@ -2290,7 +2293,7 @@ int main(int argc, char * argv[])
 
 				} else {
 
-					DIMINUTO_LOG_WARNING("Sync Lost 0x%08llx 0x%02x\n", (unsigned long long)io_total, ch);
+					DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
 
 					sync = 0;
 
@@ -2309,7 +2312,7 @@ int main(int argc, char * argv[])
 					size = hazer_size(&nmea_context);
 					length = size - 1;
 					format = NMEA;
-					if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%08llx\n", (unsigned long long)io_total); sync = !0; }
+					if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 
 					DIMINUTO_LOG_DEBUG("Device NMEA [%zd] [%zd]", size, length);
@@ -2325,7 +2328,7 @@ int main(int argc, char * argv[])
 					size = yodel_size(&ubx_context);
 					length = size - 1;
 					format = UBX;
-					if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%08llx\n", (unsigned long long)io_total); sync = !0; }
+					if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 
 					DIMINUTO_LOG_DEBUG("Device UBX [%zd] [%zd]", size, length);
@@ -2340,7 +2343,7 @@ int main(int argc, char * argv[])
 					size = tumbleweed_size(&rtcm_context);
 					length = size - 1;
 					format = RTCM;
-					if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%08llx\n", (unsigned long long)io_total); sync = !0; }
+					if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 
 					DIMINUTO_LOG_DEBUG("Device RTCM [%zd] [%zd]", size, length);
@@ -2361,16 +2364,20 @@ int main(int argc, char * argv[])
 				} else if (rtcm_state != TUMBLEWEED_STATE_STOP) {
 					/* Do nothing. */
 				} else {
-					if (sync) { DIMINUTO_LOG_WARNING("Sync Stop 0x%08llx 0x%02x\n", (unsigned long long)io_total, ch); sync = 0; }
+					if (sync) { DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch); sync = 0; }
 				    frame = 0;
 				    nmea_state = HAZER_STATE_START;
 				    ubx_state = YODEL_STATE_START;
 				    rtcm_state = TUMBLEWEED_STATE_START;
 				}
 
-			} while ((io_available = diminuto_file_ready(in_fp)) > 0);
+			} while (diminuto_file_ready(in_fp) > 0);
 
-			assert((io_available == 0) || (buffer != (void *)0) || eof);
+			/*
+			 * At this point, either we ran out of data in the input
+			 * stream buffer, or we assembled a complete NMEA sentence,
+			 * UBX packet, or NMEA message to process, or we hit end of file.
+			 */
 
 		} else if (fd == remote_fd) {
 
@@ -2427,7 +2434,7 @@ int main(int argc, char * argv[])
 		} else if (fd == surveyor_fd) {
 
 			/*
-			 * Receive an RTCM message from a remote gpstool doing a survey.
+			 * Receive an RTCM datagram from a remote gpstool doing a survey.
 			 */
 
 			if ((surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer))) < sizeof(surveyor_buffer.header)) {
@@ -2452,7 +2459,7 @@ int main(int argc, char * argv[])
 
 			} else {
 
-	            kinematics.source = ROVER;
+	            kinematics.source = NETWORK;
 
 				kinematics.number = tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length);
 	            if (kinematics.number < 0) { kinematics.number = 9999; }
@@ -2471,14 +2478,21 @@ int main(int argc, char * argv[])
 
 			}
 
+		} else if (fd < 0) {
+
+			/*
+			 * Very unlikely but not impossible if our device or remote
+			 * stopped generating data.
+			 */
+
 		} else {
 
 			/*
 			 * The multiplexor returned a file descriptor which was not one we
-			 * know about; that should be impossible.
+			 * recognize; that should be impossible.
 			 */
 
-			DIMINUTO_LOG_ERROR("Multiplex Invalid (%d) <%d %d %d>\n", fd, dev_fd, remote_fd, surveyor_fd);
+			DIMINUTO_LOG_ERROR("Multiplexor Fail [%d] (%d) <%d %d %d>\n", ready, fd, dev_fd, remote_fd, surveyor_fd);
 			assert(0);
 
 		}
@@ -2488,6 +2502,13 @@ int main(int argc, char * argv[])
          */
 
         if (eof) { break; }
+
+        /*
+         * At this point, either we have a buffer with a complete and validated
+         * NMEA sentence, UBX packet, or RTCM message ready to process, acquired
+         * either from a state machine or a socket, or there is no input pending
+         * and maybe this is a good time to update the display.
+         */
 
         /**
          ** KEEPALIVE
@@ -2900,6 +2921,19 @@ int main(int argc, char * argv[])
 
             }
 
+            /*
+             * Calculate our time to first fix if the code above established
+             * a fix.
+             */
+
+            if (fix < 0) {
+                /* Do nothing. */
+            } else if (timetofirstfix >= 0) {
+                /* Do nothing. */
+            } else {
+                timetofirstfix = fix - epoch;
+            }
+
             break;
 
         case UBX:
@@ -3083,7 +3117,7 @@ int main(int argc, char * argv[])
 
             if (verbose) { diminuto_dump(stderr, buffer, length); }
 
-            kinematics.source = BASE;
+            kinematics.source = DEVICE;
 
             kinematics.number = tumbleweed_message(buffer, length);
             if (kinematics.number < 0) { kinematics.number = 9999; }
@@ -3110,7 +3144,7 @@ int main(int argc, char * argv[])
          **/
 
         /*
-         * We always give priority to reading input from the device or the
+         * We always give priority to reading input from the device or a
          * socket. Generating the report can take a long time, particularly
          * with slow displays or serial consoles (partly what the -F flag is
          * all about). So if there is still data waiting to be read, we
@@ -3121,14 +3155,10 @@ int main(int argc, char * argv[])
 
         if (diminuto_file_ready(in_fp) > 0) {
         	continue;
-        } else if ((ready = diminuto_mux_wait(&mux, 0)) == 0) {
-        	/* Do nothing. */
-        } else if (ready > 0) {
-        	continue;
-		} else if (errno == EINTR) {
+        } else if (diminuto_mux_wait(&mux, 0 /* POLL */) > 0) {
 			continue;
 		} else {
-			assert(0);
+			/* Do nothing. */
 		}
 
         /*
@@ -3136,7 +3166,10 @@ int main(int argc, char * argv[])
          * It turns out to be remarkably difficult to block the most recent
          * GPS receivers, e.g. the UBlox 8. Makes me wish I still had access
          * to those gigantic walk-in Faraday cages that several of my clients
-         * have.
+         * have. Anyway, if some of the data are too old, we remove them from
+         * the display. This is particularly useful (for me) for determining
+         * when a base has stopped transmitting to a rover, making the rover's
+         * high precision position fix problematic.
          */
 
         if (!expire) {
@@ -3183,21 +3216,13 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * Calculate our time to first fix.
+         * Generate the display if necessary and sufficient reasons exist.
          */
 
-        if (fix < 0) {
-            /* Do nothing. */
-        } else if (timetofirstfix >= 0) {
-            /* Do nothing. */
-        } else {
-            timetofirstfix = fix - epoch;
-        }
-
         if (!refresh) {
-            /* Do nothing: nothing changed. */
+            /* Do nothing. */
         } else if (slow && (display_was == (display_now = ticktock(frequency)))) {
-            /* Do nothing: slow display cannot handle real-time refresh rate. */
+            /* Do nothing. */
         } else {
 
             if (escape) { fputs("\033[3;1H", out_fp); }

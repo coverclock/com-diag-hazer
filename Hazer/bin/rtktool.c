@@ -299,7 +299,7 @@ int main(int argc, char * argv[])
 			    assert(temp != (diminuto_tree_t *)0);
 				this->last = 0;
 				this->sequence = 0;
-				this->classification = CLASSIFICATION;
+				this->classification = CLASS;
 			}
 
 			/*

@@ -47,7 +47,7 @@ typedef enum Format { FORMAT = 0, NMEA = (1<<0), UBX = (1<<1), RTCM = (1<<2), AN
  * base station in survey mode) or from the network (in which case we are a
  * mobile rover)?
  */
-typedef enum Source { SOURCE = '?', BASE = 'B', ROVER = 'R', } source_t;
+typedef enum Source { SOURCE = '?', DEVICE = 'D', NETWORK = 'N', } source_t;
 
 /**
  * What is our jamming state?
