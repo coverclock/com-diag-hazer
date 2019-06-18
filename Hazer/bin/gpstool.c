@@ -2206,6 +2206,8 @@ int main(int argc, char * argv[])
 		 * signal handlers.
 		 */
 
+		fd = -1;
+
 		if ((io_available = diminuto_file_ready(in_fp)) > 0) {
 			fd = in_fd;
 		} else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
@@ -3117,7 +3119,9 @@ int main(int argc, char * argv[])
          * log, or use to update our databases.
          */
 
-        if ((ready = diminuto_mux_wait(&mux, 0)) == 0) {
+        if (diminuto_file_ready(in_fp) > 0) {
+        	continue;
+        } else if ((ready = diminuto_mux_wait(&mux, 0)) == 0) {
         	/* Do nothing. */
         } else if (ready > 0) {
         	continue;
@@ -3289,12 +3293,12 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else {
         rc = fclose(log_fp);
-        assert(rc != EOF);
+        if (rc == EOF) { diminuto_perror("fclose(log_fp)"); }
     }
 
     if (dev_fp != (FILE *)0) {
     	rc = fclose(dev_fp);
-    	assert(rc != EOF);
+        if (rc == EOF) { diminuto_perror("fclose(dev_fp)"); }
     }
 
     DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)));
@@ -3302,15 +3306,17 @@ int main(int argc, char * argv[])
 
     if (in_fp != dev_fp) {
         rc = fclose(in_fp);
-        assert(rc != EOF);
+        if (rc == EOF) { diminuto_perror("fclose(in_fp)"); }
     }
 
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_commit(out_fp, &temporary);
         assert(out_fp == (FILE *)0);
-    } else {
+    } else if (out_fp != dev_fp) {
         rc = fclose(out_fp);
-        assert(rc != EOF);
+        if (rc == EOF) { diminuto_perror("fclose(out_fp)"); }
+    } else {
+    	/* Do nothing. */
     }
 
     while (!diminuto_list_isempty(&command_list)) {
