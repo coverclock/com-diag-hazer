@@ -83,7 +83,7 @@
  *      -U '\xb5\x62\x06\x01\x03\x00\x01\x14\x01' \
  *      -U ''
  *
- *  gpstool -D /dev/ttyACM0 -b 9600 -8 -n -1 -E 2> >(log -S)
+ *  gpstool -D /dev/ttyACM0 E 2> >(log -S)
  */
 
 #undef NDEBUG
@@ -1283,6 +1283,7 @@ int main(int argc, char * argv[])
     int slow = 0;
     int expire = 0;
     int unknown = 0;
+    int serial = 0;
     long timeout = HAZER_GNSS_SECONDS;
     long keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
     /*
@@ -1315,8 +1316,8 @@ int main(int argc, char * argv[])
     int modemcontrol = 0;
     int rtscts = 0;
     int xonxoff = 0;
-    int readonly = !0;
     int carrierdetect = 0;
+    int readonly = !0;
     long device_mask = NMEA;
     /*
      * Remote variables.
@@ -1567,15 +1568,19 @@ int main(int argc, char * argv[])
         switch (opt) {
         case '1':
             stopbits = 1;
+            serial = !0;
             break;
         case '2':
             stopbits = 2;
+            serial = !0;
             break;
         case '7':
             databits = 7;
+            serial = !0;
             break;
         case '8':
             databits = 8;
+            serial = !0;
             break;
         case 'B':
             io_size = strtoul(optarg, &end, 0);
@@ -1659,16 +1664,19 @@ int main(int argc, char * argv[])
         case 'b':
             bitspersecond = strtoul(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (bitspersecond == 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            serial = !0;
             break;
         case 'c':
             modemcontrol = !0;
             carrierdetect = !0;
+            serial = !0;
             break;
         case 'd':
             debug = !0;
             break;
         case 'e':
             paritybit = 2;
+            serial = !0;
             break;
         case 'g':
             remote_mask = strtol(optarg, &end, 0);
@@ -1676,6 +1684,7 @@ int main(int argc, char * argv[])
             break;
         case 'h':
             rtscts = !0;
+            serial = !0;
             break;
         case 'k':
             device_mask = strtol(optarg, &end, 0);
@@ -1683,15 +1692,19 @@ int main(int argc, char * argv[])
             break;
         case 'l':
             modemcontrol = 0;
+            serial = !0;
             break;
         case 'm':
             modemcontrol = !0;
+            serial = !0;
             break;
         case 'n':
             paritybit = 0;
+            serial = !0;
             break;
         case 'o':
             paritybit = 1;
+            serial = !0;
             break;
         case 'p':
             strobe = optarg;
@@ -1700,6 +1713,7 @@ int main(int argc, char * argv[])
             break;
         case 's':
             xonxoff = !0;
+            serial = !0;
             break;
         case 't':
             timeout = strtol(optarg, &end, 0);
@@ -1717,7 +1731,7 @@ int main(int argc, char * argv[])
             break;
         case '?':
             fprintf(stderr, "usage: %s "
-                           "[ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -C ] "
+                           "[ -d ] [ -v ] [ -u ] [ -V ] [ -X ] "
                            "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
                            "[ -t SECONDS ] "
                            "[ -I PIN | -c ] [ -p PIN ] "
@@ -1733,7 +1747,6 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -7          Use seven data bits for DEVICE.\n");
             fprintf(stderr, "       -8          Use eight data bits for DEVICE.\n");
             fprintf(stderr, "       -B BYTES    Set the input Buffer size to BYTES bytes.\n");
-            fprintf(stderr, "       -C          Ignore bad Checksums.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
             fprintf(stderr, "       -F          Like -R but reFresh at 1Hz.\n");
@@ -2006,11 +2019,21 @@ int main(int argc, char * argv[])
         if (dev_fd < 0) { diminuto_perror(device); }
         assert(dev_fd >= 0);
 
-        rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
-        assert(rc == 0);
+        if (serial) {
 
-        rc = diminuto_serial_raw(dev_fd);
-        assert(rc == 0);
+			DIMINUTO_LOG_INFORMATION("Device \"%s\" %s (%d) %d %d%c%d%s%s%s\n", device, readonly ? "ro" : "rw", dev_fd, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
+
+        	rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
+        	assert(rc == 0);
+
+        	rc = diminuto_serial_raw(dev_fd);
+        	assert(rc == 0);
+
+        } else {
+
+			DIMINUTO_LOG_INFORMATION("Device \"%s\" %s (%d)\n", device, readonly ? "ro" : "rw", dev_fd);
+
+        }
 
         /*
          * Remarkably, below, some USB receivers will work with a mode of "w+"
@@ -2246,10 +2269,12 @@ int main(int argc, char * argv[])
 		 * signal handlers.
 		 */
 
+		available = 0;
 		fd = -1;
+		ready = 0;
 
 		if ((available = diminuto_file_ready(in_fp)) > 0) {
-			/* Do nothing. */
+			fd = in_fd;
 		} else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
 			/* Do nothing. */
 		} else if ((ready = diminuto_mux_wait(&mux, delay /* BLOCK */)) == 0) {
@@ -2273,7 +2298,14 @@ int main(int argc, char * argv[])
 
 		buffer = (uint8_t *)0;
 
-		if ((available > 0) || (fd == in_fd)) {
+		if (fd < 0) {
+
+			/*
+			 * The multiplexor timed out; very unlikely but not impossible
+			 * if our device or remote stopped producing data.
+			 */
+
+		} else if (fd == in_fd) {
 
 			if (available > io_maximum) { io_maximum = available; }
 
@@ -2517,13 +2549,6 @@ int main(int argc, char * argv[])
 				write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
 
 			}
-
-		} else if (fd < 0) {
-
-			/*
-			 * Very unlikely but not impossible if our device or remote
-			 * stopped generating data.
-			 */
 
 		} else {
 
