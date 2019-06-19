@@ -2387,7 +2387,7 @@ int main(int argc, char * argv[])
 					if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 
-					DIMINUTO_LOG_DEBUG("Device NMEA [%zd] [%zd]", size, length);
+					DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd]", size, length);
 
 					break;
 
@@ -2403,7 +2403,7 @@ int main(int argc, char * argv[])
 					if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 
-					DIMINUTO_LOG_DEBUG("Device UBX [%zd] [%zd]", size, length);
+					DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd]", size, length);
 
 					break;
 				}
@@ -2418,7 +2418,7 @@ int main(int argc, char * argv[])
 					if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 
-					DIMINUTO_LOG_DEBUG("Device RTCM [%zd] [%zd]", size, length);
+					DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd]", size, length);
 
 					break;
 				 }
