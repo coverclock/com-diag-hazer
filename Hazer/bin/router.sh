@@ -5,7 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 
 PROGRAM=$(basename ${0})
-ROUTER=${1:-"localhost:21010"}
+ROUTER=${1:-":tumbleweed"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
