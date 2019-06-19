@@ -15,7 +15,6 @@
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
-RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
