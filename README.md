@@ -118,6 +118,9 @@ build number changes when I've fixed a bug so that existing features or
 functionality works as described (even though this may break workarounds in
 applications).
 
+The major and minor numbers are incorporated into the name of the shared
+object (dynamic link library) produced by the build.
+
 The vintage is the date and time of the most recent build in UTC and expressed
 in ISO8601 format.
 
