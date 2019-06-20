@@ -118,15 +118,19 @@ build number changes when I've fixed a bug so that existing features or
 functionality works as described (even though this may break workarounds in
 applications).
 
-The revision is the Git commit number.
-
 The vintage is the date and time of the most recent build in UTC and expressed
 in ISO8601 format.
+
+The revision is the Git commit number.
 
 The release, revision, vintage, and a bunch of other stuff, are embedded as
 modules in the Hazer and Diminuto libraries. Those modules can be linked into
 an application. Each project has a binary executable named vintage that
 displays this information.
+
+The gpstool and rtktool utilities can be run with a -V flag to display the
+release, vintage, and revision of the Hazer library with which they were
+built.
 
 # Repositories
 
