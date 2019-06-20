@@ -67,7 +67,8 @@ mode to provide real-time corrections to one or more mobile rovers. This
 project, called Tumblweed (same as the RTCM software stack), does not use
 the Networked Transport of RTCM via Internet Protocol (Ntrip), but instead
 uses its own trivial data format consisting of raw RTCM messages preceeded
-by a four-byte sequence number carried over UDP datagrams.
+by a four-byte sequence number carried over UDP datagrams. (Yeah, I know, this
+isn't secure. I'm pondering the best way to accomplish that.)
 
 If you're wondering why I don't use the excellent open source GPS Daemon
 (gpsd) and its GPS Monitor (gpsmon), the answer is: I have, in many
@@ -98,6 +99,34 @@ Diminuto have also shipped in products from several of my clients.
 Hazer (and Diminuto) have also been used in other Digital Aggregates
 projects that do have their own repositories, for example: Obelisk,
 Hourglass, Candleclock, Astrolabe, and Critter.
+
+# Versioning
+
+Both Hazer and Diminuto are complex enough that I moved to a "master" and
+"develop" dual branch model of development. I now do all my development
+in the "develop" branch, and when I think I have a stable release, I merge
+"develop" into the "master" branch.
+
+I still try to tag releases with a three-number tuple that is defined in the
+build Makefile for each project. Release numbers, e.g. 22.2.1, consist of a
+major number (22), a minor number (2), and a build number (1). The major
+number changes when I've made a change significant enough that I think
+applications using the library will likely need to be changed, even though
+they may compile. The minor number changes when I've added new features or
+functionality, but existing features and functionality haven't changed. The
+build number changes when I've fixed a bug so that existing features or
+functionality works as described (even though this may break workarounds in
+applications).
+
+The revision is the Git commit number.
+
+The vintage is the date and time of the most recent build in UTC and expressed
+in ISO8601 format.
+
+The release, revision, vintage, and a bunch of other stuff, are embedded as
+modules in the Hazer and Diminuto libraries. Those modules can be linked into
+an application. Each project has a binary executable named vintage that
+displays this information.
 
 # Repositories
 
