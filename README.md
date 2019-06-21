@@ -659,6 +659,8 @@ the libraries and binaries in the system directories.)
 
 # Help
 
+## gpstool
+
     > gpstool -?
     usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]           -1          Use one stop bit for DEVICE.
            -1          Use one stop bit for DEVICE.
@@ -704,6 +706,8 @@ the libraries and binaries in the system directories.)
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
+
+## rtktool
 
     > rtktool -?
     usage: rtktool [ -d ] [ -v ] [ -V ] [ -p PORT ] [ -t SECONDS ]
