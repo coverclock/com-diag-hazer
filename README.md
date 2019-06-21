@@ -365,7 +365,7 @@ Chip Overclock, "A Menagerie of GPS Devices",
 Chip Overclock, "Practical Geolocation",
 <https://coverclock.blogspot.com/2018/08/practical-geolocation.html>
 
-Chip Overclock, "Pratical Geolocation II",
+Chip Overclock, "Practical Geolocation II",
 <https://coverclock.blogspot.com/2018/08/practical-geolocation-ii.html>
 
 Chip Overclock, "We Have Met the Enemy and He Is Us",
