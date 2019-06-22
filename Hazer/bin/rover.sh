@@ -7,7 +7,7 @@
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
-DEVICE=${2:-"/dev/ttyACM0"}
+DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
