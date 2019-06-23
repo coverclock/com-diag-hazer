@@ -1,0 +1,2 @@
+# Novatel USB730L - coverclock@diag.com
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1410", ATTR{idProduct}=="9030", RUN+="/usr/sbin/usb_modeswitch -v 0x1410 -p 0x9030 -u 2"

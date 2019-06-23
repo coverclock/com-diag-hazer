@@ -1,0 +1,2 @@
+# U-blox UBX-ZED-F9P in the Ardusimple SimpleRTK2B board - coverclock@diag.com
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a9", SYMLINK+="tumbleweed", OWNER="root", GROUP="dialout", MODE="0660"
