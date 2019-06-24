@@ -1602,6 +1602,37 @@ I haven't reported this to U-blox because I would really like this to be a
 software bug on my part, because then I could fix it. But that strategy is
 looking iffy.
 
+## Running Tumbleweed for Differential GNSS
+
+On the router, which must have a static IP address or a usable Dynamic DNS
+(DDNS) address:
+
+    > cd ~/src/com-diag-hazer/Hazer
+    > . out/host/bin/setup
+    > router :tumbleweed &
+    > tail -f out/host/log/router.err
+
+On the base station, which is on my LAN:
+
+    > cd ~/src/com-diag-hazer/Hazer
+    > . out/host/bin/setup
+    > base tumbleweed:tumbleweed &
+    > more out/host/log/base.err
+    > headless out/host/log/base.out
+
+On the mobile rover, which is on the WAN typically via an LTE modem:
+
+    > cd ~/src/com-diag-hazer/Hazer
+    > . out/host/bin/setup
+    > rover tumbleweed.test:tumbleweed &
+    > more out/host/log/rover.err
+    > headless out/host/log/rover.out
+
+On my Raspberry Pi test fixtures, I define "tumbleweed" to be UDP port 21010
+in /etc/service, the router's LAN address to be "tumbleweed" in /etc/hosts,
+and in the example above the name "tumbleweed.test" to be the hypothetical DDNS
+name that identifies the router on the WAN.
+
 # Acknowledgements
 
 Special thanks to Mrs. Overclock for her assistance in road testing (literally)
