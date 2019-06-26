@@ -676,8 +676,7 @@ lines that need to be added to the indicated files.
 
 ## gpstool
 
-    > gpstool -?
-   usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]
+    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
@@ -687,7 +686,7 @@ lines that need to be added to the indicated files.
            -E          Like -R but use ANSI Escape sequences.
            -F          Like -R but reFresh at 1Hz.
            -G IP:PORT  Use remote IP and PORT as dataGram sink.
-           -G PORT     Use local PORT as dataGram source.
+           -G :PORT    Use local PORT as dataGram source.
            -H HEADLESS Like -R but writes each iteration to HEADLESS file.
            -I PIN      Take 1PPS from GPIO Input PIN (requires -D).
            -K          Write input to DEVICE sinK from datagram source.
@@ -703,7 +702,7 @@ lines that need to be added to the indicated files.
            -W ''       Exit when this empty Write STRING is processed.
            -X          Enable message eXpiration test mode.
            -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.
-           -Y PORT     Use local PORT as surveYor source.
+           -Y :PORT    Use local PORT as surveYor source.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
            -d          Display Debug output on standard error.
@@ -726,11 +725,11 @@ lines that need to be added to the indicated files.
 ## rtktool
 
     > rtktool -?
-    usage: rtktool [ -d ] [ -v ] [ -M ] [ -V ] [ -M ] [ -p PORT ] [ -t SECONDS ]
+    usage: rtktool [ -d ] [ -v ] [ -M ] [ -V ] [ -M ] [ -p :PORT ] [ -t SECONDS ]
            -M          Run in the background as a daeMon.
            -V          Log Version in the form of release, vintage, and revision.
            -d          Display Debug output on standard error.
-           -p PORT     Use PORT as the RTCM source and sink port.
+           -p :PORT    Use PORT as the RTCM source and sink port.
            -t SECONDS  Set the client timeout to SECONDS seconds.
            -v          Display Verbose output on standard error.
 

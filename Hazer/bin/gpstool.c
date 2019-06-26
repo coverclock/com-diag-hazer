@@ -1756,7 +1756,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
             fprintf(stderr, "       -F          Like -R but reFresh at 1Hz.\n");
             fprintf(stderr, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
-            fprintf(stderr, "       -G PORT     Use local PORT as dataGram source.\n");
+            fprintf(stderr, "       -G :PORT    Use local PORT as dataGram source.\n");
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
@@ -1772,7 +1772,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -W ''       Exit when this empty Write STRING is processed.\n");
             fprintf(stderr, "       -X          Enable message eXpiration test mode.\n");
             fprintf(stderr, "       -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.\n");
-            fprintf(stderr, "       -Y PORT     Use local PORT as surveYor source.\n");
+            fprintf(stderr, "       -Y :PORT    Use local PORT as surveYor source.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");

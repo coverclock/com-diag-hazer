@@ -190,11 +190,11 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -M ] [ -V ] [ -M ] [ -p PORT ] [ -t SECONDS ]\n", Program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -M ] [ -V ] [ -M ] [ -p :PORT ] [ -t SECONDS ]\n", Program);
             fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
-            fprintf(stderr, "       -p PORT     Use PORT as the RTCM source and sink port.\n");
+            fprintf(stderr, "       -p :PORT    Use PORT as the RTCM source and sink port.\n");
             fprintf(stderr, "       -t SECONDS  Set the client timeout to SECONDS seconds.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
             return 1;
