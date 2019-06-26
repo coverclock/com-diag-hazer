@@ -674,14 +674,15 @@ lines that need to be added to the indicated files.
 
 # Help
 
+## gpstool
+
     > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]           -1          Use one stop bit for DEVICE.
+   usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
            -B BYTES    Set the input Buffer size to BYTES bytes.
-           -C          Ignore bad Checksums.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
            -F          Like -R but reFresh at 1Hz.
@@ -691,12 +692,13 @@ lines that need to be added to the indicated files.
            -I PIN      Take 1PPS from GPIO Input PIN (requires -D).
            -K          Write input to DEVICE sinK from datagram source.
            -L LOG      Write input to LOG file.
+           -M          Run in the background as a daeMon.
            -P          Process incoming data even if no report is being generated.
            -R          Print a Report on standard output.
            -S SOURCE   Use SOURCE file or named pipe for input.
            -U STRING   Like -W except expect UBX ACK or NAK response.
            -U ''       Exit when this empty UBX STRING is processed.
-           -V          Print release, Vintage, and revision on standard output.
+           -V          Log Version in the form of release, vintage, and revision.
            -W STRING   Collapse STRING, append checksum, Write to DEVICE.
            -W ''       Exit when this empty Write STRING is processed.
            -X          Enable message eXpiration test mode.
@@ -718,11 +720,15 @@ lines that need to be added to the indicated files.
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
+           -x          Run in the background as a daemon.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
 
+## rtktool
+
     > rtktool -?
-    usage: rtktool [ -d ] [ -v ] [ -V ] [ -p PORT ] [ -t SECONDS ]
-           -V          Print release, Vintage, and revision on standard output.
+    usage: rtktool [ -d ] [ -v ] [ -M ] [ -V ] [ -M ] [ -p PORT ] [ -t SECONDS ]
+           -M          Run in the background as a daeMon.
+           -V          Log Version in the form of release, vintage, and revision.
            -d          Display Debug output on standard error.
            -p PORT     Use PORT as the RTCM source and sink port.
            -t SECONDS  Set the client timeout to SECONDS seconds.
