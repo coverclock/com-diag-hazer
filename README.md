@@ -337,6 +337,13 @@ Raspbian 9.9 "Stretch"
 Linux 4.19.42    
 gcc 6.3.0    
 
+"Bodega", "Mochila" and "Jefe" (updated)    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.50    
+gcc 8.3.0    
+
 "Cadmium"    
 Intel NUC7i7BNH    
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
@@ -578,6 +585,14 @@ the libraries and binaries in the system directories.)
     unitest-ubx
     gpstool -?
     rtktool -?
+
+The fs directory contains a file system overlay of files that I've found
+useful to carefully install in system directories like /etc and /lib.
+It is not installed automatically, because whether they are helpful, or
+they reduce your target system to a smoking heap of silicon, depends on your
+exact circumstances: the target system, the version of Linux it runs, etc.
+Some of the files under fs are new files in their entirety, some just contain
+lines that need to be added to the indicated files.
 
 # Directories
  
@@ -1563,25 +1578,6 @@ use SimpleRTK2B boards interchangeably in the field.
 > both (the latter using AT&T LTE-M SIMs). As far as I can tell, both worked
 > as advertised.
 
-## Verizon/NovaTel Wireless USB630L and USB730L USB-attached LTE Modems
-
-I've used the USB630L and USB730L LTE modems in a variety of IoT efforts,
-including with Hazer. I've discovered that when using the device with a
-Raspbarry Pi, in order to maintain a stable mobile connection, or sometimes
-to have the device come up reliably at all, I need to insert a powered hub
-between the modem and the Pi.
-
-I know from other work that CDMA-based cellular radios - like those used with
-the Verizon network - are constantly being told many times a second by the
-CDMA base station to adjust their power up and down as other devices leave
-and join the network. I'm guessing the Pi's USB port doesn't provide
-sufficient power to always meet this demand.
-
-I like the Anker AH221 USB 3.0 powered hub, but your mileage may vary. For
-some applications, I end up running the hub, the Pi, and the GNSS receiver
-all off battery power using a ginormous Lithium power pack (Anker makes
-those too).
-
 ## Spurious /dev/ttyACM Characters on Intel NUC/Ubuntu
 
 I've been troubleshooting a weird issue with spurious characters showing up
@@ -1604,15 +1600,16 @@ looking iffy.
 
 ## Running Tumbleweed for Differential GNSS
 
-On the router, which must have a static IP address or a usable Dynamic DNS
-(DDNS) address:
+On the router, which is on my LAN but must have a static IP address or a
+usable Dynamic DNS (DDNS) address that can be reached through my firewall:
 
     > cd ~/src/com-diag-hazer/Hazer
     > . out/host/bin/setup
     > router :tumbleweed &
     > tail -f out/host/log/router.err
 
-On the base station, which is on my LAN:
+On the base station, which is on my LAN (but could be on the WAN, changing
+the hostname through which the router is address):
 
     > cd ~/src/com-diag-hazer/Hazer
     > . out/host/bin/setup
