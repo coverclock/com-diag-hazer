@@ -1573,10 +1573,10 @@ configuration is in volatile memory so that the GPS receiver reverts back to its
 factory defaults when it is power cycled. Among other things, this allows me to
 use SimpleRTK2B boards interchangeably in the field.
 
-> Ultimately, neither the the Digi Xbee3 SX 900MHz radios, nor the same
-> form-factor Digi Xbee3 LTE-M cellular radios, met my needs, although I tried
-> both (the latter using AT&T LTE-M SIMs). As far as I can tell, both worked
-> as advertised.
+> Ultimately, neither the the Digi Xbee3 SX 900MHz radios, nor the Digi Xbee3
+> LTE-M cellular radios which have the same form factor and are pin compatible,
+> met my needs, although I tried both, the latter using AT&T LTE-M SIMs. As
+> far as I can tell, however, both worked as advertised.
 
 ## Spurious /dev/ttyACM Characters on Intel NUC/Ubuntu
 
@@ -1600,35 +1600,45 @@ looking iffy.
 
 ## Running Tumbleweed for Differential GNSS
 
-On the router, which is on my LAN but must have a static IP address or a
-usable Dynamic DNS (DDNS) address that can be reached through my firewall:
+The Tumbleweed router, which is on my LAN, must have a static IP address
+or a usable Dynamic DNS (DDNS) address that can be reached through the
+firewall.
 
-    > cd ~/src/com-diag-hazer/Hazer
-    > . out/host/bin/setup
-    > router :tumbleweed &
-    > tail -f out/host/log/router.err
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    router :tumbleweed &
+    tail -f out/host/log/router.err
 
-On the base station, which is on my LAN (but could be on the WAN, changing
-the hostname through which the router is address):
+The Tumbleweed base station is typically on my LAN, but can be on
+the WAN by changing the hostname through which the router is addressed.
 
-    > cd ~/src/com-diag-hazer/Hazer
-    > . out/host/bin/setup
-    > base tumbleweed:tumbleweed &
-    > more out/host/log/base.err
-    > headless out/host/log/base.out
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    base tumbleweed:tumbleweed &
+    more out/host/log/base.err
+    headless out/host/log/base.out
 
-On the mobile rover, which is on the WAN typically via an LTE modem:
+A Tumbleweed mobile rover (there can be more than one) is on the WAN, and is
+agnostic as to the Internet connection:
 
-    > cd ~/src/com-diag-hazer/Hazer
-    > . out/host/bin/setup
-    > rover tumbleweed.test:tumbleweed &
-    > more out/host/log/rover.err
-    > headless out/host/log/rover.out
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    rover tumbleweed.test:tumbleweed &
+    more out/host/log/rover.err
+    headless out/host/log/rover.out
 
-On my Raspberry Pi test fixtures, I define "tumbleweed" to be UDP port 21010
+On my three test systems, I define "tumbleweed" to be UDP port 21010
 in /etc/service, the router's LAN address to be "tumbleweed" in /etc/hosts,
-and in the example above the name "tumbleweed.test" to be the hypothetical DDNS
-name that identifies the router on the WAN.
+and in the example above the name "tumbleweed.test" is the stand in for the
+DDNS name that identifies my connection on the WAN. My firewall forwards
+port 21010 to the same port on the Tumbleweed router.
+
+My prototype setup uses three Raspberry Pi 3B+ systems. My rover (and
+sometimes my base too) uses a NovaTel Wireless USB730L USB LTE modem with
+service from Verizon Wireless. (N.B. Despite my best efforts, these modems,
+working in end-user mode, worked like crap until I upgraded to Raspbian 10,
+at which point they worked flawlessly.) My router connects directly via
+wired Ethernet to my home access point/router.
 
 # Acknowledgements
 

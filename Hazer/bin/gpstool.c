@@ -129,6 +129,7 @@
 #include "com/diag/diminuto/diminuto_containerof.h"
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_file.h"
+#include "com/diag/diminuto/diminuto_daemon.h"
 
 /*******************************************************************************
  * CONSTANTS
@@ -1284,6 +1285,7 @@ int main(int argc, char * argv[])
     int expire = 0;
     int unknown = 0;
     int serial = 0;
+    int daemon = 0;
     long timeout = HAZER_GNSS_SECONDS;
     long keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
     /*
@@ -1543,7 +1545,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:OPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:MOPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1621,6 +1623,9 @@ int main(int argc, char * argv[])
         case 'L':
             logging = optarg;
             break;
+        case 'M':
+        	daemon = !0;
+        	break;
         case 'P':
         	process = !0;
         	break;
@@ -1641,7 +1646,7 @@ int main(int argc, char * argv[])
             diminuto_list_enqueue(&command_list, command_node);
             break;
         case 'V':
-            fprintf(stderr, "%s: version com-diag-hazer %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+        	DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
             readonly = 0;
@@ -1731,7 +1736,7 @@ int main(int argc, char * argv[])
             break;
         case '?':
             fprintf(stderr, "usage: %s "
-                           "[ -d ] [ -v ] [ -u ] [ -V ] [ -X ] "
+                           "[ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] "
                            "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
                            "[ -t SECONDS ] "
                            "[ -I PIN | -c ] [ -p PIN ] "
@@ -1756,12 +1761,13 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
             fprintf(stderr, "       -L LOG      Write input to LOG file.\n");
+            fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S SOURCE   Use SOURCE file or named pipe for input.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
             fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
-            fprintf(stderr, "       -V          Print release, Vintage, and revision on standard output.\n");
+            fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
             fprintf(stderr, "       -W STRING   Collapse STRING, append checksum, Write to DEVICE.\n");
             fprintf(stderr, "       -W ''       Exit when this empty Write STRING is processed.\n");
             fprintf(stderr, "       -X          Enable message eXpiration test mode.\n");
@@ -1783,6 +1789,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
             fprintf(stderr, "       -u          Note Unprocessed input on standard error.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
+            fprintf(stderr, "       -x          Run in the background as a daemon.\n");
             fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds.\n");
             return 1;
             break;
@@ -1796,6 +1803,12 @@ int main(int argc, char * argv[])
     /**
      ** INITIALIZATION
      **/
+
+    if (daemon) {
+    	rc = diminuto_daemon(Program);
+    	DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
+    	assert(rc == 0);
+    }
 
     DIMINUTO_LOG_INFORMATION("Begin");
 
