@@ -1638,12 +1638,83 @@ and in the example above the name "tumbleweed.test" is the stand in for the
 DDNS name that identifies my connection on the WAN. My firewall forwards
 port 21010 to the same port on the Tumbleweed router.
 
+I'm running all three, router, base, and rover, as simple background processes.
+But it is also possible to run them in daemon mode, in which case messages
+normally written to standard error are logged to the system log. Also,
+all three are run in "headless" mode, where the screens normally written to
+standard output are instead written to a file, and a script is used to
+display the file as it changes; this decouples the router, rover, and base
+software from the display terminal while still allowing an on-demand real-time
+display. (This requires that the inotify-tools package be installed on the Pi.)
+
 My prototype setup uses three Raspberry Pi 3B+ systems. My rover (and
 sometimes my base too) uses a NovaTel Wireless USB730L USB LTE modem with
 service from Verizon Wireless. (N.B. Despite my best efforts, these modems,
 working in end-user mode, worked like crap until I upgraded to Raspbian 10,
 at which point they worked flawlessly.) My router connects directly via
 wired Ethernet to my home access point/router.
+
+At least with my LTE modems, it is not unusual to see the rover and the base
+(which in this test were connected to both the WAN and the LAN) drop off and
+reappear on the WAN, often with a different port number or even an IP address.
+The router makes a note of this; here are the results of an overnight test.
+(The IPv4 addresses are expressed in IPv6 notation, which the router uses
+natively. Also, I've obfuscated portions of the WAN addresses.) You can see
+the base and rover changing ports and even addresses, and even sometimes
+switching between the WAN and the LAN.
+
+    2019-06-25T23:29:47.791661Z <INFO> [744] {76f6b530} Begin
+    2019-06-25T23:29:47.792252Z <INFO> [744] {76f6b530} Router (3) ":tumbleweed" [::]:21010
+    2019-06-25T23:29:47.792322Z <INFO> [744] {76f6b530} Start
+    2019-06-25T23:30:52.219618Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.0.61]:6571
+    2019-06-25T23:30:52.219789Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.0.61]:6571
+    2019-06-25T23:36:28.213760Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T00:33:19.063809Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T00:33:28.416375Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T00:58:59.064859Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T00:59:08.301363Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T02:38:48.012487Z <NOTE> [744] {76f6b530} Client Old base [::ffff:XXX.YYY.0.61]:6571
+    2019-06-26T02:38:48.013164Z <NOTE> [744] {76f6b530} Client New base [::ffff:192.168.1.188]:43289
+    2019-06-26T02:38:48.013336Z <NOTE> [744] {76f6b530} Client Set base [::ffff:192.168.1.188]:43289
+    2019-06-26T02:39:28.253289Z <NOTE> [744] {76f6b530} Client Old base [::ffff:192.168.1.188]:43289
+    2019-06-26T02:39:29.070321Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.1.209]:8231
+    2019-06-26T02:39:29.070540Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.1.209]:8231
+    2019-06-26T03:05:28.058945Z <NOTE> [744] {76f6b530} Client New rover [::ffff:192.168.1.1]:42804
+    2019-06-26T03:05:39.069692Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T03:05:48.256039Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.9.215]:4224
+    2019-06-26T03:05:59.069366Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:192.168.1.1]:42804
+    2019-06-26T06:09:28.058577Z <NOTE> [744] {76f6b530} Client New rover [::ffff:192.168.1.1]:42804
+    2019-06-26T06:09:39.065573Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.9.215]:4224
+    2019-06-26T06:09:48.108028Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.16.196]:7052
+    2019-06-26T06:09:59.065301Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:192.168.1.1]:42804
+    2019-06-26T06:10:08.058974Z <NOTE> [744] {76f6b530} Client New rover [::ffff:192.168.1.182]:42804
+    2019-06-26T06:10:19.066025Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.16.196]:7052
+    2019-06-26T06:10:28.266752Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.16.196]:7040
+    2019-06-26T06:10:39.065709Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:192.168.1.182]:42804
+    2019-06-26T06:43:20.066215Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.16.196]:7040
+    2019-06-26T06:43:48.268595Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.16.196]:7040
+    2019-06-26T09:13:20.020202Z <NOTE> [744] {76f6b530} Client Old base [::ffff:XXX.YYY.1.209]:8231
+    2019-06-26T09:13:20.220657Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.13.157]:5803
+    2019-06-26T09:13:20.220928Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.13.157]:5803
+    2019-06-26T10:58:19.069629Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.16.196]:7040
+    2019-06-26T10:58:28.052347Z <NOTE> [744] {76f6b530} Client New rover [::ffff:192.168.1.1]:42804
+    2019-06-26T10:59:08.257400Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.17.45]:4970
+    2019-06-26T10:59:18.069004Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:192.168.1.1]:42804
+    2019-06-26T14:01:28.248198Z <NOTE> [744] {76f6b530} Client Old base [::ffff:XXX.YYY.13.157]:5803
+    2019-06-26T14:01:29.059184Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.27.107]:4679
+    2019-06-26T14:01:29.059431Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.27.107]:4679
+    2019-06-26T14:02:08.263694Z <NOTE> [744] {76f6b530} Client Old base [::ffff:XXX.YYY.27.107]:4679
+    2019-06-26T14:02:09.063249Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.27.107]:4686
+    2019-06-26T14:02:09.063542Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.27.107]:4686
+
+When a client of the router changes its port or IP address, it appears to be
+a new rover or base. In the case of the rover, it is immediately registered
+with the router, which begins feeding it RTK updates from the current base.
+The old rover times out when no more keep alives are received, and it is
+removed from the list of active rovers on the router. In the case of the base,
+the new base is rejected until similarly the old base times out and is removed
+when no more updates are received; then the new base is registered on the
+router and its updates are used to feed the rovers.
 
 # Acknowledgements
 
