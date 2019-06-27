@@ -1646,6 +1646,9 @@ standard output are instead written to a file, and a script is used to
 display the file as it changes; this decouples the router, rover, and base
 software from the display terminal while still allowing an on-demand real-time
 display. (This requires that the inotify-tools package be installed on the Pi.)
+Both gpstool and rtktool can be run as daemons via a command line switch
+(although I have not done so in these examples) and the headless mode can still
+be used.
 
 My prototype setup uses three Raspberry Pi 3B+ systems. My rover (and
 sometimes my base too) uses a NovaTel Wireless USB730L USB LTE modem with
