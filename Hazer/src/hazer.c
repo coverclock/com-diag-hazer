@@ -778,21 +778,21 @@ void hazer_format_nanominutes2position(int64_t nanominutes, int * degreesp, int 
     }
 
     *degreesp = nanominutes / 60000000000LL;                /* Get integral degrees. */
-    nanominutes -= (int64_t)*degreesp * 60000000000LL;      /* Avoid modulo. */
+    nanominutes = nanominutes % 60000000000LL;              /* Remainder. */
     *minutesp = nanominutes / 1000000000LL;                 /* Get integral minutes. */
-    nanominutes -= (int64_t)*minutesp * 1000000000LL;       /* Avoid modulo. */
+    nanominutes = nanominutes % 1000000000LL;;              /* Remainder. */
     nanominutes *= 60LL;                                    /* Convert to nanoseconds. */
     *secondsp = nanominutes / 1000000000LL;                 /* Get integral seconds. */
-    nanominutes -= (int64_t)*secondsp * 1000000000LL;       /* Avoid modulo. */
+    nanominutes = nanominutes % 1000000000LL;               /* Remainder. */
     *hundredthsp = (nanominutes * 100LL) / 1000000000LL;    /* Get hundredths. */
 }
 
 void hazer_format_nanominutes2degrees(int64_t nanominutes, int * degreesp, uint64_t * nanodegreesp)
 {
-    *degreesp = nanominutes / 60000000000LL;                     /* Get integral degrees. */
-    *nanodegreesp = abs64(nanominutes);                          /* Fraction is unsigned. */
-    *nanodegreesp -= abs64((int64_t)*degreesp) * 60000000000ULL; /* Avoid modulo. */
-    *nanodegreesp /= 60ULL;                                      /* Get nanodegrees. */
+    *degreesp = nanominutes / 60000000000LL;                 /* Get integral degrees. */
+    nanominutes = abs64(nanominutes);                        /* Fraction is unsigned. */
+    nanominutes = nanominutes % 60000000000LL;               /* Remainder. */
+    *nanodegreesp = nanominutes / 60LL;                      /* Get nanodegrees. */
 }
 
 const char * hazer_format_nanodegrees2compass32(int64_t nanodegrees)

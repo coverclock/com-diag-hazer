@@ -893,14 +893,14 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
         assert((0 <= minutes) && (minutes <= 59));
         assert((0 <= seconds) && (seconds <= 59));
         assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %2d%lc%02d'%02d.%02d\"%c,", degrees, DEGREE, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
+        fprintf(fp, " %2d%lc%02d'%02d.%02d\"%c,", degrees, DEGREE, minutes, seconds, hundredths, (direction < 0) ? 'S' : 'N');
 
         hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &hundredths, &direction);
         assert((0 <= degrees) && (degrees <= 180));
         assert((0 <= minutes) && (minutes <= 59));
         assert((0 <= seconds) && (seconds <= 59));
         assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %3d%lc%02d'%02d.%02d\"%c", degrees, DEGREE, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
+        fprintf(fp, " %3d%lc%02d'%02d.%02d\"%c", degrees, DEGREE, minutes, seconds, hundredths, (direction < 0) ? 'W' : 'E');
 
         fputc(' ', fp);
 
@@ -1074,6 +1074,11 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
  */
 static void print_solution(FILE * fp, const yodel_solution_t * sp)
 {
+    int degrees = 0;
+    int minutes = 0;
+    int seconds = 0;
+    int tenminus5 = 0;
+    int direction = 0;
     int64_t value = 0;
     int64_t whole = 0;
     uint64_t fraction = 0;
@@ -1082,21 +1087,11 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fputs("HPP", fp);
 
-        value = sp->payload.lat;
-        value *= 100;
-        value += sp->payload.latHp;
-        whole = value / 1000000000LL;
-        fraction = abs64(value) % 1000000000ULL;
-        fprintf(fp, " %4lld.%09llu,", (long long signed int)whole, (long long unsigned int)fraction);
+        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &fraction);
+        fprintf(fp, " %4d.%09llu,", degrees, (long long unsigned int)fraction);
 
-        value = sp->payload.lon;
-        value *= 100;
-        value += sp->payload.lonHp;
-        whole = value / 1000000000LL;
-        fraction = abs64(value) % 1000000000ULL;
-        fprintf(fp, " %4lld.%09llu", (long long signed int)whole, (long long unsigned int)fraction);
-
-        // fprintf(fp, " hAcc=%d", sp->payload.hAcc);
+        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &fraction);
+        fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)fraction);
 
         value = sp->payload.hAcc;
         whole = value / 10000LL;
@@ -1118,14 +1113,26 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         fraction = abs64(value) % 10000ULL;
         fprintf(fp, " %6lld.%04llum", (long long signed int)whole, (long long unsigned int)fraction);
 
-        // fprintf(fp, " vACC=%d", sp->payload.vAcc);
-
         value = sp->payload.vAcc;
         whole = value / 10000LL;
         fraction = abs64(value) % 10000ULL;
         fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)whole, (long long unsigned int)fraction);
 
         fprintf(fp, "%40s", "");
+
+        fprintf(fp, " %-8s", "GNSS");
+
+        fputc('\n', fp);
+
+        fputs("NGS", fp);
+
+        hazer_format_hppos2position(sp->payload.lat, sp->payload.latHp, &degrees, &minutes, &seconds, &tenminus5, &direction);
+        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenminus5, (direction < 0) ? 'S' : 'N');
+
+        hazer_format_hppos2position(sp->payload.lon, sp->payload.lonHp, &degrees, &minutes, &seconds, &tenminus5, &direction);
+        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenminus5, (direction < 0) ? 'W' : 'E');
+
+        fprintf(fp, "%29s", "");
 
         fprintf(fp, " %-8s", "GNSS");
 

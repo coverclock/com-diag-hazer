@@ -860,6 +860,10 @@ reported via POS and ALT due to the conversion of units done to conform
 to the NMEA format. When available, the HPP and HPA is expected to be
 more precise.
 
+NGS shows the same high precision position as HPP but in the format used
+in the National Geodetic Survey (NGS) data sheets for coordinates of artifacts
+such as NGS and municipal survey markers.
+
 BAS or ROV (if present and enabled) show information about the Ublox
 device operating in base station or in rover modes. In base (stationary)
 mode, it shows if the device is actively surveying or if the survey has
