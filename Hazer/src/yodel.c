@@ -613,11 +613,17 @@ void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, 
 
 void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * fractionp, int * directionp)
 {
-	uint64_t nanodegrees = 0;
+	int64_t nanodegrees = 0;
+
+	/*
+	 * Remarkably, the fractional part (lonHp, latHp) may not have the same
+	 * sign as the whole part (lon, lat) in the HPPOSLLH record. I have no
+	 * idea what this means, but I've seen it. I'm taking them at their word.
+	 * See [UBX 9, pp. 145..146].
+	 */
 
     if (whole < 0) {
     	whole = -whole;
-    	fraction = -fraction;                                   /* Assuming whole and fraction are signed the same. */
         *directionp = -1;
     } else {
         *directionp = 1;
@@ -635,5 +641,5 @@ void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp,
     nanodegrees *= 60ULL;                                       /* Convert to nanoseconds. */
     *secondsp = nanodegrees / 1000000000LL;                     /* Get integral seconds. */
     nanodegrees = nanodegrees % 1000000000LL;                   /* Remainder. */
-    *fractionp = (nanodegrees * 10000LL) / 1000000000LL;        /* Get 10^-5 seconds. */
+    *fractionp = (nanodegrees * 100000LL) / 1000000000LL;       /* Get 10^-5 seconds. */
 }
