@@ -190,6 +190,11 @@ static inline uint64_t abs64(int64_t datum)
     return (datum >= 0) ? datum : -datum;
 }
 
+/**
+ * Return monotonic time in seconds.
+ * @param frequency is the underlying clock frequency.
+ * @return monotonic time in seconds.
+ */
 static inline long ticktock(diminuto_sticks_t frequency)
 {
     return diminuto_time_elapsed() / frequency;
@@ -883,14 +888,14 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
         fputs("POS", fp);
 
-        hazer_format_nanodegrees2position(pa[system].lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+        hazer_format_nanominutes2position(pa[system].lat_nanominutes, &degrees, &minutes, &seconds, &hundredths, &direction);
         assert((0 <= degrees) && (degrees <= 90));
         assert((0 <= minutes) && (minutes <= 59));
         assert((0 <= seconds) && (seconds <= 59));
         assert((0 <= hundredths) && (hundredths <= 99));
         fprintf(fp, " %2d%lc%02d'%02d.%02d\"%c,", degrees, DEGREE, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
 
-        hazer_format_nanodegrees2position(pa[system].lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+        hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &hundredths, &direction);
         assert((0 <= degrees) && (degrees <= 180));
         assert((0 <= minutes) && (minutes <= 59));
         assert((0 <= seconds) && (seconds <= 59));
@@ -899,13 +904,13 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
         fputc(' ', fp);
 
-        whole = pa[system].lat_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].lat_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu,", (long long signed int)whole, (long long unsigned int)fraction);
+        hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &fraction);
+        assert((-90 <= degrees) && (degrees <= 90));
+        fprintf(fp, " %4d.%09llu,", degrees, (long long unsigned int)fraction);
 
-        whole = pa[system].lon_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].lon_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu", (long long signed int)whole, (long long unsigned int)fraction);
+        hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &fraction);
+        assert((-180 <= degrees) && (degrees <= 180));
+        fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)fraction);
 
         fprintf(fp, "%5s", "");
 
@@ -1302,7 +1307,7 @@ int main(int argc, char * argv[])
      */
     FILE * in_fp = stdin;
     FILE * out_fp = stdout;
-    FILE * dev_fp = stdout;
+    FILE * dev_fp = (FILE *)0;
     FILE * log_fp = (FILE *)0;
     FILE * strobe_fp = (FILE *)0;
     FILE * pps_fp = (FILE *)0;
@@ -3232,8 +3237,9 @@ int main(int argc, char * argv[])
          * complete sentence, packet, or message that we can forward, write,
          * log, or use to update our databases.
          */
-
-        if (diminuto_file_ready(in_fp) > 0) {
+        if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
+        	/* Do nothing. */
+        } else if (diminuto_file_ready(in_fp) > 0) {
         	continue;
         } else if (diminuto_mux_wait(&mux, 0 /* POLL */) > 0) {
 			continue;

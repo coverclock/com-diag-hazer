@@ -563,11 +563,11 @@ extern uint64_t hazer_parse_dmy(const char * string);
 
 /**
  * Parse a string containing the latitude or longitude in NMEA format into
- * a signed integer number of nanodegrees.
+ * a signed integer number of nanominutes.
  * @param string points to the string.
  * @param direction is the NMEA direction: 'N', 'S', 'E', or 'W'.
  * @param digitsp points to where the number of digits is stored.
- * @return nanodegrees.
+ * @return nanominutes.
  */
 extern int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp);
 
@@ -752,8 +752,8 @@ typedef struct HazerPosition {
     uint64_t tot_nanoseconds;   /* Total nanoseconds. */
     uint64_t utc_nanoseconds;   /* Time in nanoseconds since 00:00 UTC. */
     uint64_t dmy_nanoseconds;   /* Date in nanoseconds since POSIX epoch. */
-    int64_t lat_nanodegrees;    /* Latitude in nanodegrees. */
-    int64_t lon_nanodegrees;    /* Longitude in nanodegrees. */
+    int64_t lat_nanominutes;    /* Latitude in nanominutes. */
+    int64_t lon_nanominutes;    /* Longitude in nanominutes. */
     int64_t alt_millimeters;    /* Altitude in millimeters. */
     int64_t sog_microknots;     /* Speed On Ground in microknots. */
     int64_t sog_millimeters;    /* Speed On Ground in millimeters per hour. */
@@ -1022,15 +1022,23 @@ extern int hazer_parse_txt(char * vector[], size_t count);
 extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp);
 
 /**
- * Format nanodegrees of latitude or longitude into separate values.
- * @param nanodegrees is a longitude or latitude in nanodegrees.
+ * Format nanominutes of latitude or longitude into position values.
+ * @param nanominutes is a longitude or latitude in nanominutes.
  * @param degreesp points to where the integral degrees (e.g. 180) is stored.
  * @param minutesp points to where the minutes (0..59) are stored.
  * @param secondsp points to where the seconds (0..59) are stored.
  * @param hundredsthp points to there the fractional seconds (0..99) are stored.
  * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
  */
-extern void hazer_format_nanodegrees2position(int64_t nanodegrees, int * degreesp, int * minutesp, int * secondsp, int * hundredsthp, int * directionp);
+extern void hazer_format_nanominutes2position(int64_t nanominutes, int * degreesp, int * minutesp, int * secondsp, int * hundredsthp, int * directionp);
+
+/**
+ * Format nanominutes of latitude or longitude into decimal degrees.
+ * @param nanominutes is a longitude or latitude in nanominutes.
+ * @param degreesp points to where the signed integral degrees (e.g. 180) is stored.
+ * @param nanodegreesp points to where the unsigned fractional nanodegrees are stored.
+ */
+extern void hazer_format_nanominutes2degrees(int64_t nanominutes, int * degreesp, uint64_t * nanodegreesp);
 
 /**
  * Format nanodegrees of compass bearing in a pointer to a name of a

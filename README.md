@@ -825,7 +825,7 @@ can be cut and pasted directly into Google Maps, and at least the latter
 into Google Earth.
 
 N.B. The underlying position data is stored as binary integers in billionths
-of a degree (nanodegrees). But the device under test may not provide that much
+of a minutes (nanominutes). But the device under test may not provide that much
 accuracy; the actual number of significant digits for various data is reported
 by the INT line (below), but even this may be optimistic - or, for that matter,
 pessimistic - when compared to what the device is capable of. In particular,
@@ -1597,39 +1597,50 @@ I only see this when I run Hazer under Ubuntu on Intel servers (Nickel,
 Cadmium, and Mercury as described above). It is reproducible removing Hazer
 from the test completely and just using standard utilities like cat and socat.
 It is not reproducible running the exact same software and GNSS receivers on
-the ARM-based Raspberry Pi 3+ (Gold, Bodega, and Mochila as decribed above).
+the ARM-based Raspberry Pi 3+ (Gold, Bodega, and Mochila as decribed above)
+under Raspbian. Both Ubuntu and Raspbian are Debian-based Linux distributions.
 
-I haven't reported this to U-blox because I would really like this to be a
-software bug on my part, because then I could fix it. But that strategy is
+I haven't reported this to U-blox because it seems like a bug (somehow) in the
+Intel-specific portions of the USB stack. Plus, I would really like this to be
+a software bug on my part, because then I could fix it; but that strategy is
 looking iffy.
 
-## Running Tumbleweed for Differential GNSS
+## Differential GNSS Using Tumbleweed
+
+Tumbleweed uses three Raspberry Pi 3B+ SBCs and two Ardusimple SimpleRTK2B
+boards, each equipped with a U-blox UBX-ZED-F9P receiver chip and a multi-band
+GPS active antenna, to implement a Differential GNSS system which is (at least
+theoretically) capable of centimeter-level accuracy. One of the Pis is a
+stationary base station running its ZED-F9P in survey mode, one of the Pis is
+a mobile rover whose ZED-F9P receives RTK updates from the base station, and
+one of the Pis is a router that receives RTK updates from one base station
+and forwards them to one or more rovers.
 
 The Tumbleweed router, which is on my LAN, must have a static IP address
-or a usable Dynamic DNS (DDNS) address that can be reached through the
-firewall.
+or a usable Dynamic DNS (DDNS) address (which is what I do) that can be
+reached through the firewall.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     router :tumbleweed &
     tail -f out/host/log/router.err
 
-The Tumbleweed base station is typically on my LAN, but can be on
-the WAN by changing the hostname through which the router is addressed.
+The Tumbleweed base is typically on my LAN, but can be on the WAN by changing
+the hostname through which the router is addressed.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     base tumbleweed:tumbleweed &
-    more out/host/log/base.err
+    cat out/host/log/base.err
     headless out/host/log/base.out
 
-A Tumbleweed mobile rover (there can be more than one) is on the WAN, and is
-agnostic as to the Internet connection:
+A Tumbleweed rover (there can be more than one) is on the WAN, and is agnostic
+as to the Internet connection (I use a USB LTE modem).
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     rover tumbleweed.test:tumbleweed &
-    more out/host/log/rover.err
+    cat out/host/log/rover.err
     headless out/host/log/rover.out
 
 On my three test systems, I define "tumbleweed" to be UDP port 21010
@@ -1664,7 +1675,7 @@ The router makes a note of this; here are the results of an overnight test.
 (The IPv4 addresses are expressed in IPv6 notation, which the router uses
 natively. Also, I've obfuscated portions of the WAN addresses.) You can see
 the base and rover changing ports and even addresses, and even sometimes
-switching between the WAN and the LAN.
+switching between the WAN and the LAN when they have access to both.
 
     2019-06-25T23:29:47.791661Z <INFO> [744] {76f6b530} Begin
     2019-06-25T23:29:47.792252Z <INFO> [744] {76f6b530} Router (3) ":tumbleweed" [::]:21010
@@ -1718,6 +1729,19 @@ removed from the list of active rovers on the router. In the case of the base,
 the new base is rejected until similarly the old base times out and is removed
 when no more updates are received; then the new base is registered on the
 router and its updates are used to feed the rovers.
+
+All internet communication is via UDP datagram. Each datagram contains one
+and only one fully validated RTCM message complete with checksum and preceeded
+by a four-byte sequence number. UDP datagrams received out of sequence are
+rejected by the receiver.
+
+The internet route to the rover for RTK updates is determined by the address
+and port from which a keep alive is received by the router from the rover.
+The keep alive message is an RTCM message with a zero-length payload. A keep
+alive message is sent by each rover to the router by default once every
+twenty-five seconds. Thirty seconds is a typical timeout after which a firewall
+or router will remove the UDP return route. (This mechanism was inspired by a
+similar one used by SIP to route RTP packets to VoIP phones.)
 
 # Acknowledgements
 

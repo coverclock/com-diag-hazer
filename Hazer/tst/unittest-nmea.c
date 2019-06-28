@@ -63,8 +63,8 @@ int main(void)
         assert(position.sat_used == 12);
         assert(position.utc_nanoseconds == 50187000000000ULL);
         assert(position.tot_nanoseconds == 50187000000000ULL);
-        assert(position.lat_nanodegrees == 39794222999LL); /* 39794223000 nominally. */
-        assert(position.lon_nanodegrees == -105153369333LL);
+        assert(position.lat_nanominutes == 2387653380000LL);
+        assert(position.lon_nanominutes == -6309202160000LL);
     }
 
     {
@@ -113,8 +113,8 @@ int main(void)
         assert(position.utc_nanoseconds == 50188000000000ULL);
         assert(position.dmy_nanoseconds == 1533600000000000000ULL); /* date -u -d "August 7 2018" +"%s.%N" */
         assert(position.tot_nanoseconds == (1533600000000000000ULL + 50188000000000ULL));
-        assert(position.lat_nanodegrees == 39794222833LL);
-        assert(position.lon_nanodegrees == -105153370500LL);
+        assert(position.lat_nanominutes == 2387653370000LL);
+        assert(position.lon_nanominutes == -6309202230000LL);
         assert(position.sog_microknots == 10000ULL);
         assert(position.cog_nanodegrees == 0LL);
 
@@ -165,8 +165,8 @@ int main(void)
         assert(strcmp(position.label, "GLL") == 0);
         assert(position.utc_nanoseconds == 50188000000000ULL);
         assert(position.tot_nanoseconds == 50188000000000ULL);
-        assert(position.lat_nanodegrees == 39794222833LL);
-        assert(position.lon_nanodegrees == -105153370500LL);
+        assert(position.lat_nanominutes == 2387653370000LL);
+        assert(position.lon_nanominutes == -6309202230000LL);
     }
 
     {
