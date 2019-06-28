@@ -1124,8 +1124,6 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fputc('\n', fp);
 
-printf("LAT %d %d\n",sp->payload.lat, sp->payload.latHp);
-printf("LON %d %d\n",sp->payload.lon, sp->payload.lonHp);
         fputs("NGS", fp);
 
         hazer_format_hppos2position(sp->payload.lat, sp->payload.latHp, &degrees, &minutes, &seconds, &tenminus5, &direction);
