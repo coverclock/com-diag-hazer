@@ -629,10 +629,10 @@ void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp,
 
     *degreesp = nanodegrees / 1000000000ULL;                    /* Get integral degrees. */
     nanodegrees = nanodegrees % 1000000000ULL;                  /* Remainder. */
-    nanodegrees /= 60LL;                                        /* Convert to nanominutes. */
+    nanodegrees *= 60ULL;                                       /* Convert to nanominutes. */
     *minutesp = nanodegrees / 1000000000LL;                     /* Get integral minutes. */
     nanodegrees = nanodegrees % 1000000000LL;                   /* Remainder. */
-    nanodegrees /= 60LL;                                        /* Convert to nanoseconds. */
+    nanodegrees *= 60ULL;                                       /* Convert to nanoseconds. */
     *secondsp = nanodegrees / 1000000000LL;                     /* Get integral seconds. */
     nanodegrees = nanodegrees % 1000000000LL;                   /* Remainder. */
     *fractionp = (nanodegrees * 10000LL) / 1000000000LL;        /* Get 10^-5 seconds. */
