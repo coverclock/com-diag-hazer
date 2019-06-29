@@ -22,6 +22,7 @@ int main(void)
     char * string = (char *)0;
     uint64_t numerator = 0;
     uint64_t denominator = 0;
+    int64_t nanominutes = 0;
     int64_t nanodegrees = 0;
     int64_t millimeters = 0;
     int64_t microknots = 0;
@@ -412,96 +413,96 @@ int main(void)
 
     /**************************************************************************/
 
-    nanodegrees = hazer_parse_latlon("00000", 'E', &digits);
-    assert(nanodegrees == 0LL);
+    nanominutes = hazer_parse_latlon("00000", 'E', &digits);
+    assert(nanominutes == 0LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("00000", 'S', &digits);
-    assert(nanodegrees == 0LL);
+    nanominutes = hazer_parse_latlon("00000", 'S', &digits);
+    assert(nanominutes == 0LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("18000", 'E', &digits);
-    assert(nanodegrees == 180000000000LL);
+    nanominutes = hazer_parse_latlon("18000", 'E', &digits);
+    assert(nanominutes == 10800000000000LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("18000", 'S', &digits);
-    assert(nanodegrees == -180000000000LL);
+    nanominutes = hazer_parse_latlon("18000", 'S', &digits);
+    assert(nanominutes == -10800000000000LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("18030", 'E', &digits);
-    assert(nanodegrees == 180500000000LL);
+    nanominutes = hazer_parse_latlon("18030", 'E', &digits);
+    assert(nanominutes == 10830000000000LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("18030", 'S', &digits);
-    assert(nanodegrees == -180500000000LL);
+    nanominutes = hazer_parse_latlon("18030", 'S', &digits);
+    assert(nanominutes == -10830000000000LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("18030.", 'E', &digits);
-    assert(nanodegrees == 180500000000LL);
+    nanominutes = hazer_parse_latlon("18030.", 'E', &digits);
+    assert(nanominutes == 10830000000000LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("18030.", 'W', &digits);
-    assert(nanodegrees == -180500000000LL);
+    nanominutes = hazer_parse_latlon("18030.", 'W', &digits);
+    assert(nanominutes == -10830000000000LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("18030.60", 'E', &digits);
-    assert(nanodegrees == 180510000000LL);
+    nanominutes = hazer_parse_latlon("18030.60", 'E', &digits);
+    assert(nanominutes == 10830600000000LL);
     assert(digits == 7);
 
-    nanodegrees = hazer_parse_latlon("18030.60", 'W', &digits);
-    assert(nanodegrees == -180510000000LL);
+    nanominutes = hazer_parse_latlon("18030.60", 'W', &digits);
+    assert(nanominutes == -10830600000000LL);
     assert(digits == 7);
 
-    nanodegrees = hazer_parse_latlon("0000", 'N', &digits);
-    assert(nanodegrees == 0LL);
+    nanominutes = hazer_parse_latlon("0000", 'N', &digits);
+    assert(nanominutes == 0LL);
     assert(digits == 4);
 
-    nanodegrees = hazer_parse_latlon("0000", 'S', &digits);
-    assert(nanodegrees == 0LL);
+    nanominutes = hazer_parse_latlon("0000", 'S', &digits);
+    assert(nanominutes == 0LL);
     assert(digits == 4);
 
-    nanodegrees = hazer_parse_latlon("9000", 'N', &digits);
-    assert(nanodegrees == 90000000000LL);
+    nanominutes = hazer_parse_latlon("9000", 'N', &digits);
+    assert(nanominutes == 5400000000000LL);
     assert(digits == 4);
 
-    nanodegrees = hazer_parse_latlon("9000", 'S', &digits);
-    assert(nanodegrees == -90000000000);
+    nanominutes = hazer_parse_latlon("9000", 'S', &digits);
+    assert(nanominutes == -5400000000000LL);
     assert(digits == 4);
 
-    nanodegrees = hazer_parse_latlon("9030", 'N', &digits);
-    assert(nanodegrees == 90500000000LL);
+    nanominutes = hazer_parse_latlon("9030", 'N', &digits);
+    assert(nanominutes == 5430000000000LL);
     assert(digits == 4);
 
-    nanodegrees = hazer_parse_latlon("9030", 'S', &digits);
-    assert(nanodegrees == -90500000000LL);
+    nanominutes = hazer_parse_latlon("9030", 'S', &digits);
+    assert(nanominutes == -5430000000000LL);
     assert(digits == 4);
 
-    nanodegrees = hazer_parse_latlon("9030.", 'N', &digits);
-    assert(nanodegrees == 90500000000LL);
+    nanominutes = hazer_parse_latlon("9030.", 'N', &digits);
+    assert(nanominutes == 5430000000000LL);
     assert(digits == 4);
 
-    nanodegrees = hazer_parse_latlon("9030.", 'S', &digits);
-    assert(nanodegrees == -90500000000LL);
+    nanominutes = hazer_parse_latlon("9030.", 'S', &digits);
+    assert(nanominutes == -5430000000000LL);
     assert(digits == 4);
 
-    nanodegrees = hazer_parse_latlon("9030.0", 'N', &digits);
-    assert(nanodegrees == 90500000000LL);
+    nanominutes = hazer_parse_latlon("9030.0", 'N', &digits);
+    assert(nanominutes == 5430000000000LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("9030.0", 'S', &digits);
-    assert(nanodegrees == -90500000000LL);
+    nanominutes = hazer_parse_latlon("9030.0", 'S', &digits);
+    assert(nanominutes == -5430000000000LL);
     assert(digits == 5);
 
-    nanodegrees = hazer_parse_latlon("9030.60", 'N', &digits);
-    assert(nanodegrees == 90510000000LL);
+    nanominutes = hazer_parse_latlon("9030.60", 'N', &digits);
+    assert(nanominutes == 5430600000000LL);
     assert(digits == 6);
 
-    nanodegrees = hazer_parse_latlon("9030.60", 'S', &digits);
-    assert(nanodegrees == -90510000000);
+    nanominutes = hazer_parse_latlon("9030.60", 'S', &digits);
+    assert(nanominutes == -5430600000000LL);
     assert(digits == 6);
 
-    nanodegrees = hazer_parse_latlon("9030.66", 'N', &digits);
-    assert(nanodegrees == 90511000000LL);
+    nanominutes = hazer_parse_latlon("9030.66", 'N', &digits);
+    assert(nanominutes == 5430660000000LL);
     assert(digits == 6);
 
     /**************************************************************************/

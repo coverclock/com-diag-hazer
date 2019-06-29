@@ -129,6 +129,7 @@
 #include "com/diag/diminuto/diminuto_containerof.h"
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_file.h"
+#include "com/diag/diminuto/diminuto_daemon.h"
 
 /*******************************************************************************
  * CONSTANTS
@@ -189,6 +190,11 @@ static inline uint64_t abs64(int64_t datum)
     return (datum >= 0) ? datum : -datum;
 }
 
+/**
+ * Return monotonic time in seconds.
+ * @param frequency is the underlying clock frequency.
+ * @return monotonic time in seconds.
+ */
 static inline long ticktock(diminuto_sticks_t frequency)
 {
     return diminuto_time_elapsed() / frequency;
@@ -882,29 +888,29 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
         fputs("POS", fp);
 
-        hazer_format_nanodegrees2position(pa[system].lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+        hazer_format_nanominutes2position(pa[system].lat_nanominutes, &degrees, &minutes, &seconds, &hundredths, &direction);
         assert((0 <= degrees) && (degrees <= 90));
         assert((0 <= minutes) && (minutes <= 59));
         assert((0 <= seconds) && (seconds <= 59));
         assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %2d%lc%02d'%02d.%02d\"%c,", degrees, DEGREE, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
+        fprintf(fp, " %2d%lc%02d'%02d.%02d\"%c,", degrees, DEGREE, minutes, seconds, hundredths, (direction < 0) ? 'S' : 'N');
 
-        hazer_format_nanodegrees2position(pa[system].lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
+        hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &hundredths, &direction);
         assert((0 <= degrees) && (degrees <= 180));
         assert((0 <= minutes) && (minutes <= 59));
         assert((0 <= seconds) && (seconds <= 59));
         assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %3d%lc%02d'%02d.%02d\"%c", degrees, DEGREE, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
+        fprintf(fp, " %3d%lc%02d'%02d.%02d\"%c", degrees, DEGREE, minutes, seconds, hundredths, (direction < 0) ? 'W' : 'E');
 
         fputc(' ', fp);
 
-        whole = pa[system].lat_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].lat_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu,", (long long signed int)whole, (long long unsigned int)fraction);
+        hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &fraction);
+        assert((-90 <= degrees) && (degrees <= 90));
+        fprintf(fp, " %4d.%09llu,", degrees, (long long unsigned int)fraction);
 
-        whole = pa[system].lon_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].lon_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu", (long long signed int)whole, (long long unsigned int)fraction);
+        hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &fraction);
+        assert((-180 <= degrees) && (degrees <= 180));
+        fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)fraction);
 
         fprintf(fp, "%5s", "");
 
@@ -1068,6 +1074,11 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
  */
 static void print_solution(FILE * fp, const yodel_solution_t * sp)
 {
+    int degrees = 0;
+    int minutes = 0;
+    int seconds = 0;
+    int tenminus5 = 0;
+    int direction = 0;
     int64_t value = 0;
     int64_t whole = 0;
     uint64_t fraction = 0;
@@ -1076,21 +1087,11 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fputs("HPP", fp);
 
-        value = sp->payload.lat;
-        value *= 100;
-        value += sp->payload.latHp;
-        whole = value / 1000000000LL;
-        fraction = abs64(value) % 1000000000ULL;
-        fprintf(fp, " %4lld.%09llu,", (long long signed int)whole, (long long unsigned int)fraction);
+        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &fraction);
+        fprintf(fp, " %4d.%09llu,", degrees, (long long unsigned int)fraction);
 
-        value = sp->payload.lon;
-        value *= 100;
-        value += sp->payload.lonHp;
-        whole = value / 1000000000LL;
-        fraction = abs64(value) % 1000000000ULL;
-        fprintf(fp, " %4lld.%09llu", (long long signed int)whole, (long long unsigned int)fraction);
-
-        // fprintf(fp, " hAcc=%d", sp->payload.hAcc);
+        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &fraction);
+        fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)fraction);
 
         value = sp->payload.hAcc;
         whole = value / 10000LL;
@@ -1112,14 +1113,26 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         fraction = abs64(value) % 10000ULL;
         fprintf(fp, " %6lld.%04llum", (long long signed int)whole, (long long unsigned int)fraction);
 
-        // fprintf(fp, " vACC=%d", sp->payload.vAcc);
-
         value = sp->payload.vAcc;
         whole = value / 10000LL;
         fraction = abs64(value) % 10000ULL;
         fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)whole, (long long unsigned int)fraction);
 
         fprintf(fp, "%40s", "");
+
+        fprintf(fp, " %-8s", "GNSS");
+
+        fputc('\n', fp);
+
+        fputs("NGS", fp);
+
+        hazer_format_hppos2position(sp->payload.lat, sp->payload.latHp, &degrees, &minutes, &seconds, &tenminus5, &direction);
+        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenminus5, (direction < 0) ? 'S' : 'N');
+
+        hazer_format_hppos2position(sp->payload.lon, sp->payload.lonHp, &degrees, &minutes, &seconds, &tenminus5, &direction);
+        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenminus5, (direction < 0) ? 'W' : 'E');
+
+        fprintf(fp, "%29s", "");
 
         fprintf(fp, " %-8s", "GNSS");
 
@@ -1284,6 +1297,7 @@ int main(int argc, char * argv[])
     int expire = 0;
     int unknown = 0;
     int serial = 0;
+    int daemon = 0;
     long timeout = HAZER_GNSS_SECONDS;
     long keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
     /*
@@ -1300,7 +1314,7 @@ int main(int argc, char * argv[])
      */
     FILE * in_fp = stdin;
     FILE * out_fp = stdout;
-    FILE * dev_fp = stdout;
+    FILE * dev_fp = (FILE *)0;
     FILE * log_fp = (FILE *)0;
     FILE * strobe_fp = (FILE *)0;
     FILE * pps_fp = (FILE *)0;
@@ -1543,7 +1557,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:OPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:MOPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1621,6 +1635,9 @@ int main(int argc, char * argv[])
         case 'L':
             logging = optarg;
             break;
+        case 'M':
+        	daemon = !0;
+        	break;
         case 'P':
         	process = !0;
         	break;
@@ -1641,7 +1658,7 @@ int main(int argc, char * argv[])
             diminuto_list_enqueue(&command_list, command_node);
             break;
         case 'V':
-            fprintf(stderr, "%s: version com-diag-hazer %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+        	DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
             readonly = 0;
@@ -1731,7 +1748,7 @@ int main(int argc, char * argv[])
             break;
         case '?':
             fprintf(stderr, "usage: %s "
-                           "[ -d ] [ -v ] [ -u ] [ -V ] [ -X ] "
+                           "[ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] "
                            "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
                            "[ -t SECONDS ] "
                            "[ -I PIN | -c ] [ -p PIN ] "
@@ -1751,22 +1768,23 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
             fprintf(stderr, "       -F          Like -R but reFresh at 1Hz.\n");
             fprintf(stderr, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
-            fprintf(stderr, "       -G PORT     Use local PORT as dataGram source.\n");
+            fprintf(stderr, "       -G :PORT    Use local PORT as dataGram source.\n");
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
             fprintf(stderr, "       -L LOG      Write input to LOG file.\n");
+            fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S SOURCE   Use SOURCE file or named pipe for input.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
             fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
-            fprintf(stderr, "       -V          Print release, Vintage, and revision on standard output.\n");
+            fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
             fprintf(stderr, "       -W STRING   Collapse STRING, append checksum, Write to DEVICE.\n");
             fprintf(stderr, "       -W ''       Exit when this empty Write STRING is processed.\n");
             fprintf(stderr, "       -X          Enable message eXpiration test mode.\n");
             fprintf(stderr, "       -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.\n");
-            fprintf(stderr, "       -Y PORT     Use local PORT as surveYor source.\n");
+            fprintf(stderr, "       -Y :PORT    Use local PORT as surveYor source.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
@@ -1783,6 +1801,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
             fprintf(stderr, "       -u          Note Unprocessed input on standard error.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
+            fprintf(stderr, "       -x          Run in the background as a daemon.\n");
             fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds.\n");
             return 1;
             break;
@@ -1796,6 +1815,12 @@ int main(int argc, char * argv[])
     /**
      ** INITIALIZATION
      **/
+
+    if (daemon) {
+    	rc = diminuto_daemon(Program);
+    	DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
+    	assert(rc == 0);
+    }
 
     DIMINUTO_LOG_INFORMATION("Begin");
 
@@ -3219,8 +3244,9 @@ int main(int argc, char * argv[])
          * complete sentence, packet, or message that we can forward, write,
          * log, or use to update our databases.
          */
-
-        if (diminuto_file_ready(in_fp) > 0) {
+        if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
+        	/* Do nothing. */
+        } else if (diminuto_file_ready(in_fp) > 0) {
         	continue;
         } else if (diminuto_mux_wait(&mux, 0 /* POLL */) > 0) {
 			continue;

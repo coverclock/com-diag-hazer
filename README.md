@@ -337,6 +337,13 @@ Raspbian 9.9 "Stretch"
 Linux 4.19.42    
 gcc 6.3.0    
 
+"Bodega", "Mochila" and "Jefe" (updated)    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.50    
+gcc 8.3.0    
+
 "Cadmium"    
 Intel NUC7i7BNH    
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
@@ -365,7 +372,7 @@ Chip Overclock, "A Menagerie of GPS Devices",
 Chip Overclock, "Practical Geolocation",
 <https://coverclock.blogspot.com/2018/08/practical-geolocation.html>
 
-Chip Overclock, "Pratical Geolocation II",
+Chip Overclock, "Practical Geolocation II",
 <https://coverclock.blogspot.com/2018/08/practical-geolocation-ii.html>
 
 Chip Overclock, "We Have Met the Enemy and He Is Us",
@@ -579,6 +586,14 @@ the libraries and binaries in the system directories.)
     gpstool -?
     rtktool -?
 
+The fs directory contains a file system overlay of files that I've found
+useful to carefully install in system directories like /etc and /lib.
+It is not installed automatically, because whether they are helpful, or
+they reduce your target system to a smoking heap of silicon, depends on your
+exact circumstances: the target system, the version of Linux it runs, etc.
+Some of the files under fs are new files in their entirety, some just contain
+lines that need to be added to the indicated files.
+
 # Directories
  
 * bin - utility source files.
@@ -659,34 +674,35 @@ the libraries and binaries in the system directories.)
 
 # Help
 
-    > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]           -1          Use one stop bit for DEVICE.
+## gpstool
+
+    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
            -B BYTES    Set the input Buffer size to BYTES bytes.
-           -C          Ignore bad Checksums.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
            -F          Like -R but reFresh at 1Hz.
            -G IP:PORT  Use remote IP and PORT as dataGram sink.
-           -G PORT     Use local PORT as dataGram source.
+           -G :PORT    Use local PORT as dataGram source.
            -H HEADLESS Like -R but writes each iteration to HEADLESS file.
            -I PIN      Take 1PPS from GPIO Input PIN (requires -D).
            -K          Write input to DEVICE sinK from datagram source.
            -L LOG      Write input to LOG file.
+           -M          Run in the background as a daeMon.
            -P          Process incoming data even if no report is being generated.
            -R          Print a Report on standard output.
            -S SOURCE   Use SOURCE file or named pipe for input.
            -U STRING   Like -W except expect UBX ACK or NAK response.
            -U ''       Exit when this empty UBX STRING is processed.
-           -V          Print release, Vintage, and revision on standard output.
+           -V          Log Version in the form of release, vintage, and revision.
            -W STRING   Collapse STRING, append checksum, Write to DEVICE.
            -W ''       Exit when this empty Write STRING is processed.
            -X          Enable message eXpiration test mode.
            -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.
-           -Y PORT     Use local PORT as surveYor source.
+           -Y :PORT    Use local PORT as surveYor source.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
            -d          Display Debug output on standard error.
@@ -703,13 +719,17 @@ the libraries and binaries in the system directories.)
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
+           -x          Run in the background as a daemon.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
 
+## rtktool
+
     > rtktool -?
-    usage: rtktool [ -d ] [ -v ] [ -V ] [ -p PORT ] [ -t SECONDS ]
-           -V          Print release, Vintage, and revision on standard output.
+    usage: rtktool [ -d ] [ -v ] [ -M ] [ -V ] [ -M ] [ -p :PORT ] [ -t SECONDS ]
+           -M          Run in the background as a daeMon.
+           -V          Log Version in the form of release, vintage, and revision.
            -d          Display Debug output on standard error.
-           -p PORT     Use PORT as the RTCM source and sink port.
+           -p :PORT    Use PORT as the RTCM source and sink port.
            -t SECONDS  Set the client timeout to SECONDS seconds.
            -v          Display Verbose output on standard error.
 
@@ -805,7 +825,7 @@ can be cut and pasted directly into Google Maps, and at least the latter
 into Google Earth.
 
 N.B. The underlying position data is stored as binary integers in billionths
-of a degree (nanodegrees). But the device under test may not provide that much
+of a minutes (nanominutes). But the device under test may not provide that much
 accuracy; the actual number of significant digits for various data is reported
 by the INT line (below), but even this may be optimistic - or, for that matter,
 pessimistic - when compared to what the device is capable of. In particular,
@@ -839,6 +859,10 @@ accuracy. This may differ (slightly) from the position and altitude
 reported via POS and ALT due to the conversion of units done to conform
 to the NMEA format. When available, the HPP and HPA is expected to be
 more precise.
+
+NGS shows the same high precision position as HPP but in the format used
+in the National Geodetic Survey (NGS) data sheets for coordinates of artifacts
+such as NGS and municipal survey markers.
 
 BAS or ROV (if present and enabled) show information about the Ublox
 device operating in base station or in rover modes. In base (stationary)
@@ -1558,29 +1582,10 @@ configuration is in volatile memory so that the GPS receiver reverts back to its
 factory defaults when it is power cycled. Among other things, this allows me to
 use SimpleRTK2B boards interchangeably in the field.
 
-> Ultimately, neither the the Digi Xbee3 SX 900MHz radios, nor the same
-> form-factor Digi Xbee3 LTE-M cellular radios, met my needs, although I tried
-> both (the latter using AT&T LTE-M SIMs). As far as I can tell, both worked
-> as advertised.
-
-## Verizon/NovaTel Wireless USB630L and USB730L USB-attached LTE Modems
-
-I've used the USB630L and USB730L LTE modems in a variety of IoT efforts,
-including with Hazer. I've discovered that when using the device with a
-Raspbarry Pi, in order to maintain a stable mobile connection, or sometimes
-to have the device come up reliably at all, I need to insert a powered hub
-between the modem and the Pi.
-
-I know from other work that CDMA-based cellular radios - like those used with
-the Verizon network - are constantly being told many times a second by the
-CDMA base station to adjust their power up and down as other devices leave
-and join the network. I'm guessing the Pi's USB port doesn't provide
-sufficient power to always meet this demand.
-
-I like the Anker AH221 USB 3.0 powered hub, but your mileage may vary. For
-some applications, I end up running the hub, the Pi, and the GNSS receiver
-all off battery power using a ginormous Lithium power pack (Anker makes
-those too).
+> Ultimately, neither the the Digi Xbee3 SX 900MHz radios, nor the Digi Xbee3
+> LTE-M cellular radios which have the same form factor and are pin compatible,
+> met my needs, although I tried both, the latter using AT&T LTE-M SIMs. As
+> far as I can tell, however, both worked as advertised.
 
 ## Spurious /dev/ttyACM Characters on Intel NUC/Ubuntu
 
@@ -1596,11 +1601,151 @@ I only see this when I run Hazer under Ubuntu on Intel servers (Nickel,
 Cadmium, and Mercury as described above). It is reproducible removing Hazer
 from the test completely and just using standard utilities like cat and socat.
 It is not reproducible running the exact same software and GNSS receivers on
-the ARM-based Raspberry Pi 3+ (Gold, Bodega, and Mochila as decribed above).
+the ARM-based Raspberry Pi 3+ (Gold, Bodega, and Mochila as decribed above)
+under Raspbian. Both Ubuntu and Raspbian are Debian-based Linux distributions.
 
-I haven't reported this to U-blox because I would really like this to be a
-software bug on my part, because then I could fix it. But that strategy is
+I haven't reported this to U-blox because it seems like a bug (somehow) in the
+Intel-specific portions of the USB stack. Plus, I would really like this to be
+a software bug on my part, because then I could fix it; but that strategy is
 looking iffy.
+
+## Differential GNSS Using Tumbleweed
+
+Tumbleweed uses three Raspberry Pi 3B+ SBCs and two Ardusimple SimpleRTK2B
+boards, each equipped with a U-blox UBX-ZED-F9P receiver chip and a multi-band
+GPS active antenna, to implement a Differential GNSS system which is (at least
+theoretically) capable of centimeter-level accuracy. One of the Pis is a
+stationary base station running its ZED-F9P in survey mode, one of the Pis is
+a mobile rover whose ZED-F9P receives RTK updates from the base station, and
+one of the Pis is a router that receives RTK updates from one base station
+and forwards them to one or more rovers.
+
+The Tumbleweed router, which is on my LAN, must have a static IP address
+or a usable Dynamic DNS (DDNS) address (which is what I do) that can be
+reached through the firewall.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    router :tumbleweed &
+    tail -f out/host/log/router.err
+
+The Tumbleweed base is typically on my LAN, but can be on the WAN by changing
+the hostname through which the router is addressed.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    base tumbleweed:tumbleweed &
+    cat out/host/log/base.err
+    headless out/host/log/base.out
+
+A Tumbleweed rover (there can be more than one) is on the WAN, and is agnostic
+as to the Internet connection (I use a USB LTE modem).
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    rover tumbleweed.test:tumbleweed &
+    cat out/host/log/rover.err
+    headless out/host/log/rover.out
+
+On my three test systems, I define "tumbleweed" to be UDP port 21010
+in /etc/service, the router's LAN address to be "tumbleweed" in /etc/hosts,
+and in the example above the name "tumbleweed.test" is the stand in for the
+DDNS name that identifies my connection on the WAN. My firewall forwards
+port 21010 to the same port on the Tumbleweed router.
+
+I'm running all three, router, base, and rover, as simple background processes.
+But it is also possible to run them in daemon mode, in which case messages
+normally written to standard error are logged to the system log. Also,
+all three are run in "headless" mode, where the screens normally written to
+standard output are instead written to a file, and a script is used to
+display the file as it changes; this decouples the router, rover, and base
+software from the display terminal while still allowing an on-demand real-time
+display. (This requires that the inotify-tools package be installed on the Pi.)
+Both gpstool and rtktool can be run as daemons via a command line switch
+(although I have not done so in these examples) and the headless mode can still
+be used.
+
+My prototype setup uses three Raspberry Pi 3B+ systems. My rover (and
+sometimes my base too) uses a NovaTel Wireless USB730L USB LTE modem with
+service from Verizon Wireless. (N.B. Despite my best efforts, these modems,
+working in end-user mode, worked like crap until I upgraded to Raspbian 10,
+at which point they worked flawlessly.) My router connects directly via
+wired Ethernet to my home access point/router.
+
+At least with my LTE modems, it is not unusual to see the rover and the base
+(which in this test were connected to both the WAN and the LAN) drop off and
+reappear on the WAN, often with a different port number or even an IP address.
+The router makes a note of this; here are the results of an overnight test.
+(The IPv4 addresses are expressed in IPv6 notation, which the router uses
+natively. Also, I've obfuscated portions of the WAN addresses.) You can see
+the base and rover changing ports and even addresses, and even sometimes
+switching between the WAN and the LAN when they have access to both.
+
+    2019-06-25T23:29:47.791661Z <INFO> [744] {76f6b530} Begin
+    2019-06-25T23:29:47.792252Z <INFO> [744] {76f6b530} Router (3) ":tumbleweed" [::]:21010
+    2019-06-25T23:29:47.792322Z <INFO> [744] {76f6b530} Start
+    2019-06-25T23:30:52.219618Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.0.61]:6571
+    2019-06-25T23:30:52.219789Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.0.61]:6571
+    2019-06-25T23:36:28.213760Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T00:33:19.063809Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T00:33:28.416375Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T00:58:59.064859Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T00:59:08.301363Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T02:38:48.012487Z <NOTE> [744] {76f6b530} Client Old base [::ffff:XXX.YYY.0.61]:6571
+    2019-06-26T02:38:48.013164Z <NOTE> [744] {76f6b530} Client New base [::ffff:192.168.1.188]:43289
+    2019-06-26T02:38:48.013336Z <NOTE> [744] {76f6b530} Client Set base [::ffff:192.168.1.188]:43289
+    2019-06-26T02:39:28.253289Z <NOTE> [744] {76f6b530} Client Old base [::ffff:192.168.1.188]:43289
+    2019-06-26T02:39:29.070321Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.1.209]:8231
+    2019-06-26T02:39:29.070540Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.1.209]:8231
+    2019-06-26T03:05:28.058945Z <NOTE> [744] {76f6b530} Client New rover [::ffff:192.168.1.1]:42804
+    2019-06-26T03:05:39.069692Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.33.234]:2645
+    2019-06-26T03:05:48.256039Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.9.215]:4224
+    2019-06-26T03:05:59.069366Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:192.168.1.1]:42804
+    2019-06-26T06:09:28.058577Z <NOTE> [744] {76f6b530} Client New rover [::ffff:192.168.1.1]:42804
+    2019-06-26T06:09:39.065573Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.9.215]:4224
+    2019-06-26T06:09:48.108028Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.16.196]:7052
+    2019-06-26T06:09:59.065301Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:192.168.1.1]:42804
+    2019-06-26T06:10:08.058974Z <NOTE> [744] {76f6b530} Client New rover [::ffff:192.168.1.182]:42804
+    2019-06-26T06:10:19.066025Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.16.196]:7052
+    2019-06-26T06:10:28.266752Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.16.196]:7040
+    2019-06-26T06:10:39.065709Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:192.168.1.182]:42804
+    2019-06-26T06:43:20.066215Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.16.196]:7040
+    2019-06-26T06:43:48.268595Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.16.196]:7040
+    2019-06-26T09:13:20.020202Z <NOTE> [744] {76f6b530} Client Old base [::ffff:XXX.YYY.1.209]:8231
+    2019-06-26T09:13:20.220657Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.13.157]:5803
+    2019-06-26T09:13:20.220928Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.13.157]:5803
+    2019-06-26T10:58:19.069629Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:XXX.YYY.16.196]:7040
+    2019-06-26T10:58:28.052347Z <NOTE> [744] {76f6b530} Client New rover [::ffff:192.168.1.1]:42804
+    2019-06-26T10:59:08.257400Z <NOTE> [744] {76f6b530} Client New rover [::ffff:XXX.YYY.17.45]:4970
+    2019-06-26T10:59:18.069004Z <NOTE> [744] {76f6b530} Client Old rover [::ffff:192.168.1.1]:42804
+    2019-06-26T14:01:28.248198Z <NOTE> [744] {76f6b530} Client Old base [::ffff:XXX.YYY.13.157]:5803
+    2019-06-26T14:01:29.059184Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.27.107]:4679
+    2019-06-26T14:01:29.059431Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.27.107]:4679
+    2019-06-26T14:02:08.263694Z <NOTE> [744] {76f6b530} Client Old base [::ffff:XXX.YYY.27.107]:4679
+    2019-06-26T14:02:09.063249Z <NOTE> [744] {76f6b530} Client New base [::ffff:XXX.YYY.27.107]:4686
+    2019-06-26T14:02:09.063542Z <NOTE> [744] {76f6b530} Client Set base [::ffff:XXX.YYY.27.107]:4686
+
+When a client of the router changes its port or IP address, it appears to be
+a new rover or base. In the case of the rover, it is immediately registered
+with the router, which begins feeding it RTK updates from the current base.
+The old rover times out when no more keep alives are received, and it is
+removed from the list of active rovers on the router. In the case of the base,
+the new base is rejected until similarly the old base times out and is removed
+when no more updates are received; then the new base is registered on the
+router and its updates are used to feed the rovers.
+
+All internet communication is via UDP datagram. Each datagram contains one
+and only one fully validated RTCM message complete with checksum and preceeded
+by a four-byte sequence number. UDP datagrams received out of sequence are
+rejected by the receiver.
+
+The internet route to the rover for RTK updates is determined by the address
+and port from which a keep alive is received by the router from the rover.
+The keep alive message is an RTCM message with a zero-length payload. A keep
+alive message is sent by each rover to the router by default once every
+twenty-five seconds. Thirty seconds is a typical timeout after which a firewall
+or router will remove the UDP return route. (This mechanism was inspired by a
+similar one used by SIP to route RTP packets to VoIP phones.)
 
 # Acknowledgements
 

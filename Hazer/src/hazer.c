@@ -31,6 +31,20 @@ const char * HAZER_SYSTEM_NAME[] = HAZER_SYSTEM_NAME_INITIALIZER;
  *
  ******************************************************************************/
 
+/**
+ * Return the absolute value of a signed sixty-four bit integer.
+ * @param datum is a signed sixty-four bit integer.
+ * @return an unsigned sixty-four bit integer.
+ */
+static inline uint64_t abs64(int64_t datum)
+{
+    return (datum >= 0) ? datum : -datum;
+}
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 FILE * hazer_debug(FILE * now)
 {
     FILE * was;
@@ -514,7 +528,7 @@ uint64_t hazer_parse_dmy(const char * string)
 
 int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp)
 {
-    int64_t nanodegrees = 0;
+    int64_t nanominutes = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
     unsigned long dddmm = 0;
@@ -524,19 +538,17 @@ int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digits
     digits = strlen(string);
 
     dddmm = strtoul(string, &end, 10);
-    nanodegrees = dddmm / 100;
-    nanodegrees *= 1000000000LL;
+    nanominutes = dddmm / 100;
+    nanominutes *= 60000000000LL;
     fraction = dddmm % 100;
     fraction *= 1000000000LL;
-    fraction /= 60;
-    nanodegrees += fraction;
+    nanominutes += fraction;
    
     if (*end == HAZER_STIMULUS_DECIMAL) {
         fraction = hazer_parse_fraction(end + 1, &denominator);
         fraction *= 1000000000LL;
-        fraction /= 60;
         fraction /= denominator;
-        nanodegrees += fraction;
+        nanominutes += fraction;
         --digits;
     }
 
@@ -546,7 +558,7 @@ int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digits
         break;
     case HAZER_STIMULUS_SOUTH:
     case HAZER_STIMULUS_WEST:
-        nanodegrees = -nanodegrees;
+        nanominutes = -nanominutes;
         break;
     default:
         break;
@@ -554,7 +566,7 @@ int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digits
 
     *digitsp = digits;
 
-    return nanodegrees; 
+    return nanominutes;
 }
 
 int64_t hazer_parse_cog(const char * string, uint8_t * digitsp)
@@ -753,25 +765,34 @@ void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int *
     *nanosecondsp = nanoseconds % 1000000000ULL;
 }
 
-void hazer_format_nanodegrees2position(int64_t nanodegrees, int * degreesp, int * minutesp, int * secondsp, int * hundredthsp, int * directionp)
+void hazer_format_nanominutes2position(int64_t nanominutes, int * degreesp, int * minutesp, int * secondsp, int * hundredthsp, int * directionp)
 {
     int hundredths = 0;
     char direction = '\0';
 
-    if (nanodegrees < 0) {
-        nanodegrees = -nanodegrees;
+    if (nanominutes < 0) {
+        nanominutes = -nanominutes;
         *directionp = -1;
     } else {
         *directionp = 1;
     }
 
-    *degreesp = nanodegrees / 1000000000LL;
-    nanodegrees %= 1000000000LL;
-    *minutesp = (nanodegrees * 60LL) / 1000000000LL;
-    nanodegrees %= 1000000000LL / 60LL;
-    *secondsp = (nanodegrees * 3600LL) / 1000000000LL;
-    nanodegrees %= 1000000000LL / 3600LL;
-    *hundredthsp = (nanodegrees * 360000LL) / 1000000000LL;
+    *degreesp = nanominutes / 60000000000LL;                /* Get integral degrees. */
+    nanominutes = nanominutes % 60000000000LL;              /* Remainder. */
+    *minutesp = nanominutes / 1000000000LL;                 /* Get integral minutes. */
+    nanominutes = nanominutes % 1000000000LL;;              /* Remainder. */
+    nanominutes *= 60LL;                                    /* Convert to nanoseconds. */
+    *secondsp = nanominutes / 1000000000LL;                 /* Get integral seconds. */
+    nanominutes = nanominutes % 1000000000LL;               /* Remainder. */
+    *hundredthsp = (nanominutes * 100LL) / 1000000000LL;    /* Get hundredths. */
+}
+
+void hazer_format_nanominutes2degrees(int64_t nanominutes, int * degreesp, uint64_t * nanodegreesp)
+{
+    *degreesp = nanominutes / 60000000000LL;                 /* Get integral degrees. */
+    nanominutes = abs64(nanominutes);                        /* Fraction is unsigned. */
+    nanominutes = nanominutes % 60000000000LL;               /* Remainder. */
+    *nanodegreesp = nanominutes / 60LL;                      /* Get nanodegrees. */
 }
 
 const char * hazer_format_nanodegrees2compass32(int64_t nanodegrees)
@@ -998,8 +1019,8 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
         positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
         positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-        positionp->lat_nanodegrees = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits);
-        positionp->lon_nanodegrees = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
+        positionp->lat_nanominutes = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits);
+        positionp->lon_nanominutes = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
         positionp->sat_used = strtol(vector[7], (char **)0, 10);
         positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits);
         positionp->label = GGA;
@@ -1218,8 +1239,8 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         positionp->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
         positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-        positionp->lat_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
-        positionp->lon_nanodegrees = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
+        positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
+        positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
         positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits);
         positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits);
         positionp->label = RMC;
@@ -1252,8 +1273,8 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         positionp->utc_nanoseconds = hazer_parse_utc(vector[5]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
         positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;;
-        positionp->lat_nanodegrees = hazer_parse_latlon(vector[1], *(vector[2]), &positionp->lat_digits);
-        positionp->lon_nanodegrees = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lon_digits);
+        positionp->lat_nanominutes = hazer_parse_latlon(vector[1], *(vector[2]), &positionp->lat_digits);
+        positionp->lon_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lon_digits);
         positionp->label = GLL;
         rc = 0;
     }
