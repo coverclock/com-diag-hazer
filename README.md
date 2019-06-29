@@ -31,9 +31,9 @@ Hazer project includes parsers for three different output formats, NMEA,
 UBX, and RTCM, and interprets many of the data records typically represented
 in those formats into C structures.
 
-For purposes of commenting in my C code, I find it useful to rever to
-NMEA records as "sentences" (consist with the NMEA standard), UBX records
-as packets, and RTCM records as messages.
+For purposes of commenting in my C code, I find it useful to rever
+to NMEA records as "sentences" (terminology consistent with the
+NMEA standard), UBX records as packets, and RTCM records as messages.
 
 NMEA sentences are printable ASCII messages that conform
 to the National Marine Electronics Association (NMEA) 0183 4.10
@@ -663,7 +663,7 @@ lines that need to be added to the indicated files.
 * source - send UDP packets to the sink.
 * talkers - processes a file of synthetic input.
 * tumbleweedkeepalives - serves as a Tumbleweed keepalive sink.
-* tumbleweedpi - Another Tumbleweed functioanal test.
+* tumbleweedpi - Another Tumbleweed functional test.
 * tumbleweedremote - serves as a Tumbleweed RTCM sink.
 * tumbleweed - Tumbleweed functional test.
 * ublox7 - exercises any Ublox 7 device.    
