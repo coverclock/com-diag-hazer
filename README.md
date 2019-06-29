@@ -648,7 +648,7 @@ the libraries and binaries in the system directories.)
 * source - send UDP packets to the sink.
 * talkers - processes a file of synthetic input.
 * tumbleweedkeepalives - serves as a Tumbleweed keepalive sink.
-* tumbleweedpi - Another Tumbleweed functioanal test.
+* tumbleweedpi - Another Tumbleweed functional test.
 * tumbleweedremote - serves as a Tumbleweed RTCM sink.
 * tumbleweed - Tumbleweed functional test.
 * ublox7 - exercises any Ublox 7 device.    
