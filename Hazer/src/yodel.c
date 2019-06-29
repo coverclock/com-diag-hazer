@@ -617,11 +617,10 @@ void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp,
 
 	/*
 	 * Remarkably, the fractional part (lonHp, latHp) may not have the same
-	 * sign as the whole part (lon, lat) in the HPPOSLLH record. I have no
-	 * idea what this means, but I've seen it. I'm taking them at their word.
-	 * Also, making that assumption, the HPPOSLLH matches the NMEA values to
-	 * hundredths of seconds. So the F9P chip thinks that's the right thing
-	 * to do too. See [UBX 9, pp. 145..146].
+	 * sign as the corresponding whole part (lon, lat) in the HPPOSLLH record.
+	 * I have no idea what this means, but I've seen it. [UBX 9, pp. 145..146]:
+	 * latitude  in deg * 10^-7 = lat + (latHp * 10^2)
+	 * longitude in deg * 10^-7 = lon + (lonHp * 10^2)
 	 */
 
     if (whole < 0) {
