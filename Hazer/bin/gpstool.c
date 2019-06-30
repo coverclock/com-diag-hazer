@@ -835,189 +835,210 @@ static void print_status(FILE * fp, const yodel_status_t * sp)
 static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyokay, int totokay)
 {
     unsigned int system = 0;
-    int64_t whole = 0;
-    uint64_t fraction = 0;
-    uint64_t nanoseconds = 0;
-    int year = 0;
-    int month = 0;
-    int day = 0;
-    int hour = 0;
-    int minute = 0;
-    int second = 0;
-    int degrees = 0;
-    int minutes = 0;
-    int seconds = 0;
-    int hundredths = 0;
-    int direction = 0;
-    const char * compass = (const char *)0;
-    char zone = '\0';
 
-    zone = diminuto_time_zonename(0);
+    {
+        int year = 0;
+        int month = 0;
+        int day = 0;
+        int hour = 0;
+        int minute = 0;
+        int second = 0;
+        uint64_t billionths = 0;
+        char zone = '\0';
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        zone = diminuto_time_zonename(0);
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
-        if (pa[system].dmy_nanoseconds == 0) { continue; }
+		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("TIM", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
+			if (pa[system].dmy_nanoseconds == 0) { continue; }
 
-        hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
-        assert((1 <= month) && (month <= 12));
-        assert((1 <= day) && (day <= 31));
-        assert((0 <= hour) && (hour <= 23));
-        assert((0 <= minute) && (minute <= 59));
-        assert((0 <= second) && (second <= 59));
-        assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
-        fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
+			fputs("TIM", fp);
 
-        fprintf(fp, " %cpps", pps ? '1' : '0');
+			hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &billionths);
+			assert((1 <= month) && (month <= 12));
+			assert((1 <= day) && (day <= 31));
+			assert((0 <= hour) && (hour <= 23));
+			assert((0 <= minute) && (minute <= 59));
+			assert((0 <= second) && (second <= 59));
+			assert((0 <= billionths) && (billionths < 1000000000ULL));
+			fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
 
-        fprintf(fp, "%28s", "");
+			fprintf(fp, " %cpps", pps ? '1' : '0');
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%28s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+        int degrees = 0;
+        int minutes = 0;
+        int seconds = 0;
+        int thousandths = 0;
+        int direction = 0;
+        uint64_t tenmillionths = 0;
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
+        for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("POS", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
 
-        hazer_format_nanominutes2position(pa[system].lat_nanominutes, &degrees, &minutes, &seconds, &hundredths, &direction);
-        assert((0 <= degrees) && (degrees <= 90));
-        assert((0 <= minutes) && (minutes <= 59));
-        assert((0 <= seconds) && (seconds <= 59));
-        assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %2d%lc%02d'%02d.%02d\"%c,", degrees, DEGREE, minutes, seconds, hundredths, (direction < 0) ? 'S' : 'N');
+			fputs("POS", fp);
 
-        hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &hundredths, &direction);
-        assert((0 <= degrees) && (degrees <= 180));
-        assert((0 <= minutes) && (minutes <= 59));
-        assert((0 <= seconds) && (seconds <= 59));
-        assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %3d%lc%02d'%02d.%02d\"%c", degrees, DEGREE, minutes, seconds, hundredths, (direction < 0) ? 'W' : 'E');
+			hazer_format_nanominutes2position(pa[system].lat_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
+			assert((0 <= degrees) && (degrees <= 90));
+			assert((0 <= minutes) && (minutes <= 59));
+			assert((0 <= seconds) && (seconds <= 59));
+			assert((0 <= thousandths) && (thousandths <= 999));
+			fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
 
-        fputc(' ', fp);
+			hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
+			assert((0 <= degrees) && (degrees <= 180));
+			assert((0 <= minutes) && (minutes <= 59));
+			assert((0 <= seconds) && (seconds <= 59));
+			assert((0 <= thousandths) && (thousandths <= 999));
+			fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
 
-        hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &fraction);
-        assert((-90 <= degrees) && (degrees <= 90));
-        fprintf(fp, " %4d.%09llu,", degrees, (long long unsigned int)fraction);
+			fputc(' ', fp);
 
-        hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &fraction);
-        assert((-180 <= degrees) && (degrees <= 180));
-        fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)fraction);
+			hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &tenmillionths);
+			assert((-90 <= degrees) && (degrees <= 90));
+			assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
+			fprintf(fp, " %4d.%07llu,", degrees, (long long unsigned int)tenmillionths);
 
-        fprintf(fp, "%5s", "");
+			hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &tenmillionths);
+			assert((-180 <= degrees) && (degrees <= 180));
+			fprintf(fp, " %4d.%07llu", degrees, (long long unsigned int)tenmillionths);
+			assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%7s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+        int64_t meters = 0;
+        uint64_t thousandths = 0;
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
+		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("ALT", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
 
-        fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
+			fputs("ALT", fp);
 
-        whole = pa[system].alt_millimeters / 1000LL;
-        fraction = abs(pa[system].alt_millimeters) % 1000LLU;
-        fprintf(fp, " %6lld.%03llum", (long long signed int)whole, (long long unsigned int)fraction);
+			fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
 
-        fprintf(fp, "%43s", "");
+			meters = pa[system].alt_millimeters / 1000LL;
+			thousandths = abs64(pa[system].alt_millimeters) % 1000ULL;
+			fprintf(fp, " %6lld.%03llum", (long long signed int)meters, (long long unsigned int)thousandths);
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%43s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+        int64_t degrees = 0;
+        uint64_t billionths = 0;
+        const char * compass = (const char *)0;
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
+        for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("COG", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
 
-        assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
+			fputs("COG", fp);
 
-        compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
-        assert(compass != (const char *)0);
-        assert(strlen(compass) <= 4);
-        fprintf(fp, " %-2s", compass);
+			assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
 
-        whole = pa[system].cog_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)whole, (long long unsigned int)fraction, DEGREE);
+			compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
+			assert(compass != (const char *)0);
+			assert(strlen(compass) <= 4);
+			fprintf(fp, " %-2s", compass);
 
-        whole = pa[system].mag_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)whole, (long long unsigned int)fraction, DEGREE);
+			degrees = pa[system].cog_nanodegrees / 1000000000LL;
+			billionths = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
+			fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
 
-        fprintf(fp, "%30s", "");
+			degrees = pa[system].mag_nanodegrees / 1000000000LL;
+			billionths = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
+			fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%30s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+        int64_t knots = 0;
+        int64_t kilometersperhour = 0;
+        uint64_t millionths = 0;
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
+		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("SOG", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
 
-        fprintf(fp, " %11.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
+			fputs("SOG", fp);
 
-        whole = pa[system].sog_microknots / 1000000LL;
-        fraction = abs64(pa[system].sog_microknots) % 1000000ULL;
-        fprintf(fp, " %7lld.%06lluknots", (long long signed int)whole, (long long unsigned int)fraction);
+			fprintf(fp, " %11.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
 
-        whole = pa[system].sog_millimeters / 1000000LL;
-        fraction = abs64(pa[system].sog_millimeters) % 1000000ULL;
-        fprintf(fp, " %7lld.%06llukph", (long long signed int)whole, (long long unsigned int)fraction);
+			knots = pa[system].sog_microknots / 1000000LL;
+			millionths = abs64(pa[system].sog_microknots) % 1000000ULL;
+			fprintf(fp, " %7lld.%06lluknots", (long long signed int)knots, (long long unsigned int)millionths);
 
-        fprintf(fp, "%14s", "");
+			kilometersperhour = pa[system].sog_millimeters / 1000000LL;
+			millionths = abs64(pa[system].sog_millimeters) % 1000000ULL;
+			fprintf(fp, " %7lld.%06llukph", (long long signed int)kilometersperhour, (long long unsigned int)millionths);
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%14s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        if (pa[system].ticks == 0) { continue; }
+			if (pa[system].ticks == 0) { continue; }
 
-        fputs("INT", fp);
+			fputs("INT", fp);
 
-        fprintf(fp, " %s", pa[system].label);
+			fprintf(fp, " %s", pa[system].label);
+			fprintf(fp, " [%2u]", pa[system].sat_used);
+			fprintf(fp, " %ddmy", dmyokay);
+			fprintf(fp, " %dinc", totokay);
+			fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
 
-        fprintf(fp, " [%2u]", pa[system].sat_used);
+			fprintf(fp, "%23s", "");
 
-        fprintf(fp, " %ddmy", dmyokay);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-        fprintf(fp, " %dinc", totokay);
+			fputc('\n', fp);
 
-        fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
-
-        fprintf(fp, "%23s", "");
-
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
-
-        fputc('\n', fp);
-
+		}
     }
 
 }
@@ -1077,7 +1098,8 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
     int degrees = 0;
     int minutes = 0;
     int seconds = 0;
-    int tenminus5 = 0;
+    int tenthousandths = 0;
+    uint64_t billionths = 0;
     int direction = 0;
     int64_t value = 0;
     int64_t whole = 0;
@@ -1087,11 +1109,11 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fputs("HPP", fp);
 
-        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &fraction);
-        fprintf(fp, " %4d.%09llu,", degrees, (long long unsigned int)fraction);
+        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
+        fprintf(fp, " %4d.%09llu,", degrees, (long long unsigned int)billionths);
 
-        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &fraction);
-        fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)fraction);
+        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &billionths);
+        fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)billionths);
 
         value = sp->payload.hAcc;
         whole = value / 10000LL;
@@ -1126,11 +1148,11 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fputs("NGS", fp);
 
-        hazer_format_hppos2position(sp->payload.lat, sp->payload.latHp, &degrees, &minutes, &seconds, &tenminus5, &direction);
-        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenminus5, (direction < 0) ? 'S' : 'N');
+        hazer_format_hppos2position(sp->payload.lat, sp->payload.latHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
+        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'S' : 'N');
 
-        hazer_format_hppos2position(sp->payload.lon, sp->payload.lonHp, &degrees, &minutes, &seconds, &tenminus5, &direction);
-        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenminus5, (direction < 0) ? 'W' : 'E');
+        hazer_format_hppos2position(sp->payload.lon, sp->payload.lonHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
+        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'W' : 'E');
 
         fprintf(fp, "%29s", "");
 

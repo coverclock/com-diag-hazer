@@ -1021,16 +1021,22 @@ extern int hazer_parse_txt(char * vector[], size_t count);
  */
 extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp);
 
+/*
+ * At least on later devices, NMEA sentences report about ten significant
+ * digits for latitude and longitude in the form of whole degrees and decimal
+ * minutes. I try to do the same below.
+ */
+
 /**
  * Format nanominutes of latitude or longitude into position values.
  * @param nanominutes is a longitude or latitude in nanominutes.
  * @param degreesp points to where the integral degrees (e.g. 180) is stored.
  * @param minutesp points to where the minutes (0..59) are stored.
  * @param secondsp points to where the seconds (0..59) are stored.
- * @param hundredsthp points to there the fractional seconds (0..99) are stored.
+ * @param thousanthsp points to there the fractional seconds (0..999) are stored.
  * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
  */
-extern void hazer_format_nanominutes2position(int64_t nanominutes, int * degreesp, int * minutesp, int * secondsp, int * hundredsthp, int * directionp);
+extern void hazer_format_nanominutes2position(int64_t nanominutes, int * degreesp, int * minutesp, int * secondsp, int * thousanthsp, int * directionp);
 
 /**
  * Format nanominutes of latitude or longitude into decimal degrees.
