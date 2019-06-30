@@ -1076,8 +1076,8 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
      if (kp->ticks != 0) {
 
          fputs("RTK", fp);
-         fprintf(fp, " %4u [%4zu] [%4zu] [%4zu] %-8s", kp->number, kp->minimum, kp->length, kp->maximum, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown");
-         fprintf(fp, "%33s", "");
+         fprintf(fp, " %4u [%4zu] [%4zu] [%4zu] %-8s 0x%016llx", kp->number, kp->minimum, kp->length, kp->maximum, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown", (long long int)kp->updates);
+         fprintf(fp, "%14s", "");
          fprintf(fp, "%-8s", "DGNSS");
          fputc('\n', fp);
 
@@ -3236,6 +3236,39 @@ int main(int argc, char * argv[])
             kinematics.number = tumbleweed_message(buffer, length);
             if (kinematics.number < 0) { kinematics.number = 9999; }
 
+            switch (kinematics.number) {
+
+            case 1005:
+            	kinematics.updates |= RTCM_TYPE_1005;
+            	break;
+
+            case 1074:
+            	kinematics.updates |= RTCM_TYPE_1074;
+            	break;
+
+            case 1084:
+            	kinematics.updates |= RTCM_TYPE_1084;
+            	break;
+
+            case 1094:
+            	kinematics.updates |= RTCM_TYPE_1094;
+            	break;
+
+            case 1124:
+            	kinematics.updates |= RTCM_TYPE_1124;
+            	break;
+
+            case 1230:
+            	kinematics.updates |= RTCM_TYPE_1230;
+            	break;
+
+            default:
+            	kinematics.updates |= RTCM_TYPE_9999;
+            	break;
+
+            }
+
+
             kinematics.length = length;
             if (length < kinematics.minimum) { kinematics.minimum = length; }
             if (length > kinematics.maximum) { kinematics.maximum = length; }
@@ -3351,7 +3384,7 @@ int main(int argc, char * argv[])
                 print_local(out_fp, timetofirstfix);
                 print_positions(out_fp, position, onepps, dmyokay, totokay);
                 print_solution(out_fp, &solution);
-                print_corrections(out_fp, &base, &rover, &kinematics);
+                print_corrections(out_fp, &base, &rover, &kinematics); kinematics.updates <<= 8;
                 print_actives(out_fp, active);
                 print_views(out_fp, view, active);
             }

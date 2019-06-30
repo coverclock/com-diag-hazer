@@ -820,8 +820,8 @@ or DCD) or -I (using general purpose input/output or GPIO).
 
 POS is the most recent position solution, latitude and longitude, in degrees,
 hours, minutes, and decimal seconds, and in decimal degrees. Either format
-can be cut and pasted directly into Google Maps, and at least the latter
-into Google Earth.
+can be cut and pasted directly into Google Maps, and the latter into Google
+Earth.
 
 > N.B. The underlying position data is stored as binary integers in billionths
 > of a minute (nanominutes). But the device under test may not provide that much
@@ -885,9 +885,9 @@ ephemeris, the signal strength (really, a carrier to noise density ratio)
 in deciBels Hertz of its transmission, a signal identifier indicating
 which signal or band (e.g.  L1 C/A, L2, etc.) is being used, and one
 or more flags. A flag of '<' indicates that the satellite is on the
-active list (see ACT above), a '?' indicates that the azimuth and/or the
+active list (see ACT above); a '?' indicates that the azimuth and/or the
 elevation were empty but display as zero (likely that the satellite is
-not in the transmitted almanac), and an '!' indicates that the signal
+not in the transmitted almanac); and an '!' indicates that the signal
 strength was empty but displays as zero (some receivers use this to
 indicate the satellite is not being tracked).
 

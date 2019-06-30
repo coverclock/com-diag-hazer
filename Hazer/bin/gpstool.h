@@ -59,6 +59,11 @@ typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CR
  */
 typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!', } marker_t;
 
+/**
+ * What update did we receive?
+ */
+typedef enum Update { UPDATE = 0, RTCM_TYPE_1005 = (1<<0), RTCM_TYPE_1074 = (1<<1), RTCM_TYPE_1084 = (1<<2), RTCM_TYPE_1094 = (1<<3), RTCM_TYPE_1124 = (1<<4), RTCM_TYPE_1230 = (1<<5), RTCM_TYPE_9999 = (1<<7), } update_t;
+
 /*******************************************************************************
  * HIGH PRECISION SOLUTION
  ******************************************************************************/
@@ -188,6 +193,7 @@ typedef struct YodelRover {
  * Structure combining both a RTCM message number and its expiry time in ticks.
  */
 typedef struct TumbleweedMessage {
+	uint64_t updates;
 	ssize_t length;
 	ssize_t minimum;
 	ssize_t maximum;
@@ -202,6 +208,7 @@ typedef struct TumbleweedMessage {
  */
 #define TUMBLEWEED_MESSAGE_INITIALIZER \
     { \
+		0, \
 		0, \
 		TUMBLEWEED_RTCM_LONGEST, \
 		0, \
