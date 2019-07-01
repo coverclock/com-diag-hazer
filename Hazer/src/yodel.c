@@ -598,7 +598,7 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t lengt
     return rc;
 }
 
-void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, uint64_t * nanodegreesp)
+void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, uint64_t * billionthsp)
 {
 	int64_t nanodegrees = 0;
 
@@ -608,20 +608,19 @@ void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, 
     *degreesp = nanodegrees / 1000000000LL;                     /* Get integral degrees. */
     nanodegrees = abs64(nanodegrees);					        /* Fraction is not signed. */
     nanodegrees = nanodegrees % 1000000000LL;                   /* Remainder. */
-    *nanodegreesp = nanodegrees;                                /* Get nanodegrees. */
+    *billionthsp = nanodegrees;                                 /* Get billionths. */
 }
 
-void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * fractionp, int * directionp)
+void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp)
 {
 	int64_t nanodegrees = 0;
 
 	/*
 	 * Remarkably, the fractional part (lonHp, latHp) may not have the same
-	 * sign as the whole part (lon, lat) in the HPPOSLLH record. I have no
-	 * idea what this means, but I've seen it. I'm taking them at their word.
-	 * Also, making that assumption, the HPPOSLLH matches the NMEA values to
-	 * hundredths of seconds. So the F9P chip thinks that's the right thing
-	 * to do too. See [UBX 9, pp. 145..146].
+	 * sign as the corresponding whole part (lon, lat) in the HPPOSLLH record.
+	 * I have no idea what this means, but I've seen it. [UBX 9, pp. 145..146]:
+	 * latitude  in deg * 10^-7 = lat + (latHp * 10^2)
+	 * longitude in deg * 10^-7 = lon + (lonHp * 10^2)
 	 */
 
     if (whole < 0) {
@@ -631,17 +630,17 @@ void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp,
         *directionp = 1;
     }
 
-    nanodegrees = whole;										/* Get 10^-7 degrees. */
-    nanodegrees *= 100LL;                                       /* Convert to nanodegrees (10^-9). */
-    nanodegrees += fraction;                                    /* Add fraction already in nanodegrees. */
+    nanodegrees = whole;										        /* Get 10^-7 degrees. */
+    nanodegrees *= 100LL;                                               /* Convert to nanodegrees (10^-9). */
+    nanodegrees += fraction;                                            /* Add fraction already in nanodegrees. */
 
-    *degreesp = nanodegrees / 1000000000ULL;                    /* Get integral degrees. */
-    nanodegrees = nanodegrees % 1000000000ULL;                  /* Remainder. */
-    nanodegrees *= 60ULL;                                       /* Convert to nanominutes. */
-    *minutesp = nanodegrees / 1000000000LL;                     /* Get integral minutes. */
-    nanodegrees = nanodegrees % 1000000000LL;                   /* Remainder. */
-    nanodegrees *= 60ULL;                                       /* Convert to nanoseconds. */
-    *secondsp = nanodegrees / 1000000000LL;                     /* Get integral seconds. */
-    nanodegrees = nanodegrees % 1000000000LL;                   /* Remainder. */
-    *fractionp = (nanodegrees * 100000LL) / 1000000000LL;       /* Get 10^-5 seconds. */
+    *degreesp = nanodegrees / 1000000000ULL;                            /* Get integral degrees. */
+    nanodegrees = nanodegrees % 1000000000ULL;                          /* Remainder. */
+    nanodegrees *= 60ULL;                                               /* Convert to nanominutes. */
+    *minutesp = nanodegrees / 1000000000LL;                             /* Get integral minutes. */
+    nanodegrees = nanodegrees % 1000000000LL;                           /* Remainder. */
+    nanodegrees *= 60ULL;                                               /* Convert to nanoseconds. */
+    *secondsp = nanodegrees / 1000000000LL;                             /* Get integral seconds. */
+    nanodegrees = nanodegrees % 1000000000LL;                           /* Remainder. */
+    *onehundredthousandsthp = (nanodegrees * 100000LL) / 1000000000LL;  /* Get one hundred thousanths. */
 }

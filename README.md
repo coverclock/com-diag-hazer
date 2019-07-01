@@ -734,12 +734,11 @@ lines that need to be added to the indicated files.
 
 # Display
 
-When using the -E option with gpstool, so that it uses ASCII escape
-sequences to do cursor control for its report on standard output, as
-this example does when using Ublox 9-based receiver, the display looks
-something like this snapshot as it is continually updated.
+When using the -E option with gpstool, so that it uses ANSI escape
+sequences to do cursor control for its report on standard output, the display
+looks something like this snapshot as it is continually updated. This example
+is from a Ublox 8 receiver.
 
-    > gpstool -D devttyACM0 -b 9600 -8 -n -1 -E -t 10
     INP [ 68] \xb5b\n\t<\0\0\xf4\x01\0\0\0\0\0\0\0\x01\0\xaf\xff\0\0_\0\x94\v\x02
     OUT [  7] \xb5b\x06>\0\0\0
     MON -jamming  -history   6indicator  24maximum
@@ -820,17 +819,17 @@ or DCD) or -I (using general purpose input/output or GPIO).
 
 POS is the most recent position solution, latitude and longitude, in degrees,
 hours, minutes, and decimal seconds, and in decimal degrees. Either format
-can be cut and pasted directly into Google Maps, and at least the latter
-into Google Earth.
+can be cut and pasted directly into Google Maps, and the latter into Google
+Earth.
 
-N.B. The underlying position data is stored as binary integers in billionths
-of a minutes (nanominutes). But the device under test may not provide that much
-accuracy; the actual number of significant digits for various data is reported
-by the INT line (below), but even this may be optimistic - or, for that matter,
-pessimistic - when compared to what the device is capable of. In particular,
-technologies like Wide Area Augmentation System (WAAS), multi-band GNSS,
-differential GPS, Real-Time Kinematics (RTK), and long-term surveying, can
-potentially achieve remarkable accuracy.
+> N.B. The underlying position data is stored as binary integers in billionths
+> of a minute (nanominutes). But the device under test may not provide that much
+> accuracy; the actual number of significant digits for various data is reported
+> by the INT line (below), but even this may be optimistic - or, for that matter,
+> pessimistic - when compared to what the device is capable of. In particular,
+> technologies like Wide Area Augmentation System (WAAS), multi-band GNSS,
+> differential GPS, Real-Time Kinematics (RTK), and long-term surveying, can
+> potentially achieve remarkable accuracy.
 
 ALT is the most recent altitude solution, in feet and meters. (Similar comments
 here regarding precision as those for POS.)
@@ -851,29 +850,6 @@ received), an indication as to whether time is incrementing monotonically (it
 can appear to run backwards when receiving UDP packets because UDP may reorder
 them), and some metrics as to the number of significant digits provided for
 various datums provided by the device.
-
-HPP and HPA (if present and enabled) show the high precision position and
-altitude available from some Ublox devices, along with their estimated
-accuracy. This may differ (slightly) from the position and altitude
-reported via POS and ALT due to the conversion of units done to conform
-to the NMEA format. When available, the HPP and HPA is expected to be
-more precise.
-
-NGS shows the same high precision position as HPP but in the format used
-in the National Geodetic Survey (NGS) data sheets for coordinates of artifacts
-such as NGS and municipal survey markers.
-
-BAS or ROV (if present and enabled) show information about the Ublox
-device operating in base station or in rover modes. In base (stationary)
-mode, it shows if the device is actively surveying or if the survey has
-resolved to a valid location, how many seconds and observations have
-been consumed during the survey, and what the mean error is. In rover
-(mobile) mode, it shows what RTCM message was last received and from whom.
-
-RTK (if present) show the latest RTCM message received, either from the
-device when operating in base mode, or from the base when operating in
-rover mode. The lengths of the shortest, most recent, and longest RTCM
-message is shown. The mode of the system, base or rover, is shown.
 
 ACT is the list of active satellites, typically provided seperately
 for each system or constellation by the device, showing each satellites
@@ -908,11 +884,104 @@ ephemeris, the signal strength (really, a carrier to noise density ratio)
 in deciBels Hertz of its transmission, a signal identifier indicating
 which signal or band (e.g.  L1 C/A, L2, etc.) is being used, and one
 or more flags. A flag of '<' indicates that the satellite is on the
-active list (see ACT above), a '?' indicates that the azimuth and/or the
+active list (see ACT above); a '?' indicates that the azimuth and/or the
 elevation were empty but display as zero (likely that the satellite is
-not in the transmitted almanac), and an '!' indicates that the signal
+not in the transmitted almanac); and an '!' indicates that the signal
 strength was empty but displays as zero (some receivers use this to
 indicate the satellite is not being tracked).
+
+Here is another example, this one from a Ublox 9 receiver.
+
+    INP [173] \xd3\0\xa7C \0! \xf5\x02\0\0A\x15p\n\0\0\0\0 \0\x80\0=]ZZ::R\x92RZ\x
+
+    LOC 2019-07-01T08:35:34.144-07:00+01T          0/00:00:00.141 23.0.0   bodega
+    TIM 2019-07-01T14:35:33.000-00:00+00Z 0pps                             GNSS
+    POS 39°47'39.223"N, 105°09'12.193"W    39.7942286, -105.1533871        GNSS
+    ALT    5616.40'   1711.900m                                            GNSS
+    COG N     0.000000000°T    0.000000000°M                               GNSS
+    SOG       0.055mph       0.048000knots       0.088000kph               GNSS
+    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
+    HPP   39.794228712, -105.153387086 ±     1.3262m                       GNSS
+    HPA   1711.8725m ±     2.7076m                                         GNSS
+    NGS  39 47 39.22336(N) 105 09 12.19361(W)                              GNSS
+    BAS 1active 0valid      66587sec      66588obs      12.8868m           DGNSS
+    RTK 1074 [ 173] base     <73298732>                                    DGNSS
+    ACT [1]  {    13     1    28    18    11     8 } [ 6] [10] [30]        GPS
+    ACT [2]  {    17     7    19    30             } [ 4] [10] [30]        GPS
+    ACT [1]  {    74    73    85    84    66    75 } [ 6] [ 7] [30]        GLONASS
+    ACT [2]  {    65                               } [ 1] [ 7] [30]        GLONASS
+    ACT [1]  {    24     5     3    36     2     8 } [ 6] [ 9] [30]        GALILEO
+    ACT [2]  {    11    12    25                   } [ 3] [ 9] [30]        GALILEO
+    ACT [1]  {    24    26    29    12             } [ 4] [ 4] [30]        BEIDOU
+    DOP   0.96pdop   0.48hdop   0.83vdop                                   GPS
+    DOP   0.96pdop   0.48hdop   0.83vdop                                   GLONASS
+    DOP   0.96pdop   0.48hdop   0.83vdop                                   GALILEO
+    DOP   0.96pdop   0.48hdop   0.83vdop                                   BEIDOU
+    SAT [  1]     1id  29°elv  107°azm   30dBHz  6sig <                    GPS
+    SAT [  2]     4id   0°elv    0°azm   38dBHz  6sig   ?                  GPS
+    SAT [  3]     7id  47°elv  128°azm   37dBHz  6sig <                    GPS
+    SAT [  4]     8id  23°elv   45°azm   25dBHz  6sig <                    GPS
+    SAT [  5]     9id   4°elv  177°azm   31dBHz  6sig                      GPS
+    SAT [  6]    11id  46°elv   89°azm    0dBHz  6sig <   !                GPS
+    SAT [  7]    13id  35°elv  299°azm    0dBHz  6sig <   !                GPS
+    SAT [  8]    15id   9°elv  321°azm   17dBHz  6sig                      GPS
+    SAT [  9]    17id  35°elv  209°azm   34dBHz  6sig <                    GPS
+    SAT [ 10]    18id  28°elv   78°azm    0dBHz  6sig <   !                GPS
+    SAT [ 11]    19id  13°elv  211°azm    0dBHz  6sig <   !                GPS
+    SAT [ 12]    28id  63°elv  305°azm    0dBHz  6sig <   !                GPS
+    SAT [ 13]    30id  82°elv  113°azm   30dBHz  6sig <                    GPS
+    SAT [ 14]    65id  17°elv  264°azm   18dBHz  3sig <                    GLONASS
+    SAT [ 15]    66id  13°elv  324°azm   25dBHz  3sig <                    GLONASS
+    SAT [ 16]    72id   3°elv  223°azm   26dBHz  3sig                      GLONASS
+    SAT [ 17]    73id  18°elv   99°azm   19dBHz  3sig <                    GLONASS
+    SAT [ 18]    74id  54°elv   63°azm   28dBHz  3sig <                    GLONASS
+    SAT [ 19]    75id  44°elv  325°azm   33dBHz  3sig <                    GLONASS
+    SAT [ 20]    76id   2°elv  300°azm    0dBHz  3sig     !                GLONASS
+    SAT [ 21]    83id   6°elv   23°azm    0dBHz  3sig     !                GLONASS
+    SAT [ 22]    84id  53°elv   60°azm   35dBHz  3sig <                    GLONASS
+    SAT [ 23]    85id  46°elv  163°azm   36dBHz  3sig <                    GLONASS
+    SAT [ 24]     2id  19°elv  290°azm   26dBHz  2sig <                    GALILEO
+    SAT [ 25]     3id  27°elv  257°azm   28dBHz  2sig <                    GALILEO
+    SAT [ 26]     5id  13°elv  206°azm   31dBHz  2sig <                    GALILEO
+    SAT [ 27]     8id  15°elv  310°azm   19dBHz  2sig <                    GALILEO
+    SAT [ 28]    11id  44°elv  138°azm   39dBHz  2sig <                    GALILEO
+    SAT [ 29]    12id  37°elv   64°azm   30dBHz  2sig <                    GALILEO
+    SAT [ 30]    24id  46°elv   76°azm   27dBHz  2sig <                    GALILEO
+    SAT [ 31]    25id  64°elv  331°azm   37dBHz  2sig <                    GALILEO
+    SAT [ 32]    33id   2°elv   28°azm    0dBHz  2sig     !                GALILEO
+    SAT [ 33]    36id  11°elv  182°azm   33dBHz  2sig <                    GALILEO
+    SAT [ 34]    12id  29°elv  193°azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 35]    24id  27°elv  304°azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 36]    26id  75°elv  344°azm    0dBHz  0sig <   !                BEIDOU
+    SAT [ 37]    29id  33°elv   49°azm    0dBHz  0sig <   !                BEIDOU    
+
+HPP and HPA (if present and enabled) show the high precision position and
+altitude available from some Ublox devices, along with their estimated
+accuracy. This may differ (slightly) from the position and altitude
+reported via POS and ALT due to the conversion of units done to conform
+to the NMEA format. When available, the HPP and HPA is expected to be
+more precise.
+
+BAS or ROV (if present and enabled) show information about the Ublox
+device operating in base station or in rover modes. In base (stationary)
+mode, it shows if the device is actively surveying or if the survey has
+resolved to a valid location, how many seconds and observations have
+been consumed during the survey, and what the mean error is. In rover
+(mobile) mode, it shows what RTCM message was last received and from whom.
+
+RTK (if present) show the latest RTCM message received, when operating in base
+mode (in which case the message was received from the device), or in
+rover mode (the message was received from the base in a datagram via UDP).
+The lengths of the most recent message is shown, as is the mode of the system,
+base or rover. The character sequence between the angle brackets records the
+last eight RTCM messages that were received, the newest one indicated by the
+rightmost character in the sequence, as the sequence is progressively shifted
+left as new messages are received.
+
+NGS shows the same high precision position as HPP but in the format used
+in the National Geodetic Survey (NGS) data sheets for coordinates of artifacts
+such as NGS and municipal survey markers. This makes it easier to compare
+the Hazer position against examples from the NGS database.
 
 While NMEA (and UBX amd RTCM too for that matter) is good about updating
 the application with new information, it is not so good about letting the
@@ -924,13 +993,13 @@ new sentences or messages from the GPS device, it is no longer displayed.
 
 # Notes
 
-N.B. Most of the snapshots below were taken from earlier versions of Hazer and
-its gpstool utility. The snapshots were cut and pasted from actual output and
-may differ slightly (or greatly) from that of the most current version. For
-some of these, a \* was used to mean the degree symbol; later versions of
-Hazer display the actual degree symbol using Unicode. I've tried to update
-the command line examples to reflect the current code, but I may have missed
-a few here or there.
+> N.B. Most of the snapshots below were taken from earlier versions of Hazer and
+> its gpstool utility. The snapshots were cut and pasted from actual output and
+> may differ slightly (or greatly) from that of the most current version. For
+> some of these, a \* was used to mean the degree symbol; later versions of
+> Hazer display the actual degree symbol using Unicode. I've tried to update
+> the command line examples to reflect the current code, but I may have missed
+> a few here or there.
 
 ## Sending Commands
 

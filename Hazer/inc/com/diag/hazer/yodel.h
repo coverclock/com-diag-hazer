@@ -430,14 +430,21 @@ enum YodelUbxNavHpposllhConstants {
  */
 extern int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * bp, ssize_t length);
 
+/*
+ * At least on later devices, UBX HPPOS packets report about twelve significant
+ * digits for latitude and longitude using a resolution of billionths of a
+ * degree if both the standard and the high precision fields are taken into
+ * account. I try to do the same below.
+ */
+
 /**
  * Format a high precision position into decimal degrees.
  * @param whole is the lat or lon value in the UBX-NAV-HPPOSLLH structure in 10^-7 degrees.
  * @param fraction is the corresponding latHp or lonHp value in the UBX-NAV-HPPOSLLH structure in 10^-9 degrees.
  * @param degreesp points to where the signed integral degrees (e.g. 180) is stored.
- * @param nanodegreesp points to where the unsigned fractional nanodegrees is stored.
+ * @param billionthsp points to where the unsigned fractional degrees (0..999999999) is stored.
  */
-extern void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, uint64_t * nanodegreesp);
+extern void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, uint64_t * billionthsp);
 
 /**
  * Format a high precision position into position values with a fractional
@@ -446,10 +453,10 @@ extern void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * deg
  * @param fraction is the corresponding latHp or lonHp value in the UBX-NAV-HPPOSLLH structure in 1/10^9 degrees.
  * @param minutesp points to where the minutes (0..59) are stored.
  * @param secondsp points to where the seconds (0..59) are stored.
- * @param fractionp points to there the fractional 10^-5 seconds (0..99999) are stored.
+ * @param onehundredthousandsthp points to there the fractional seconds (0..99999) are stored.
  * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
  */
-extern void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * fractionp, int * directionp);
+extern void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp);
 
 /*******************************************************************************
  * PROCESSING UBX-MON-HW MESSAGES
