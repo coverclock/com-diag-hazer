@@ -211,6 +211,23 @@ typedef struct TumbleweedMessage {
 		0, \
     }
 
+/**
+ * Union makes it a little simpler to track RTCM messages.
+ */
+typedef union TumbleweedUpdates {
+	uint8_t bytes[sizeof(uint64_t)];
+	uint64_t word;
+} tumbleweed_updates_t;
+
+/**
+ * @define TUMBLEWEED_UPDATES_INITIALIZER
+ * Initialize a TumbleweedUpdates union.
+ */
+#define TUMBLEWEED_UPDATES_INITIALIZER \
+    { \
+	    { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', } \
+    }
+
 /*******************************************************************************
  * STRUCTURES
  ******************************************************************************/
@@ -238,13 +255,5 @@ typedef struct Command {
 	diminuto_list_t link;
 	int acknak;
 } command_t;
-
-/**
- * The Updates union makes it a little simpler to track RTCM messages.
- */
-typedef union Updates {
-	uint8_t bytes[sizeof(uint64_t)];
-	uint64_t word;
-} updates_t;
 
 #endif

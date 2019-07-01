@@ -385,7 +385,13 @@ static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
     return length;
 }
 
-static void collect_update(int number, updates_t * up)
+/**
+ * Track RTK updates by encoding each received RTCM message as a single
+ * character in a shifting string.
+ * @param number is the RTCM message number.
+ * @param up points to the updates union.
+ */
+static void collect_update(int number, tumbleweed_updates_t * up)
 {
 	update_t update = UPDATE;
 
@@ -1090,7 +1096,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
  * @param rp points to the rover structure.
  * @param mp points to the kinematics structure.
  */
-static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp, const updates_t * up)
+static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp, const tumbleweed_updates_t * up)
 {
 
 	if (bp->ticks != 0) {
@@ -1116,7 +1122,7 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
      if (kp->ticks != 0) {
 
          fputs("RTK", fp);
-         fprintf(fp, " %4u [%4zu] %-8s <%8s>", kp->number, kp->length, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown", up->bytes);
+         fprintf(fp, " %4u [%4zu] %-8s <%8.8s>", kp->number, kp->length, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown", up->bytes);
          fprintf(fp, "%36s", "");
          fprintf(fp, "%-8s", "DGNSS");
          fputc('\n', fp);
@@ -1540,7 +1546,7 @@ int main(int argc, char * argv[])
      * RTCM state databases.
      */
     tumbleweed_message_t kinematics = TUMBLEWEED_MESSAGE_INITIALIZER;
-    updates_t updates = { 0, };
+    tumbleweed_updates_t updates = TUMBLEWEED_UPDATES_INITIALIZER;
     /*
      * Time keeping variables.
      */
