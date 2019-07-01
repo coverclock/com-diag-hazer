@@ -385,6 +385,46 @@ static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
     return length;
 }
 
+static void collect_update(int number, updates_t * up)
+{
+	update_t update = UPDATE;
+
+    switch (number) {
+
+    case 1005:
+    	update = RTCM_TYPE_1005;
+    	break;
+
+    case 1074:
+    	update = RTCM_TYPE_1074;
+    	break;
+
+    case 1084:
+    	update = RTCM_TYPE_1084;
+    	break;
+
+    case 1094:
+    	update = RTCM_TYPE_1094;
+    	break;
+
+    case 1124:
+    	update = RTCM_TYPE_1124;
+    	break;
+
+    case 1230:
+    	update = RTCM_TYPE_1230;
+    	break;
+
+    default:
+    	update = RTCM_TYPE_9999;
+    	break;
+
+    }
+
+    up->word = (up->word << 8) | update;
+
+}
+
 /*******************************************************************************
  * REPORTERS
  ******************************************************************************/
@@ -1050,7 +1090,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
  * @param rp points to the rover structure.
  * @param mp points to the kinematics structure.
  */
-static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp)
+static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp, const updates_t * up)
 {
 
 	if (bp->ticks != 0) {
@@ -1076,8 +1116,8 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
      if (kp->ticks != 0) {
 
          fputs("RTK", fp);
-         fprintf(fp, " %4u [%4zu] [%4zu] [%4zu] %-8s 0x%016llx", kp->number, kp->minimum, kp->length, kp->maximum, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown", (long long int)kp->updates);
-         fprintf(fp, "%14s", "");
+         fprintf(fp, " %4u [%4zu] %-8s <%8s>", kp->number, kp->length, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown", up->bytes);
+         fprintf(fp, "%36s", "");
          fprintf(fp, "%-8s", "DGNSS");
          fputc('\n', fp);
 
@@ -1176,13 +1216,13 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 static void * dcdpoller(void * argp)
 {
     void * xc = (void *)1;
-    struct Poller * ctxp = (struct Poller *)0;
+    poller_t * ctxp = (poller_t *)0;
     int done = 0;
     int rc = -1;
     int nowpps = 0;
     int waspps = 0;
 
-    ctxp = (struct Poller *)argp;
+    ctxp = (poller_t *)argp;
 
     while (!0) {
         DIMINUTO_COHERENT_SECTION_BEGIN;
@@ -1228,7 +1268,7 @@ static void * dcdpoller(void * argp)
 static void * gpiopoller(void * argp)
 {
     void * xc = (void *)1;
-    struct Poller * pollerp = (struct Poller *)0;
+    poller_t * pollerp = (poller_t *)0;
     diminuto_mux_t mux = { 0 };
     int ppsfd = -1;
     int done = 0;
@@ -1237,7 +1277,7 @@ static void * gpiopoller(void * argp)
     int nowpps = 0;
     int waspps = 0;
 
-    pollerp = (struct Poller *)argp;
+    pollerp = (poller_t *)argp;
 
     diminuto_mux_init(&mux);
     ppsfd = fileno(pollerp->ppsfp);
@@ -1325,7 +1365,7 @@ int main(int argc, char * argv[])
     /*
      * Configuration command variables.
      */
-    struct Command * command = (struct Command *)0;
+    command_t * command = (command_t *)0;
     diminuto_list_t * command_node = (diminuto_list_t *)0;
     diminuto_list_t command_list = DIMINUTO_LIST_NULLINIT(&command_list);
     uint8_t * command_string = (uint8_t *)0;
@@ -1398,7 +1438,7 @@ int main(int argc, char * argv[])
      * 1PPS poller thread variables.
      */
     const char * pps = (const char *)0;
-    struct Poller poller = { 0 };
+    poller_t poller = { 0 };
     void * result = (void *)0;
     pthread_t thread;
     int pthreadrc = -1;
@@ -1500,6 +1540,7 @@ int main(int argc, char * argv[])
      * RTCM state databases.
      */
     tumbleweed_message_t kinematics = TUMBLEWEED_MESSAGE_INITIALIZER;
+    updates_t updates = { 0, };
     /*
      * Time keeping variables.
      */
@@ -1525,7 +1566,7 @@ int main(int argc, char * argv[])
     /*
      * Source variables.
      */
-    diminuto_mux_t mux = { 0 };
+    diminuto_mux_t mux = { 0, };
     int ch = EOF;
     int ready = 0;
     int fd = -1;
@@ -1672,8 +1713,8 @@ int main(int argc, char * argv[])
             break;
         case 'U':
             readonly = 0;
-            command = (struct Command *)malloc(sizeof(struct Command));
-            assert(command != (struct Command *)0);
+            command = (command_t *)malloc(sizeof(command_t));
+            assert(command != (command_t *)0);
             command->acknak = !0;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
@@ -1684,8 +1725,8 @@ int main(int argc, char * argv[])
             break;
         case 'W':
             readonly = 0;
-            command = (struct Command *)malloc(sizeof(struct Command));
-            assert(command != (struct Command *)0);
+            command = (command_t *)malloc(sizeof(command_t));
+            assert(command != (command_t *)0);
             command->acknak = 0;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
@@ -2582,10 +2623,9 @@ int main(int argc, char * argv[])
 
 				kinematics.number = tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length);
 	            if (kinematics.number < 0) { kinematics.number = 9999; }
+	            collect_update(kinematics.number, &updates);
 
 	            kinematics.length = surveyor_length;
-	            if (surveyor_length < kinematics.minimum) { kinematics.minimum = surveyor_length; }
-	            if (surveyor_length > kinematics.maximum) { kinematics.maximum = surveyor_length; }
 
 	            kinematics.ticks = timeout;
 	            refresh = !0;
@@ -2695,7 +2735,7 @@ int main(int argc, char * argv[])
         	command_node = diminuto_list_dequeue(&command_list);
             assert(command_node != (diminuto_list_t *)0);
 
-            command = diminuto_containerof(struct Command, link, command_node);
+            command = diminuto_containerof(command_t, link, command_node);
             command_string = diminuto_list_data(command_node);
             assert(command_string != (uint8_t *)0);
 
@@ -3235,43 +3275,9 @@ int main(int argc, char * argv[])
 
             kinematics.number = tumbleweed_message(buffer, length);
             if (kinematics.number < 0) { kinematics.number = 9999; }
-
-            switch (kinematics.number) {
-
-            case 1005:
-            	kinematics.updates |= RTCM_TYPE_1005;
-            	break;
-
-            case 1074:
-            	kinematics.updates |= RTCM_TYPE_1074;
-            	break;
-
-            case 1084:
-            	kinematics.updates |= RTCM_TYPE_1084;
-            	break;
-
-            case 1094:
-            	kinematics.updates |= RTCM_TYPE_1094;
-            	break;
-
-            case 1124:
-            	kinematics.updates |= RTCM_TYPE_1124;
-            	break;
-
-            case 1230:
-            	kinematics.updates |= RTCM_TYPE_1230;
-            	break;
-
-            default:
-            	kinematics.updates |= RTCM_TYPE_9999;
-            	break;
-
-            }
-
+            collect_update(kinematics.number, &updates);
 
             kinematics.length = length;
-            if (length < kinematics.minimum) { kinematics.minimum = length; }
-            if (length > kinematics.maximum) { kinematics.maximum = length; }
 
             kinematics.ticks = timeout;
             refresh = !0;
@@ -3384,7 +3390,7 @@ int main(int argc, char * argv[])
                 print_local(out_fp, timetofirstfix);
                 print_positions(out_fp, position, onepps, dmyokay, totokay);
                 print_solution(out_fp, &solution);
-                print_corrections(out_fp, &base, &rover, &kinematics); kinematics.updates <<= 8;
+                print_corrections(out_fp, &base, &rover, &kinematics, &updates);
                 print_actives(out_fp, active);
                 print_views(out_fp, view, active);
             }
