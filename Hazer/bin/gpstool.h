@@ -62,7 +62,7 @@ typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?',
 /**
  * What update did we receive?
  */
-typedef enum Update { UPDATE = ' ', RTCM_TYPE_1005 = '5', RTCM_TYPE_1074 = '7', RTCM_TYPE_1084 = '8', RTCM_TYPE_1094 = '9', RTCM_TYPE_1124 = '2', RTCM_TYPE_1230 = '3', RTCM_TYPE_9999 = '?', } update_t;
+typedef enum Update { UPDATE = '.', RTCM_TYPE_1005 = 'B', RTCM_TYPE_1074 = 'N', RTCM_TYPE_1084 = 'R', RTCM_TYPE_1094 = 'E', RTCM_TYPE_1124 = 'C', RTCM_TYPE_1230 = 'r', RTCM_TYPE_9999 = '?', } update_t;
 
 /*******************************************************************************
  * HIGH PRECISION SOLUTION
