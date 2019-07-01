@@ -974,9 +974,9 @@ RTK (if present) show the latest RTCM message received, when operating in base
 mode (in which case the message was received from the device), or in
 rover mode (the message was received from the base in a datagram via UDP).
 The lengths of the most recent message is shown, as is the mode of the system,
-base or rover. The number between the angle brackets is an indicator of what
-RTCM messages are being received, the newest one indicated by the rightmost
-character in the number, as the number is progressively shifted left.
+base or rover. The number sequence between the angle brackets records the last
+eight RTCM messages that were received, the newest one indicated by the
+rightmost character in the number, as the number is progressively shifted left.
 
 NGS shows the same high precision position as HPP but in the format used
 in the National Geodetic Survey (NGS) data sheets for coordinates of artifacts
