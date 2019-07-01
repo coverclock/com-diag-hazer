@@ -421,8 +421,12 @@ static void collect_update(int number, tumbleweed_updates_t * up)
     	update = RTCM_TYPE_1230;
     	break;
 
-    default:
+    case 9999:
     	update = RTCM_TYPE_9999;
+    	break;
+
+    default:
+    	/* Do nothing. */
     	break;
 
     }
