@@ -386,9 +386,6 @@ Chip Overclock, "This Is What You Have To Deal With",
 
 # Media
 
-Adam Hart-Davis, "The Clock That Changed the World", A History of the World,
-BBC, video, <https://youtu.be/T-g27KS0yiY>
-
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
 
 John Sloan, "GPS Receiver Gallery", album, <https://flic.kr/s/aHsmvoXqSH>
@@ -548,6 +545,8 @@ astronomers in the audience, but it wasn't to me.
 <https://github.com/digidotcom/xbee_ansic_library>
 
 <https://github.com/ukyg9e5r6k7gubiekd6/gpsd/blob/master/crc24q.c>
+
+<https://youtu.be/T-g27KS0yiY> Adam Hart-Davis, "The Clock That Changed the World", A History of the World, BBC, video
 
 # Build
 
