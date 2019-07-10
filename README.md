@@ -155,15 +155,15 @@ Hazer recognizes the following received NMEA sentences.
 
 Yodel recognizes the following received UBX messages.
 
-* UBX-ACK-ACK - Acknowledge UBX input and indicate success. (UBX 9 p. 38)
-* UBX-ACK-NAK - Acknowledge UBX input and indicate failure. (UBX 9 p. 38)
-* UBX-CFG-VALGET - Get Configuration Value. (UBLOX 9 p. 85)
-* UBX-MON-HW - Monitor Hardware to detect jamming. (UBLOX 8 R15 p. 285)
-* UBX-MON-VER - Monitor hardware and software Version. (UBLOX 9 p. 139)
-* UBX-NAV-HPPOSLLH - Report high precision position and altitude. (UBX 9 p. 145)
-* UBX-NAV-STATUS - Report Status to detect spoofing. (UBLOX 8 R15 p. 316)
-* UBX-NAV-SVIN - Report Survey-in status on DGNSS Base. (UBLOX 9 p. 163)
-* UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (UBLOX 9 p. 181)
+* UBX-ACK-ACK - Acknowledge UBX input and indicate success. (u-blox 9 p. 38)
+* UBX-ACK-NAK - Acknowledge UBX input and indicate failure. (u-blox 9 p. 38)
+* UBX-CFG-VALGET - Get Configuration Value. (u-blox 9 p. 85)
+* UBX-MON-HW - Monitor Hardware to detect jamming. (u-blox 8 R15 p. 285)
+* UBX-MON-VER - Monitor hardware and software Version. (u-blox 9 p. 139)
+* UBX-NAV-HPPOSLLH - Report high precision position and altitude. (u-blox 9 p. 145)
+* UBX-NAV-STATUS - Report Status to detect spoofing. (u-blox 8 R15 p. 316)
+* UBX-NAV-SVIN - Report Survey-in status on DGNSS Base. (u-blox 9 p. 163)
+* UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (u-blox 9 p. 181)
 
 Tumbleweed recognizes RTCM messages with a valid CRC but does not process
 their contents. As a special case, an RTCM message with a zero payload length
@@ -274,7 +274,7 @@ Footnotes:
 [8] Supports UBX.    
 [9] Hardware from National Instruments.    
 [10] Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* BeiDou (China) simultaneously.    
-[11] Currently my default GNSS receiver against which I run regression tests of Hazer.    
+[11] Currently a GNSS receiver against which I run regression tests of Hazer.    
 
 # Platforms
 
