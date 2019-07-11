@@ -548,6 +548,10 @@ astronomers in the audience, but it wasn't to me.
 
 <https://youtu.be/T-g27KS0yiY> Adam Hart-Davis, "The Clock That Changed the World", A History of the World, BBC, video
 
+<https://www.movable-type.co.uk/scripts/latlong.html>
+
+<https://en.wikipedia.org/wiki/Haversine_formula>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
