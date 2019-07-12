@@ -254,7 +254,8 @@ Hazer has been successfully tested with the following GPS devices.
 * NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
 * TOPGNSS GN-803G (U-Blox UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
 * GlobalSat BU-353W10 (U-Blox UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [0] [1] [2] [4] [8] [11]
-* Ardusimple SimpleRTK2B (U-Blox UBX-ZED-F9P, 9600 8N1, v1516p01a9, ttyACM, 1Hz) [2] [8] [10]
+* Ardusimple SimpleRTK2B (U-Blox UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]
+* SparkFun GPS-RTK2 (U-Blox UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]
 
 Hazer has been successfully tested with the following software defined
 radio (SDR) configurations.
@@ -1709,7 +1710,7 @@ the hostname through which the router is addressed.
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     base tumbleweed:tumbleweed &
-    cat out/host/log/base.err
+    tail -f out/host/log/base.err# Control-C out when "Ready".
     headless out/host/log/base.out
 
 A Tumbleweed rover (there can be more than one) is on the WAN, and is agnostic
@@ -1718,7 +1719,7 @@ as to the Internet connection (I use a USB LTE modem).
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     rover tumbleweed.test:tumbleweed &
-    cat out/host/log/rover.err
+    tail -f out/host/log/rover.err# Control-C out when "Ready".
     headless out/host/log/rover.out
 
 On my three test systems, I define "tumbleweed" to be UDP port 21010
