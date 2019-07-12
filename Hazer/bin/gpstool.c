@@ -129,6 +129,7 @@
 #include "com/diag/diminuto/diminuto_containerof.h"
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_file.h"
+#include "com/diag/diminuto/diminuto_daemon.h"
 
 /*******************************************************************************
  * CONSTANTS
@@ -189,6 +190,11 @@ static inline uint64_t abs64(int64_t datum)
     return (datum >= 0) ? datum : -datum;
 }
 
+/**
+ * Return monotonic time in seconds.
+ * @param frequency is the underlying clock frequency.
+ * @return monotonic time in seconds.
+ */
 static inline long ticktock(diminuto_sticks_t frequency)
 {
     return diminuto_time_elapsed() / frequency;
@@ -377,6 +383,56 @@ static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
     }
 
     return length;
+}
+
+/**
+ * Track RTK updates by encoding each received RTCM message as a single
+ * character in a shifting string.
+ * @param number is the RTCM message number.
+ * @param up points to the updates union.
+ */
+static void collect_update(int number, tumbleweed_updates_t * up)
+{
+	update_t update = UPDATE;
+
+    switch (number) {
+
+    case 1005:
+    	update = RTCM_TYPE_1005;
+    	break;
+
+    case 1074:
+    	update = RTCM_TYPE_1074;
+    	break;
+
+    case 1084:
+    	update = RTCM_TYPE_1084;
+    	break;
+
+    case 1094:
+    	update = RTCM_TYPE_1094;
+    	break;
+
+    case 1124:
+    	update = RTCM_TYPE_1124;
+    	break;
+
+    case 1230:
+    	update = RTCM_TYPE_1230;
+    	break;
+
+    case 9999:
+    	update = RTCM_TYPE_9999;
+    	break;
+
+    default:
+    	/* Do nothing. */
+    	break;
+
+    }
+
+    up->word = (up->word << 8) | update;
+
 }
 
 /*******************************************************************************
@@ -829,189 +885,210 @@ static void print_status(FILE * fp, const yodel_status_t * sp)
 static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyokay, int totokay)
 {
     unsigned int system = 0;
-    int64_t whole = 0;
-    uint64_t fraction = 0;
-    uint64_t nanoseconds = 0;
-    int year = 0;
-    int month = 0;
-    int day = 0;
-    int hour = 0;
-    int minute = 0;
-    int second = 0;
-    int degrees = 0;
-    int minutes = 0;
-    int seconds = 0;
-    int hundredths = 0;
-    int direction = 0;
-    const char * compass = (const char *)0;
-    char zone = '\0';
 
-    zone = diminuto_time_zonename(0);
+    {
+        int year = 0;
+        int month = 0;
+        int day = 0;
+        int hour = 0;
+        int minute = 0;
+        int second = 0;
+        uint64_t billionths = 0;
+        char zone = '\0';
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        zone = diminuto_time_zonename(0);
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
-        if (pa[system].dmy_nanoseconds == 0) { continue; }
+		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("TIM", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
+			if (pa[system].dmy_nanoseconds == 0) { continue; }
 
-        hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
-        assert((1 <= month) && (month <= 12));
-        assert((1 <= day) && (day <= 31));
-        assert((0 <= hour) && (hour <= 23));
-        assert((0 <= minute) && (minute <= 59));
-        assert((0 <= second) && (second <= 59));
-        assert((0 <= nanoseconds) && (nanoseconds < 1000000000ULL));
-        fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
+			fputs("TIM", fp);
 
-        fprintf(fp, " %cpps", pps ? '1' : '0');
+			hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &billionths);
+			assert((1 <= month) && (month <= 12));
+			assert((1 <= day) && (day <= 31));
+			assert((0 <= hour) && (hour <= 23));
+			assert((0 <= minute) && (minute <= 59));
+			assert((0 <= second) && (second <= 59));
+			assert((0 <= billionths) && (billionths < 1000000000ULL));
+			fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
 
-        fprintf(fp, "%28s", "");
+			fprintf(fp, " %cpps", pps ? '1' : '0');
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%28s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+        int degrees = 0;
+        int minutes = 0;
+        int seconds = 0;
+        int thousandths = 0;
+        int direction = 0;
+        uint64_t tenmillionths = 0;
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
+        for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("POS", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
 
-        hazer_format_nanodegrees2position(pa[system].lat_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
-        assert((0 <= degrees) && (degrees <= 90));
-        assert((0 <= minutes) && (minutes <= 59));
-        assert((0 <= seconds) && (seconds <= 59));
-        assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %2d%lc%02d'%02d.%02d\"%c,", degrees, DEGREE, minutes, seconds, hundredths, direction < 0 ? 'S' : 'N');
+			fputs("POS", fp);
 
-        hazer_format_nanodegrees2position(pa[system].lon_nanodegrees, &degrees, &minutes, &seconds, &hundredths, &direction);
-        assert((0 <= degrees) && (degrees <= 180));
-        assert((0 <= minutes) && (minutes <= 59));
-        assert((0 <= seconds) && (seconds <= 59));
-        assert((0 <= hundredths) && (hundredths <= 99));
-        fprintf(fp, " %3d%lc%02d'%02d.%02d\"%c", degrees, DEGREE, minutes, seconds, hundredths, direction < 0 ? 'W' : 'E');
+			hazer_format_nanominutes2position(pa[system].lat_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
+			assert((0 <= degrees) && (degrees <= 90));
+			assert((0 <= minutes) && (minutes <= 59));
+			assert((0 <= seconds) && (seconds <= 59));
+			assert((0 <= thousandths) && (thousandths <= 999));
+			fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
 
-        fputc(' ', fp);
+			hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
+			assert((0 <= degrees) && (degrees <= 180));
+			assert((0 <= minutes) && (minutes <= 59));
+			assert((0 <= seconds) && (seconds <= 59));
+			assert((0 <= thousandths) && (thousandths <= 999));
+			fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
 
-        whole = pa[system].lat_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].lat_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu,", (long long signed int)whole, (long long unsigned int)fraction);
+			fputc(' ', fp);
 
-        whole = pa[system].lon_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].lon_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu", (long long signed int)whole, (long long unsigned int)fraction);
+			hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &tenmillionths);
+			assert((-90 <= degrees) && (degrees <= 90));
+			assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
+			fprintf(fp, " %4d.%07llu,", degrees, (long long unsigned int)tenmillionths);
 
-        fprintf(fp, "%5s", "");
+			hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &tenmillionths);
+			assert((-180 <= degrees) && (degrees <= 180));
+			fprintf(fp, " %4d.%07llu", degrees, (long long unsigned int)tenmillionths);
+			assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%7s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+        int64_t meters = 0;
+        uint64_t thousandths = 0;
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
+		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("ALT", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
 
-        fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
+			fputs("ALT", fp);
 
-        whole = pa[system].alt_millimeters / 1000LL;
-        fraction = abs(pa[system].alt_millimeters) % 1000LLU;
-        fprintf(fp, " %6lld.%03llum", (long long signed int)whole, (long long unsigned int)fraction);
+			fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
 
-        fprintf(fp, "%43s", "");
+			meters = pa[system].alt_millimeters / 1000LL;
+			thousandths = abs64(pa[system].alt_millimeters) % 1000ULL;
+			fprintf(fp, " %6lld.%03llum", (long long signed int)meters, (long long unsigned int)thousandths);
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%43s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+        int64_t degrees = 0;
+        uint64_t billionths = 0;
+        const char * compass = (const char *)0;
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
+        for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("COG", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
 
-        assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
+			fputs("COG", fp);
 
-        compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
-        assert(compass != (const char *)0);
-        assert(strlen(compass) <= 4);
-        fprintf(fp, " %-2s", compass);
+			assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
 
-        whole = pa[system].cog_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)whole, (long long unsigned int)fraction, DEGREE);
+			compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
+			assert(compass != (const char *)0);
+			assert(strlen(compass) <= 4);
+			fprintf(fp, " %-2s", compass);
 
-        whole = pa[system].mag_nanodegrees / 1000000000LL;
-        fraction = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
-        fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)whole, (long long unsigned int)fraction, DEGREE);
+			degrees = pa[system].cog_nanodegrees / 1000000000LL;
+			billionths = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
+			fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
 
-        fprintf(fp, "%30s", "");
+			degrees = pa[system].mag_nanodegrees / 1000000000LL;
+			billionths = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
+			fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%30s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+        int64_t knots = 0;
+        int64_t kilometersperhour = 0;
+        uint64_t millionths = 0;
 
-        if (pa[system].ticks == 0) { continue; }
-        if (pa[system].utc_nanoseconds == 0) { continue; }
+		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        fputs("SOG", fp);
+			if (pa[system].ticks == 0) { continue; }
+			if (pa[system].utc_nanoseconds == 0) { continue; }
 
-        fprintf(fp, " %11.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
+			fputs("SOG", fp);
 
-        whole = pa[system].sog_microknots / 1000000LL;
-        fraction = abs64(pa[system].sog_microknots) % 1000000ULL;
-        fprintf(fp, " %7lld.%06lluknots", (long long signed int)whole, (long long unsigned int)fraction);
+			fprintf(fp, " %11.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
 
-        whole = pa[system].sog_millimeters / 1000000LL;
-        fraction = abs64(pa[system].sog_millimeters) % 1000000ULL;
-        fprintf(fp, " %7lld.%06llukph", (long long signed int)whole, (long long unsigned int)fraction);
+			knots = pa[system].sog_microknots / 1000000LL;
+			millionths = abs64(pa[system].sog_microknots) % 1000000ULL;
+			fprintf(fp, " %7lld.%06lluknots", (long long signed int)knots, (long long unsigned int)millionths);
 
-        fprintf(fp, "%14s", "");
+			kilometersperhour = pa[system].sog_millimeters / 1000000LL;
+			millionths = abs64(pa[system].sog_millimeters) % 1000000ULL;
+			fprintf(fp, " %7lld.%06llukph", (long long signed int)kilometersperhour, (long long unsigned int)millionths);
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+			fprintf(fp, "%14s", "");
 
-        fputc('\n', fp);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
+			fputc('\n', fp);
+
+		}
     }
 
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+    {
+		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-        if (pa[system].ticks == 0) { continue; }
+			if (pa[system].ticks == 0) { continue; }
 
-        fputs("INT", fp);
+			fputs("INT", fp);
 
-        fprintf(fp, " %s", pa[system].label);
+			fprintf(fp, " %s", pa[system].label);
+			fprintf(fp, " [%2u]", pa[system].sat_used);
+			fprintf(fp, " %ddmy", dmyokay);
+			fprintf(fp, " %dinc", totokay);
+			fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
 
-        fprintf(fp, " [%2u]", pa[system].sat_used);
+			fprintf(fp, "%23s", "");
 
-        fprintf(fp, " %ddmy", dmyokay);
+			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-        fprintf(fp, " %dinc", totokay);
+			fputc('\n', fp);
 
-        fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
-
-        fprintf(fp, "%23s", "");
-
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
-
-        fputc('\n', fp);
-
+		}
     }
 
 }
@@ -1023,7 +1100,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
  * @param rp points to the rover structure.
  * @param mp points to the kinematics structure.
  */
-static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp)
+static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp, const tumbleweed_updates_t * up)
 {
 
 	if (bp->ticks != 0) {
@@ -1049,8 +1126,8 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
      if (kp->ticks != 0) {
 
          fputs("RTK", fp);
-         fprintf(fp, " %4u [%4zu] [%4zu] [%4zu] %-8s", kp->number, kp->minimum, kp->length, kp->maximum, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown");
-         fprintf(fp, "%33s", "");
+         fprintf(fp, " %4u [%4zu] %-8s <%8.8s>", kp->number, kp->length, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown", up->bytes);
+         fprintf(fp, "%36s", "");
          fprintf(fp, "%-8s", "DGNSS");
          fputc('\n', fp);
 
@@ -1068,6 +1145,12 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
  */
 static void print_solution(FILE * fp, const yodel_solution_t * sp)
 {
+    int degrees = 0;
+    int minutes = 0;
+    int seconds = 0;
+    int tenthousandths = 0;
+    uint64_t billionths = 0;
+    int direction = 0;
     int64_t value = 0;
     int64_t whole = 0;
     uint64_t fraction = 0;
@@ -1076,21 +1159,11 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fputs("HPP", fp);
 
-        value = sp->payload.lat;
-        value *= 100;
-        value += sp->payload.latHp;
-        whole = value / 1000000000LL;
-        fraction = abs64(value) % 1000000000ULL;
-        fprintf(fp, " %4lld.%09llu,", (long long signed int)whole, (long long unsigned int)fraction);
+        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
+        fprintf(fp, " %4d.%09llu,", degrees, (long long unsigned int)billionths);
 
-        value = sp->payload.lon;
-        value *= 100;
-        value += sp->payload.lonHp;
-        whole = value / 1000000000LL;
-        fraction = abs64(value) % 1000000000ULL;
-        fprintf(fp, " %4lld.%09llu", (long long signed int)whole, (long long unsigned int)fraction);
-
-        // fprintf(fp, " hAcc=%d", sp->payload.hAcc);
+        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &billionths);
+        fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)billionths);
 
         value = sp->payload.hAcc;
         whole = value / 10000LL;
@@ -1112,14 +1185,26 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         fraction = abs64(value) % 10000ULL;
         fprintf(fp, " %6lld.%04llum", (long long signed int)whole, (long long unsigned int)fraction);
 
-        // fprintf(fp, " vACC=%d", sp->payload.vAcc);
-
         value = sp->payload.vAcc;
         whole = value / 10000LL;
         fraction = abs64(value) % 10000ULL;
         fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)whole, (long long unsigned int)fraction);
 
         fprintf(fp, "%40s", "");
+
+        fprintf(fp, " %-8s", "GNSS");
+
+        fputc('\n', fp);
+
+        fputs("NGS", fp);
+
+        hazer_format_hppos2position(sp->payload.lat, sp->payload.latHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
+        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'S' : 'N');
+
+        hazer_format_hppos2position(sp->payload.lon, sp->payload.lonHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
+        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'W' : 'E');
+
+        fprintf(fp, "%29s", "");
 
         fprintf(fp, " %-8s", "GNSS");
 
@@ -1141,13 +1226,13 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 static void * dcdpoller(void * argp)
 {
     void * xc = (void *)1;
-    struct Poller * ctxp = (struct Poller *)0;
+    poller_t * ctxp = (poller_t *)0;
     int done = 0;
     int rc = -1;
     int nowpps = 0;
     int waspps = 0;
 
-    ctxp = (struct Poller *)argp;
+    ctxp = (poller_t *)argp;
 
     while (!0) {
         DIMINUTO_COHERENT_SECTION_BEGIN;
@@ -1193,7 +1278,7 @@ static void * dcdpoller(void * argp)
 static void * gpiopoller(void * argp)
 {
     void * xc = (void *)1;
-    struct Poller * pollerp = (struct Poller *)0;
+    poller_t * pollerp = (poller_t *)0;
     diminuto_mux_t mux = { 0 };
     int ppsfd = -1;
     int done = 0;
@@ -1202,7 +1287,7 @@ static void * gpiopoller(void * argp)
     int nowpps = 0;
     int waspps = 0;
 
-    pollerp = (struct Poller *)argp;
+    pollerp = (poller_t *)argp;
 
     diminuto_mux_init(&mux);
     ppsfd = fileno(pollerp->ppsfp);
@@ -1284,12 +1369,13 @@ int main(int argc, char * argv[])
     int expire = 0;
     int unknown = 0;
     int serial = 0;
+    int daemon = 0;
     long timeout = HAZER_GNSS_SECONDS;
     long keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
     /*
      * Configuration command variables.
      */
-    struct Command * command = (struct Command *)0;
+    command_t * command = (command_t *)0;
     diminuto_list_t * command_node = (diminuto_list_t *)0;
     diminuto_list_t command_list = DIMINUTO_LIST_NULLINIT(&command_list);
     uint8_t * command_string = (uint8_t *)0;
@@ -1300,7 +1386,7 @@ int main(int argc, char * argv[])
      */
     FILE * in_fp = stdin;
     FILE * out_fp = stdout;
-    FILE * dev_fp = stdout;
+    FILE * dev_fp = (FILE *)0;
     FILE * log_fp = (FILE *)0;
     FILE * strobe_fp = (FILE *)0;
     FILE * pps_fp = (FILE *)0;
@@ -1362,7 +1448,7 @@ int main(int argc, char * argv[])
      * 1PPS poller thread variables.
      */
     const char * pps = (const char *)0;
-    struct Poller poller = { 0 };
+    poller_t poller = { 0 };
     void * result = (void *)0;
     pthread_t thread;
     int pthreadrc = -1;
@@ -1464,6 +1550,7 @@ int main(int argc, char * argv[])
      * RTCM state databases.
      */
     tumbleweed_message_t kinematics = TUMBLEWEED_MESSAGE_INITIALIZER;
+    tumbleweed_updates_t updates = TUMBLEWEED_UPDATES_INITIALIZER;
     /*
      * Time keeping variables.
      */
@@ -1489,7 +1576,7 @@ int main(int argc, char * argv[])
     /*
      * Source variables.
      */
-    diminuto_mux_t mux = { 0 };
+    diminuto_mux_t mux = { 0, };
     int ch = EOF;
     int ready = 0;
     int fd = -1;
@@ -1543,7 +1630,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:OPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:MOPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1621,6 +1708,9 @@ int main(int argc, char * argv[])
         case 'L':
             logging = optarg;
             break;
+        case 'M':
+        	daemon = !0;
+        	break;
         case 'P':
         	process = !0;
         	break;
@@ -1633,20 +1723,20 @@ int main(int argc, char * argv[])
             break;
         case 'U':
             readonly = 0;
-            command = (struct Command *)malloc(sizeof(struct Command));
-            assert(command != (struct Command *)0);
+            command = (command_t *)malloc(sizeof(command_t));
+            assert(command != (command_t *)0);
             command->acknak = !0;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
             diminuto_list_enqueue(&command_list, command_node);
             break;
         case 'V':
-            fprintf(stderr, "%s: version com-diag-hazer %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+        	DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
             readonly = 0;
-            command = (struct Command *)malloc(sizeof(struct Command));
-            assert(command != (struct Command *)0);
+            command = (command_t *)malloc(sizeof(command_t));
+            assert(command != (command_t *)0);
             command->acknak = 0;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
@@ -1731,7 +1821,7 @@ int main(int argc, char * argv[])
             break;
         case '?':
             fprintf(stderr, "usage: %s "
-                           "[ -d ] [ -v ] [ -u ] [ -V ] [ -X ] "
+                           "[ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] "
                            "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
                            "[ -t SECONDS ] "
                            "[ -I PIN | -c ] [ -p PIN ] "
@@ -1751,22 +1841,23 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
             fprintf(stderr, "       -F          Like -R but reFresh at 1Hz.\n");
             fprintf(stderr, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
-            fprintf(stderr, "       -G PORT     Use local PORT as dataGram source.\n");
+            fprintf(stderr, "       -G :PORT    Use local PORT as dataGram source.\n");
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
             fprintf(stderr, "       -L LOG      Write input to LOG file.\n");
+            fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S SOURCE   Use SOURCE file or named pipe for input.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
             fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
-            fprintf(stderr, "       -V          Print release, Vintage, and revision on standard output.\n");
+            fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
             fprintf(stderr, "       -W STRING   Collapse STRING, append checksum, Write to DEVICE.\n");
             fprintf(stderr, "       -W ''       Exit when this empty Write STRING is processed.\n");
             fprintf(stderr, "       -X          Enable message eXpiration test mode.\n");
             fprintf(stderr, "       -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.\n");
-            fprintf(stderr, "       -Y PORT     Use local PORT as surveYor source.\n");
+            fprintf(stderr, "       -Y :PORT    Use local PORT as surveYor source.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
@@ -1783,6 +1874,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
             fprintf(stderr, "       -u          Note Unprocessed input on standard error.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
+            fprintf(stderr, "       -x          Run in the background as a daemon.\n");
             fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds.\n");
             return 1;
             break;
@@ -1796,6 +1888,12 @@ int main(int argc, char * argv[])
     /**
      ** INITIALIZATION
      **/
+
+    if (daemon) {
+    	rc = diminuto_daemon(Program);
+    	DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
+    	assert(rc == 0);
+    }
 
     DIMINUTO_LOG_INFORMATION("Begin");
 
@@ -2387,7 +2485,7 @@ int main(int argc, char * argv[])
 					if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 
-					DIMINUTO_LOG_DEBUG("Device NMEA [%zd] [%zd]", size, length);
+					DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd]", size, length);
 
 					break;
 
@@ -2403,7 +2501,7 @@ int main(int argc, char * argv[])
 					if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 
-					DIMINUTO_LOG_DEBUG("Device UBX [%zd] [%zd]", size, length);
+					DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd]", size, length);
 
 					break;
 				}
@@ -2418,7 +2516,7 @@ int main(int argc, char * argv[])
 					if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
 					frame = !0;
 
-					DIMINUTO_LOG_DEBUG("Device RTCM [%zd] [%zd]", size, length);
+					DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd]", size, length);
 
 					break;
 				 }
@@ -2535,10 +2633,9 @@ int main(int argc, char * argv[])
 
 				kinematics.number = tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length);
 	            if (kinematics.number < 0) { kinematics.number = 9999; }
+	            collect_update(kinematics.number, &updates);
 
 	            kinematics.length = surveyor_length;
-	            if (surveyor_length < kinematics.minimum) { kinematics.minimum = surveyor_length; }
-	            if (surveyor_length > kinematics.maximum) { kinematics.maximum = surveyor_length; }
 
 	            kinematics.ticks = timeout;
 	            refresh = !0;
@@ -2648,7 +2745,7 @@ int main(int argc, char * argv[])
         	command_node = diminuto_list_dequeue(&command_list);
             assert(command_node != (diminuto_list_t *)0);
 
-            command = diminuto_containerof(struct Command, link, command_node);
+            command = diminuto_containerof(command_t, link, command_node);
             command_string = diminuto_list_data(command_node);
             assert(command_string != (uint8_t *)0);
 
@@ -3188,10 +3285,9 @@ int main(int argc, char * argv[])
 
             kinematics.number = tumbleweed_message(buffer, length);
             if (kinematics.number < 0) { kinematics.number = 9999; }
+            collect_update(kinematics.number, &updates);
 
             kinematics.length = length;
-            if (length < kinematics.minimum) { kinematics.minimum = length; }
-            if (length > kinematics.maximum) { kinematics.maximum = length; }
 
             kinematics.ticks = timeout;
             refresh = !0;
@@ -3219,8 +3315,9 @@ int main(int argc, char * argv[])
          * complete sentence, packet, or message that we can forward, write,
          * log, or use to update our databases.
          */
-
-        if (diminuto_file_ready(in_fp) > 0) {
+        if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
+        	/* Do nothing. */
+        } else if (diminuto_file_ready(in_fp) > 0) {
         	continue;
         } else if (diminuto_mux_wait(&mux, 0 /* POLL */) > 0) {
 			continue;
@@ -3303,7 +3400,7 @@ int main(int argc, char * argv[])
                 print_local(out_fp, timetofirstfix);
                 print_positions(out_fp, position, onepps, dmyokay, totokay);
                 print_solution(out_fp, &solution);
-                print_corrections(out_fp, &base, &rover, &kinematics);
+                print_corrections(out_fp, &base, &rover, &kinematics, &updates);
                 print_actives(out_fp, active);
                 print_views(out_fp, view, active);
             }

@@ -59,6 +59,11 @@ typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CR
  */
 typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!', } marker_t;
 
+/**
+ * What update did we receive?
+ */
+typedef enum Update { UPDATE = '.', RTCM_TYPE_1005 = 'B', RTCM_TYPE_1074 = 'N', RTCM_TYPE_1084 = 'R', RTCM_TYPE_1094 = 'E', RTCM_TYPE_1124 = 'C', RTCM_TYPE_1230 = 'r', RTCM_TYPE_9999 = '?', } update_t;
+
 /*******************************************************************************
  * HIGH PRECISION SOLUTION
  ******************************************************************************/
@@ -189,8 +194,6 @@ typedef struct YodelRover {
  */
 typedef struct TumbleweedMessage {
 	ssize_t length;
-	ssize_t minimum;
-	ssize_t maximum;
 	int number;				/* Message number e.g. 1005. */
 	source_t source;
 	hazer_expiry_t ticks;	/* Lifetime in application-defined ticks. */
@@ -203,11 +206,26 @@ typedef struct TumbleweedMessage {
 #define TUMBLEWEED_MESSAGE_INITIALIZER \
     { \
 		0, \
-		TUMBLEWEED_RTCM_LONGEST, \
 		0, \
-        0, \
 		SOURCE, \
 		0, \
+    }
+
+/**
+ * Union makes it a little simpler to track RTCM messages.
+ */
+typedef union TumbleweedUpdates {
+	uint8_t bytes[sizeof(uint64_t)];
+	uint64_t word;
+} tumbleweed_updates_t;
+
+/**
+ * @define TUMBLEWEED_UPDATES_INITIALIZER
+ * Initialize a TumbleweedUpdates union.
+ */
+#define TUMBLEWEED_UPDATES_INITIALIZER \
+    { \
+	    { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', } \
     }
 
 /*******************************************************************************
@@ -221,21 +239,21 @@ typedef struct TumbleweedMessage {
  * declaration is used to suggest to the compiler that it doesn't optimize
  * use of these variables out since they can be altered by other threads.
  */
-struct Poller {
+typedef struct Poller {
     FILE * ppsfp;
     FILE * strobefp;
     volatile int onepps;
     volatile int done;
-};
+} poller_t;
 
 /**
  * The Command structure contains a linked list node whose data pointer
  * points to the command we want to send, and the acknak field indicates
  * whether this command expects an UBX CFG ACK or a NAK from the device.
  */
-struct Command {
+typedef struct Command {
 	diminuto_list_t link;
 	int acknak;
-};
+} command_t;
 
 #endif

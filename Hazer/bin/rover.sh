@@ -6,8 +6,9 @@
 # Configure and run the Ardusimple SimpleRTK2B as a mobile Rover.
 
 PROGRAM=$(basename ${0})
-ROUTER=${1:-"localhost:21010"}
-DEVICE=${2:-"/dev/ttyACM0"}
+ROUTER=${1:-"tumbleweed.test:tumbleweed"}
+DEVICE=${2:-"/dev/tumbleweed"}
+RATE=${3:-230400}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -23,7 +24,7 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-UBX_RXM_RTCM_USB 1
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
-exec coreable gpstool -D ${DEVICE} \
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -Y ${ROUTER} -y 20 \
     -F -H ${LOG}/${PROGRAM}.out -t 10 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x00' \

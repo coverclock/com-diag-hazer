@@ -21,6 +21,20 @@
  *
  ******************************************************************************/
 
+/**
+ * Return the absolute value of a signed sixty-four bit integer.
+ * @param datum is a signed sixty-four bit integer.
+ * @return an unsigned sixty-four bit integer.
+ */
+static inline uint64_t abs64(int64_t datum)
+{
+    return (datum >= 0) ? datum : -datum;
+}
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 static FILE * debug  = (FILE *)0;
 
 FILE * yodel_debug(FILE * now)
@@ -582,4 +596,51 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t lengt
     }
 
     return rc;
+}
+
+void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, uint64_t * billionthsp)
+{
+	int64_t nanodegrees = 0;
+
+    nanodegrees = whole;                                        /* Get 10^-7 degrees. */
+    nanodegrees *= 100LL;                                       /* Convert to nanodegrees (10^-9). */
+    nanodegrees += fraction;                                    /* Add fraction already in nanodegrees. */
+    *degreesp = nanodegrees / 1000000000LL;                     /* Get integral degrees. */
+    nanodegrees = abs64(nanodegrees);					        /* Fraction is not signed. */
+    nanodegrees = nanodegrees % 1000000000LL;                   /* Remainder. */
+    *billionthsp = nanodegrees;                                 /* Get billionths. */
+}
+
+void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp)
+{
+	int64_t nanodegrees = 0;
+
+	/*
+	 * Remarkably, the fractional part (lonHp, latHp) may not have the same
+	 * sign as the corresponding whole part (lon, lat) in the HPPOSLLH record.
+	 * I have no idea what this means, but I've seen it. [UBX 9, pp. 145..146]:
+	 * latitude  in deg * 10^-7 = lat + (latHp * 10^2)
+	 * longitude in deg * 10^-7 = lon + (lonHp * 10^2)
+	 */
+
+    if (whole < 0) {
+    	whole = -whole;
+        *directionp = -1;
+    } else {
+        *directionp = 1;
+    }
+
+    nanodegrees = whole;										        /* Get 10^-7 degrees. */
+    nanodegrees *= 100LL;                                               /* Convert to nanodegrees (10^-9). */
+    nanodegrees += fraction;                                            /* Add fraction already in nanodegrees. */
+
+    *degreesp = nanodegrees / 1000000000ULL;                            /* Get integral degrees. */
+    nanodegrees = nanodegrees % 1000000000ULL;                          /* Remainder. */
+    nanodegrees *= 60ULL;                                               /* Convert to nanominutes. */
+    *minutesp = nanodegrees / 1000000000LL;                             /* Get integral minutes. */
+    nanodegrees = nanodegrees % 1000000000LL;                           /* Remainder. */
+    nanodegrees *= 60ULL;                                               /* Convert to nanoseconds. */
+    *secondsp = nanodegrees / 1000000000LL;                             /* Get integral seconds. */
+    nanodegrees = nanodegrees % 1000000000LL;                           /* Remainder. */
+    *onehundredthousandsthp = (nanodegrees * 100000LL) / 1000000000LL;  /* Get one hundred thousanths. */
 }

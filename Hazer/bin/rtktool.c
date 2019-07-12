@@ -48,6 +48,7 @@
 #include "com/diag/diminuto/diminuto_frequency.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_delay.h"
+#include "com/diag/diminuto/diminuto_daemon.h"
 
 /*******************************************************************************
  * GLOBALS
@@ -104,6 +105,7 @@ int main(int argc, char * argv[])
     int opt = -1;
     int debug = 0;
     int verbose = 0;
+    int daemon = 0;
     long timeout = 30;
     int sock = -1;
     int error = 0;
@@ -139,7 +141,7 @@ int main(int argc, char * argv[])
     long was = 0;
     unsigned int outoforder = 0;
     unsigned int missing = 0;
-    static const char OPTIONS[] = "Vdp:t:v?";
+    static const char OPTIONS[] = "MVdp:t:v?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -166,8 +168,11 @@ int main(int argc, char * argv[])
 
     while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
+        case 'M':
+        	daemon = !0;
+        	break;
         case 'V':
-            fprintf(stderr, "%s: version com-diag-hazer %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'd':
             debug = !0;
@@ -185,10 +190,11 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -V ] [ -p PORT ] [ -t SECONDS ]\n", Program);
-            fprintf(stderr, "       -V          Print release, Vintage, and revision on standard output.\n");
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -M ] [ -V ] [ -M ] [ -p :PORT ] [ -t SECONDS ]\n", Program);
+            fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
+            fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
-            fprintf(stderr, "       -p PORT     Use PORT as the RTCM source and sink port.\n");
+            fprintf(stderr, "       -p :PORT    Use PORT as the RTCM source and sink port.\n");
             fprintf(stderr, "       -t SECONDS  Set the client timeout to SECONDS seconds.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
             return 1;
@@ -203,6 +209,12 @@ int main(int argc, char * argv[])
     /***************************************************************************
      * INITIALIZATION
      **************************************************************************/
+
+    if (daemon) {
+    	rc = diminuto_daemon(Program);
+    	DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
+    	assert(rc == 0);
+    }
 
     DIMINUTO_LOG_INFORMATION("Begin");
 

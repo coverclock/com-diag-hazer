@@ -58,31 +58,33 @@ static struct {
 
 int main(void)
 {
-    double degrees = 0.0;
-    const char * name = (const char *)0;
-    int index = 0;
-    uint64_t nanodegrees = 0;
-    uint32_t millidegrees = 0;
+	{
+		double degrees = 0.0;
+		const char * name = (const char *)0;
+		int index = 0;
+		uint64_t nanodegrees = 0;
+		uint32_t millidegrees = 0;
 
-    for (degrees = 0.00; degrees < 360.00; degrees += 0.01) {
-        nanodegrees = degrees * 1000000000.0;
-        name = hazer_format_nanodegrees2compass32(nanodegrees);
-        millidegrees = degrees * 1000.0;
-        for (index = 0; index < (sizeof(POINT) / sizeof(POINT[0])); ++index) {
-            if (index == 0) {
-                if ((POINT[index].minimum <= millidegrees) && (millidegrees < 360000)) {
-                    break;
-                }
-                if ((0 <= millidegrees) && (millidegrees < POINT[index].maximum)) {
-                    break;
-                }
-            } else {
-                if ((POINT[index].minimum <= millidegrees) && (millidegrees < POINT[index].maximum)) {
-                    break;
-                }
-            }
-        }
-        assert(index < (sizeof(POINT) / sizeof(POINT[0])));
-        assert(strcmp(name, POINT[index].name) == 0);
-    }
+		for (degrees = 0.00; degrees < 360.00; degrees += 0.01) {
+			nanodegrees = degrees * 1000000000.0;
+			name = hazer_format_nanodegrees2compass32(nanodegrees);
+			millidegrees = degrees * 1000.0;
+			for (index = 0; index < (sizeof(POINT) / sizeof(POINT[0])); ++index) {
+				if (index == 0) {
+					if ((POINT[index].minimum <= millidegrees) && (millidegrees < 360000)) {
+						break;
+					}
+					if ((0 <= millidegrees) && (millidegrees < POINT[index].maximum)) {
+						break;
+					}
+				} else {
+					if ((POINT[index].minimum <= millidegrees) && (millidegrees < POINT[index].maximum)) {
+						break;
+					}
+				}
+			}
+			assert(index < (sizeof(POINT) / sizeof(POINT[0])));
+			assert(strcmp(name, POINT[index].name) == 0);
+		}
+	}
 }
