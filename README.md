@@ -288,6 +288,13 @@ Raspbian 9.9 "Stretch"
 Linux 4.19.42    
 gcc 6.3.0    
 
+"Bodega", "Mochila", and "Jefe" (updated)    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.50    
+gcc 8.3.0    
+
 "Cadmium"    
 Intel NUC7i7BNH    
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
