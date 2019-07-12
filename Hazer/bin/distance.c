@@ -30,7 +30,7 @@
  *
  * USAGE
  *
- * distance LAT1 LON1 LAT2 LON2
+ * distance [ -? ] [ -d ] LAT1 LON1 LAT2 LON2
  *
  * EXAMPLE
  *
@@ -65,7 +65,7 @@ int main(int argc, char * argv[])
     argc--;
 
     if ((argc > 0) && (strcmp(*argv, "-?") == 0)) {
-		fprintf(stderr, "usage: %s LAT1 LON1 LAT2 LON2\n", program);
+		fprintf(stderr, "usage: %s [ -? ] [ -d ] LAT1 LON1 LAT2 LON2\n", program);
 		argv++;
 		argc--;
     }
