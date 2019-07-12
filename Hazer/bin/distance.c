@@ -86,6 +86,10 @@ int main(int argc, char * argv[])
 	lat2 = atof(*(argv++));
 	lon2 = atof(*(argv++));
 
+	if (debug) {
+		fprintf(stderr, "%s: ( %f , %f ) ( %f , %f )\n", program, lat1, lon1, lat2, lon2);
+	}
+
 	theta1 = (lat1 * M_PI) / 180.0;
 	theta2 = (lat2 * M_PI) / 180.0;
 
@@ -104,5 +108,5 @@ int main(int argc, char * argv[])
 
 	d = R * c;
 
-	printf("%lf\n", d);
+	printf("%f\n", d);
 }
