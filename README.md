@@ -635,6 +635,7 @@ lines that need to be added to the indicated files.
 * hazer - consumes data from a serial port and reports on stdout.
 * headless - uses inotifywait to watch headless output.
 * ngs2gmaps - converts NGS coordinates to a form usable in Google Maps.
+* peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
