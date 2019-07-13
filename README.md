@@ -553,6 +553,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://en.wikipedia.org/wiki/Haversine_formula>
 
+<https://www.gsc-europa.eu/system-status/Constellation-Information>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
