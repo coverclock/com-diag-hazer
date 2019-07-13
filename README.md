@@ -31,7 +31,7 @@ Hazer project includes parsers for three different output formats, NMEA,
 UBX, and RTCM, and interprets many of the data records typically represented
 in those formats into C structures.
 
-For purposes of commenting in my C code, I find it useful to rever
+For purposes of commenting in my C code, I find it useful to refer
 to NMEA records as "sentences" (terminology consistent with the
 NMEA standard), UBX records as packets, and RTCM records as messages.
 
