@@ -338,7 +338,7 @@ Raspbian 9.9 "Stretch"
 Linux 4.19.42    
 gcc 6.3.0    
 
-"Bodega", "Mochila" and "Jefe" (updated)    
+"Bodega", "Mochila", and "Jefe" (updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
@@ -552,6 +552,8 @@ astronomers in the audience, but it wasn't to me.
 <https://www.movable-type.co.uk/scripts/latlong.html>
 
 <https://en.wikipedia.org/wiki/Haversine_formula>
+
+<https://www.gsc-europa.eu/system-status/Constellation-Information>
 
 # Build
 
