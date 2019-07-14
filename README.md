@@ -1853,7 +1853,7 @@ seconds. Thirty seconds is a typical timeout after which a firewall or router
 will remove the UDP return route. (This mechanism was inspired by a similar one
 used by SIP to route RTP packets via UDP to VoIP phones.)
 
-Note that the UDP stream is not encrypted, nor s the source of the datagrams
+Note that the UDP stream is not encrypted, nor is the source of the datagrams
 authenticated, so this mechanism is not secure. It should be. I'm pondering how
 best to accomplish that.
 
