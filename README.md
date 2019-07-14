@@ -1780,10 +1780,12 @@ wired Ethernet to my home access point/ IP router.
 As mentioned above, it is not unusual to see a WAN connected rover or base
 drop off and reappear on the WAN, often with a different port number or even
 an IP address. The router makes a note of this; here are the results of an
-overnight test. (The IPv4 addresses are expressed in IPv6 notation, which the
-router uses natively. Also, I've obfuscated portions of the WAN addresses.)
-You can see the base and rover changing ports and even addresses, and even
-sometimes switching between the WAN and the LAN when they have access to both.
+overnight test. (The IPv4 addresses are expressed in IPv6 notation, which is
+what the router uses natively. Also, I've obfuscated portions of the WAN
+addresses. The base and rover can use either IPv4 or IPv6.) You can see the
+base and rover changing ports and even addresses, and even sometimes switching
+between the WAN and the LAN when they have access to both (the latter via my
+WiFI WLAN).
 
     2019-06-25T23:29:47.791661Z <INFO> [744] {76f6b530} Begin
     2019-06-25T23:29:47.792252Z <INFO> [744] {76f6b530} Router (3) ":tumbleweed" [::]:21010
