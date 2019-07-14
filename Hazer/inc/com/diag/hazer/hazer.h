@@ -293,7 +293,7 @@ typedef enum HazerSystem {
 #define HAZER_SYSTEM_NAME_INITIALIZER \
     { \
         "GNSS", \
-        "GPS", \
+        "NAVSTAR", \
         "GLONASS", \
         "GALILEO", \
         "COMPASS", \
