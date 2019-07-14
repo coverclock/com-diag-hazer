@@ -296,7 +296,7 @@ typedef enum HazerSystem {
         "GPS", \
         "GLONASS", \
         "GALILEO", \
-        "BEIDOU", \
+        "COMPASS", \
         "SBAS", \
         "IMES", \
         "7", \

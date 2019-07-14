@@ -4,12 +4,22 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # 
-# Just a quick way to peruse the log or the output from one of the Tumbleweed
+# ABSTRACT
+#
+# Helper script used to follow the log or the screens from the Tumbleweed
 # scripts.
 #
-#     peruse base out
-#     peruse rover out
-#     peruse router err
+# USAGE
+#
+#    peruse TASK FILE
+#
+# EXAMPLES
+#
+#    peruse base out
+#    peruse base err
+#    peruse rover out
+#    peruse rover err
+#    peruse router err
 
 PROGRAM=$(basename ${0})
 TASK=${1}
@@ -20,11 +30,11 @@ FILE=${2}
 LOG=$(readlink -e $(dirname ${0})/../log)
 
 if [[ "${FILE}" == "err" ]]; then
-	CMD="tail -f"
+    CMD="tail -f"
 elif [[ "${FILE}" == "out" ]]; then
-	CMD="headless"
+    CMD="headless"
 else
-	CMD="cat"
+    CMD="cat"
 fi
 
 exec ${CMD} ${LOG}/${TASK}.${FILE}
