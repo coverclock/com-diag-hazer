@@ -268,7 +268,7 @@ Footnotes:
 [6] Supports One Pulse Per Second (1PPS) by toggling digital output pin.    
 [7] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
 [8] Supports UBX.    
-[9] A software defined radio (SDR).
+[9] A software defined radio (SDR).    
 [10] Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* COMPASS (China) concurrently.    
 [11] This is a GNSS receiver against which I regression test Hazer.    
 
