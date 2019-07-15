@@ -1858,6 +1858,10 @@ Note that the UDP stream is not encrypted, nor is the source of the datagrams
 authenticated, so this mechanism is not secure. It should be. I'm pondering how
 best to accomplish that.
 
+Although Tumbleweed has been implemented using the Ardusimple SimpleRTK2B
+board, the same software runs on the SparkFun GPS-RTK2 board which uses the
+same U-blox UBX-ZED-F9P receiver chip.
+
 # Acknowledgements
 
 Special thanks to Mrs. Overclock for her assistance in road testing (literally)
