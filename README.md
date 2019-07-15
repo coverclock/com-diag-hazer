@@ -1695,12 +1695,13 @@ theoretically) capable of centimeter-level accuracy. One of the Pis is a
 stationary base station running its ZED-F9P in survey mode, one of the Pis is
 a mobile rover whose ZED-F9P receives RTK updates from the base station, and
 one of the Pis is a router that receives RTK updates from one base station
-and forwards them to one or more rovers.
+and forwards them to one or more rovers. (You can combine the base and the
+router on to one Pi, but I chose not to configure my set up that way.)
 
 The Tumbleweed router, which is on my LAN, must have a static IP address
 or a usable Dynamic DNS (DDNS) address (which is what I do) that can be
 reached through the firewall. ":tumbleweed" identifies the port on the
-localhost defined in /etc/services to which to receive and send RTK update
+localhost defined in /etc/services from which to receive and send RTK update
 datagrams.
 
     cd ~/src/com-diag-hazer/Hazer
@@ -1710,9 +1711,9 @@ datagrams.
 
 The Tumbleweed base is typically on my LAN, but can be on the WAN by changing
 the hostname through which the router is addressed. "tumbleweed:tumbleweed"
-idenfities the address of the router on the LAN defined in /etc/hosts, and the
-port on the router on the LAN defined in /etc/services, to which to send RTK
-update datagrams.
+idenfities the address of the router on the LAN as defined in /etc/hosts, and
+the port on the router on the LAN defined as in /etc/services, to which to send
+RTK update datagrams.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
@@ -1720,11 +1721,12 @@ update datagrams.
     peruse base err# Control-C to exit upon "Ready".
     peruse base out
 
-A Tumbleweed rover (there can be more than one) is on the WAN, and is agnostic
-as to the Internet connection (I use a USB LTE modem).
+A Tumbleweed rover (there can be more than one) is typically on the WAN, and is
+agnostic as to the Internet connection (I use a USB LTE modem).
 "tumbleweed.test:tumbleweed" stands in for the fully qualified domain name
-(FQDN) on the WAN resolved via DNS, and the port on the router to which send
-keep alive datagrams and receive RTK update datagrams defined in /etc/services.
+(FQDN) on the WAN as resolved via DNS, and the port on the router to which send
+keep alive datagrams and receive RTK update datagrams as defined in
+/etc/services.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
@@ -1734,56 +1736,55 @@ keep alive datagrams and receive RTK update datagrams defined in /etc/services.
 
 Note that the actual IP address of neither the base nor the rover need be
 known. This is important because the rover (and sometimes the base) is on
-the a mobile carrier WAN via an LTE modem. Not only can the IP address on the
-WAN not be known ahead of time until the modem connects to the carrier network,
-over the span of a long base survey, can take many many hours depending on the
-desired level of precision (configured via a UBX message defined in the base
-script), and the quality of the view of the sky afforded to the base. In my
-tests, with the base antenna set up in my front yard, an accuracy of
-ten centimeters (about four inches) requires about sixteen hours of "survey-in"
-time. During this time the mobile network can disconnect from the modem and
-reconnect, often with a different IP address. While the base and Tumbleweed
-router routinely deal with this, but it means the IP address you begin with in
-your survey will not be the one you end up with when the survey is complete or
-as the base sends subsequent updates to the rover.
+the a WAN, in my set up via an LTE modem to a mobile service provider. (Despite
+my best udev fu, these modems, working in end-user mode, worked like crap until
+I upgraded to Raspbian 10, at which point they worked flawlessly.) In this
+case, not only can the IP address on the WAN not be known ahead of time until
+the modem connects to the carrier network, over the span of a long base survey
+which can take many many hours depending on the desired level of precision
+(configured via a UBX message defined in the base script) and the quality of
+the view of the sky afforded to the base, the IP address provided by the WAN
+via DHCP, as well as the port number, may change. In my tests, with the base
+antenna set up in my front yard, an accuracy of ten centimeters (about four
+inches) requires about sixteen hours of "survey-in" time (your mileage may
+vary). During this time the mobile network can disconnect from the modem and
+reconnect. The base and Tumbleweed router routinely deal with this; but it
+means the IP address you begin with in your survey will not be the one you end
+up with when the survey is complete or as the base sends subsequent updates to
+the rover.
 
 The Tumbleweed router does require a fixed IP address for this to work. In my
 setup, the Tumbleweed router connects to my home IP router (in my case,
-directly via an Ethernet cable). But my IP router gets its globally routable
+directly via wired Ethernet). But my IP router gets its globally routable
 WAN IP address from my internet provider via DHCP. My IP router supports Dynamic
 DNS (DDNS), in which it automatically sends an notification to my DDNS provider
-who then changes the DNS database to map a fixed FQDN to the provided DHCP
-address. This FQDN is represented by "tumbleweed.test" above. I have configured
-the firewall in my IP router to forward the port used above to and from the
-same port on the static IP address on my LAN that I assigned to the
-Tumbleweed router.
+regarding the assigned IP address, who then changes the DNS database to map
+a fixed FQDN to the provided address. This FQDN is represented by
+"tumbleweed.test" above. I have configured the firewall in my IP router to 
+forward the port named "tumbleweed" above to and from the same port on the
+static IP address on my LAN that I assigned to the Tumbleweed router.
 
 I'm running all three, router, base, and rover, as simple background processes.
 But it is also possible to run them in daemon mode, in which case messages
-normally written to standard error are logged to the system log. Also,
-all three are run in "headless" mode, where the screens normally written to
-standard output are instead written to a file, and a script is used to
-display the file as it changes; this decouples the router, rover, and base
-software from the display terminal while still allowing an on-demand real-time
-display. (This requires that the inotify-tools package be installed on the Pi.)
-Both gpstool and rtktool can be run as daemons via a command line switch
-(although I have not done so in these examples) and the headless mode can still
+normally written to standard error are logged to the system log. Also, I run
+all three in "headless" mode, where the screens normally written to standard
+output are instead written to a file, and a script is used to display the file
+as it changes; this decouples the router, rover, and base software from the
+display terminal while still allowing an on-demand real-time display. (This
+requires that the inotify-tools package be installed on the Pi.)
+
+Both gpstool (which implements the base and the rover) and rtktool (which
+implements the router) can be run as daemons via a command line switch
+(although I have not done so in these examples); the headless mode can still
 be used.
 
-My prototype setup uses three Raspberry Pi 3B+ systems. My rover (and
-sometimes my base too) uses a NovaTel Wireless USB730L USB LTE modem with
-service from Verizon Wireless. (N.B. Despite my best efforts, these modems,
-working in end-user mode, worked like crap until I upgraded to Raspbian 10,
-at which point they worked flawlessly.) My router connects directly via
-wired Ethernet to my home access point/ IP router.
-
 As mentioned above, it is not unusual to see a WAN connected rover or base
-drop off and reappear on the WAN, often with a different port number or even
-an IP address. The router makes a note of this; here are the results of an
-overnight test. (The IPv4 addresses are expressed in IPv6 notation, which is
+drop off and reappear on the WAN, often with a different port number and
+IP address. The router makes a note of this; here are the results of an
+overnight test. The IPv4 addresses are expressed in IPv6 notation, which is
 what the router uses natively. Also, I've obfuscated portions of the WAN
-addresses. The base and rover can use either IPv4 or IPv6.) You can see the
-base and rover changing ports and even addresses, and even sometimes switching
+addresses. The base and rover can use either IPv4 or IPv6. You can see the
+base and rover changing ports and IP addresses, and even sometimes switching
 between the WAN and the LAN when they have access to both (the latter via my
 WiFI WLAN).
 
@@ -1834,16 +1835,16 @@ WiFI WLAN).
 When a client of the router changes its port or IP address, it appears to be
 a new rover or base. In the case of the rover, it is immediately registered
 with the router, which begins feeding it RTK updates from the current base.
-The old rover times out when no more keep alives are received, and it is
-removed from the list of active rovers on the router. In the case of the base,
-the new base is rejected until similarly the old base times out and is removed
-when no more updates are received; then the new base is registered on the
-router and its updates are used to feed the rovers.
+The entry for the old rover times out when no more keep alives are received,
+and it is removed from the list of active rovers on the router. In the case of
+the base, the new base is rejected until similarly the old base times out and
+is removed when no more updates are received, at which point the new base is
+registered on the router and its updates are used to feed the rovers.
 
 All internet communication is via UDP datagram. Each datagram contains one
 and only one fully validated RTCM message complete with checksum and preceeded
 by a four-byte sequence number. UDP datagrams received out of sequence are
-rejected by the receiver.
+dropped by the router or the rover.
 
 The internet route to the rover for RTK updates is determined by the address
 and port from which a keep alive is received by the router from the rover.
