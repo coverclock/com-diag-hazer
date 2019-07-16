@@ -624,7 +624,7 @@ static void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t 
         } else if  (va[system].channels == va[system].view) {
             /* Do nothing. */
         } else {
-            DIINUTO_LOG_WARNING("VIEW \"%s\" %u %u %u\n", HAZER_SYSTEM_NAME[system], va[system].pending, va[system].channels, va[system].view);
+            DIMINUTO_LOG_WARNING("VIEW \"%s\" %u %u %u\n", HAZER_SYSTEM_NAME[system], va[system].pending, va[system].channels, va[system].view);
         }
 #endif
 
@@ -895,6 +895,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
         int second = 0;
         uint64_t billionths = 0;
         char zone = '\0';
+        static int once = 0;
 
         zone = diminuto_time_zonename(0);
 
@@ -922,6 +923,15 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
 			fputc('\n', fp);
+
+			if (once) {
+				/* Do nothing. */
+			} else if (pa[system].tot_nanoseconds == 0) {
+				/* Do nothing. */
+			} else {
+				DIMINUTO_LOG_NOTICE("Time %04d-%02d-%02d %02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
+				once = !0;
+			}
 
 		}
     }
