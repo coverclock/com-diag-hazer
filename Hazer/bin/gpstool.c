@@ -924,11 +924,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
 			fputc('\n', fp);
 
-			if (once) {
-				/* Do nothing. */
-			} else if (pa[system].tot_nanoseconds == 0) {
-				/* Do nothing. */
-			} else {
+			if (!once) {
 				DIMINUTO_LOG_NOTICE("Time %04d-%02d-%02d %02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
 				once = !0;
 			}
