@@ -556,6 +556,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://youtu.be/RH2h5iHO6ZU>
 
+<https://youtu.be/ZTCrqXpKHec>
+
 # Build
 
 Clone and build Diminuto (used by gpstool although not by libhazer).
