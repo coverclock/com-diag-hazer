@@ -621,7 +621,7 @@ void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, 
     *billionthsp = nanodegrees;                                 /* Get billionths. */
 }
 
-void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp)
+void yodel_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp)
 {
 	int64_t nanodegrees = 0;
 

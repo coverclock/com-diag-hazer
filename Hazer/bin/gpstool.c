@@ -1198,10 +1198,10 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fputs("NGS", fp);
 
-        hazer_format_hppos2position(sp->payload.lat, sp->payload.latHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
+        yodel_format_hppos2position(sp->payload.lat, sp->payload.latHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
         fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'S' : 'N');
 
-        hazer_format_hppos2position(sp->payload.lon, sp->payload.lonHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
+        yodel_format_hppos2position(sp->payload.lon, sp->payload.lonHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
         fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'W' : 'E');
 
         fprintf(fp, "%29s", "");

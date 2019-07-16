@@ -231,7 +231,7 @@ int main(void)
 		int seconds = ~0;
 		int onehundredthousandsth = ~0;
 		int direction = 0;
-		hazer_format_hppos2position(397942134, 61, &degrees, &minutes, &seconds, &onehundredthousandsth, &direction);
+		yodel_format_hppos2position(397942134, 61, &degrees, &minutes, &seconds, &onehundredthousandsth, &direction);
 		assert(degrees == 39);
 		assert(minutes == 47);
 		assert(seconds == 39);
@@ -245,12 +245,15 @@ int main(void)
 		int seconds = ~0;
 		int onehundredthousandsth = ~0;
 		int direction = 0;
-		hazer_format_hppos2position(-1051533822, -87, &degrees, &minutes, &seconds, &onehundredthousandsth, &direction);
+		yodel_format_hppos2position(-1051533822, -87, &degrees, &minutes, &seconds, &onehundredthousandsth, &direction);
 		assert(degrees == 105);
 		assert(minutes == 9);
 		assert(seconds == 12);
 		assert(onehundredthousandsth == 17623);
 		assert(direction == -1);
+		/*
+		 * It pays to unit test: this uncovered a day-one bug in this function!
+		 */
 	}
 
 }

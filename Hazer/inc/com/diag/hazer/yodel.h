@@ -456,7 +456,7 @@ extern void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * deg
  * @param onehundredthousandsthp points to there the fractional seconds (0..99999) are stored.
  * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
  */
-extern void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp);
+extern void yodel_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp);
 
 /*******************************************************************************
  * PROCESSING UBX-MON-HW MESSAGES
