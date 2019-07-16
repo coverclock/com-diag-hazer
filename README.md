@@ -83,8 +83,8 @@ This software is an original work of its author(s).
 
 # Dependencies
 
-The Hazer library (including both Hazer and Yodel) depends on no more
-than the usual standard C, GNU, and POSIX libraries.
+The Hazer library, which includes the Hazer, Yodel, and Tumbleweed software
+stacks, depends on no more than the usual standard C, GNU, and POSIX libraries.
 
 The gpstool and rtktool utilities are built on top of the Hazer library
 and also my Diminuto library. Diminuto is a general purpose C-based systems
@@ -95,9 +95,9 @@ so much C code. I use Diminuto in virtually all of my C-based projects,
 and sometimes in other languages too that support C-linkage.  Portions of
 Diminuto have also shipped in products from several of my clients.
 
-Hazer (and Diminuto) have also been used in other Digital Aggregates
-projects that do have their own repositories, for example: Obelisk,
-Hourglass, Candleclock, Astrolabe, and Critter.
+Hazer (with Diminuto) has been used in other Digital Aggregates projects that
+have their own repositories: Obelisk, Hourglass, Candleclock, and Astrolabe.
+All of these have to do with precision timekeeping.
 
 # Versioning
 

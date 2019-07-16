@@ -704,7 +704,10 @@ install-include:
 
 unit-test:
 	R="PASSED."; \
+	mkdir -p $(OUT)/log; \
+	cp /dev/null $(OUT)/log/unit-test.log; \
 	for U in $(TARGETUNITTESTS); do \
-		$$U || R="FAILED!"; \
+		echo "UNIT TEST" $$U >> $(OUT)/log/unit-test.log; \
+		$$U >> $(OUT)/log/unit-test.log 2>&1 || R="FAILED!"; \
 	done; \
 	echo $$R 1>&2
