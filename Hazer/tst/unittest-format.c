@@ -249,7 +249,6 @@ int main(void)
 		assert(degrees == 105);
 		assert(minutes == 9);
 		assert(seconds == 12);
-		fprintf(stderr, "%d\n", onehundredthousandsth);
 		assert(onehundredthousandsth == 17623);
 		assert(direction == -1);
 	}

@@ -635,16 +635,16 @@ void hazer_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp,
 	 * longitude in deg * 10^-7 = lon + (lonHp * 10^2)
 	 */
 
-    if (whole < 0) {
-    	whole = -whole;
+    nanodegrees = whole;										        /* Get 10^-7 degrees. */
+    nanodegrees *= 100LL;                                               /* Convert to nanodegrees (10^-9). */
+    nanodegrees += fraction;                                            /* Add fraction already in nanodegrees. */
+
+    if (nanodegrees < 0) {
+    	nanodegrees = -nanodegrees;
         *directionp = -1;
     } else {
         *directionp = 1;
     }
-
-    nanodegrees = whole;										        /* Get 10^-7 degrees. */
-    nanodegrees *= 100LL;                                               /* Convert to nanodegrees (10^-9). */
-    nanodegrees += fraction;                                            /* Add fraction already in nanodegrees. */
 
     *degreesp = nanodegrees / 1000000000ULL;                            /* Get integral degrees. */
     nanodegrees = nanodegrees % 1000000000ULL;                          /* Remainder. */
