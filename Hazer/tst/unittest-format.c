@@ -175,11 +175,6 @@ int main(void)
 		hazer_format_nanominutes2degrees(2387652807660LL, &degrees, &tenmillionths);
 		assert(degrees == 39);
 		assert(tenmillionths == 7942134ULL);
-		/*
-		 * In real-life, on the UBX-ZED-F9P chip, as processed by Hazer, the
-		 * NMEA latitude differs from the UBX high precision latitude by ten-
-		 * millionth of a degree. It's a distance difference of < 5mm.
-		 */
 	}
 
 	{
@@ -202,11 +197,6 @@ int main(void)
 		hazer_format_nanominutes2degrees(-6309202937220LL, &degrees, &tenmillionths);
 		assert(degrees == -105);
 		assert(tenmillionths == 1533822ULL);
-		/*
-		 * In real-life, on the UBX-ZED-F9P chip, as processed by Hazer, the
-		 * NMEA longitude differs from the UBX high precision longitude by ten-
-		 * millionth of a degree. It's a distance difference of < 5mm.
-		 */
 	}
 
 	{
