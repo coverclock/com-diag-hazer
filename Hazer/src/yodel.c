@@ -602,16 +602,6 @@ void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, 
 {
 	int64_t nanodegrees = 0;
 
-	/*
-	 * Remarkably, the fractional part (lonHp, latHp) may not have the same
-	 * sign as the corresponding whole part (lon, lat) in the HPPOSLLH record.
-	 * I have no idea what this means, but I've seen it. I'm taking them at
-	 * their literal word because that's what agrees with the NMEA position
-	 * [UBX 9, pp. 145..146]:
-	 * latitude  in deg * 10^-7 = lat + (latHp * 10^2)
-	 * longitude in deg * 10^-7 = lon + (lonHp * 10^2)
-	 */
-
     nanodegrees = whole;                                        /* Get 10^-7 degrees. */
     nanodegrees *= 100LL;                                       /* Convert to nanodegrees (10^-9). */
     nanodegrees += fraction;                                    /* Add fraction already in nanodegrees. */
@@ -624,16 +614,6 @@ void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, 
 void yodel_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp)
 {
 	int64_t nanodegrees = 0;
-
-	/*
-	 * Remarkably, the fractional part (lonHp, latHp) may not have the same
-	 * sign as the corresponding whole part (lon, lat) in the HPPOSLLH record.
-	 * I have no idea what this means, but I've seen it. I'm taking them at
-	 * their literal word because that's what agrees with the NMEA position
-	 * [UBX 9, pp. 145..146]:
-	 * latitude  in deg * 10^-7 = lat + (latHp * 10^2)
-	 * longitude in deg * 10^-7 = lon + (lonHp * 10^2)
-	 */
 
     nanodegrees = whole;										        /* Get 10^-7 degrees. */
     nanodegrees *= 100LL;                                               /* Convert to nanodegrees (10^-9). */
