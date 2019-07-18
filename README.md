@@ -3,6 +3,8 @@ com-diag-hazer
 
 Parse common NMEA strings and other typical output from GNSS devices.
 
+# Thanks
+
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/coverclock)
 
 # Copyright
@@ -19,8 +21,12 @@ Chip Overclock
 Digital Aggregates Corporation    
 3440 Youngfield Street, Suite 209    
 Wheat Ridge CO 80033 USA    
-http://www.diag.com    
-mailto:coverclock@diag.com    
+<http://www.diag.com>    
+<mailto:coverclock@diag.com>    
+
+# Help
+
+<https://stackoverflow.com/questions/tagged/com-diag-hazer> [com-diag-hazer]
 
 # Abstract
 
@@ -79,7 +85,7 @@ by a four-byte sequence number carried over UDP datagrams.
 > I am frequently called to work upon. Hazer and gpstool have also turned
 > out to be really useful tools for testing and evaluating GPS devices.
 
-This software is an original work of its author(s).
+This software is an original work of its author.
 
 # Dependencies
 
