@@ -178,13 +178,13 @@ constellations and systems.
 These talkers have been observed in the wild coming from actual GPS receivers.
 
 * GA - Galileo (as in Galileo Galilei) - EU
-* GB - BeiDou (as in The Big Dipper) - China
+* GB - BeiDou 2 (as in The Big Dipper) a.k.a. COMPASS - China
 * GL - Globalnaya Navigazionnaya Sputnikovaya Sistema (GLONASS) - Russia
 * GN - Global Navigation Satellite System (GNSS) - Generic
 * GP - Global Positioning System (NavStar GPS) - USA
 
-Support for these talkers has been unit tested but has never been exercised
-using actual GPS receivers.
+Support for these talkers has been unit tested but the talkers have never been
+observed in the wild.
 
 * BD - BeiDou (as in The Big Dipper) - China
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
@@ -208,7 +208,7 @@ exercised using actual GPS receivers.
 * QZSS - 193..197
 * BeiDou - 201..235
 * Galileo - 301..336
-* BeiDou - 401..437
+* BeiDou 2 - 401..437
 
 However, receivers that implement the GSA System ID field introduced in
 NMEA 4.10 may reuse satellite identifiers (e.g. I see GPS and Galileo both
