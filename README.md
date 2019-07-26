@@ -1864,11 +1864,15 @@ used by SIP to route RTP packets via UDP to VoIP phones.)
 
 Note that the UDP stream is not encrypted, nor is the source of the datagrams
 authenticated, so this mechanism is not secure. It should be. I'm pondering how
-best to accomplish that.
+best to accomplish that. Probably DTLS.
 
 Although Tumbleweed has been implemented using the Ardusimple SimpleRTK2B
 board, the same software runs on the SparkFun GPS-RTK2 board which uses the
-same U-blox UBX-ZED-F9P receiver chip.
+same U-blox UBX-ZED-F9P receiver chip. Ublox has since introduced their own
+F9P application board, the C099-F9P, but I haven't tried it. Since I ended
+up implementing the inter-board communication channel on the Raspberry Pi,
+I don't need the support for various radio technologies that both the
+Ardusimple and the Ublox boards provide.
 
 # Acknowledgements
 
