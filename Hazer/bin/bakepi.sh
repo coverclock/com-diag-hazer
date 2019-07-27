@@ -8,8 +8,9 @@ PROGRAM=$(basename ${0})
 DELAY=${1:-"3"}
 
 while true; do
+	DEGREE=$'\u00B0'
 	TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%S)
-	TEMPERATURE=$(/opt/vc/bin/vcgencmd measure_temp | sed 's/^.*=//')
+	TEMPERATURE=$(/opt/vc/bin/vcgencmd measure_temp | sed "s/'/${DEGREE}/; s/^.*=//")
 	echo ${PROGRAM} ${TIMESTAMP}Z ${TEMPERATURE}
 	sleep ${DELAY}
 done
