@@ -377,7 +377,12 @@ int main(int argc, char * argv[])
 			 */
 
 			/*
-			 * Validate the datagram.
+			 * Validate the datagram. This is more complicated than it looks.
+			 * I'd really like to add end-to-end encryption to this data
+			 * stream. But to do so, I either have to have this utility be a
+			 * man-in-the-middle, decrypting and reencrypting the stream, or
+			 * else distribute the datagram without validation. I don't like
+			 * either option.
 			 */
 
 			if ((size = validate_datagram(&(thou->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {

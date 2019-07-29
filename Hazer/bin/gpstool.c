@@ -345,18 +345,23 @@ static void show_connection(const char * label, const char * option, int fd, pro
  * @param port is an IP UDP port.
  * @param buffer points to the sentence or packet.
  * @param size is the size of the sentence or packet.
+ * @return the size of the sent datagram in bytes or <0 if an error occurred.
  */
-static void send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
+static ssize_t send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
 {
+	ssize_t length = 0;
+
     if (size <= 0) {
         /* Do nothing. */
     } else if (protocol == IPV4) {
-        (void)diminuto_ipc4_datagram_send(fd, buffer, size, *ipv4p, port);
+        length = diminuto_ipc4_datagram_send(fd, buffer, size, *ipv4p, port);
     } else if (protocol == IPV6) {
-        (void)diminuto_ipc6_datagram_send(fd, buffer, size, *ipv6p, port);
+        length = diminuto_ipc6_datagram_send(fd, buffer, size, *ipv6p, port);
     } else {
         /* Do nothing. */
     }
+
+    return length;
 }
 
 /**
@@ -365,7 +370,7 @@ static void send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * i
  * @param fd is an open socket.
  * @param buffer points to the buffer.
  * @param size is the size of the buffer in bytes.
- * @return the size of the received datagram plus the terminating NUL in bytes.
+ * @return the size of the received datagram in bytes or <0 if an error occurred.
  */
 static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
     ssize_t length = 0;
@@ -881,8 +886,9 @@ static void print_status(FILE * fp, const yodel_status_t * sp)
  * @param pps is the current value of the 1PPS strobe.
  * @param dmyokay is true if the DMY field has been set.
  * @param totokay is true if time is monotonically increasing.
+ * @param bytes is the total number of bytes sent and received over the network.
  */
-static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyokay, int totokay)
+static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyokay, int totokay, uint64_t bytes)
 {
     unsigned int system = 0;
 
@@ -1087,8 +1093,9 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 			fprintf(fp, " %ddmy", dmyokay);
 			fprintf(fp, " %dinc", totokay);
 			fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
+			fprintf(fp, " %20llu", (unsigned long long)bytes); /* (2^64)-1 == 0xFFFFFFFFFFFFFFFF == 18,446,744,073,709,551,615. */
 
-			fprintf(fp, "%23s", "");
+			fprintf(fp, "%2s", "");
 
 			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -1417,11 +1424,11 @@ int main(int argc, char * argv[])
     protocol_t remote_protocol = PROTOCOL;
     datagram_buffer_t remote_buffer = DATAGRAM_BUFFER_INITIALIZER;
     ssize_t remote_total = 0;
+    ssize_t remote_size = 0;
+    ssize_t remote_length = 0;
     datagram_sequence_t remote_sequence = 0;
     const char * remote_option = (const char *)0;
     diminuto_ipc_endpoint_t remote_endpoint = { 0, };
-    ssize_t remote_size = 0;
-    ssize_t remote_length = 0;
     long remote_mask = NMEA;
     role_t role = ROLE;
     /*
@@ -1438,6 +1445,10 @@ int main(int argc, char * argv[])
     uint8_t surveyor_crc1 = 0;
     uint8_t surveyor_crc2 = 0;
     uint8_t surveyor_crc3 = 0;
+    /*
+     * Network variables.
+     */
+    uint64_t network_total = 0;
     /*
      * Keepalive variables.
      */
@@ -1616,7 +1627,7 @@ int main(int argc, char * argv[])
     hazer_active_t cache = HAZER_ACTIVE_INITIALIZER;
     int dmyokay = 0;
     int totokay = 0;
-    /*
+     /*
      * Counters.
      */
     unsigned int outoforder_counter = 0;
@@ -2566,7 +2577,10 @@ int main(int argc, char * argv[])
 			 * is a serious bug either in this software or in the transport.
 			 */
 
-			if ((remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer))) < sizeof(remote_buffer.header)) {
+			remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer));
+			if (remote_total > 0) { network_total += remote_total; }
+
+			if (remote_total < sizeof(remote_buffer.header)) {
 
 				DIMINUTO_LOG_WARNING("Remote Length [%zd]\n", remote_total);
 
@@ -2613,7 +2627,10 @@ int main(int argc, char * argv[])
 			 * Receive an RTCM datagram from a remote gpstool doing a survey.
 			 */
 
-			if ((surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer))) < sizeof(surveyor_buffer.header)) {
+			surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer));
+			if (surveyor_total > 0) { network_total += surveyor_total; }
+
+			if (surveyor_total < sizeof(surveyor_buffer.header)) {
 
 				DIMINUTO_LOG_WARNING("Surveyor Length [%zd]\n", surveyor_total);
 
@@ -2667,9 +2684,10 @@ int main(int argc, char * argv[])
 
         /*
          * If one of the input sources indicated end of file, we're done.
+         * (This may be the only time I've found a legitimate use for a goto.)
          */
 
-        if (eof) { break; }
+        if (eof) { goto report; }
 
         /*
          * At this point, either we have a buffer with a complete and validated
@@ -2712,7 +2730,8 @@ int main(int argc, char * argv[])
         } else {
 
         	stamp_datagram(&keepalive_buffer.header, &keepalive_sequence);
-            send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
+            surveyor_total = send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
+            if (surveyor_total > 0) { network_total += surveyor_total; }
             keepalive_was = keepalive_now;
 
             DIMINUTO_LOG_DEBUG("Surveyor RTCM keepalive sent");
@@ -2846,7 +2865,8 @@ int main(int argc, char * argv[])
         	datagram_buffer_t * dp;
         	dp = diminuto_containerof(datagram_buffer_t, payload, buffer);
         	stamp_datagram(&(dp->header), &remote_sequence);
-            send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
+            remote_total = send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
+            if (remote_total > 0) { network_total += remote_total; }
         }
 
         /**
@@ -3389,6 +3409,8 @@ int main(int argc, char * argv[])
          * Generate the display if necessary and sufficient reasons exist.
          */
 
+report:
+
         if (!refresh) {
             /* Do nothing. */
         } else if (slow && (display_was == (display_now = ticktock(frequency)))) {
@@ -3404,7 +3426,7 @@ int main(int argc, char * argv[])
                 print_hardware(out_fp, &hardware);
                 print_status(out_fp, &status);
                 print_local(out_fp, timetofirstfix);
-                print_positions(out_fp, position, onepps, dmyokay, totokay);
+                print_positions(out_fp, position, onepps, dmyokay, totokay, network_total);
                 print_solution(out_fp, &solution);
                 print_corrections(out_fp, &base, &rover, &kinematics, &updates);
                 print_actives(out_fp, active);
@@ -3429,6 +3451,8 @@ int main(int argc, char * argv[])
 
             refresh = 0;
         }
+
+        if (eof) { break; }
 
     }
 
