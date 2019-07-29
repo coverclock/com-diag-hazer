@@ -635,6 +635,7 @@ lines that need to be added to the indicated files.
 
 # Utilities
 
+* bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
 * base - configures and runs an Ardusimple SimpleRTK2B board as a fixed base.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
