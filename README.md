@@ -908,70 +908,79 @@ not in the transmitted almanac); and an '!' indicates that the signal
 strength was empty but displays as zero (some receivers use this to
 indicate the satellite is not being tracked).
 
-Here is another example, this one from a Ublox 9 receiver.
+Here is another example, this one from a Ublox 9 receiver, and reflecting some
+minor changes to the output format.
 
-    INP [173] \xd3\0\xa7C \0! \xf5\x02\0\0A\x15p\n\0\0\0\0 \0\x80\0=]ZZ::R\x92RZ\x
+    INP [ 14] \xd3\0\bL\xe0\0\x8a\0\0\0\0\xa8\xf7*
 
-    LOC 2019-07-01T08:35:34.144-07:00+01T          0/00:00:00.141 23.0.0   bodega
-    TIM 2019-07-01T14:35:33.000-00:00+00Z 0pps                             GNSS
-    POS 39°47'39.223"N, 105°09'12.193"W    39.7942286, -105.1533871        GNSS
-    ALT    5616.40'   1711.900m                                            GNSS
+    LOC 2019-07-29T10:25:35.055-07:00+01T          0/00:00:00.804 25.1.0   gold
+    TIM 2019-07-29T16:25:34.000-00:00+00Z 0pps                             GNSS
+    POS 39°47'39.239"N, 105°09'12.116"W    39.7942331, -105.1533656        GNSS
+    ALT    5616.73'   1712.000m                                            GNSS
     COG N     0.000000000°T    0.000000000°M                               GNSS
-    SOG       0.055mph       0.048000knots       0.088000kph               GNSS
-    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    HPP   39.794228712, -105.153387086 ±     1.3262m                       GNSS
-    HPA   1711.8725m ±     2.7076m                                         GNSS
-    NGS  39 47 39.22336(N) 105 09 12.19361(W)                              GNSS
-    BAS 1active 0valid      66587sec      66588obs      12.8868m           DGNSS
-    RTK 1074 [ 173] base     <73298732>                                    DGNSS
-    ACT [1]  {    13     1    28    18    11     8 } [ 6] [10] [30]        GPS
-    ACT [2]  {    17     7    19    30             } [ 4] [10] [30]        GPS
-    ACT [1]  {    74    73    85    84    66    75 } [ 6] [ 7] [30]        GLONASS
-    ACT [2]  {    65                               } [ 1] [ 7] [30]        GLONASS
-    ACT [1]  {    24     5     3    36     2     8 } [ 6] [ 9] [30]        GALILEO
-    ACT [2]  {    11    12    25                   } [ 3] [ 9] [30]        GALILEO
-    ACT [1]  {    24    26    29    12             } [ 4] [ 4] [30]        BEIDOU
-    DOP   0.96pdop   0.48hdop   0.83vdop                                   GPS
-    DOP   0.96pdop   0.48hdop   0.83vdop                                   GLONASS
-    DOP   0.96pdop   0.48hdop   0.83vdop                                   GALILEO
-    DOP   0.96pdop   0.48hdop   0.83vdop                                   BEIDOU
-    SAT [  1]     1id  29°elv  107°azm   30dBHz  6sig <                    GPS
-    SAT [  2]     4id   0°elv    0°azm   38dBHz  6sig   ?                  GPS
-    SAT [  3]     7id  47°elv  128°azm   37dBHz  6sig <                    GPS
-    SAT [  4]     8id  23°elv   45°azm   25dBHz  6sig <                    GPS
-    SAT [  5]     9id   4°elv  177°azm   31dBHz  6sig                      GPS
-    SAT [  6]    11id  46°elv   89°azm    0dBHz  6sig <   !                GPS
-    SAT [  7]    13id  35°elv  299°azm    0dBHz  6sig <   !                GPS
-    SAT [  8]    15id   9°elv  321°azm   17dBHz  6sig                      GPS
-    SAT [  9]    17id  35°elv  209°azm   34dBHz  6sig <                    GPS
-    SAT [ 10]    18id  28°elv   78°azm    0dBHz  6sig <   !                GPS
-    SAT [ 11]    19id  13°elv  211°azm    0dBHz  6sig <   !                GPS
-    SAT [ 12]    28id  63°elv  305°azm    0dBHz  6sig <   !                GPS
-    SAT [ 13]    30id  82°elv  113°azm   30dBHz  6sig <                    GPS
-    SAT [ 14]    65id  17°elv  264°azm   18dBHz  3sig <                    GLONASS
-    SAT [ 15]    66id  13°elv  324°azm   25dBHz  3sig <                    GLONASS
-    SAT [ 16]    72id   3°elv  223°azm   26dBHz  3sig                      GLONASS
-    SAT [ 17]    73id  18°elv   99°azm   19dBHz  3sig <                    GLONASS
-    SAT [ 18]    74id  54°elv   63°azm   28dBHz  3sig <                    GLONASS
-    SAT [ 19]    75id  44°elv  325°azm   33dBHz  3sig <                    GLONASS
-    SAT [ 20]    76id   2°elv  300°azm    0dBHz  3sig     !                GLONASS
-    SAT [ 21]    83id   6°elv   23°azm    0dBHz  3sig     !                GLONASS
-    SAT [ 22]    84id  53°elv   60°azm   35dBHz  3sig <                    GLONASS
-    SAT [ 23]    85id  46°elv  163°azm   36dBHz  3sig <                    GLONASS
-    SAT [ 24]     2id  19°elv  290°azm   26dBHz  2sig <                    GALILEO
-    SAT [ 25]     3id  27°elv  257°azm   28dBHz  2sig <                    GALILEO
-    SAT [ 26]     5id  13°elv  206°azm   31dBHz  2sig <                    GALILEO
-    SAT [ 27]     8id  15°elv  310°azm   19dBHz  2sig <                    GALILEO
-    SAT [ 28]    11id  44°elv  138°azm   39dBHz  2sig <                    GALILEO
-    SAT [ 29]    12id  37°elv   64°azm   30dBHz  2sig <                    GALILEO
-    SAT [ 30]    24id  46°elv   76°azm   27dBHz  2sig <                    GALILEO
-    SAT [ 31]    25id  64°elv  331°azm   37dBHz  2sig <                    GALILEO
-    SAT [ 32]    33id   2°elv   28°azm    0dBHz  2sig     !                GALILEO
-    SAT [ 33]    36id  11°elv  182°azm   33dBHz  2sig <                    GALILEO
-    SAT [ 34]    12id  29°elv  193°azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 35]    24id  27°elv  304°azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 36]    26id  75°elv  344°azm    0dBHz  0sig <   !                BEIDOU
-    SAT [ 37]    29id  33°elv   49°azm    0dBHz  0sig <   !                BEIDOU    
+    SOG       0.003mph       0.003000knots       0.005000kph               GNSS
+    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                67929b  GNSS
+    HPP   39.794233230, -105.153365665 ±     1.0083m                       GNSS
+    HPA   1712.0309m ±     2.0568m                                         GNSS
+    NGS  39 47 39.23962(N) 105 09 12.11639(W)                              GNSS
+    BAS 1active 0valid        974sec        975obs       6.4909m           DGNSS
+    RTK 1230 [  14] base     <rCERNrCE>                                    DGNSS
+    ACT [1]  {     2     3     6    12    17    19 } [ 6] [ 8] [24]        NAVSTAR
+    ACT [2]  {    24    28                         } [ 2] [ 8] [24]        NAVSTAR
+    ACT [1]  {    82    73    80    79    83       } [ 5] [ 5] [24]        GLONASS
+    ACT [1]  {     1    12    24    26    31    33 } [ 6] [ 6] [24]        GALILEO
+    ACT [1]  {    34    12    25    11    24       } [ 5] [ 5] [24]        COMPASS
+    DOP   1.14pdop   0.60hdop   0.97vdop                                   NAVSTAR
+    DOP   1.14pdop   0.60hdop   0.97vdop                                   GLONASS
+    DOP   1.14pdop   0.60hdop   0.97vdop                                   GALILEO
+    DOP   1.14pdop   0.60hdop   0.97vdop                                   COMPASS
+    SAT [  1]     2id  42°elv  210°azm    0dBHz  6sig <   !                NAVSTAR
+    SAT [  2]     3id  12°elv   45°azm   16dBHz  6sig <                    NAVSTAR
+    SAT [  3]     6id  78°elv  136°azm   36dBHz  6sig <                    NAVSTAR
+    SAT [  4]    12id  29°elv  311°azm   22dBHz  6sig <                    NAVSTAR
+    SAT [  5]    17id  48°elv   52°azm   31dBHz  6sig <                    NAVSTAR
+    SAT [  6]    19id  62°elv   33°azm    0dBHz  6sig <   !                NAVSTAR
+    SAT [  7]    22id   1°elv   31°azm    0dBHz  6sig     !                NAVSTAR
+    SAT [  8]    24id  40°elv  273°azm   29dBHz  6sig <                    NAVSTAR
+    SAT [  9]    28id  25°elv  120°azm    0dBHz  6sig <   !                NAVSTAR
+    SAT [ 10]    66id   8°elv   50°azm   17dBHz  3sig                      GLONASS
+    SAT [ 11]    67id   2°elv   97°azm   16dBHz  3sig                      GLONASS
+    SAT [ 12]    73id  43°elv  321°azm   29dBHz  3sig <                    GLONASS
+    SAT [ 13]    74id   2°elv  332°azm    0dBHz  3sig     !                GLONASS
+    SAT [ 14]    79id  14°elv  159°azm   35dBHz  3sig <                    GLONASS
+    SAT [ 15]    80id  65°elv  185°azm   37dBHz  3sig <                    GLONASS
+    SAT [ 16]    81id   5°elv   47°azm   17dBHz  3sig                      GLONASS
+    SAT [ 17]    82id  50°elv   24°azm   25dBHz  3sig <                    GLONASS
+    SAT [ 18]    83id  62°elv  275°azm   33dBHz  3sig <                    GLONASS
+    SAT [ 19]    84id  11°elv  238°azm   22dBHz  3sig                      GLONASS
+    SAT [ 20]     1id  44°elv  148°azm   42dBHz  2sig <                    GALILEO
+    SAT [ 21]    12id  36°elv  231°azm   39dBHz  2sig <                    GALILEO
+    SAT [ 22]    24id  26°elv  316°azm   33dBHz  2sig <                    GALILEO
+    SAT [ 23]    26id  35°elv   47°azm   25dBHz  2sig <                    GALILEO
+    SAT [ 24]    31id  78°elv  283°azm   38dBHz  2sig <                    GALILEO
+    SAT [ 25]    33id  87°elv  322°azm   34dBHz  2sig <                    GALILEO
+    SAT [ 26]    11id  37°elv  257°azm   35dBHz  3sig <                    COMPASS
+    SAT [ 27]    12id  54°elv   42°azm   44dBHz  3sig <                    COMPASS
+    SAT [ 28]    19id   5°elv   43°azm    0dBHz  3sig     !                COMPASS
+    SAT [ 29]    21id   4°elv  138°azm    0dBHz  3sig     !                COMPASS
+    SAT [ 30]    22id  12°elv   91°azm    0dBHz  3sig     !                COMPASS
+    SAT [ 31]    23id   8°elv  323°azm    0dBHz  3sig     !                COMPASS
+    SAT [ 32]    24id  50°elv  192°azm    0dBHz  3sig <   !                COMPASS
+    SAT [ 33]    25id  50°elv  291°azm    0dBHz  3sig <   !                COMPASS
+    SAT [ 34]    26id   9°elv  162°azm    0dBHz  3sig     !                COMPASS
+    SAT [ 35]    34id  62°elv  274°azm    0dBHz  3sig <   !                COMPASS
+    SAT [ 36]    35id   6°elv   63°azm    0dBHz  3sig     !                COMPASS
+
+The string used to identify the U.S. Navstar GPS constellation has been
+changed from "GPS" to "NAVSTAR". The string used to identify the Chinese
+constellation has been changed from "BEIDOU" to "COMPASS" to reflect the
+nomenclature change by China for its second generation constellation. The
+string "DGNSS" identifies lines specific to Differential GNSS.
+
+INT now includes the total number of bytes sent and received - 67929 in this
+example - over the network. This allows you to keep track of your network
+utilization, especially important when paying for data on your LTE mobile
+provider.
 
 HPP and HPA (if present and enabled) show the high precision position and
 altitude available from some Ublox devices, along with their estimated
