@@ -1767,7 +1767,7 @@ int main(int argc, char * argv[])
             readonly = 0;
             surveyor_option = optarg;
             rc = diminuto_ipc_endpoint(surveyor_option, &surveyor_endpoint);
-            if (remote_endpoint.udp <= 0) { rc = -1; errno = EINVAL; }
+            if (surveyor_endpoint.udp <= 0) { rc = -1; errno = EINVAL; }
             if (rc < 0) { diminuto_perror(optarg); error = !0; }
             break;
         case 'b':

@@ -6,7 +6,7 @@
 # Configure and run the Ardusimple SimpleRTK2B as a mobile Rover.
 
 PROGRAM=$(basename ${0})
-ROUTER=${1:-"tumbleweed.test:tumbleweed"}
+ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
 
