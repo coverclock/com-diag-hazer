@@ -552,6 +552,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.gsc-europa.eu/system-status/Constellation-Information>
 
+<https://en.wikipedia.org/wiki/North_American_Plate>
+
 # Soundtrack
 
 <https://youtu.be/FB-nXQc6LMU>
@@ -1718,7 +1720,7 @@ router on to one Pi, but I chose not to configure my set up that way.)
 
 The Tumbleweed router, which is on my LAN, must have a static IP address
 or a usable Dynamic DNS (DDNS) address (which is what I do) that can be
-reached through the firewall. ":tumbleweed" identifies the port on the
+reached through the firewall. ":tumbleweed" identifies the service on the
 localhost defined in /etc/services from which to receive and send RTK update
 datagrams.
 
@@ -1728,28 +1730,29 @@ datagrams.
     peruse router err
 
 The Tumbleweed base is typically on my LAN, but can be on the WAN by changing
-the hostname through which the router is addressed. "tumbleweed:tumbleweed"
-idenfities the address of the router on the LAN as defined in /etc/hosts, and
-the port on the router on the LAN defined as in /etc/services, to which to send
-RTK update datagrams.
+the hostname through which the router is addressed. "tumbleweed:" idenfities
+the hostname of the router on the LAN as defined in /etc/hosts, and
+":tumbleweed" the service on the router on the LAN defined as in /etc/services
+(typically I defined this to be port 21010) to which to send RTK update
+datagrams.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     base tumbleweed:tumbleweed &
-    peruse base err# Control-C to exit upon "Ready".
+    peruse base err# Control-C to exit upon seeing "Ready".
     peruse base out
 
 A Tumbleweed rover (there can be more than one) is typically on the WAN, and is
 agnostic as to the Internet connection (I use a USB LTE modem).
-"tumbleweed.test:tumbleweed" stands in for the fully qualified domain name
-(FQDN) on the WAN as resolved via DNS, and the port on the router to which send
-keep alive datagrams and receive RTK update datagrams as defined in
-/etc/services.
+"tumbleweed.test:" stands in for the fully qualified domain name (FQDN) on the
+WAN as (for me) defined by DDNS and resolved via DNS, and ":tumbleweed" the
+service on the router to which send keep alive datagrams and receive RTK update
+datagrams as defined in /etc/services.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     rover tumbleweed.test:tumbleweed &
-    peruse rover err# Control-C to exit upon "Ready".
+    peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
 
 Note that the actual IP address of neither the base nor the rover need be
