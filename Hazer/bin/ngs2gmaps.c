@@ -28,6 +28,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #include <locale.h>
 #include <wchar.h>
@@ -36,6 +37,8 @@ static const wchar_t DEGREE = 0x00B0; /* %lc */
 
 int main(int argc, char * argv[])
 {
+	const char * program = (const char *)0;
+	int debug = 0;
 	char * ss;
 	char * latdeg = (char *)0;
 	char * latmin = (char *)0;
@@ -48,9 +51,27 @@ int main(int argc, char * argv[])
 
     setlocale(LC_ALL, "");
 
-	while (--argc > 0) {
+    program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
+    argv++;
+    argc--;
 
-		ss = *(++argv);
+    if ((argc > 0) && (strcmp(*argv, "-?") == 0)) {
+		fprintf(stderr, "usage: %s [ -? ] [ -d ] NGS [ NGS ... ]\n", program);
+		argv++;
+		argc--;
+    }
+
+    if ((argc > 0) && (strcmp(*argv, "-d") == 0)) {
+		debug = !0;
+		argv++;
+		argc--;
+    }
+
+	while (argc-- > 0) {
+
+		ss = *(argv++);
+
+		if (debug) { fprintf(stderr, "%s: \"%s\"\n", program, ss); }
 
 		do {
 
@@ -132,11 +153,9 @@ int main(int argc, char * argv[])
 			if (*ss != ')') { break; }
 			*(ss++) = '\0';
 
-			printf("%s%lc%s'%s\"%s, %s%lc%s'%s\"%s", latdeg, DEGREE, latmin, latsec, latdir, londeg, DEGREE, lonmin, lonsec, londir);
+			printf("%s%lc%s'%s\"%s, %s%lc%s'%s\"%s\n", latdeg, DEGREE, latmin, latsec, latdir, londeg, DEGREE, lonmin, lonsec, londir);
 
 		} while (0);
-
-		fputc('\n', stdout);
 
 	}
 }
