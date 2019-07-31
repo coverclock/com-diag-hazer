@@ -22,6 +22,9 @@
  *
  * REFERENCES
  *
+ * Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
+ * 2013-01, 87.1, pp. 43..55
+ *
  * <https://geographiclib.sourceforge.io>
  *
  * <https://geographiclib.sourceforge.io/html/C/inverse_8c_source.html>
