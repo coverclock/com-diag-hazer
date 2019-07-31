@@ -81,7 +81,8 @@ by a four-byte sequence number carried over UDP datagrams.
 > I am frequently called to work upon. Hazer and gpstool have also turned
 > out to be really useful tools for testing and evaluating GPS devices.
 
-This software is an original work of its author.
+This software is an original work of its author and the Digital Aggregates
+Corporation PNT division.
 
 # Dependencies
 
@@ -641,9 +642,10 @@ lines that need to be added to the indicated files.
 * base - configures and runs an Ardusimple SimpleRTK2B board as a fixed base.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
-* distance - computes the distance in meters between two coordinates.
+* dms2ds - converts coordinates in degrees minutes seconds to  decimal degrees.
 * gpstool - serves as Hazer's all purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
+* haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
 * headless - uses inotifywait to watch headless output.
 * ngs2gmaps - converts NGS coordinates to a form usable in Google Maps.
@@ -974,7 +976,8 @@ minor changes to the output format.
     SAT [ 36]    35id   6°elv   63°azm    0dBHz  3sig     !                COMPASS
 
 The string used to identify the U.S. Navstar GPS constellation has been
-changed from "GPS" to "NAVSTAR". The string used to identify the Chinese
+changed from "GPS" to "NAVSTAR" to discriminate it from the (incorrect)
+generic use of GPS to mean GNSS. The string used to identify the Chinese
 constellation has been changed from "BEIDOU" to "COMPASS" to reflect the
 nomenclature change by China for its second generation constellation. The
 string "DGNSS" identifies lines specific to Differential GNSS.

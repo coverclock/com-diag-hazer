@@ -19,7 +19,12 @@
  *
  * USAGE
  *
+ * ngs2gmaps STRING
+ *
+ * EXAMPLE
+ *
  * ngs2gmaps '39 43 28.76565(N)    105 09 45.24156(W)'
+ * 39°43'28.76565"N, 105°09'45.24156"W
  */
 
 #include <stdio.h>
@@ -46,8 +51,6 @@ int main(int argc, char * argv[])
 	while (--argc > 0) {
 
 		ss = *(++argv);
-
-		fputs(ss, stdout);
 
 		do {
 
@@ -90,8 +93,6 @@ int main(int argc, char * argv[])
 			if (*ss != ')') { break; }
 			*(ss++) = '\0';
 
-			/* TODO */
-
 			while ((*ss != '\0') && (isspace(*ss))) { ++ss; }
 			if (*ss == '\0') { break; }
 			if (!isdigit(*ss)) { break; }
@@ -131,7 +132,7 @@ int main(int argc, char * argv[])
 			if (*ss != ')') { break; }
 			*(ss++) = '\0';
 
-			printf(" : %s%lc%s'%s\"%s, %s%lc%s'%s\"%s", latdeg, DEGREE, latmin, latsec, latdir, londeg, DEGREE, lonmin, lonsec, londir);
+			printf("%s%lc%s'%s\"%s, %s%lc%s'%s\"%s", latdeg, DEGREE, latmin, latsec, latdir, londeg, DEGREE, lonmin, lonsec, londir);
 
 		} while (0);
 

@@ -9,12 +9,13 @@
  *
  * ABSTRACT
  *
- * distance computes the distance between two points on the Earth identified
+ * haversine computes the distance between two points on the Earth identified
  * by their respective latitudes and longitudes expressed in decimal degrees.
  * (These arguments can be cut and pasted directly from the POS or HPP fields
  * in the gpstool output.) The computation is performed in double precision
- * floating point using the haversine formula based on spherical trigonometry.
- * The output is expressed in meters.
+ * floating point using the haversine formula based on great circle routes and
+ * spherical trigonometry. The output is expressed in meters. It does *not*
+ * take into account the elliptical shape of the Earth as does WGS84.
  *
  * REFERENCES
  *
@@ -30,11 +31,12 @@
  *
  * USAGE
  *
- * distance [ -? ] [ -d ] LAT1 LON1 LAT2 LON2
+ * haversine [ -? ] [ -d ] LATDD1 LONDD1 LATDD2 LONDD2
  *
  * EXAMPLE
  *
- * distance 39.794366985, -105.153063138 39.794237168, -105.153370541
+ * haversine 39.794366985, -105.153063138 39.794237168, -105.153370541
+ * 30.002282
  */
 
 #include <stdio.h>
@@ -65,7 +67,7 @@ int main(int argc, char * argv[])
     argc--;
 
     if ((argc > 0) && (strcmp(*argv, "-?") == 0)) {
-		fprintf(stderr, "usage: %s [ -? ] [ -d ] LAT1 LON1 LAT2 LON2\n", program);
+		fprintf(stderr, "usage: %s [ -? ] [ -d ] LATDD1 LONDD1 LATDD2 LONDD2\n", program);
 		argv++;
 		argc--;
     }
