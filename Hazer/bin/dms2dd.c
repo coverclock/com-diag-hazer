@@ -9,6 +9,9 @@
  *
  * ABSTRACT
  *
+ * Simple utility to convert coordinates from degrees minutes seconds to
+ * decimal degrees.
+ *
  * USAGE
  *
  * dms2dd [ -? ] [ -d ] LATD LATM LATDS N|S LOND LONM LONDS E|W
