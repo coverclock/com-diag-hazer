@@ -149,7 +149,7 @@ int main(int argc, char * argv[])
 		londir = *arg;
 
 		if (debug) {
-			fprintf(stderr, "%s: %ld %ld %f %c %ld %ld %f %c\n", program, latd, latm, latds, latdir, lond, lonm, londs, londir);
+			fprintf(stderr, "%s: latd=%ld latm=%ld lads=%f ladir=%c lond=%ld lonm=%ld londs=%f londir=%c\n", program, latd, latm, latds, latdir, lond, lonm, londs, londir);
 		}
 
 		printf("%.9f, %.9f\n", lat, lon);

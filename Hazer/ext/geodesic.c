@@ -77,6 +77,8 @@ int main(int argc, char ** argv) {
     		argc--;
         }
 
+        if (debug) { fprintf(stderr, "%s: a=%.15f f=%.15f\n", program, a, f); }
+
 		if ((argc--) <= 0) { break; }
 		arg = *(argv++);
 		lat1 = strtold(arg, &end);
@@ -105,7 +107,7 @@ int main(int argc, char ** argv) {
 		if (*end != '\0') { break; }
 		if (!((-180.0 <= lon2) && (lon2 <= 180.0))) { break; }
 
-		if (debug) { fprintf(stderr, "%.15f %.15f %.15f %.15f\n", lat1, lon1, lat2, lon2); }
+		if (debug) { fprintf(stderr, "%s: lat1=%.15f lon1=%.15f lat2=%.15f lon2=%.15f\n", program, lat1, lon1, lat2, lon2); }
 
 		geod_init(&g, a, f);
 
