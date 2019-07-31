@@ -116,7 +116,9 @@ int main(int argc, char ** argv) {
 
 	    geod_inverse(&g, lat1, lon1, lat2, lon2, &s12, &azi1, &azi2);
 
-	    printf("%.15f %.15f %.10f\n", azi1, azi2, s12);
+		if (debug) { fprintf(stderr, "%s: azi1=%.15f azi2=%.15f\n", program, azi1, azi2); }
+
+	    printf("%.10f\n", s12);
 
 	    xc = 0;
 
