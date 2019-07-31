@@ -46,8 +46,8 @@ int main(int argc, char ** argv) {
     int xc = 1;
     const char * program = (const char *)0;
     int debug = 0;
-    double a = 6378137; /* WGS84 */
-    double f = 1.0 / 298.257223563; /* WGS84 */
+    double a = 6378137; /* WGS84 equatorial radius in meters. */
+    double f = 1.0 / 298.257223563; /* WGS84 ellipsoidal flattening. */
     double lat1 = 0.0;
     double lon1 = 0.0;
     double azi1 = 0.0;
