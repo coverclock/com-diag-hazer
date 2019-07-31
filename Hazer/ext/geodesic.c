@@ -9,15 +9,16 @@
  *
  * ABSTRACT
  *
- * geodesic computes the azimuths and the distance between two points on the
- * Earth identified by their respective latitudes and longitudes expressed in
- * decimal degrees. (These arguments can be cut and pasted directly from the
+ * geodesic computes the azimuths for, and the distance between, two points on
+ * the Earth identified by their respective latitudes and longitudes expressed
+ * in decimal degrees. (These arguments can be cut and pasted directly from the
  * POS or HPP fields in the gpstool output.) The computation is performed in
  * double precision floating point using the geodesic algorithms from
  * GeographicLib authored by Charles Karney. The output is expressed in meters.
- * The geodesic is based on the elliptical shape of the Earth as defined by
- * WGS84. This is not part of the normal Hazer build and requires Mr. Karney's
- * library.
+ * The geodesic distance is based on the elliptical shape of the Earth as
+ * defined by WGS84. This is not part of the normal Hazer build and requires
+ * Mr. Karney's library. Compare this with the result produced by the great
+ * circle computation performed by the haversine utility.
  *
  * REFERENCES
  *
