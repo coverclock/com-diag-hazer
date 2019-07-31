@@ -426,6 +426,9 @@ RTCM-SC104, 2015-07-14
 Elliott D. Kaplan ed., *Understanding GPS principles and Applications*, Artech
 House, 1996
 
+Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
+2013-01, 87.1, pp. 43..55
+
 Greg Milner, *Pinpoint: How GPS is Changing Technology, Culture, and Our Minds*,
 W. W. Norton, 2017-05-16
 
@@ -555,6 +558,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://en.wikipedia.org/wiki/North_American_Plate>
 
+<https://cs.nyu.edu/visual/home/proj/tiger/gisfaq.html>
+
 # Soundtrack
 
 <https://youtu.be/FB-nXQc6LMU>
@@ -615,6 +620,7 @@ lines that need to be added to the indicated files.
 * bin - utility source files.
 * cfg - configuration makefiles.
 * dat - NMEA and UBX output captured from actual receivers.
+* ext - sources for extra files not part of this library.
 * fun - functional test source files.
 * inc - public header files.
 * out - build artifacts.
@@ -627,6 +633,7 @@ lines that need to be added to the indicated files.
 * out/TARGET/arc - object file archives for static linking.
 * out/TARGET/bin - utility stripped binary executables and scripts.
 * out/TARGET/dep - make dependencies.
+* out/TARGET/ext - executables of extra files if you choose to compile them.
 * out/TARGET/fun - functional test binary executables and scripts.
 * out/TARGET/gen - generated source files.
 * out/TARGET/inc - include (header) files.
@@ -692,6 +699,10 @@ lines that need to be added to the indicated files.
 * ublox8 - exercises any Ublox 8 device.
 * ublox9 - exercises any Ublox 9 device.
 * uputronics - exercises the Uputronics GPS board for the Rasperry Pi.
+
+# Extras
+
+* geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
 
 # Help
 
