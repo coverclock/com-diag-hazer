@@ -87,7 +87,9 @@ Corporation PNT division.
 # Dependencies
 
 The Hazer library, which includes the Hazer, Yodel, and Tumbleweed software
-stacks, depends on no more than the usual standard C, GNU, and POSIX libraries.
+stacks, depends on no more than the usual standard C, GNU, and POSIX libraries
+and commands that come as part of (for example) the full Raspbian 10 (based
+on Debian "Buster") install for the Raspberry Pi.
 
 The gpstool and rtktool utilities are built on top of the Hazer library
 and also my Diminuto library. Diminuto is a general purpose C-based systems
@@ -98,9 +100,9 @@ so much C code. I use Diminuto in virtually all of my C-based projects,
 and sometimes in other languages too that support C-linkage.  Portions of
 Diminuto have also shipped in products from several of my clients.
 
-Hazer (with Diminuto) has been used in other Digital Aggregates projects that
-have their own repositories: Obelisk, Hourglass, Candleclock, and Astrolabe.
-All of these have to do with precision timekeeping.
+If you run the peruse script on a Raspberry Pi running the full version of
+Rasbian 10 (based on Debian "Buster"), you will still need to install the
+inotify tools: sudo apt-get install inotify-tools .
 
 # Versioning
 
@@ -329,7 +331,7 @@ Raspbian 9.8 "Stretch"
 Linux 4.14.98    
 gcc 6.3.0    
 
-"Jefe"    
+"ElJefe"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.9 "Stretch"    
@@ -355,6 +357,14 @@ Intel NUC7i7BNH
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
 Ubuntu 19.04 "Disco Dingo"   
 Linux 5.0.0    
+gcc 8.3.0    
+
+"Rhodium"    
+Raspberry Pi 4 Model B    
+ARMv8 64-bit    
+Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.58    
 gcc 8.3.0    
 
 # Articles
