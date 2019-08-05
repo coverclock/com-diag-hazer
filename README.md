@@ -469,6 +469,22 @@ ublox, 6cc4473, 2018-12-20
 u-blox 9 integration, "ZED-F9P Integration Manual", UBX-18010802-R03,
 ublox, 2018-12-20
 
+# Tools
+
+<https://www.notams.faa.gov/dinsQueryWeb/>
+
+<https://pilotweb.nas.faa.gov/PilotWeb/noticesAction.do?queryType=ALLGPS&formatType=ICAO>
+
+<https://www.navcen.uscg.gov/?pageName=gpsAlmanacs>
+
+<https://navcen.uscg.gov/?Do=constellationStatus>
+
+<https://celestrak.com/GPS/NANU/description.php>
+
+<https://www.gsc-europa.eu/system-status/Constellation-Information>
+
+<https://www.ngs.noaa.gov/NGSDataExplorer/>
+
 # Resources
 
 <http://www.catb.org/gpsd/NMEA.txt>
@@ -493,8 +509,6 @@ ublox, 2018-12-20
 
 <https://github.com/mvglasow/satstat/wiki/NMEA-IDs>
 
-<https://pilotweb.nas.faa.gov/PilotWeb/noticesAction.do?queryType=ALLGPS&formatType=ICAO>
-
 <https://www.rapidtables.com/convert/number/degrees-to-degrees-minutes-seconds.html>
 
 <https://in-the-sky.org/satmap_radar.php> Note: when using the "Live
@@ -513,14 +527,6 @@ astronomers in the audience, but it wasn't to me.
 <https://gssc.esa.int/navipedia/index.php/GPS_Navigation_Message>
 
 <ftp://ftp.agi.com/pub/Catalog/Almanacs/SEM/GPSAlmanac.al3>
-
-<https://www.navcen.uscg.gov/?pageName=gpsAlmanacs>
-
-<https://www.notams.faa.gov/dinsQueryWeb/>
-
-<https://navcen.uscg.gov/?Do=constellationStatus>
-
-<https://celestrak.com/GPS/NANU/description.php>
 
 <https://www.rtca.org/sites/default/files/intentional_gps_interference_approved.pdf>
 
@@ -552,8 +558,6 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.digi.com/resources/documentation/Digidocs/90001456-13/concepts/c_transparent_mode_detailed.htm?tocpath=XBee%20transparent%20mode%7CXBee%20transparent%20mode%20in%20detail%7C_____0>
 
-<https://www.ngs.noaa.gov/NGSDataExplorer/>
-
 <https://github.com/digidotcom/xbee_ansic_library>
 
 <https://github.com/ukyg9e5r6k7gubiekd6/gpsd/blob/master/crc24q.c>
@@ -563,8 +567,6 @@ astronomers in the audience, but it wasn't to me.
 <https://www.movable-type.co.uk/scripts/latlong.html>
 
 <https://en.wikipedia.org/wiki/Haversine_formula>
-
-<https://www.gsc-europa.eu/system-status/Constellation-Information>
 
 <https://en.wikipedia.org/wiki/North_American_Plate>
 
