@@ -14,6 +14,10 @@
  * stationary base station running in survey mode. The datagrams are sent to
  * the port identified as the source of periodic keepalives sent from each
  * rover to the router.
+ *
+ * EXAMPLES
+ *
+ * rtktool -p :21010 -t 30
  */
 
 #undef NDEBUG
