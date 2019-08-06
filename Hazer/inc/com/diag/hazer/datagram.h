@@ -1,6 +1,6 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
-#ifndef _H_COM_DIAG_HAZER_COMMON_
-#define _H_COM_DIAG_HAZER_COMMON_
+#ifndef _H_COM_DIAG_HAZER_DATAGRAM_
+#define _H_COM_DIAG_HAZER_DATAGRAM_
 
 /**
  * @file
@@ -12,9 +12,8 @@
  *
  * This file is part of the Digital Aggregates Corporation Hazer package.
  *
- * This file is not in the inc or src directory because Hazer has a rule
- * about not creating a dependency to Diminuto in the resulting archive or
- * shared object.
+ * This file has some definitions common to both gpstool and rtktool that
+ * are pertinent to handling datagrams.
  *
  * It turns out to be remarkably difficult to solve the sequence number
  * wrap (roll over) problem for the general case. This code borrows from
@@ -23,12 +22,12 @@
  * RFC1323.
  */
 
+#include <stdint.h>
+#include <stddef.h>
 #include <arpa/inet.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/tumbleweed.h"
-#include "com/diag/diminuto/diminuto_types.h"
-#include "com/diag/diminuto/diminuto_log.h"
 
 /*******************************************************************************
  * DATAGRAM BUFFER
@@ -96,32 +95,7 @@ typedef struct DatagramBuffer {
  * @param missingp points to the Missing counter.
  * @return the size of the actual payload of the buffer or <0 if out of order.
  */
-static ssize_t validate_datagram(datagram_sequence_t * expectedp, datagram_header_t * header, ssize_t length, unsigned int * outoforderp, unsigned int * missingp)
-{
-	ssize_t result = -1;
-	datagram_sequence_t actual = 0;
-	datagram_sequence_t gap = 0;
-	static const datagram_sequence_t THRESHOLD = ((datagram_sequence_t)1) << ((sizeof(datagram_sequence_t) * 8) - 1);
-
-	// (EXPECTED < ACTUAL) if (0 < (ACTUAL - EXPECTED) < THRESHOLD)
-
-	actual = ntohl(header->sequence);
-	if (actual == *expectedp) {
-		*expectedp = *expectedp + 1;
-		result = length - sizeof(datagram_header_t);
-	} else {
-		gap = actual - *expectedp;
-		if (gap < THRESHOLD) {
-			*missingp += gap;
-			*expectedp = actual + 1;
-			result = length - sizeof(datagram_header_t);
-		} else {
-			*outoforderp += 1;
-		}
-	}
-
-	return result;
-}
+ssize_t datagram_validate(datagram_sequence_t * expectedp, datagram_header_t * header, ssize_t length, unsigned int * outoforderp, unsigned int * missingp);
 
 /**
  * Generate a sequence number and store it in the sequence field of the
@@ -129,10 +103,6 @@ static ssize_t validate_datagram(datagram_sequence_t * expectedp, datagram_heade
  * @param buffer points to the datagram buffer.
  * @param expectedp points to the expected sequence number.
  */
-static void stamp_datagram(datagram_header_t * buffer, datagram_sequence_t * expectedp)
-{
-	buffer->sequence = htonl(*expectedp);
-	*expectedp += 1;
-}
+void datagram_stamp(datagram_header_t * buffer, datagram_sequence_t * expectedp);
 
 #endif

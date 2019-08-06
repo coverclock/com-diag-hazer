@@ -13,8 +13,7 @@
  * This file is part of the Digital Aggregates Corporation Hazer package.
  */
 
-#include "com/diag/hazer/yodel.h"
-#include "com/diag/hazer/tumbleweed.h"
+#include "com/diag/hazer/datagram.h"
 #include "com/diag/diminuto/diminuto_list.h"
 
 /*******************************************************************************

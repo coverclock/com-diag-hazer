@@ -21,19 +21,20 @@
 #undef NDEBUG
 #include <assert.h>
 #include "com/diag/diminuto/diminuto_dump.h"
-
-static const wchar_t DEGREE = 0x00B0;
+#include "com/diag/hazer/coordinates.h"
 
 const char EXAMPLE_HPP_LATITUDE[] = "39.794234216";
 const char EXAMPLE_HPP_LONGITUDE[] = "-105.153377669";
+
 const char EXAMPLE_NGS_LATITUDE[] = "39 47 39.24317(N)";
 const char EXAMPLE_NGS_LONGITUDE[] = "105 09 12.15960(W)";
+
 const char EXAMPLE_POS_LATITUDE[] = "39°47'39.243\"N";
 const char EXAMPLE_POS_LONGITUDE[] = "105°09'12.159\"W";
 
-const char COM_DIAG_HAZER_SCANF_HPP[] = "%lf";
-const char COM_DIAG_HAZER_SCANF_NGS[] = "%u %u %lf(%c)";
-const char COM_DIAG_HAZER_SCANF_POS[] = "%u\u00B0%u'%lf\"%c";
+const char EXAMPLE_HPP[] = "39.794212196, -105.153349930";
+const char EXAMPLE_NGS[] = "39 47 39.16390(N) 105 09 12.05974(W)";
+const char EXAMPLE_POS[] = "39°47'39.163\"N, 105°09'12.060\"W";
 
 int main(int argc, char * argv[])
 {
@@ -42,8 +43,8 @@ int main(int argc, char * argv[])
 		int longituderc = 0;
 		double latitude = 0.0;
 		double longitude = 0.0;
-		latituderc = sscanf(EXAMPLE_HPP_LATITUDE, COM_DIAG_HAZER_SCANF_HPP, &latitude);
-		longituderc = sscanf(EXAMPLE_HPP_LONGITUDE, COM_DIAG_HAZER_SCANF_HPP, &longitude);
+		latituderc = sscanf(EXAMPLE_HPP_LATITUDE, COORDINATES_FORMAT_HPP, &latitude);
+		longituderc = sscanf(EXAMPLE_HPP_LONGITUDE, COORDINATES_FORMAT_HPP, &longitude);
 		fprintf(stderr, "HPP LATITUDE=\"%s\"[%d] latitude=%.9f LONGITUDE=\"%s\"[%d] longitude=%.9f\n", EXAMPLE_HPP_LATITUDE, latituderc, latitude, EXAMPLE_HPP_LONGITUDE, longituderc, longitude);
 		assert(latituderc == 1);
 		assert(latitude == 39.794234216);
@@ -62,8 +63,8 @@ int main(int argc, char * argv[])
 		double longitudeseconds = 0.0;
 		char latitudedirection = '\0';
 		char longitudedirection = '\0';
-		latituderc = sscanf(EXAMPLE_NGS_LATITUDE, COM_DIAG_HAZER_SCANF_NGS, &latitudedegrees, &latitudeminutes, &latitudeseconds, &latitudedirection);
-		longituderc = sscanf(EXAMPLE_NGS_LONGITUDE, COM_DIAG_HAZER_SCANF_NGS, &longitudedegrees, &longitudeminutes, &longitudeseconds, &longitudedirection);
+		latituderc = sscanf(EXAMPLE_NGS_LATITUDE, COORDINATES_FORMAT_NGS, &latitudedegrees, &latitudeminutes, &latitudeseconds, &latitudedirection);
+		longituderc = sscanf(EXAMPLE_NGS_LONGITUDE, COORDINATES_FORMAT_NGS, &longitudedegrees, &longitudeminutes, &longitudeseconds, &longitudedirection);
 		fprintf(stderr, "NGS LATITUDE=\"%s\"[%d] latitude=%u %02u %012.9lf(%c) LONGITUDE=\"%s\"[%d] longitude=%u %02u %012.9lf(%c)\n", EXAMPLE_NGS_LATITUDE, latituderc, latitudedegrees, latitudeminutes, latitudeseconds, latitudedirection, EXAMPLE_NGS_LONGITUDE, longituderc, longitudedegrees, longitudeminutes, longitudeseconds, longitudedirection);
 		assert(latituderc == 4);
 		assert(latitudedegrees == 39);
@@ -90,8 +91,8 @@ int main(int argc, char * argv[])
 		char longitudedirection = '\0';
 		char * locale = (char *)0;
 	    locale = setlocale(LC_ALL, "");
-	    latituderc = sscanf(EXAMPLE_POS_LATITUDE, COM_DIAG_HAZER_SCANF_POS, &latitudedegrees, &latitudeminutes, &latitudeseconds, &latitudedirection);
-		longituderc = sscanf(EXAMPLE_POS_LONGITUDE, COM_DIAG_HAZER_SCANF_POS, &longitudedegrees, &longitudeminutes, &longitudeseconds, &longitudedirection);
+	    latituderc = sscanf(EXAMPLE_POS_LATITUDE, COORDINATES_FORMAT_POS, &latitudedegrees, &latitudeminutes, &latitudeseconds, &latitudedirection);
+		longituderc = sscanf(EXAMPLE_POS_LONGITUDE, COORDINATES_FORMAT_POS, &longitudedegrees, &longitudeminutes, &longitudeseconds, &longitudedirection);
 		fprintf(stderr, "POS LATITUDE=\"%s\"[%d] latitude=%u\u00b0%02u'%012.9lf\"%c LONGITUDE=\"%s\"[%d] longitude=%u\u00b0%02u'%012.9lf\"%c\n", EXAMPLE_POS_LATITUDE, latituderc, latitudedegrees, latitudeminutes, latitudeseconds, latitudedirection, EXAMPLE_POS_LONGITUDE, longituderc, longitudedegrees, longitudeminutes, longitudeseconds, longitudedirection);
 		assert(latituderc == 4);
 		assert(latitudedegrees == 39);

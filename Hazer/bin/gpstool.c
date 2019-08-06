@@ -102,7 +102,6 @@
 #include <pthread.h>
 #include <locale.h>
 #include <wchar.h>
-#include "./common.h"
 #include "./gpstool.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
@@ -2586,7 +2585,7 @@ int main(int argc, char * argv[])
 
 				DIMINUTO_LOG_WARNING("Remote Length [%zd]\n", remote_total);
 
-			} else if ((remote_size = validate_datagram(&remote_sequence, &remote_buffer.header, remote_total, &outoforder_counter, &missing_counter)) < 0) {
+			} else if ((remote_size = datagram_validate(&remote_sequence, &remote_buffer.header, remote_total, &outoforder_counter, &missing_counter)) < 0) {
 
 				DIMINUTO_LOG_NOTICE("Remote Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
@@ -2636,7 +2635,7 @@ int main(int argc, char * argv[])
 
 				DIMINUTO_LOG_WARNING("Surveyor Length [%zd]\n", surveyor_total);
 
-			} else if ((surveyor_size = validate_datagram(&surveyor_sequence, &surveyor_buffer.header, surveyor_total, &outoforder_counter, &missing_counter)) < 0) {
+			} else if ((surveyor_size = datagram_validate(&surveyor_sequence, &surveyor_buffer.header, surveyor_total, &outoforder_counter, &missing_counter)) < 0) {
 
 				DIMINUTO_LOG_NOTICE("Surveyor Order [%zd] {%lu} {%lu}\n", surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
 
@@ -2731,7 +2730,7 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else {
 
-        	stamp_datagram(&keepalive_buffer.header, &keepalive_sequence);
+        	datagram_stamp(&keepalive_buffer.header, &keepalive_sequence);
             surveyor_total = send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             if (surveyor_total > 0) { network_total += surveyor_total; }
             keepalive_was = keepalive_now;
@@ -2866,7 +2865,7 @@ int main(int argc, char * argv[])
         } else {
         	datagram_buffer_t * dp;
         	dp = diminuto_containerof(datagram_buffer_t, payload, buffer);
-        	stamp_datagram(&(dp->header), &remote_sequence);
+        	datagram_stamp(&(dp->header), &remote_sequence);
             remote_total = send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
             if (remote_total > 0) { network_total += remote_total; }
         }
