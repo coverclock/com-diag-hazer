@@ -406,6 +406,8 @@ John Sloan, "Hazer Test 2017-02-15 15:45 UTC", video,
 
 John Sloan, "NGS AA7126", album, <https://flic.kr/s/aHsmEnM8We>
 
+John Sloan, "NGS KK1446", album, <https://flic.kr/s/aHsmFKdcgF>
+
 John Sloan, "NGS KK1770", album, <https://flic.kr/s/aHskTG9K1h>
 
 John Sloan, "NTP Clock Gallery, album, <https://flic.kr/s/aHsmgrizkL>
