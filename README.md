@@ -104,6 +104,18 @@ If you run the peruse script on a Raspberry Pi running the full version of
 Rasbian 10 (based on Debian "Buster"), you will still need to install the
 inotify tools: sudo apt-get install inotify-tools .
 
+The geodesic utility is based on algorithms described in
+
+> Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
+> 2013-01, 87.1, pp. 43..55
+
+and uses a source module included here that was written by Mr. Karney and which
+can be found at
+
+<https://geographiclib.sourceforge.io>
+
+and which is licensed under the MIT license.
+
 # Versioning
 
 Both Hazer and Diminuto are complex enough that I moved to a "master" and
@@ -1962,21 +1974,10 @@ of the Earth from the WGS84 datum (this is a model used by most GPS receivers).
 The output is expressed in meters. The input can be cut and pasted directly
 from the googlemaps utility (see above). This is a more accurate, but much
 more computationally complex, approach than using great circles. This utility
-makes use of code extracted from an external library (see below).
+makes use of code extracted from an external library (see far above).
 
     $ geodesic 39.794212194, -105.153349928 39.794211944, -105.153350000
     0.0284344407
-
-The geodesic utility is based on algorithms described in
-
-> Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
-> 2013-01, 87.1, pp. 43..55
-
-and uses a source module written by Mr. Karney which can be found at
-
-<https://geographiclib.sourceforge.io>
-
-and which is licensed under the MIT license.
 
 # Acknowledgements
 
