@@ -1912,6 +1912,37 @@ up implementing the inter-board communication channel on the Raspberry Pi,
 I don't need the support for various radio technologies that both the
 Ardusimple and the Ublox boards provide.
 
+## Google Maps
+
+The googlemaps utility converts strings containing latitude and longitude
+coordinates of various formats (several of which are output by the gpstool
+utility) into a decimal degrees format that is understood by Google Maps.
+You can cut and paste the output of googlemaps directly into the search bar
+of the Google Maps web page.
+
+    $ googlemaps "39.794212196, -105.153349930"# HPP
+    39.794212196, -105.153349930
+    
+    $ googlemaps "39 47 39.16390(N) 105 09 12.05974(W)"# NGS
+    39.794212194, -105.153349928
+    
+    $ googlemaps "39°47'39.163\"N, 105°09'12.060\"W"# POS
+    39.794211944, -105.153350000
+
+HPP is the U-blox UBX High Precision Position format. It is also a format
+directly supported by Google Maps.
+
+NGS is the format used in the National Geodetic Survey datasheets. It is
+mostly for this format that I wrote this utility.
+
+POS is the standard gpstool format. It is also a format (minus the BASH
+backslash escapes) directly supported by Google Maps.
+
+Nine significant fractional digits are used in the decimal degrees output
+because that allows for about three significant fractional seconds digits for
+the input. Also, billionths of a degree is the precision provided by the UBX
+HPP format.
+
 # Acknowledgements
 
 Special thanks to Mrs. Overclock for her assistance in road testing (literally)
