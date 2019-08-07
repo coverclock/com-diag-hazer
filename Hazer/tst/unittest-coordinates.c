@@ -42,8 +42,13 @@ const char EXAMPLE_POS_LINE[] = "POS 39°47'39.183\"N, 105°09'12.152\"W    39.7
 const char EXAMPLE_HPP[] = "39.794212196 -105.153349930";
 const char EXAMPLE_POS[] = "39°47'39.163\"N 105°09'12.060\"W";
 
+const char EXAMPLE_HPP_OTHER[] = "-39.794212196, 105.153349930";
+const char EXAMPLE_NGS_OTHER[] = "39 47 39.16390(S) 105 09 12.05974(E)";
+
 int main(int argc, char * argv[])
 {
+	if (argc > 1) { (void)coordinates_debug(!0); }
+
 	{
 		int latituderc = 0;
 		int longituderc = 0;
@@ -112,6 +117,17 @@ int main(int argc, char * argv[])
 		assert(longitudedirection == 'W');
 	}
 
+	/*
+	 * Comparing for exact values of computed floating point variables in a
+	 * platform and target independent way is problematic. That's why the Hazer
+	 * keeps NMEA coordinates integer units. Hazer uses nanominutes because the
+	 * NMEA spec uses degrees, minutes, and fractional minutes. Yodel uses
+	 * nanodegrees because that's what UBX uses for its high precision position
+	 * (HPP). Below, we just check for the first few fractional digits. Above,
+	 * we may check for more, because there is no computation; we're effectively
+	 * checking the correctness of the sscanf(3) function.
+	 */
+
 	{
 		int rc = 0;
 		double latitude = 0.0;
@@ -120,6 +136,20 @@ int main(int argc, char * argv[])
 		rc = coordinates_parse(string, &latitude, &longitude);
 		fprintf(stderr, "HPP DATA=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
 		assert(rc == COORDINATES_FORMAT_HPP_SEPERATOR);
+		assert(((int)(latitude * 1000)) == 39794);
+		assert(((int)(longitude * 1000)) == -105153);
+	}
+
+	{
+		int rc = 0;
+		double latitude = 0.0;
+		double longitude = 0.0;
+		const char * string = EXAMPLE_HPP_OTHER;
+		rc = coordinates_parse(string, &latitude, &longitude);
+		fprintf(stderr, "HPP DATA=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
+		assert(rc == COORDINATES_FORMAT_HPP_SEPERATOR);
+		assert(((int)(latitude * 1000)) == -39794);
+		assert(((int)(longitude * 1000)) == 105153);
 	}
 
 	{
@@ -130,6 +160,8 @@ int main(int argc, char * argv[])
 		rc = coordinates_parse(string, &latitude, &longitude);
 		fprintf(stderr, "HPP LINE=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
 		assert(rc == COORDINATES_FORMAT_HPP_PREFIX_SEPERATOR);
+		assert(((int)(latitude * 1000)) == 39794);
+		assert(((int)(longitude * 1000)) == -105153);
 	}
 
 	{
@@ -140,6 +172,8 @@ int main(int argc, char * argv[])
 		rc = coordinates_parse(string, &latitude, &longitude);
 		fprintf(stderr, "HPP PAIR=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
 		assert(rc == COORDINATES_FORMAT_HPP);
+		assert(((int)(latitude * 1000)) == 39794);
+		assert(((int)(longitude * 1000)) == -105153);
 	}
 
 	{
@@ -150,6 +184,20 @@ int main(int argc, char * argv[])
 		rc = coordinates_parse(string, &latitude, &longitude);
 		fprintf(stderr, "NGS DATA=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
 		assert(rc == COORDINATES_FORMAT_NGS);
+		assert(((int)(latitude * 1000)) == 39794);
+		assert(((int)(longitude * 1000)) == -105153);
+	}
+
+	{
+		int rc = 0;
+		double latitude = 0.0;
+		double longitude = 0.0;
+		const char * string = EXAMPLE_NGS_OTHER;
+		rc = coordinates_parse(string, &latitude, &longitude);
+		fprintf(stderr, "NGS DATA=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
+		assert(rc == COORDINATES_FORMAT_NGS);
+		assert(((int)(latitude * 1000)) == -39794);
+		assert(((int)(longitude * 1000)) == 105153);
 	}
 
 	{
@@ -160,6 +208,8 @@ int main(int argc, char * argv[])
 		rc = coordinates_parse(string, &latitude, &longitude);
 		fprintf(stderr, "NGS LINE=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
 		assert(rc == COORDINATES_FORMAT_NGS_PREFIX);
+		assert(((int)(latitude * 1000)) == 39794);
+		assert(((int)(longitude * 1000)) == -105153);
 	}
 
 	{
@@ -170,6 +220,8 @@ int main(int argc, char * argv[])
 		rc = coordinates_parse(string, &latitude, &longitude);
 		fprintf(stderr, "POS DATA=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
 		assert(rc == COORDINATES_FORMAT_POS_SEPERATOR);
+		assert(((int)(latitude * 1000)) == 39794);
+		assert(((int)(longitude * 1000)) == -105153);
 	}
 
 	{
@@ -180,6 +232,8 @@ int main(int argc, char * argv[])
 		rc = coordinates_parse(string, &latitude, &longitude);
 		fprintf(stderr, "POS LINE=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
 		assert(rc == COORDINATES_FORMAT_POS_PREFIX_SEPERATOR);
+		assert(((int)(latitude * 1000)) == 39794);
+		assert(((int)(longitude * 1000)) == -105153);
 	}
 
 	{
@@ -190,6 +244,8 @@ int main(int argc, char * argv[])
 		rc = coordinates_parse(string, &latitude, &longitude);
 		fprintf(stderr, "POS PAIR=\"%s\" rc=%d latitude=%.9lf longitude=%.9f\n", string, rc, latitude, longitude);
 		assert(rc == COORDINATES_FORMAT_POS);
+		assert(((int)(latitude * 1000)) == 39794);
+		assert(((int)(longitude * 1000)) == -105153);
 	}
 
 	return 0;

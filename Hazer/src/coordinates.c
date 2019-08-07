@@ -24,6 +24,17 @@ static const char FORMAT_POS[] = COORDINATES_SCANF_POS " " COORDINATES_SCANF_POS
 static const char FORMAT_NGS_PREFIX[] = "NGS " COORDINATES_SCANF_NGS " " COORDINATES_SCANF_NGS;
 static const char FORMAT_NGS[] = COORDINATES_SCANF_NGS " " COORDINATES_SCANF_NGS;
 
+static int debug = 0;
+
+int coordinates_debug(int now) {
+	int was = -1;
+
+	was = debug;
+	debug = now;
+
+	return was;
+}
+
 int coordinates_parse(const char * string, double * latitudep, double * longitudep)
 {
 	coordinates_format_t rc = COORDINATES_FORMAT_INVALID;
@@ -70,9 +81,7 @@ int coordinates_parse(const char * string, double * latitudep, double * longitud
 	case COORDINATES_FORMAT_HPP_SEPERATOR:
 	case COORDINATES_FORMAT_HPP:
 
-#if !0
-		fprintf(stderr, "coordinates_parse: [%d] ( %.9lf , %.9lf )\n", format, latitude, longitude);
-#endif
+		if (debug) { fprintf(stderr, "%s[%d]: [%d] ( %.9lf , %.9lf )\n", __FILE__, __LINE__, format, latitude, longitude); }
 
 		if ((!((-90.0 <= latitude) && (latitude <= 90.0)))) { break; }
 		if ((!((-180.0 <= longitude) && (longitude <= 180.0)))) { break; }
@@ -87,9 +96,7 @@ int coordinates_parse(const char * string, double * latitudep, double * longitud
 	case COORDINATES_FORMAT_NGS:
 	case COORDINATES_FORMAT_POS:
 
-#if !0
-		fprintf(stderr, "coordinates_parse: [%d] ( %u %u %lf %c , %u %u %lf %c )\n", format, latitudedegrees, latitudeminutes, latitudeseconds, latitudedirection, longitudedegrees, longitudeminutes, longitudeseconds, longitudedirection);
-#endif
+		if (debug) { fprintf(stderr, "%s[%d]: [%d] ( %u %u %lf %c , %u %u %lf %c )\n", __FILE__, __LINE__, format, latitudedegrees, latitudeminutes, latitudeseconds, latitudedirection, longitudedegrees, longitudeminutes, longitudeseconds, longitudedirection); }
 
 		if (!((0 <= latitudedegrees) && (latitudedegrees <= 90))) { break; }
 		if (!((0 <= longitudedegrees) && (longitudedegrees <= 180))) { break; }
