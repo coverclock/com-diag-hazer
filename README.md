@@ -661,13 +661,12 @@ lines that need to be added to the indicated files.
 * base - configures and runs an Ardusimple SimpleRTK2B board as a fixed base.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
-* dms2ds - converts coordinates in degrees minutes seconds to  decimal degrees.
+* googlemaps - convert various format coordinate strings to decimal degrees.
 * gpstool - serves as Hazer's all purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
 * headless - uses inotifywait to watch headless output.
-* ngs2gmaps - converts NGS coordinates to a form usable in Google Maps.
 * peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
