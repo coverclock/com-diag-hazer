@@ -50,6 +50,8 @@ int coordinates_parse(const char * string, double * latitudep, double * longitud
 	char latitudedirection = '?';
 	char longitudedirection = '?';
 
+	if (debug) { fprintf(stderr, "%s[%d]: \"%s\"\n", __FILE__, __LINE__, string); }
+
 	/*
 	 * The order here is important, since simpler scanf(3) formats can match
 	 * the wrong longer input strings.
@@ -155,6 +157,7 @@ int coordinates_parse(const char * string, double * latitudep, double * longitud
 	}
 
 	if (rc > 0) {
+		if (debug) { fprintf(stderr, "%s[%d]: [%d] ( %.9lf , %.9lf )\n", __FILE__, __LINE__, rc, latitude, longitude); }
 		*latitudep = latitude;
 		*longitudep = longitude;
 	}

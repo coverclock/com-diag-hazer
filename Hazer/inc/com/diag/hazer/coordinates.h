@@ -69,7 +69,8 @@ int coordinates_debug(int now);
 /**
  * Parse a character string containing any one of a number of supported
  * latitude and longitude coordinate formats and convert it into binary
- * values in double precision floating point degrees.
+ * values in double precision floating point degrees. N.B.: this requires
+ * that the locale be set, for example via setlocale(LC_ALL, "").
  * @param string points to the input string.
  * @param latitudep points to where the latitude result (if any) is stored.
  * @param longitudep points to where the longitude result (if any) is stored.
