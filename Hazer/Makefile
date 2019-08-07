@@ -21,7 +21,7 @@ default:	all
 TITLE				:=	Hazer
 
 MAJOR				:=	26# API changes that may require that applications be modified.
-MINOR				:=	0# Only functionality or features added with no legacy API changes.
+MINOR				:=	1# Only functionality or features added with no legacy API changes.
 BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
@@ -69,7 +69,7 @@ CFG_DIR				:=	cfg# Build configuration files
 DEP_DIR				:=	dep# Generated dependencies and other make files
 DOC_DIR				:=	doc# Documentation
 ETC_DIR				:=	etc# Miscellaneous files
-EXT_DIR				:=  ext# Extra source files or executable binaries
+EXT_DIR				:=  ext# Extra source files not part of Hazer
 FUN_DIR				:=	fun# Functional tests
 GEN_DIR				:=	gen# Generated source files
 INC_DIR				:=	inc# Header files
@@ -511,7 +511,7 @@ $(OUT)/$(SYM_DIR)/vintage:	$(OUT)/$(GEN_DIR)/vintage.c
 $(OUT)/$(BIN_DIR)/generate:	Makefile
 	D=`dirname $@`; mkdir -p $$D
 	echo 'COM_DIAG_$(SYMBOL)_PATH=`dirname $$0`; COM_DIAG_$(SYMBOL)_ROOT=`cd $$COM_DIAG_$(SYMBOL)_PATH; pwd`' > $@
-	echo 'echo export PATH=\\$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../$(BIN_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(TST_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(FUN_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(EXT_DIR)' >> $@
+	echo 'echo export PATH=\\$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../$(BIN_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(TST_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(FUN_DIR)' >> $@
 	echo 'echo export LD_LIBRARY_PATH=\\$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../$(LIB_DIR)' >> $@
 	echo 'echo . $(DIMINUTO_ROOT)/$(OUT)/$(BIN_DIR)/setup' >> $@
 	chmod 755 $@

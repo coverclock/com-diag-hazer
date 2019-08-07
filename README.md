@@ -1945,7 +1945,7 @@ because that allows for about three significant fractional seconds digits for
 the input. Also, billionths of a degree is the precision provided by the UBX
 HPP format.
 
-## Haversine and Geodesic
+## Haversine and Geodesic Distances
 
 The utility haversine computes the distance between two coordinates expressed
 in decimal degrees using the Haversine algorithm based on great circles. This
@@ -1956,14 +1956,13 @@ pasted directly from the googlemaps utility (see above).
     $ haversine 39.794212194, -105.153349928 39.794211944, -105.153350000
     0.028503
 
-The external utility geodesic computes the distance between too coordinates
-expressed in decimal degress using the Geodesic algorithm based on an
-elliptical model of the Earth from the WGS84 datum (this is the model
-used by most GPS receivers). The output is expressed in meters. The input can
-be cut and pasted directly from the googlemaps utility (see above). This is a
-more accurate, but much more computationally complex, approach than using great
-circles. It is not built as part of the standard build process since it depends
-on an external library (see below).
+The utility geodesic computes the distance between two coordinates expressed
+in decimal degress using the Geodesic algorithm based on an elliptical model
+of the Earth from the WGS84 datum (this is a model used by most GPS receivers).
+The output is expressed in meters. The input can be cut and pasted directly
+from the googlemaps utility (see above). This is a more accurate, but much
+more computationally complex, approach than using great circles. This utility
+makes use of code extracted from an external library (see below).
 
     $ geodesic 39.794212194, -105.153349928 39.794211944, -105.153350000
     0.0284344407
@@ -1973,17 +1972,11 @@ The geodesic utility is based on algorithms described in
 > Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
 > 2013-01, 87.1, pp. 43..55
 
-and uses an external library written by Mr. Karney, the source code for which
-can be found at the following URL.
+and uses a source module written by Mr. Karney which can be found at
 
 <https://geographiclib.sourceforge.io>
 
-I used the following commands to build the geodesic utility once I downloaded
-and built the library.
-
-    cd Hazer/ext
-    mkdir -p ../out/host/ext
-    gcc -I${HOME}/src/GeographicLib-1.49/legacy/C geodesic.c ${HOME}/src/GeographicLib-1.49/legacy/C/geodesic.c -o ../out/host/ext/geodesic -lm
+and which is licensed under the MIT license.
 
 # Acknowledgements
 
