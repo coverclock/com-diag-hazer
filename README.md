@@ -350,7 +350,7 @@ Raspbian 9.9 "Stretch"
 Linux 4.19.42    
 gcc 6.3.0    
 
-"Bodega", "Mochila", and "Jefe" (updated)    
+"Bodega", "Mochila", and "ElJefe" (updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
