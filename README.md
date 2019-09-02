@@ -405,6 +405,9 @@ Chip Overclock, "GPS Satellite PRN 4",
 Chip Overclock, "This Is What You Have To Deal With",
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
+Chip Overclock, "Geolocation While Airborne",
+<https://coverclock.blogspot.com/2019/09/geotagging-while-airborne.html>
+
 # Media
 
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
