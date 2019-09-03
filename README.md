@@ -18,7 +18,7 @@ Licensed under the terms in LICENSE.txt.
 # Contact
 
 Chip Overclock    
-Digital Aggregates Corporation    
+Digital Aggregates Corporation/PNT Division    
 3440 Youngfield Street, Suite 209    
 Wheat Ridge CO 80033 USA    
 <http://www.diag.com>    
@@ -87,7 +87,9 @@ Corporation PNT division.
 # Dependencies
 
 The Hazer library, which includes the Hazer, Yodel, and Tumbleweed software
-stacks, depends on no more than the usual standard C, GNU, and POSIX libraries.
+stacks, depends on no more than the usual standard C, GNU, and POSIX libraries
+and commands that come as part of (for example) the full Raspbian 10 (based
+on Debian "Buster") install for the Raspberry Pi.
 
 The gpstool and rtktool utilities are built on top of the Hazer library
 and also my Diminuto library. Diminuto is a general purpose C-based systems
@@ -98,9 +100,21 @@ so much C code. I use Diminuto in virtually all of my C-based projects,
 and sometimes in other languages too that support C-linkage.  Portions of
 Diminuto have also shipped in products from several of my clients.
 
-Hazer (with Diminuto) has been used in other Digital Aggregates projects that
-have their own repositories: Obelisk, Hourglass, Candleclock, and Astrolabe.
-All of these have to do with precision timekeeping.
+If you run the peruse script on a Raspberry Pi running the full version of
+Rasbian 10 (based on Debian "Buster"), you will still need to install the
+inotify tools: sudo apt-get install inotify-tools .
+
+The geodesic utility is based on algorithms described in
+
+> Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
+> 2013-01, 87.1, pp. 43..55
+
+and uses a source module included here that was written by Mr. Karney and which
+can be found at
+
+<https://geographiclib.sourceforge.io>
+
+and which is licensed under the MIT license.
 
 # Versioning
 
@@ -329,14 +343,14 @@ Raspbian 9.8 "Stretch"
 Linux 4.14.98    
 gcc 6.3.0    
 
-"Jefe"    
+"ElJefe"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.9 "Stretch"    
 Linux 4.19.42    
 gcc 6.3.0    
 
-"Bodega", "Mochila", and "Jefe" (updated)    
+"Bodega", "Mochila", and "ElJefe" (updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
@@ -355,6 +369,14 @@ Intel NUC7i7BNH
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
 Ubuntu 19.04 "Disco Dingo"   
 Linux 5.0.0    
+gcc 8.3.0    
+
+"Rhodium"    
+Raspberry Pi 4 Model B    
+ARMv8 64-bit    
+Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.58    
 gcc 8.3.0    
 
 # Articles
@@ -383,6 +405,9 @@ Chip Overclock, "GPS Satellite PRN 4",
 Chip Overclock, "This Is What You Have To Deal With",
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
+Chip Overclock, "Geolocation While Airborne",
+<https://coverclock.blogspot.com/2019/09/geotagging-while-airborne.html>
+
 # Media
 
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
@@ -395,6 +420,8 @@ John Sloan, "Hazer Test 2017-02-15 15:45 UTC", video,
 <https://youtu.be/UluGfpqpiQw>
 
 John Sloan, "NGS AA7126", album, <https://flic.kr/s/aHsmEnM8We>
+
+John Sloan, "NGS KK1446", album, <https://flic.kr/s/aHsmFKdcgF>
 
 John Sloan, "NGS KK1770", album, <https://flic.kr/s/aHskTG9K1h>
 
@@ -459,6 +486,22 @@ ublox, 6cc4473, 2018-12-20
 u-blox 9 integration, "ZED-F9P Integration Manual", UBX-18010802-R03,
 ublox, 2018-12-20
 
+# Tools
+
+<https://www.notams.faa.gov/dinsQueryWeb/>
+
+<https://pilotweb.nas.faa.gov/PilotWeb/noticesAction.do?queryType=ALLGPS&formatType=ICAO>
+
+<https://www.navcen.uscg.gov/?pageName=gpsAlmanacs>
+
+<https://navcen.uscg.gov/?Do=constellationStatus>
+
+<https://celestrak.com/GPS/NANU/description.php>
+
+<https://www.gsc-europa.eu/system-status/Constellation-Information>
+
+<https://www.ngs.noaa.gov/NGSDataExplorer/>
+
 # Resources
 
 <http://www.catb.org/gpsd/NMEA.txt>
@@ -483,8 +526,6 @@ ublox, 2018-12-20
 
 <https://github.com/mvglasow/satstat/wiki/NMEA-IDs>
 
-<https://pilotweb.nas.faa.gov/PilotWeb/noticesAction.do?queryType=ALLGPS&formatType=ICAO>
-
 <https://www.rapidtables.com/convert/number/degrees-to-degrees-minutes-seconds.html>
 
 <https://in-the-sky.org/satmap_radar.php> Note: when using the "Live
@@ -503,14 +544,6 @@ astronomers in the audience, but it wasn't to me.
 <https://gssc.esa.int/navipedia/index.php/GPS_Navigation_Message>
 
 <ftp://ftp.agi.com/pub/Catalog/Almanacs/SEM/GPSAlmanac.al3>
-
-<https://www.navcen.uscg.gov/?pageName=gpsAlmanacs>
-
-<https://www.notams.faa.gov/dinsQueryWeb/>
-
-<https://navcen.uscg.gov/?Do=constellationStatus>
-
-<https://celestrak.com/GPS/NANU/description.php>
 
 <https://www.rtca.org/sites/default/files/intentional_gps_interference_approved.pdf>
 
@@ -542,8 +575,6 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.digi.com/resources/documentation/Digidocs/90001456-13/concepts/c_transparent_mode_detailed.htm?tocpath=XBee%20transparent%20mode%7CXBee%20transparent%20mode%20in%20detail%7C_____0>
 
-<https://www.ngs.noaa.gov/NGSDataExplorer/>
-
 <https://github.com/digidotcom/xbee_ansic_library>
 
 <https://github.com/ukyg9e5r6k7gubiekd6/gpsd/blob/master/crc24q.c>
@@ -554,21 +585,26 @@ astronomers in the audience, but it wasn't to me.
 
 <https://en.wikipedia.org/wiki/Haversine_formula>
 
-<https://www.gsc-europa.eu/system-status/Constellation-Information>
-
 <https://en.wikipedia.org/wiki/North_American_Plate>
 
 <https://cs.nyu.edu/visual/home/proj/tiger/gisfaq.html>
 
 # Soundtrack
 
+Leonid & Friends, "Does Anybody Really Know What Time It Is" (Chicago)
 <https://youtu.be/FB-nXQc6LMU>
 
+Coldplay & Buena Vista Social Club, "Clocks" (Coldplay)
 <https://youtu.be/RH2h5iHO6ZU>
 
+Gerard Way featuring Ray Toro, "Hazy Shade of Winter" (Simon & Garfunkel)
 <https://youtu.be/ZTCrqXpKHec>
 
+Pink Floyd live at Earls Court London, "Time" (Pink Floyd)
 <https://youtu.be/F_VjVqe3KJ0>
+
+The World of Hans Zimmer, INCEPTION "Time" (Hans Zimmer)
+<https://youtu.be/xdYYN-4ttDg>
 
 # Build
 
@@ -649,13 +685,12 @@ lines that need to be added to the indicated files.
 * base - configures and runs an Ardusimple SimpleRTK2B board as a fixed base.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
-* dms2ds - converts coordinates in degrees minutes seconds to  decimal degrees.
+* googlemaps - convert various format coordinate strings to decimal degrees.
 * gpstool - serves as Hazer's all purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
 * headless - uses inotifywait to watch headless output.
-* ngs2gmaps - converts NGS coordinates to a form usable in Google Maps.
 * peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
@@ -1900,6 +1935,59 @@ F9P application board, the C099-F9P, but I haven't tried it. Since I ended
 up implementing the inter-board communication channel on the Raspberry Pi,
 I don't need the support for various radio technologies that both the
 Ardusimple and the Ublox boards provide.
+
+## Google Maps
+
+The googlemaps utility converts strings containing latitude and longitude
+coordinates of various formats (several of which are output by the gpstool
+utility) into a decimal degrees format that is understood by Google Maps.
+You can cut and paste the output of googlemaps directly into the search bar
+of the Google Maps web page.
+
+    $ googlemaps "39.794212196, -105.153349930"# HPP
+    39.794212196, -105.153349930
+    
+    $ googlemaps "39 47 39.16390(N) 105 09 12.05974(W)"# NGS
+    39.794212194, -105.153349928
+    
+    $ googlemaps "39°47'39.163\"N, 105°09'12.060\"W"# POS
+    39.794211944, -105.153350000
+
+HPP is the U-blox UBX High Precision Position format. It is also a format
+directly supported by Google Maps.
+
+NGS is the format used in the National Geodetic Survey datasheets. It is
+mostly for this format that I wrote this utility.
+
+POS is the standard gpstool format. It is also a format (minus the BASH
+backslash escapes) directly supported by Google Maps.
+
+Nine significant fractional digits are used in the decimal degrees output
+because that allows for about three significant fractional seconds digits for
+the input. Also, billionths of a degree is the precision provided by the UBX
+HPP format.
+
+## Haversine and Geodesic Distances
+
+The utility haversine computes the distance between two coordinates expressed
+in decimal degrees using the Haversine algorithm based on great circles. This
+is a simple trigonometric approach that (incorrectly) assumes the Earth is a
+perfect sphere. The output is expressed in meters. The input can be cut and
+pasted directly from the googlemaps utility (see above).
+
+    $ haversine 39.794212194, -105.153349928 39.794211944, -105.153350000
+    0.028503
+
+The utility geodesic computes the distance between two coordinates expressed
+in decimal degress using the Geodesic algorithm based on an elliptical model
+of the Earth from the WGS84 datum (this is a model used by most GPS receivers).
+The output is expressed in meters. The input can be cut and pasted directly
+from the googlemaps utility (see above). This is a more accurate, but much
+more computationally complex, approach than using great circles. This utility
+makes use of code extracted from an external library (see far above).
+
+    $ geodesic 39.794212194, -105.153349928 39.794211944, -105.153350000
+    0.0284344407
 
 # Acknowledgements
 

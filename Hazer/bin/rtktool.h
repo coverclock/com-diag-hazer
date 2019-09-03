@@ -13,6 +13,7 @@
  * This file is part of the Digital Aggregates Corporation Hazer package.
  */
 
+#include "com/diag/hazer/datagram.h"
 #include "com/diag/diminuto/diminuto_tree.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_time.h"

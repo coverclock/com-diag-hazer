@@ -14,6 +14,10 @@
  * stationary base station running in survey mode. The datagrams are sent to
  * the port identified as the source of periodic keepalives sent from each
  * rover to the router.
+ *
+ * EXAMPLES
+ *
+ * rtktool -p :21010 -t 30
  */
 
 #undef NDEBUG
@@ -31,7 +35,6 @@
 #include <signal.h>
 #include <pthread.h>
 #include <locale.h>
-#include "./common.h"
 #include "./rtktool.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
@@ -385,7 +388,7 @@ int main(int argc, char * argv[])
 			 * either option.
 			 */
 
-			if ((size = validate_datagram(&(thou->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {
+			if ((size = datagram_validate(&(thou->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {
 				DIMINUTO_LOG_NOTICE("Datagram Order {%lu} {%lu} [%s]:%d", (unsigned long)(thou->sequence), (unsigned long)ntohl(buffer.header.sequence), diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
 				continue; /* REJECT */
 			} else if ((length = tumbleweed_validate(buffer.payload.rtcm, size)) < TUMBLEWEED_RTCM_SHORTEST) {
