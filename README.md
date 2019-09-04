@@ -1991,5 +1991,8 @@ makes use of code extracted from an external library (see far above).
 
 # Acknowledgements
 
+Thanks to Charles F. F. Karney for his open source (MIT licensed) geodesic
+software.
+
 Special thanks to Mrs. Overclock for her assistance in road testing (literally)
 this software.
