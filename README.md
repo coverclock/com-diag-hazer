@@ -603,7 +603,10 @@ Gerard Way featuring Ray Toro, "Hazy Shade of Winter" (Simon & Garfunkel)
 Pink Floyd live at Earls Court London, "Time" (Pink Floyd)
 <https://youtu.be/F_VjVqe3KJ0>
 
-The World of Hans Zimmer, INCEPTION "Time" (Hans Zimmer)
+Mark Williams & Tara Morice, "Time After Time" from STRICTLY BALLROOM (Cyndi Lauper)
+<https://youtu.be/RcN0b7J_PfE>
+
+The World of Hans Zimmer, "Time" from INCEPTION (Hans Zimmer)
 <https://youtu.be/xdYYN-4ttDg>
 
 # Build
