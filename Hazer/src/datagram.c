@@ -21,29 +21,29 @@
  */
 ssize_t datagram_validate(datagram_sequence_t * expectedp, datagram_header_t * header, ssize_t length, unsigned int * outoforderp, unsigned int * missingp)
 {
-	ssize_t result = -1;
-	datagram_sequence_t actual = 0;
-	datagram_sequence_t gap = 0;
-	static const datagram_sequence_t THRESHOLD = ((datagram_sequence_t)1) << ((sizeof(datagram_sequence_t) * 8) - 1);
+    ssize_t result = -1;
+    datagram_sequence_t actual = 0;
+    datagram_sequence_t gap = 0;
+    static const datagram_sequence_t THRESHOLD = ((datagram_sequence_t)1) << ((sizeof(datagram_sequence_t) * 8) - 1);
 
-	// (EXPECTED < ACTUAL) if (0 < (ACTUAL - EXPECTED) < THRESHOLD)
+    // (EXPECTED < ACTUAL) if (0 < (ACTUAL - EXPECTED) < THRESHOLD)
 
-	actual = ntohl(header->sequence);
-	if (actual == *expectedp) {
-		*expectedp = *expectedp + 1;
-		result = length - sizeof(datagram_header_t);
-	} else {
-		gap = actual - *expectedp;
-		if (gap < THRESHOLD) {
-			*missingp += gap;
-			*expectedp = actual + 1;
-			result = length - sizeof(datagram_header_t);
-		} else {
-			*outoforderp += 1;
-		}
-	}
+    actual = ntohl(header->sequence);
+    if (actual == *expectedp) {
+        *expectedp = *expectedp + 1;
+        result = length - sizeof(datagram_header_t);
+    } else {
+        gap = actual - *expectedp;
+        if (gap < THRESHOLD) {
+            *missingp += gap;
+            *expectedp = actual + 1;
+            result = length - sizeof(datagram_header_t);
+        } else {
+            *outoforderp += 1;
+        }
+    }
 
-	return result;
+    return result;
 }
 
 /**
@@ -54,6 +54,6 @@ ssize_t datagram_validate(datagram_sequence_t * expectedp, datagram_header_t * h
  */
 void datagram_stamp(datagram_header_t * buffer, datagram_sequence_t * expectedp)
 {
-	buffer->sequence = htonl(*expectedp);
-	*expectedp += 1;
+    buffer->sequence = htonl(*expectedp);
+    *expectedp += 1;
 }

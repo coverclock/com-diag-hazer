@@ -39,9 +39,9 @@
 
 int main(int argc, char *argv[])
 {
-	const char * program = (const char *)0;
-	double latitude = 0.0;
-	double longitude = 0.0;
+    const char * program = (const char *)0;
+    double latitude = 0.0;
+    double longitude = 0.0;
 
     setlocale(LC_ALL, "");
 
@@ -50,27 +50,27 @@ int main(int argc, char *argv[])
     argc--;
 
     if ((argc > 0) && (strcmp(*argv, "-?") == 0)) {
-		fprintf(stderr, "usage: %s [ -? ] [ -d ] STRING [ STRING ... ]\n", program);
-		argv++;
-		argc--;
+        fprintf(stderr, "usage: %s [ -? ] [ -d ] STRING [ STRING ... ]\n", program);
+        argv++;
+        argc--;
     }
 
     if ((argc > 0) && (strcmp(*argv, "-d") == 0)) {
-		(void)coordinates_debug(!0);
-		argv++;
-		argc--;
+        (void)coordinates_debug(!0);
+        argv++;
+        argc--;
     }
 
-	while (argc-- > 0) {
-		if (coordinates_parse(*argv, &latitude, &longitude) <= 0) {
-			errno = EINVAL;
-			diminuto_perror(*argv);
-			return 1;
-		} else {
-			printf("%.9lf, %.9lf\n", latitude, longitude);
-			argv++;
-		}
-	}
+    while (argc-- > 0) {
+        if (coordinates_parse(*argv, &latitude, &longitude) <= 0) {
+            errno = EINVAL;
+            diminuto_perror(*argv);
+            return 1;
+        } else {
+            printf("%.9lf, %.9lf\n", latitude, longitude);
+            argv++;
+        }
+    }
 
-	return 0;
+    return 0;
 }

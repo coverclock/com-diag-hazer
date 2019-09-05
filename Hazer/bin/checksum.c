@@ -183,10 +183,10 @@ int main(int argc, char * argv[])
         } else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
             rc = print_packet(stdout, buffer, size - 1);
         } else if (buffer[0] == TUMBLEWEED_STIMULUS_PREAMBLE) {
-        	rc = print_message(stdout, buffer, size - 1);
+            rc = print_message(stdout, buffer, size - 1);
         } else {
-        	fprintf(stderr, "OTHER! 0x%x 0x%x\n", buffer[0], buffer[1]);
-        	rc = -2;
+            fprintf(stderr, "OTHER! 0x%x 0x%x\n", buffer[0], buffer[1]);
+            rc = -2;
         }
         if (rc < 0) {
             fputc('\n', stdout);

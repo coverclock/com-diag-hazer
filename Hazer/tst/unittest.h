@@ -28,27 +28,27 @@
  * the collapsed message and does not include any terminating NUL.
  */
 #define BEGIN(_MESSAGE_) \
-	do { \
-		const char * string = (const char *)0; \
-		size_t length = 0; \
-		unsigned char * message = (unsigned char *)0; \
-		size_t size = 0; \
-		string = (_MESSAGE_); \
-		length = strlen(string) + 1; \
-		message = (char *)malloc(length); \
-		size = diminuto_escape_collapse(message, string, length); \
-		size -= 1; \
-		do { \
-			(void)0
+    do { \
+        const char * string = (const char *)0; \
+        size_t length = 0; \
+        unsigned char * message = (unsigned char *)0; \
+        size_t size = 0; \
+        string = (_MESSAGE_); \
+        length = strlen(string) + 1; \
+        message = (char *)malloc(length); \
+        size = diminuto_escape_collapse(message, string, length); \
+        size -= 1; \
+        do { \
+            (void)0
 
 /**
  * @define END
  * End a unit test using a test string.
  */
 #define END \
-		} while (0); \
-		free(message); \
-	} while (0)
+        } while (0); \
+        free(message); \
+    } while (0)
 
 #undef NDEBUG
 

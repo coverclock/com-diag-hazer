@@ -348,7 +348,7 @@ static void show_connection(const char * label, const char * option, int fd, pro
  */
 static ssize_t send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
 {
-	ssize_t length = 0;
+    ssize_t length = 0;
 
     if (size <= 0) {
         /* Do nothing. */
@@ -374,7 +374,7 @@ static ssize_t send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t 
 static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
     ssize_t length = 0;
     diminuto_ipv6_t address = { 0, };
-	diminuto_port_t port = 0;
+    diminuto_port_t port = 0;
 
     if (size <= 1) {
         /* Do nothing. */
@@ -397,41 +397,41 @@ static ssize_t receive_datagram(int fd, void * buffer, size_t size) {
  */
 static void collect_update(int number, tumbleweed_updates_t * up)
 {
-	update_t update = UPDATE;
+    update_t update = UPDATE;
 
     switch (number) {
 
     case 1005:
-    	update = RTCM_TYPE_1005;
-    	break;
+        update = RTCM_TYPE_1005;
+        break;
 
     case 1074:
-    	update = RTCM_TYPE_1074;
-    	break;
+        update = RTCM_TYPE_1074;
+        break;
 
     case 1084:
-    	update = RTCM_TYPE_1084;
-    	break;
+        update = RTCM_TYPE_1084;
+        break;
 
     case 1094:
-    	update = RTCM_TYPE_1094;
-    	break;
+        update = RTCM_TYPE_1094;
+        break;
 
     case 1124:
-    	update = RTCM_TYPE_1124;
-    	break;
+        update = RTCM_TYPE_1124;
+        break;
 
     case 1230:
-    	update = RTCM_TYPE_1230;
-    	break;
+        update = RTCM_TYPE_1230;
+        break;
 
     case 9999:
-    	update = RTCM_TYPE_9999;
-    	break;
+        update = RTCM_TYPE_9999;
+        break;
 
     default:
-    	/* Do nothing. */
-    	break;
+        /* Do nothing. */
+        break;
 
     }
 
@@ -904,37 +904,37 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
         zone = diminuto_time_zonename(0);
 
-		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-			if (pa[system].ticks == 0) { continue; }
-			if (pa[system].utc_nanoseconds == 0) { continue; }
-			if (pa[system].dmy_nanoseconds == 0) { continue; }
+            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].utc_nanoseconds == 0) { continue; }
+            if (pa[system].dmy_nanoseconds == 0) { continue; }
 
-			fputs("TIM", fp);
+            fputs("TIM", fp);
 
-			hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &billionths);
-			assert((1 <= month) && (month <= 12));
-			assert((1 <= day) && (day <= 31));
-			assert((0 <= hour) && (hour <= 23));
-			assert((0 <= minute) && (minute <= 59));
-			assert((0 <= second) && (second <= 59));
-			assert((0 <= billionths) && (billionths < 1000000000ULL));
-			fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
+            hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &billionths);
+            assert((1 <= month) && (month <= 12));
+            assert((1 <= day) && (day <= 31));
+            assert((0 <= hour) && (hour <= 23));
+            assert((0 <= minute) && (minute <= 59));
+            assert((0 <= second) && (second <= 59));
+            assert((0 <= billionths) && (billionths < 1000000000ULL));
+            fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
 
-			fprintf(fp, " %cpps", pps ? '1' : '0');
+            fprintf(fp, " %cpps", pps ? '1' : '0');
 
-			fprintf(fp, "%28s", "");
+            fprintf(fp, "%28s", "");
 
-			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-			fputc('\n', fp);
+            fputc('\n', fp);
 
-			if (!once) {
-				DIMINUTO_LOG_NOTICE("Time %04d-%02d-%02d %02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
-				once = !0;
-			}
+            if (!once) {
+                DIMINUTO_LOG_NOTICE("Time %04d-%02d-%02d %02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
+                once = !0;
+            }
 
-		}
+        }
     }
 
     {
@@ -947,70 +947,70 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-			if (pa[system].ticks == 0) { continue; }
-			if (pa[system].utc_nanoseconds == 0) { continue; }
+            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].utc_nanoseconds == 0) { continue; }
 
-			fputs("POS", fp);
+            fputs("POS", fp);
 
-			hazer_format_nanominutes2position(pa[system].lat_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
-			assert((0 <= degrees) && (degrees <= 90));
-			assert((0 <= minutes) && (minutes <= 59));
-			assert((0 <= seconds) && (seconds <= 59));
-			assert((0 <= thousandths) && (thousandths <= 999));
-			fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
+            hazer_format_nanominutes2position(pa[system].lat_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
+            assert((0 <= degrees) && (degrees <= 90));
+            assert((0 <= minutes) && (minutes <= 59));
+            assert((0 <= seconds) && (seconds <= 59));
+            assert((0 <= thousandths) && (thousandths <= 999));
+            fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
 
-			hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
-			assert((0 <= degrees) && (degrees <= 180));
-			assert((0 <= minutes) && (minutes <= 59));
-			assert((0 <= seconds) && (seconds <= 59));
-			assert((0 <= thousandths) && (thousandths <= 999));
-			fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
+            hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
+            assert((0 <= degrees) && (degrees <= 180));
+            assert((0 <= minutes) && (minutes <= 59));
+            assert((0 <= seconds) && (seconds <= 59));
+            assert((0 <= thousandths) && (thousandths <= 999));
+            fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
 
-			fputc(' ', fp);
+            fputc(' ', fp);
 
-			hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &tenmillionths);
-			assert((-90 <= degrees) && (degrees <= 90));
-			assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
-			fprintf(fp, " %4d.%07llu,", degrees, (long long unsigned int)tenmillionths);
+            hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &tenmillionths);
+            assert((-90 <= degrees) && (degrees <= 90));
+            assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
+            fprintf(fp, " %4d.%07llu,", degrees, (long long unsigned int)tenmillionths);
 
-			hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &tenmillionths);
-			assert((-180 <= degrees) && (degrees <= 180));
-			fprintf(fp, " %4d.%07llu", degrees, (long long unsigned int)tenmillionths);
-			assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
+            hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &tenmillionths);
+            assert((-180 <= degrees) && (degrees <= 180));
+            fprintf(fp, " %4d.%07llu", degrees, (long long unsigned int)tenmillionths);
+            assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
 
-			fprintf(fp, "%7s", "");
+            fprintf(fp, "%7s", "");
 
-			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-			fputc('\n', fp);
+            fputc('\n', fp);
 
-		}
+        }
     }
 
     {
         int64_t meters = 0;
         uint64_t thousandths = 0;
 
-		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-			if (pa[system].ticks == 0) { continue; }
-			if (pa[system].utc_nanoseconds == 0) { continue; }
+            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].utc_nanoseconds == 0) { continue; }
 
-			fputs("ALT", fp);
+            fputs("ALT", fp);
 
-			fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
+            fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
 
-			meters = pa[system].alt_millimeters / 1000LL;
-			thousandths = abs64(pa[system].alt_millimeters) % 1000ULL;
-			fprintf(fp, " %6lld.%03llum", (long long signed int)meters, (long long unsigned int)thousandths);
+            meters = pa[system].alt_millimeters / 1000LL;
+            thousandths = abs64(pa[system].alt_millimeters) % 1000ULL;
+            fprintf(fp, " %6lld.%03llum", (long long signed int)meters, (long long unsigned int)thousandths);
 
-			fprintf(fp, "%43s", "");
+            fprintf(fp, "%43s", "");
 
-			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-			fputc('\n', fp);
+            fputc('\n', fp);
 
-		}
+        }
     }
 
     {
@@ -1020,33 +1020,33 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-			if (pa[system].ticks == 0) { continue; }
-			if (pa[system].utc_nanoseconds == 0) { continue; }
+            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].utc_nanoseconds == 0) { continue; }
 
-			fputs("COG", fp);
+            fputs("COG", fp);
 
-			assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
+            assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
 
-			compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
-			assert(compass != (const char *)0);
-			assert(strlen(compass) <= 4);
-			fprintf(fp, " %-2s", compass);
+            compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
+            assert(compass != (const char *)0);
+            assert(strlen(compass) <= 4);
+            fprintf(fp, " %-2s", compass);
 
-			degrees = pa[system].cog_nanodegrees / 1000000000LL;
-			billionths = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
-			fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
+            degrees = pa[system].cog_nanodegrees / 1000000000LL;
+            billionths = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
+            fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
 
-			degrees = pa[system].mag_nanodegrees / 1000000000LL;
-			billionths = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
-			fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
+            degrees = pa[system].mag_nanodegrees / 1000000000LL;
+            billionths = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
+            fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
 
-			fprintf(fp, "%30s", "");
+            fprintf(fp, "%30s", "");
 
-			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-			fputc('\n', fp);
+            fputc('\n', fp);
 
-		}
+        }
     }
 
     {
@@ -1054,53 +1054,53 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
         int64_t kilometersperhour = 0;
         uint64_t millionths = 0;
 
-		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-			if (pa[system].ticks == 0) { continue; }
-			if (pa[system].utc_nanoseconds == 0) { continue; }
+            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].utc_nanoseconds == 0) { continue; }
 
-			fputs("SOG", fp);
+            fputs("SOG", fp);
 
-			fprintf(fp, " %11.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
+            fprintf(fp, " %11.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
 
-			knots = pa[system].sog_microknots / 1000000LL;
-			millionths = abs64(pa[system].sog_microknots) % 1000000ULL;
-			fprintf(fp, " %7lld.%06lluknots", (long long signed int)knots, (long long unsigned int)millionths);
+            knots = pa[system].sog_microknots / 1000000LL;
+            millionths = abs64(pa[system].sog_microknots) % 1000000ULL;
+            fprintf(fp, " %7lld.%06lluknots", (long long signed int)knots, (long long unsigned int)millionths);
 
-			kilometersperhour = pa[system].sog_millimeters / 1000000LL;
-			millionths = abs64(pa[system].sog_millimeters) % 1000000ULL;
-			fprintf(fp, " %7lld.%06llukph", (long long signed int)kilometersperhour, (long long unsigned int)millionths);
+            kilometersperhour = pa[system].sog_millimeters / 1000000LL;
+            millionths = abs64(pa[system].sog_millimeters) % 1000000ULL;
+            fprintf(fp, " %7lld.%06llukph", (long long signed int)kilometersperhour, (long long unsigned int)millionths);
 
-			fprintf(fp, "%14s", "");
+            fprintf(fp, "%14s", "");
 
-			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-			fputc('\n', fp);
+            fputc('\n', fp);
 
-		}
+        }
     }
 
     {
-		for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
-			if (pa[system].ticks == 0) { continue; }
+            if (pa[system].ticks == 0) { continue; }
 
-			fputs("INT", fp);
+            fputs("INT", fp);
 
-			fprintf(fp, " %s", pa[system].label);
-			fprintf(fp, " [%2u]", pa[system].sat_used);
-			fprintf(fp, " %ddmy", dmyokay);
-			fprintf(fp, " %dinc", totokay);
-			fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
-			fprintf(fp, " %20llub", (unsigned long long)bytes); /* (2^64)-1 == 0xFFFFFFFFFFFFFFFF == 18,446,744,073,709,551,615. */
+            fprintf(fp, " %s", pa[system].label);
+            fprintf(fp, " [%2u]", pa[system].sat_used);
+            fprintf(fp, " %ddmy", dmyokay);
+            fprintf(fp, " %dinc", totokay);
+            fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
+            fprintf(fp, " %20llub", (unsigned long long)bytes); /* (2^64)-1 == 0xFFFFFFFFFFFFFFFF == 18,446,744,073,709,551,615. */
 
-			fprintf(fp, "%1s", "");
+            fprintf(fp, "%1s", "");
 
-			fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
-			fputc('\n', fp);
+            fputc('\n', fp);
 
-		}
+        }
     }
 
 }
@@ -1115,7 +1115,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp, const tumbleweed_updates_t * up)
 {
 
-	if (bp->ticks != 0) {
+    if (bp->ticks != 0) {
 
         fputs("BAS", fp);
         fprintf(fp, " %dactive %dvalid %10usec %10uobs %12.4lfm", !!bp->payload.active, !!bp->payload.valid, bp->payload.dur, bp->payload.obs, (double)bp->payload.meanAcc / 10000.0);
@@ -1485,7 +1485,7 @@ int main(int argc, char * argv[])
      * RTCM parser state variables.
      */
     tumbleweed_state_t rtcm_state = TUMBLEWEED_STATE_STOP;
-	tumbleweed_context_t rtcm_context = { 0, };
+    tumbleweed_context_t rtcm_context = { 0, };
     datagram_buffer_t rtcm_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * NMEA processing variables.
@@ -1695,12 +1695,12 @@ int main(int argc, char * argv[])
         case 'E':
             report = !0;
             escape = !0;
-        	process = !0;
+            process = !0;
             break;
         case 'F':
             report = !0;
             slow = !0;
-        	process = !0;
+            process = !0;
             break;
         case 'G':
             remote_option = optarg;
@@ -1711,7 +1711,7 @@ int main(int argc, char * argv[])
         case 'H':
             report = !0;
             headless = optarg;
-        	process = !0;
+            process = !0;
             break;
         case 'I':
             pps = optarg;
@@ -1726,14 +1726,14 @@ int main(int argc, char * argv[])
             logging = optarg;
             break;
         case 'M':
-        	daemon = !0;
-        	break;
+            daemon = !0;
+            break;
         case 'P':
-        	process = !0;
-        	break;
+            process = !0;
+            break;
         case 'R':
             report = !0;
-        	process = !0;
+            process = !0;
             break;
         case 'S':
             source = optarg;
@@ -1748,7 +1748,7 @@ int main(int argc, char * argv[])
             diminuto_list_enqueue(&command_list, command_node);
             break;
         case 'V':
-        	DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
             readonly = 0;
@@ -1908,9 +1908,9 @@ int main(int argc, char * argv[])
      **/
 
     if (daemon) {
-    	rc = diminuto_daemon(Program);
-    	DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
-    	assert(rc == 0);
+        rc = diminuto_daemon(Program);
+        DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
+        assert(rc == 0);
     }
 
     DIMINUTO_LOG_INFORMATION("Begin");
@@ -2137,17 +2137,17 @@ int main(int argc, char * argv[])
 
         if (serial) {
 
-			DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s %d %d%c%d%s%s%s\n", dev_fd, device, readonly ? "ro" : "rw", bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
+            DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s %d %d%c%d%s%s%s\n", dev_fd, device, readonly ? "ro" : "rw", bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
 
-        	rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
-        	assert(rc == 0);
+            rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
+            assert(rc == 0);
 
-        	rc = diminuto_serial_raw(dev_fd);
-        	assert(rc == 0);
+            rc = diminuto_serial_raw(dev_fd);
+            assert(rc == 0);
 
         } else {
 
-			DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s\n", dev_fd, device, readonly ? "ro" : "rw");
+            DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s\n", dev_fd, device, readonly ? "ro" : "rw");
 
         }
 
@@ -2348,340 +2348,340 @@ int main(int argc, char * argv[])
 
     DIMINUTO_LOG_INFORMATION("Start");
 
-	while (!0) {
+    while (!0) {
 
-	    /*
-	     * We keep working until out input goes away (end of file), or until
-	     * we are interrupted by a SIGINT or terminated by a SIGTERM. We
-	     * also check for SIGHUP, which I might use for something in the
-	     * future.
-	     */
+        /*
+         * We keep working until out input goes away (end of file), or until
+         * we are interrupted by a SIGINT or terminated by a SIGTERM. We
+         * also check for SIGHUP, which I might use for something in the
+         * future.
+         */
 
-		if (diminuto_terminator_check()) {
-			DIMINUTO_LOG_NOTICE("SIGTERM");
-			break;
-		}
+        if (diminuto_terminator_check()) {
+            DIMINUTO_LOG_NOTICE("SIGTERM");
+            break;
+        }
 
-		if (diminuto_interrupter_check()) {
-			DIMINUTO_LOG_NOTICE("SIGINT");
-			break;
-		}
+        if (diminuto_interrupter_check()) {
+            DIMINUTO_LOG_NOTICE("SIGINT");
+            break;
+        }
 
-		if (diminuto_hangup_check()) {
-			diminuto_log_mask ^= DIMINUTO_LOG_MASK_DEBUG;
-		}
+        if (diminuto_hangup_check()) {
+            diminuto_log_mask ^= DIMINUTO_LOG_MASK_DEBUG;
+        }
 
-		/**
+        /**
          ** INPUT
          **/
 
-		/*
-		 * We keep looking for input from one of our sources until one of them
-		 * tells us we have a buffer to process. It could be a NMEA sentence,
-		 * a UBX packet, or an RTCM message. It is also possible that the
-		 * select(2) timed out, and no file descriptor will be returned, in
-		 * which case we have other work to do further below. Or it may be
-		 * that the select(2) was interrupted, so we need to interrogate our
-		 * signal handlers.
-		 */
-
-		available = 0;
-		fd = -1;
-		ready = 0;
-
-		if ((available = diminuto_file_ready(in_fp)) > 0) {
-			fd = in_fd;
-		} else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
-			/* Do nothing. */
-		} else if ((ready = diminuto_mux_wait(&mux, delay /* BLOCK */)) == 0) {
-			/* Do nothing. */
-		} else if (ready > 0) {
-			fd = diminuto_mux_ready_read(&mux);
-			assert(fd >= 0);
-		} else if (errno == EINTR) {
-			continue;
-		} else {
-			assert(0);
-		}
+        /*
+         * We keep looking for input from one of our sources until one of them
+         * tells us we have a buffer to process. It could be a NMEA sentence,
+         * a UBX packet, or an RTCM message. It is also possible that the
+         * select(2) timed out, and no file descriptor will be returned, in
+         * which case we have other work to do further below. Or it may be
+         * that the select(2) was interrupted, so we need to interrogate our
+         * signal handlers.
+         */
+
+        available = 0;
+        fd = -1;
+        ready = 0;
+
+        if ((available = diminuto_file_ready(in_fp)) > 0) {
+            fd = in_fd;
+        } else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
+            /* Do nothing. */
+        } else if ((ready = diminuto_mux_wait(&mux, delay /* BLOCK */)) == 0) {
+            /* Do nothing. */
+        } else if (ready > 0) {
+            fd = diminuto_mux_ready_read(&mux);
+            assert(fd >= 0);
+        } else if (errno == EINTR) {
+            continue;
+        } else {
+            assert(0);
+        }
 
-		/*
-		 * At this point, either available > 0 (there is pending data in
-		 * the input stream buffer) or fd >= 0 (there is a file descriptor or
-		 * socket with pending data), or fd < 0 (there is no data pending).
-		 * The latter case is very unlikely since there was a long timeout in
-		 * the multiplexor wait unless our device has stopped generating data.
-		 */
+        /*
+         * At this point, either available > 0 (there is pending data in
+         * the input stream buffer) or fd >= 0 (there is a file descriptor or
+         * socket with pending data), or fd < 0 (there is no data pending).
+         * The latter case is very unlikely since there was a long timeout in
+         * the multiplexor wait unless our device has stopped generating data.
+         */
 
-		buffer = (uint8_t *)0;
+        buffer = (uint8_t *)0;
 
-		if (fd < 0) {
+        if (fd < 0) {
 
-			/*
-			 * The multiplexor timed out; very unlikely but not impossible
-			 * if our device or remote stopped producing data.
-			 */
+            /*
+             * The multiplexor timed out; very unlikely but not impossible
+             * if our device or remote stopped producing data.
+             */
 
-		} else if (fd == in_fd) {
+        } else if (fd == in_fd) {
 
-			if (available > io_maximum) { io_maximum = available; }
+            if (available > io_maximum) { io_maximum = available; }
 
-			/*
-			 * Consume bytes of NMEA, UBX, or RTCM from the input stream until
-			 * the current input stream buffer is empty or until a complete
-			 * buffer is assembled.
-			 */
+            /*
+             * Consume bytes of NMEA, UBX, or RTCM from the input stream until
+             * the current input stream buffer is empty or until a complete
+             * buffer is assembled.
+             */
 
-			do {
+            do {
 
-				ch = fgetc(in_fp);
-				if (ch == EOF) {
-		        	DIMINUTO_LOG_NOTICE("EOF");
-					eof = !0;
-					break;
-				}
+                ch = fgetc(in_fp);
+                if (ch == EOF) {
+                    DIMINUTO_LOG_NOTICE("EOF");
+                    eof = !0;
+                    break;
+                }
 
-				io_total += 1;
+                io_total += 1;
 
-				/*
-				 * We just received a character from the input stream.
-				 * If we're synchronized (most recently received a complete
-				 * and valid NMEA sentence, UBX packet, or RTCM message), and
-				 * are at the beginning of a new sentence, packet, or message,
-				 * then we will guess what the next format will be based on
-				 * this one character and only activate the state machine
-				 * that we need. If we don't recognize that character, then
-				 * we're lost synchronization and need to reestablish it.
-				 */
-
-				if (!sync) {
-
-					/* Do nothing. */
-
-				} else if (!frame) {
-
-					/* Do nothing. */
-
-				} else if ((ch == HAZER_STIMULUS_START) || (ch == HAZER_STIMULUS_ENCAPSULATION)) {
-
-					nmea_state = HAZER_STATE_START;
-					ubx_state = YODEL_STATE_STOP;
-					rtcm_state = TUMBLEWEED_STATE_STOP;
-
-				} else if (ch == YODEL_STIMULUS_SYNC_1) {
-
-					nmea_state = HAZER_STATE_STOP;
-					ubx_state = YODEL_STATE_START;
-					rtcm_state = TUMBLEWEED_STATE_STOP;
-
-				} else if (ch == TUMBLEWEED_STIMULUS_PREAMBLE) {
-
-					nmea_state = HAZER_STATE_STOP;
-					ubx_state = YODEL_STATE_STOP;
-					rtcm_state = TUMBLEWEED_STATE_START;
+                /*
+                 * We just received a character from the input stream.
+                 * If we're synchronized (most recently received a complete
+                 * and valid NMEA sentence, UBX packet, or RTCM message), and
+                 * are at the beginning of a new sentence, packet, or message,
+                 * then we will guess what the next format will be based on
+                 * this one character and only activate the state machine
+                 * that we need. If we don't recognize that character, then
+                 * we're lost synchronization and need to reestablish it.
+                 */
+
+                if (!sync) {
+
+                    /* Do nothing. */
+
+                } else if (!frame) {
+
+                    /* Do nothing. */
+
+                } else if ((ch == HAZER_STIMULUS_START) || (ch == HAZER_STIMULUS_ENCAPSULATION)) {
+
+                    nmea_state = HAZER_STATE_START;
+                    ubx_state = YODEL_STATE_STOP;
+                    rtcm_state = TUMBLEWEED_STATE_STOP;
+
+                } else if (ch == YODEL_STIMULUS_SYNC_1) {
+
+                    nmea_state = HAZER_STATE_STOP;
+                    ubx_state = YODEL_STATE_START;
+                    rtcm_state = TUMBLEWEED_STATE_STOP;
+
+                } else if (ch == TUMBLEWEED_STIMULUS_PREAMBLE) {
+
+                    nmea_state = HAZER_STATE_STOP;
+                    ubx_state = YODEL_STATE_STOP;
+                    rtcm_state = TUMBLEWEED_STATE_START;
 
-				} else {
-
-					DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                } else {
+
+                    DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
 
-					sync = 0;
+                    sync = 0;
 
-					nmea_state = HAZER_STATE_START;
-					ubx_state = YODEL_STATE_START;
-					rtcm_state = TUMBLEWEED_STATE_START;
+                    nmea_state = HAZER_STATE_START;
+                    ubx_state = YODEL_STATE_START;
+                    rtcm_state = TUMBLEWEED_STATE_START;
 
-				}
+                }
 
-				frame = 0;
+                frame = 0;
 
-				nmea_state = hazer_machine(nmea_state, ch, nmea_buffer.payload.nmea, sizeof(nmea_buffer.payload.nmea), &nmea_context);
-				if (nmea_state == HAZER_STATE_END) {
+                nmea_state = hazer_machine(nmea_state, ch, nmea_buffer.payload.nmea, sizeof(nmea_buffer.payload.nmea), &nmea_context);
+                if (nmea_state == HAZER_STATE_END) {
 
-					buffer = nmea_buffer.payload.nmea;
-					size = hazer_size(&nmea_context);
-					length = size - 1;
-					format = NMEA;
-					if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
-					frame = !0;
+                    buffer = nmea_buffer.payload.nmea;
+                    size = hazer_size(&nmea_context);
+                    length = size - 1;
+                    format = NMEA;
+                    if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
+                    frame = !0;
 
-					DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd]", size, length);
+                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd]", size, length);
 
-					break;
+                    break;
 
-				}
+                }
 
-				ubx_state = yodel_machine(ubx_state, ch, ubx_buffer.payload.ubx, sizeof(ubx_buffer.payload.ubx), &ubx_context);
-				if (ubx_state == YODEL_STATE_END) {
+                ubx_state = yodel_machine(ubx_state, ch, ubx_buffer.payload.ubx, sizeof(ubx_buffer.payload.ubx), &ubx_context);
+                if (ubx_state == YODEL_STATE_END) {
 
-					buffer = ubx_buffer.payload.ubx;
-					size = yodel_size(&ubx_context);
-					length = size - 1;
-					format = UBX;
-					if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
-					frame = !0;
+                    buffer = ubx_buffer.payload.ubx;
+                    size = yodel_size(&ubx_context);
+                    length = size - 1;
+                    format = UBX;
+                    if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
+                    frame = !0;
 
-					DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd]", size, length);
+                    DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd]", size, length);
 
-					break;
-				}
+                    break;
+                }
 
-				rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer.payload.rtcm, sizeof(rtcm_buffer.payload.rtcm), &rtcm_context);
-				if (rtcm_state == TUMBLEWEED_STATE_END) {
+                rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer.payload.rtcm, sizeof(rtcm_buffer.payload.rtcm), &rtcm_context);
+                if (rtcm_state == TUMBLEWEED_STATE_END) {
 
-					buffer = rtcm_buffer.payload.rtcm;
-					size = tumbleweed_size(&rtcm_context);
-					length = size - 1;
-					format = RTCM;
-					if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
-					frame = !0;
+                    buffer = rtcm_buffer.payload.rtcm;
+                    size = tumbleweed_size(&rtcm_context);
+                    length = size - 1;
+                    format = RTCM;
+                    if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
+                    frame = !0;
 
-					DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd]", size, length);
+                    DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd]", size, length);
 
-					break;
-				 }
+                    break;
+                 }
 
-				/*
-				 * If all the state machines have stopped, then either we have
-				 * never had synchronization, or we lost synchronization.
-				 * Restart all of them.
-				 */
+                /*
+                 * If all the state machines have stopped, then either we have
+                 * never had synchronization, or we lost synchronization.
+                 * Restart all of them.
+                 */
 
-				if (nmea_state != HAZER_STATE_STOP) {
-					/* Do nothing. */
-				} else if (ubx_state != YODEL_STATE_STOP) {
-					/* Do nothing. */
-				} else if (rtcm_state != TUMBLEWEED_STATE_STOP) {
-					/* Do nothing. */
-				} else {
-					if (sync) { DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch); sync = 0; }
-				    frame = 0;
-				    nmea_state = HAZER_STATE_START;
-				    ubx_state = YODEL_STATE_START;
-				    rtcm_state = TUMBLEWEED_STATE_START;
-				}
+                if (nmea_state != HAZER_STATE_STOP) {
+                    /* Do nothing. */
+                } else if (ubx_state != YODEL_STATE_STOP) {
+                    /* Do nothing. */
+                } else if (rtcm_state != TUMBLEWEED_STATE_STOP) {
+                    /* Do nothing. */
+                } else {
+                    if (sync) { DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch); sync = 0; }
+                    frame = 0;
+                    nmea_state = HAZER_STATE_START;
+                    ubx_state = YODEL_STATE_START;
+                    rtcm_state = TUMBLEWEED_STATE_START;
+                }
 
-			} while (diminuto_file_ready(in_fp) > 0);
+            } while (diminuto_file_ready(in_fp) > 0);
 
-			/*
-			 * At this point, either we ran out of data in the input
-			 * stream buffer, or we assembled a complete NMEA sentence,
-			 * UBX packet, or NMEA message to process, or we hit end of file.
-			 */
+            /*
+             * At this point, either we ran out of data in the input
+             * stream buffer, or we assembled a complete NMEA sentence,
+             * UBX packet, or NMEA message to process, or we hit end of file.
+             */
 
-		} else if (fd == remote_fd) {
+        } else if (fd == remote_fd) {
 
-			/*
-			 * Receive a NMEA, UBX, or RTCM datagram from a remote gpstool.
-			 * We make a rule that the datagram must be a complete NMEA
-			 * sentence, UBX packet, or RTCM message, complete with a valid
-			 * checksum or cyclic redundancy check, with no extra leading or
-			 * trailing bytes. If we do receive an invalid datagram, that
-			 * is a serious bug either in this software or in the transport.
-			 */
+            /*
+             * Receive a NMEA, UBX, or RTCM datagram from a remote gpstool.
+             * We make a rule that the datagram must be a complete NMEA
+             * sentence, UBX packet, or RTCM message, complete with a valid
+             * checksum or cyclic redundancy check, with no extra leading or
+             * trailing bytes. If we do receive an invalid datagram, that
+             * is a serious bug either in this software or in the transport.
+             */
 
-			remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer));
-			if (remote_total > 0) { network_total += remote_total; }
+            remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer));
+            if (remote_total > 0) { network_total += remote_total; }
 
-			if (remote_total < sizeof(remote_buffer.header)) {
+            if (remote_total < sizeof(remote_buffer.header)) {
 
-				DIMINUTO_LOG_WARNING("Remote Length [%zd]\n", remote_total);
+                DIMINUTO_LOG_WARNING("Remote Length [%zd]\n", remote_total);
 
-			} else if ((remote_size = datagram_validate(&remote_sequence, &remote_buffer.header, remote_total, &outoforder_counter, &missing_counter)) < 0) {
+            } else if ((remote_size = datagram_validate(&remote_sequence, &remote_buffer.header, remote_total, &outoforder_counter, &missing_counter)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Remote Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
+                DIMINUTO_LOG_NOTICE("Remote Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
-			} else if ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0) {
+            } else if ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0) {
 
-				buffer = remote_buffer.payload.nmea;
-				size = remote_size;
-				length = remote_length;
-				format = NMEA;
+                buffer = remote_buffer.payload.nmea;
+                size = remote_size;
+                length = remote_length;
+                format = NMEA;
 
-				DIMINUTO_LOG_DEBUG("Remote NMEA [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+                DIMINUTO_LOG_DEBUG("Remote NMEA [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-			} else if ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0) {
+            } else if ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0) {
 
-				buffer = remote_buffer.payload.ubx;
-				size = remote_size;
-				length = remote_length;
-				format = UBX;
+                buffer = remote_buffer.payload.ubx;
+                size = remote_size;
+                length = remote_length;
+                format = UBX;
 
-				DIMINUTO_LOG_DEBUG("Remote UBX [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+                DIMINUTO_LOG_DEBUG("Remote UBX [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-			} else if ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0) {
+            } else if ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0) {
 
-				buffer = remote_buffer.payload.rtcm;
-				size = remote_size;
-				length = remote_length;
-				format = RTCM;
+                buffer = remote_buffer.payload.rtcm;
+                size = remote_size;
+                length = remote_length;
+                format = RTCM;
 
-				DIMINUTO_LOG_DEBUG("Remote RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+                DIMINUTO_LOG_DEBUG("Remote RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-			} else {
+            } else {
 
-				DIMINUTO_LOG_ERROR("Remote Other [%zd] [%zd] [%zd] 0x%02x\n", remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
+                DIMINUTO_LOG_ERROR("Remote Other [%zd] [%zd] [%zd] 0x%02x\n", remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
 
-			}
+            }
 
-		} else if (fd == surveyor_fd) {
+        } else if (fd == surveyor_fd) {
 
-			/*
-			 * Receive an RTCM datagram from a remote gpstool doing a survey.
-			 */
+            /*
+             * Receive an RTCM datagram from a remote gpstool doing a survey.
+             */
 
-			surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer));
-			if (surveyor_total > 0) { network_total += surveyor_total; }
+            surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer));
+            if (surveyor_total > 0) { network_total += surveyor_total; }
 
-			if (surveyor_total < sizeof(surveyor_buffer.header)) {
+            if (surveyor_total < sizeof(surveyor_buffer.header)) {
 
-				DIMINUTO_LOG_WARNING("Surveyor Length [%zd]\n", surveyor_total);
+                DIMINUTO_LOG_WARNING("Surveyor Length [%zd]\n", surveyor_total);
 
-			} else if ((surveyor_size = datagram_validate(&surveyor_sequence, &surveyor_buffer.header, surveyor_total, &outoforder_counter, &missing_counter)) < 0) {
+            } else if ((surveyor_size = datagram_validate(&surveyor_sequence, &surveyor_buffer.header, surveyor_total, &outoforder_counter, &missing_counter)) < 0) {
 
-				DIMINUTO_LOG_NOTICE("Surveyor Order [%zd] {%lu} {%lu}\n", surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
+                DIMINUTO_LOG_NOTICE("Surveyor Order [%zd] {%lu} {%lu}\n", surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
 
-			} else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
+            } else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
 
-				DIMINUTO_LOG_ERROR("Surveyor Data [%zd] [%zd] [%zd] 0x%02x\n", surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
+                DIMINUTO_LOG_ERROR("Surveyor Data [%zd] [%zd] [%zd] 0x%02x\n", surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
 
-			} else if (surveyor_length == TUMBLEWEED_RTCM_SHORTEST) {
+            } else if (surveyor_length == TUMBLEWEED_RTCM_SHORTEST) {
 
-	            DIMINUTO_LOG_DEBUG("Surveyor RTCM keepalive received");
+                DIMINUTO_LOG_DEBUG("Surveyor RTCM keepalive received");
 
-			} else if (dev_fp == (FILE *)0) {
+            } else if (dev_fp == (FILE *)0) {
 
-				/* Do nothing. */
+                /* Do nothing. */
 
-			} else {
+            } else {
 
-	            kinematics.source = NETWORK;
+                kinematics.source = NETWORK;
 
-				kinematics.number = tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length);
-	            if (kinematics.number < 0) { kinematics.number = 9999; }
-	            collect_update(kinematics.number, &updates);
+                kinematics.number = tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length);
+                if (kinematics.number < 0) { kinematics.number = 9999; }
+                collect_update(kinematics.number, &updates);
 
-	            kinematics.length = surveyor_length;
+                kinematics.length = surveyor_length;
 
-	            kinematics.ticks = timeout;
-	            refresh = !0;
+                kinematics.ticks = timeout;
+                refresh = !0;
 
-				DIMINUTO_LOG_DEBUG("Surveyor RTCM [%zd] [%zd] [%zd] <%d>\n", surveyor_total, surveyor_size, surveyor_length, kinematics.number);
+                DIMINUTO_LOG_DEBUG("Surveyor RTCM [%zd] [%zd] [%zd] <%d>\n", surveyor_total, surveyor_size, surveyor_length, kinematics.number);
 
-				if (verbose) { diminuto_dump(stderr, &surveyor_buffer, surveyor_total); }
-				write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
+                if (verbose) { diminuto_dump(stderr, &surveyor_buffer, surveyor_total); }
+                write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
 
-			}
+            }
 
-		} else {
+        } else {
 
-			/*
-			 * The multiplexor returned a file descriptor which was not one we
-			 * recognize; that should be impossible.
-			 */
+            /*
+             * The multiplexor returned a file descriptor which was not one we
+             * recognize; that should be impossible.
+             */
 
-			DIMINUTO_LOG_ERROR("Multiplexor Fail [%d] (%d) <%d %d %d>\n", ready, fd, dev_fd, remote_fd, surveyor_fd);
-			assert(0);
+            DIMINUTO_LOG_ERROR("Multiplexor Fail [%d] (%d) <%d %d %d>\n", ready, fd, dev_fd, remote_fd, surveyor_fd);
+            assert(0);
 
-		}
+        }
 
         /*
          * If one of the input sources indicated end of file, we're done.
@@ -2730,7 +2730,7 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else {
 
-        	datagram_stamp(&keepalive_buffer.header, &keepalive_sequence);
+            datagram_stamp(&keepalive_buffer.header, &keepalive_sequence);
             surveyor_total = send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             if (surveyor_total > 0) { network_total += surveyor_total; }
             keepalive_was = keepalive_now;
@@ -2768,7 +2768,7 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else {
 
-        	command_node = diminuto_list_dequeue(&command_list);
+            command_node = diminuto_list_dequeue(&command_list);
             assert(command_node != (diminuto_list_t *)0);
 
             command = diminuto_containerof(command_t, link, command_node);
@@ -2778,26 +2778,26 @@ int main(int argc, char * argv[])
             if (command_string[0] == '\0') {
 
                 free(command_node);
-            	DIMINUTO_LOG_NOTICE("Done");
+                DIMINUTO_LOG_NOTICE("Done");
                 eof = !0;
 
             } else {
 
-            	command_size = strlen(command_string) + 1;
+                command_size = strlen(command_string) + 1;
                 command_length = diminuto_escape_collapse(command_string, command_string, command_size);
                 if (command_string[0] == HAZER_STIMULUS_START) {
 
-                	emit_sentence(dev_fp, command_string, command_length);
+                    emit_sentence(dev_fp, command_string, command_length);
                     rc = 0;
 
                 } else if ((command_string[0] == YODEL_STIMULUS_SYNC_1) && (command_string[1] == YODEL_STIMULUS_SYNC_2)) {
 
-                	emit_packet(dev_fp, command_string, command_length);
+                    emit_packet(dev_fp, command_string, command_length);
                     rc = 0;
 
                 } else {
 
-                	DIMINUTO_LOG_WARNING("Command Other 0x%02x%02x [%zd]", command_string[0], command_string[1], command_length);
+                    DIMINUTO_LOG_WARNING("Command Other 0x%02x%02x [%zd]", command_string[0], command_string[1], command_length);
                     rc = -1;
 
                 }
@@ -2863,9 +2863,9 @@ int main(int argc, char * argv[])
         } else if ((remote_mask & format) == 0) {
             /* Do nothing. */
         } else {
-        	datagram_buffer_t * dp;
-        	dp = diminuto_containerof(datagram_buffer_t, payload, buffer);
-        	datagram_stamp(&(dp->header), &remote_sequence);
+            datagram_buffer_t * dp;
+            dp = diminuto_containerof(datagram_buffer_t, payload, buffer);
+            datagram_stamp(&(dp->header), &remote_sequence);
             remote_total = send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
             if (remote_total > 0) { network_total += remote_total; }
         }
@@ -2940,7 +2940,7 @@ int main(int argc, char * argv[])
         elapsed = (expiration_now > expiration_was) ? expiration_now - expiration_was : 0;
 
         if (elapsed > 0) {
-        	int ii;
+            int ii;
 
             for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
                 countdown(&position[ii].ticks, elapsed);
@@ -2976,8 +2976,8 @@ int main(int argc, char * argv[])
              * sentence later.
              */
 
-        	strncpy(tokenized, buffer, sizeof(tokenized));
-        	tokenized[sizeof(tokenized) - 1] = '\0';
+            strncpy(tokenized, buffer, sizeof(tokenized));
+            tokenized[sizeof(tokenized) - 1] = '\0';
             count = hazer_tokenize(vector, diminuto_countof(vector), tokenized, length);
             assert(count >= 0);
             assert(vector[count - 1] == (char *)0);
@@ -3012,7 +3012,7 @@ int main(int argc, char * argv[])
 
             } else {
 
-            	/* Do nothing. */
+                /* Do nothing. */
 
             }
 
@@ -3343,14 +3343,14 @@ int main(int argc, char * argv[])
          * log, or use to update our databases.
          */
         if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
-        	/* Do nothing. */
+            /* Do nothing. */
         } else if (diminuto_file_ready(in_fp) > 0) {
-        	continue;
+            continue;
         } else if (diminuto_mux_wait(&mux, 0 /* POLL */) > 0) {
-			continue;
-		} else {
-			/* Do nothing. */
-		}
+            continue;
+        } else {
+            /* Do nothing. */
+        }
 
         /*
          * This code is just for testing the expiration feature.
@@ -3461,9 +3461,9 @@ report:
      ** FINIALIZATION
      **/
 
-	DIMINUTO_LOG_INFORMATION("Stop");
+    DIMINUTO_LOG_INFORMATION("Stop");
 
-	DIMINUTO_LOG_INFORMATION("Counters Remote=%lu Surveyor=%lu Keepalive=%lu OutOfOrder=%u Missing=%u", (unsigned long)remote_sequence, (unsigned long)surveyor_sequence, (unsigned long)keepalive_sequence, outoforder_counter, missing_counter);
+    DIMINUTO_LOG_INFORMATION("Counters Remote=%lu Surveyor=%lu Keepalive=%lu OutOfOrder=%u Missing=%u", (unsigned long)remote_sequence, (unsigned long)surveyor_sequence, (unsigned long)keepalive_sequence, outoforder_counter, missing_counter);
 
     rc = tumbleweed_finalize();
     assert(rc == 0);
@@ -3517,7 +3517,7 @@ report:
     }
 
     if (dev_fp != (FILE *)0) {
-    	rc = fclose(dev_fp);
+        rc = fclose(dev_fp);
         if (rc == EOF) { diminuto_perror("fclose(dev_fp)"); }
     }
 
@@ -3536,16 +3536,16 @@ report:
         rc = fclose(out_fp);
         if (rc == EOF) { diminuto_perror("fclose(out_fp)"); }
     } else {
-    	/* Do nothing. */
+        /* Do nothing. */
     }
 
     while (!diminuto_list_isempty(&command_list)) {
-    	command_node = diminuto_list_dequeue(&command_list);
-    	assert(command_node != (diminuto_list_t *)0);
-    	free(command_node);
+        command_node = diminuto_list_dequeue(&command_list);
+        assert(command_node != (diminuto_list_t *)0);
+        free(command_node);
     }
 
-	DIMINUTO_LOG_INFORMATION("End");
+    DIMINUTO_LOG_INFORMATION("End");
 
     fflush(stderr);
 

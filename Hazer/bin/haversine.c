@@ -46,69 +46,69 @@
 
 int main(int argc, char * argv[])
 {
-	const char * program = (const char *)0;
-	int debug = 0;
-	double lat1 = 0.0;
-	double lon1 = 0.0;
-	double lat2 = 0.0;
-	double lon2 = 0.0;
-	double theta1 = 0.0;
-	double theta2 = 0.0;
-	double deltatheta = 0.0;
-	double deltalambda = 0.0;
-	double a = 0.0;
-	double b = 0.0;
-	double c = 0.0;
-	double d = 0.0;
-	static const double R = 6378100;
+    const char * program = (const char *)0;
+    int debug = 0;
+    double lat1 = 0.0;
+    double lon1 = 0.0;
+    double lat2 = 0.0;
+    double lon2 = 0.0;
+    double theta1 = 0.0;
+    double theta2 = 0.0;
+    double deltatheta = 0.0;
+    double deltalambda = 0.0;
+    double a = 0.0;
+    double b = 0.0;
+    double c = 0.0;
+    double d = 0.0;
+    static const double R = 6378100;
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
     argv++;
     argc--;
 
     if ((argc > 0) && (strcmp(*argv, "-?") == 0)) {
-		fprintf(stderr, "usage: %s [ -? ] [ -d ] LATDD1 LONDD1 LATDD2 LONDD2\n", program);
-		argv++;
-		argc--;
+        fprintf(stderr, "usage: %s [ -? ] [ -d ] LATDD1 LONDD1 LATDD2 LONDD2\n", program);
+        argv++;
+        argc--;
     }
 
     if ((argc > 0) && (strcmp(*argv, "-d") == 0)) {
-		debug = !0;
-		argv++;
-		argc--;
+        debug = !0;
+        argv++;
+        argc--;
     }
 
-	if (argc < 4) {
-		return 1;
-	}
+    if (argc < 4) {
+        return 1;
+    }
 
-	lat1 = atof(*(argv++));
-	lon1 = atof(*(argv++));
+    lat1 = atof(*(argv++));
+    lon1 = atof(*(argv++));
 
-	lat2 = atof(*(argv++));
-	lon2 = atof(*(argv++));
+    lat2 = atof(*(argv++));
+    lon2 = atof(*(argv++));
 
-	if (debug) {
-		fprintf(stderr, "%s: ( %f , %f ) ( %f , %f )\n", program, lat1, lon1, lat2, lon2);
-	}
+    if (debug) {
+        fprintf(stderr, "%s: ( %f , %f ) ( %f , %f )\n", program, lat1, lon1, lat2, lon2);
+    }
 
-	theta1 = (lat1 * M_PI) / 180.0;
-	theta2 = (lat2 * M_PI) / 180.0;
+    theta1 = (lat1 * M_PI) / 180.0;
+    theta2 = (lat2 * M_PI) / 180.0;
 
-	deltatheta = ((lat2 - lat1) * M_PI) / 180.0;
-	deltalambda = ((lon2 - lon1) * M_PI) / 180.0;
+    deltatheta = ((lat2 - lat1) * M_PI) / 180.0;
+    deltalambda = ((lon2 - lon1) * M_PI) / 180.0;
 
-	b = sin(deltalambda / 2.0);
-	b *= b;
+    b = sin(deltalambda / 2.0);
+    b *= b;
 
-	a = sin(deltatheta / 2.0);
-	a *= a;
+    a = sin(deltatheta / 2.0);
+    a *= a;
 
-	a += cos(theta1) * cos(theta2) * b;
+    a += cos(theta1) * cos(theta2) * b;
 
-	c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+    c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
 
-	d = R * c;
+    d = R * c;
 
-	printf("%f\n", d);
+    printf("%f\n", d);
 }

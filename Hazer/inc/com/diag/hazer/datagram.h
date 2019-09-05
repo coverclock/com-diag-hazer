@@ -44,8 +44,8 @@ typedef uint32_t datagram_sequence_t;
  * a header containing a thirty-two bit sequence number.
  */
 typedef struct DatagramHeader {
-	datagram_sequence_t sequence;
-	uint8_t data[0];
+    datagram_sequence_t sequence;
+    uint8_t data[0];
 } datagram_header_t;
 
 /**
@@ -53,7 +53,7 @@ typedef struct DatagramHeader {
  */
 enum {
     DATAGRAM_SIZE = (
-    	(HAZER_NMEA_LONGEST > YODEL_UBX_LONGEST)
+        (HAZER_NMEA_LONGEST > YODEL_UBX_LONGEST)
             ? ((HAZER_NMEA_LONGEST > TUMBLEWEED_RTCM_LONGEST)
                 ? HAZER_NMEA_LONGEST
                 : TUMBLEWEED_RTCM_LONGEST)
@@ -71,13 +71,13 @@ enum {
  * field that is transmitted over wire or air in network byte order.
  */
 typedef struct DatagramBuffer {
-	datagram_header_t header;
-	union {
-		uint8_t data[DATAGRAM_SIZE + 1];
-		hazer_buffer_t nmea;
-		yodel_buffer_t ubx;
-		tumbleweed_buffer_t rtcm;
-	} payload;
+    datagram_header_t header;
+    union {
+        uint8_t data[DATAGRAM_SIZE + 1];
+        hazer_buffer_t nmea;
+        yodel_buffer_t ubx;
+        tumbleweed_buffer_t rtcm;
+    } payload;
 } datagram_buffer_t;
 
 /**

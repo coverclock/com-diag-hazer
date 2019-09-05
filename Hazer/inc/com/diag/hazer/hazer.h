@@ -159,7 +159,7 @@ enum HazerNmeaConstants {
  * failed; that might be of interest to the application.
  */
 typedef enum HazerState {
-	HAZER_STATE_STOP		= 'X',
+    HAZER_STATE_STOP		= 'X',
     HAZER_STATE_START		= 'S',
     HAZER_STATE_BODY		= 'P',
     HAZER_STATE_MSN			= 'M',
@@ -384,12 +384,12 @@ typedef uint8_t (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
  * Hazer NMEA parser state machine context (which needs no initial value).
  */
 typedef struct HazerContext {
-	uint8_t * bp;		/* Current buffer pointer. */
-	size_t sz;			/* Remaining buffer size in bytes. */
-	size_t tot;			/* Total size once sentence is complete. */
-	uint8_t cs;			/* Running checksum. */
-	uint8_t msn;		/* Most significant checksum nibble character. */
-	uint8_t lsn;		/* Least significant checksum nibble character. */
+    uint8_t * bp;		/* Current buffer pointer. */
+    size_t sz;			/* Remaining buffer size in bytes. */
+    size_t tot;			/* Total size once sentence is complete. */
+    uint8_t cs;			/* Running checksum. */
+    uint8_t msn;		/* Most significant checksum nibble character. */
+    uint8_t lsn;		/* Least significant checksum nibble character. */
 } hazer_context_t;
 
 /**
@@ -422,7 +422,7 @@ extern hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffe
  */
 static inline size_t hazer_size(const hazer_context_t * pp)
 {
-	return pp->tot;
+    return pp->tot;
 }
 
 /*******************************************************************************
@@ -436,7 +436,7 @@ static inline size_t hazer_size(const hazer_context_t * pp)
  */
 static inline void hazer_checksum(uint8_t ch, uint8_t * csp)
 {
-	*csp ^= ch;
+    *csp ^= ch;
 }
 
 /**
@@ -778,14 +778,14 @@ typedef struct HazerPosition {
  */
 #define HAZER_POSITION_INITIALIZER \
     { \
-	    0, 0, 0, 0, \
+        0, 0, 0, 0, \
         0, 0, 0, \
-		0, 0, 0, 0, \
-		(const char *)0, \
-		0, \
-		0, 0, 0, 0, 0, 0, 0, \
-		0, \
-		{ 0, } \
+        0, 0, 0, 0, \
+        (const char *)0, \
+        0, \
+        0, 0, 0, 0, 0, 0, 0, \
+        0, \
+        { 0, } \
     }
 
 /**
@@ -851,13 +851,13 @@ typedef struct HazerActive {
  */
 #define HAZER_ACTIVE_INITIALIZER \
     { \
-	    (const char *)0, \
-		{ 0, }, \
-		0, 0, 0, \
-		HAZER_SYSTEM_TOTAL, \
-		0, \
-		0, \
-		{ 0, } \
+        (const char *)0, \
+        { 0, }, \
+        0, 0, 0, \
+        HAZER_SYSTEM_TOTAL, \
+        0, \
+        0, \
+        { 0, } \
     }
 
 /**
@@ -913,12 +913,12 @@ typedef struct HazerSatellite {
  */
 #define HAZER_SATELLITE_INITIALIZER \
     { \
-	    0, \
-		0, 0, \
-		0, \
-		0, \
-		0, \
-		0 \
+        0, \
+        0, 0, \
+        0, \
+        0, \
+        0, \
+        0 \
     }
 
 /**fg
@@ -941,8 +941,8 @@ typedef struct HazerView {
  */
 #define HAZER_VIEW_INITIALIZER \
     { \
-	    (const char *)0, \
-		{ \
+        (const char *)0, \
+        { \
             HAZER_SATELLITE_INITIALIZER, \
             HAZER_SATELLITE_INITIALIZER, \
             HAZER_SATELLITE_INITIALIZER, \
@@ -976,11 +976,11 @@ typedef struct HazerView {
             HAZER_SATELLITE_INITIALIZER, \
             HAZER_SATELLITE_INITIALIZER, \
         }, \
-		0, \
         0, \
-		0, \
         0, \
-		0, \
+        0, \
+        0, \
+        0, \
     }
 
 /**

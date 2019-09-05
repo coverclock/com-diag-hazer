@@ -85,7 +85,7 @@ int main(void)
                         HAZER_ID_GPS_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 4,
         };
 
@@ -101,7 +101,7 @@ int main(void)
                     HAZER_ID_SBAS_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 2,
         };
 
@@ -118,7 +118,7 @@ int main(void)
                     HAZER_ID_SBAS_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -135,7 +135,7 @@ int main(void)
                     HAZER_ID_SBAS_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -152,7 +152,7 @@ int main(void)
                     HAZER_ID_GLONASS_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -169,7 +169,7 @@ int main(void)
                     HAZER_ID_BEIDOU1_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -186,7 +186,7 @@ int main(void)
                     HAZER_ID_BEIDOU2_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -203,7 +203,7 @@ int main(void)
                     HAZER_ID_QZSS_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 3,
         };
 
@@ -221,7 +221,7 @@ int main(void)
                     HAZER_ID_GLONASS_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 4,
         };
 
@@ -239,7 +239,7 @@ int main(void)
                     HAZER_ID_GLONASS_LAST,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 4,
         };
 
@@ -276,7 +276,7 @@ int main(void)
                     100,
                 },
                 0, 0, 0,
-				HAZER_SYSTEM_TOTAL,
+                HAZER_SYSTEM_TOTAL,
                 4,
         };
 
@@ -313,7 +313,7 @@ int main(void)
                     0,
                     0,
                 },
-	            { NULL }, /* GALILEO */
+                { NULL }, /* GALILEO */
                 { NULL }, /* BEIDOU */
                 {
                     NULL,

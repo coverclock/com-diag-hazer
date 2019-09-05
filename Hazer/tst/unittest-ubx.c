@@ -19,7 +19,7 @@
 
 int main(void)
 {
-	yodel_debug(stderr);
+    yodel_debug(stderr);
 
     /**************************************************************************/
 
@@ -90,67 +90,67 @@ int main(void)
     /**************************************************************************/
 
     BEGIN("\\xb5b\\x05\\x00\\x02\\0\\x06\\x8a\\x98\\xc1");
-    	yodel_ubx_ack_t data = YODEL_UBX_ACK_INITIALIZER;
-    	fprintf(stderr, "\"%s\"[%zu]\n", string, length);
-    	diminuto_dump(stderr, message, size);
-    	assert(yodel_ubx_ack(&data, message, size) == 0);
-    	assert(data.state == 0);
+        yodel_ubx_ack_t data = YODEL_UBX_ACK_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_ubx_ack(&data, message, size) == 0);
+        assert(data.state == 0);
     END;
 
     BEGIN("\\xb5b\\x05\\x01\\x02\\0\\x06\\x8b\\x99\\xc2");
-		yodel_ubx_ack_t data = YODEL_UBX_ACK_INITIALIZER;
-    	fprintf(stderr, "\"%s\"[%zu]\n", string, length);
-    	diminuto_dump(stderr, message, size);
-		assert(yodel_ubx_ack(&data, message, size) == 0);
-		assert(data.state == !0);
+        yodel_ubx_ack_t data = YODEL_UBX_ACK_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_ubx_ack(&data, message, size) == 0);
+        assert(data.state == !0);
     END;
 
     BEGIN("\\xb5b\\x06\\x8b\\f\\0\\x01\\0\\0\\0\\x11\\0\\x03@\\xa0\\x86\\x01\\0\\x19'");
-    	yodel_ubx_cfg_valget_t data = YODEL_UBX_CFG_VALGET_INITIALIZER;
-    	fprintf(stderr, "\"%s\"[%zu]\n", string, length);
-    	diminuto_dump(stderr, message, size);
-    	assert(yodel_ubx_cfg_valget(message, size) == 0);
+        yodel_ubx_cfg_valget_t data = YODEL_UBX_CFG_VALGET_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_ubx_cfg_valget(message, size) == 0);
     END;
 
     BEGIN("\\xb5b\\x06\\x8b\\t\\0\\x01\\0\\0\\0\\xbf\\x02\\x91 \\x01\\x0e\\xf5");
-		yodel_ubx_cfg_valget_t data = YODEL_UBX_CFG_VALGET_INITIALIZER;
-		fprintf(stderr, "\"%s\"[%zu]\n", string, length);
-		diminuto_dump(stderr, message, size);
-		assert(yodel_ubx_cfg_valget(message, size) == 0);
+        yodel_ubx_cfg_valget_t data = YODEL_UBX_CFG_VALGET_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_ubx_cfg_valget(message, size) == 0);
     END;
 
     BEGIN("\\xb5b\\n\\t<\\0\\xc1\\x81\\0\\0\\0\\0\\x01\\0\\0\\x80\\0\\0\\xdfg\\0\\0L\\0\\x91\\x14\\x01\\x02\\x01\\x85\\xbe\\xff\\x01\\0\\xff\\0\\x01\\x03\\x02\\x10\\xff\\x12\\x13\\x14\\x15\\x0e\\n\\v\\x0fD\\x16\\x05\\xeeZ\\0\\0\\0\\0\\xdb{\\0\\0\\0\\0\\0\\0!M");
-    	yodel_ubx_mon_hw_t data = YODEL_UBX_MON_HW_INITIALIZER;
-		fprintf(stderr, "\"%s\"[%zu]\n", string, length);
-		diminuto_dump(stderr, message, size);
-		assert(yodel_ubx_mon_hw(&data, message, size) == 0);
+        yodel_ubx_mon_hw_t data = YODEL_UBX_MON_HW_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_ubx_mon_hw(&data, message, size) == 0);
     END;
 
     BEGIN("\\xb5b\\n\\x04\\xdc\\0EXT CORE 1.00 (94e56e)\\0\\0\\0\\0\\0\\0\\0\\000190000\\0\\0ROM BASE 0x118B2060\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0FWVER=HPG 1.11\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0PROTVER=27.10\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0MOD=ZED-F9P\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0GPS;GLO;GAL;BDS\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0QZSS\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x9au");
-		fprintf(stderr, "\"%s\"[%zu]\n", string, length);
-		diminuto_dump(stderr, message, size);
-    	assert(yodel_ubx_mon_ver(message, size) == 0);
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_ubx_mon_ver(message, size) == 0);
     END;
 
     BEGIN("\\xb5b\\x01\\x03\\x10\\0h\\x15i\\x0f\\x05\\xdd\\0\\bkn\\0\\0\\xde\\x1e\\xbf\\0\\x87V");
-		yodel_ubx_nav_status_t data = YODEL_UBX_NAV_STATUS_INITIALIZER;
-		fprintf(stderr, "\"%s\"[%zu]\n", string, length);
-		diminuto_dump(stderr, message, size);
-		assert(yodel_ubx_nav_status(&data, message, size) == 0);
+        yodel_ubx_nav_status_t data = YODEL_UBX_NAV_STATUS_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_ubx_nav_status(&data, message, size) == 0);
     END;
 
     BEGIN("\\xb5b\\x01;(\\0\\0\\0\\0\\0\\xf8\\x83\\xac\\x0e<\\0\\0\\0\\xb7\\x14Z\\xf8hh\\xc2\\xe3\\x8ai5\\x18\\xe9\\xf1\\xf2\\0\\xe6\\x1a\\x01\\0=\\0\\0\\0\\x01\\0\\0\\0\\xb2\\x1f");
-		yodel_ubx_nav_svin_t data = YODEL_UBX_NAV_SVIN_INITIALIZER;
-		fprintf(stderr, "\"%s\"[%zu]\n", string, length);
-		diminuto_dump(stderr, message, size);
-		assert(yodel_ubx_nav_svin(&data, message, size) == 0);
+        yodel_ubx_nav_svin_t data = YODEL_UBX_NAV_SVIN_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_ubx_nav_svin(&data, message, size) == 0);
     END;
 
     BEGIN("\\xb5b\\x022\\b\\0\\x02\\0\\0\\0\\0\\0\\xce\\x04\\x10>");
-		yodel_ubx_rxm_rtcm_t data = YODEL_UBX_RXM_RTCM_INITIALIZER;
-		fprintf(stderr, "\"%s\"[%zu]\n", string, length);
-		diminuto_dump(stderr, message, size);
-		assert(yodel_ubx_rxm_rtcm(&data, message, size) == 0);
+        yodel_ubx_rxm_rtcm_t data = YODEL_UBX_RXM_RTCM_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_ubx_rxm_rtcm(&data, message, size) == 0);
     END;
 
     /**************************************************************************/

@@ -73,7 +73,7 @@ enum YodelUbxConstants {
     YODEL_UBX_UNSUMMED	= 2,	/* SYNC1[1], SYNC2[1] */
     YODEL_UBX_SUMMED	= 4,	/* CLASS[1], ID[1], LENGTH[2] ... */
     YODEL_UBX_SHORTEST	= 8,	/* UNSUMMED[2], SUMMED[4], CK_A[1], CK_B[1] */
-	YODEL_UBX_CHECKSUM	= 2,	/* CK_A[1], CK_B[1] */
+    YODEL_UBX_CHECKSUM	= 2,	/* CK_A[1], CK_B[1] */
     YODEL_UBX_LONGEST	= 1024,	/* Rounded up from SHORTEST + (64 * (4 + 8)). */
 };
 
@@ -128,10 +128,10 @@ typedef struct YodelUbxHeader {
  */
 #define YODEL_UBX_HEADER_INITIALIZER \
     { \
-	    0, 0, \
-		0, \
-		0, \
-		0 \
+        0, 0, \
+        0, \
+        0, \
+        0 \
     }
 
 /**
@@ -142,7 +142,7 @@ typedef struct YodelUbxHeader {
  * failed; that might be of interest to the application.
  */
 typedef enum YodelState {
-	YODEL_STATE_STOP		= 'X',
+    YODEL_STATE_STOP		= 'X',
     YODEL_STATE_START		= 'S',
     YODEL_STATE_SYNC_2		= 'Y',
     YODEL_STATE_CLASS		= 'C',
@@ -176,12 +176,12 @@ typedef enum YodelAction {
  * Yodel UBX parser state machine context (which needs no initial value).
  */
 typedef struct YodelContext {
-	uint8_t * bp;		/* Current buffer pointer. */
-	size_t sz;			/* Remaining buffer size in bytes. */
-	size_t tot;			/* Total size once packet is complete. */
-	uint16_t ln;		/* Payload length in bytes. */
-	uint8_t csa;		/* Running Fletcher checksum A. */
-	uint8_t csb;		/* Running Fletcher checksum B. */
+    uint8_t * bp;		/* Current buffer pointer. */
+    size_t sz;			/* Remaining buffer size in bytes. */
+    size_t tot;			/* Total size once packet is complete. */
+    uint16_t ln;		/* Payload length in bytes. */
+    uint8_t csa;		/* Running Fletcher checksum A. */
+    uint8_t csb;		/* Running Fletcher checksum B. */
 } yodel_context_t;
 
 /**
@@ -213,7 +213,7 @@ extern yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffe
  */
 static inline size_t yodel_size(const yodel_context_t * pp)
 {
-	return pp->tot;
+    return pp->tot;
 }
 
 /*******************************************************************************
@@ -301,7 +301,7 @@ typedef enum YodelSystem {
         "SBAS", \
         "GALILEO", \
         "BEIDOU", \
-		"", \
+        "", \
         "QZSS", \
         "GLONASS", \
         "IMES", \
@@ -316,34 +316,34 @@ typedef enum YodelSystem {
 typedef enum YodelId {
     /*                        0,     */
     YODEL_ID_GPS_FIRST		= 1,
-	/*                        :      */
+    /*                        :      */
     YODEL_ID_GPS_LAST		= 32,
     YODEL_ID_SBAS1_FIRST	= 33,
-	/*                        :      */
+    /*                        :      */
     YODEL_ID_SBAS1_LAST		= 64,
     YODEL_ID_GLONASS1_FIRST	= 65,
-	/*                        :      */
+    /*                        :      */
     YODEL_ID_GLONASS1_LAST	= 96,
     /*						  97,    */
     /*						   :     */
     /*						  119,   */
     YODEL_ID_SBAS2_FIRST	= 120,
-	/*                        :      */
+    /*                        :      */
     YODEL_ID_SBAS2_LAST		= 158,
     YODEL_ID_BEIDOU1_FIRST	= 159,
-	/*                        :      */
+    /*                        :      */
     YODEL_ID_BEIDOU1_LAST	= 163,
     /*						  164,   */
     /*						   :     */
     /*						  172,   */
     YODEL_ID_IMES_FIRST		= 173,
-	/*                        :      */
+    /*                        :      */
     YODEL_ID_IMES_LAST		= 182,
     /*						  183,   */
     /*						   :     */
     /*						  192,   */
     YODEL_ID_QZSS_FIRST		= 193,
-	/*                        :      */
+    /*                        :      */
     YODEL_ID_QZSS_LAST		= 197,
     /*						  198,   */
     /*						   :     */
@@ -354,13 +354,13 @@ typedef enum YodelId {
     /*						   :     */
     /*						  300,   */
     YODEL_ID_GALILEO_FIRST	= 301,
-	/*                        :      */
+    /*                        :      */
     YODEL_ID_GALILEO_LAST	= 336,
     /*						  337,   */
     /*						   :     */
     /*						  400,   */
     YODEL_ID_BEIDOU2_FIRST	= 401,
-	/*                        :      */
+    /*                        :      */
     YODEL_ID_BEIDOU2_LAST	= 437,
     /*						  438,   */
     /*						   :     */
@@ -492,19 +492,19 @@ typedef struct YodelUbxMonHw {
  */
 #define YODEL_UBX_MON_HW_INITIALIZER \
     { \
-	    0, 0, 0, 0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		{ 0, }, \
-		0, \
-		{ 0, }, \
-		0, \
-		0, 0 \
+        0, 0, 0, 0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        { 0, }, \
+        0, \
+        { 0, }, \
+        0, \
+        0, 0 \
     }
 
 /**
@@ -579,13 +579,13 @@ typedef struct YodelUbxNavStatus {
  */
 #define YODEL_UBX_NAV_STATUS_INITIALIZER \
     { \
-	    0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		0 \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0 \
     }
 
 /**
@@ -698,9 +698,9 @@ extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ss
  * Ublox 8 R15, p. 145.
  */
 typedef struct YodelUbxAck {
-	uint8_t clsID;		/* Class of packet ACKed or NAKed. */
-	uint8_t msgID;		/* Message of packet ACKed or NAKed. */
-	uint8_t state;		/* True if ACK, false if NAK. */
+    uint8_t clsID;		/* Class of packet ACKed or NAKed. */
+    uint8_t msgID;		/* Message of packet ACKed or NAKed. */
+    uint8_t state;		/* True if ACK, false if NAK. */
 } yodel_ubx_ack_t;
 
 /**
@@ -709,9 +709,9 @@ typedef struct YodelUbxAck {
  */
 #define YODEL_UBX_ACK_INITIALIZER \
     { \
-	    ~0, \
-		~0, \
-		~0, \
+        ~0, \
+        ~0, \
+        ~0, \
     }
 
 /**
@@ -745,10 +745,10 @@ extern int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length);
  * Ublox 9, p. 85.
  */
 typedef struct YodelUbxCfgValget {
-	uint8_t version;		/* Message version: send 0, receive 1. */
-	uint8_t layer;			/* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
-	uint8_t reserved[2];	/* Reserved. */
-	uint8_t cfgData[0];		/* Beginning of variable number key/value pairs. */
+    uint8_t version;		/* Message version: send 0, receive 1. */
+    uint8_t layer;			/* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
+    uint8_t reserved[2];	/* Reserved. */
+    uint8_t cfgData[0];		/* Beginning of variable number key/value pairs. */
 } yodel_ubx_cfg_valget_t;
 
 /**
@@ -757,9 +757,9 @@ typedef struct YodelUbxCfgValget {
  */
 #define YODEL_UBX_CFG_VALGET_INITIALIZER \
     { \
-		0, \
-		0, \
-		{ 0, }, \
+        0, \
+        0, \
+        { 0, }, \
     }
 
 /**
@@ -768,9 +768,9 @@ typedef struct YodelUbxCfgValget {
 enum YodelUbxCfgValgetConstants {
     YODEL_UBX_CFG_VALGET_Class			= 0x06,
     YODEL_UBX_CFG_VALGET_Id				= 0x8b,
-	YODEL_UBX_CFG_VALGET_Length			= 4,
-	YODEL_UBX_CFG_VALGET_Key_Size_SHIFT	= 28,
-	YODEL_UBX_CFG_VALGET_Key_Size_MASK	= 0x7,
+    YODEL_UBX_CFG_VALGET_Length			= 4,
+    YODEL_UBX_CFG_VALGET_Key_Size_SHIFT	= 28,
+    YODEL_UBX_CFG_VALGET_Key_Size_MASK	= 0x7,
 };
 
 /**
@@ -782,21 +782,21 @@ enum YodelUbxCfgValgetConstants {
  * Ublox 9, p. 86
  */
 enum YodelUbxCfgValgetLayer {
-	YODEL_UBX_CFG_VALGET_Layer_RAM	= 0,
-	YODEL_UBX_CFG_VALGET_Layer_BBR	= 1,
-	YODEL_UBX_CFG_VALGET_Layer_NVM	= 2,
-	YODEL_UBX_CFG_VALGET_Layer_ROM	= 7,
+    YODEL_UBX_CFG_VALGET_Layer_RAM	= 0,
+    YODEL_UBX_CFG_VALGET_Layer_BBR	= 1,
+    YODEL_UBX_CFG_VALGET_Layer_NVM	= 2,
+    YODEL_UBX_CFG_VALGET_Layer_ROM	= 7,
 };
 
 /**
  * Ublox 9, p. 191
  */
 enum YodelUbxCfgValgetSize {
-	YODEL_UBX_CFG_VALGET_Size_BIT	= 0x01,
-	YODEL_UBX_CFG_VALGET_Size_ONE	= 0x02,
-	YODEL_UBX_CFG_VALGET_Size_TWO	= 0x03,
-	YODEL_UBX_CFG_VALGET_Size_FOUR	= 0x04,
-	YODEL_UBX_CFG_VALGET_Size_EIGHT	= 0x05,
+    YODEL_UBX_CFG_VALGET_Size_BIT	= 0x01,
+    YODEL_UBX_CFG_VALGET_Size_ONE	= 0x02,
+    YODEL_UBX_CFG_VALGET_Size_TWO	= 0x03,
+    YODEL_UBX_CFG_VALGET_Size_FOUR	= 0x04,
+    YODEL_UBX_CFG_VALGET_Size_EIGHT	= 0x05,
 };
 
 /**
@@ -824,9 +824,9 @@ extern int yodel_ubx_cfg_valget(void * bp, ssize_t length);
 enum YodelUbxMonVerConstants {
     YODEL_UBX_MON_VER_Class				= 0x0a,
     YODEL_UBX_MON_VER_Id				= 0x04,
-	YODEL_UBX_MON_VER_swVersion_LENGTH	= 30,
-	YODEL_UBX_MON_VER_hwVersion_LENGTH	= 10,
-	YODEL_UBX_MON_VER_extension_LENGTH	= 30,
+    YODEL_UBX_MON_VER_swVersion_LENGTH	= 30,
+    YODEL_UBX_MON_VER_hwVersion_LENGTH	= 10,
+    YODEL_UBX_MON_VER_extension_LENGTH	= 30,
 };
 
 /**
@@ -847,22 +847,22 @@ extern int yodel_ubx_mon_ver(const void * bp, ssize_t length);
  * typically by the stationary Base.
  */
 typedef struct YodelUbxNavSvin {
-	uint8_t version;
-	uint8_t reserved[3];
-	uint32_t iTOW;
-	uint32_t dur;
-	int32_t meanX;
-	int32_t meanY;
-	int32_t meanZ;
-	int8_t meanXHP;
-	int8_t meanYHP;
-	int8_t meanZHP;
-	int8_t reserved2[1];
-	int32_t meanAcc;
-	int32_t obs;
-	int8_t valid;
-	int8_t active;
-	int8_t reserved3[2];
+    uint8_t version;
+    uint8_t reserved[3];
+    uint32_t iTOW;
+    uint32_t dur;
+    int32_t meanX;
+    int32_t meanY;
+    int32_t meanZ;
+    int8_t meanXHP;
+    int8_t meanYHP;
+    int8_t meanZHP;
+    int8_t reserved2[1];
+    int32_t meanAcc;
+    int32_t obs;
+    int8_t valid;
+    int8_t active;
+    int8_t reserved3[2];
 } yodel_ubx_nav_svin_t __attribute__((aligned(4)));
 
 /**
@@ -871,31 +871,31 @@ typedef struct YodelUbxNavSvin {
  */
 #define YODEL_UBX_NAV_SVIN_INITIALIZER \
     { \
-		0, \
-		{ 0, }, \
-		0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		0, \
-		{ 0, }, \
-		0, \
-		0, \
-		0, \
-		0, \
-		{ 0, }, \
+        0, \
+        { 0, }, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        { 0, }, \
+        0, \
+        0, \
+        0, \
+        0, \
+        { 0, }, \
     }
 
 /**
  * UBX-NAV-SVIN constants.
  */
 enum YodelUbxNavSvinConstants {
-	YODEL_UBX_NAV_SVIN_Class	= 0x01,
-	YODEL_UBX_NAV_SVIN_Id		= 0x3b,
-	YODEL_UBX_NAV_SVIN_Length	= 40,
+    YODEL_UBX_NAV_SVIN_Class	= 0x01,
+    YODEL_UBX_NAV_SVIN_Id		= 0x3b,
+    YODEL_UBX_NAV_SVIN_Length	= 40,
 };
 
 /**
@@ -917,11 +917,11 @@ extern int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_
  * Ublox 9 R05, p. 181.
  */
 typedef struct YodelUbxRxmRtcm {
-	uint8_t version;		/* Message version. */
-	uint8_t flags;			/* If true, crcFailed. */
-	uint16_t subType;		/* Message sub type if RTCM 4072. */
-	uint16_t refStation;	/* Reference station identification. */
-	uint16_t msgType;		/* Message type. */
+    uint8_t version;		/* Message version. */
+    uint8_t flags;			/* If true, crcFailed. */
+    uint16_t subType;		/* Message sub type if RTCM 4072. */
+    uint16_t refStation;	/* Reference station identification. */
+    uint16_t msgType;		/* Message type. */
 } yodel_ubx_rxm_rtcm_t __attribute__((aligned(2)));
 
 /**
@@ -930,11 +930,11 @@ typedef struct YodelUbxRxmRtcm {
  */
 #define YODEL_UBX_RXM_RTCM_INITIALIZER \
     { \
-		0, \
-		0, \
-		0, \
-		0, \
-		0, \
+        0, \
+        0, \
+        0, \
+        0, \
+        0, \
     }
 
 /**
@@ -943,7 +943,7 @@ typedef struct YodelUbxRxmRtcm {
 enum YodelUbxRxmRtcmConstants {
     YODEL_UBX_RXM_RTCM_Class	= 0x02,
     YODEL_UBX_RXM_RTCM_Id		= 0x32,
-	YODEL_UBX_RXM_RTCM_Length	= 8,
+    YODEL_UBX_RXM_RTCM_Length	= 8,
 };
 
 /**

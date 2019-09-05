@@ -91,8 +91,8 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     switch (state) {
 
     case HAZER_STATE_STOP:
-    	/* Do nothing. */
-    	break;
+        /* Do nothing. */
+        break;
 
     case HAZER_STATE_START:
         if (ch == HAZER_STIMULUS_START) {
@@ -118,20 +118,20 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         break;
 
     case HAZER_STATE_BODY:
-    	/*
-    	 * According to [NMEA 0183, 4.10, 2012] the checksum field is "required
-    	 * on all sentences". According to [Wikipedia, "NMEA 0183", 2019-05-27]
-    	 * the checksum field is optional on all but a handful of sentences.
-    	 * I'm assuming Wikipedia is referencing an earlier version of the
-    	 * standard. I've never tested an NMEA device that didn't provide
-    	 * checksums on all sentences.
-    	 */
+        /*
+         * According to [NMEA 0183, 4.10, 2012] the checksum field is "required
+         * on all sentences". According to [Wikipedia, "NMEA 0183", 2019-05-27]
+         * the checksum field is optional on all but a handful of sentences.
+         * I'm assuming Wikipedia is referencing an earlier version of the
+         * standard. I've never tested an NMEA device that didn't provide
+         * checksums on all sentences.
+         */
         if (ch == HAZER_STIMULUS_CHECKSUM) {
             hazer_checksum2characters(pp->cs, &(pp->msn), &(pp->lsn));
             state = HAZER_STATE_MSN;
             action = HAZER_ACTION_SAVE;
         } else if ((HAZER_STIMULUS_MINIMUM <= ch) && (ch <= HAZER_STIMULUS_MAXIMUM)) {
-        	hazer_checksum(ch, &(pp->cs));
+            hazer_checksum(ch, &(pp->cs));
             action = HAZER_ACTION_SAVE;
         } else {
             state = HAZER_STATE_STOP;
@@ -139,18 +139,18 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         break;
 
     case HAZER_STATE_MSN:
-    	if (ch == pp->msn) {
-    		state = HAZER_STATE_LSN;
-    		action = HAZER_ACTION_SAVE;
+        if (ch == pp->msn) {
+            state = HAZER_STATE_LSN;
+            action = HAZER_ACTION_SAVE;
         } else {
             state = HAZER_STATE_STOP;
         }
         break;
 
     case HAZER_STATE_LSN:
-    	if (ch == pp->lsn) {
-    		state = HAZER_STATE_CR;
-    		action = HAZER_ACTION_SAVE;
+        if (ch == pp->lsn) {
+            state = HAZER_STATE_CR;
+            action = HAZER_ACTION_SAVE;
         } else {
             state = HAZER_STATE_STOP;
         }
@@ -224,13 +224,13 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
      */
 
     if (debug == (FILE *)0) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if (old == HAZER_STATE_STOP) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if ((' ' <= ch) && (ch <= '~')) {
-    	fprintf(debug, "NMEA %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
+        fprintf(debug, "NMEA %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
     } else {
-    	fprintf(debug, "NMEA %c %c %c 0x%02x\n", old, state, action, ch);
+        fprintf(debug, "NMEA %c %c %c 0x%02x\n", old, state, action, ch);
     }
 
     return state;
@@ -254,7 +254,7 @@ const void * hazer_checksum_buffer(const void * buffer, size_t size, uint8_t * m
         --size;
 
         while ((size > 0) && (*bp != HAZER_STIMULUS_CHECKSUM) && (*bp != '\0')) {
-        	hazer_checksum(*(bp++), &cs);
+            hazer_checksum(*(bp++), &cs);
             --size;
         }
 
@@ -329,19 +329,19 @@ ssize_t hazer_length(const void * buffer, size_t size)
     bp = (const char *)buffer;
 
     if (size < HAZER_NMEA_SHORTEST) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if (*bp != HAZER_STIMULUS_START) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else {
-    	while (size > 0) {
-    		if (*bp == '\0') { break; }
-    		size -= 1;
-    		length += 1;
-    		if (*(bp++) == HAZER_STIMULUS_LF) { break; }
-    	}
-    	if (length < HAZER_NMEA_SHORTEST) {
+        while (size > 0) {
+            if (*bp == '\0') { break; }
+            size -= 1;
+            length += 1;
+            if (*(bp++) == HAZER_STIMULUS_LF) { break; }
+        }
+        if (length < HAZER_NMEA_SHORTEST) {
             /* Do nothing. */
-    	} else if (*(--bp) != HAZER_STIMULUS_LF) {
+        } else if (*(--bp) != HAZER_STIMULUS_LF) {
             /* Do nothing. */
         } else if (*(--bp) != HAZER_STIMULUS_CR) {
             /* Do nothing. */
@@ -355,23 +355,23 @@ ssize_t hazer_length(const void * buffer, size_t size)
 
 ssize_t hazer_validate(const void * buffer, size_t size)
 {
-	ssize_t result = -1;
-	ssize_t length = 0;
-	const uint8_t * bp = (uint8_t *)0;
-	uint8_t msn = 0;
-	uint8_t lsn = 0;
+    ssize_t result = -1;
+    ssize_t length = 0;
+    const uint8_t * bp = (uint8_t *)0;
+    uint8_t msn = 0;
+    uint8_t lsn = 0;
 
-	if ((length = hazer_length(buffer, size)) <= 0) {
-		/* Do nothing. */
+    if ((length = hazer_length(buffer, size)) <= 0) {
+        /* Do nothing. */
     } else if ((bp = (uint8_t *)hazer_checksum_buffer(buffer, length, &msn, &lsn)) == (unsigned char *)0) {
         /* Do nothing. */
     } else if ((msn != bp[1]) || (lsn != bp[2])) {
         /* Do nothing. */
     } else {
-    	result = length;
+        result = length;
     }
 
-	return result;
+    return result;
 }
 
 /******************************************************************************

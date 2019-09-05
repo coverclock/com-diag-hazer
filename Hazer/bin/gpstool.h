@@ -72,7 +72,7 @@ typedef enum Update { UPDATE = '.', RTCM_TYPE_1005 = 'B', RTCM_TYPE_1074 = 'N', 
  * ticks.
  */
 typedef struct YodelSolution {
-	yodel_ubx_nav_hpposllh_t payload;   /* Payload from UBX-NAV-HPPOSLLH message. */
+    yodel_ubx_nav_hpposllh_t payload;   /* Payload from UBX-NAV-HPPOSLLH message. */
     hazer_expiry_t ticks;               /* Lifetime in application-defined ticks. */
     uint8_t unused[3];
 } yodel_solution_t;
@@ -83,9 +83,9 @@ typedef struct YodelSolution {
  */
 #define YODEL_SOLUTION_INITIALIZER \
     { \
-	    YODEL_UBX_NAV_HPPOSLLH_INITIALIZER, \
-		0, \
-		{ 0, } \
+        YODEL_UBX_NAV_HPPOSLLH_INITIALIZER, \
+        0, \
+        { 0, } \
     }
 
 /*******************************************************************************
@@ -107,9 +107,9 @@ typedef struct YodelHardware {
  */
 #define YODEL_HARDWARE_INITIALIZER \
     { \
-	    YODEL_UBX_MON_HW_INITIALIZER, \
-		0, \
-		{ 0, } \
+        YODEL_UBX_MON_HW_INITIALIZER, \
+        0, \
+        { 0, } \
     }
 
 /*******************************************************************************
@@ -131,9 +131,9 @@ typedef struct YodelStatus {
  */
 #define YODEL_STATUS_INITIALIZER \
     { \
-	    YODEL_UBX_NAV_STATUS_INITIALIZER, \
-		0, \
-		{ 0, } \
+        YODEL_UBX_NAV_STATUS_INITIALIZER, \
+        0, \
+        { 0, } \
     }
 
 /*******************************************************************************
@@ -155,9 +155,9 @@ typedef struct YodelBase {
  */
 #define YODEL_BASE_INITIALIZER \
     { \
-	    YODEL_UBX_NAV_SVIN_INITIALIZER, \
-		0, \
-		{ 0, }, \
+        YODEL_UBX_NAV_SVIN_INITIALIZER, \
+        0, \
+        { 0, }, \
     }
 
 /*******************************************************************************
@@ -179,9 +179,9 @@ typedef struct YodelRover {
  */
 #define YODEL_ROVER_INITIALIZER \
     { \
-	    YODEL_UBX_RXM_RTCM_INITIALIZER, \
-		0, \
-		{ 0, }, \
+        YODEL_UBX_RXM_RTCM_INITIALIZER, \
+        0, \
+        { 0, }, \
     }
 
 /*******************************************************************************
@@ -192,10 +192,10 @@ typedef struct YodelRover {
  * Structure combining both a RTCM message number and its expiry time in ticks.
  */
 typedef struct TumbleweedMessage {
-	ssize_t length;
-	int number;				/* Message number e.g. 1005. */
-	source_t source;
-	hazer_expiry_t ticks;	/* Lifetime in application-defined ticks. */
+    ssize_t length;
+    int number;				/* Message number e.g. 1005. */
+    source_t source;
+    hazer_expiry_t ticks;	/* Lifetime in application-defined ticks. */
 } tumbleweed_message_t;
 
 /**
@@ -204,18 +204,18 @@ typedef struct TumbleweedMessage {
  */
 #define TUMBLEWEED_MESSAGE_INITIALIZER \
     { \
-		0, \
-		0, \
-		SOURCE, \
-		0, \
+        0, \
+        0, \
+        SOURCE, \
+        0, \
     }
 
 /**
  * Union makes it a little simpler to track RTCM messages.
  */
 typedef union TumbleweedUpdates {
-	uint8_t bytes[sizeof(uint64_t)];
-	uint64_t word;
+    uint8_t bytes[sizeof(uint64_t)];
+    uint64_t word;
 } tumbleweed_updates_t;
 
 /**
@@ -224,7 +224,7 @@ typedef union TumbleweedUpdates {
  */
 #define TUMBLEWEED_UPDATES_INITIALIZER \
     { \
-	    { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', } \
+        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', } \
     }
 
 /*******************************************************************************
@@ -251,8 +251,8 @@ typedef struct Poller {
  * whether this command expects an UBX CFG ACK or a NAK from the device.
  */
 typedef struct Command {
-	diminuto_list_t link;
-	int acknak;
+    diminuto_list_t link;
+    int acknak;
 } command_t;
 
 #endif

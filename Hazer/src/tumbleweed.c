@@ -66,8 +66,8 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     switch (state) {
 
     case TUMBLEWEED_STATE_STOP:
-    	/* Do nothing. */
-    	break;
+        /* Do nothing. */
+        break;
 
     case TUMBLEWEED_STATE_START:
         if (ch == TUMBLEWEED_STIMULUS_PREAMBLE) {
@@ -87,27 +87,27 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
 
     case TUMBLEWEED_STATE_LENGTH_1:
         tumbleweed_checksum(ch, &(pp->crc));
-    	/*
-    	 * RTCM 10403.3, 3.5: "Multi-byte values are expressed with the most
-    	 * significant byte transmitted first and the least significant byte
-    	 * transmitted last.", p. 108 (i.e.: big endian)
-    	 */
-    	pp->ln = (uint16_t)ch << 8; /* MSB */
-    	pp->ln &= TUMBLEWEED_RTCM_MASK_LENGTH;
+        /*
+         * RTCM 10403.3, 3.5: "Multi-byte values are expressed with the most
+         * significant byte transmitted first and the least significant byte
+         * transmitted last.", p. 108 (i.e.: big endian)
+         */
+        pp->ln = (uint16_t)ch << 8; /* MSB */
+        pp->ln &= TUMBLEWEED_RTCM_MASK_LENGTH;
         state = TUMBLEWEED_STATE_LENGTH_2;
         action = TUMBLEWEED_ACTION_SAVE;
         break;
 
     case TUMBLEWEED_STATE_LENGTH_2:
         tumbleweed_checksum(ch, &(pp->crc));
-    	/*
-    	 * RTCM 10403.3, Ibid.
-    	 */
-    	pp->ln |= (uint16_t)ch; /* LSB */
+        /*
+         * RTCM 10403.3, Ibid.
+         */
+        pp->ln |= (uint16_t)ch; /* LSB */
         if (pp->ln > 0) {
-        	state = TUMBLEWEED_STATE_PAYLOAD;
+            state = TUMBLEWEED_STATE_PAYLOAD;
         } else {
-        	state = TUMBLEWEED_STATE_CRC_1;
+            state = TUMBLEWEED_STATE_CRC_1;
         }
         action = TUMBLEWEED_ACTION_SAVE;
         break;
@@ -124,30 +124,30 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
 
     case TUMBLEWEED_STATE_CRC_1:
         tumbleweed_checksum2characters(pp->crc, &(pp->crc1), &(pp->crc2), &(pp->crc3));
-    	if (ch == pp->crc1) {
-    		state = TUMBLEWEED_STATE_CRC_2;
-    		action = TUMBLEWEED_ACTION_SAVE;
-    	} else {
+        if (ch == pp->crc1) {
+            state = TUMBLEWEED_STATE_CRC_2;
+            action = TUMBLEWEED_ACTION_SAVE;
+        } else {
             state = TUMBLEWEED_STATE_STOP;
-    	}
+        }
         break;
 
     case TUMBLEWEED_STATE_CRC_2:
-    	if (ch == pp->crc2) {
-    		state = TUMBLEWEED_STATE_CRC_3;
-    		action = TUMBLEWEED_ACTION_SAVE;
-    	} else {
+        if (ch == pp->crc2) {
+            state = TUMBLEWEED_STATE_CRC_3;
+            action = TUMBLEWEED_ACTION_SAVE;
+        } else {
             state = TUMBLEWEED_STATE_STOP;
-    	}
+        }
         break;
 
     case TUMBLEWEED_STATE_CRC_3:
-    	if (ch == pp->crc3) {
-    		state = TUMBLEWEED_STATE_END;
-    		action = TUMBLEWEED_ACTION_TERMINATE;
-    	} else {
+        if (ch == pp->crc3) {
+            state = TUMBLEWEED_STATE_END;
+            action = TUMBLEWEED_ACTION_TERMINATE;
+        } else {
             state = TUMBLEWEED_STATE_STOP;
-    	}
+        }
         break;
 
     case TUMBLEWEED_STATE_END:
@@ -206,13 +206,13 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
      */
 
     if (debug == (FILE *)0) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if (old == TUMBLEWEED_STATE_STOP) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if ((' ' <= ch) && (ch <= '~')) {
-    	fprintf(debug, "RTCM %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
+        fprintf(debug, "RTCM %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
     } else {
-    	fprintf(debug, "RTCM %c %c %c 0x%02x\n", old, state, action, ch);
+        fprintf(debug, "RTCM %c %c %c 0x%02x\n", old, state, action, ch);
     }
 
     return state;
@@ -309,11 +309,11 @@ const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_
 
     if ((length + TUMBLEWEED_RTCM_UNSUMMED) <= size) {
 
-    	for (ii = 0; ii < length; ++ii) {
-    		tumbleweed_checksum(*(bp++), &crc);
-    	}
+        for (ii = 0; ii < length; ++ii) {
+            tumbleweed_checksum(*(bp++), &crc);
+        }
 
-    	tumbleweed_checksum2characters(crc, crc1p, crc2p, crc3p);
+        tumbleweed_checksum2characters(crc, crc1p, crc2p, crc3p);
 
         result = bp;
 
@@ -335,10 +335,10 @@ ssize_t tumbleweed_length(const void * buffer, size_t size)
     } else if (message[TUMBLEWEED_RTCM_PREAMBLE] != TUMBLEWEED_STIMULUS_PREAMBLE) {
         /* Do nothing. */
     } else {
-    	memcpy(&length, &message[TUMBLEWEED_RTCM_LENGTH_MSB], sizeof(length));
-    	COM_DIAG_TUMBLEWEED_BETOH(length);
+        memcpy(&length, &message[TUMBLEWEED_RTCM_LENGTH_MSB], sizeof(length));
+        COM_DIAG_TUMBLEWEED_BETOH(length);
         if (((length & TUMBLEWEED_RTCM_MASK_RESERVED) >> TUMBLEWEED_RTCM_SHIFT_RESERVED) != TUMBLEWEED_STIMULUS_RESERVED) {
-        	/* Do nothing. */
+            /* Do nothing. */
         } else if (length > (size - TUMBLEWEED_RTCM_SHORTEST)) {
             /* Do nothing. */
         } else {
@@ -363,10 +363,10 @@ int tumbleweed_message(const void * buffer, size_t size)
     } else if (message[TUMBLEWEED_RTCM_PREAMBLE] != TUMBLEWEED_STIMULUS_PREAMBLE) {
         /* Do nothing. */
     } else {
-    	memcpy(&number, &message[TUMBLEWEED_RTCM_NUMBER_MSB], sizeof(number));
-    	COM_DIAG_TUMBLEWEED_BETOH(number);
+        memcpy(&number, &message[TUMBLEWEED_RTCM_NUMBER_MSB], sizeof(number));
+        COM_DIAG_TUMBLEWEED_BETOH(number);
         number >>= TUMBLEWEED_RTCM_SHIFT_NUMBER;
-		result = number;
+        result = number;
     }
 
     return result;
@@ -374,24 +374,24 @@ int tumbleweed_message(const void * buffer, size_t size)
 
 ssize_t tumbleweed_validate(const void * buffer, size_t size)
 {
-	ssize_t result = -1;
-	ssize_t length = 0;
-	const uint8_t * bp = (uint8_t *)0;
-	uint8_t crc1 = 0;
-	uint8_t crc2 = 0;
-	uint8_t crc3 = 0;
+    ssize_t result = -1;
+    ssize_t length = 0;
+    const uint8_t * bp = (uint8_t *)0;
+    uint8_t crc1 = 0;
+    uint8_t crc2 = 0;
+    uint8_t crc3 = 0;
 
-	if ((length = tumbleweed_length(buffer, size)) < TUMBLEWEED_RTCM_SHORTEST) {
-		/* Do nothing. */
+    if ((length = tumbleweed_length(buffer, size)) < TUMBLEWEED_RTCM_SHORTEST) {
+        /* Do nothing. */
     } else if ((bp = (uint8_t *)tumbleweed_checksum_buffer(buffer, length, &crc1, &crc2, &crc3)) == (unsigned char *)0) {
         /* Do nothing. */
     } else if ((crc1 != bp[0]) || (crc2 != bp[1]) || (crc3 != bp[2])) {
         /* Do nothing. */
     } else {
-    	result = length;
+        result = length;
     }
 
-	return result;
+    return result;
 }
 
 /******************************************************************************

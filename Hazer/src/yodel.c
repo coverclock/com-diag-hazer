@@ -81,8 +81,8 @@ yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size
     switch (state) {
 
     case YODEL_STATE_STOP:
-    	/* Do nothing. */
-    	break;
+        /* Do nothing. */
+        break;
 
     case YODEL_STATE_START:
         if (ch == YODEL_STIMULUS_SYNC_1) {
@@ -123,7 +123,7 @@ yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size
         /*
          * Ublox8, p. 134: "little endian"
          */
-    	pp->ln = ((uint16_t)ch); /* LSB */
+        pp->ln = ((uint16_t)ch); /* LSB */
         state = YODEL_STATE_LENGTH_2;
         action = YODEL_ACTION_SAVE;
         break;
@@ -133,11 +133,11 @@ yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size
         /*
          * Ublox8, p. 134: "little endian"
          */
-    	pp->ln |= ((uint16_t)ch) << 8; /* MSB */
+        pp->ln |= ((uint16_t)ch) << 8; /* MSB */
         if (pp->ln > 0) {
-        	state = YODEL_STATE_PAYLOAD;
+            state = YODEL_STATE_PAYLOAD;
         } else {
-        	state = YODEL_STATE_CK_A;
+            state = YODEL_STATE_CK_A;
         }
         action = YODEL_ACTION_SAVE;
         break;
@@ -153,21 +153,21 @@ yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size
         break;
 
     case YODEL_STATE_CK_A:
-    	if ((uint8_t)ch == pp->csa) {
-    		state = YODEL_STATE_CK_B;
-    		action = YODEL_ACTION_SAVE;
-    	} else {
+        if ((uint8_t)ch == pp->csa) {
+            state = YODEL_STATE_CK_B;
+            action = YODEL_ACTION_SAVE;
+        } else {
             state = YODEL_STATE_STOP;
-    	}
+        }
         break;
 
     case YODEL_STATE_CK_B:
-    	if ((uint8_t)ch == pp->csb) {
-    		state = YODEL_STATE_END;
-    		action = YODEL_ACTION_TERMINATE;
-    	} else {
+        if ((uint8_t)ch == pp->csb) {
+            state = YODEL_STATE_END;
+            action = YODEL_ACTION_TERMINATE;
+        } else {
             state = YODEL_STATE_STOP;
-    	}
+        }
         break;
 
     case YODEL_STATE_END:
@@ -228,13 +228,13 @@ yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size
      */
 
     if (debug == (FILE *)0) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if (old == YODEL_STATE_STOP) {
-    	/* Do nothing. */
+        /* Do nothing. */
     } else if ((' ' <= ch) && (ch <= '~')) {
-    	fprintf(debug, "UBX  %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
+        fprintf(debug, "UBX  %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
     } else {
-    	fprintf(debug, "UBX  %c %c %c 0x%02x\n", old, state, action, ch);
+        fprintf(debug, "UBX  %c %c %c 0x%02x\n", old, state, action, ch);
     }
 
     return state;
@@ -270,7 +270,7 @@ const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * c
     if ((length + YODEL_UBX_UNSUMMED) <= size) {
 
         for (bp += YODEL_UBX_CLASS; length > 0; --length) {
-        	yodel_checksum(*(bp++), &csa, &csb);
+            yodel_checksum(*(bp++), &csa, &csb);
         }
 
         *csap = csa;
@@ -316,23 +316,23 @@ ssize_t yodel_length(const void * buffer, size_t size)
 
 ssize_t yodel_validate(const void * buffer, size_t size)
 {
-	ssize_t result = -1;
-	ssize_t length = 0;
-	const uint8_t * bp = (uint8_t *)0;
-	uint8_t csa = 0;
-	uint8_t csb = 0;
+    ssize_t result = -1;
+    ssize_t length = 0;
+    const uint8_t * bp = (uint8_t *)0;
+    uint8_t csa = 0;
+    uint8_t csb = 0;
 
-	if ((length = yodel_length(buffer, size)) <= 0) {
-		/* Do nothing. */
+    if ((length = yodel_length(buffer, size)) <= 0) {
+        /* Do nothing. */
     } else if ((bp = (uint8_t *)yodel_checksum_buffer(buffer, length, &csa, &csb)) == (unsigned char *)0) {
         /* Do nothing. */
     } else if ((csa != bp[0]) || (csb != bp[1])) {
         /* Do nothing. */
     } else {
-    	result = length;
+        result = length;
     }
 
-	return result;
+    return result;
 }
 
 /******************************************************************************
@@ -448,87 +448,87 @@ int yodel_ubx_cfg_valget(void * bp, ssize_t length)
     } else if (length < (YODEL_UBX_SHORTEST + YODEL_UBX_CFG_VALGET_Length)) {
         /* Do nothing. */
     } else {
-    	yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)0;
-    	char * bb = (char *)0;
-    	const char * ee = (const char *)0;
-    	yodel_ubx_cfg_valget_key_t kk = 0;
-    	size_t ss = 0;
-    	size_t ll = 0;
-    	uint8_t vv1 = 0;
-    	uint16_t vv16 = 0;
-    	uint32_t vv32 = 0;
-    	uint64_t vv64 = 0;
+        yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)0;
+        char * bb = (char *)0;
+        const char * ee = (const char *)0;
+        yodel_ubx_cfg_valget_key_t kk = 0;
+        size_t ss = 0;
+        size_t ll = 0;
+        uint8_t vv1 = 0;
+        uint16_t vv16 = 0;
+        uint32_t vv32 = 0;
+        uint64_t vv64 = 0;
 
-    	rc = 0;
+        rc = 0;
 
-    	pp = (yodel_ubx_cfg_valget_t *)&(hp[YODEL_UBX_PAYLOAD]);
-    	ee = &(hp[length - YODEL_UBX_CHECKSUM]);
+        pp = (yodel_ubx_cfg_valget_t *)&(hp[YODEL_UBX_PAYLOAD]);
+        ee = &(hp[length - YODEL_UBX_CHECKSUM]);
 
-    	for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
+        for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
 
-			if ((bb + sizeof(kk)) > ee) {
-				rc = -1;
-				break;
-			}
+            if ((bb + sizeof(kk)) > ee) {
+                rc = -1;
+                break;
+            }
 
-			memcpy(&kk, bb, sizeof(kk));
-			kk = le32toh(kk);
-			memcpy(bb, &kk, sizeof(kk));
+            memcpy(&kk, bb, sizeof(kk));
+            kk = le32toh(kk);
+            memcpy(bb, &kk, sizeof(kk));
 
-			bb += sizeof(kk);
+            bb += sizeof(kk);
 
-			ss = (kk >> YODEL_UBX_CFG_VALGET_Key_Size_SHIFT) & YODEL_UBX_CFG_VALGET_Key_Size_MASK;
+            ss = (kk >> YODEL_UBX_CFG_VALGET_Key_Size_SHIFT) & YODEL_UBX_CFG_VALGET_Key_Size_MASK;
 
-			switch (ss) {
-			case YODEL_UBX_CFG_VALGET_Size_BIT:
-			case YODEL_UBX_CFG_VALGET_Size_ONE:
-				ll = 1;
-				break;
-			case YODEL_UBX_CFG_VALGET_Size_TWO:
-				ll = 2;
-				break;
-			case YODEL_UBX_CFG_VALGET_Size_FOUR:
-				ll = 4;
-				break;
-			case YODEL_UBX_CFG_VALGET_Size_EIGHT:
-				ll = 8;
-				break;
-			default:
-				ll = 0;
-				break;
-			}
+            switch (ss) {
+            case YODEL_UBX_CFG_VALGET_Size_BIT:
+            case YODEL_UBX_CFG_VALGET_Size_ONE:
+                ll = 1;
+                break;
+            case YODEL_UBX_CFG_VALGET_Size_TWO:
+                ll = 2;
+                break;
+            case YODEL_UBX_CFG_VALGET_Size_FOUR:
+                ll = 4;
+                break;
+            case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+                ll = 8;
+                break;
+            default:
+                ll = 0;
+                break;
+            }
 
-			if (ll == 0) {
-				rc = -1;
-				break;
-			}
+            if (ll == 0) {
+                rc = -1;
+                break;
+            }
 
-			if ((bb + ll) > ee) {
-				rc = -1;
-				break;
-			}
+            if ((bb + ll) > ee) {
+                rc = -1;
+                break;
+            }
 
-			switch (ss) {
-			case YODEL_UBX_CFG_VALGET_Size_TWO:
-				memcpy(&vv16, bb, sizeof(vv16));
-				vv16 = le16toh(vv16);
-				memcpy(bb, &vv16, sizeof(vv16));
-				break;
-			case YODEL_UBX_CFG_VALGET_Size_FOUR:
-				memcpy(&vv32, bb, sizeof(vv32));
-				vv32 = le32toh(vv32);
-				memcpy(bb, &vv32, sizeof(vv32));
-				break;
-			case YODEL_UBX_CFG_VALGET_Size_EIGHT:
-				memcpy(&vv64, bb, sizeof(vv64));
-				vv64 = le64toh(vv64);
-				memcpy(bb, &vv64, sizeof(vv64));
-				break;
-			default:
-				break;
-			}
+            switch (ss) {
+            case YODEL_UBX_CFG_VALGET_Size_TWO:
+                memcpy(&vv16, bb, sizeof(vv16));
+                vv16 = le16toh(vv16);
+                memcpy(bb, &vv16, sizeof(vv16));
+                break;
+            case YODEL_UBX_CFG_VALGET_Size_FOUR:
+                memcpy(&vv32, bb, sizeof(vv32));
+                vv32 = le32toh(vv32);
+                memcpy(bb, &vv32, sizeof(vv32));
+                break;
+            case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+                memcpy(&vv64, bb, sizeof(vv64));
+                vv64 = le64toh(vv64);
+                memcpy(bb, &vv64, sizeof(vv64));
+                break;
+            default:
+                break;
+            }
 
-		}
+        }
     }
 
     return rc;
@@ -600,7 +600,7 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t lengt
 
 void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, uint64_t * billionthsp)
 {
-	int64_t nanodegrees = 0;
+    int64_t nanodegrees = 0;
 
     nanodegrees = whole;                                        /* Get 10^-7 degrees. */
     nanodegrees *= 100LL;                                       /* Convert to nanodegrees (10^-9). */
@@ -613,14 +613,14 @@ void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, 
 
 void yodel_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp)
 {
-	int64_t nanodegrees = 0;
+    int64_t nanodegrees = 0;
 
     nanodegrees = whole;										        /* Get 10^-7 degrees. */
     nanodegrees *= 100LL;                                               /* Convert to nanodegrees (10^-9). */
     nanodegrees += fraction;                                            /* Add fraction already in nanodegrees. */
 
     if (nanodegrees < 0) {
-    	nanodegrees = -nanodegrees;
+        nanodegrees = -nanodegrees;
         *directionp = -1;
     } else {
         *directionp = 1;

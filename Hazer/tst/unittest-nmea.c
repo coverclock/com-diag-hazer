@@ -15,7 +15,7 @@
 
 int main(void)
 {
-	hazer_debug(stderr);
+    hazer_debug(stderr);
 
     {
         static const char * DATA = "$GNGGA,135627.00,3947.65338,N,10509.20216,W,2,12,0.67,1708.6,M,-21.5,M,,0000*4E\r\n";

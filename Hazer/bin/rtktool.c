@@ -73,24 +73,24 @@ static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 
 static int comparator(diminuto_tree_t * tap, diminuto_tree_t * tbp)
 {
-	int rc = 0;
-	client_t * cap = (client_t *)0;
-	client_t * cbp = (client_t *)0;
+    int rc = 0;
+    client_t * cap = (client_t *)0;
+    client_t * cbp = (client_t *)0;
 
-	cap = (client_t *)diminuto_tree_data(tap);
-	cbp = (client_t *)diminuto_tree_data(tbp);
+    cap = (client_t *)diminuto_tree_data(tap);
+    cbp = (client_t *)diminuto_tree_data(tbp);
 
-	if ((rc = diminuto_ipc6_compare(&(cap->address), &(cbp->address))) != 0) {
-		/* Do nothing. */
-	} else if (cap->port < cbp->port) {
-		rc = -1;
-	} else if (cap->port > cbp->port) {
-		rc = 1;
-	} else {
-		/* Do nothing. */
-	}
+    if ((rc = diminuto_ipc6_compare(&(cap->address), &(cbp->address))) != 0) {
+        /* Do nothing. */
+    } else if (cap->port < cbp->port) {
+        rc = -1;
+    } else if (cap->port > cbp->port) {
+        rc = 1;
+    } else {
+        /* Do nothing. */
+    }
 
-	return rc;
+    return rc;
 }
 
 /*******************************************************************************
@@ -172,8 +172,8 @@ int main(int argc, char * argv[])
     while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
         case 'M':
-        	daemon = !0;
-        	break;
+            daemon = !0;
+            break;
         case 'V':
             DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
@@ -184,7 +184,7 @@ int main(int argc, char * argv[])
             rendezvous = optarg;
             rc = diminuto_ipc_endpoint(rendezvous, &endpoint);
             if (rc < 0) { diminuto_perror(optarg); error = !0; }
-        	break;
+            break;
         case 't':
             timeout = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (timeout < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
@@ -214,9 +214,9 @@ int main(int argc, char * argv[])
      **************************************************************************/
 
     if (daemon) {
-    	rc = diminuto_daemon(Program);
-    	DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
-    	assert(rc == 0);
+        rc = diminuto_daemon(Program);
+        DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
+        assert(rc == 0);
     }
 
     DIMINUTO_LOG_INFORMATION("Begin");
@@ -256,331 +256,331 @@ int main(int argc, char * argv[])
 
     while (!0) {
 
-    	/*
-    	 * Check our signal handlers.
-    	 */
+        /*
+         * Check our signal handlers.
+         */
 
-		if (diminuto_terminator_check()) {
-			DIMINUTO_LOG_NOTICE("SIGTERM");
-			break;
-		}
+        if (diminuto_terminator_check()) {
+            DIMINUTO_LOG_NOTICE("SIGTERM");
+            break;
+        }
 
-		if (diminuto_interrupter_check()) {
-			DIMINUTO_LOG_NOTICE("SIGINT");
-			break;
-		}
+        if (diminuto_interrupter_check()) {
+            DIMINUTO_LOG_NOTICE("SIGINT");
+            break;
+        }
 
-		if (diminuto_hangup_check()) {
-			diminuto_log_mask ^= DIMINUTO_LOG_MASK_DEBUG;
-		}
+        if (diminuto_hangup_check()) {
+            diminuto_log_mask ^= DIMINUTO_LOG_MASK_DEBUG;
+        }
 
-		/*
-		 * Wait until our socket needs to be serviced... or we time out.
-		 */
+        /*
+         * Wait until our socket needs to be serviced... or we time out.
+         */
 
-		if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
-			/* Do nothing. */
-		} else if ((ready = diminuto_mux_wait(&mux, frequency)) == 0) {
-			fd = -1;
-		} else if (ready > 0) {
-			fd = diminuto_mux_ready_read(&mux);
-		} else if (errno == EINTR) {
-			continue;
-		} else {
-			assert(0);
-		}
+        if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
+            /* Do nothing. */
+        } else if ((ready = diminuto_mux_wait(&mux, frequency)) == 0) {
+            fd = -1;
+        } else if (ready > 0) {
+            fd = diminuto_mux_ready_read(&mux);
+        } else if (errno == EINTR) {
+            continue;
+        } else {
+            assert(0);
+        }
 
-		/*
-		 * Get a timestamp.
-		 */
+        /*
+         * Get a timestamp.
+         */
 
-		now = diminuto_time_elapsed() / frequency;
+        now = diminuto_time_elapsed() / frequency;
 
-		/*
-		 * Service the socket.
-		 */
+        /*
+         * Service the socket.
+         */
 
-		if (fd == sock) {
+        if (fd == sock) {
 
-			/*
-			 * If we don't have a new node handy, make a new one, and
-			 * initialize it.
-			 */
+            /*
+             * If we don't have a new node handy, make a new one, and
+             * initialize it.
+             */
 
-			if (this == (client_t *)0) {
-			    this = (client_t *)malloc(sizeof(client_t));
-			    assert(this != (client_t *)0);
-			    temp = diminuto_tree_datainit(&(this->node), this);
-			    assert(temp != (diminuto_tree_t *)0);
-				this->last = 0;
-				this->sequence = 0;
-				this->classification = CLASS;
-			}
-
-			/*
-			 * Receive the pending datagram.
-			 */
-
-			if ((total = diminuto_ipc6_datagram_receive_generic(sock, &buffer, sizeof(buffer), &(this->address), &(this->port), 0)) < sizeof(buffer.header)) {
-				DIMINUTO_LOG_ERROR("Datagram Length [%s]:%d [%zd]", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
-				continue;
-			}
-
-			DIMINUTO_LOG_DEBUG("Datagram Received [%s]:%d [%zd]", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
-
-            if (verbose) {
-				fprintf(stderr, "Datagram [%s]:%d [%zd]\n", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
-            	diminuto_dump(stderr, &buffer, total);
+            if (this == (client_t *)0) {
+                this = (client_t *)malloc(sizeof(client_t));
+                assert(this != (client_t *)0);
+                temp = diminuto_tree_datainit(&(this->node), this);
+                assert(temp != (diminuto_tree_t *)0);
+                this->last = 0;
+                this->sequence = 0;
+                this->classification = CLASS;
             }
 
-			/*
-			 * See if we know about this client.
-			 */
+            /*
+             * Receive the pending datagram.
+             */
 
-			node = diminuto_tree_search(root, &(this->node), &comparator, &comparison);
+            if ((total = diminuto_ipc6_datagram_receive_generic(sock, &buffer, sizeof(buffer), &(this->address), &(this->port), 0)) < sizeof(buffer.header)) {
+                DIMINUTO_LOG_ERROR("Datagram Length [%s]:%d [%zd]", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
+                continue;
+            }
 
-			if (node == (diminuto_tree_t *)0) {
-				that = (client_t *)0;
-				then = (client_t *)0;
-				thou = this;
-				this->sequence = 0; /* RESET */
-			} else if (comparison != 0) {
-				that = (client_t *)0;
-				then = (client_t *)diminuto_tree_data(node);
-				assert(then != (client_t *)0);
-				thou = this;
-				this->sequence = 0; /* RESET */
-			} else {
-				that = (client_t *)diminuto_tree_data(node);
-				assert(that != (client_t *)0);
-				then = (client_t *)0;
-				thou = that;
-			}
+            DIMINUTO_LOG_DEBUG("Datagram Received [%s]:%d [%zd]", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
 
-			/*
-			 * At this point in our story:
-			 *
-			 * this points to the client we allocated and which may become a
-			 * new entry in the database or may be later reused;
-			 *
-			 * that points to the matching client we found in the database or
-			 * NULL if we didn't find a matching client;
-			 *
-			 * then points to the nearest non-match in the tree that we will
-			 * use to insert the new client when we didn't find a match or NULL
-			 * if we didn't find a nearest match because the database was
-			 * empty;
-			 *
-			 * thou points to the client we're going to use to validate the
-			 * datagram we just received, and it will either be equal to either
-			 * this or that and will always be non-NULL;
-			 *
-			 * thee will temporarily point to clients as we traverse through
-			 * the database for one reason or another.
-			 */
+            if (verbose) {
+                fprintf(stderr, "Datagram [%s]:%d [%zd]\n", diminuto_ipc6_address2string(this->address, ipv6, sizeof(ipv6)), this->port, total);
+                diminuto_dump(stderr, &buffer, total);
+            }
 
-			/*
-			 * Validate the datagram. This is more complicated than it looks.
-			 * I'd really like to add end-to-end encryption to this data
-			 * stream. But to do so, I either have to have this utility be a
-			 * man-in-the-middle, decrypting and reencrypting the stream, or
-			 * else distribute the datagram without validation. I don't like
-			 * either option.
-			 */
+            /*
+             * See if we know about this client.
+             */
 
-			if ((size = datagram_validate(&(thou->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {
-				DIMINUTO_LOG_NOTICE("Datagram Order {%lu} {%lu} [%s]:%d", (unsigned long)(thou->sequence), (unsigned long)ntohl(buffer.header.sequence), diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
-				continue; /* REJECT */
-			} else if ((length = tumbleweed_validate(buffer.payload.rtcm, size)) < TUMBLEWEED_RTCM_SHORTEST) {
-				DIMINUTO_LOG_WARNING("Datagram Data [%zd] 0x%02x [%s]:%d", length, buffer.payload.data[0], diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
-				continue; /* REJECT */
-			} else {
-				/* Do nothing. */
-			}
+            node = diminuto_tree_search(root, &(this->node), &comparator, &comparison);
 
-			/*
-			 * Determine this client's classification.
-			 */
+            if (node == (diminuto_tree_t *)0) {
+                that = (client_t *)0;
+                then = (client_t *)0;
+                thou = this;
+                this->sequence = 0; /* RESET */
+            } else if (comparison != 0) {
+                that = (client_t *)0;
+                then = (client_t *)diminuto_tree_data(node);
+                assert(then != (client_t *)0);
+                thou = this;
+                this->sequence = 0; /* RESET */
+            } else {
+                that = (client_t *)diminuto_tree_data(node);
+                assert(that != (client_t *)0);
+                then = (client_t *)0;
+                thou = that;
+            }
 
-			if (length > TUMBLEWEED_RTCM_SHORTEST) {
-				this->classification = BASE;
-				label = "base";
-			} else {
-				this->classification = ROVER;
-				label = "rover";
-			}
+            /*
+             * At this point in our story:
+             *
+             * this points to the client we allocated and which may become a
+             * new entry in the database or may be later reused;
+             *
+             * that points to the matching client we found in the database or
+             * NULL if we didn't find a matching client;
+             *
+             * then points to the nearest non-match in the tree that we will
+             * use to insert the new client when we didn't find a match or NULL
+             * if we didn't find a nearest match because the database was
+             * empty;
+             *
+             * thou points to the client we're going to use to validate the
+             * datagram we just received, and it will either be equal to either
+             * this or that and will always be non-NULL;
+             *
+             * thee will temporarily point to clients as we traverse through
+             * the database for one reason or another.
+             */
 
-			/*
-			 * If this client's classification has changed, we reject it.
-			 * If it's in fact legitimate (somehow), its existing entry will
-			 * eventually time out, be removed, and can be registered anew on
-			 * reception of a subsequent datagram.
-			 */
+            /*
+             * Validate the datagram. This is more complicated than it looks.
+             * I'd really like to add end-to-end encryption to this data
+             * stream. But to do so, I either have to have this utility be a
+             * man-in-the-middle, decrypting and reencrypting the stream, or
+             * else distribute the datagram without validation. I don't like
+             * either option.
+             */
 
-			if (this->classification != thou->classification) {
-				DIMINUTO_LOG_WARNING("Client Change %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
-				continue; /* REJECT */
-			}
+            if ((size = datagram_validate(&(thou->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {
+                DIMINUTO_LOG_NOTICE("Datagram Order {%lu} {%lu} [%s]:%d", (unsigned long)(thou->sequence), (unsigned long)ntohl(buffer.header.sequence), diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+                continue; /* REJECT */
+            } else if ((length = tumbleweed_validate(buffer.payload.rtcm, size)) < TUMBLEWEED_RTCM_SHORTEST) {
+                DIMINUTO_LOG_WARNING("Datagram Data [%zd] 0x%02x [%s]:%d", length, buffer.payload.data[0], diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+                continue; /* REJECT */
+            } else {
+                /* Do nothing. */
+            }
 
-			/*
-			 * If this is a base, but we already have a base, we reject it.
-			 * Again, the existing base will time out if it is no longer
-			 * sending, we'll remove it, and the new one can be reregistered.
-			 * Note that we log a pretender base at DEBUG level since otherwise
-			 * it can flood the log.
-			 */
+            /*
+             * Determine this client's classification.
+             */
 
-			if (thou->classification != BASE) {
-				/* Do nothing. */
-			} else if (base == (client_t *)0) {
-				/* Do nothing. */
-			} else if (base == thou) {
-				/* Do nothing. */
-			} else {
-				DIMINUTO_LOG_DEBUG("Client Conflict %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
-				continue; /* REJECT */
-			}
+            if (length > TUMBLEWEED_RTCM_SHORTEST) {
+                this->classification = BASE;
+                label = "base";
+            } else {
+                this->classification = ROVER;
+                label = "rover";
+            }
 
-			/*
-			 * Cannot REJECT after this point.
-			 */
+            /*
+             * If this client's classification has changed, we reject it.
+             * If it's in fact legitimate (somehow), its existing entry will
+             * eventually time out, be removed, and can be registered anew on
+             * reception of a subsequent datagram.
+             */
 
-			/*
-			 * If this is a base, forward the datagram to all rovers. Note
-			 * that if it is truly a new base, its sequence numbers will
-			 * likely be behind that of the old base, and all of the rovers
-			 * will need to be restarted manually. But it is also possible
-			 * that the base is the same and some darn NATting firewall just
-			 * changed the client's address, in which case the sequence
-			 * numbers are fine. (Rover clients that are truly mobile may
-			 * see their IPv4 addresses change as they switch from cell site
-			 * to cell site. But it can happen to non-mobile rovers and even
-			 * stationary bases, because of a particular cell site becoming
-			 * overloaded and the network deciding to switch a client to a
-			 * different, perhaps slightly more distant, cell site.)
-			 */
+            if (this->classification != thou->classification) {
+                DIMINUTO_LOG_WARNING("Client Change %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+                continue; /* REJECT */
+            }
 
-			if (thou->classification != BASE) {
-				/* Do nothing. */
-			} else if (diminuto_tree_isempty(&root)) {
-				/* Do nothing. */
-			} else {
+            /*
+             * If this is a base, but we already have a base, we reject it.
+             * Again, the existing base will time out if it is no longer
+             * sending, we'll remove it, and the new one can be reregistered.
+             * Note that we log a pretender base at DEBUG level since otherwise
+             * it can flood the log.
+             */
 
-				node = diminuto_tree_first(&root);
-				assert(node != (diminuto_tree_t *)0);
+            if (thou->classification != BASE) {
+                /* Do nothing. */
+            } else if (base == (client_t *)0) {
+                /* Do nothing. */
+            } else if (base == thou) {
+                /* Do nothing. */
+            } else {
+                DIMINUTO_LOG_DEBUG("Client Conflict %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+                continue; /* REJECT */
+            }
 
-				last = diminuto_tree_last(&root);
-				assert(last != (diminuto_tree_t *)0);
+            /*
+             * Cannot REJECT after this point.
+             */
 
-				while (!0) {
-					thee = (client_t *)diminuto_tree_data(node);
-					if (thee->classification == ROVER) {
-						result = diminuto_ipc6_datagram_send(sock, &buffer, total, thee->address, thee->port);
-						DIMINUTO_LOG_DEBUG("Datagram Sent [%s]:%d [%zd]", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port, result);
-					}
-					if (node == last) { break; }
-					node = diminuto_tree_next(node);
-				}
+            /*
+             * If this is a base, forward the datagram to all rovers. Note
+             * that if it is truly a new base, its sequence numbers will
+             * likely be behind that of the old base, and all of the rovers
+             * will need to be restarted manually. But it is also possible
+             * that the base is the same and some darn NATting firewall just
+             * changed the client's address, in which case the sequence
+             * numbers are fine. (Rover clients that are truly mobile may
+             * see their IPv4 addresses change as they switch from cell site
+             * to cell site. But it can happen to non-mobile rovers and even
+             * stationary bases, because of a particular cell site becoming
+             * overloaded and the network deciding to switch a client to a
+             * different, perhaps slightly more distant, cell site.)
+             */
 
-			}
+            if (thou->classification != BASE) {
+                /* Do nothing. */
+            } else if (diminuto_tree_isempty(&root)) {
+                /* Do nothing. */
+            } else {
 
-			/*
-			 * If this a new client, add it to the database.
-			 */
+                node = diminuto_tree_first(&root);
+                assert(node != (diminuto_tree_t *)0);
 
-			if (that == (client_t *)0) {
-				DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d ", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
-				if (thou->classification == BASE) {
-					base = thou;
-					DIMINUTO_LOG_NOTICE("Client Set %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
-				}
-				if (debug) {
-					fprintf(stderr, "Client [%s]:%d [%zd] %p %p %p %d\n", diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port, total, root, node, then, comparison);
-	            	diminuto_dump(stderr, &(thou->address), sizeof(thou->address));
-	            	diminuto_dump(stderr, &(thou->port), sizeof(thou->port));
-				}
-			}
+                last = diminuto_tree_last(&root);
+                assert(last != (diminuto_tree_t *)0);
 
-			if (that != (client_t *)0) {
-				/* Do nothing. */
-			} else if (diminuto_tree_isempty(&root)) {
-				assert(this != (client_t *)0);
-				node = diminuto_tree_insert_root(&(this->node), &root);
-				assert(node != (diminuto_tree_t *)0);
-				this = (client_t *)0; /* CONSUMED */
-			} else if (comparison < 0) {
-				assert(this != (client_t *)0);
-				assert(then != (client_t *)0);
-				node = diminuto_tree_insert_right(&(this->node), &(then->node));
-				assert(node != (diminuto_tree_t *)0);
-				this = (client_t *)0; /* CONSUMED */
-			} else if (comparison > 0) {
-				assert(this != (client_t *)0);
-				assert(then != (client_t *)0);
-				node = diminuto_tree_insert_left(&(this->node), &(then->node));
-				assert(node != (diminuto_tree_t *)0);
-				this = (client_t *)0; /* CONSUMED */
-			} else {
-				assert(0);
-			}
+                while (!0) {
+                    thee = (client_t *)diminuto_tree_data(node);
+                    if (thee->classification == ROVER) {
+                        result = diminuto_ipc6_datagram_send(sock, &buffer, total, thee->address, thee->port);
+                        DIMINUTO_LOG_DEBUG("Datagram Sent [%s]:%d [%zd]", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port, result);
+                    }
+                    if (node == last) { break; }
+                    node = diminuto_tree_next(node);
+                }
 
-			if (debug) {
-				node = diminuto_tree_audit(&root);
-				assert(node == (diminuto_tree_t *)0);
-			}
+            }
 
-			/*
-			 * Timestamp the client now that we know that the client and its
-			 * datagram are valid. If we haven't heard from a client within the
-			 * timeout period, we'll remove it. As a useful side effect, if a
-			 * client gets restarted such that its sequence numbers are
-			 * unexpected, or if a client changes classifications from base to
-			 * rover or vice versa, we will eventually remove it and reregister
-			 * its connection as a new one.
-			 */
+            /*
+             * If this a new client, add it to the database.
+             */
 
-			thou->last = now;
+            if (that == (client_t *)0) {
+                DIMINUTO_LOG_NOTICE("Client New %s [%s]:%d ", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+                if (thou->classification == BASE) {
+                    base = thou;
+                    DIMINUTO_LOG_NOTICE("Client Set %s [%s]:%d", label, diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
+                }
+                if (debug) {
+                    fprintf(stderr, "Client [%s]:%d [%zd] %p %p %p %d\n", diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port, total, root, node, then, comparison);
+                    diminuto_dump(stderr, &(thou->address), sizeof(thou->address));
+                    diminuto_dump(stderr, &(thou->port), sizeof(thou->port));
+                }
+            }
 
-		}
+            if (that != (client_t *)0) {
+                /* Do nothing. */
+            } else if (diminuto_tree_isempty(&root)) {
+                assert(this != (client_t *)0);
+                node = diminuto_tree_insert_root(&(this->node), &root);
+                assert(node != (diminuto_tree_t *)0);
+                this = (client_t *)0; /* CONSUMED */
+            } else if (comparison < 0) {
+                assert(this != (client_t *)0);
+                assert(then != (client_t *)0);
+                node = diminuto_tree_insert_right(&(this->node), &(then->node));
+                assert(node != (diminuto_tree_t *)0);
+                this = (client_t *)0; /* CONSUMED */
+            } else if (comparison > 0) {
+                assert(this != (client_t *)0);
+                assert(then != (client_t *)0);
+                node = diminuto_tree_insert_left(&(this->node), &(then->node));
+                assert(node != (diminuto_tree_t *)0);
+                this = (client_t *)0; /* CONSUMED */
+            } else {
+                assert(0);
+            }
 
-		/*
-		 * Once a second or so, step through all of the clients in the database
-		 * and see if any of them have timed out. We time out both rovers and
-		 * bases (so we need to check if its a base).
-		 */
+            if (debug) {
+                node = diminuto_tree_audit(&root);
+                assert(node == (diminuto_tree_t *)0);
+            }
 
-		if ((now - was) <= 0) {
-			/* Do nothing. */
-		} else  if (diminuto_tree_isempty(&root)) {
-			/* Do nothing. */
-		} else {
+            /*
+             * Timestamp the client now that we know that the client and its
+             * datagram are valid. If we haven't heard from a client within the
+             * timeout period, we'll remove it. As a useful side effect, if a
+             * client gets restarted such that its sequence numbers are
+             * unexpected, or if a client changes classifications from base to
+             * rover or vice versa, we will eventually remove it and reregister
+             * its connection as a new one.
+             */
 
-			node = diminuto_tree_first(&root);
-			assert(node != (diminuto_tree_t *)0);
+            thou->last = now;
 
-			last = diminuto_tree_last(&root);
-			assert(last != (diminuto_tree_t *)0);
+        }
 
-			while (!0) {
-				thee = (client_t *)diminuto_tree_data(node);
-				next = diminuto_tree_next(node);
-				if ((now - thee->last) > timeout) {
-					DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", (thee->classification == BASE) ? "base" : (thee->classification == ROVER) ? "rover" : "unknown", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port);
-					node = diminuto_tree_remove(&(thee->node));
-					assert(node != (diminuto_tree_t *)0);
-					if (thee == base) {
-						base = (client_t *)0;
-					}
-					free(thee);
-				}
-				if (node == last) { break; }
-				assert(next != (diminuto_tree_t *)0);
-				node = next;
-			}
+        /*
+         * Once a second or so, step through all of the clients in the database
+         * and see if any of them have timed out. We time out both rovers and
+         * bases (so we need to check if its a base).
+         */
 
-			was = now;
+        if ((now - was) <= 0) {
+            /* Do nothing. */
+        } else  if (diminuto_tree_isempty(&root)) {
+            /* Do nothing. */
+        } else {
 
-		}
+            node = diminuto_tree_first(&root);
+            assert(node != (diminuto_tree_t *)0);
+
+            last = diminuto_tree_last(&root);
+            assert(last != (diminuto_tree_t *)0);
+
+            while (!0) {
+                thee = (client_t *)diminuto_tree_data(node);
+                next = diminuto_tree_next(node);
+                if ((now - thee->last) > timeout) {
+                    DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", (thee->classification == BASE) ? "base" : (thee->classification == ROVER) ? "rover" : "unknown", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port);
+                    node = diminuto_tree_remove(&(thee->node));
+                    assert(node != (diminuto_tree_t *)0);
+                    if (thee == base) {
+                        base = (client_t *)0;
+                    }
+                    free(thee);
+                }
+                if (node == last) { break; }
+                assert(next != (diminuto_tree_t *)0);
+                node = next;
+            }
+
+            was = now;
+
+        }
 
     }
 
@@ -588,9 +588,9 @@ int main(int argc, char * argv[])
      * FINALIZATION
      **************************************************************************/
 
-	DIMINUTO_LOG_INFORMATION("Stop");
+    DIMINUTO_LOG_INFORMATION("Stop");
 
-	DIMINUTO_LOG_INFORMATION("Counters OutOfOrder=%u Missing=%u", outoforder, missing);
+    DIMINUTO_LOG_INFORMATION("Counters OutOfOrder=%u Missing=%u", outoforder, missing);
 
     diminuto_mux_fini(&mux);
 
@@ -598,28 +598,28 @@ int main(int argc, char * argv[])
     assert(rc >= 0);
 
 
-	if (!diminuto_tree_isempty(&root)) {
+    if (!diminuto_tree_isempty(&root)) {
 
-		node = diminuto_tree_first(&root);
-		assert(node != (diminuto_tree_t *)0);
+        node = diminuto_tree_first(&root);
+        assert(node != (diminuto_tree_t *)0);
 
-		last = diminuto_tree_last(&root);
-		assert(last != (diminuto_tree_t *)0);
+        last = diminuto_tree_last(&root);
+        assert(last != (diminuto_tree_t *)0);
 
-		while (!0) {
-			thee = (client_t *)diminuto_tree_data(node);
-			next = diminuto_tree_next(node);
-			node = diminuto_tree_remove(&(thee->node));
-			assert(node != (diminuto_tree_t *)0);
-			free(thee);
-			if (node == last) { break; }
-			assert(next != (diminuto_tree_t *)0);
-			node = next;
-		}
+        while (!0) {
+            thee = (client_t *)diminuto_tree_data(node);
+            next = diminuto_tree_next(node);
+            node = diminuto_tree_remove(&(thee->node));
+            assert(node != (diminuto_tree_t *)0);
+            free(thee);
+            if (node == last) { break; }
+            assert(next != (diminuto_tree_t *)0);
+            node = next;
+        }
 
-	}
+    }
 
-	DIMINUTO_LOG_INFORMATION("Exit");
+    DIMINUTO_LOG_INFORMATION("Exit");
 
     return 0;
 }

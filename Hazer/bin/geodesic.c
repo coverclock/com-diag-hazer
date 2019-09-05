@@ -62,63 +62,63 @@ int main(int argc, char ** argv) {
 
     do {
 
-		if ((argc--) <= 0) { break; }
-		arg = *(argv++);
+        if ((argc--) <= 0) { break; }
+        arg = *(argv++);
         program = ((program = strrchr(arg, '/')) == (char *)0) ? arg : program + 1;
 
         if ((argc > 0) && (strcmp(*argv, "-?") == 0)) {
-    		fprintf(stderr, "usage: %s [ -? ] [ -d ] LATDD1 LONDD1 LATDD2 LONDD2\n", program);
-    		argv++;
-    		argc--;
+            fprintf(stderr, "usage: %s [ -? ] [ -d ] LATDD1 LONDD1 LATDD2 LONDD2\n", program);
+            argv++;
+            argc--;
         }
 
         if ((argc > 0) && (strcmp(*argv, "-d") == 0)) {
-    		debug = !0;
-    		argv++;
-    		argc--;
+            debug = !0;
+            argv++;
+            argc--;
         }
 
         if (debug) { fprintf(stderr, "%s: a=%.15f f=%.15f\n", program, a, f); }
 
-		if ((argc--) <= 0) { break; }
-		arg = *(argv++);
-		lat1 = strtold(arg, &end);
-		if (end == (char *)0) { break; }
-		if ((*end != '\0') && (*end != ',')) { break; }
-		if (!((-90.0 <= lat1) && (lat1 <= 90.0))) { break; }
+        if ((argc--) <= 0) { break; }
+        arg = *(argv++);
+        lat1 = strtold(arg, &end);
+        if (end == (char *)0) { break; }
+        if ((*end != '\0') && (*end != ',')) { break; }
+        if (!((-90.0 <= lat1) && (lat1 <= 90.0))) { break; }
 
-		if ((argc--) <= 0) { break; }
-		arg = *(argv++);
-		lon1 = strtold(arg, &end);
-		if (end == (char *)0) { break; }
-		if (*end != '\0') { break; }
-		if (!((-180.0 <= lon1) && (lon1 <= 180.0))) { break; }
+        if ((argc--) <= 0) { break; }
+        arg = *(argv++);
+        lon1 = strtold(arg, &end);
+        if (end == (char *)0) { break; }
+        if (*end != '\0') { break; }
+        if (!((-180.0 <= lon1) && (lon1 <= 180.0))) { break; }
 
-		if ((argc--) <= 0) { break; }
-		arg = *(argv++);
-		lat2 = strtold(arg, &end);
-		if (end == (char *)0) { break; }
-		if ((*end != '\0') && (*end != ',')) { break; }
-		if (!((-90.0 <= lat2) && (lat2 <= 90.0))) { break; }
+        if ((argc--) <= 0) { break; }
+        arg = *(argv++);
+        lat2 = strtold(arg, &end);
+        if (end == (char *)0) { break; }
+        if ((*end != '\0') && (*end != ',')) { break; }
+        if (!((-90.0 <= lat2) && (lat2 <= 90.0))) { break; }
 
-		if ((argc--) <= 0) { break; }
-		arg = *(argv++);
-		lon2 = strtold(arg, &end);
-		if (end == (char *)0) { break; }
-		if (*end != '\0') { break; }
-		if (!((-180.0 <= lon2) && (lon2 <= 180.0))) { break; }
+        if ((argc--) <= 0) { break; }
+        arg = *(argv++);
+        lon2 = strtold(arg, &end);
+        if (end == (char *)0) { break; }
+        if (*end != '\0') { break; }
+        if (!((-180.0 <= lon2) && (lon2 <= 180.0))) { break; }
 
-		if (debug) { fprintf(stderr, "%s: lat1=%.15f lon1=%.15f lat2=%.15f lon2=%.15f\n", program, lat1, lon1, lat2, lon2); }
+        if (debug) { fprintf(stderr, "%s: lat1=%.15f lon1=%.15f lat2=%.15f lon2=%.15f\n", program, lat1, lon1, lat2, lon2); }
 
-		geod_init(&g, a, f);
+        geod_init(&g, a, f);
 
-	    geod_inverse(&g, lat1, lon1, lat2, lon2, &s12, &azi1, &azi2);
+        geod_inverse(&g, lat1, lon1, lat2, lon2, &s12, &azi1, &azi2);
 
-		if (debug) { fprintf(stderr, "%s: azi1=%.15f azi2=%.15f\n", program, azi1, azi2); }
+        if (debug) { fprintf(stderr, "%s: azi1=%.15f azi2=%.15f\n", program, azi1, azi2); }
 
-	    printf("%.10f\n", s12);
+        printf("%.10f\n", s12);
 
-	    xc = 0;
+        xc = 0;
 
     } while (0);
 
