@@ -987,4 +987,27 @@ extern int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_
         } \
     } while (0)
 
+/**
+ * @def COM_DIAG_YODEL_HTOLE
+ * Convert in-place variable @a _FIELD_ from Host byte order to Little Endian
+ * byte order. The field width, 16, 32, or 64 bits, in inferred automatically.
+ * The field must be appropriately aligned.
+ */
+#define COM_DIAG_YODEL_HTOLE(_FIELD_) \
+    do { \
+        switch (sizeof(_FIELD_)) { \
+        case sizeof(uint16_t): \
+            _FIELD_ = htole16(_FIELD_); \
+            break; \
+        case sizeof(uint32_t): \
+            _FIELD_ = htole32(_FIELD_); \
+            break; \
+        case sizeof(uint64_t): \
+            _FIELD_ = htole64(_FIELD_); \
+            break; \
+        default: \
+            break; \
+        } \
+    } while (0)
+
 #endif

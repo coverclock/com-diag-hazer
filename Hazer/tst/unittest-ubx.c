@@ -65,26 +65,133 @@ int main(void)
         union { uint8_t  integer; uint8_t byte[sizeof(uint8_t)];  } u8 =  { 0x11U };
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
+
         assert(u64.byte[0] == 0x88);
+        assert(u64.byte[1] == 0x77);
+        assert(u64.byte[2] == 0x66);
+        assert(u64.byte[3] == 0x55);
+        assert(u64.byte[4] == 0x44);
+        assert(u64.byte[5] == 0x33);
+        assert(u64.byte[6] == 0x22);
+        assert(u64.byte[7] == 0x11);
+
         assert(u32.byte[0] == 0x44);
+        assert(u32.byte[1] == 0x33);
+        assert(u32.byte[2] == 0x22);
+        assert(u32.byte[3] == 0x11);
+
         assert(u16.byte[0] == 0x22);
+        assert(u16.byte[1] == 0x11);
+
         assert(u8.byte[0]  == 0x11);
+
 #else
+
         assert(u64.byte[0] == 0x11);
+        assert(u64.byte[1] == 0x22);
+        assert(u64.byte[2] == 0x33);
+        assert(u64.byte[3] == 0x44);
+        assert(u64.byte[4] == 0x55);
+        assert(u64.byte[5] == 0x66);
+        assert(u64.byte[6] == 0x77);
+        assert(u64.byte[7] == 0x88);
+
         assert(u32.byte[0] == 0x11);
+        assert(u32.byte[1] == 0x22);
+        assert(u32.byte[2] == 0x33);
+        assert(u32.byte[3] == 0x44);
+
         assert(u16.byte[0] == 0x11);
+        assert(u16.byte[1] == 0x22);
+
         assert(u8.byte[0]  == 0x11);
+
 #endif
 
         COM_DIAG_YODEL_LETOH(u64.integer);
         COM_DIAG_YODEL_LETOH(u32.integer);
         COM_DIAG_YODEL_LETOH(u16.integer);
-        COM_DIAG_YODEL_LETOH(u8.integer );
+        COM_DIAG_YODEL_LETOH(u8.integer);
+
+        /*
+         * If the host on which this is running is also Little Endian,
+         * the bytes will not have changed and so will be the same as the
+         * Little Endian segment above; otherwise, they will be reversed
+         * with respect to the Big Endian (not Little Endian) segment above.
+         */
 
         assert(u64.byte[0] == 0x88);
+        assert(u64.byte[1] == 0x77);
+        assert(u64.byte[2] == 0x66);
+        assert(u64.byte[3] == 0x55);
+        assert(u64.byte[4] == 0x44);
+        assert(u64.byte[5] == 0x33);
+        assert(u64.byte[6] == 0x22);
+        assert(u64.byte[7] == 0x11);
+
         assert(u32.byte[0] == 0x44);
+        assert(u32.byte[1] == 0x33);
+        assert(u32.byte[2] == 0x22);
+        assert(u32.byte[3] == 0x11);
+
         assert(u16.byte[0] == 0x22);
+        assert(u16.byte[1] == 0x11);
+
         assert(u8.byte[0]  == 0x11);
+
+        COM_DIAG_YODEL_HTOLE(u64.integer);
+        COM_DIAG_YODEL_HTOLE(u32.integer);
+        COM_DIAG_YODEL_HTOLE(u16.integer);
+        COM_DIAG_YODEL_HTOLE(u8.integer);
+
+        /*
+         * Now the bytes should be back in their original order.
+         */
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+
+        assert(u64.byte[0] == 0x88);
+        assert(u64.byte[1] == 0x77);
+        assert(u64.byte[2] == 0x66);
+        assert(u64.byte[3] == 0x55);
+        assert(u64.byte[4] == 0x44);
+        assert(u64.byte[5] == 0x33);
+        assert(u64.byte[6] == 0x22);
+        assert(u64.byte[7] == 0x11);
+
+        assert(u32.byte[0] == 0x44);
+        assert(u32.byte[1] == 0x33);
+        assert(u32.byte[2] == 0x22);
+        assert(u32.byte[3] == 0x11);
+
+        assert(u16.byte[0] == 0x22);
+        assert(u16.byte[1] == 0x11);
+
+        assert(u8.byte[0]  == 0x11);
+
+#else
+
+        assert(u64.byte[0] == 0x11);
+        assert(u64.byte[1] == 0x22);
+        assert(u64.byte[2] == 0x33);
+        assert(u64.byte[3] == 0x44);
+        assert(u64.byte[4] == 0x55);
+        assert(u64.byte[5] == 0x66);
+        assert(u64.byte[6] == 0x77);
+        assert(u64.byte[7] == 0x88);
+
+        assert(u32.byte[0] == 0x11);
+        assert(u32.byte[1] == 0x22);
+        assert(u32.byte[2] == 0x33);
+        assert(u32.byte[3] == 0x44);
+
+        assert(u16.byte[0] == 0x11);
+        assert(u16.byte[1] == 0x22);
+
+        assert(u8.byte[0]  == 0x11);
+
+#endif
+
     }
 
     /**************************************************************************/
