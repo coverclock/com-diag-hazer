@@ -598,7 +598,7 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t lengt
     return rc;
 }
 
-void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, uint64_t * billionthsp)
+void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int32_t * degreesp, uint64_t * billionthsp)
 {
     int64_t nanodegrees = 0;
 
@@ -611,7 +611,7 @@ void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, 
     *billionthsp = nanodegrees;                                 /* Get billionths. */
 }
 
-void yodel_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp)
+void yodel_format_hppos2position(int32_t whole, int8_t fraction, uint32_t * degreesp, uint32_t * minutesp, uint32_t * secondsp, uint32_t * onehundredthousandsthp, int * directionp)
 {
     int64_t nanodegrees = 0;
 
@@ -635,4 +635,21 @@ void yodel_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp,
     *secondsp = nanodegrees / 1000000000LL;                             /* Get integral seconds. */
     nanodegrees = nanodegrees % 1000000000LL;                           /* Remainder. */
     *onehundredthousandsthp = (nanodegrees * 100000LL) / 1000000000LL;  /* Get one hundred thousanths. */
+}
+
+void yodel_format_hpalt2aaltitude(int32_t whole, int8_t fraction, int32_t * metersp, uint32_t * tenthousandthsp)
+{
+	int64_t tenthousandsth = 0;
+
+    tenthousandsth = whole;
+    tenthousandsth *= 10;
+    tenthousandsth += fraction;
+    *metersp = tenthousandsth / 10000LL;
+    *tenthousandthsp = abs64(tenthousandsth) % 10000ULL;
+}
+
+void yodel_format_hpacc2accuracy(int32_t whole,  int32_t * metersp, uint32_t * tenthousandthsp)
+{
+	*metersp = whole / 10000L;
+	*tenthousandthsp = abs64(whole) % 10000UL;
 }

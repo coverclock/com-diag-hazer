@@ -444,7 +444,7 @@ extern int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * bp
  * @param degreesp points to where the signed integral degrees (e.g. 180) is stored.
  * @param billionthsp points to where the unsigned fractional degrees (0..999999999) is stored.
  */
-extern void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * degreesp, uint64_t * billionthsp);
+extern void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int32_t * degreesp, uint64_t * billionthsp);
 
 /**
  * Format a high precision position into position values with a fractional
@@ -456,7 +456,27 @@ extern void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int * deg
  * @param onehundredthousandsthp points to there the fractional seconds (0..99999) are stored.
  * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
  */
-extern void yodel_format_hppos2position(int32_t whole, int8_t fraction, int * degreesp, int * minutesp, int * secondsp, int * onehundredthousandsthp, int * directionp);
+extern void yodel_format_hppos2position(int32_t whole, int8_t fraction, uint32_t * degreesp, uint32_t * minutesp, uint32_t * secondsp, uint32_t * onehundredthousandsthp, int * directionp);
+
+/**
+ * Format a high precision height into an altitude value with a fractional part
+ * in 10^-4 meters. This can format either the altitude above Mean Sea Level
+ * (MSL) value, or the height above the WGS84 ellipse value.
+ * @param whole is the height value in 10^-3 meters (millimeters).
+ * @param fraction is the fractional part in 10^-4 meters.
+ * @param metersp points to where the meters value is stored.
+ * @param tenthousandthsp points to there the 10^-4 fractional part is stored.
+ */
+extern void yodel_format_hpalt2aaltitude(int32_t whole, int8_t fraction, int32_t * metersp, uint32_t * tenthousandthsp);
+
+/**
+ * Format a high precision accuracy into a plus/minus value with a fractional
+ * part in 10^-4 meters.
+ * @param whole is the accuracy value in 10^-4 meters.
+ * @param metersp points to where the meters value is stored.
+ * @param tenthousandthsp points to there the 10^-4 fractional part is stored.
+ */
+extern void yodel_format_hpacc2accuracy(int32_t whole,  int32_t * metersp, uint32_t * tenthousandthsp);
 
 /*******************************************************************************
  * PROCESSING UBX-MON-HW MESSAGES

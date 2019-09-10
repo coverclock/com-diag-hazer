@@ -39,6 +39,7 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
 exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -G ${ROUTER} -g 4 \
+    -N ${LOG}/${PROGRAM}.fix \
     -F -H ${LOG}/${PROGRAM}.out -t 10 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01' \
     -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00' \

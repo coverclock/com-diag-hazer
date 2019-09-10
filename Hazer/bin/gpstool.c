@@ -1239,30 +1239,27 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
  */
 static void print_solution(FILE * fp, const yodel_solution_t * sp)
 {
-    int degrees = 0;
-    int minutes = 0;
-    int seconds = 0;
-    int tenthousandths = 0;
+	int32_t decimaldegrees = 0;
+    uint32_t degrees = 0;
+    uint32_t minutes = 0;
+    uint32_t seconds = 0;
     uint64_t billionths = 0;
     int direction = 0;
-    int64_t value = 0;
-    int64_t whole = 0;
-    uint64_t fraction = 0;
+    int32_t meters = 0;
+    uint32_t tenthousandths = 0;
 
     if (sp->ticks != 0) {
 
         fputs("HPP", fp);
 
-        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
-        fprintf(fp, " %4d.%09llu,", degrees, (long long unsigned int)billionths);
+        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &decimaldegrees, &billionths);
+        fprintf(fp, " %4d.%09llu,", decimaldegrees, (long long unsigned int)billionths);
 
-        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &billionths);
-        fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)billionths);
+        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &decimaldegrees, &billionths);
+        fprintf(fp, " %4d.%09llu", decimaldegrees, (long long unsigned int)billionths);
 
-        value = sp->payload.hAcc;
-        whole = value / 10000LL;
-        fraction = abs64(value) % 10000ULL;
-        fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)whole, (long long unsigned int)fraction);
+        yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
+        fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
 
         fprintf(fp, "%22s", "");
 
@@ -1272,24 +1269,14 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fputs("HPA", fp);
 
-        value = sp->payload.hMSL;
-        value *= 10;
-        value += sp->payload.hMSLHp;
-        whole = value / 10000LL;
-        fraction = abs64(value) % 10000ULL;
-        fprintf(fp, " %6lld.%04llum MSL", (long long signed int)whole, (long long unsigned int)fraction);
+        yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &tenthousandths);
+        fprintf(fp, " %6lld.%04llum MSL", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
-        value = sp->payload.height;
-        value *= 10;
-        value += sp->payload.heightHp;
-        whole = value / 10000LL;
-        fraction = abs64(value) % 10000ULL;
-        fprintf(fp, " %6lld.%04llum WGS84", (long long signed int)whole, (long long unsigned int)fraction);
+        yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &tenthousandths);
+        fprintf(fp, " %6lld.%04llum WGS84", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
-        value = sp->payload.vAcc;
-        whole = value / 10000LL;
-        fraction = abs64(value) % 10000ULL;
-        fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)whole, (long long unsigned int)fraction);
+        yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
+        fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
 
         fprintf(fp, "%17s", "");
 
@@ -1300,10 +1287,10 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         fputs("NGS", fp);
 
         yodel_format_hppos2position(sp->payload.lat, sp->payload.latHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
-        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'S' : 'N');
+        fprintf(fp, " %3u %02u %02u.%05u(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'S' : 'N');
 
         yodel_format_hppos2position(sp->payload.lon, sp->payload.lonHp, &degrees, &minutes, &seconds, &tenthousandths, &direction);
-        fprintf(fp, " %3d %02d %02d.%05d(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'W' : 'E');
+        fprintf(fp, " %3u %02u %02u.%05u(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'W' : 'E');
 
         fprintf(fp, "%29s", "");
 
