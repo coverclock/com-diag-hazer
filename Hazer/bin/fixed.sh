@@ -3,28 +3,52 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the Ardusimple SimpleRTK2B as a surveying Base.
-
-# The SVIN-ACC-LIMIT is based on actual testing under not bad but less than
-# ideal conditions: the antenna in my front yard, but not on a roof. The
-# SVIN-MIN-DUR is laughably small; eight hours is a more realistic value
-# given the conditions under which I did the test.
+# Configure and run the Ardusimple SimpleRTK2B as a fixed Base.
 
 PROGRAM=$(basename ${0})
-ROUTER=${1:-"tumbleweed:tumbleweed"}
-DEVICE=${2:-"/dev/tumbleweed"}
-RATE=${3:-230400}
-
-. $(readlink -e $(dirname ${0})/../bin)/setup
-
 LOG=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${LOG}
 
+ROUTER=${1:-"tumbleweed:tumbleweed"}
+DEVICE=${2:-"/dev/tumbleweed"}
+FILE=${3:-${LOG}/base.fix}
+RATE=${4:-230400}
+
+. $(readlink -e $(dirname ${0})/../bin)/setup
+
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
-# UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE SURVEY_IN
-# UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-SVIN-MIN-DUR 300 (seconds)
-# UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-SVIN-ACC-LIMIT 100 (x 0.1mm) = 1cm ~ 0.4in
+exec 0<${FILE}
+
+read -r CFG_TMODE_LAT
+read -r CFG_TMODE_LATHP
+read -r CFG_TMODE_LON
+read -r CFG_TMODE_LONHP
+read -r CFG_TMODE_HEIGHT
+read -r CFG_TMODE_HEIGHTHP
+
+log -N ${PROGRAM} -i CFG_TMODE_LAT="\"${CFG_TMODE_LAT}\""
+log -N ${PROGRAM} -i CFG_TMODE_LATHP="\"${CFG_TMODE_LATHP}\""
+log -N ${PROGRAM} -i CFG_TMODE_LON="\"${CFG_TMODE_LON}\""
+log -N ${PROGRAM} -i CFG_TMODE_LONHP="\"${CFG_TMODE_LONHP}\""
+log -N ${PROGRAM} -i CFG_TMODE_HEIGHT="\"${CFG_TMODE_HEIGHT}\""
+log -N ${PROGRAM} -i CFG_TMODE_HEIGHTHP="\"${CFG_TMODE_HEIGHTHP}\""
+
+test -z "${CFG_TMODE_LAT}" && exit 1
+test -z "${CFG_TMODE_LATHP}" && exit 1
+test -z "${CFG_TMODE_LON}" && exit 1
+test -z "${CFG_TMODE_LONHP}" && exit 1
+test -z "${CFG_TMODE_HEIGHT}" && exit 1
+test -z "${CFG_TMODE_HEIGHTHP}" && exit 1
+
+# UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE FIXED
+# UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-POS_TYPE LLH
+# UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_LAT (read)
+# UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_LATHP (read)
+# UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_LON (read)
+# UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_LONHP (read)
+# UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_HEIGHT (read)
+# UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_HEIGHTHP (read)
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-RTCM_3X_TYPE1005_USB 1
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-RTCM_3X_TYPE1074_USB 1
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-RTCM_3X_TYPE1084_USB 1
@@ -39,11 +63,15 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
 exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -G ${ROUTER} -g 4 \
-    -N ${LOG}/${PROGRAM}.fix \
     -F -H ${LOG}/${PROGRAM}.out -t 10 \
-    -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01' \
-    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00' \
-    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40\x64\x00\x00\x00' \
+    -U "${CFG_TMODE_LAT}" \
+    -U "${CFG_TMODE_LATHP}" \
+    -U "${CFG_TMODE_LON}" \
+    -U "${CFG_TMODE_LONHP}" \
+    -U "${CFG_TMODE_HEIGHT}" \
+    -U "${CFG_TMODE_HEIGHTHP}" \
+    -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x02' \
+    -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x02\x00\x03\x20\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\xc0\x02\x91\x20\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x61\x03\x91\x20\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x66\x03\x91\x20\x01' \
@@ -54,8 +82,5 @@ exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x78\x10\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x8b\x00\x91\x20\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x05\x00\x53\x10\x00' \
-    -U '\xb5\x62\x06\x01\x03\x00\x01\x14\x01' \
+    -U '\xb5\x62\x06\x01\x03\x00\x01\x14\x01'
     < /dev/null 1> /dev/null 2> ${LOG}/${PROGRAM}.err
- 
-# UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-RTCM_3X_TYPE4072_1_USB 1
-# -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x84\x03\x91\x20\x01' \
