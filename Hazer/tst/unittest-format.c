@@ -200,7 +200,7 @@ int main(void)
     }
 
     {
-        int degrees = 0;
+        int32_t degrees = 0;
         uint64_t billionths = 0;
         yodel_format_hppos2degrees(397942134, 61, &degrees, &billionths);
         assert(degrees == 39);
@@ -208,7 +208,7 @@ int main(void)
     }
 
     {
-        int degrees = 0;
+        int32_t degrees = 0;
         uint64_t billionths = 0;
         yodel_format_hppos2degrees(-1051533822, -87, &degrees, &billionths);
         assert(degrees == -105);
@@ -216,10 +216,10 @@ int main(void)
     }
 
     {
-        int degrees = ~0;
-        int minutes = ~0;
-        int seconds = ~0;
-        int onehundredthousandsth = ~0;
+        uint32_t degrees = ~0;
+        uint32_t minutes = ~0;
+        uint32_t seconds = ~0;
+        uint32_t onehundredthousandsth = ~0;
         int direction = 0;
         yodel_format_hppos2position(397942134, 61, &degrees, &minutes, &seconds, &onehundredthousandsth, &direction);
         assert(degrees == 39);
@@ -230,10 +230,10 @@ int main(void)
     }
 
     {
-        int degrees = ~0;
-        int minutes = ~0;
-        int seconds = ~0;
-        int onehundredthousandsth = ~0;
+    	uint32_t degrees = ~0;
+    	uint32_t minutes = ~0;
+    	uint32_t seconds = ~0;
+    	uint32_t onehundredthousandsth = ~0;
         int direction = 0;
         yodel_format_hppos2position(-1051533822, -87, &degrees, &minutes, &seconds, &onehundredthousandsth, &direction);
         assert(degrees == 105);
@@ -246,4 +246,37 @@ int main(void)
          */
     }
 
+    {
+    	int32_t meters = ~0;
+    	uint32_t tenthousandths = ~0;
+    	yodel_format_hpalt2aaltitude(2345, 6, &meters, &tenthousandths);
+    	assert(meters == 2);
+    	assert(tenthousandths == 3456);
+    }
+
+
+    {
+    	int32_t meters = ~0;
+    	uint32_t tenthousandths = ~0;
+    	yodel_format_hpalt2aaltitude(-2345, -6, &meters, &tenthousandths);
+    	assert(meters == -2);
+    	assert(tenthousandths == 3456);
+    }
+
+    {
+    	int32_t meters = ~0;
+    	uint32_t tenthousandths = ~0;
+    	yodel_format_hpacc2accuracy(23456, &meters, &tenthousandths);
+    	assert(meters == 2);
+    	assert(tenthousandths == 3456);
+    }
+
+
+    {
+    	int32_t meters = ~0;
+    	uint32_t tenthousandths = ~0;
+    	yodel_format_hpacc2accuracy(-23456, &meters, &tenthousandths);
+    	assert(meters == -2);
+    	assert(tenthousandths == 3456);
+    }
 }
