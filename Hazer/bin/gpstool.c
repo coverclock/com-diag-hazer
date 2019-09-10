@@ -303,6 +303,28 @@ static void write_buffer(FILE * fp, const void * buffer, size_t size)
 }
 
 /**
+ * Print an NMEA sentence or UBX message to a stream, expanding non-printable
+ * characters into escape sequences.
+ * @param fp points to the FILE stream.
+ * @param ep points to the FILE stream for errors.
+ * @param buffer points to the sentence or packet.
+ * @param size is the size of the sentence or packet.
+ * @param limit is the maximum number of characters to display.
+ */
+static void print_buffer(FILE * fp, const void * buffer, size_t size, size_t limit)
+{
+    const char * bb = (const char *)0;
+    size_t current = 0;
+    int end = 0;
+
+    for (bb = buffer; size > 0; --size) {
+        diminuto_phex_emit(fp, *(bb++), UNLIMITED, 0, !0, 0, &current, &end, 0);
+        if (current >= limit) { break; }
+    }
+    fputc('\n', fp);
+}
+
+/**
  * Log connection information.
  * @param label is a label prepended to the output.
  * @param option is the command line endpoint option argument.
@@ -439,31 +461,91 @@ static void collect_update(int number, tumbleweed_updates_t * up)
 
 }
 
+/**
+ * If the caller has passed a valid file name, and the solution is not active
+ * yet valid, emit the appropriate UBX messages minus checksums for feeding
+ * this solution into this programming running in fixed mode.
+ * @param arp points to a Antenna Reference Point file name.
+ * @param bp points to a base structure.
+ * @param sp points to a solution structure.
+ * @return true if the solution was emitted, false otherwise.
+ */
+static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_solution_t * sp)
+{
+	int rc = 0;
+	FILE * fp = (FILE *)0;
+	char * temporary = (char *)0;
+	int64_t value = 0;
+	int32_t lat = 0;
+	int32_t lon = 0;
+	int32_t height = 0;
+	int8_t heightHp = 0;
+	uint8_t cfg_tmode_lat[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x09, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
+	uint8_t cfg_tmode_latHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0c, 0x00, 0x03, 0x20, 0xFF,                   };
+	uint8_t cfg_tmode_lon[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0a, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
+	uint8_t cfg_tmode_lonHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0d, 0x00, 0x03, 0x20, 0xFF,                   };
+	uint8_t cfg_tmode_height[]   = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0b, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
+	uint8_t cfg_tmode_heightHp[] = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0e, 0x00, 0x03, 0x20, 0xFF,                   };
+
+    // e.g. \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01
+    // e.g. \xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00
+
+	if (bp->ticks == 0) {
+		/* Do nothing. */
+	} else if (sp->ticks == 0) {
+		/* Do nothing. */
+	} else if (bp->payload.active) {
+		/* Do nothing. */
+	} else if (!bp->payload.valid) {
+		/* Do nothing. */
+	} else if ((fp = diminuto_observation_create(arp, &temporary)) == (FILE *)0) {
+		/* Do nothing. */
+	} else {
+		DIMINUTO_LOG_INFORMATION("Fix Emit lat %d %d lon %d %d alt %d %d\n", sp->payload.lat, sp->payload.latHp, sp->payload.lon, sp->payload.lonHp, sp->payload.height, sp->payload.heightHp);
+
+        lat      = sp->payload.lat;
+		lon      = sp->payload.lon;
+
+		/*
+		 * Remarkably, the output high precision height in SURVEY-IN mode is
+		 * reported in slightly different units than its input configuration
+		 * in FIXED mode. This seems like a bug. [U-blox 9 Interface, p. 145
+		 * vs. pp. 226-227]
+		 */
+
+		height   = sp->payload.height; /* mm == 10^-3m */
+		heightHp = sp->payload.heightHp; /* 0.1mm == 10^-4m (-9..+9) */
+		value = (height * 10) + heightHp; /* 0.1mm == 10^-4m */
+		height = value / 100; /* cm == 10^-4m * 10^2 == 10^-2m */
+		heightHp = value % 100; /* 0.1mm == 10^-4m (-99..+99) */
+
+		COM_DIAG_YODEL_HTOLE(lat);
+		COM_DIAG_YODEL_HTOLE(lon);
+		COM_DIAG_YODEL_HTOLE(height);
+
+		memcpy(&cfg_tmode_lat     [sizeof(cfg_tmode_lat)      - sizeof(lat)],               &lat,               sizeof(lat));
+		memcpy(&cfg_tmode_latHp   [sizeof(cfg_tmode_latHp)    - sizeof(sp->payload.latHp)], &sp->payload.latHp, sizeof(sp->payload.latHp));
+		memcpy(&cfg_tmode_lon     [sizeof(cfg_tmode_lon)      - sizeof(lon)],               &lon,               sizeof(lon));
+		memcpy(&cfg_tmode_lonHp   [sizeof(cfg_tmode_lonHp)    - sizeof(sp->payload.lonHp)], &sp->payload.lonHp, sizeof(sp->payload.lonHp));
+		memcpy(&cfg_tmode_height  [sizeof(cfg_tmode_height)   - sizeof(height)],            &height,            sizeof(height));
+		memcpy(&cfg_tmode_heightHp[sizeof(cfg_tmode_heightHp) - sizeof(heightHp)],          &heightHp,          sizeof(heightHp));
+
+		print_buffer(fp, &cfg_tmode_lat,      sizeof(cfg_tmode_lat),      ~(size_t)0);
+		print_buffer(fp, &cfg_tmode_latHp,    sizeof(cfg_tmode_latHp),    ~(size_t)0);
+		print_buffer(fp, &cfg_tmode_lon,      sizeof(cfg_tmode_lon),      ~(size_t)0);
+		print_buffer(fp, &cfg_tmode_lonHp,    sizeof(cfg_tmode_lonHp),    ~(size_t)0);
+		print_buffer(fp, &cfg_tmode_height,   sizeof(cfg_tmode_height),   ~(size_t)0);
+		print_buffer(fp, &cfg_tmode_heightHp, sizeof(cfg_tmode_heightHp), ~(size_t)0);
+
+		rc = (diminuto_observation_commit(fp, &temporary) == (FILE *)0);
+	}
+
+	return rc;
+}
+
 /*******************************************************************************
  * REPORTERS
  ******************************************************************************/
-
-/**
- * Print an NMEA sentence or UBX message to a stream, expanding non-printable
- * characters into escape sequences.
- * @param fp points to the FILE stream.
- * @param ep points to the FILE stream for errors.
- * @param buffer points to the sentence or packet.
- * @param size is the size of the sentence or packet.
- * @param limit is the maximum number of characters to display.
- */
-static void print_buffer(FILE * fp, const void * buffer, size_t size, size_t limit)
-{
-    const char * bb = (const char *)0;
-    size_t current = 0;
-    int end = 0;
-
-    for (bb = buffer; size > 0; --size) {
-        diminuto_phex_emit(fp, *(bb++), UNLIMITED, 0, !0, 0, &current, &end, 0);
-        if (current >= limit) { break; }
-    }
-    fputc('\n', fp);
-}
 
 /**
  * Print all of the active satellites used for the most recent fix.
@@ -1195,14 +1277,21 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         value += sp->payload.hMSLHp;
         whole = value / 10000LL;
         fraction = abs64(value) % 10000ULL;
-        fprintf(fp, " %6lld.%04llum", (long long signed int)whole, (long long unsigned int)fraction);
+        fprintf(fp, " %6lld.%04llum MSL", (long long signed int)whole, (long long unsigned int)fraction);
+
+        value = sp->payload.height;
+        value *= 10;
+        value += sp->payload.heightHp;
+        whole = value / 10000LL;
+        fraction = abs64(value) % 10000ULL;
+        fprintf(fp, " %6lld.%04llum WGS84", (long long signed int)whole, (long long unsigned int)fraction);
 
         value = sp->payload.vAcc;
         whole = value / 10000LL;
         fraction = abs64(value) % 10000ULL;
         fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)whole, (long long unsigned int)fraction);
 
-        fprintf(fp, "%40s", "");
+        fprintf(fp, "%17s", "");
 
         fprintf(fp, " %-8s", "GNSS");
 
@@ -1369,6 +1458,7 @@ int main(int argc, char * argv[])
     const char * strobe = (const char *)0;
     const char * logging = (const char *)0;
     const char * headless = (const char *)0;
+    const char * arp = (const char *)0;
     int opt = -1;
     int debug = 0;
     int verbose = 0;
@@ -1646,7 +1736,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:MOPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTXZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:MN:OPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTZ afijqrwxz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1728,6 +1818,9 @@ int main(int argc, char * argv[])
         case 'M':
             daemon = !0;
             break;
+        case 'N':
+        	arp = optarg;
+        	break;
         case 'P':
             process = !0;
             break;
@@ -1849,6 +1942,7 @@ int main(int argc, char * argv[])
                            "[ -G [ IP:PORT | :PORT [ -g MASK ] ] ] "
                            "[ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] "
                            "[ -K [ -k MASK ] ] "
+                           "[ -N FILE ]"
                            "\n", Program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
@@ -1865,9 +1959,10 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
             fprintf(stderr, "       -L LOG      Write input to LOG file.\n");
             fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
+            fprintf(stderr, "       -N FILE     Use FILE to output Antenna Reference Point for subsequent fixed mode.\n");
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
-            fprintf(stderr, "       -S SOURCE   Use SOURCE file or named pipe for input.\n");
+            fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
             fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
@@ -3404,6 +3499,20 @@ int main(int argc, char * argv[])
             if (crowbar > 0) {
                 crowbar -= 1;
             }
+        }
+
+        /*
+         * If we've generated a high precision solution in survey mode,
+         * and have been asked to emit the solution to a file for later use
+         * in fixed mode, do so now.
+         */
+
+        if (arp == (const char *)0) {
+        	/* Do nothing. */
+        } else if (!save_solution(arp, &base, &solution)) {
+        	/* Do nothing. */
+        } else {
+        	arp = (const char *)0;
         }
 
         /*
