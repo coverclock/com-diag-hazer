@@ -1946,7 +1946,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
             fprintf(stderr, "       -L LOG      Write input to LOG file.\n");
             fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
-            fprintf(stderr, "       -N FILE     Use FILE to output Antenna Reference Point for subsequent fixed mode.\n");
+            fprintf(stderr, "       -N FILE     Use fix FILE to save ARP LLH for subsequeNt fixed mode.\n");
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
