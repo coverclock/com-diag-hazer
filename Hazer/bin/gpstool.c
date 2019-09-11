@@ -498,15 +498,12 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
     int32_t lon = 0;
     int32_t height = 0;
     int8_t heightHp = 0;
-    uint8_t cfg_tmode_lat[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x09, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
-    uint8_t cfg_tmode_latHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0c, 0x00, 0x03, 0x20, 0xFF,                   };
-    uint8_t cfg_tmode_lon[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0a, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
-    uint8_t cfg_tmode_lonHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0d, 0x00, 0x03, 0x20, 0xFF,                   };
-    uint8_t cfg_tmode_height[]   = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0b, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
-    uint8_t cfg_tmode_heightHp[] = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0e, 0x00, 0x03, 0x20, 0xFF,                   };
-
-    // e.g. \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01
-    // e.g. \xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00
+    uint8_t cfg_tmode_lat[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x09, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, }; /* UBX ZED-F9P Interface, pp. 226..227] */
+    uint8_t cfg_tmode_latHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0c, 0x00, 0x03, 0x20, 0xFF,                   }; /* UBX ZED-F9P Interface, pp. 226..227] */
+    uint8_t cfg_tmode_lon[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0a, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, }; /* UBX ZED-F9P Interface, pp. 226..227] */
+    uint8_t cfg_tmode_lonHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0d, 0x00, 0x03, 0x20, 0xFF,                   }; /* UBX ZED-F9P Interface, pp. 226..227] */
+    uint8_t cfg_tmode_height[]   = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0b, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, }; /* UBX ZED-F9P Interface, pp. 226..227] */
+    uint8_t cfg_tmode_heightHp[] = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0e, 0x00, 0x03, 0x20, 0xFF,                   }; /* UBX ZED-F9P Interface, pp. 226..227] */
 
     if (bp->ticks == 0) {
         /* Do nothing. */
@@ -519,7 +516,7 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
     } else if ((fp = diminuto_observation_create(arp, &temporary)) == (FILE *)0) {
         /* Do nothing. */
     } else {
-        DIMINUTO_LOG_INFORMATION("Fix Emit lat 0x%8.8x 0x%2.2x lon 0x%8.8x 0x%2.2x alt 0x%8.8x 0x%2.2x\n", (unsigned)(sp->payload.lat), (unsigned)(sp->payload.latHp), (unsigned)(sp->payload.lon), (unsigned)(sp->payload.lonHp), (unsigned)(sp->payload.height), (unsigned)(sp->payload.heightHp));
+        DIMINUTO_LOG_INFORMATION("Fix Emit lat 0x%8.8x 0x%2.2x lon 0x%8.8x 0x%2.2x alt 0x%8.8x 0x%2.2x\n", (uint32_t)(sp->payload.lat), (uint8_t)(sp->payload.latHp), (uint32_t)(sp->payload.lon), (uint8_t)(sp->payload.lonHp), (uint32_t)(sp->payload.height), (uint8_t)(sp->payload.heightHp));
 
         lat      = sp->payload.lat;
         lon      = sp->payload.lon;
@@ -527,7 +524,7 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
         /*
          * Remarkably, the output high precision height in SURVEY-IN mode is
          * reported in slightly different units than its input configuration
-         * in FIXED mode. This seems like a bug. [U-blox 9 Interface, p. 145
+         * in FIXED mode. This seems like a bug. [UBX ZED-F9P Interface, p. 145
          * vs. pp. 226-227]
          */
 
