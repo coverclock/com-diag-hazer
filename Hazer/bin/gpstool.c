@@ -325,6 +325,24 @@ static void print_buffer(FILE * fp, const void * buffer, size_t size, size_t lim
 }
 
 /**
+ * Print an NMEA sentence or UBX message to a stream, expanding all
+ * characters into hexadecimal escape sequences.
+ * @param fp points to the FILE stream.
+ * @param ep points to the FILE stream for errors.
+ * @param buffer points to the sentence or packet.
+ * @param size is the size of the sentence or packet.
+ */
+static void dump_buffer(FILE * fp, const void * buffer, size_t size)
+{
+    const unsigned char * bb = (const char *)0;
+
+    for (bb = buffer; size > 0; --size) {
+        fprintf(fp, "\\x%2.2x", *(bb++));
+    }
+    fputc('\n', fp);
+}
+
+/**
  * Log connection information.
  * @param label is a label prepended to the output.
  * @param option is the command line endpoint option argument.
@@ -472,75 +490,75 @@ static void collect_update(int number, tumbleweed_updates_t * up)
  */
 static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_solution_t * sp)
 {
-	int rc = 0;
-	FILE * fp = (FILE *)0;
-	char * temporary = (char *)0;
-	int64_t value = 0;
-	int32_t lat = 0;
-	int32_t lon = 0;
-	int32_t height = 0;
-	int8_t heightHp = 0;
-	uint8_t cfg_tmode_lat[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x09, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
-	uint8_t cfg_tmode_latHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0c, 0x00, 0x03, 0x20, 0xFF,                   };
-	uint8_t cfg_tmode_lon[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0a, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
-	uint8_t cfg_tmode_lonHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0d, 0x00, 0x03, 0x20, 0xFF,                   };
-	uint8_t cfg_tmode_height[]   = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0b, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
-	uint8_t cfg_tmode_heightHp[] = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0e, 0x00, 0x03, 0x20, 0xFF,                   };
+    int rc = 0;
+    FILE * fp = (FILE *)0;
+    char * temporary = (char *)0;
+    int64_t value = 0;
+    int32_t lat = 0;
+    int32_t lon = 0;
+    int32_t height = 0;
+    int8_t heightHp = 0;
+    uint8_t cfg_tmode_lat[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x09, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
+    uint8_t cfg_tmode_latHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0c, 0x00, 0x03, 0x20, 0xFF,                   };
+    uint8_t cfg_tmode_lon[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0a, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
+    uint8_t cfg_tmode_lonHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0d, 0x00, 0x03, 0x20, 0xFF,                   };
+    uint8_t cfg_tmode_height[]   = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0b, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, };
+    uint8_t cfg_tmode_heightHp[] = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0e, 0x00, 0x03, 0x20, 0xFF,                   };
 
     // e.g. \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01
     // e.g. \xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00
 
-	if (bp->ticks == 0) {
-		/* Do nothing. */
-	} else if (sp->ticks == 0) {
-		/* Do nothing. */
-	} else if (bp->payload.active) {
-		/* Do nothing. */
-	} else if (!bp->payload.valid) {
-		/* Do nothing. */
-	} else if ((fp = diminuto_observation_create(arp, &temporary)) == (FILE *)0) {
-		/* Do nothing. */
-	} else {
-		DIMINUTO_LOG_INFORMATION("Fix Emit lat %d %d lon %d %d alt %d %d\n", sp->payload.lat, sp->payload.latHp, sp->payload.lon, sp->payload.lonHp, sp->payload.height, sp->payload.heightHp);
+    if (bp->ticks == 0) {
+        /* Do nothing. */
+    } else if (sp->ticks == 0) {
+        /* Do nothing. */
+    } else if (bp->payload.active) {
+        /* Do nothing. */
+    } else if (!bp->payload.valid) {
+        /* Do nothing. */
+    } else if ((fp = diminuto_observation_create(arp, &temporary)) == (FILE *)0) {
+        /* Do nothing. */
+    } else {
+        DIMINUTO_LOG_INFORMATION("Fix Emit lat 0x%8.8x 0x%2.2x lon 0x%8.8x 0x%2.2x alt 0x%8.8x 0x%2.2x\n", (unsigned)(sp->payload.lat), (unsigned)(sp->payload.latHp), (unsigned)(sp->payload.lon), (unsigned)(sp->payload.lonHp), (unsigned)(sp->payload.height), (unsigned)(sp->payload.heightHp));
 
         lat      = sp->payload.lat;
-		lon      = sp->payload.lon;
+        lon      = sp->payload.lon;
 
-		/*
-		 * Remarkably, the output high precision height in SURVEY-IN mode is
-		 * reported in slightly different units than its input configuration
-		 * in FIXED mode. This seems like a bug. [U-blox 9 Interface, p. 145
-		 * vs. pp. 226-227]
-		 */
+        /*
+         * Remarkably, the output high precision height in SURVEY-IN mode is
+         * reported in slightly different units than its input configuration
+         * in FIXED mode. This seems like a bug. [U-blox 9 Interface, p. 145
+         * vs. pp. 226-227]
+         */
 
-		height   = sp->payload.height; /* mm == 10^-3m */
-		heightHp = sp->payload.heightHp; /* 0.1mm == 10^-4m (-9..+9) */
-		value = (height * 10) + heightHp; /* 0.1mm == 10^-4m */
-		height = value / 100; /* cm == 10^-4m * 10^2 == 10^-2m */
-		heightHp = value % 100; /* 0.1mm == 10^-4m (-99..+99) */
+        height   = sp->payload.height; /* mm == 10^-3m */
+        heightHp = sp->payload.heightHp; /* 0.1mm == 10^-4m (-9..+9) */
+        value = (height * 10) + heightHp; /* 0.1mm == 10^-4m */
+        height = value / 100; /* cm == 10^-4m * 10^2 == 10^-2m */
+        heightHp = value % 100; /* 0.1mm == 10^-4m (-99..+99) */
 
-		COM_DIAG_YODEL_HTOLE(lat);
-		COM_DIAG_YODEL_HTOLE(lon);
-		COM_DIAG_YODEL_HTOLE(height);
+        COM_DIAG_YODEL_HTOLE(lat);
+        COM_DIAG_YODEL_HTOLE(lon);
+        COM_DIAG_YODEL_HTOLE(height);
 
-		memcpy(&cfg_tmode_lat     [sizeof(cfg_tmode_lat)      - sizeof(lat)],               &lat,               sizeof(lat));
-		memcpy(&cfg_tmode_latHp   [sizeof(cfg_tmode_latHp)    - sizeof(sp->payload.latHp)], &sp->payload.latHp, sizeof(sp->payload.latHp));
-		memcpy(&cfg_tmode_lon     [sizeof(cfg_tmode_lon)      - sizeof(lon)],               &lon,               sizeof(lon));
-		memcpy(&cfg_tmode_lonHp   [sizeof(cfg_tmode_lonHp)    - sizeof(sp->payload.lonHp)], &sp->payload.lonHp, sizeof(sp->payload.lonHp));
-		memcpy(&cfg_tmode_height  [sizeof(cfg_tmode_height)   - sizeof(height)],            &height,            sizeof(height));
-		memcpy(&cfg_tmode_heightHp[sizeof(cfg_tmode_heightHp) - sizeof(heightHp)],          &heightHp,          sizeof(heightHp));
+        memcpy(&cfg_tmode_lat     [sizeof(cfg_tmode_lat)      - sizeof(lat)],               &lat,               sizeof(lat));
+        memcpy(&cfg_tmode_latHp   [sizeof(cfg_tmode_latHp)    - sizeof(sp->payload.latHp)], &sp->payload.latHp, sizeof(sp->payload.latHp));
+        memcpy(&cfg_tmode_lon     [sizeof(cfg_tmode_lon)      - sizeof(lon)],               &lon,               sizeof(lon));
+        memcpy(&cfg_tmode_lonHp   [sizeof(cfg_tmode_lonHp)    - sizeof(sp->payload.lonHp)], &sp->payload.lonHp, sizeof(sp->payload.lonHp));
+        memcpy(&cfg_tmode_height  [sizeof(cfg_tmode_height)   - sizeof(height)],            &height,            sizeof(height));
+        memcpy(&cfg_tmode_heightHp[sizeof(cfg_tmode_heightHp) - sizeof(heightHp)],          &heightHp,          sizeof(heightHp));
 
-		print_buffer(fp, &cfg_tmode_lat,      sizeof(cfg_tmode_lat),      ~(size_t)0);
-		print_buffer(fp, &cfg_tmode_latHp,    sizeof(cfg_tmode_latHp),    ~(size_t)0);
-		print_buffer(fp, &cfg_tmode_lon,      sizeof(cfg_tmode_lon),      ~(size_t)0);
-		print_buffer(fp, &cfg_tmode_lonHp,    sizeof(cfg_tmode_lonHp),    ~(size_t)0);
-		print_buffer(fp, &cfg_tmode_height,   sizeof(cfg_tmode_height),   ~(size_t)0);
-		print_buffer(fp, &cfg_tmode_heightHp, sizeof(cfg_tmode_heightHp), ~(size_t)0);
+        dump_buffer(fp, &cfg_tmode_lat,      sizeof(cfg_tmode_lat));
+        dump_buffer(fp, &cfg_tmode_latHp,    sizeof(cfg_tmode_latHp));
+        dump_buffer(fp, &cfg_tmode_lon,      sizeof(cfg_tmode_lon));
+        dump_buffer(fp, &cfg_tmode_lonHp,    sizeof(cfg_tmode_lonHp));
+        dump_buffer(fp, &cfg_tmode_height,   sizeof(cfg_tmode_height));
+        dump_buffer(fp, &cfg_tmode_heightHp, sizeof(cfg_tmode_heightHp));
 
-		rc = (diminuto_observation_commit(fp, &temporary) == (FILE *)0);
-	}
+        rc = (diminuto_observation_commit(fp, &temporary) == (FILE *)0);
+    }
 
-	return rc;
+    return rc;
 }
 
 /*******************************************************************************
@@ -1239,7 +1257,7 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
  */
 static void print_solution(FILE * fp, const yodel_solution_t * sp)
 {
-	int32_t decimaldegrees = 0;
+    int32_t decimaldegrees = 0;
     uint32_t degrees = 0;
     uint32_t minutes = 0;
     uint32_t seconds = 0;
@@ -1687,10 +1705,10 @@ int main(int argc, char * argv[])
     /**
      * Control variables.
      */
-    int eof = 0;		/** If true then the input stream hit end of file. */
-    int sync = 0;		/** If true then the input stream is synchronized. */
-    int frame = 0;		/** If true then the input stream is at frame start. */
-    int refresh = !0;	/** If true then the display needs to be refreshed. */
+    int eof = 0;        /** If true then the input stream hit end of file. */
+    int sync = 0;       /** If true then the input stream is synchronized. */
+    int frame = 0;      /** If true then the input stream is at frame start. */
+    int refresh = !0;   /** If true then the display needs to be refreshed. */
     /*
      * Command line processing variables.
      */
@@ -1806,8 +1824,8 @@ int main(int argc, char * argv[])
             daemon = !0;
             break;
         case 'N':
-        	arp = optarg;
-        	break;
+            arp = optarg;
+            break;
         case 'P':
             process = !0;
             break;
@@ -3491,15 +3509,21 @@ int main(int argc, char * argv[])
         /*
          * If we've generated a high precision solution in survey mode,
          * and have been asked to emit the solution to a file for later use
-         * in fixed mode, do so now.
+         * in fixed mode, do so now. We delay doing this until the device
+         * is fully configured and has ACKed all of the configuration
+         * commands.
          */
 
         if (arp == (const char *)0) {
-        	/* Do nothing. */
+            /* Do nothing. */
+        } else if (!diminuto_list_isempty(&command_list)) {
+            /* Do nothing. */
+        } else if (acknakpending > 0) {
+            /* Do nothing. */
         } else if (!save_solution(arp, &base, &solution)) {
-        	/* Do nothing. */
+            /* Do nothing. */
         } else {
-        	arp = (const char *)0;
+            arp = (const char *)0;
         }
 
         /*

@@ -639,7 +639,7 @@ void yodel_format_hppos2position(int32_t whole, int8_t fraction, uint32_t * degr
 
 void yodel_format_hpalt2aaltitude(int32_t whole, int8_t fraction, int32_t * metersp, uint32_t * tenthousandthsp)
 {
-	int64_t tenthousandsth = 0;
+    int64_t tenthousandsth = 0;
 
     tenthousandsth = whole;
     tenthousandsth *= 10;
@@ -650,6 +650,6 @@ void yodel_format_hpalt2aaltitude(int32_t whole, int8_t fraction, int32_t * mete
 
 void yodel_format_hpacc2accuracy(int32_t whole,  int32_t * metersp, uint32_t * tenthousandthsp)
 {
-	*metersp = whole / 10000L;
-	*tenthousandthsp = abs64(whole) % 10000UL;
+    *metersp = whole / 10000L;
+    *tenthousandthsp = abs64(whole) % 10000UL;
 }
