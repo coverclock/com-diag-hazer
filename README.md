@@ -685,9 +685,10 @@ lines that need to be added to the indicated files.
 # Utilities
 
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
-* base - configures and runs an Ardusimple SimpleRTK2B board as a fixed base.
+* base - configures and runs a UBX-ZED-F9P chip as a stationary base in survey mode.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
+* fixed - configures and runs a UBX-ZED-F9P chip as a stationary base in fixed mode.
 * googlemaps - convert various format coordinate strings to decimal degrees.
 * gpstool - serves as Hazer's all purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
@@ -700,7 +701,7 @@ lines that need to be added to the indicated files.
 * provider - consumes datagrams and forwards to serial port.
 * proxy - receive UDP packets from the Base and forward to the Rover.
 * router - routes UDP packets received from a base to all rovers.
-* rover - configures and runs an Ardusimple SimpleRTK2B board as a mobile rover.
+* rover - configures and runs a UBX-ZED-F9P chip as a mobile rover.
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 
 # Functional Tests
@@ -718,6 +719,7 @@ lines that need to be added to the indicated files.
 * datagramsource - exercises a datagram sink.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
 * gr701w - exercises the NaviSys GR701W receiver.    
+* lowresolution - same as bin/base.sh but has much much lower standards.
 * simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
 * simplertk2b - exercises the Ardusimple SimpleRTK2B board.
 * simplertk2bquery - queries the configuration of an Ardusimple SimpleRTK2B board.
