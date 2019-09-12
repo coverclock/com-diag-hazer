@@ -25,13 +25,14 @@ PROGRAM=$(basename ${0})
 
 TASK=${1}
 FILE=${2}
+LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 LOGDIR=${TMPDIR:="/tmp"}/hazer/log
 
 if [[ "${FILE}" == "err" ]]; then
-    CMD="tail -f"
+    CMD="tail -n ${LIMIT} -f"
 elif [[ "${FILE}" == "out" ]]; then
     CMD="headless"
 else

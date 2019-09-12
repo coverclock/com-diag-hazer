@@ -10,7 +10,7 @@ ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
 FIXFIL=${4-"./base.fix"}
-ACCFIL=${4-"./base.acc"}
+ACCFIL=${5-"./base.acc"}
 
 LOGDIR=${TMPDIR:="/tmp"}/hazer/log
 mkdir -p ${LOGDIR}
@@ -51,7 +51,7 @@ exec 0<${ACCFIL}
 
 read -r CFG_TMODE_SVIN_ACC_LIMIT
 
-CFG_TMODE_FIXED_POS_ACC='\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x0f\x00\x03\x40'"${CFG_TMODE_SVIN_ACC_LIMIT:-16:16}"
+CFG_TMODE_FIXED_POS_ACC='\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x0f\x00\x03\x40'"${CFG_TMODE_SVIN_ACC_LIMIT: -16:16}"
 
 log -N ${PROGRAM} -i CFG_TMODE_FIXED_POS_ACC="\"${CFG_TMODE_FIXED_POS_ACC}\""
 
@@ -78,8 +78,6 @@ test -z "${CFG_TMODE_FIXED_POS_ACC}" && exit 3
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-UBX_NAV_SVIN_USB 1
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-UART2-ENABLED 0
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
-
-exit 0
 
 exec coreable gpstool \
     -F -H ${LOGDIR}/${PROGRAM}.out -t 10 \
