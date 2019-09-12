@@ -32,12 +32,15 @@ read -r CFG_TMODE_LONHP
 read -r CFG_TMODE_HEIGHT
 read -r CFG_TMODE_HEIGHTHP
 
+CFG_TMODE_FIXED_POS_ACC='\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x0f\x00\x03\x40\xf0\x49\x02\x00'
+
 log -N ${PROGRAM} -i CFG_TMODE_LAT="\"${CFG_TMODE_LAT}\""
 log -N ${PROGRAM} -i CFG_TMODE_LATHP="\"${CFG_TMODE_LATHP}\""
 log -N ${PROGRAM} -i CFG_TMODE_LON="\"${CFG_TMODE_LON}\""
 log -N ${PROGRAM} -i CFG_TMODE_LONHP="\"${CFG_TMODE_LONHP}\""
 log -N ${PROGRAM} -i CFG_TMODE_HEIGHT="\"${CFG_TMODE_HEIGHT}\""
 log -N ${PROGRAM} -i CFG_TMODE_HEIGHTHP="\"${CFG_TMODE_HEIGHTHP}\""
+log -N ${PROGRAM} -i CFG_TMODE_FIXED_POS_ACC="\"${CFG_TMODE_FIXED_POS_ACC}\""
 
 test -z "${CFG_TMODE_LAT}" && exit 2
 test -z "${CFG_TMODE_LATHP}" && exit 2
@@ -68,7 +71,7 @@ test -z "${CFG_TMODE_HEIGHTHP}" && exit 2
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-UART2-ENABLED 0
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
-exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -v \
     -G ${ROUTER} -g 4 \
     -F -H ${LOG}/${PROGRAM}.out -t 10 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x00' \
@@ -78,7 +81,7 @@ exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -U "${CFG_TMODE_LONHP}" \
     -U "${CFG_TMODE_HEIGHT}" \
     -U "${CFG_TMODE_HEIGHTHP}" \
-    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x0f\x00\x03\x40\xf0\x49\x02\x00' \
+    -U "${CFG_TMODE_FIXED_POS_ACC}" \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x02' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x02\x00\x03\x20\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\xc0\x02\x91\x20\x01' \
