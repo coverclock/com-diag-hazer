@@ -1647,6 +1647,7 @@ int main(int argc, char * argv[])
     yodel_rover_t rover = YODEL_ROVER_INITIALIZER;
     yodel_ubx_ack_t acknak = YODEL_UBX_ACK_INITIALIZER;
     int acknakpending = 0;
+    int nominal = 0;
     /*
      * RTCM state databases.
      */
@@ -2901,10 +2902,19 @@ int main(int argc, char * argv[])
 
                 free(command_node);
 
-                if (diminuto_list_isempty(&command_list)) { DIMINUTO_LOG_NOTICE("Ready"); }
-
             }
 
+        }
+
+        if (!diminuto_list_isempty(&command_list)) {
+            /* Do nothing. */
+        } else if (acknakpending > 0) {
+            /* Do nothing. */
+        } else if (nominal) {
+            /* Do nothing. */
+        } else {
+            DIMINUTO_LOG_NOTICE("Ready");
+            nominal = !0;
         }
 
         /*
