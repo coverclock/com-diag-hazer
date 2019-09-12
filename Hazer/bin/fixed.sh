@@ -6,24 +6,24 @@
 # Configure and run the Ardusimple SimpleRTK2B as a fixed Base.
 
 PROGRAM=$(basename ${0})
-LOG=$(readlink -e $(dirname ${0})/..)/log
-mkdir -p ${LOG}
-
 ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
-FILE=${3:-${LOG}/base.fix}
-RATE=${4:-230400}
+RATE=${3:-230400}
+FIXFIL=${4-"./base.fix"}
+ACCFIL=${4-"./base.acc"}
+
+LOGDIR=${TMPDIR:="/tmp"}/hazer/log
+mkdir -p ${LOGDIR}
+
+exec 2>>${LOGDIR}/${PROGRAM}.err
+cp /dev/null ${LOGDIR}/${PROGRAM}.err
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
-cp /dev/null ${LOG}/${PROGRAM}.err
-
-test -f ${FILE} || exit 1
-
-exec 2>>${LOG}/${PROGRAM}.err
-exec 0<${FILE}
+test -f ${FIXFIL} || exit 1
+exec 0<${FIXFIL}
 
 read -r CFG_TMODE_LAT
 read -r CFG_TMODE_LATHP
@@ -32,22 +32,30 @@ read -r CFG_TMODE_LONHP
 read -r CFG_TMODE_HEIGHT
 read -r CFG_TMODE_HEIGHTHP
 
-CFG_TMODE_FIXED_POS_ACC='\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x0f\x00\x03\x40\xf0\x49\x02\x00'
-
 log -N ${PROGRAM} -i CFG_TMODE_LAT="\"${CFG_TMODE_LAT}\""
 log -N ${PROGRAM} -i CFG_TMODE_LATHP="\"${CFG_TMODE_LATHP}\""
 log -N ${PROGRAM} -i CFG_TMODE_LON="\"${CFG_TMODE_LON}\""
 log -N ${PROGRAM} -i CFG_TMODE_LONHP="\"${CFG_TMODE_LONHP}\""
 log -N ${PROGRAM} -i CFG_TMODE_HEIGHT="\"${CFG_TMODE_HEIGHT}\""
 log -N ${PROGRAM} -i CFG_TMODE_HEIGHTHP="\"${CFG_TMODE_HEIGHTHP}\""
+
+test -z "${CFG_TMODE_LAT}" && exit 3
+test -z "${CFG_TMODE_LATHP}" && exit 3
+test -z "${CFG_TMODE_LON}" && exit 3
+test -z "${CFG_TMODE_LONHP}" && exit 3
+test -z "${CFG_TMODE_HEIGHT}" && exit 3
+test -z "${CFG_TMODE_HEIGHTHP}" && exit 3
+
+test -f ${ACCFIL} || exit 2
+exec 0<${ACCFIL}
+
+read -r CFG_TMODE_SVIN_ACC_LIMIT
+
+CFG_TMODE_FIXED_POS_ACC='\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x0f\x00\x03\x40'"${CFG_TMODE_SVIN_ACC_LIMIT:-16:16}"
+
 log -N ${PROGRAM} -i CFG_TMODE_FIXED_POS_ACC="\"${CFG_TMODE_FIXED_POS_ACC}\""
 
-test -z "${CFG_TMODE_LAT}" && exit 2
-test -z "${CFG_TMODE_LATHP}" && exit 2
-test -z "${CFG_TMODE_LON}" && exit 2
-test -z "${CFG_TMODE_LONHP}" && exit 2
-test -z "${CFG_TMODE_HEIGHT}" && exit 2
-test -z "${CFG_TMODE_HEIGHTHP}" && exit 2
+test -z "${CFG_TMODE_FIXED_POS_ACC}" && exit 3
 
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE DISABLED
 # UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_LAT (read)
@@ -71,9 +79,12 @@ test -z "${CFG_TMODE_HEIGHTHP}" && exit 2
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-UART2-ENABLED 0
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
-exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -v \
+exit 0
+
+exec coreable gpstool \
+    -F -H ${LOGDIR}/${PROGRAM}.out -t 10 \
+    -D ${DEVICE} -b ${RATE} -8 -n -1 -v \
     -G ${ROUTER} -g 4 \
-    -F -H ${LOG}/${PROGRAM}.out -t 10 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x00' \
     -U "${CFG_TMODE_LAT}" \
     -U "${CFG_TMODE_LATHP}" \

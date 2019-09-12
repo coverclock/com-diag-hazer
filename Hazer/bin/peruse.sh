@@ -22,12 +22,13 @@
 #    peruse router err
 
 PROGRAM=$(basename ${0})
+
 TASK=${1}
 FILE=${2}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-LOG=$(readlink -e $(dirname ${0})/../log)
+LOGDIR=${TMPDIR:="/tmp"}/hazer/log
 
 if [[ "${FILE}" == "err" ]]; then
     CMD="tail -f"
@@ -37,4 +38,4 @@ else
     CMD="cat"
 fi
 
-exec ${CMD} ${LOG}/${TASK}.${FILE}
+exec ${CMD} ${LOGDIR}/${TASK}.${FILE}

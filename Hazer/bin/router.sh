@@ -9,10 +9,11 @@ ROUTER=${1:-":tumbleweed"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-LOG=$(readlink -e $(dirname ${0})/..)/log
-mkdir -p ${LOG}
+LOGDIR=${TMPDIR:="/tmp"}/hazer/log
+mkdir -p ${LOGDIR}
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
-exec coreable rtktool -p ${ROUTER} -t 30 \
-     < /dev/null 1> /dev/null 2> ${LOG}/${PROGRAM}.err
+exec coreable rtktool \
+    -p ${ROUTER} -t 30 \
+    < /dev/null 1> /dev/null 2> ${LOGDIR}/${PROGRAM}.err
