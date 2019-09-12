@@ -39,23 +39,21 @@ log -N ${PROGRAM} -i CFG_TMODE_LONHP="\"${CFG_TMODE_LONHP}\""
 log -N ${PROGRAM} -i CFG_TMODE_HEIGHT="\"${CFG_TMODE_HEIGHT}\""
 log -N ${PROGRAM} -i CFG_TMODE_HEIGHTHP="\"${CFG_TMODE_HEIGHTHP}\""
 
-test -z "${CFG_TMODE_LAT}" && exit 3
-test -z "${CFG_TMODE_LATHP}" && exit 3
-test -z "${CFG_TMODE_LON}" && exit 3
-test -z "${CFG_TMODE_LONHP}" && exit 3
-test -z "${CFG_TMODE_HEIGHT}" && exit 3
-test -z "${CFG_TMODE_HEIGHTHP}" && exit 3
+test -z "${CFG_TMODE_LAT}" && exit 2
+test -z "${CFG_TMODE_LATHP}" && exit 2
+test -z "${CFG_TMODE_LON}" && exit 2
+test -z "${CFG_TMODE_LONHP}" && exit 2
+test -z "${CFG_TMODE_HEIGHT}" && exit 2
+test -z "${CFG_TMODE_HEIGHTHP}" && exit 2
 
-test -f ${ACCFIL} || exit 2
+test -f ${ACCFIL} || exit 3
 exec 0<${ACCFIL}
 
-read -r CFG_TMODE_SVIN_ACC_LIMIT
-
-CFG_TMODE_FIXED_POS_ACC='\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x0f\x00\x03\x40'"${CFG_TMODE_SVIN_ACC_LIMIT: -16:16}"
+read -r CFG_TMODE_FIXED_POS_ACC
 
 log -N ${PROGRAM} -i CFG_TMODE_FIXED_POS_ACC="\"${CFG_TMODE_FIXED_POS_ACC}\""
 
-test -z "${CFG_TMODE_FIXED_POS_ACC}" && exit 3
+test -z "${CFG_TMODE_FIXED_POS_ACC}" && exit 4
 
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE DISABLED
 # UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_LAT (read)
@@ -64,7 +62,7 @@ test -z "${CFG_TMODE_FIXED_POS_ACC}" && exit 3
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_LONHP (read)
 # UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_HEIGHT (read)
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-CFG_TMODE_HEIGHTHP (read)
-# UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-FIXED_ACC_LIMIT 100 (x 0.1mm) = 1cm ~ 0.4in
+# UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-FIXED_ACC_LIMIT (read)
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE FIXED
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-POS_TYPE LLH
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-RTCM_3X_TYPE1005_USB 1
@@ -84,13 +82,13 @@ exec coreable gpstool \
     -D ${DEVICE} -b ${RATE} -8 -n -1 -v \
     -G ${ROUTER} -g 4 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x00' \
-    -U "${CFG_TMODE_LAT}" \
-    -U "${CFG_TMODE_LATHP}" \
-    -U "${CFG_TMODE_LON}" \
-    -U "${CFG_TMODE_LONHP}" \
-    -U "${CFG_TMODE_HEIGHT}" \
-    -U "${CFG_TMODE_HEIGHTHP}" \
-    -U "${CFG_TMODE_FIXED_POS_ACC}" \
+    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x09\x00\x03\x40'"${CFG_TMODE_LAT}" \
+    -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x0c\x00\x03\x20'"${CFG_TMODE_LATHP}" \
+    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x0a\x00\x03\x40'"${CFG_TMODE_LON}" \
+    -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x0d\x00\x03\x20'"${CFG_TMODE_LONHP}" \
+    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x0b\x00\x03\x40'"${CFG_TMODE_HEIGHT}" \
+    -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x0e\x00\x03\x20'"${CFG_TMODE_HEIGHTHP}" \
+    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x0f\x00\x03\x40'"${CFG_TMODE_FIXED_POS_ACC}" \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x02' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x02\x00\x03\x20\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\xc0\x02\x91\x20\x01' \

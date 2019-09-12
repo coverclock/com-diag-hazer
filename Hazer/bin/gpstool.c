@@ -495,15 +495,11 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
     char * temporary = (char *)0;
     int64_t value = 0;
     int32_t lat = 0;
+    int8_t latHp = 0;
     int32_t lon = 0;
+    int8_t lonHp = 0;
     int32_t height = 0;
     int8_t heightHp = 0;
-    uint8_t cfg_tmode_lat[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x09, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, }; /* UBX ZED-F9P Interface, pp. 226..227] */
-    uint8_t cfg_tmode_latHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0c, 0x00, 0x03, 0x20, 0xFF,                   }; /* UBX ZED-F9P Interface, pp. 226..227] */
-    uint8_t cfg_tmode_lon[]      = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0a, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, }; /* UBX ZED-F9P Interface, pp. 226..227] */
-    uint8_t cfg_tmode_lonHp[]    = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0d, 0x00, 0x03, 0x20, 0xFF,                   }; /* UBX ZED-F9P Interface, pp. 226..227] */
-    uint8_t cfg_tmode_height[]   = { 0xb5, 0x62, 0x06, 0x8a, 8 + 4, 0x00, 0x00, 0x01, 0x00, 0x0b, 0x00, 0x03, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, }; /* UBX ZED-F9P Interface, pp. 226..227] */
-    uint8_t cfg_tmode_heightHp[] = { 0xb5, 0x62, 0x06, 0x8a, 8 + 1, 0x00, 0x00, 0x01, 0x00, 0x0e, 0x00, 0x03, 0x20, 0xFF,                   }; /* UBX ZED-F9P Interface, pp. 226..227] */
 
     if (bp->ticks == 0) {
         /* Do nothing. */
@@ -516,43 +512,40 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
     } else if ((fp = diminuto_observation_create(arp, &temporary)) == (FILE *)0) {
         /* Do nothing. */
     } else {
-        DIMINUTO_LOG_INFORMATION("Fix Emit lat 0x%8.8x 0x%2.2x lon 0x%8.8x 0x%2.2x alt 0x%8.8x 0x%2.2x\n", (uint32_t)(sp->payload.lat), (uint8_t)(sp->payload.latHp), (uint32_t)(sp->payload.lon), (uint8_t)(sp->payload.lonHp), (uint32_t)(sp->payload.height), (uint8_t)(sp->payload.heightHp));
 
-        lat      = sp->payload.lat;
-        lon      = sp->payload.lon;
+        lat = sp->payload.lat;
+        latHp = sp->payload.latHp;
+        lon = sp->payload.lon;
+        lonHp = sp->payload.lonHp;
+        height  = sp->payload.height; /* mm == 10^-3m */
+        heightHp = sp->payload.heightHp; /* 0.1mm == 10^-4m (-9..+9) */
 
         /*
          * Remarkably, the output high precision height in SURVEY-IN mode is
          * reported in slightly different units than its input configuration
-         * in FIXED mode. This seems like a bug. [UBX ZED-F9P Interface, p. 145
-         * vs. pp. 226-227]
+         * in FIXED mode. This seems wrong. [UBX ZED-F9P Interface,
+         * pp. 145, 226..227]
          */
 
-        height   = sp->payload.height; /* mm == 10^-3m */
-        heightHp = sp->payload.heightHp; /* 0.1mm == 10^-4m (-9..+9) */
         value = (height * 10) + heightHp; /* 0.1mm == 10^-4m */
         height = value / 100; /* cm == 10^-4m * 10^2 == 10^-2m */
         heightHp = value % 100; /* 0.1mm == 10^-4m (-99..+99) */
+
+        DIMINUTO_LOG_INFORMATION("Fix Emit lat 0x%8.8x 0x%2.2x lon 0x%8.8x 0x%2.2x alt 0x%8.8x 0x%2.2x\n", (uint32_t)lat, (uint8_t)latHp, (uint32_t)lon, (uint8_t)lonHp, (uint32_t)height, (uint8_t)heightHp);
 
         COM_DIAG_YODEL_HTOLE(lat);
         COM_DIAG_YODEL_HTOLE(lon);
         COM_DIAG_YODEL_HTOLE(height);
 
-        memcpy(&cfg_tmode_lat     [sizeof(cfg_tmode_lat)      - sizeof(lat)],               &lat,               sizeof(lat));
-        memcpy(&cfg_tmode_latHp   [sizeof(cfg_tmode_latHp)    - sizeof(sp->payload.latHp)], &sp->payload.latHp, sizeof(sp->payload.latHp));
-        memcpy(&cfg_tmode_lon     [sizeof(cfg_tmode_lon)      - sizeof(lon)],               &lon,               sizeof(lon));
-        memcpy(&cfg_tmode_lonHp   [sizeof(cfg_tmode_lonHp)    - sizeof(sp->payload.lonHp)], &sp->payload.lonHp, sizeof(sp->payload.lonHp));
-        memcpy(&cfg_tmode_height  [sizeof(cfg_tmode_height)   - sizeof(height)],            &height,            sizeof(height));
-        memcpy(&cfg_tmode_heightHp[sizeof(cfg_tmode_heightHp) - sizeof(heightHp)],          &heightHp,          sizeof(heightHp));
-
-        dump_buffer(fp, &cfg_tmode_lat,      sizeof(cfg_tmode_lat));
-        dump_buffer(fp, &cfg_tmode_latHp,    sizeof(cfg_tmode_latHp));
-        dump_buffer(fp, &cfg_tmode_lon,      sizeof(cfg_tmode_lon));
-        dump_buffer(fp, &cfg_tmode_lonHp,    sizeof(cfg_tmode_lonHp));
-        dump_buffer(fp, &cfg_tmode_height,   sizeof(cfg_tmode_height));
-        dump_buffer(fp, &cfg_tmode_heightHp, sizeof(cfg_tmode_heightHp));
+        dump_buffer(fp, &lat, sizeof(lat));
+        dump_buffer(fp, &latHp, sizeof(latHp));
+        dump_buffer(fp, &lon, sizeof(lon));
+        dump_buffer(fp, &lonHp, sizeof(lonHp));
+        dump_buffer(fp, &height, sizeof(height));
+        dump_buffer(fp, &heightHp, sizeof(heightHp));
 
         rc = (diminuto_observation_commit(fp, &temporary) == (FILE *)0);
+
     }
 
     return rc;
