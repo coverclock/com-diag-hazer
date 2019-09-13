@@ -1767,8 +1767,8 @@ Tumbleweed uses three Raspberry Pi 3B+ SBCs and two Ardusimple SimpleRTK2B
 boards, each equipped with a U-blox UBX-ZED-F9P receiver chip and a multi-band
 GPS active antenna, to implement a Differential GNSS system which is (at least
 theoretically) capable of centimeter-level accuracy. One of the Pis is a
-stationary base station running its ZED-F9P in survey mode, one of the Pis is
-a mobile rover whose ZED-F9P receives RTK updates from the base station, and
+stationary base station running its ZED-F9P in "survey-in" mode, one of the Pis
+is a mobile rover whose ZED-F9P receives RTK updates from the base station, and
 one of the Pis is a router that receives RTK updates from one base station
 and forwards them to one or more rovers. (You can combine the base and the
 router on to one Pi, but I chose not to configure my set up that way.)
@@ -1796,6 +1796,31 @@ datagrams.
     base tumbleweed:tumbleweed &
     peruse base err# Control-C to exit upon seeing "Ready".
     peruse base out
+
+Depending on the specified accuracy - encoded in a message sent to the chip
+by the script - it can take days for the receiver to arrive at a solution that
+has the required radius of error. This depends greatly on antenna placement as
+well as other factors that may be less under your control. Putting the antenna
+in my front yard, which has the usual ground clutter of trees and adjacent
+houses, resulted in taking about two days to get to ten centimeters, about four
+inches.
+
+Because of this potentially lengthy duration of the survey, you don't want to do
+it more than once. First rule is: don't move the antenna. (If you do, you'll
+have to do another survey, no matter what.) Second rule is: don't restart the
+receiver. But fortunately the base station script saves the pertinent results
+from a successful survey in two files, the first with the ending ".acc" and
+the second with the ending ".fix". These are human-readable ASCII files that
+store the parameters in a form that can later be imported into another script
+that runs the receiver in fixed mode. Fixed mode is where the receiver is told
+what its location is, and so immediately begins transmitting corrections using
+this information.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    fixed tumbleweed:tumbleweed &
+    peruse fixed err# Control-C to exit upon seeing "Ready".
+    peruse fixed out
 
 A Tumbleweed rover (there can be more than one) is typically on the WAN, and is
 agnostic as to the Internet connection (I use a USB LTE modem).
