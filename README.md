@@ -1805,16 +1805,18 @@ in my front yard, which has the usual ground clutter of trees and adjacent
 houses, resulted in taking about two days to get to ten centimeters, about four
 inches.
 
-Because of this potentially lengthy duration of the survey, you don't want to do
-it more than once. First rule is: don't move the antenna. (If you do, you'll
-have to do another survey, no matter what.) Second rule is: don't restart the
-receiver. But fortunately the base station script saves the pertinent results
-from a successful survey in two files, the first with the ending ".acc" and
-the second with the ending ".fix". These are human-readable ASCII files that
-store the parameters in a form that can later be imported into another script
-that runs the receiver in fixed mode. Fixed mode is where the receiver is told
-what its location is, and so immediately begins transmitting corrections using
-this information.
+Because of this potentially lengthy duration of the survey, you don't
+want to do it more than once. First rule is: don't move the antenna. (If
+you do, you'll have to do another survey, no matter what.) Second rule
+is: don't restart the receiver. But fortunately the base station script
+saves the pertinent results from a successful survey in two files, the
+first with the ending ".acc" to store the input paramters regarding the
+specified accuracy, and the second with the ending ".fix" to store the
+output fix results. These are human-readable ASCII files that store
+the parameters in a form that can later be imported into another script
+that runs the receiver in fixed mode. Fixed mode is where the receiver
+is told what its location is, and so immediately begins transmitting
+corrections based on  this information.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
