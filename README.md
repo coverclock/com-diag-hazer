@@ -2010,7 +2010,7 @@ perfect sphere. The output is expressed in meters. The input can be cut and
 pasted directly from the googlemaps utility (see above).
 
     $ haversine 39.794212194, -105.153349928 39.794211944, -105.153350000
-    0.028503
+    0.0285029342
 
 The utility geodesic computes the distance between two coordinates expressed
 in decimal degress using the Geodesic algorithm based on an elliptical model
