@@ -1812,11 +1812,11 @@ is: don't restart the receiver. But fortunately the base station script
 saves the pertinent results from a successful survey in two files, the
 first with the ending ".acc" to store the input paramters regarding the
 specified accuracy, and the second with the ending ".fix" to store the
-output fix results. These are human-readable ASCII files that store
-the parameters in a form that can later be imported into another script
-that runs the receiver in fixed mode. Fixed mode is where the receiver
-is told what its location is, and so immediately begins transmitting
-corrections based on  this information.
+output fix results. These are human-readable ASCII files that store the
+parameters in a form that can later be imported into another script that
+runs the receiver in fixed mode, in which the receiver is told what its
+location is, and so immediately begins transmitting corrections based
+on  this information.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
