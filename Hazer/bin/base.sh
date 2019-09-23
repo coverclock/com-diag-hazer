@@ -29,10 +29,10 @@ exec 2>>${LOGDIR}/${PROGRAM}.err
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
 SVIN_MIN_DUR=$(ubxval -4 ${DURATION})
-log -N ${PROGRAM} -i SVIN_MIN_DUR="\"${SVIN_MIN_DUR}\""
+log -I -N ${PROGRAM} -i SVIN_MIN_DUR="\"${SVIN_MIN_DUR}\""
 
 SVIN_ACC_LIMIT=$(ubxval -4 ${ACCURACY})
-log -N ${PROGRAM} -i SVIN_ACC_LIMIT="\"${SVIN_ACC_LIMIT}\""
+log -I -N ${PROGRAM} -i SVIN_ACC_LIMIT="\"${SVIN_ACC_LIMIT}\""
 echo "${SVIN_ACC_LIMIT}" > ${ACCFIL}
 
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE SURVEY_IN
@@ -57,8 +57,7 @@ exec coreable gpstool \
     -N ${FIXFIL} \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01' \
     -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40'"${SVIN_MIN_DUR}" \
-    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x0f\x00\x03\x40'"${SVIN_ACC_LIMIT}" \
-    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40\x64\x00\x00\x00' \
+    -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40'"${SVIN_ACC_LIMIT}" \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\xc0\x02\x91\x20\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x61\x03\x91\x20\x01' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x66\x03\x91\x20\x01' \

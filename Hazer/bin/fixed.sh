@@ -26,7 +26,7 @@ exec 0<${ACCFIL}
 
 read -r FIXED_POS_ACC
 
-log -N ${PROGRAM} -i FIXED_POS_ACC="\"${FIXED_POS_ACC}\""
+log -I -N ${PROGRAM} -i FIXED_POS_ACC="\"${FIXED_POS_ACC}\""
 
 test -z "${FIXED_POS_ACC}" && exit 3
 
@@ -40,12 +40,12 @@ read -r LONHP
 read -r HEIGHT
 read -r HEIGHTHP
 
-log -N ${PROGRAM} -i LAT="\"${LAT}\""
-log -N ${PROGRAM} -i LATHP="\"${LATHP}\""
-log -N ${PROGRAM} -i LON="\"${LON}\""
-log -N ${PROGRAM} -i LONHP="\"${LONHP}\""
-log -N ${PROGRAM} -i HEIGHT="\"${HEIGHT}\""
-log -N ${PROGRAM} -i HEIGHTHP="\"${HEIGHTHP}\""
+log -I -N ${PROGRAM} -i LAT="\"${LAT}\""
+log -I -N ${PROGRAM} -i LATHP="\"${LATHP}\""
+log -I -N ${PROGRAM} -i LON="\"${LON}\""
+log -I -N ${PROGRAM} -i LONHP="\"${LONHP}\""
+log -I -N ${PROGRAM} -i HEIGHT="\"${HEIGHT}\""
+log -I -N ${PROGRAM} -i HEIGHTHP="\"${HEIGHTHP}\""
 
 test -z "${LAT}" && exit 5
 test -z "${LATHP}" && exit 5
