@@ -694,7 +694,6 @@ lines that need to be added to the indicated files.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
-* headless - uses inotifywait to watch headless output.
 * peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
@@ -703,6 +702,7 @@ lines that need to be added to the indicated files.
 * router - routes UDP packets received from a base to all rovers.
 * rover - configures and runs a UBX-ZED-F9P chip as a mobile rover.
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
+* ubxval - converts a number into a UBX-usable form.
 
 # Functional Tests
 
