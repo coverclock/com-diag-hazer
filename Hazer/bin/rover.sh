@@ -3,7 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the Ardusimple SimpleRTK2B as a mobile Rover.
+# Configure and run the U-blox ZED-UBX-F9P as a mobile Rover.
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
@@ -14,6 +14,8 @@ RATE=${3:-230400}
 
 LOGDIR=${TMPDIR:="/tmp"}/hazer/log
 mkdir -p ${LOGDIR}
+cp /dev/null ${LOGDIR}/${PROGRAM}.err
+exec 2>>${LOGDIR}/${PROGRAM}.err
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
@@ -34,4 +36,4 @@ exec coreable gpstool \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x78\x10\x00' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x6b\x02\x91\x20\x01' \
     -U '\xb5\x62\x06\x01\x03\x00\x01\x14\x01' \
-    < /dev/null 1> /dev/null 2> ${LOGDIR}/${PROGRAM}.err
+    < /dev/null 1> /dev/null
