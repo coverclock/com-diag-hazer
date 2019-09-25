@@ -11,11 +11,10 @@ DEVICE=${2:-"/dev/ttyACM0"}
 RATE=${3:-230400}
 DURATION=${4:-300}
 ACCURACY=${5:-150000}
-ACCFIL=${6-"./${PROGRAM}.acc"}
-FIXFIL=${7-"./${PROGRAM}.fix"}
-ERRFIL=${8-"./${PROGRAM}.err"}
-OUTFIL=${9-"./${PROGRAM}.out"}
+FIXFIL=${6-"./${PROGRAM}.fix"}
+ERRFIL=${7-"./${PROGRAM}.err"}
+OUTFIL=${8-"./${PROGRAM}.out"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-exec base ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${ACCFIL} ${FIXFIL} ${ERRFIL} ${OUTFIL}
+exec base ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}

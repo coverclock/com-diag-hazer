@@ -1818,26 +1818,26 @@ datagrams.
     peruse base err# Control-C to exit upon seeing "Ready".
     peruse base out
 
-Depending on the specified accuracy - encoded in a message sent to the chip
-by the script - it can take days for the receiver to arrive at a solution that
-has the required radius of error. This depends greatly on antenna placement as
-well as other factors that may be less under your control. Putting the antenna
-in my front yard, which has the usual ground clutter of trees and adjacent
-houses, resulted in taking about two days to get to ten centimeters, about four
-inches.
+Depending on the specified accuracy - encoded in a message sent to the
+chip by the script - it can take days for the receiver to arrive at a
+solution that has the required radius of error. This depends greatly
+on antenna placement as well as other factors that may be less under
+your control. Putting the antenna in my front yard, which has the usual
+ground clutter of trees and adjacent houses, resulted in taking about
+two days to get to ten centimeters, about four inches.
 
-Because of this potentially lengthy duration of the survey, you don't
-want to do it more than once. First rule is: don't move the antenna. (If
-you do, you'll have to do another survey, no matter what.) Second rule
-is: don't restart the receiver. But fortunately the base station script
-saves the pertinent results from a successful survey in two files, the
-first with the ending ".acc" to store the input paramters regarding the
-specified accuracy, and the second with the ending ".fix" to store the
-output fix results. These are human-readable ASCII files that store the
-parameters in a form that can later be imported into another script that
-runs the receiver in fixed mode, in which the receiver is told what its
-location is, and so immediately begins transmitting corrections based
-on  this information.
+Because of this potentially lengthy duration of the survey, you don't want
+to do it more than once. First rule is: don't move the antenna. (If you
+do, you'll have to do another survey, no matter what.) Second rule is:
+don't restart the receiver.
+
+Fortunately, once a survey is successfully completed, the base station
+script saves the pertinent results from a successful survey in a file
+whose names ends in ".fix".  This is a human-readable ASCII file that
+stores the values in a form that can later be imported into another
+script that runs the receiver in fixed mode, in which the receiver
+is told what its location is, and so immediately begins transmitting
+corrections based on this information.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
@@ -1845,12 +1845,12 @@ on  this information.
     peruse fixed err# Control-C to exit upon seeing "Ready".
     peruse fixed out
 
-A Tumbleweed rover (there can be more than one) is typically on the WAN, and is
-agnostic as to the Internet connection (I use a USB LTE modem).
-"tumbleweed.test:" stands in for the fully qualified domain name (FQDN) on the
-WAN as (for me) defined by DDNS and resolved via DNS, and ":tumbleweed" the
-service on the router to which send keep alive datagrams and receive RTK update
-datagrams as defined in /etc/services.
+A Tumbleweed rover (there can be more than one) is typically on the WAN,
+and is agnostic as to the Internet connection (I use a USB LTE modem).
+"tumbleweed.test:" stands in for the fully qualified domain name
+(FQDN) on the WAN as (for me) defined by DDNS and resolved via DNS,
+and ":tumbleweed" the service on the router to which send keep alive
+datagrams and receive RTK update datagrams as defined in /etc/services.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
@@ -1858,24 +1858,25 @@ datagrams as defined in /etc/services.
     peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
 
-Note that the actual IP address of neither the base nor the rover need be
-known. This is important because the rover (and sometimes the base) is on
-the a WAN, in my set up via an LTE modem to a mobile service provider. (Despite
-my best udev fu, these modems, working in end-user mode, worked like crap until
-I upgraded to Raspbian 10, at which point they worked flawlessly.) In this
-case, not only can the IP address on the WAN not be known ahead of time until
-the modem connects to the carrier network, over the span of a long base survey
-which can take many many hours depending on the desired level of precision
-(configured via a UBX message defined in the base script) and the quality of
-the view of the sky afforded to the base, the IP address provided by the WAN
-via DHCP, as well as the port number, may change. In my tests, with the base
-antenna set up in my front yard, an accuracy of ten centimeters (about four
-inches) requires about sixteen hours of "survey-in" time (your mileage may
-vary). During this time the mobile network can disconnect from the modem and
-reconnect. The base and Tumbleweed router routinely deal with this; but it
-means the IP address you begin with in your survey will not be the one you end
-up with when the survey is complete or as the base sends subsequent updates to
-the rover.
+Note that the actual IP address of neither the base nor the rover need
+be known. This is important because the rover (and sometimes the base)
+is on the a WAN, in my set up via an LTE modem to a mobile service
+provider. (Despite my best udev fu, these modems, working in end-user
+mode, worked like crap until I upgraded to Raspbian 10, at which point
+they worked flawlessly.) In this case, not only can the IP address on the
+WAN not be known ahead of time until the modem connects to the carrier
+network, over the span of a long base survey which can take many many
+hours depending on the desired level of precision (configured via a UBX
+message defined in the base script) and the quality of the view of the
+sky afforded to the base, the IP address provided by the WAN via DHCP, as
+well as the port number, may change. In my tests, with the base antenna
+set up in my front yard, an accuracy of ten centimeters (about four
+inches) requires about sixteen hours of "survey-in" time (your mileage
+may vary). During this time the mobile network can disconnect from the
+modem and reconnect. The base and Tumbleweed router routinely deal with
+this; but it means the IP address you begin with in your survey will
+not be the one you end up with when the survey is complete or as the
+base sends subsequent updates to the rover.
 
 The Tumbleweed router does require a fixed IP address for this to work. In my
 setup, the Tumbleweed router connects to my home IP router (in my case,

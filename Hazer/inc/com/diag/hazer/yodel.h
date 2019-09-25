@@ -878,7 +878,7 @@ typedef struct YodelUbxNavSvin {
     int8_t meanYHP;
     int8_t meanZHP;
     int8_t reserved2[1];
-    int32_t meanAcc;
+    uint32_t meanAcc;
     int32_t obs;
     int8_t valid;
     int8_t active;

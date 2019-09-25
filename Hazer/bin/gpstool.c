@@ -494,6 +494,7 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
     FILE * fp = (FILE *)0;
     char * temporary = (char *)0;
     int64_t value = 0;
+    uint32_t acc = 0;
     int32_t lat = 0;
     int8_t latHp = 0;
     int32_t lon = 0;
@@ -513,12 +514,11 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
         /* Do nothing. */
     } else {
 
+        acc = bp->payload.meanAcc;
         lat = sp->payload.lat;
         latHp = sp->payload.latHp;
         lon = sp->payload.lon;
         lonHp = sp->payload.lonHp;
-        height  = sp->payload.height; /* mm == 10^-3m */
-        heightHp = sp->payload.heightHp; /* 0.1mm == 10^-4m (-9..+9) */
 
         /*
          * Remarkably, the documented output format for the high precision
@@ -528,16 +528,20 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
          * Interface, pp. 226..227] (cm and 0.1mm).
          */
 
+        height  = sp->payload.height; /* mm == 10^-3m */
+        heightHp = sp->payload.heightHp; /* 0.1mm == 10^-4m (-9..+9) */
         value = (height * 10) + heightHp; /* 0.1mm == 10^-4m */
         height = value / 100; /* 10^-4m / 10^2 == 10^-2m == cm */
         heightHp = value % 100; /* 0.1mm == 10^-4m (-99..+99) */
 
-        DIMINUTO_LOG_INFORMATION("Fix Emit lat 0x%8.8x 0x%2.2x lon 0x%8.8x 0x%2.2x alt 0x%8.8x 0x%2.2x\n", (uint32_t)lat, (uint8_t)latHp, (uint32_t)lon, (uint8_t)lonHp, (uint32_t)height, (uint8_t)heightHp);
+        DIMINUTO_LOG_INFORMATION("Fix Emit acc 0x%8.8x lat 0x%8.8x 0x%2.2x lon 0x%8.8x 0x%2.2x alt 0x%8.8x 0x%2.2x\n", acc, (uint32_t)lat, (uint8_t)latHp, (uint32_t)lon, (uint8_t)lonHp, (uint32_t)height, (uint8_t)heightHp);
 
+        COM_DIAG_YODEL_HTOLE(acc);
         COM_DIAG_YODEL_HTOLE(lat);
         COM_DIAG_YODEL_HTOLE(lon);
         COM_DIAG_YODEL_HTOLE(height);
 
+        dump_buffer(fp, &acc, sizeof(acc));
         dump_buffer(fp, &lat, sizeof(lat));
         dump_buffer(fp, &latHp, sizeof(latHp));
         dump_buffer(fp, &lon, sizeof(lon));

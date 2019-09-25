@@ -11,7 +11,6 @@ PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
-ACCFIL=${4-"./base.acc"}
 FIXFIL=${5-"./base.fix"}
 ERRFIL=${6-"./${PROGRAM}.err"}
 OUTFIL=${7-"./${PROGRAM}.out"}
@@ -23,18 +22,10 @@ exec 2>>${ERRFIL}
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
-test -f ${ACCFIL} || exit 2
-exec 0<${ACCFIL}
-
-read -r FIXED_POS_ACC
-
-log -I -N ${PROGRAM} -i FIXED_POS_ACC="\"${FIXED_POS_ACC}\""
-
-test -z "${FIXED_POS_ACC}" && exit 3
-
-test -f ${FIXFIL} || exit 4
+test -f ${FIXFIL} || exit 2
 exec 0<${FIXFIL}
 
+read -r FIXED_POS_ACC
 read -r LAT
 read -r LATHP
 read -r LON
@@ -42,6 +33,7 @@ read -r LONHP
 read -r HEIGHT
 read -r HEIGHTHP
 
+log -I -N ${PROGRAM} -i FIXED_POS_ACC="\"${FIXED_POS_ACC}\""
 log -I -N ${PROGRAM} -i LAT="\"${LAT}\""
 log -I -N ${PROGRAM} -i LATHP="\"${LATHP}\""
 log -I -N ${PROGRAM} -i LON="\"${LON}\""
@@ -49,12 +41,13 @@ log -I -N ${PROGRAM} -i LONHP="\"${LONHP}\""
 log -I -N ${PROGRAM} -i HEIGHT="\"${HEIGHT}\""
 log -I -N ${PROGRAM} -i HEIGHTHP="\"${HEIGHTHP}\""
 
-test -z "${LAT}" && exit 5
-test -z "${LATHP}" && exit 5
-test -z "${LON}" && exit 5
-test -z "${LONHP}" && exit 5
-test -z "${HEIGHT}" && exit 5
-test -z "${HEIGHTHP}" && exit 5
+test -z "${FIXED_POS_ACC}" && exit 3
+test -z "${LAT}" && exit 3
+test -z "${LATHP}" && exit 3
+test -z "${LON}" && exit 3
+test -z "${LONHP}" && exit 3
+test -z "${HEIGHT}" && exit 3
+test -z "${HEIGHTHP}" && exit 3
 
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE DISABLED
 # UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-LAT (read)

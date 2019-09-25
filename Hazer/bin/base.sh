@@ -16,10 +16,9 @@ DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
 DURATION=${4:-300}
 ACCURACY=${5:-1000}
-ACCFIL=${6-"./${PROGRAM}.acc"}
-FIXFIL=${7-"./${PROGRAM}.fix"}
-ERRFIL=${8-"./${PROGRAM}.err"}
-OUTFIL=${9-"./${PROGRAM}.out"}
+FIXFIL=${6-"./${PROGRAM}.fix"}
+ERRFIL=${7-"./${PROGRAM}.err"}
+OUTFIL=${8-"./${PROGRAM}.out"}
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
@@ -33,7 +32,6 @@ log -I -N ${PROGRAM} -i SVIN_MIN_DUR="\"${SVIN_MIN_DUR}\""
 
 SVIN_ACC_LIMIT=$(ubxval -4 ${ACCURACY})
 log -I -N ${PROGRAM} -i SVIN_ACC_LIMIT="\"${SVIN_ACC_LIMIT}\""
-echo "${SVIN_ACC_LIMIT}" > ${ACCFIL}
 
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-TMODE-MODE SURVEY_IN
 # UBX-CFG-VALSET [12] V0 RAM 0 0 CFG-TMODE-SVIN_MIN_DUR 300 (seconds)
