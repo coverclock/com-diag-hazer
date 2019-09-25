@@ -521,14 +521,15 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
         heightHp = sp->payload.heightHp; /* 0.1mm == 10^-4m (-9..+9) */
 
         /*
-         * Remarkably, the output high precision height in SURVEY-IN mode is
-         * reported in slightly different units than its input configuration
-         * in FIXED mode. This seems wrong. [UBX ZED-F9P Interface,
-         * pp. 145, 226..227]
+         * Remarkably, the documented output format for the high precision
+         * height in SURVEY-IN mode [UBX ZED-F9P Interface, p. 145] is in
+         * different units (mm and 0.1mm, which yields plausible results)
+         * than the documented input format in FIXED mode [UBX ZED-F9P
+         * Interface, pp. 226..227] (cm and 0.1mm).
          */
 
         value = (height * 10) + heightHp; /* 0.1mm == 10^-4m */
-        height = value / 100; /* cm == 10^-4m * 10^2 == 10^-2m */
+        height = value / 100; /* 10^-4m / 10^2 == 10^-2m == cm */
         heightHp = value % 100; /* 0.1mm == 10^-4m (-99..+99) */
 
         DIMINUTO_LOG_INFORMATION("Fix Emit lat 0x%8.8x 0x%2.2x lon 0x%8.8x 0x%2.2x alt 0x%8.8x 0x%2.2x\n", (uint32_t)lat, (uint8_t)latHp, (uint32_t)lon, (uint8_t)lonHp, (uint32_t)height, (uint8_t)heightHp);

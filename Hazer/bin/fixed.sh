@@ -3,7 +3,9 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the Ardusimple SimpleRTK2B as a fixed Base.
+# Configure and run the U-blox ZED-UBX-F9P as a fixed base wth configured LLH.
+# IMPORTANT SAFETY TIP: when switching the F9P between FIXED and SVIN modes,
+# power cycle or otherwise reset the device first.
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
@@ -11,11 +13,11 @@ DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
 ACCFIL=${4-"./base.acc"}
 FIXFIL=${5-"./base.fix"}
+ERRFIL=${6-"./${PROGRAM}.err"}
+OUTFIL=${7-"./${PROGRAM}.out"}
 
-LOGDIR=${TMPDIR:="/tmp"}/hazer/log
-mkdir -p ${LOGDIR}
-cp /dev/null ${LOGDIR}/${PROGRAM}.err
-exec 2>>${LOGDIR}/${PROGRAM}.err
+cp /dev/null ${ERRFIL}
+exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -77,7 +79,7 @@ test -z "${HEIGHTHP}" && exit 5
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
 exec coreable gpstool \
-    -F -H ${LOGDIR}/${PROGRAM}.out -t 10 \
+    -F -H ${OUTFIL} -t 10 \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -G ${ROUTER} -g 4 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x00' \

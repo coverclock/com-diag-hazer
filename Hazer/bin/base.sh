@@ -18,11 +18,11 @@ DURATION=${4:-300}
 ACCURACY=${5:-1000}
 ACCFIL=${6-"./${PROGRAM}.acc"}
 FIXFIL=${7-"./${PROGRAM}.fix"}
+ERRFIL=${8-"./${PROGRAM}.err"}
+OUTFIL=${9-"./${PROGRAM}.out"}
 
-LOGDIR=${TMPDIR:="/tmp"}/hazer/log
-mkdir -p ${LOGDIR}
-cp /dev/null ${LOGDIR}/${PROGRAM}.err
-exec 2>>${LOGDIR}/${PROGRAM}.err
+cp /dev/null ${ERRFIL}
+exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -51,7 +51,7 @@ echo "${SVIN_ACC_LIMIT}" > ${ACCFIL}
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
 exec coreable gpstool \
-    -F -H ${LOGDIR}/${PROGRAM}.out -t 10 \
+    -F -H ${OUTFIL} -t 10 \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -G ${ROUTER} -g 4 \
     -N ${FIXFIL} \

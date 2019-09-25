@@ -13,7 +13,9 @@ DURATION=${4:-300}
 ACCURACY=${5:-150000}
 ACCFIL=${6-"./${PROGRAM}.acc"}
 FIXFIL=${7-"./${PROGRAM}.fix"}
+ERRFIL=${8-"./${PROGRAM}.err"}
+OUTFIL=${9-"./${PROGRAM}.out"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-exec base ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${ACCFIL} ${FIXFIL}
+exec base ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${ACCFIL} ${FIXFIL} ${ERRFIL} ${OUTFIL}
