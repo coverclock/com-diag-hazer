@@ -2020,6 +2020,10 @@ int main(int argc, char * argv[])
 
     DIMINUTO_LOG_INFORMATION("Begin");
 
+    if (process) {
+        DIMINUTO_LOG_INFORMATION("Processing");
+    }
+
     /*
      * Are we logging every valid sentence or packet to an output file?
      */
