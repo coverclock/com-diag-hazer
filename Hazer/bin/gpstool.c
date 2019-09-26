@@ -1455,6 +1455,7 @@ int main(int argc, char * argv[])
      * Command line options and parameters with defaults.
      */
     const char * source = (const char *)0;
+    const char * sink = (const char *)0;
     const char * strobe = (const char *)0;
     const char * logging = (const char *)0;
     const char * headless = (const char *)0;
@@ -1489,6 +1490,7 @@ int main(int argc, char * argv[])
     FILE * in_fp = stdin;
     FILE * out_fp = stdout;
     FILE * dev_fp = (FILE *)0;
+    FILE * sink_fp = (FILE *)0;
     FILE * log_fp = (FILE *)0;
     FILE * strobe_fp = (FILE *)0;
     FILE * pps_fp = (FILE *)0;
@@ -1726,6 +1728,7 @@ int main(int argc, char * argv[])
      * Miscellaneous variables.
      */
     int rc = 0;
+    size_t sz = 0;
     char * locale = (char *)0;
     /*
      * External symbols.
@@ -1737,7 +1740,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:D:EFG:H:I:KL:MN:OPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: ACJNQTZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:OPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: AJNQTZ afijqrwxz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1779,6 +1782,9 @@ int main(int argc, char * argv[])
         case 'B':
             io_size = strtoul(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (io_size < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            break;
+        case 'C':
+            sink = optarg;
             break;
         case 'D':
             device = optarg;
@@ -1840,6 +1846,7 @@ int main(int argc, char * argv[])
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
             diminuto_list_enqueue(&command_list, command_node);
+            process = !0; /* Have to process ACK/NAKs. */
             break;
         case 'V':
             DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
@@ -1935,6 +1942,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "usage: %s "
                            "[ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] "
                            "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
+                           "[ -C FILE ] "
                            "[ -t SECONDS ] "
                            "[ -I PIN | -c ] [ -p PIN ] "
                            "[ -U STRING ... ] [ -W STRING ... ] "
@@ -1950,6 +1958,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -7          Use seven data bits for DEVICE.\n");
             fprintf(stderr, "       -8          Use eight data bits for DEVICE.\n");
             fprintf(stderr, "       -B BYTES    Set the input Buffer size to BYTES bytes.\n");
+            fprintf(stderr, "       -C FILE     Catenate input to FILE or named pipe.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
             fprintf(stderr, "       -F          Like -R but reFresh at 1Hz.\n");
@@ -2279,6 +2288,21 @@ int main(int argc, char * argv[])
         in_fp = fopen(source, "r");
         if (in_fp == (FILE *)0) { diminuto_perror(source); }
         assert(in_fp != (FILE *)0);
+    }
+
+    /*
+     * If we are using some other sink of output (e.g. a file, a FIFO, etc.),
+     * open it here.
+     */
+
+    if (sink == (const char *)0) {
+        /* Do nothing. */
+    } else if (strcmp(sink, "-") == 0) {
+        sink_fp = stdout;
+    } else {
+        sink_fp = fopen(sink, "a");
+        if (sink_fp == (FILE *)0) { diminuto_perror(sink); }
+        assert(sink_fp != (FILE *)0);
     }
 
     /*
@@ -2903,6 +2927,7 @@ int main(int argc, char * argv[])
                     if (verbose) { fprintf(stderr, "OUT [%zd] ", command_length); print_buffer(stderr, command_string, command_length, UNLIMITED); }
                     if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
                     if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }
+fprintf(stderr, "SENT %d\n", command_length);
                 }
 
                 free(command_node);
@@ -2947,6 +2972,15 @@ int main(int argc, char * argv[])
          * extracted from the data in the buffer. Unless the format requires
          * it (none currently do), it does not include the trailing NUL.
          */
+
+        /**
+         ** CATENATE
+         **/
+
+        if (sink_fp != (FILE *)0) {
+            sz = fwrite(buffer, 1, length, sink_fp);
+            assert(sz == length);
+        }
 
         /**
          ** FORWARD
@@ -3010,17 +3044,14 @@ int main(int argc, char * argv[])
 
         if (verbose) { fprintf(stderr, "INP [%zd] ", length); print_buffer(stderr, buffer, length, UNLIMITED); }
 
-        /*
-         * At this point, if we are not generating a report or not otherwise
-         * required to process the incoming data (maybe we're only forwarding
-         * data to a remote via datagrams, or writing incoming datagrams to
-         * a device), there is no point in continuing.
-         */
-
-        if (!process) { continue; }
-
         if (escape) { fputs("\033[1;1H\033[0K", out_fp); }
         if (report) { fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation); fflush(out_fp); }
+
+        /**
+         ** ITERATE
+         **/
+
+        if (!process) { continue; }
 
         /**
          ** EXPIRE
@@ -3648,6 +3679,11 @@ report:
 
     DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)));
     free(io_buffer);
+
+    if (sink_fp != (FILE *)0) {
+        rc = fclose(sink_fp);
+        if (rc == EOF) { diminuto_perror("fclose(sink_fp)"); }
+    }
 
     if (in_fp != dev_fp) {
         rc = fclose(in_fp);
