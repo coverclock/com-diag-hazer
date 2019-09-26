@@ -1,2 +1,6 @@
-# U-blox UBX-ZED-F9P on the Ardusimple SimpleRTK2B board
+# U-blox UBX-ZED-F9P chip
+# Ardusimple SimpleRTK2B board
+# SparkFun GPS-RTK2 board
+# Try: udevadm info --export-db
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a9", ENV{ID_MM_DEVICE_IGNORE}="1"
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a9", SYMLINK+="tumbleweed", OWNER="root", GROUP="dialout", MODE="0660"
