@@ -2931,7 +2931,6 @@ int main(int argc, char * argv[])
                     if (verbose) { fprintf(stderr, "OUT [%zd] ", command_length); print_buffer(stderr, command_string, command_length, UNLIMITED); }
                     if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
                     if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }
-fprintf(stderr, "SENT %d\n", command_length);
                 }
 
                 free(command_node);
