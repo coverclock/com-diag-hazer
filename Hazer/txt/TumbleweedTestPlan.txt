@@ -1,0 +1,40 @@
+TUMBLEWEED TEST PLAN
+
+1. Start router on ElJefe.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    router :tumbleweed &
+    peruse router err
+
+2. Start base on Bodega and wait for valid 10cm solution.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    base tumbleweed:tumbleweed &
+    peruse base err# Control-C to exit upon seeing "Ready".
+    peruse base out
+
+3. Establish FOUR UNCORRECTED results in 10m square starting with survey marker.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    # Power cycle the F9P.
+    mobile &
+    peruse mobile err# Control-C to exit upon seeing "Ready".
+    peruse mobile out
+
+4. Repeat FOUR UNCORRECTED results in 10m square starting with survey marker.
+
+5. Establish FOUR CORRECTED results in 10m square starting with survey marker.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    # Power cycle the F9P.
+    rover tumbleweed.test:tumbleweed &
+    peruse rover err# Control-C to exit upon seeing "Ready".
+    peruse rover out
+
+6. Repeat FOUR CORRECTED results in 10m square starting with survey marker.
+
+7. Repeat ONE CORRECTED result on survey marker.

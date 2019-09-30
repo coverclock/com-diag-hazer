@@ -686,6 +686,7 @@ lines that need to be added to the indicated files.
 * fs - file system overlay that may be useful on the host on which Hazer runs.
 * src - feature implementation and private header source files.
 * tst - unit test source files (does not require a GPS receiver).
+* txt - miscellaneous archived text files.
 
 # Artifacts
 
