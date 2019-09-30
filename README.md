@@ -705,10 +705,10 @@ lines that need to be added to the indicated files.
 # Utilities
 
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
-* base - configures and runs a UBX-ZED-F9P chip as a stationary base in survey mode.
+* base - configures and runs a UBX-ZED-F9P chip as a base station in survey mode.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
-* fixed - configures and runs a UBX-ZED-F9P chip as a stationary base in fixed mode.
+* station - configures and runs a UBX-ZED-F9P chip as a base station in fixed mode.
 * googlemaps - convert various format coordinate strings to decimal degrees.
 * gpstool - serves as Hazer's all purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
@@ -1842,9 +1842,9 @@ corrections based on this information.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    fixed tumbleweed:tumbleweed &
-    peruse fixed err# Control-C to exit upon seeing "Ready".
-    peruse fixed out
+    station tumbleweed:tumbleweed &
+    peruse station err# Control-C to exit upon seeing "Ready".
+    peruse station out
 
 A Tumbleweed rover (there can be more than one) is typically on the WAN,
 and is agnostic as to the Internet connection (I use a USB LTE modem).
@@ -1858,6 +1858,18 @@ datagrams and receive RTK update datagrams as defined in /etc/services.
     rover tumbleweed.test:tumbleweed &
     peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
+
+The rover can also be run as an uncorrected mobile unit, basically a
+receiver that doesn't support Differential GNSS.. (It might be a good
+idea to power cycle the F9P before changing from rover to mobile; some
+of the rover configuration seems to be sticky.)
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    # Power cycle the F9P if previously configured for corrections.
+    mobile &
+    peruse mobile err# Control-C to exit upon seeing "Ready".
+    peruse mobile out
 
 Note that the actual IP address of neither the base nor the rover need
 be known. This is important because the rover (and sometimes the base)
