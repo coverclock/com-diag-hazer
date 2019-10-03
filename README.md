@@ -631,14 +631,17 @@ The World of Hans Zimmer, "Time" (Hans Zimmer), INCEPTION
 
 # Build
 
-Clone and build Diminuto (used by gpstool although not by libhazer).
+Clone and build Diminuto, which is used by gpstool although not by libhazer.
+(Or follow the directions in the Diminuto README.)
 
     cd ~
     mkdir -p src
     cd src
     git clone https://github.com/coverclock/com-diag-diminuto
     cd com-diag-diminuto/Diminuto
-    make pristine depend all
+    make pristine
+    make depend
+    make all
 
 Clone and build Hazer. (If you don't build Diminuto where the Hazer Makefile
 expects it, some minor Makefile hacking might be required.)
@@ -648,7 +651,9 @@ expects it, some minor Makefile hacking might be required.)
     cd src
     git clone https://github.com/coverclock/com-diag-hazer
     cd com-diag-hazer/Hazer
-    make pristine depend all
+    make pristine
+    make depend
+    make all
 
 Set up environment and run tests and utilities. (This establishes the paths
 for both the Hazer and the Diminuto executables so you don't have to install
