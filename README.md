@@ -631,14 +631,17 @@ The World of Hans Zimmer, "Time" (Hans Zimmer), INCEPTION
 
 # Build
 
-Clone and build Diminuto (used by gpstool although not by libhazer).
+Clone and build Diminuto, which is used by gpstool although not by libhazer.
+(Or follow the directions in the Diminuto README.)
 
     cd ~
     mkdir -p src
     cd src
     git clone https://github.com/coverclock/com-diag-diminuto
     cd com-diag-diminuto/Diminuto
-    make pristine depend all
+    make pristine
+    make depend
+    make all
 
 Clone and build Hazer. (If you don't build Diminuto where the Hazer Makefile
 expects it, some minor Makefile hacking might be required.)
@@ -648,7 +651,9 @@ expects it, some minor Makefile hacking might be required.)
     cd src
     git clone https://github.com/coverclock/com-diag-hazer
     cd com-diag-hazer/Hazer
-    make pristine depend all
+    make pristine
+    make depend
+    make all
 
 Set up environment and run tests and utilities. (This establishes the paths
 for both the Hazer and the Diminuto executables so you don't have to install
@@ -686,6 +691,7 @@ lines that need to be added to the indicated files.
 * fs - file system overlay that may be useful on the host on which Hazer runs.
 * src - feature implementation and private header source files.
 * tst - unit test source files (does not require a GPS receiver).
+* txt - miscellaneous archived text files.
 
 # Artifacts
 
@@ -705,22 +711,23 @@ lines that need to be added to the indicated files.
 # Utilities
 
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
-* base - configures and runs a UBX-ZED-F9P chip as a stationary base in survey mode.
+* base - configures and runs a UBX-ZED-F9P chip as a base station in survey mode.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
-* fixed - configures and runs a UBX-ZED-F9P chip as a stationary base in fixed mode.
+* station - configures and runs a UBX-ZED-F9P chip as a base station in fixed mode.
 * googlemaps - convert various format coordinate strings to decimal degrees.
 * gpstool - serves as Hazer's all purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
+* mobile - configures and runs a UBX-ZED-F9P chip as an uncorrected mobile rover.
 * peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
 * proxy - receive UDP packets from the Base and forward to the Rover.
 * router - routes UDP packets received from a base to all rovers.
-* rover - configures and runs a UBX-ZED-F9P chip as a mobile rover.
+* rover - configures and runs a UBX-ZED-F9P chip as a corrected mobile rover.
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * ubxval - converts a number into a UBX-usable form.
 
@@ -739,7 +746,7 @@ lines that need to be added to the indicated files.
 * datagramsource - exercises a datagram sink.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
 * gr701w - exercises the NaviSys GR701W receiver.    
-* lowresolution - same as bin/base.sh but has much much lower standards.
+* lowresolution - same as bin/base.sh but with much much lower standards.
 * simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
 * simplertk2b - exercises the Ardusimple SimpleRTK2B board.
 * simplertk2bquery - queries the configuration of an Ardusimple SimpleRTK2B board.
@@ -1841,9 +1848,9 @@ corrections based on this information.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    fixed tumbleweed:tumbleweed &
-    peruse fixed err# Control-C to exit upon seeing "Ready".
-    peruse fixed out
+    station tumbleweed:tumbleweed &
+    peruse station err# Control-C to exit upon seeing "Ready".
+    peruse station out
 
 A Tumbleweed rover (there can be more than one) is typically on the WAN,
 and is agnostic as to the Internet connection (I use a USB LTE modem).
@@ -1857,6 +1864,18 @@ datagrams and receive RTK update datagrams as defined in /etc/services.
     rover tumbleweed.test:tumbleweed &
     peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
+
+The rover can also be run as an uncorrected mobile unit, basically a
+receiver that doesn't support Differential GNSS.. (It might be a good
+idea to power cycle the F9P before changing from rover to mobile; some
+of the rover configuration seems to be sticky.)
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    # Power cycle the F9P if previously configured for corrections.
+    mobile &
+    peruse mobile err# Control-C to exit upon seeing "Ready".
+    peruse mobile out
 
 Note that the actual IP address of neither the base nor the rover need
 be known. This is important because the rover (and sometimes the base)

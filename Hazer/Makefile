@@ -21,8 +21,8 @@ default:	all
 TITLE				:=	Hazer
 
 MAJOR				:=	26# API changes that may require that applications be modified.
-MINOR				:=	5# Only functionality or features added with no legacy API changes.
-BUILD				:=	2# Only bugs fixed with no API changes or new functionality.
+MINOR				:=	7# Only functionality or features added with no legacy API changes.
+BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -69,7 +69,7 @@ CFG_DIR				:=	cfg# Build configuration files
 DEP_DIR				:=	dep# Generated dependencies and other make files
 DOC_DIR				:=	doc# Documentation
 ETC_DIR				:=	etc# Miscellaneous files
-EXT_DIR				:=  ext# Extra source files not part of Hazer
+EXT_DIR				:=	ext# Extra source files not part of Hazer
 FUN_DIR				:=	fun# Functional tests
 GEN_DIR				:=	gen# Generated source files
 INC_DIR				:=	inc# Header files
