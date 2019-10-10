@@ -14,13 +14,16 @@
  */
 
 /*
- * POS 39°47'39.216"N, 105°09'12.106"W    39.7942268, -105.1533628        GNSS
- * HPP   39.794226865, -105.153362915 ±     1.1993m                       GNSS
+ * POS 39*47'39.216"N, 105*09'12.106"W    39.7942268, -105.1533628        GNSS
+ * HPP   39.794226865, -105.153362915 ~     1.1993m                       GNSS
  * NGS  39 47 39.21671(N) 105 09 12.10649(W)                              GNSS
+ *
+ * N.B. Non-ASCII characters replaced to make IDE happy.
  */
 
 /*
- * These are #define symbols and not static const variables for a reason.
+ * N.B. These are preprocessor symbols and not static const variables for a
+ * reason.
  */
 
 /**
@@ -64,7 +67,7 @@ typedef enum CoordinatesFormat {
  * @param now is the new debug value (true or false).
  * @return the old debug value (true or false);
  */
-int coordinates_debug(int now);
+extern int coordinates_debug(int now);
 
 /**
  * Parse a character string containing any one of a number of supported
@@ -76,6 +79,17 @@ int coordinates_debug(int now);
  * @param longitudep points to where the longitude result (if any) is stored.
  * @return a value indicating what format the input data was in.
  */
-int coordinates_parse(const char * string, double * latitudep, double * longitudep);
+extern int coordinates_parse(const char * string, double * latitudep, double * longitudep);
+
+/**
+ * Format decimal degrees of latitude or longitude into position values.
+ * @param decimaldegrees is a longitude or latitude in floating point.
+ * @param degreesp points to where the integral degrees (e.g. 180) is stored.
+ * @param minutesp points to where the minutes (0..59) are stored.
+ * @param secondsp points to where the seconds (0..59) are stored.
+ * @param millionthsp points to there the fractional seconds (0..999999) are stored.
+ * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
+ */
+extern void coordinates_format_decimaldegrees2position(double decimaldegrees, int * degreesp, int * minutesp, int * secondsp, int * millionthsp, int * directionp);
 
 #endif
