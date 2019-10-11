@@ -514,6 +514,10 @@ ublox, 2018-12-20
 
 <https://www.ngs.noaa.gov/NGSDataExplorer/>
 
+<https://www.ngs.noaa.gov/NCAT/>
+
+<https://tagis.dep.wv.gov/convert/>
+
 # Resources
 
 <http://www.catb.org/gpsd/NMEA.txt>
