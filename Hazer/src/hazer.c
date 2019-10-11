@@ -767,9 +767,6 @@ void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int *
 
 void hazer_format_nanominutes2position(int64_t nanominutes, int * degreesp, int * minutesp, int * secondsp, int * thousandthsp, int * directionp)
 {
-    int hundredths = 0;
-    char direction = '\0';
-
     if (nanominutes < 0) {
         nanominutes = -nanominutes;
         *directionp = -1;

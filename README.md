@@ -719,7 +719,7 @@ lines that need to be added to the indicated files.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
 * station - configures and runs a UBX-ZED-F9P chip as a base station in fixed mode.
-* googlemaps - convert various format coordinate strings to decimal degrees.
+* googlemaps - convert gpstool coordinate strings to formats accepted by Google Maps.
 * gpstool - serves as Hazer's all purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
