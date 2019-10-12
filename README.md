@@ -2072,6 +2072,12 @@ geographiclib, which is licensed under the MIT license.
 
 Thanks to Charles F. F. Karney for his MIT licensed geographiclib.
 
-Special thanks to Mrs. Overclock for her assistance in road testing (literally)
-this software and for her understanding regarding having GPS equipment
-littered all around the house both inside and outside.
+A big thank you to Brad Gabbard, a professional surveyor with
+Flatirons, Inc., a surveying, engineering, and geomatics firm located
+in Boulder Colorado. Mr. Gabbard generously shared some results off
+his professional Trimble GPS rover taken at a NGS survey marker
+KK1446 that I have used to test this code.
+
+Special thanks to Mrs. Overclock for her assistance in road testing
+(literally) this software and for her understanding regarding having
+GPS equipment littered all around the house both inside and outside.
