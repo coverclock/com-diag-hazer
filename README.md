@@ -446,6 +446,9 @@ M. Dunn at al., "Navstar GPS Space Segment/Navigation User Interfaces",
 IS-GPS-200H, Global Positioning Systems Directorate / Systems Engineering &
 Integration, 2013-09-24
 
+Dane E. Ericksen, "NAD 83: What Is It And Why You Should Care",
+*1994 SBE National Convention and World Media Expo*, 1994
+
 Geocaching.com, "Benchmark Hunting", 2019-09-16
 
 Mohinder S. Gerwal et al., *Global Navigation Satellite Systems, Inertial
