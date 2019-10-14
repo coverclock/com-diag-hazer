@@ -10,7 +10,7 @@ DEVICE=${1:-"/dev/tumbleweed"}
 RATE=${2:-230400}
 ERRFIL=${3-"./${PROGRAM}.err"}
 OUTFIL=${4-"./${PROGRAM}.out"}
-TRCFIL=${5-"./${PROGRAM}.trc"}
+TRCFIL=${5-"./${PROGRAM}.csv"}
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}

@@ -34,7 +34,7 @@ if [[ "${FILE}" == "err" ]]; then
     CMD="tail -n ${LIMIT} -f"
 elif [[ "${FILE}" == "out" ]]; then
     CMD="headless"
-elif [[ "${FILE}" == "trc" ]]; then
+elif [[ "${FILE}" == "csv" ]]; then
     CMD="tail -n ${LIMIT} -f"
 else
     CMD="cat"

@@ -571,30 +571,42 @@ static void emit_trace(FILE * fp, const yodel_solution_t * sp)
     int32_t meters = 0;
     uint32_t tenthousandths = 0;
     static uint64_t sn = 0;
+    static diminuto_sticks_t epoch = 0;
 
-    fputs("TRACE", fp);
+    if (sn == 0) {
+        epoch = diminuto_time_elapsed();
+        fputs("OBSERVATION,", fp);
+        fputs(" ELAPSED,", fp);
+        fputs(" LATITUDE,", fp);
+        fputs(" LONGITUDE,", fp);
+        fputs(" HORIZONTAL,", fp);
+        fputs(" MSL,", fp);
+        fputs(" WGS84,", fp);
+        fputs(" VERTICAL\n", fp);
+        sn++;
+    }
 
-    fprintf(fp, " %-20llu", (long long unsigned int)(sn++));
+    fprintf(fp, "%llu,", (long long unsigned int)(sn++));
+
+    fprintf(fp, " %llu,", (long long unsigned int)((diminuto_time_elapsed() - epoch) / diminuto_time_frequency()));
 
     yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
-    fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)billionths);
+    fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
 
     yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &billionths);
-    fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)billionths);
+    fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
 
     yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
-    fprintf(fp, " %6lld.%04llu", (long long signed int)meters, (long long unsigned int)tenthousandths);
+    fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
     yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &tenthousandths);
-    fprintf(fp, " %6lld.%04llu", (long long signed int)meters, (long long unsigned int)tenthousandths);
+    fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
     yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &tenthousandths);
-    fprintf(fp, " %6lld.%04llu", (long long signed int)meters, (long long unsigned int)tenthousandths);
+    fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
     yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
-    fprintf(fp, " %6lld.%04llu", (long long signed int)meters, (long long unsigned int)tenthousandths);
-
-    fputc('\n', fp);
+    fprintf(fp, " %lld.%04llu\n", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
     fflush(fp);
 }
