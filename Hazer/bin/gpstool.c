@@ -556,6 +556,49 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
     return rc;
 }
 
+/**
+ * Print information about the high-precision positioning solution that UBX
+ * provides. I think this is the same result as NMEA but is expressed with
+ * the maximum precision available in the underlying device and beyond which
+ * NMEA can express.
+ * @param fp points to the FILE stream.
+ * @param sp points to the solutions structure.
+ */
+static void emit_trace(FILE * fp, const yodel_solution_t * sp)
+{
+    int32_t degrees = 0;
+    uint64_t billionths = 0;
+    int32_t meters = 0;
+    uint32_t tenthousandths = 0;
+    static uint64_t sn = 0;
+
+    fputs("TRACE", fp);
+
+    fprintf(fp, " %-20llu", (long long unsigned int)(sn++));
+
+    yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
+    fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)billionths);
+
+    yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &billionths);
+    fprintf(fp, " %4d.%09llu", degrees, (long long unsigned int)billionths);
+
+    yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
+    fprintf(fp, " %6lld.%04llu", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+    yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &tenthousandths);
+    fprintf(fp, " %6lld.%04llu", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+    yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &tenthousandths);
+    fprintf(fp, " %6lld.%04llu", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+    yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
+    fprintf(fp, " %6lld.%04llu", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+    fputc('\n', fp);
+
+    fflush(fp);
+}
+
 /*******************************************************************************
  * REPORTERS
  ******************************************************************************/
@@ -1460,6 +1503,7 @@ int main(int argc, char * argv[])
     const char * logging = (const char *)0;
     const char * headless = (const char *)0;
     const char * arp = (const char *)0;
+    const char * trace = (const char *)0;
     int opt = -1;
     int debug = 0;
     int verbose = 0;
@@ -1494,6 +1538,7 @@ int main(int argc, char * argv[])
     FILE * log_fp = (FILE *)0;
     FILE * strobe_fp = (FILE *)0;
     FILE * pps_fp = (FILE *)0;
+    FILE * trace_fp = (FILE *)0;
     /*
      * Serial device variables.
      */
@@ -1707,6 +1752,7 @@ int main(int argc, char * argv[])
     int sync = 0;       /** If true then the input stream is synchronized. */
     int frame = 0;      /** If true then the input stream is at frame start. */
     int refresh = !0;   /** If true then the display needs to be refreshed. */
+    int hpllh = 0;      /** If true then the trace needs to be emitted. */
     /*
      * Command line processing variables.
      */
@@ -1719,7 +1765,7 @@ int main(int argc, char * argv[])
     hazer_active_t cache = HAZER_ACTIVE_INITIALIZER;
     int dmyokay = 0;
     int totokay = 0;
-     /*
+    /*
      * Counters.
      */
     unsigned int outoforder_counter = 0;
@@ -1740,7 +1786,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:OPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: AJNQTZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:OPRS:T:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: AJQZ afijqrwxz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1837,6 +1883,10 @@ int main(int argc, char * argv[])
             break;
         case 'S':
             source = optarg;
+            break;
+        case 'T':
+            trace = optarg;
+            process = !0; /* Have to process trace. */
             break;
         case 'U':
             readonly = 0;
@@ -1951,8 +2001,9 @@ int main(int argc, char * argv[])
                            "[ -G [ IP:PORT | :PORT [ -g MASK ] ] ] "
                            "[ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] "
                            "[ -K [ -k MASK ] ] "
-                           "[ -N FILE ]"
-                           "\n", Program);
+                           "[ -N FILE ] "
+                           "[ -T FILE ] "
+                          "\n", Program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(stderr, "       -7          Use seven data bits for DEVICE.\n");
@@ -1973,6 +2024,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
+            fprintf(stderr, "       -T FILE     Save the high precision LLH trace to FILE.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
             fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
@@ -2366,6 +2418,20 @@ int main(int argc, char * argv[])
         }
         assert(pthreadrc == 0);
 
+    }
+
+    /*
+     * If we are saving the track, open the track file.
+     */
+
+    if (trace == (const char *)0) {
+        /* Do nothing. */
+    } else if (strcmp(trace, "-") == 0) {
+        trace_fp = stdout;
+    } else {
+        trace_fp = fopen(trace, "a");
+        if (trace_fp == (FILE *)0) { diminuto_perror(trace); }
+        assert(trace_fp != (FILE *)0);
     }
 
     /*
@@ -2864,7 +2930,7 @@ int main(int argc, char * argv[])
         }
 
         /**
-         ** CONFIGURATION
+         ** COMMANDS
          **/
 
         /*
@@ -3278,6 +3344,7 @@ int main(int argc, char * argv[])
 
                 solution.ticks = timeout;
                 refresh = !0;
+                hpllh = !0;
 
             } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 
@@ -3468,10 +3535,6 @@ int main(int argc, char * argv[])
 
         }
 
-        /**
-         ** REPORT
-         **/
-
         /*
          * We always give priority to reading input from the device or a
          * socket. Generating the report can take a long time, particularly
@@ -3490,6 +3553,46 @@ int main(int argc, char * argv[])
         } else {
             /* Do nothing. */
         }
+
+        /*
+         * If we've generated a high precision solution in survey mode,
+         * and have been asked to emit the solution to a file for later use
+         * in fixed mode, do so now. We delay doing this until the device
+         * is fully configured and has ACKed all of the configuration
+         * commands.
+         */
+
+        if (arp == (const char *)0) {
+            /* Do nothing. */
+        } else if (!diminuto_list_isempty(&command_list)) {
+            /* Do nothing. */
+        } else if (acknakpending > 0) {
+            /* Do nothing. */
+        } else if (!save_solution(arp, &base, &solution)) {
+            /* Do nothing. */
+        } else {
+            arp = (const char *)0;
+        }
+
+        /*
+         * If tracing is enabled and we have a high precision latitude,
+         * longitude, and height (LLH) solution, emit the trace.
+         */
+
+        if (trace_fp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (!hpllh) {
+            /* Do nothing. */
+        } else {
+            emit_trace(trace_fp, &solution);
+            hpllh = 0;
+        }
+
+        /**
+         ** REPORT
+         **/
+
+report:
 
         /*
          * This code is just for testing the expiration feature.
@@ -3546,30 +3649,8 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * If we've generated a high precision solution in survey mode,
-         * and have been asked to emit the solution to a file for later use
-         * in fixed mode, do so now. We delay doing this until the device
-         * is fully configured and has ACKed all of the configuration
-         * commands.
-         */
-
-        if (arp == (const char *)0) {
-            /* Do nothing. */
-        } else if (!diminuto_list_isempty(&command_list)) {
-            /* Do nothing. */
-        } else if (acknakpending > 0) {
-            /* Do nothing. */
-        } else if (!save_solution(arp, &base, &solution)) {
-            /* Do nothing. */
-        } else {
-            arp = (const char *)0;
-        }
-
-        /*
          * Generate the display if necessary and sufficient reasons exist.
          */
-
-report:
 
         if (!refresh) {
             /* Do nothing. */

@@ -116,7 +116,7 @@ enum YodelUbxOffsets {
 typedef struct YodelUbxHeader {
     uint8_t sync_1;		/* 0xb5 */
     uint8_t sync_2;		/* 0x62 */
-    uint8_t class;
+    uint8_t classx;
     uint8_t	id;
     uint16_t length;	/* little endian */
     uint8_t payload[0];

@@ -10,6 +10,7 @@ DEVICE=${1:-"/dev/tumbleweed"}
 RATE=${2:-230400}
 ERRFIL=${3-"./${PROGRAM}.err"}
 OUTFIL=${4-"./${PROGRAM}.out"}
+TRCFIL=${5-"./${PROGRAM}.trc"}
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
@@ -27,6 +28,7 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
 exec coreable gpstool \
     -F -H ${OUTFIL} -t 10 \
+    -T ${TRCFIL} \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x00' \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x05\x00\x53\x10\x00' \

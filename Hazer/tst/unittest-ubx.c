@@ -51,7 +51,7 @@ int main(void)
 
         assert(header.sync_1 == YODEL_STIMULUS_SYNC_1);
         assert(header.sync_2 == YODEL_STIMULUS_SYNC_2);
-        assert(header.class == 0x11);
+        assert(header.classx == 0x11);
         assert(header.id == 0x22);
         assert(le16toh(header.length) == 0x4433);
     }
