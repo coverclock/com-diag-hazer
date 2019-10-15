@@ -1776,27 +1776,41 @@ use SimpleRTK2B boards interchangeably in the field.
 > met my needs, although I tried both, the latter using AT&T LTE-M SIMs. As
 > far as I can tell, however, both worked as advertised.
 
-## Spurious /dev/ttyACM Characters on Intel NUC/Ubuntu
+## Lost /dev/ttyACM Characters on Intel NUC/Ubuntu
 
-I've been troubleshooting a weird issue with spurious characters showing up
-on the serial-ish USB connection between a U-blox UBX-ZED-F9P (generation 9)
-on the Ardusimple SimpleRTK2B board, as well as a U-Blox UBX-M8030 (generation
-8) in a GlobalSat BU353W10 dongle, and Hazer. I've described this at length
-in the article
+I've been troubleshooting a weird issue with sequences of characters being
+lost on the modem-ish (ttyACM) USB connection between a U-blox UBX-ZED-F9P
+(generation 9). This occurs when using the Ardusimple SimpleRTK2B and
+Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation
+8) in a GlobalSat BU353W10 dongle. I've described this at length in
+the article
 
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
-I only see this when I run Hazer under Ubuntu on Intel servers (Nickel,
-Cadmium, and Mercury as described above). It is reproducible removing Hazer
-from the test completely and just using standard utilities like cat and socat.
-It is not reproducible running the exact same software and GNSS receivers on
-the ARM-based Raspberry Pi 3+ (Gold, Bodega, and Mochila as decribed above)
-under Raspbian. Both Ubuntu and Raspbian are Debian-based Linux distributions.
+I see this when I run Hazer under Ubuntu on Intel servers (Nickel,
+Cadmium, and Mercury as described above) and under Raspian on a Raspberry
+Pi 4B (Rhodium ibid). I to NOT see it running on under the SAME version
+of Raspbian on a Raspberry Pi 3B+ (Gold, Bodega, and Mochila ibid).
+Both Ubuntu and Raspbian are Debian-based Linux distributions.
 
-I haven't reported this to U-blox because it seems like a bug (somehow) in the
-Intel-specific portions of the USB stack. Plus, I would really like this to be
-a software bug on my part, because then I could fix it; but that strategy is
-looking iffy.
+It is reproducible by removing Hazer from the test completely and just
+using standard utilities like cat and socat. Since presumably these
+utilities are consuming data from the device as quickly as possible, it
+doesn't seem to be a speed issue. (And it doesn't occur on the slower
+Pi 3B+.)
+
+This smells like a conflict with some other daemon like Modem Manager. But
+I have Modem Manager disabled (or else it doesn't exist); also, a looping
+lsof command doesn't find another process opening the ttyACM device.
+
+There doesn't seem to be a consistent pattern in what characters are lost.
+
+Enabling flow control on the device and in gpstool doesn't seem to have
+any effect.
+
+I haven't reported this to U-blox because it doesn't seem like a
+U-blox bug.  I would really like this to be a software bug on my part,
+because then I could fix it; but that strategy is looking iffy.
 
 ## Differential GNSS Using Tumbleweed
 
