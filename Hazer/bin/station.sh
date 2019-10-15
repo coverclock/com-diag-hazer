@@ -3,7 +3,10 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the U-blox ZED-UBX-F9P as a fixed base wth configured LLH.
+# Configure and run the U-blox ZED-UBX-F9P as a stationary Base using
+# the coordinates established by a prior survey and sending corrections
+# to Rovers.
+
 # IMPORTANT SAFETY TIP: when switching the F9P between FIXED and SVIN modes,
 # power cycle or otherwise reset the device first.
 
