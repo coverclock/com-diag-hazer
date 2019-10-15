@@ -719,6 +719,7 @@ lines that need to be added to the indicated files.
 
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
 * base - configures and runs a UBX-ZED-F9P chip as a base station in survey mode.
+* benchmark - configures and runs a UBX-ZED-F9P chip as a corrected mobile rover saving a CSV.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
 * station - configures and runs a UBX-ZED-F9P chip as a base station in fixed mode.
@@ -1873,8 +1874,22 @@ datagrams and receive RTK update datagrams as defined in /etc/services.
     peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
 
+The rover can also generate a CSV file as it runs that will contain
+the results of the high precision solution every time is is generated
+and reported. This is useful when testing the rover against a fixed
+location, for example a survey benchmark whose coordinates are well known.
+(Be aware that National Geodetic Survey markers in the U.S. use the
+NAD83 datum, so are not directly comparable to GPS, which uses the
+WGS84 datum.)
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    benchmark tumbleweed.test:tumbleweed &
+    peruse benchmark err# Control-C to exit upon seeing "Ready".
+    peruse benchmark csv
+
 The rover can also be run as an uncorrected mobile unit, basically a
-receiver that doesn't support Differential GNSS.. (It might be a good
+receiver that doesn't support Differential GNSS. (It might be a good
 idea to power cycle the F9P before changing from rover to mobile; some
 of the rover configuration seems to be sticky.)
 
