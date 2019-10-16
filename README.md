@@ -1888,13 +1888,16 @@ datagrams and receive RTK update datagrams as defined in /etc/services.
     peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
 
-The rover can also generate a CSV file as it runs that will contain
-the results of the high precision solution every time is is generated
-and reported. This is useful when testing the rover against a fixed
-location, for example a survey benchmark whose coordinates are well known.
-(Be aware that National Geodetic Survey markers in the U.S. use the
-NAD83 datum, so are not directly comparable to GPS, which uses the
-WGS84 datum.)
+The rover can also generate a CSV file as it runs that will contain the
+results of the high precision solution every time is is generated and
+reported. This is useful when testing the rover against a fixed location,
+for example a survey benchmark whose coordinates are well known.
+(Be aware that the surveyed coordinates of National Geodetic Survey
+markers in the U.S. are, in my experience anyway, typically based on the
+NAD83 datum - an abstract model of the shape of the Earth - which is
+used solely for the North American plate minute Mexico, and which are not
+directly comparable to GPS coordinates, which are determined using the
+WGS84 datum based on space observations.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
