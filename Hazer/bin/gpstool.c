@@ -627,12 +627,15 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
     unsigned int satellite = 0;
     unsigned int count = 0;
     unsigned int total = 0;
+    static unsigned int maximum = 0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
         if (aa[system].ticks == 0) { continue; }
         if (aa[system].active == 0) { continue; }
         total += aa[system].active;
     }
+
+    if (total > maximum) { maximum = total; }
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -651,9 +654,9 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
             }
         }
 
-        fprintf(fp, " } [%2u] [%2u] [%2u]", count, aa[system].active, total);
+        fprintf(fp, " } [%2u] [%2u] [%2u] [%2u]", count, aa[system].active, total, maximum);
 
-        fprintf(fp, "%7s", "");
+        fprintf(fp, "%2s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -673,9 +676,9 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
             }
         }
 
-        fprintf(fp, " } [%2u] [%2u] [%2u]", count, aa[system].active, total);
+        fprintf(fp, " } [%2u] [%2u] [%2u] [%2u]", count, aa[system].active, total, maximum);
 
-        fprintf(fp, "%7s", "");
+        fprintf(fp, "%2s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
