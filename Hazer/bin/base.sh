@@ -3,7 +3,8 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the U-blox ZED-UBX-F9P as a surveying Base.
+# Configure and run the U-blox ZED-UBX-F9P as a stationary Base sending
+# corrections to Rovers.
 
 # The SVIN-ACC-LIMIT is based on actual testing under not bad but less than
 # ideal conditions: the antenna in my front yard, but not on a roof. The

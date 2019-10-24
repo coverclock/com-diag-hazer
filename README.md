@@ -719,6 +719,7 @@ lines that need to be added to the indicated files.
 
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
 * base - configures and runs a UBX-ZED-F9P chip as a base station in survey mode.
+* benchmark - configures and runs a UBX-ZED-F9P chip as a corrected mobile rover saving a CSV.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
 * station - configures and runs a UBX-ZED-F9P chip as a base station in fixed mode.
@@ -783,7 +784,7 @@ lines that need to be added to the indicated files.
 ## gpstool
 
     > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ]
+    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
@@ -803,6 +804,7 @@ lines that need to be added to the indicated files.
            -P          Process incoming data even if no report is being generated.
            -R          Print a Report on standard output.
            -S FILE     Use source FILE or named pipe for input.
+           -T FILE     Save the high precision LLH trace to FILE.
            -U STRING   Like -W except expect UBX ACK or NAK response.
            -U ''       Exit when this empty UBX STRING is processed.
            -V          Log Version in the form of release, vintage, and revision.
@@ -1790,27 +1792,41 @@ use SimpleRTK2B boards interchangeably in the field.
 > met my needs, although I tried both, the latter using AT&T LTE-M SIMs. As
 > far as I can tell, however, both worked as advertised.
 
-## Spurious /dev/ttyACM Characters on Intel NUC/Ubuntu
+## Lost /dev/ttyACM Characters on Intel NUC/Ubuntu
 
-I've been troubleshooting a weird issue with spurious characters showing up
-on the serial-ish USB connection between a U-blox UBX-ZED-F9P (generation 9)
-on the Ardusimple SimpleRTK2B board, as well as a U-Blox UBX-M8030 (generation
-8) in a GlobalSat BU353W10 dongle, and Hazer. I've described this at length
-in the article
+I've been troubleshooting a weird issue with sequences of characters being
+lost on the modem-ish (ttyACM) USB connection between a U-blox UBX-ZED-F9P
+(generation 9). This occurs when using the Ardusimple SimpleRTK2B and
+Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation
+8) in a GlobalSat BU353W10 dongle. I've described this at length in
+the article
 
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
-I only see this when I run Hazer under Ubuntu on Intel servers (Nickel,
-Cadmium, and Mercury as described above). It is reproducible removing Hazer
-from the test completely and just using standard utilities like cat and socat.
-It is not reproducible running the exact same software and GNSS receivers on
-the ARM-based Raspberry Pi 3+ (Gold, Bodega, and Mochila as decribed above)
-under Raspbian. Both Ubuntu and Raspbian are Debian-based Linux distributions.
+I see this when I run Hazer under Ubuntu on Intel servers (Nickel,
+Cadmium, and Mercury as described above) and under Raspian on a Raspberry
+Pi 4B (Rhodium ibid). I to NOT see it running on under the SAME version
+of Raspbian on a Raspberry Pi 3B+ (Gold, Bodega, and Mochila ibid).
+Both Ubuntu and Raspbian are Debian-based Linux distributions.
 
-I haven't reported this to U-blox because it seems like a bug (somehow) in the
-Intel-specific portions of the USB stack. Plus, I would really like this to be
-a software bug on my part, because then I could fix it; but that strategy is
-looking iffy.
+It is reproducible by removing Hazer from the test completely and just
+using standard utilities like cat and socat. Since presumably these
+utilities are consuming data from the device as quickly as possible, it
+doesn't seem to be a speed issue. (And it doesn't occur on the slower
+Pi 3B+.)
+
+This smells like a conflict with some other daemon like Modem Manager. But
+I have Modem Manager disabled (or else it doesn't exist); also, a looping
+lsof command doesn't find another process opening the ttyACM device.
+
+There doesn't seem to be a consistent pattern in what characters are lost.
+
+Enabling flow control on the device and in gpstool doesn't seem to have
+any effect.
+
+I haven't reported this to U-blox because it doesn't seem like a
+U-blox bug.  I would really like this to be a software bug on my part,
+because then I could fix it; but that strategy is looking iffy.
 
 ## Differential GNSS Using Tumbleweed
 
@@ -1888,8 +1904,25 @@ datagrams and receive RTK update datagrams as defined in /etc/services.
     peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
 
+The rover can also generate a CSV file as it runs that will contain the
+results of the high precision solution every time is is generated and
+reported. This is useful when testing the rover against a fixed location,
+for example a survey benchmark whose coordinates are well known.
+(Be aware that the surveyed coordinates of National Geodetic Survey
+markers in the U.S. are, in my experience anyway, typically based on the
+NAD83 datum - an abstract model of the shape of the Earth - which is
+used solely for the North American plate minute Mexico, and which are not
+directly comparable to GPS coordinates, which are determined using the
+WGS84 datum based on space observations.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    benchmark tumbleweed.test:tumbleweed &
+    peruse benchmark err# Control-C to exit upon seeing "Ready".
+    peruse benchmark csv
+
 The rover can also be run as an uncorrected mobile unit, basically a
-receiver that doesn't support Differential GNSS.. (It might be a good
+receiver that doesn't support Differential GNSS. (It might be a good
 idea to power cycle the F9P before changing from rover to mobile; some
 of the rover configuration seems to be sticky.)
 
