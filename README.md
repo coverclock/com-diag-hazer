@@ -1005,64 +1005,66 @@ Here is another example, this one from a Ublox 9 receiver, and reflecting some
 minor changes to the output format.
 
     INP [ 14] \xd3\0\bL\xe0\0\x8a\0\0\0\0\xa8\xf7*
-
-    LOC 2019-07-29T10:25:35.055-07:00+01T          0/00:00:00.804 25.1.0   gold
-    TIM 2019-07-29T16:25:34.000-00:00+00Z 0pps                             GNSS
-    POS 39°47'39.239"N, 105°09'12.116"W    39.7942331, -105.1533656        GNSS
-    ALT    5616.73'   1712.000m                                            GNSS
+    
+    LOC 2019-10-24T16:30:45.884-07:00+01T          0/00:00:00.122 27.2.0   hacienda
+    TIM 2019-10-24T22:30:45.000-00:00+00Z 0pps                             GNSS
+    POS 39°47'39.323"N, 105°09'12.309"W    39.7942565, -105.1534191        GNSS
+    ALT    5612.79'   1710.800m                                            GNSS
     COG N     0.000000000°T    0.000000000°M                               GNSS
-    SOG       0.003mph       0.003000knots       0.005000kph               GNSS
-    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                67929b  GNSS
-    HPP   39.794233230, -105.153365665 ±     1.0083m                       GNSS
-    HPA   1712.0309m ±     2.0568m                                         GNSS
-    NGS  39 47 39.23962(N) 105 09 12.11639(W)                              GNSS
-    BAS 1active 0valid        974sec        975obs       6.4909m           DGNSS
+    SOG       0.009mph       0.008000knots       0.014000kph               GNSS
+    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )              9932763b  GNSS
+    HPP   39.794256489, -105.153419128 ±     0.4660m                       GNSS
+    HPA   1710.7684m MSL   1689.2685m WGS84 ±     0.7809m                  GNSS
+    NGS  39 47 39.32336(N) 105 09 12.30886(W)                              GNSS
+    BAS 1active 0valid      18019sec      18020obs       0.1675m           DGNSS
     RTK 1230 [  14] base     <rCERNrCE>                                    DGNSS
-    ACT [1]  {     2     3     6    12    17    19 } [ 6] [ 8] [24]        NAVSTAR
-    ACT [2]  {    24    28                         } [ 2] [ 8] [24]        NAVSTAR
-    ACT [1]  {    82    73    80    79    83       } [ 5] [ 5] [24]        GLONASS
-    ACT [1]  {     1    12    24    26    31    33 } [ 6] [ 6] [24]        GALILEO
-    ACT [1]  {    34    12    25    11    24       } [ 5] [ 5] [24]        COMPASS
-    DOP   1.14pdop   0.60hdop   0.97vdop                                   NAVSTAR
-    DOP   1.14pdop   0.60hdop   0.97vdop                                   GLONASS
-    DOP   1.14pdop   0.60hdop   0.97vdop                                   GALILEO
-    DOP   1.14pdop   0.60hdop   0.97vdop                                   COMPASS
-    SAT [  1]     2id  42°elv  210°azm    0dBHz  6sig <   !                NAVSTAR
-    SAT [  2]     3id  12°elv   45°azm   16dBHz  6sig <                    NAVSTAR
-    SAT [  3]     6id  78°elv  136°azm   36dBHz  6sig <                    NAVSTAR
-    SAT [  4]    12id  29°elv  311°azm   22dBHz  6sig <                    NAVSTAR
-    SAT [  5]    17id  48°elv   52°azm   31dBHz  6sig <                    NAVSTAR
-    SAT [  6]    19id  62°elv   33°azm    0dBHz  6sig <   !                NAVSTAR
-    SAT [  7]    22id   1°elv   31°azm    0dBHz  6sig     !                NAVSTAR
-    SAT [  8]    24id  40°elv  273°azm   29dBHz  6sig <                    NAVSTAR
-    SAT [  9]    28id  25°elv  120°azm    0dBHz  6sig <   !                NAVSTAR
-    SAT [ 10]    66id   8°elv   50°azm   17dBHz  3sig                      GLONASS
-    SAT [ 11]    67id   2°elv   97°azm   16dBHz  3sig                      GLONASS
-    SAT [ 12]    73id  43°elv  321°azm   29dBHz  3sig <                    GLONASS
-    SAT [ 13]    74id   2°elv  332°azm    0dBHz  3sig     !                GLONASS
-    SAT [ 14]    79id  14°elv  159°azm   35dBHz  3sig <                    GLONASS
-    SAT [ 15]    80id  65°elv  185°azm   37dBHz  3sig <                    GLONASS
-    SAT [ 16]    81id   5°elv   47°azm   17dBHz  3sig                      GLONASS
-    SAT [ 17]    82id  50°elv   24°azm   25dBHz  3sig <                    GLONASS
-    SAT [ 18]    83id  62°elv  275°azm   33dBHz  3sig <                    GLONASS
-    SAT [ 19]    84id  11°elv  238°azm   22dBHz  3sig                      GLONASS
-    SAT [ 20]     1id  44°elv  148°azm   42dBHz  2sig <                    GALILEO
-    SAT [ 21]    12id  36°elv  231°azm   39dBHz  2sig <                    GALILEO
-    SAT [ 22]    24id  26°elv  316°azm   33dBHz  2sig <                    GALILEO
-    SAT [ 23]    26id  35°elv   47°azm   25dBHz  2sig <                    GALILEO
-    SAT [ 24]    31id  78°elv  283°azm   38dBHz  2sig <                    GALILEO
-    SAT [ 25]    33id  87°elv  322°azm   34dBHz  2sig <                    GALILEO
-    SAT [ 26]    11id  37°elv  257°azm   35dBHz  3sig <                    COMPASS
-    SAT [ 27]    12id  54°elv   42°azm   44dBHz  3sig <                    COMPASS
-    SAT [ 28]    19id   5°elv   43°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 29]    21id   4°elv  138°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 30]    22id  12°elv   91°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 31]    23id   8°elv  323°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 32]    24id  50°elv  192°azm    0dBHz  3sig <   !                COMPASS
-    SAT [ 33]    25id  50°elv  291°azm    0dBHz  3sig <   !                COMPASS
-    SAT [ 34]    26id   9°elv  162°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 35]    34id  62°elv  274°azm    0dBHz  3sig <   !                COMPASS
-    SAT [ 36]    35id   6°elv   63°azm    0dBHz  3sig     !                COMPASS
+    ACT [1]  {    10    25    11    14    22    26 } [ 6] [10] [29] [31]   NAVSTAR
+    ACT [2]  {     3     1    32    31             } [ 4] [10] [29] [31]   NAVSTAR
+    ACT [1]  {    74    73    72    81    87    71 } [ 6] [ 9] [29] [31]   GLONASS
+    ACT [2]  {    88    75    65                   } [ 3] [ 9] [29] [31]   GLONASS
+    ACT [1]  {     5     1    24     4     9    36 } [ 6] [ 7] [29] [31]   GALILEO
+    ACT [2]  {    31                               } [ 1] [ 7] [29] [31]   GALILEO
+    ACT [1]  {    14    24    26                   } [ 3] [ 3] [29] [31]   COMPASS
+    DOP   0.92pdop   0.47hdop   0.79vdop                                   NAVSTAR
+    DOP   0.92pdop   0.47hdop   0.79vdop                                   GLONASS
+    DOP   0.92pdop   0.47hdop   0.79vdop                                   GALILEO
+    DOP   0.92pdop   0.47hdop   0.79vdop                                   COMPASS
+    SAT [  1]     1id  42°elv  281°azm   45dBHz  6sig <                    NAVSTAR
+    SAT [  2]     3id  19°elv  310°azm   34dBHz  6sig <                    NAVSTAR
+    SAT [  3]    10id  24°elv  126°azm   46dBHz  6sig <                    NAVSTAR
+    SAT [  4]    11id  21°elv  264°azm    0dBHz  6sig <   !                NAVSTAR
+    SAT [  5]    12id   5°elv   33°azm   17dBHz  6sig                      NAVSTAR
+    SAT [  6]    14id  68°elv   21°azm    0dBHz  6sig <   !                NAVSTAR
+    SAT [  7]    22id  40°elv  309°azm    0dBHz  6sig <   !                NAVSTAR
+    SAT [  8]    23id   1°elv  266°azm    0dBHz  6sig     !                NAVSTAR
+    SAT [  9]    25id  23°elv   71°azm   41dBHz  6sig <                    NAVSTAR
+    SAT [ 10]    26id  10°elv  159°azm   43dBHz  6sig <                    NAVSTAR
+    SAT [ 11]    31id  76°elv  150°azm   49dBHz  6sig <                    NAVSTAR
+    SAT [ 12]    32id  46°elv   59°azm   47dBHz  6sig <                    NAVSTAR
+    SAT [ 13]    65id  47°elv  328°azm   42dBHz  3sig <                    GLONASS
+    SAT [ 14]    71id  18°elv   95°azm   45dBHz  3sig <                    GLONASS
+    SAT [ 15]    72id  57°elv   50°azm   50dBHz  3sig <                    GLONASS
+    SAT [ 16]    73id  26°elv   36°azm   42dBHz  3sig <                    GLONASS
+    SAT [ 17]    74id  17°elv  180°azm    0dBHz  3sig <   !                GLONASS
+    SAT [ 18]    75id  35°elv  168°azm   48dBHz  3sig <                    GLONASS
+    SAT [ 19]    81id  14°elv  328°azm   36dBHz  3sig <                    GLONASS
+    SAT [ 20]    87id  13°elv  235°azm   32dBHz  3sig <                    GLONASS
+    SAT [ 21]    88id  24°elv  281°azm   26dBHz  3sig <                    GLONASS
+    SAT [ 22]     1id  15°elv   39°azm   38dBHz  2sig <                    GALILEO
+    SAT [ 23]     3id   3°elv  280°azm    0dBHz  2sig     !                GALILEO
+    SAT [ 24]     4id  15°elv   88°azm   39dBHz  2sig <                    GALILEO
+    SAT [ 25]     5id  50°elv  301°azm   51dBHz  2sig <                    GALILEO
+    SAT [ 26]     9id  63°elv   54°azm   52dBHz  2sig <                    GALILEO
+    SAT [ 27]    15id   9°elv  327°azm   37dBHz  2sig                      GALILEO
+    SAT [ 28]    24id  30°elv  155°azm   49dBHz  2sig <                    GALILEO
+    SAT [ 29]    31id  43°elv   89°azm   51dBHz  2sig <                    GALILEO
+    SAT [ 30]    36id  23°elv  222°azm   46dBHz  2sig <                    GALILEO
+    SAT [ 31]    11id   3°elv  225°azm    0dBHz  0sig     !                COMPASS
+    SAT [ 32]    14id  52°elv  313°azm    0dBHz  0sig <   !                COMPASS
+    SAT [ 33]    21id  40°elv  103°azm    0dBHz  0sig     !                COMPASS
+    SAT [ 34]    24id  29°elv  189°azm    0dBHz  0sig <   !                COMPASS
+    SAT [ 35]    26id  63°elv  128°azm    0dBHz  0sig <   !                COMPASS
+    SAT [ 36]    28id  10°elv  295°azm    0dBHz  0sig     !                COMPASS
 
 The string used to identify the U.S. Navstar GPS constellation has been
 changed from "GPS" to "NAVSTAR" to discriminate it from the (incorrect)
@@ -1103,6 +1105,20 @@ NGS shows the same high precision position as HPP but in the format used
 in the National Geodetic Survey (NGS) data sheets for coordinates of artifacts
 such as NGS and municipal survey markers. This makes it easier to compare
 the Hazer position against examples from the NGS database.
+
+ACT now adds a fourth metric: the maximum number of space vehicles (SVs)
+or satellites used in the solution since the application began. This
+is useful when testing different antenna locations, particularly when
+using the device in a fixed base survey mode. In the example above,
+the first ACT line indicates that 6 SVs in the NAVSTAR constellation
+are represented in this particular line, the solution includes 10 total
+NAVSTAR SVs (so 4 more appear in a subsequent ACT line for NAVSTAR),
+the solution is using 29 SVs total among all constellations, and at one
+time as many as 31 SVs were used in the solution. (The U-blox 9 receiver
+used for this example has a maximum of 32 RF channels, so receiving 31
+SVs indicates that antenna placement is good; in this particular case I
+have the antenna installed in a skylight in my kitchen that is near the
+peak of the roof of my home.)
 
 While NMEA (and UBX amd RTCM too for that matter) is good about updating
 the application with new information, it is not so good about letting the
