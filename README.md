@@ -1844,7 +1844,8 @@ The Tumbleweed router, which is on my LAN, must have a static IP address
 or a usable Dynamic DNS (DDNS) address (which is what I do) that can be
 reached through the firewall. ":tumbleweed" identifies the service on the
 localhost defined in /etc/services from which to receive and send RTK update
-datagrams.
+datagrams. (My Tumbleweed router is code-named "eljefe". You may come across
+this and related names in logs, screen shots, etc.)
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
@@ -1856,7 +1857,9 @@ the hostname through which the router is addressed. "tumbleweed:" idenfities
 the hostname of the router on the LAN as defined in /etc/hosts, and
 ":tumbleweed" the service on the router on the LAN defined as in /etc/services
 (typically I defined this to be port 21010) to which to send RTK update
-datagrams.
+datagrams. (I have used two different Tumbleweed bases; the portable version
+is code-named "bodega" and the one whose antenna is permanently fixed is
+"hacienda".)
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
@@ -1897,6 +1900,7 @@ and is agnostic as to the Internet connection (I use a USB LTE modem).
 (FQDN) on the WAN as (for me) defined by DDNS and resolved via DNS,
 and ":tumbleweed" the service on the router to which send keep alive
 datagrams and receive RTK update datagrams as defined in /etc/services.
+(My rover is code-named "mochila".)
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
