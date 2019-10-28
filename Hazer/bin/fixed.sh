@@ -3,20 +3,19 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the U-blox ZED-UBX-F9P as a stationary Base using
-# the coordinates established by a prior survey and sending corrections
-# to Rovers.
+# Configure and run the U-blox ZED-UBX-F9P as a stationary Base in fixed
+# mode sending corrections to Rovers.
 
-# IMPORTANT SAFETY TIP: when switching the F9P between FIXED and SVIN modes,
+# IMPORTANT SAFETY TIP: when switching the F9P from FIXED back to SVIN mode,
 # power cycle or otherwise reset the device first.
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
-FIXFIL=${5-"./base.fix"}
-ERRFIL=${6-"./${PROGRAM}.err"}
-OUTFIL=${7-"./${PROGRAM}.out"}
+FIXFIL=${4-"./base.fix"}
+ERRFIL=${5-"./${PROGRAM}.err"}
+OUTFIL=${6-"./${PROGRAM}.out"}
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}

@@ -718,24 +718,25 @@ lines that need to be added to the indicated files.
 # Utilities
 
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
-* base - configures and runs a UBX-ZED-F9P chip as a base station in survey mode.
-* benchmark - configures and runs a UBX-ZED-F9P chip as a corrected mobile rover saving a CSV.
+* base - configures and runs a UBX-ZED-F9P as a base in survey or fixed mode.
+* benchmark - configures and runs a UBX-ZED-F9P as a corrected rover saving a CSV.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
-* station - configures and runs a UBX-ZED-F9P chip as a base station in fixed mode.
+* fixed - configures and runs a UBX-ZED-F9P as a base station in fixed mode.
 * googlemaps - convert gpstool coordinate strings to formats accepted by Google Maps.
-* gpstool - serves as Hazer's all purpose GNSS pocket tool.
+* gpstool - serves as Hazer's multi purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
-* mobile - configures and runs a UBX-ZED-F9P chip as an uncorrected mobile rover.
+* mobile - configures and runs a UBX-ZED-F9P as an uncorrected rover.
 * peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
 * proxy - receive UDP packets from the Base and forward to the Rover.
 * router - routes UDP packets received from a base to all rovers.
-* rover - configures and runs a UBX-ZED-F9P chip as a corrected mobile rover.
+* rover - configures and runs a UBX-ZED-F9P as a corrected rover.
+* survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * ubxval - converts a number into a UBX-usable form.
 
@@ -1840,6 +1841,8 @@ one of the Pis is a router that receives RTK updates from one base station
 and forwards them to one or more rovers. (You can combine the base and the
 router on to one Pi, but I chose not to configure my set up that way.)
 
+### Router
+
 The Tumbleweed router, which is on my LAN, must have a static IP address
 or a usable Dynamic DNS (DDNS) address (which is what I do) that can be
 reached through the firewall. ":tumbleweed" identifies the service on the
@@ -1852,28 +1855,32 @@ this and related names in logs, screen shots, etc.)
     router :tumbleweed &
     peruse router err
 
-The Tumbleweed base is typically on my LAN, but can be on the WAN by changing
-the hostname through which the router is addressed. "tumbleweed:" idenfities
-the hostname of the router on the LAN as defined in /etc/hosts, and
-":tumbleweed" the service on the router on the LAN defined as in /etc/services
-(typically I defined this to be port 21010) to which to send RTK update
-datagrams. (I have used two different Tumbleweed bases; the portable version
-is code-named "bodega" and the one whose antenna is permanently fixed is
-"hacienda".)
+### Base
+
+The Tumbleweed base is typically on my LAN, but can be on the WAN by
+changing the hostname through which the router is addressed. "tumbleweed:"
+idenfities the hostname of the router on the LAN as defined in /etc/hosts,
+and ":tumbleweed" the service on the router on the LAN defined as in
+/etc/services (typically I defined this to be port 21010) to which to
+send RTK update datagrams. (I have used two different Tumbleweed bases;
+the portable version I use with a tripod-mounted anntenna is code-named
+"bodega" and the one whose antenna is permanently fixed is "hacienda".)
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    base tumbleweed:tumbleweed &
-    peruse base err# Control-C to exit upon seeing "Ready".
-    peruse base out
+    survey tumbleweed:tumbleweed /dev/tumbleweed &
+    peruse survey err# Control-C to exit upon seeing "Ready".
+    peruse survey out
 
 Depending on the specified accuracy - encoded in a message sent to the
 chip by the script - it can take days for the receiver to arrive at a
-solution that has the required radius of error. This depends greatly
-on antenna placement as well as other factors that may be less under
-your control. Putting the antenna in my front yard, which has the usual
-ground clutter of trees and adjacent houses, resulted in taking about
-two days to get to ten centimeters, about four inches.
+solution that has the required radius of error. This depends greatly on
+antenna placement as well as other factors that may be less under your
+control. Putting the antenna in my front yard, which has the usual ground
+clutter of trees and adjacent houses, resulted in taking about two days
+to get to a resolution of ten centimeters, about four inches. Using a
+permanently attached antenna near the peak of the roof of my house took
+a little over twelve hours to get the same resolution.
 
 Because of this potentially lengthy duration of the survey, you don't want
 to do it more than once. First rule is: don't move the antenna. (If you
@@ -1890,9 +1897,21 @@ corrections based on this information.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    station tumbleweed:tumbleweed &
-    peruse station err# Control-C to exit upon seeing "Ready".
-    peruse station out
+    fixed tumbleweed:tumbleweed /dev/tumbleweed &
+    peruse fixed err# Control-C to exit upon seeing "Ready".
+    peruse fixed out
+
+The choice between running the base in survey mode or in fixed mode
+is automated in a script that does for latter if the base.fix file is
+present and seems sane, and the former if it is not. This allows you to
+start up the base as part of the Raspberry Pi system start up, letting
+the base recover if, for example, it loses power.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    base tumbleweed:tumbleweed /dev/tumbleweed &
+
+### Rover
 
 A Tumbleweed rover (there can be more than one) is typically on the WAN,
 and is agnostic as to the Internet connection (I use a USB LTE modem).
@@ -1904,7 +1923,7 @@ datagrams and receive RTK update datagrams as defined in /etc/services.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    rover tumbleweed.test:tumbleweed &
+    rover tumbleweed.test:tumbleweed /dev/tumblweed &
     peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
 
@@ -1921,7 +1940,7 @@ WGS84 datum based on space observations.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    benchmark tumbleweed.test:tumbleweed &
+    benchmark tumbleweed.test:tumbleweed /dev/tumbleweed &
     peruse benchmark err# Control-C to exit upon seeing "Ready".
     peruse benchmark csv
 
@@ -1933,9 +1952,28 @@ of the rover configuration seems to be sticky.)
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     # Power cycle the F9P if previously configured for corrections.
-    mobile &
+    mobile /dev/tumbleweed &
     peruse mobile err# Control-C to exit upon seeing "Ready".
     peruse mobile out
+
+### Daemons
+
+I'm running all three, router, base, and rover, as simple background
+processes.  But it is also possible to run them in daemon mode, in which
+case messages normally written to standard error are logged to the system
+log. Also, I run all three in "headless" mode, where the screens normally
+written to standard output are instead written to a file, and a script
+is used to display the file as it changes; this decouples the router,
+rover, and base software from the display terminal while still allowing
+an on-demand real-time display. (This requires that the inotify-tools
+package be installed on the Pi.)
+
+Both gpstool (which implements the base and the rover) and rtktool (which
+implements the router) can be run as daemons via a command line switch
+(although I have not done so in these examples); the headless mode can
+still be used.
+
+### Networking
 
 Note that the actual IP address of neither the base nor the rover need
 be known. This is important because the rover (and sometimes the base)
@@ -1957,30 +1995,17 @@ this; but it means the IP address you begin with in your survey will
 not be the one you end up with when the survey is complete or as the
 base sends subsequent updates to the rover.
 
-The Tumbleweed router does require a fixed IP address for this to work. In my
-setup, the Tumbleweed router connects to my home IP router (in my case,
-directly via wired Ethernet). But my IP router gets its globally routable
-WAN IP address from my internet provider via DHCP. My IP router supports Dynamic
-DNS (DDNS), in which it automatically sends an notification to my DDNS provider
-regarding the assigned IP address, who then changes the DNS database to map
-a fixed FQDN to the provided address. This FQDN is represented by
-"tumbleweed.test" above. I have configured the firewall in my IP router to 
-forward the port named "tumbleweed" above to and from the same port on the
-static IP address on my LAN that I assigned to the Tumbleweed router.
-
-I'm running all three, router, base, and rover, as simple background processes.
-But it is also possible to run them in daemon mode, in which case messages
-normally written to standard error are logged to the system log. Also, I run
-all three in "headless" mode, where the screens normally written to standard
-output are instead written to a file, and a script is used to display the file
-as it changes; this decouples the router, rover, and base software from the
-display terminal while still allowing an on-demand real-time display. (This
-requires that the inotify-tools package be installed on the Pi.)
-
-Both gpstool (which implements the base and the rover) and rtktool (which
-implements the router) can be run as daemons via a command line switch
-(although I have not done so in these examples); the headless mode can still
-be used.
+The Tumbleweed router does require a fixed IP address for this to
+work. In my setup, the Tumbleweed router connects to my home IP router
+(in my case, directly via wired Ethernet). But my IP router gets its
+globally routable WAN IP address from my internet provider via DHCP. My
+IP router supports Dynamic DNS (DDNS), in which it automatically sends
+an notification to my DDNS provider regarding the assigned IP address,
+who then changes the DNS database to map a fixed FQDN to the provided
+address. This FQDN is represented by "tumbleweed.test" above. I have
+configured the firewall in my IP router to forward the port named
+"tumbleweed" above to and from the same port on the static IP address
+on my LAN that I assigned to the Tumbleweed router.
 
 As mentioned above, it is not unusual to see a WAN connected rover or base
 drop off and reappear on the WAN, often with a different port number and
@@ -2061,6 +2086,8 @@ used by SIP to route RTP packets via UDP to VoIP phones.)
 Note that the UDP stream is not encrypted, nor is the source of the datagrams
 authenticated, so this mechanism is not secure. It should be. I'm pondering how
 best to accomplish that. Probably DTLS.
+
+### Hardware
 
 Although Tumbleweed has been implemented using the Ardusimple SimpleRTK2B
 board, the same software runs on the SparkFun GPS-RTK2 board which uses the

@@ -2573,7 +2573,11 @@ int main(int argc, char * argv[])
         }
 
         if (diminuto_hangup_check()) {
-            diminuto_log_mask ^= DIMINUTO_LOG_MASK_DEBUG;
+            /*
+             * Using SIGHUP is actually a little problematic, since I
+             * routinely start gpstool interactively, run it in the
+             * background, and later disconnect my terminal session.
+             */
         }
 
         /**
