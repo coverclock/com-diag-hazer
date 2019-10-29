@@ -785,12 +785,13 @@ lines that need to be added to the indicated files.
 ## gpstool
 
     > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE ]
+    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
            -B BYTES    Set the input Buffer size to BYTES bytes.
+           -C FILE     Catenate input to FILE or named pipe.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
            -F          Like -R but reFresh at 1Hz.
@@ -830,7 +831,7 @@ lines that need to be added to the indicated files.
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
-           -x          Run in the background as a daemon.
+           -x          EXit if a NAK is received.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
 
 ## rtktool
@@ -1902,10 +1903,10 @@ corrections based on this information.
     peruse fixed out
 
 The choice between running the base in survey mode or in fixed mode
-is automated in a script that does for latter if the base.fix file is
+is automated in a script that does latter if the base.fix file is
 present and seems sane, and the former if it is not. This allows you to
-start up the base as part of the Raspberry Pi system start up, letting
-the base recover if, for example, it loses power.
+restart the base station and have it do the right thing depending on
+whether or not the survey had been previously completed.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup

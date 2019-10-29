@@ -1509,6 +1509,7 @@ static void * gpiopoller(void * argp)
  */
 int main(int argc, char * argv[])
 {
+    int xc = 0;
     /*
      * Command line options and parameters with defaults.
      */
@@ -1714,6 +1715,7 @@ int main(int argc, char * argv[])
     yodel_rover_t rover = YODEL_ROVER_INITIALIZER;
     yodel_ubx_ack_t acknak = YODEL_UBX_ACK_INITIALIZER;
     int acknakpending = 0;
+    int nakquit = 0;
     int nominal = 0;
     /*
      * RTCM state databases.
@@ -1801,7 +1803,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:OPRS:T:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: AJQZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:OPRS:T:U:VW:XY:b:cdeg:hk:lmnop:st:uvxy:?"; /* Unused: AJQZ afijqrwz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1999,25 +2001,28 @@ int main(int argc, char * argv[])
         case 'v':
             verbose = !0;
             break;
+        case 'x':
+            nakquit = !0;
+            break;
         case 'y':
             keepalive = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (keepalive < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case '?':
-            fprintf(stderr, "usage: %s "
-                           "[ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] "
-                           "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
-                           "[ -C FILE ] "
-                           "[ -t SECONDS ] "
-                           "[ -I PIN | -c ] [ -p PIN ] "
-                           "[ -U STRING ... ] [ -W STRING ... ] "
-                           "[ -R | -E | -F | -H HEADLESS | -P ] "
-                           "[ -L LOG ] "
-                           "[ -G [ IP:PORT | :PORT [ -g MASK ] ] ] "
-                           "[ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] "
-                           "[ -K [ -k MASK ] ] "
-                           "[ -N FILE ] "
-                           "[ -T FILE ] "
+            fprintf(stderr, "usage: %s"
+                           " [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ]"
+                           " [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
+                           " [ -C FILE ]"
+                           " [ -t SECONDS ]"
+                           " [ -I PIN | -c ] [ -p PIN ]"
+                           " [ -U STRING ... ] [ -W STRING ... ]"
+                           " [ -R | -E | -F | -H HEADLESS | -P ]"
+                           " [ -L LOG ]"
+                           " [ -G [ IP:PORT | :PORT [ -g MASK ] ] ]"
+                           " [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ]"
+                           " [ -K [ -k MASK ] ]"
+                           " [ -N FILE ]"
+                           " [ -T FILE ]"
                           "\n", Program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
@@ -2064,7 +2069,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
             fprintf(stderr, "       -u          Note Unprocessed input on standard error.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
-            fprintf(stderr, "       -x          Run in the background as a daemon.\n");
+            fprintf(stderr, "       -x          EXit if a NAK is received.\n");
             fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds.\n");
             return 1;
             break;
@@ -2575,9 +2580,11 @@ int main(int argc, char * argv[])
         if (diminuto_hangup_check()) {
             /*
              * Using SIGHUP is actually a little problematic, since I
-             * routinely start gpstool interactively, run it in the
-             * background, and later disconnect my terminal session.
+             * routinely start gpstool interactively, switch it to the
+             * background, and later disconnect my terminal session and
+             * let it run.
              */
+            DIMINUTO_LOG_INFORMATION("SIGHUP");
         }
 
         /**
@@ -3379,7 +3386,15 @@ int main(int argc, char * argv[])
 
                 refresh = !0;
 
-                DIMINUTO_LOG_INFORMATION("Parse UBX %s 0x%02x 0x%02x (%d)\n", acknak.state ? "ACK" : "NAK", acknak.clsID, acknak.msgID, acknakpending);
+                if (acknak.state) {
+                    DIMINUTO_LOG_INFORMATION("Parse UBX ACK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                } else if (!nakquit) {
+                    DIMINUTO_LOG_INFORMATION("Parse UBX NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                } else {
+                    DIMINUTO_LOG_NOTICE("Parse UBX NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                    xc = 1;
+                    eof = !0;
+                }
 
                 if (acknakpending > 0) { acknakpending -= 1; }
 
@@ -3553,6 +3568,8 @@ int main(int argc, char * argv[])
             break;
 
         }
+
+        if (eof) { break; }
 
         /*
          * We always give priority to reading input from the device or a
@@ -3813,5 +3830,5 @@ report:
 
     fflush(stderr);
 
-    return 0;
+    return xc;
 }
