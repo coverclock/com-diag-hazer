@@ -1130,7 +1130,7 @@ time in seconds. This can be set from the command line, in the range 0
 to the default of 255. If the data is not updated within that duration by
 new sentences or messages from the GPS device, it is no longer displayed.
 
-# Notes
+# Remarks
 
 > N.B. Most of the snapshots below were taken from earlier versions of Hazer and
 > its gpstool utility. The snapshots were cut and pasted from actual output and
