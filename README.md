@@ -1912,6 +1912,29 @@ whether or not the survey had been previously completed.
     . out/host/bin/setup
     base tumbleweed:tumbleweed /dev/tumbleweed &
 
+The .fix file contains the following UBX variables in character hex format
+in this order.
+
+    FIXED_POS_ACC
+    LAT
+    LATHP
+    LON
+    LONHP
+    HEIGHT
+    HEIGHTHP
+
+Here is an example of an actual base.fix file that resulted from a
+survey done with 10 cm (1000 x 0.1mm) accuracy; note that UBX stores
+its variables in little-endian byte order.
+
+    \xe8\x03\x00\x00
+    \xb1\x1f\xb8\x17
+    \x20
+    \x91\xdc\x52\xc1
+    \xe5
+    \x01\x94\x02\x00
+    \x1d
+
 ### Rover
 
 A Tumbleweed rover (there can be more than one) is typically on the WAN,
