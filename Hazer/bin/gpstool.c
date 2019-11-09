@@ -102,6 +102,7 @@
 #include <pthread.h>
 #include <locale.h>
 #include <wchar.h>
+#include <ctype.h>
 #include "./gpstool.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
@@ -1744,6 +1745,8 @@ int main(int argc, char * argv[])
     size_t io_size = BUFSIZ;
     size_t io_maximum = 0;
     size_t io_total = 0;
+    ssize_t io_available = 0;
+    ssize_t io_peak = 0;
     /*
      * Source variables.
      */
@@ -2391,12 +2394,17 @@ int main(int argc, char * argv[])
 
     in_fd = fileno(in_fp);
 
+    serial = diminuto_serial_valid(in_fd);
+
     rc = diminuto_mux_register_read(&mux, in_fd);
     assert(rc >= 0);
 
     io_buffer = malloc(io_size);
     assert(io_buffer != (void *)0);
-    setvbuf(in_fp, io_buffer, _IOFBF, io_size);
+    rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
+    assert(rc == 0);
+
+    DIMINUTO_LOG_INFORMATION("Buffer (%d) [%zu] [%zu]\n", in_fd, io_size, (size_t)BUFSIZ);
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -2697,7 +2705,11 @@ int main(int argc, char * argv[])
 
                 } else {
 
-                    DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                    if (isprint(ch)) {
+                        DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
+                    } else {
+                        DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                    }
 
                     sync = 0;
 
@@ -2716,7 +2728,12 @@ int main(int argc, char * argv[])
                     size = hazer_size(&nmea_context);
                     length = size - 1;
                     format = NMEA;
-                    if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
+
+                    if (!sync) {
+                        DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total);
+                        sync = !0;
+                    }
+
                     frame = !0;
 
                     DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd]", size, length);
@@ -2732,7 +2749,12 @@ int main(int argc, char * argv[])
                     size = yodel_size(&ubx_context);
                     length = size - 1;
                     format = UBX;
-                    if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
+
+                    if (!sync) {
+                        DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total);
+                        sync = !0;
+                    }
+
                     frame = !0;
 
                     DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd]", size, length);
@@ -2747,13 +2769,18 @@ int main(int argc, char * argv[])
                     size = tumbleweed_size(&rtcm_context);
                     length = size - 1;
                     format = RTCM;
-                    if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
+
+                    if (!sync) {
+                        DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total);
+                        sync = !0;
+                    }
+
                     frame = !0;
 
                     DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd]", size, length);
 
                     break;
-                 }
+                }
 
                 /*
                  * If all the state machines have stopped, then either we have
@@ -2768,11 +2795,18 @@ int main(int argc, char * argv[])
                 } else if (rtcm_state != TUMBLEWEED_STATE_STOP) {
                     /* Do nothing. */
                 } else {
-                    if (sync) { DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch); sync = 0; }
+
+                    if (sync) {
+                        DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                        sync = 0;
+                    }
+
                     frame = 0;
+
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_START;
+
                 }
 
             } while (diminuto_file_ready(in_fp) > 0);
@@ -3580,11 +3614,21 @@ int main(int argc, char * argv[])
          * complete sentence, packet, or message that we can forward, write,
          * log, or use to update our databases.
          */
+
         if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
             /* Do nothing. */
-        } else if (diminuto_file_ready(in_fp) > 0) {
+        } else if ((io_available = diminuto_file_ready(in_fp)) > 0) {
+            if (io_available > io_peak) { io_peak = io_available; }
+            DIMINUTO_LOG_DEBUG("Ready file [%zu] [%zu]\n", io_available, io_peak);
+            if (io_available >= io_size) { DIMINUTO_LOG_WARNING("Full file [%zd] [%zu]\n", io_available, io_size); }
             continue;
-        } else if (diminuto_mux_wait(&mux, 0 /* POLL */) > 0) {
+        } else if ((io_available = diminuto_serial_available(in_fd)) > 0) {
+            if (io_available > io_peak) { io_peak = io_available; }
+            DIMINUTO_LOG_DEBUG("Ready device [%zu] [%zu]\n", io_available, io_peak);
+            continue;
+        } else if ((io_available = diminuto_mux_wait(&mux, 0 /* POLL */)) > 0) {
+            if (io_peak <= 0) { io_peak = 1; } /* Actual number of bytes unknown but greater than zero. */
+            DIMINUTO_LOG_DEBUG("Ready socket [%zu] [%zu]\n", io_available, io_peak);
             continue;
         } else {
             /* Do nothing. */
@@ -3797,7 +3841,8 @@ report:
         if (rc == EOF) { diminuto_perror("fclose(dev_fp)"); }
     }
 
-    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)));
+    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS peak=%lldB\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)), (long long)io_peak);
+
     free(io_buffer);
 
     if (sink_fp != (FILE *)0) {
