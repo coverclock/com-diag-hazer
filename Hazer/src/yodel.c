@@ -619,7 +619,7 @@ int yodel_ubx_mon_comms(yodel_ubx_mon_comms_t * mp, const void * bp, ssize_t len
         length -= sizeof(mp->prefix);
         while ((ii < mp->prefix.nPorts) && (ii < (sizeof(mp->port)/sizeof(mp->port[0]))) && (length >= sizeof(mp->port[ii]))) {
             memcpy(&(mp->port[ii]), hp, sizeof(mp->port[ii]));
-            COM_DIAG_YODEL_LETOH(mp->port[ii].portId);
+            COM_DIAG_YODEL_LETOH(mp->port[ii].portId); /* Does not appear to be little-endian in practice. */
             COM_DIAG_YODEL_LETOH(mp->port[ii].txPending);
             COM_DIAG_YODEL_LETOH(mp->port[ii].txBytes);
             COM_DIAG_YODEL_LETOH(mp->port[ii].rxPending);

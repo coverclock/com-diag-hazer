@@ -919,20 +919,34 @@ extern int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_
  ******************************************************************************/
 
 /**
+ * UBX-MON-COMMS port indices.
+ * Ublox 9 "Integration Manual" R05, p. 34..35.
+ */
+enum YodelUbxMonCommsPort {
+    YODEL_UBX_MON_COMMS_PORT_FIRST  = 0,
+    YODEL_UBX_MON_COMMS_PORT_I2C    = YODEL_UBX_MON_COMMS_PORT_FIRST,
+    YODEL_UBX_MON_COMMS_PORT_UART1,
+    YODEL_UBX_MON_COMMS_PORT_UART2,
+    YODEL_UBX_MON_COMMS_PORT_USB,
+    YODEL_UBX_MON_COMMS_PORT_SPI,
+    YODEL_UBX_MON_COMMS_PORT_LAST   = YODEL_UBX_MON_COMMS_PORT_SPI,
+};
+
+/**
  * UBX-MON-COMMS (0x0A, 0x36) [8 + 40 * nPorts] reports the communication ports
  * utilization.
- * Ublox 9 "Interface Description" R07, p. 131.
+ * Ublox 9 "Interface Description" R07, p. 131..132.
  */
 typedef struct YodelUbxMonComms {
     struct {
         uint8_t version;        /* Message version. */
         uint8_t nPorts;         /* Number of ports included. */
         uint8_t txErrors;       /* TX error bitmask. */
-        uint8_t reserved1;      /* Reserved. */
-        uint8_t portIds[4];     /* Identifiers of protocols. */
+        uint8_t reserved1[1];   /* Reserved. */
+        uint8_t protIds[4];     /* Protocol identifiers. */
     } prefix;
     struct {
-        uint16_t portId;        /* Unique identifier. */
+        uint16_t portId;        /* Port identifier. */
         uint16_t txPending;     /* Number of bytes pending in TX buffer. */
         uint32_t txBytes;       /* Number of bytes ever sent. */
         uint8_t txUsage;        /* Percentage recent usage TX buffer. */
@@ -945,8 +959,8 @@ typedef struct YodelUbxMonComms {
         uint16_t msgs[4];       /* Number of parsed message per protocol. */
         uint8_t reserved2[8];   /* Reserved. */
         uint32_t skipped;       /* Number of bytes skipped. */
-    } port[5];
-} yodel_ubx_mon_comms_t;
+    } port[YODEL_UBX_MON_COMMS_PORT_LAST + 1];
+} yodel_ubx_mon_comms_t  __attribute__((aligned(4)));
 
 /**
  * @define YODEL_UBX_MON_COMMS_INITIALIZER
@@ -956,15 +970,15 @@ typedef struct YodelUbxMonComms {
     { 0, }
 
 /**
- * UBX-MON-COMMS port indices.
- * Ublox 9 "Integration Manual" R05, p. 34..35.
+ * UBX-MON-COMMS protocol identifiers.
+ * Ublox 9 "Interface Description" R07, p. 131..132.
  */
-enum YodelUbxMonCommsPort {
-    YODEL_UBX_MON_COMMS_PORT_I2C    = 0,
-    YODEL_UBX_MON_COMMS_PORT_UART1  = 1,
-    YODEL_UBX_MON_COMMS_PORT_UART2  = 2,
-    YODEL_UBX_MON_COMMS_PORT_USB    = 3,
-    YODEL_UBX_MON_COMMS_PORT_SPI    = 4,
+enum YodelUbxMonCommsProtocol {
+    YODEL_UBX_MON_COMMS_PROT_UBX    = 0,
+    YODEL_UBX_MON_COMMS_PROT_NMEA   = 1,
+    YODEL_UBX_MON_COMMS_PROT_RTCM2  = 2,
+    YODEL_UBX_MON_COMMS_PROT_RTCM3  = 5,
+    YODEL_UBX_MON_COMMS_PROT_NONE   = 256,
 };
 
 /**
@@ -973,7 +987,7 @@ enum YodelUbxMonCommsPort {
 enum YodelUbxMonCommsConstants {
     YODEL_UBX_MON_COMMS_Class	= 0x0a,
     YODEL_UBX_MON_COMMS_Id		= 0x36,
-    YODEL_UBX_MON_COMMS_Length	= sizeof(((yodel_ubx_mon_comms_t *)0)->prefix),
+    YODEL_UBX_MON_COMMS_Length	= sizeof(((yodel_ubx_mon_comms_t *)0)->prefix), /* Minimum. */
 };
 
 /**

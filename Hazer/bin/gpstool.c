@@ -3567,11 +3567,15 @@ int main(int argc, char * argv[])
                 int ii = 0;
                 int jj = 0;
 
+                assert(sizeof(ports.prefix) == 8);
+                assert(sizeof(ports.port[0]) == 40);
+                assert(sizeof(ports) == (8 + (5 * 40)));
+
                 DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS version = %u\n", ports.prefix.version);
                 DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS nPorts = %u\n", ports.prefix.nPorts);
                 DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS txErrors = 0x%02x\n", ports.prefix.txErrors);
-                for (ii = 0; ii < countof(ports.prefix.portIds); ++ii) {
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS portIds[%d] = %u\n", ii, ports.prefix.portIds[ii]);
+                for (ii = 0; ii < countof(ports.prefix.protIds); ++ii) {
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS protIds[%d] = %u\n", ii, ports.prefix.protIds[ii]);
                 }
                 for (ii = 0; ii < rc; ++ii) {
                     DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] portId = 0x%04x\n", ii, ports.port[ii].portId);
@@ -3659,7 +3663,7 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_DEBUG("Ready socket [%zu] [%zu]\n", io_available, io_peak);
             continue;
         } else {
-            /* Do nothing. */
+            DIMINUTO_LOG_DEBUG("Ready empty [0] [%zu]\n", io_peak);
         }
 
         /*
