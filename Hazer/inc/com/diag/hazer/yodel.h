@@ -26,6 +26,12 @@
  *
  * "u-blox 8 / u-blox M8 Receiver Description Including Protocol Specification",
  * UBX-13003221-R15, ublox AG, 2018-03-06
+ *
+ * "u-blox ZED-F9P Interface Description", v27.11, UBX-18010854-R07, ublox AG,
+ * 2019-07-10
+ *
+ * "ZED-F9P u-blox F9 high precision GNSS module Integration Manual",
+ * UBX-18010802-R05, ublox AG, 2019-07-11
  */
 
 #include <stdio.h>
@@ -89,7 +95,8 @@ typedef uint8_t (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
  * @define YODEL_BUFFER_INITIALIZER
  * Initialize a YodelBuffer type.
  */
-#define YODEL_BUFFER_INITIALIZER  { '\0', }
+#define YODEL_BUFFER_INITIALIZER  \
+    { '\0', }
 
 /**
  * Yodel UBX offsets.
@@ -127,12 +134,7 @@ typedef struct YodelUbxHeader {
  * Initialize a YodelUbxHeader structure.
  */
 #define YODEL_UBX_HEADER_INITIALIZER \
-    { \
-        0, 0, \
-        0, \
-        0, \
-        0 \
-    }
+    { 0, }
 
 /**
  * UBX state machine states. The only states the application needs
@@ -396,21 +398,7 @@ typedef struct YodelUbxNavHpposllh {
  * Initialize a YodelUbxNavHpposllh structure.
  */
 #define YODEL_UBX_NAV_HPPOSLLH_INITIALIZER \
-    { \
-        0, \
-        { 0, }, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-    }
+    { 0, }
 
 /**
  * UBX-NAV-HPPOSLLH constants.
@@ -511,21 +499,7 @@ typedef struct YodelUbxMonHw {
  * Initialize a YodelUbxMonHw structure.
  */
 #define YODEL_UBX_MON_HW_INITIALIZER \
-    { \
-        0, 0, 0, 0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        { 0, }, \
-        0, \
-        { 0, }, \
-        0, \
-        0, 0 \
-    }
+    { 0, }
 
 /**
  * UBX-MON-HW constants.
@@ -598,15 +572,7 @@ typedef struct YodelUbxNavStatus {
  * Initialize a YodelUbxNavStatus structure.
  */
 #define YODEL_UBX_NAV_STATUS_INITIALIZER \
-    { \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0 \
-    }
+    { 0, }
 
 /**
  * UBX-NAV-STATUS constants.
@@ -776,11 +742,7 @@ typedef struct YodelUbxCfgValget {
  * Initialize the fixed portion of a YodelUbxCfgValget structure.
  */
 #define YODEL_UBX_CFG_VALGET_INITIALIZER \
-    { \
-        0, \
-        0, \
-        { 0, }, \
-    }
+    { 0, }
 
 /**
  * UBX-CFG-VALGET constants.
@@ -890,24 +852,7 @@ typedef struct YodelUbxNavSvin {
  * Initialize a YodelUbxAck structure.
  */
 #define YODEL_UBX_NAV_SVIN_INITIALIZER \
-    { \
-        0, \
-        { 0, }, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-        { 0, }, \
-        0, \
-        0, \
-        0, \
-        0, \
-        { 0, }, \
-    }
+    { 0, }
 
 /**
  * UBX-NAV-SVIN constants.
@@ -949,13 +894,7 @@ typedef struct YodelUbxRxmRtcm {
  * Initialize a YodelUbxAck structure.
  */
 #define YODEL_UBX_RXM_RTCM_INITIALIZER \
-    { \
-        0, \
-        0, \
-        0, \
-        0, \
-        0, \
-    }
+    { 0, }
 
 /**
  * UBX-RXM-RTCM constants.
@@ -974,6 +913,77 @@ enum YodelUbxRxmRtcmConstants {
  * @return 0 if the message was valid, <0 otherwise.
  */
 extern int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-MON-COMMS MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-MON-COMMS (0x0A, 0x36) [8 + 40 * nPorts] reports the communication ports
+ * utilization.
+ * Ublox 9 "Interface Description" R07, p. 131.
+ */
+typedef struct YodelUbxMonComms {
+    struct {
+        uint8_t version;        /* Message version. */
+        uint8_t nPorts;         /* Number of ports included. */
+        uint8_t txErrors;       /* TX error bitmask. */
+        uint8_t reserved1;      /* Reserved. */
+        uint8_t portIds[4];     /* Identifiers of protocols. */
+    } prefix;
+    struct {
+        uint16_t portId;        /* Unique identifier. */
+        uint16_t txPending;     /* Number of bytes pending in TX buffer. */
+        uint32_t txBytes;       /* Number of bytes ever sent. */
+        uint8_t txUsage;        /* Percentage recent usage TX buffer. */
+        uint8_t txPeakUsage;    /* Percentage maximum usage TX buffer. */
+        uint16_t rxPending;     /* Number of bytes pending in RX buffer. */
+        uint32_t rxBytes;       /* Number of bytes ever received. */
+        uint8_t rxUsage;        /* Percentage recent usage RX buffer. */
+        uint8_t rxPeakUsage;    /* Percentage maximum usage RX buffer. */
+        uint16_t overrunErrs;   /* Number of 100ms timeslots with overrun. */
+        uint16_t msgs[4];       /* Number of parsed message per protocol. */
+        uint8_t reserved2[8];   /* Reserved. */
+        uint32_t skipped;       /* Number of bytes skipped. */
+    } port[5];
+} yodel_ubx_mon_comms_t;
+
+/**
+ * @define YODEL_UBX_MON_COMMS_INITIALIZER
+ * Initialize a YodelUbxMonComms structure.
+ */
+#define YODEL_UBX_MON_COMMS_INITIALIZER \
+    { 0, }
+
+/**
+ * UBX-MON-COMMS port indices.
+ * Ublox 9 "Integration Manual" R05, p. 34..35.
+ */
+enum YodelUbxMonCommsPort {
+    YODEL_UBX_MON_COMMS_PORT_I2C    = 0,
+    YODEL_UBX_MON_COMMS_PORT_UART1  = 1,
+    YODEL_UBX_MON_COMMS_PORT_UART2  = 2,
+    YODEL_UBX_MON_COMMS_PORT_USB    = 3,
+    YODEL_UBX_MON_COMMS_PORT_SPI    = 4,
+};
+
+/**
+ * UBX-MON-COMMS constants.
+ */
+enum YodelUbxMonCommsConstants {
+    YODEL_UBX_MON_COMMS_Class	= 0x0a,
+    YODEL_UBX_MON_COMMS_Id		= 0x36,
+    YODEL_UBX_MON_COMMS_Length	= sizeof(((yodel_ubx_mon_comms_t *)0)->prefix),
+};
+
+/**
+ * Process a possible UBX-MON-COMMS message.
+ * @param mp points to a UBX-MON-COMMS structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return the number of ports processed, <0 otherwise.
+ */
+extern int yodel_ubx_mon_comms(yodel_ubx_mon_comms_t * mp, const void * bp, ssize_t length);
 
 /******************************************************************************
  * ENDIAN CONVERSION

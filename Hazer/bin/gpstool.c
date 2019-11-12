@@ -1715,6 +1715,7 @@ int main(int argc, char * argv[])
     yodel_base_t base = YODEL_BASE_INITIALIZER;
     yodel_rover_t rover = YODEL_ROVER_INITIALIZER;
     yodel_ubx_ack_t acknak = YODEL_UBX_ACK_INITIALIZER;
+    yodel_ubx_mon_comms_t ports = YODEL_UBX_MON_COMMS_INITIALIZER;
     int acknakpending = 0;
     int nakquit = 0;
     int nominal = 0;
@@ -3561,6 +3562,33 @@ int main(int argc, char * argv[])
 
                 rover.ticks = timeout;
                 refresh = !0;
+
+            } else if ((rc = yodel_ubx_mon_comms(&ports, buffer, length)) >= 0) {
+                int ii = 0;
+                int jj = 0;
+
+                DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS version = %u\n", ports.prefix.version);
+                DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS nPorts = %u\n", ports.prefix.nPorts);
+                DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS txErrors = 0x%02x\n", ports.prefix.txErrors);
+                for (ii = 0; ii < countof(ports.prefix.portIds); ++ii) {
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS portIds[%d] = %u\n", ii, ports.prefix.portIds[ii]);
+                }
+                for (ii = 0; ii < rc; ++ii) {
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] portId = 0x%04x\n", ii, ports.port[ii].portId);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txPending = %u\n", ii, ports.port[ii].txPending);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txBytes = %u\n", ii, ports.port[ii].txBytes);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txUsage = %u\n", ii, ports.port[ii].txUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txPeakUsage = %u\n", ii, ports.port[ii].txPeakUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxPending = %u\n", ii, ports.port[ii].rxPending);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxBytes = %u\n", ii, ports.port[ii].rxBytes);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxUsage = %u\n", ii, ports.port[ii].rxUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxPeakUsage = %u\n", ii, ports.port[ii].rxPeakUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] overrunErrs = %u\n", ii, ports.port[ii].overrunErrs);
+                    for (jj = 0; jj < countof(ports.port[ii].msgs); ++jj) {
+                        DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] msgs[%d] = %u\n", ii, jj, ports.port[ii].msgs[jj]);
+                    }
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] skipped = %u\n", ii, ports.port[ii].skipped);
+                }
 
             } else if (unknown) {
 
