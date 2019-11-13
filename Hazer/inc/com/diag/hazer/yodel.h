@@ -970,15 +970,27 @@ typedef struct YodelUbxMonComms {
     { 0, }
 
 /**
+ * UBX-MON-COMMS port identifiers.
+ * Ublox 9 "Integration Manual" R05, p. 34..35.
+ */
+enum YodelUbxMonCommsPortId {
+    YODEL_UBX_MON_COMMS_PORTID_I2C      = 0x0000,
+    YODEL_UBX_MON_COMMS_PORTID_UART1    = 0x0001,
+    YODEL_UBX_MON_COMMS_PORTID_UART2    = 0x0102, /* (sic) */
+    YODEL_UBX_MON_COMMS_PORTID_USB      = 0x0003,
+    YODEL_UBX_MON_COMMS_PORTID_SPI      = 0x0004,
+};
+
+/**
  * UBX-MON-COMMS protocol identifiers.
  * Ublox 9 "Interface Description" R07, p. 131..132.
  */
-enum YodelUbxMonCommsProtocol {
-    YODEL_UBX_MON_COMMS_PROT_UBX    = 0,
-    YODEL_UBX_MON_COMMS_PROT_NMEA   = 1,
-    YODEL_UBX_MON_COMMS_PROT_RTCM2  = 2,
-    YODEL_UBX_MON_COMMS_PROT_RTCM3  = 5,
-    YODEL_UBX_MON_COMMS_PROT_NONE   = 256,
+enum YodelUbxMonCommsProtId {
+    YODEL_UBX_MON_COMMS_PROTID_UBX    = 0,
+    YODEL_UBX_MON_COMMS_PROTID_NMEA   = 1,
+    YODEL_UBX_MON_COMMS_PROTID_RTCM2  = 2,
+    YODEL_UBX_MON_COMMS_PROTID_RTCM3  = 5,
+    YODEL_UBX_MON_COMMS_PROTID_NONE   = 256,
 };
 
 /**
