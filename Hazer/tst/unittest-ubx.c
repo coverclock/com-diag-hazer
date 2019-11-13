@@ -13,6 +13,7 @@
 #define _BSD_SOURCE
 #endif
 #include <endian.h>
+#include <string.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "./unittest.h"
@@ -260,10 +261,9 @@ int main(void)
         assert(yodel_ubx_rxm_rtcm(&data, message, size) == 0);
     END;
 
-    /**************************************************************************/
-
     BEGIN("\\xb5b\\n6\\xa8\\0\\0\\x04\\0\\0\\0\\x01\\x05\\xff\\0\\x01\\0\\0\\xec8\\0\\0\\0\\x0e\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x02\\0\\0H\\x8dV\\x01\\0\\t\\0\\0\\x80\\x1f\\xf2\\x03\\x05\\r\\0\\0\\xc1\\xdc\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x1b\\0\\0\\0\\0\\x03\\0\\0\\x84\\xf5p\\0\\x014\\0\\0\\xc8\\x03\\0\\0\\0\\0\\0\\0C\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x01\\x01\\0\\0>\\xff\\xf1\\x03\\0\\0\\0\\0\\x1e\\x1bP\\x01\\x06\\n\\0\\0Py\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0~(");
         yodel_ubx_mon_comms_t data = YODEL_UBX_MON_COMMS_INITIALIZER;
+        memset(&data, 0xA5, sizeof(data));
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
         assert(yodel_ubx_mon_comms(&data, message, size) == 4);
