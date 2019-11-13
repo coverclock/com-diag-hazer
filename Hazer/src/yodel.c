@@ -598,6 +598,47 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t lengt
     return rc;
 }
 
+int yodel_ubx_mon_comms(yodel_ubx_mon_comms_t * mp, const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+    int ii = 0;
+    int jj = 0;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_COMMS_Class) {
+        /* Do nothing. */
+    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_MON_COMMS_Id) {
+        /* Do nothing. */
+    } else if (length < (YODEL_UBX_SHORTEST + YODEL_UBX_MON_COMMS_Length)) {
+        /* Do nothing. */
+    } else {
+        hp += YODEL_UBX_PAYLOAD;
+        length -= YODEL_UBX_PAYLOAD;
+        memcpy(&(mp->prefix), hp, sizeof(mp->prefix));
+        hp += sizeof(mp->prefix);
+        length -= sizeof(mp->prefix);
+        while ((ii < mp->prefix.nPorts) && (ii < (sizeof(mp->port)/sizeof(mp->port[0]))) && (length >= sizeof(mp->port[ii]))) {
+            memcpy(&(mp->port[ii]), hp, sizeof(mp->port[ii]));
+            COM_DIAG_YODEL_LETOH(mp->port[ii].portId); /* Does not appear to be little-endian in practice. */
+            COM_DIAG_YODEL_LETOH(mp->port[ii].txPending);
+            COM_DIAG_YODEL_LETOH(mp->port[ii].txBytes);
+            COM_DIAG_YODEL_LETOH(mp->port[ii].rxPending);
+            COM_DIAG_YODEL_LETOH(mp->port[ii].rxBytes);
+            COM_DIAG_YODEL_LETOH(mp->port[ii].overrunErrs);
+            for (jj = 0; jj < (sizeof(mp->port[ii].msgs)/sizeof(mp->port[ii].msgs[jj])); ++jj) {
+                COM_DIAG_YODEL_LETOH(mp->port[ii].msgs[jj]);
+            }
+            COM_DIAG_YODEL_LETOH(mp->port[ii].skipped);
+            hp += sizeof(mp->port[ii]);
+            length -= sizeof(mp->port[ii]);
+            ii += 1;
+        }
+        rc = ii;
+    }
+
+    return rc;
+}
+
 void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int32_t * degreesp, uint64_t * billionthsp)
 {
     int64_t nanodegrees = 0;

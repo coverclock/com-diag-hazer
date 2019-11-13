@@ -351,7 +351,7 @@ Raspbian 9.9 "Stretch"
 Linux 4.19.42    
 gcc 6.3.0    
 
-"Bodega", "Mochila", and "ElJefe" (updated)    
+"Bodega", "Mochila", "Hacienda", and "ElJefe" (updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
@@ -445,6 +445,9 @@ David Doyle and Ed McKay, "NGS SURVEY MARKER ACCURACY", NGS, 2000-05-04
 M. Dunn at al., "Navstar GPS Space Segment/Navigation User Interfaces",
 IS-GPS-200H, Global Positioning Systems Directorate / Systems Engineering &
 Integration, 2013-09-24
+
+Dane E. Ericksen, "NAD 83: What Is It And Why You Should Care",
+*1994 SBE National Convention and World Media Expo*, 1994
 
 Geocaching.com, "Benchmark Hunting", 2019-09-16
 
@@ -715,23 +718,25 @@ lines that need to be added to the indicated files.
 # Utilities
 
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
-* base - configures and runs a UBX-ZED-F9P chip as a base station in survey mode.
+* base - configures and runs a UBX-ZED-F9P as a base in survey or fixed mode.
+* benchmark - configures and runs a UBX-ZED-F9P as a corrected rover saving a CSV.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
-* station - configures and runs a UBX-ZED-F9P chip as a base station in fixed mode.
+* fixed - configures and runs a UBX-ZED-F9P as a base station in fixed mode.
 * googlemaps - convert gpstool coordinate strings to formats accepted by Google Maps.
-* gpstool - serves as Hazer's all purpose GNSS pocket tool.
+* gpstool - serves as Hazer's multi purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
-* mobile - configures and runs a UBX-ZED-F9P chip as an uncorrected mobile rover.
+* mobile - configures and runs a UBX-ZED-F9P as an uncorrected rover.
 * peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
 * proxy - receive UDP packets from the Base and forward to the Rover.
 * router - routes UDP packets received from a base to all rovers.
-* rover - configures and runs a UBX-ZED-F9P chip as a corrected mobile rover.
+* rover - configures and runs a UBX-ZED-F9P as a corrected rover.
+* survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * ubxval - converts a number into a UBX-usable form.
 
@@ -780,12 +785,13 @@ lines that need to be added to the indicated files.
 ## gpstool
 
     > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ]
+    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
            -B BYTES    Set the input Buffer size to BYTES bytes.
+           -C FILE     Catenate input to FILE or named pipe.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
            -F          Like -R but reFresh at 1Hz.
@@ -800,6 +806,7 @@ lines that need to be added to the indicated files.
            -P          Process incoming data even if no report is being generated.
            -R          Print a Report on standard output.
            -S FILE     Use source FILE or named pipe for input.
+           -T FILE     Save the high precision LLH trace to FILE.
            -U STRING   Like -W except expect UBX ACK or NAK response.
            -U ''       Exit when this empty UBX STRING is processed.
            -V          Log Version in the form of release, vintage, and revision.
@@ -824,7 +831,7 @@ lines that need to be added to the indicated files.
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
-           -x          Run in the background as a daemon.
+           -x          EXit if a NAK is received.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
 
 ## rtktool
@@ -1000,64 +1007,66 @@ Here is another example, this one from a Ublox 9 receiver, and reflecting some
 minor changes to the output format.
 
     INP [ 14] \xd3\0\bL\xe0\0\x8a\0\0\0\0\xa8\xf7*
-
-    LOC 2019-07-29T10:25:35.055-07:00+01T          0/00:00:00.804 25.1.0   gold
-    TIM 2019-07-29T16:25:34.000-00:00+00Z 0pps                             GNSS
-    POS 39°47'39.239"N, 105°09'12.116"W    39.7942331, -105.1533656        GNSS
-    ALT    5616.73'   1712.000m                                            GNSS
+    
+    LOC 2019-10-24T16:30:45.884-07:00+01T          0/00:00:00.122 27.2.0   hacienda
+    TIM 2019-10-24T22:30:45.000-00:00+00Z 0pps                             GNSS
+    POS 39°47'39.323"N, 105°09'12.309"W    39.7942565, -105.1534191        GNSS
+    ALT    5612.79'   1710.800m                                            GNSS
     COG N     0.000000000°T    0.000000000°M                               GNSS
-    SOG       0.003mph       0.003000knots       0.005000kph               GNSS
-    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                67929b  GNSS
-    HPP   39.794233230, -105.153365665 ±     1.0083m                       GNSS
-    HPA   1712.0309m ±     2.0568m                                         GNSS
-    NGS  39 47 39.23962(N) 105 09 12.11639(W)                              GNSS
-    BAS 1active 0valid        974sec        975obs       6.4909m           DGNSS
+    SOG       0.009mph       0.008000knots       0.014000kph               GNSS
+    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )              9932763b  GNSS
+    HPP   39.794256489, -105.153419128 ±     0.4660m                       GNSS
+    HPA   1710.7684m MSL   1689.2685m WGS84 ±     0.7809m                  GNSS
+    NGS  39 47 39.32336(N) 105 09 12.30886(W)                              GNSS
+    BAS 1active 0valid      18019sec      18020obs       0.1675m           DGNSS
     RTK 1230 [  14] base     <rCERNrCE>                                    DGNSS
-    ACT [1]  {     2     3     6    12    17    19 } [ 6] [ 8] [24]        NAVSTAR
-    ACT [2]  {    24    28                         } [ 2] [ 8] [24]        NAVSTAR
-    ACT [1]  {    82    73    80    79    83       } [ 5] [ 5] [24]        GLONASS
-    ACT [1]  {     1    12    24    26    31    33 } [ 6] [ 6] [24]        GALILEO
-    ACT [1]  {    34    12    25    11    24       } [ 5] [ 5] [24]        COMPASS
-    DOP   1.14pdop   0.60hdop   0.97vdop                                   NAVSTAR
-    DOP   1.14pdop   0.60hdop   0.97vdop                                   GLONASS
-    DOP   1.14pdop   0.60hdop   0.97vdop                                   GALILEO
-    DOP   1.14pdop   0.60hdop   0.97vdop                                   COMPASS
-    SAT [  1]     2id  42°elv  210°azm    0dBHz  6sig <   !                NAVSTAR
-    SAT [  2]     3id  12°elv   45°azm   16dBHz  6sig <                    NAVSTAR
-    SAT [  3]     6id  78°elv  136°azm   36dBHz  6sig <                    NAVSTAR
-    SAT [  4]    12id  29°elv  311°azm   22dBHz  6sig <                    NAVSTAR
-    SAT [  5]    17id  48°elv   52°azm   31dBHz  6sig <                    NAVSTAR
-    SAT [  6]    19id  62°elv   33°azm    0dBHz  6sig <   !                NAVSTAR
-    SAT [  7]    22id   1°elv   31°azm    0dBHz  6sig     !                NAVSTAR
-    SAT [  8]    24id  40°elv  273°azm   29dBHz  6sig <                    NAVSTAR
-    SAT [  9]    28id  25°elv  120°azm    0dBHz  6sig <   !                NAVSTAR
-    SAT [ 10]    66id   8°elv   50°azm   17dBHz  3sig                      GLONASS
-    SAT [ 11]    67id   2°elv   97°azm   16dBHz  3sig                      GLONASS
-    SAT [ 12]    73id  43°elv  321°azm   29dBHz  3sig <                    GLONASS
-    SAT [ 13]    74id   2°elv  332°azm    0dBHz  3sig     !                GLONASS
-    SAT [ 14]    79id  14°elv  159°azm   35dBHz  3sig <                    GLONASS
-    SAT [ 15]    80id  65°elv  185°azm   37dBHz  3sig <                    GLONASS
-    SAT [ 16]    81id   5°elv   47°azm   17dBHz  3sig                      GLONASS
-    SAT [ 17]    82id  50°elv   24°azm   25dBHz  3sig <                    GLONASS
-    SAT [ 18]    83id  62°elv  275°azm   33dBHz  3sig <                    GLONASS
-    SAT [ 19]    84id  11°elv  238°azm   22dBHz  3sig                      GLONASS
-    SAT [ 20]     1id  44°elv  148°azm   42dBHz  2sig <                    GALILEO
-    SAT [ 21]    12id  36°elv  231°azm   39dBHz  2sig <                    GALILEO
-    SAT [ 22]    24id  26°elv  316°azm   33dBHz  2sig <                    GALILEO
-    SAT [ 23]    26id  35°elv   47°azm   25dBHz  2sig <                    GALILEO
-    SAT [ 24]    31id  78°elv  283°azm   38dBHz  2sig <                    GALILEO
-    SAT [ 25]    33id  87°elv  322°azm   34dBHz  2sig <                    GALILEO
-    SAT [ 26]    11id  37°elv  257°azm   35dBHz  3sig <                    COMPASS
-    SAT [ 27]    12id  54°elv   42°azm   44dBHz  3sig <                    COMPASS
-    SAT [ 28]    19id   5°elv   43°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 29]    21id   4°elv  138°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 30]    22id  12°elv   91°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 31]    23id   8°elv  323°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 32]    24id  50°elv  192°azm    0dBHz  3sig <   !                COMPASS
-    SAT [ 33]    25id  50°elv  291°azm    0dBHz  3sig <   !                COMPASS
-    SAT [ 34]    26id   9°elv  162°azm    0dBHz  3sig     !                COMPASS
-    SAT [ 35]    34id  62°elv  274°azm    0dBHz  3sig <   !                COMPASS
-    SAT [ 36]    35id   6°elv   63°azm    0dBHz  3sig     !                COMPASS
+    ACT [1]  {    10    25    11    14    22    26 } [ 6] [10] [29] [31]   NAVSTAR
+    ACT [2]  {     3     1    32    31             } [ 4] [10] [29] [31]   NAVSTAR
+    ACT [1]  {    74    73    72    81    87    71 } [ 6] [ 9] [29] [31]   GLONASS
+    ACT [2]  {    88    75    65                   } [ 3] [ 9] [29] [31]   GLONASS
+    ACT [1]  {     5     1    24     4     9    36 } [ 6] [ 7] [29] [31]   GALILEO
+    ACT [2]  {    31                               } [ 1] [ 7] [29] [31]   GALILEO
+    ACT [1]  {    14    24    26                   } [ 3] [ 3] [29] [31]   COMPASS
+    DOP   0.92pdop   0.47hdop   0.79vdop                                   NAVSTAR
+    DOP   0.92pdop   0.47hdop   0.79vdop                                   GLONASS
+    DOP   0.92pdop   0.47hdop   0.79vdop                                   GALILEO
+    DOP   0.92pdop   0.47hdop   0.79vdop                                   COMPASS
+    SAT [  1]     1id  42°elv  281°azm   45dBHz  6sig <                    NAVSTAR
+    SAT [  2]     3id  19°elv  310°azm   34dBHz  6sig <                    NAVSTAR
+    SAT [  3]    10id  24°elv  126°azm   46dBHz  6sig <                    NAVSTAR
+    SAT [  4]    11id  21°elv  264°azm    0dBHz  6sig <   !                NAVSTAR
+    SAT [  5]    12id   5°elv   33°azm   17dBHz  6sig                      NAVSTAR
+    SAT [  6]    14id  68°elv   21°azm    0dBHz  6sig <   !                NAVSTAR
+    SAT [  7]    22id  40°elv  309°azm    0dBHz  6sig <   !                NAVSTAR
+    SAT [  8]    23id   1°elv  266°azm    0dBHz  6sig     !                NAVSTAR
+    SAT [  9]    25id  23°elv   71°azm   41dBHz  6sig <                    NAVSTAR
+    SAT [ 10]    26id  10°elv  159°azm   43dBHz  6sig <                    NAVSTAR
+    SAT [ 11]    31id  76°elv  150°azm   49dBHz  6sig <                    NAVSTAR
+    SAT [ 12]    32id  46°elv   59°azm   47dBHz  6sig <                    NAVSTAR
+    SAT [ 13]    65id  47°elv  328°azm   42dBHz  3sig <                    GLONASS
+    SAT [ 14]    71id  18°elv   95°azm   45dBHz  3sig <                    GLONASS
+    SAT [ 15]    72id  57°elv   50°azm   50dBHz  3sig <                    GLONASS
+    SAT [ 16]    73id  26°elv   36°azm   42dBHz  3sig <                    GLONASS
+    SAT [ 17]    74id  17°elv  180°azm    0dBHz  3sig <   !                GLONASS
+    SAT [ 18]    75id  35°elv  168°azm   48dBHz  3sig <                    GLONASS
+    SAT [ 19]    81id  14°elv  328°azm   36dBHz  3sig <                    GLONASS
+    SAT [ 20]    87id  13°elv  235°azm   32dBHz  3sig <                    GLONASS
+    SAT [ 21]    88id  24°elv  281°azm   26dBHz  3sig <                    GLONASS
+    SAT [ 22]     1id  15°elv   39°azm   38dBHz  2sig <                    GALILEO
+    SAT [ 23]     3id   3°elv  280°azm    0dBHz  2sig     !                GALILEO
+    SAT [ 24]     4id  15°elv   88°azm   39dBHz  2sig <                    GALILEO
+    SAT [ 25]     5id  50°elv  301°azm   51dBHz  2sig <                    GALILEO
+    SAT [ 26]     9id  63°elv   54°azm   52dBHz  2sig <                    GALILEO
+    SAT [ 27]    15id   9°elv  327°azm   37dBHz  2sig                      GALILEO
+    SAT [ 28]    24id  30°elv  155°azm   49dBHz  2sig <                    GALILEO
+    SAT [ 29]    31id  43°elv   89°azm   51dBHz  2sig <                    GALILEO
+    SAT [ 30]    36id  23°elv  222°azm   46dBHz  2sig <                    GALILEO
+    SAT [ 31]    11id   3°elv  225°azm    0dBHz  0sig     !                COMPASS
+    SAT [ 32]    14id  52°elv  313°azm    0dBHz  0sig <   !                COMPASS
+    SAT [ 33]    21id  40°elv  103°azm    0dBHz  0sig     !                COMPASS
+    SAT [ 34]    24id  29°elv  189°azm    0dBHz  0sig <   !                COMPASS
+    SAT [ 35]    26id  63°elv  128°azm    0dBHz  0sig <   !                COMPASS
+    SAT [ 36]    28id  10°elv  295°azm    0dBHz  0sig     !                COMPASS
 
 The string used to identify the U.S. Navstar GPS constellation has been
 changed from "GPS" to "NAVSTAR" to discriminate it from the (incorrect)
@@ -1099,6 +1108,20 @@ in the National Geodetic Survey (NGS) data sheets for coordinates of artifacts
 such as NGS and municipal survey markers. This makes it easier to compare
 the Hazer position against examples from the NGS database.
 
+ACT now adds a fourth metric: the maximum number of space vehicles (SVs)
+or satellites used in the solution since the application began. This
+is useful when testing different antenna locations, particularly when
+using the device in a fixed base survey mode. In the example above,
+the first ACT line indicates that 6 SVs in the NAVSTAR constellation
+are represented in this particular line, the solution includes 10 total
+NAVSTAR SVs (so 4 more appear in a subsequent ACT line for NAVSTAR),
+the solution is using 29 SVs total among all constellations, and at one
+time as many as 31 SVs were used in the solution. (The U-blox 9 receiver
+used for this example has a maximum of 32 RF channels, so receiving 31
+SVs indicates that antenna placement is good; in this particular case I
+have the antenna installed in a skylight in my kitchen that is near the
+peak of the roof of my home.)
+
 While NMEA (and UBX amd RTCM too for that matter) is good about updating
 the application with new information, it is not so good about letting the
 application know when that data is no longer relevant. For that reason,
@@ -1107,7 +1130,7 @@ time in seconds. This can be set from the command line, in the range 0
 to the default of 255. If the data is not updated within that duration by
 new sentences or messages from the GPS device, it is no longer displayed.
 
-# Notes
+# Remarks
 
 > N.B. Most of the snapshots below were taken from earlier versions of Hazer and
 > its gpstool utility. The snapshots were cut and pasted from actual output and
@@ -1771,27 +1794,41 @@ use SimpleRTK2B boards interchangeably in the field.
 > met my needs, although I tried both, the latter using AT&T LTE-M SIMs. As
 > far as I can tell, however, both worked as advertised.
 
-## Spurious /dev/ttyACM Characters on Intel NUC/Ubuntu
+## Lost /dev/ttyACM Characters on Intel NUC/Ubuntu
 
-I've been troubleshooting a weird issue with spurious characters showing up
-on the serial-ish USB connection between a U-blox UBX-ZED-F9P (generation 9)
-on the Ardusimple SimpleRTK2B board, as well as a U-Blox UBX-M8030 (generation
-8) in a GlobalSat BU353W10 dongle, and Hazer. I've described this at length
-in the article
+I've been troubleshooting a weird issue with sequences of characters being
+lost on the modem-ish (ttyACM) USB connection between a U-blox UBX-ZED-F9P
+(generation 9). This occurs when using the Ardusimple SimpleRTK2B and
+Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation
+8) in a GlobalSat BU353W10 dongle. I've described this at length in
+the article
 
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
-I only see this when I run Hazer under Ubuntu on Intel servers (Nickel,
-Cadmium, and Mercury as described above). It is reproducible removing Hazer
-from the test completely and just using standard utilities like cat and socat.
-It is not reproducible running the exact same software and GNSS receivers on
-the ARM-based Raspberry Pi 3+ (Gold, Bodega, and Mochila as decribed above)
-under Raspbian. Both Ubuntu and Raspbian are Debian-based Linux distributions.
+I see this when I run Hazer under Ubuntu on Intel servers (Nickel,
+Cadmium, and Mercury as described above) and under Raspian on a Raspberry
+Pi 4B (Rhodium ibid). I to NOT see it running on under the SAME version
+of Raspbian on a Raspberry Pi 3B+ (Gold, Bodega, and Mochila ibid).
+Both Ubuntu and Raspbian are Debian-based Linux distributions.
 
-I haven't reported this to U-blox because it seems like a bug (somehow) in the
-Intel-specific portions of the USB stack. Plus, I would really like this to be
-a software bug on my part, because then I could fix it; but that strategy is
-looking iffy.
+It is reproducible by removing Hazer from the test completely and just
+using standard utilities like cat and socat. Since presumably these
+utilities are consuming data from the device as quickly as possible, it
+doesn't seem to be a speed issue. (And it doesn't occur on the slower
+Pi 3B+.)
+
+This smells like a conflict with some other daemon like Modem Manager. But
+I have Modem Manager disabled (or else it doesn't exist); also, a looping
+lsof command doesn't find another process opening the ttyACM device.
+
+There doesn't seem to be a consistent pattern in what characters are lost.
+
+Enabling flow control on the device and in gpstool doesn't seem to have
+any effect.
+
+I haven't reported this to U-blox because it doesn't seem like a
+U-blox bug.  I would really like this to be a software bug on my part,
+because then I could fix it; but that strategy is looking iffy.
 
 ## Differential GNSS Using Tumbleweed
 
@@ -1805,37 +1842,46 @@ one of the Pis is a router that receives RTK updates from one base station
 and forwards them to one or more rovers. (You can combine the base and the
 router on to one Pi, but I chose not to configure my set up that way.)
 
+### Router
+
 The Tumbleweed router, which is on my LAN, must have a static IP address
 or a usable Dynamic DNS (DDNS) address (which is what I do) that can be
 reached through the firewall. ":tumbleweed" identifies the service on the
 localhost defined in /etc/services from which to receive and send RTK update
-datagrams.
+datagrams. (My Tumbleweed router is code-named "eljefe". You may come across
+this and related names in logs, screen shots, etc.)
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     router :tumbleweed &
     peruse router err
 
-The Tumbleweed base is typically on my LAN, but can be on the WAN by changing
-the hostname through which the router is addressed. "tumbleweed:" idenfities
-the hostname of the router on the LAN as defined in /etc/hosts, and
-":tumbleweed" the service on the router on the LAN defined as in /etc/services
-(typically I defined this to be port 21010) to which to send RTK update
-datagrams.
+### Base
+
+The Tumbleweed base is typically on my LAN, but can be on the WAN by
+changing the hostname through which the router is addressed. "tumbleweed:"
+idenfities the hostname of the router on the LAN as defined in /etc/hosts,
+and ":tumbleweed" the service on the router on the LAN defined as in
+/etc/services (typically I defined this to be port 21010) to which to
+send RTK update datagrams. (I have used two different Tumbleweed bases;
+the portable version I use with a tripod-mounted anntenna is code-named
+"bodega" and the one whose antenna is permanently fixed is "hacienda".)
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    base tumbleweed:tumbleweed &
-    peruse base err# Control-C to exit upon seeing "Ready".
-    peruse base out
+    survey tumbleweed:tumbleweed /dev/tumbleweed &
+    peruse survey err# Control-C to exit upon seeing "Ready".
+    peruse survey out
 
 Depending on the specified accuracy - encoded in a message sent to the
 chip by the script - it can take days for the receiver to arrive at a
-solution that has the required radius of error. This depends greatly
-on antenna placement as well as other factors that may be less under
-your control. Putting the antenna in my front yard, which has the usual
-ground clutter of trees and adjacent houses, resulted in taking about
-two days to get to ten centimeters, about four inches.
+solution that has the required radius of error. This depends greatly on
+antenna placement as well as other factors that may be less under your
+control. Putting the antenna in my front yard, which has the usual ground
+clutter of trees and adjacent houses, resulted in taking about two days
+to get to a resolution of ten centimeters, about four inches. Using a
+permanently attached antenna near the peak of the roof of my house took
+a little over twelve hours to get the same resolution.
 
 Because of this potentially lengthy duration of the survey, you don't want
 to do it more than once. First rule is: don't move the antenna. (If you
@@ -1852,9 +1898,44 @@ corrections based on this information.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    station tumbleweed:tumbleweed &
-    peruse station err# Control-C to exit upon seeing "Ready".
-    peruse station out
+    fixed tumbleweed:tumbleweed /dev/tumbleweed &
+    peruse fixed err# Control-C to exit upon seeing "Ready".
+    peruse fixed out
+
+The choice between running the base in survey mode or in fixed mode
+is automated in a script that does latter if the base.fix file is
+present and seems sane, and the former if it is not. This allows you to
+restart the base station and have it do the right thing depending on
+whether or not the survey had been previously completed.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    base tumbleweed:tumbleweed /dev/tumbleweed &
+
+The .fix file contains the following UBX variables in character hex format
+in this order.
+
+    FIXED_POS_ACC
+    LAT
+    LATHP
+    LON
+    LONHP
+    HEIGHT
+    HEIGHTHP
+
+Here is an example of an actual base.fix file that resulted from a
+survey done with 10 cm (1000 x 0.1mm) accuracy; note that UBX stores
+its variables in little-endian byte order.
+
+    \xe8\x03\x00\x00
+    \xb1\x1f\xb8\x17
+    \x20
+    \x91\xdc\x52\xc1
+    \xe5
+    \x01\x94\x02\x00
+    \x1d
+
+### Rover
 
 A Tumbleweed rover (there can be more than one) is typically on the WAN,
 and is agnostic as to the Internet connection (I use a USB LTE modem).
@@ -1862,24 +1943,61 @@ and is agnostic as to the Internet connection (I use a USB LTE modem).
 (FQDN) on the WAN as (for me) defined by DDNS and resolved via DNS,
 and ":tumbleweed" the service on the router to which send keep alive
 datagrams and receive RTK update datagrams as defined in /etc/services.
+(My rover is code-named "mochila".)
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    rover tumbleweed.test:tumbleweed &
+    rover tumbleweed.test:tumbleweed /dev/tumblweed &
     peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
 
+The rover can also generate a CSV file as it runs that will contain the
+results of the high precision solution every time is is generated and
+reported. This is useful when testing the rover against a fixed location,
+for example a survey benchmark whose coordinates are well known.
+(Be aware that the surveyed coordinates of National Geodetic Survey
+markers in the U.S. are, in my experience anyway, typically based on the
+NAD83 datum - an abstract model of the shape of the Earth - which is
+used solely for the North American plate minute Mexico, and which are not
+directly comparable to GPS coordinates, which are determined using the
+WGS84 datum based on space observations.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    benchmark tumbleweed.test:tumbleweed /dev/tumbleweed &
+    peruse benchmark err# Control-C to exit upon seeing "Ready".
+    peruse benchmark csv
+
 The rover can also be run as an uncorrected mobile unit, basically a
-receiver that doesn't support Differential GNSS.. (It might be a good
+receiver that doesn't support Differential GNSS. (It might be a good
 idea to power cycle the F9P before changing from rover to mobile; some
 of the rover configuration seems to be sticky.)
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     # Power cycle the F9P if previously configured for corrections.
-    mobile &
+    mobile /dev/tumbleweed &
     peruse mobile err# Control-C to exit upon seeing "Ready".
     peruse mobile out
+
+### Daemons
+
+I'm running all three, router, base, and rover, as simple background
+processes.  But it is also possible to run them in daemon mode, in which
+case messages normally written to standard error are logged to the system
+log. Also, I run all three in "headless" mode, where the screens normally
+written to standard output are instead written to a file, and a script
+is used to display the file as it changes; this decouples the router,
+rover, and base software from the display terminal while still allowing
+an on-demand real-time display. (This requires that the inotify-tools
+package be installed on the Pi.)
+
+Both gpstool (which implements the base and the rover) and rtktool (which
+implements the router) can be run as daemons via a command line switch
+(although I have not done so in these examples); the headless mode can
+still be used.
+
+### Networking
 
 Note that the actual IP address of neither the base nor the rover need
 be known. This is important because the rover (and sometimes the base)
@@ -1901,30 +2019,17 @@ this; but it means the IP address you begin with in your survey will
 not be the one you end up with when the survey is complete or as the
 base sends subsequent updates to the rover.
 
-The Tumbleweed router does require a fixed IP address for this to work. In my
-setup, the Tumbleweed router connects to my home IP router (in my case,
-directly via wired Ethernet). But my IP router gets its globally routable
-WAN IP address from my internet provider via DHCP. My IP router supports Dynamic
-DNS (DDNS), in which it automatically sends an notification to my DDNS provider
-regarding the assigned IP address, who then changes the DNS database to map
-a fixed FQDN to the provided address. This FQDN is represented by
-"tumbleweed.test" above. I have configured the firewall in my IP router to 
-forward the port named "tumbleweed" above to and from the same port on the
-static IP address on my LAN that I assigned to the Tumbleweed router.
-
-I'm running all three, router, base, and rover, as simple background processes.
-But it is also possible to run them in daemon mode, in which case messages
-normally written to standard error are logged to the system log. Also, I run
-all three in "headless" mode, where the screens normally written to standard
-output are instead written to a file, and a script is used to display the file
-as it changes; this decouples the router, rover, and base software from the
-display terminal while still allowing an on-demand real-time display. (This
-requires that the inotify-tools package be installed on the Pi.)
-
-Both gpstool (which implements the base and the rover) and rtktool (which
-implements the router) can be run as daemons via a command line switch
-(although I have not done so in these examples); the headless mode can still
-be used.
+The Tumbleweed router does require a fixed IP address for this to
+work. In my setup, the Tumbleweed router connects to my home IP router
+(in my case, directly via wired Ethernet). But my IP router gets its
+globally routable WAN IP address from my internet provider via DHCP. My
+IP router supports Dynamic DNS (DDNS), in which it automatically sends
+an notification to my DDNS provider regarding the assigned IP address,
+who then changes the DNS database to map a fixed FQDN to the provided
+address. This FQDN is represented by "tumbleweed.test" above. I have
+configured the firewall in my IP router to forward the port named
+"tumbleweed" above to and from the same port on the static IP address
+on my LAN that I assigned to the Tumbleweed router.
 
 As mentioned above, it is not unusual to see a WAN connected rover or base
 drop off and reappear on the WAN, often with a different port number and
@@ -2006,6 +2111,8 @@ Note that the UDP stream is not encrypted, nor is the source of the datagrams
 authenticated, so this mechanism is not secure. It should be. I'm pondering how
 best to accomplish that. Probably DTLS.
 
+### Hardware
+
 Although Tumbleweed has been implemented using the Ardusimple SimpleRTK2B
 board, the same software runs on the SparkFun GPS-RTK2 board which uses the
 same U-blox UBX-ZED-F9P receiver chip. Ublox has since introduced their own
@@ -2072,6 +2179,12 @@ geographiclib, which is licensed under the MIT license.
 
 Thanks to Charles F. F. Karney for his MIT licensed geographiclib.
 
-Special thanks to Mrs. Overclock for her assistance in road testing (literally)
-this software and for her understanding regarding having GPS equipment
-littered all around the house both inside and outside.
+A big thank you to Brad Gabbard, a professional surveyor with
+Flatirons, Inc., a surveying, engineering, and geomatics firm located
+in Boulder Colorado. Mr. Gabbard generously shared some results off
+his professional Trimble GPS rover taken at NGS survey marker
+KK1446 that I have used to test this code.
+
+Special thanks to Mrs. Overclock for her assistance in road testing
+(literally) this software and for her understanding regarding having
+GPS equipment littered all around the house both inside and outside.
