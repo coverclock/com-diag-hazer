@@ -274,7 +274,7 @@ int main(void)
 		assert(data.prefix.protIds[1] == 1);
 		assert(data.prefix.protIds[2] == 5);
 		assert(data.prefix.protIds[3] == 255);
-		assert(data.port[0].portId == 0x0100);
+		assert(data.port[0].portId == 0x0100); /* ??? */
 		assert(data.port[0].txPending == 0);
 		assert(data.port[0].txBytes == 14572);
 		assert(data.port[0].txUsage == 0);
@@ -289,7 +289,7 @@ int main(void)
 		assert(data.port[0].msgs[2] == 0);
 		assert(data.port[0].msgs[3] == 0);
 		assert(data.port[0].skipped == 0);
-		assert(data.port[1].portId == 0x0200);
+		assert(data.port[1].portId == 0x0200); /* ??? */
 		assert(data.port[1].txPending == 0);
 		assert(data.port[1].txBytes == 22449480);
 		assert(data.port[1].txUsage == 0);
@@ -304,7 +304,7 @@ int main(void)
 		assert(data.port[1].msgs[2] == 0);
 		assert(data.port[1].msgs[3] == 0);
 		assert(data.port[1].skipped == 27);
-		assert(data.port[2].portId == 0x0300);
+		assert(data.port[2].portId == 0x0300); /* ??? */
 		assert(data.port[2].txPending == 0);
 		assert(data.port[2].txBytes == 7402884);
 		assert(data.port[2].txUsage == 1);
@@ -319,7 +319,7 @@ int main(void)
 		assert(data.port[2].msgs[2] == 0);
 		assert(data.port[2].msgs[3] == 0);
 		assert(data.port[2].skipped == 0);
-		assert(data.port[3].portId == 0x0101);
+		assert(data.port[3].portId == 0x0101); /* ??? */
 		assert(data.port[3].txPending == 0);
 		assert(data.port[3].txBytes == 66191166);
 		assert(data.port[3].txUsage == 0);
