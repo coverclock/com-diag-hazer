@@ -50,6 +50,9 @@ log -I -N ${PROGRAM} -i SVIN_ACC_LIMIT="\"${SVIN_ACC_LIMIT}\""
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-UART2-ENABLED 0
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
+# UBX-CFG-MSG [3] UBX-MON-COMMS 240 (4min @ 1Hz)
+#    -U '\xb5\x62\x06\x01\x03\x00\x0a\x36\xf0' \
+
 exec coreable gpstool \
     -F -H ${OUTFIL} -t 10 \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
