@@ -616,6 +616,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.sparkfun.com/products/15136>
 
+<https://register.gotowebinar.com/recording/6016509329100006146>
+
 # Soundtrack
 
 Leonid & Friends, "Does Anybody Really Know What Time It Is" (Chicago)
