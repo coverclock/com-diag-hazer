@@ -1801,41 +1801,20 @@ use SimpleRTK2B boards interchangeably in the field.
 > met my needs, although I tried both, the latter using AT&T LTE-M SIMs. As
 > far as I can tell, however, both worked as advertised.
 
-## Lost /dev/ttyACM Characters on Intel NUC/Ubuntu
+## Lost /dev/ttyACM Characters
 
 I've been troubleshooting a weird issue with sequences of characters being
-lost on the modem-ish (ttyACM) USB connection between a U-blox UBX-ZED-F9P
-(generation 9). This occurs when using the Ardusimple SimpleRTK2B and
-Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation
-8) in a GlobalSat BU353W10 dongle. I've described this at length in
-the article
+lost on the modem-ish (ttyACM) USB connection on a U-blox UBX-ZED-F9P
+(generation 9) chip. This occurs when using the Ardusimple SimpleRTK2B and
+Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation 8)
+chip in a GlobalSat BU353W10 dongle. I've seen in on Intel (Dell) and
+ARM (Raspberry Pi 3B+ and 4B) systems. I've seen it using my software,
+using socat, and even just using cat, to collect data off the USB port.
+I've seen it at a variety of baud rates.
+
+I've described this at length in the article
 
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
-
-I see this when I run Hazer under Ubuntu on Intel servers (Nickel,
-Cadmium, and Mercury as described above) and under Raspian on a Raspberry
-Pi 4B (Rhodium ibid). I to NOT see it running on under the SAME version
-of Raspbian on a Raspberry Pi 3B+ (Gold, Bodega, and Mochila ibid).
-Both Ubuntu and Raspbian are Debian-based Linux distributions.
-
-It is reproducible by removing Hazer from the test completely and just
-using standard utilities like cat and socat. Since presumably these
-utilities are consuming data from the device as quickly as possible, it
-doesn't seem to be a speed issue. (And it doesn't occur on the slower
-Pi 3B+.)
-
-This smells like a conflict with some other daemon like Modem Manager. But
-I have Modem Manager disabled (or else it doesn't exist); also, a looping
-lsof command doesn't find another process opening the ttyACM device.
-
-There doesn't seem to be a consistent pattern in what characters are lost.
-
-Enabling flow control on the device and in gpstool doesn't seem to have
-any effect.
-
-I haven't reported this to U-blox because it doesn't seem like a
-U-blox bug.  I would really like this to be a software bug on my part,
-because then I could fix it; but that strategy is looking iffy.
 
 ## Differential GNSS Using Tumbleweed
 
