@@ -102,6 +102,7 @@
 #include <pthread.h>
 #include <locale.h>
 #include <wchar.h>
+#include <ctype.h>
 #include "./gpstool.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
@@ -556,6 +557,61 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
     return rc;
 }
 
+/**
+ * Print information about the high-precision positioning solution that UBX
+ * provides. I think this is the same result as NMEA but is expressed with
+ * the maximum precision available in the underlying device and beyond which
+ * NMEA can express.
+ * @param fp points to the FILE stream.
+ * @param sp points to the solutions structure.
+ */
+static void emit_trace(FILE * fp, const yodel_solution_t * sp)
+{
+    int32_t degrees = 0;
+    uint64_t billionths = 0;
+    int32_t meters = 0;
+    uint32_t tenthousandths = 0;
+    static uint64_t sn = 0;
+    static diminuto_sticks_t epoch = 0;
+
+    if (sn == 0) {
+        epoch = diminuto_time_elapsed();
+        fputs("OBSERVATION,", fp);
+        fputs(" ELAPSED,", fp);
+        fputs(" LATITUDE,", fp);
+        fputs(" LONGITUDE,", fp);
+        fputs(" HORIZONTAL,", fp);
+        fputs(" MSL,", fp);
+        fputs(" WGS84,", fp);
+        fputs(" VERTICAL\n", fp);
+        sn++;
+    }
+
+    fprintf(fp, "%llu,", (long long unsigned int)(sn++));
+
+    fprintf(fp, " %llu,", (long long unsigned int)((diminuto_time_elapsed() - epoch) / diminuto_time_frequency()));
+
+    yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
+    fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
+
+    yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &billionths);
+    fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
+
+    yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
+    fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+    yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &tenthousandths);
+    fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+    yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &tenthousandths);
+    fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+    yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
+    fprintf(fp, " %lld.%04llu\n", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+    fflush(fp);
+}
+
 /*******************************************************************************
  * REPORTERS
  ******************************************************************************/
@@ -572,12 +628,15 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
     unsigned int satellite = 0;
     unsigned int count = 0;
     unsigned int total = 0;
+    static unsigned int maximum = 0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
         if (aa[system].ticks == 0) { continue; }
         if (aa[system].active == 0) { continue; }
         total += aa[system].active;
     }
+
+    if (total > maximum) { maximum = total; }
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -596,9 +655,9 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
             }
         }
 
-        fprintf(fp, " } [%2u] [%2u] [%2u]", count, aa[system].active, total);
+        fprintf(fp, " } [%2u] [%2u] [%2u] [%2u]", count, aa[system].active, total, maximum);
 
-        fprintf(fp, "%7s", "");
+        fprintf(fp, "%2s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -618,9 +677,9 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
             }
         }
 
-        fprintf(fp, " } [%2u] [%2u] [%2u]", count, aa[system].active, total);
+        fprintf(fp, " } [%2u] [%2u] [%2u] [%2u]", count, aa[system].active, total, maximum);
 
-        fprintf(fp, "%7s", "");
+        fprintf(fp, "%2s", "");
 
         fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
 
@@ -1451,6 +1510,7 @@ static void * gpiopoller(void * argp)
  */
 int main(int argc, char * argv[])
 {
+    int xc = 0;
     /*
      * Command line options and parameters with defaults.
      */
@@ -1460,6 +1520,7 @@ int main(int argc, char * argv[])
     const char * logging = (const char *)0;
     const char * headless = (const char *)0;
     const char * arp = (const char *)0;
+    const char * trace = (const char *)0;
     int opt = -1;
     int debug = 0;
     int verbose = 0;
@@ -1494,6 +1555,7 @@ int main(int argc, char * argv[])
     FILE * log_fp = (FILE *)0;
     FILE * strobe_fp = (FILE *)0;
     FILE * pps_fp = (FILE *)0;
+    FILE * trace_fp = (FILE *)0;
     /*
      * Serial device variables.
      */
@@ -1653,7 +1715,9 @@ int main(int argc, char * argv[])
     yodel_base_t base = YODEL_BASE_INITIALIZER;
     yodel_rover_t rover = YODEL_ROVER_INITIALIZER;
     yodel_ubx_ack_t acknak = YODEL_UBX_ACK_INITIALIZER;
+    yodel_ubx_mon_comms_t ports = YODEL_UBX_MON_COMMS_INITIALIZER;
     int acknakpending = 0;
+    int nakquit = 0;
     int nominal = 0;
     /*
      * RTCM state databases.
@@ -1682,6 +1746,8 @@ int main(int argc, char * argv[])
     size_t io_size = BUFSIZ;
     size_t io_maximum = 0;
     size_t io_total = 0;
+    ssize_t io_available = 0;
+    ssize_t io_peak = 0;
     /*
      * Source variables.
      */
@@ -1707,6 +1773,7 @@ int main(int argc, char * argv[])
     int sync = 0;       /** If true then the input stream is synchronized. */
     int frame = 0;      /** If true then the input stream is at frame start. */
     int refresh = !0;   /** If true then the display needs to be refreshed. */
+    int hpllh = 0;      /** If true then the trace needs to be emitted. */
     /*
      * Command line processing variables.
      */
@@ -1719,7 +1786,7 @@ int main(int argc, char * argv[])
     hazer_active_t cache = HAZER_ACTIVE_INITIALIZER;
     int dmyokay = 0;
     int totokay = 0;
-     /*
+    /*
      * Counters.
      */
     unsigned int outoforder_counter = 0;
@@ -1740,7 +1807,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:OPRS:U:VW:XY:b:cdeg:hk:lmnop:st:uvy:?"; /* Unused: AJNQTZ afijqrwxz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:OPRS:T:U:VW:XY:b:cdeg:hk:lmnop:st:uvxy:?"; /* Unused: AJQZ afijqrwz Pairs: Aa Jj Qq Zz */
 
     /**
      ** PREINITIALIZATION
@@ -1838,6 +1905,10 @@ int main(int argc, char * argv[])
         case 'S':
             source = optarg;
             break;
+        case 'T':
+            trace = optarg;
+            process = !0; /* Have to process trace. */
+            break;
         case 'U':
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
@@ -1934,25 +2005,29 @@ int main(int argc, char * argv[])
         case 'v':
             verbose = !0;
             break;
+        case 'x':
+            nakquit = !0;
+            break;
         case 'y':
             keepalive = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (keepalive < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case '?':
-            fprintf(stderr, "usage: %s "
-                           "[ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] "
-                           "[ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
-                           "[ -C FILE ] "
-                           "[ -t SECONDS ] "
-                           "[ -I PIN | -c ] [ -p PIN ] "
-                           "[ -U STRING ... ] [ -W STRING ... ] "
-                           "[ -R | -E | -F | -H HEADLESS | -P ] "
-                           "[ -L LOG ] "
-                           "[ -G [ IP:PORT | :PORT [ -g MASK ] ] ] "
-                           "[ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] "
-                           "[ -K [ -k MASK ] ] "
-                           "[ -N FILE ]"
-                           "\n", Program);
+            fprintf(stderr, "usage: %s"
+                           " [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ]"
+                           " [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
+                           " [ -C FILE ]"
+                           " [ -t SECONDS ]"
+                           " [ -I PIN | -c ] [ -p PIN ]"
+                           " [ -U STRING ... ] [ -W STRING ... ]"
+                           " [ -R | -E | -F | -H HEADLESS | -P ]"
+                           " [ -L LOG ]"
+                           " [ -G [ IP:PORT | :PORT [ -g MASK ] ] ]"
+                           " [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ]"
+                           " [ -K [ -k MASK ] ]"
+                           " [ -N FILE ]"
+                           " [ -T FILE ]"
+                          "\n", Program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(stderr, "       -7          Use seven data bits for DEVICE.\n");
@@ -1973,6 +2048,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
+            fprintf(stderr, "       -T FILE     Save the high precision LLH trace to FILE.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
             fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
@@ -1997,7 +2073,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
             fprintf(stderr, "       -u          Note Unprocessed input on standard error.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
-            fprintf(stderr, "       -x          Run in the background as a daemon.\n");
+            fprintf(stderr, "       -x          EXit if a NAK is received.\n");
             fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds.\n");
             return 1;
             break;
@@ -2319,12 +2395,17 @@ int main(int argc, char * argv[])
 
     in_fd = fileno(in_fp);
 
+    serial = diminuto_serial_valid(in_fd);
+
     rc = diminuto_mux_register_read(&mux, in_fd);
     assert(rc >= 0);
 
     io_buffer = malloc(io_size);
     assert(io_buffer != (void *)0);
-    setvbuf(in_fp, io_buffer, _IOFBF, io_size);
+    rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
+    assert(rc == 0);
+
+    DIMINUTO_LOG_INFORMATION("Buffer (%d) [%zu] [%zu]\n", in_fd, io_size, (size_t)BUFSIZ);
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -2366,6 +2447,20 @@ int main(int argc, char * argv[])
         }
         assert(pthreadrc == 0);
 
+    }
+
+    /*
+     * If we are saving the track, open the track file.
+     */
+
+    if (trace == (const char *)0) {
+        /* Do nothing. */
+    } else if (strcmp(trace, "-") == 0) {
+        trace_fp = stdout;
+    } else {
+        trace_fp = fopen(trace, "a");
+        if (trace_fp == (FILE *)0) { diminuto_perror(trace); }
+        assert(trace_fp != (FILE *)0);
     }
 
     /*
@@ -2492,7 +2587,13 @@ int main(int argc, char * argv[])
         }
 
         if (diminuto_hangup_check()) {
-            diminuto_log_mask ^= DIMINUTO_LOG_MASK_DEBUG;
+            /*
+             * Using SIGHUP is actually a little problematic, since I
+             * routinely start gpstool interactively, switch it to the
+             * background, and later disconnect my terminal session and
+             * let it run.
+             */
+            DIMINUTO_LOG_INFORMATION("SIGHUP");
         }
 
         /**
@@ -2605,7 +2706,11 @@ int main(int argc, char * argv[])
 
                 } else {
 
-                    DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                    if (isprint(ch)) {
+                        DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
+                    } else {
+                        DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                    }
 
                     sync = 0;
 
@@ -2624,7 +2729,12 @@ int main(int argc, char * argv[])
                     size = hazer_size(&nmea_context);
                     length = size - 1;
                     format = NMEA;
-                    if (!sync) { DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
+
+                    if (!sync) {
+                        DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total);
+                        sync = !0;
+                    }
+
                     frame = !0;
 
                     DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd]", size, length);
@@ -2640,7 +2750,12 @@ int main(int argc, char * argv[])
                     size = yodel_size(&ubx_context);
                     length = size - 1;
                     format = UBX;
-                    if (!sync) { DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
+
+                    if (!sync) {
+                        DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total);
+                        sync = !0;
+                    }
+
                     frame = !0;
 
                     DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd]", size, length);
@@ -2655,13 +2770,18 @@ int main(int argc, char * argv[])
                     size = tumbleweed_size(&rtcm_context);
                     length = size - 1;
                     format = RTCM;
-                    if (!sync) { DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total); sync = !0; }
+
+                    if (!sync) {
+                        DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total);
+                        sync = !0;
+                    }
+
                     frame = !0;
 
                     DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd]", size, length);
 
                     break;
-                 }
+                }
 
                 /*
                  * If all the state machines have stopped, then either we have
@@ -2676,11 +2796,18 @@ int main(int argc, char * argv[])
                 } else if (rtcm_state != TUMBLEWEED_STATE_STOP) {
                     /* Do nothing. */
                 } else {
-                    if (sync) { DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch); sync = 0; }
+
+                    if (sync) {
+                        DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                        sync = 0;
+                    }
+
                     frame = 0;
+
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_START;
+
                 }
 
             } while (diminuto_file_ready(in_fp) > 0);
@@ -2864,7 +2991,7 @@ int main(int argc, char * argv[])
         }
 
         /**
-         ** CONFIGURATION
+         ** COMMANDS
          **/
 
         /*
@@ -3278,6 +3405,7 @@ int main(int argc, char * argv[])
 
                 solution.ticks = timeout;
                 refresh = !0;
+                hpllh = !0;
 
             } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 
@@ -3293,7 +3421,15 @@ int main(int argc, char * argv[])
 
                 refresh = !0;
 
-                DIMINUTO_LOG_INFORMATION("Parse UBX %s 0x%02x 0x%02x (%d)\n", acknak.state ? "ACK" : "NAK", acknak.clsID, acknak.msgID, acknakpending);
+                if (acknak.state) {
+                    DIMINUTO_LOG_INFORMATION("Parse UBX ACK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                } else if (!nakquit) {
+                    DIMINUTO_LOG_INFORMATION("Parse UBX NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                } else {
+                    DIMINUTO_LOG_NOTICE("Parse UBX NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                    xc = 1;
+                    eof = !0;
+                }
 
                 if (acknakpending > 0) { acknakpending -= 1; }
 
@@ -3427,6 +3563,37 @@ int main(int argc, char * argv[])
                 rover.ticks = timeout;
                 refresh = !0;
 
+            } else if ((rc = yodel_ubx_mon_comms(&ports, buffer, length)) >= 0) {
+                int ii = 0;
+                int jj = 0;
+
+                assert(sizeof(ports.prefix) == 8);
+                assert(sizeof(ports.port[0]) == 40);
+                assert(sizeof(ports) == (8 + (5 * 40)));
+
+                DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS version = %u\n", ports.prefix.version);
+                DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS nPorts = %u\n", ports.prefix.nPorts);
+                DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS txErrors = 0x%02x\n", ports.prefix.txErrors);
+                for (ii = 0; ii < countof(ports.prefix.protIds); ++ii) {
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS protIds[%d] = %u\n", ii, ports.prefix.protIds[ii]);
+                }
+                for (ii = 0; ii < rc; ++ii) {
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] portId = 0x%04x\n", ii, ports.port[ii].portId);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txPending = %u\n", ii, ports.port[ii].txPending);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txBytes = %u\n", ii, ports.port[ii].txBytes);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txUsage = %u\n", ii, ports.port[ii].txUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txPeakUsage = %u\n", ii, ports.port[ii].txPeakUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxPending = %u\n", ii, ports.port[ii].rxPending);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxBytes = %u\n", ii, ports.port[ii].rxBytes);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxUsage = %u\n", ii, ports.port[ii].rxUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxPeakUsage = %u\n", ii, ports.port[ii].rxPeakUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] overrunErrs = %u\n", ii, ports.port[ii].overrunErrs);
+                    for (jj = 0; jj < countof(ports.port[ii].msgs); ++jj) {
+                        DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] msgs[%d] = %u\n", ii, jj, ports.port[ii].msgs[jj]);
+                    }
+                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] skipped = %u\n", ii, ports.port[ii].skipped);
+                }
+
             } else if (unknown) {
 
                 DIMINUTO_LOG_WARNING("Parse UBX Other 0x%02x%02x%02x%02x\n", buffer[YODEL_UBX_SYNC_1], buffer[YODEL_UBX_SYNC_2], buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
@@ -3468,9 +3635,7 @@ int main(int argc, char * argv[])
 
         }
 
-        /**
-         ** REPORT
-         **/
+        if (eof) { break; }
 
         /*
          * We always give priority to reading input from the device or a
@@ -3481,15 +3646,65 @@ int main(int argc, char * argv[])
          * complete sentence, packet, or message that we can forward, write,
          * log, or use to update our databases.
          */
+
         if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
             /* Do nothing. */
-        } else if (diminuto_file_ready(in_fp) > 0) {
+        } else if ((io_available = diminuto_file_ready(in_fp)) > 0) {
+            if (io_available > io_peak) { io_peak = io_available; }
+            DIMINUTO_LOG_DEBUG("Ready file [%zu] [%zu]\n", io_available, io_peak);
+            if (io_available >= io_size) { DIMINUTO_LOG_WARNING("Full file [%zd] [%zu]\n", io_available, io_size); }
             continue;
-        } else if (diminuto_mux_wait(&mux, 0 /* POLL */) > 0) {
+        } else if ((io_available = diminuto_serial_available(in_fd)) > 0) {
+            if (io_available > io_peak) { io_peak = io_available; }
+            DIMINUTO_LOG_DEBUG("Ready device [%zu] [%zu]\n", io_available, io_peak);
+            continue;
+        } else if ((io_available = diminuto_mux_wait(&mux, 0 /* POLL */)) > 0) {
+            if (io_peak <= 0) { io_peak = 1; } /* Actual number of bytes unknown but greater than zero. */
+            DIMINUTO_LOG_DEBUG("Ready socket [%zu] [%zu]\n", io_available, io_peak);
             continue;
         } else {
-            /* Do nothing. */
+            DIMINUTO_LOG_DEBUG("Ready empty [0] [%zu]\n", io_peak);
         }
+
+        /*
+         * If we've generated a high precision solution in survey mode,
+         * and have been asked to emit the solution to a file for later use
+         * in fixed mode, do so now. We delay doing this until the device
+         * is fully configured and has ACKed all of the configuration
+         * commands.
+         */
+
+        if (arp == (const char *)0) {
+            /* Do nothing. */
+        } else if (!diminuto_list_isempty(&command_list)) {
+            /* Do nothing. */
+        } else if (acknakpending > 0) {
+            /* Do nothing. */
+        } else if (!save_solution(arp, &base, &solution)) {
+            /* Do nothing. */
+        } else {
+            arp = (const char *)0;
+        }
+
+        /*
+         * If tracing is enabled and we have a high precision latitude,
+         * longitude, and height (LLH) solution, emit the trace.
+         */
+
+        if (trace_fp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (!hpllh) {
+            /* Do nothing. */
+        } else {
+            emit_trace(trace_fp, &solution);
+            hpllh = 0;
+        }
+
+        /**
+         ** REPORT
+         **/
+
+report:
 
         /*
          * This code is just for testing the expiration feature.
@@ -3546,30 +3761,8 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * If we've generated a high precision solution in survey mode,
-         * and have been asked to emit the solution to a file for later use
-         * in fixed mode, do so now. We delay doing this until the device
-         * is fully configured and has ACKed all of the configuration
-         * commands.
-         */
-
-        if (arp == (const char *)0) {
-            /* Do nothing. */
-        } else if (!diminuto_list_isempty(&command_list)) {
-            /* Do nothing. */
-        } else if (acknakpending > 0) {
-            /* Do nothing. */
-        } else if (!save_solution(arp, &base, &solution)) {
-            /* Do nothing. */
-        } else {
-            arp = (const char *)0;
-        }
-
-        /*
          * Generate the display if necessary and sufficient reasons exist.
          */
-
-report:
 
         if (!refresh) {
             /* Do nothing. */
@@ -3680,7 +3873,8 @@ report:
         if (rc == EOF) { diminuto_perror("fclose(dev_fp)"); }
     }
 
-    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)));
+    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS peak=%lldB\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)), (long long)io_peak);
+
     free(io_buffer);
 
     if (sink_fp != (FILE *)0) {
@@ -3713,5 +3907,5 @@ report:
 
     fflush(stderr);
 
-    return 0;
+    return xc;
 }

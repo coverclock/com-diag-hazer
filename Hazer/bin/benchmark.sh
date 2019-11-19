@@ -4,7 +4,8 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Configure and run the U-blox ZED-UBX-F9P as a mobile Rover receiving
-# corrections from a stationary Base.
+# corrections from a stationary Base and saving high precision solutions
+# to a CSV file (especially useful for testing on survey benchmarks).
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
@@ -12,6 +13,7 @@ DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
 ERRFIL=${4-"./${PROGRAM}.err"}
 OUTFIL=${5-"./${PROGRAM}.out"}
+CSVFIL=${6-"./${PROGRAM}.csv"}
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
@@ -30,11 +32,9 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-UBX_RXM_RTCM_USB 1
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
-# UBX-CFG-MSG [3] UBX-MON-COMMS 240 (4min @ 1Hz)
-#    -U '\xb5\x62\x06\x01\x03\x00\x0a\x36\xf0' \
-
 exec coreable gpstool \
     -F -H ${OUTFIL} -t 10 \
+    -T ${CSVFIL} \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -Y ${ROUTER} -y 20 \
     -x \
