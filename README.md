@@ -175,9 +175,10 @@ Yodel recognizes the following received UBX messages.
 * UBX-ACK-ACK - Acknowledge UBX input and indicate success. (u-blox 9 p. 38)
 * UBX-ACK-NAK - Acknowledge UBX input and indicate failure. (u-blox 9 p. 38)
 * UBX-CFG-VALGET - Get Configuration Value. (u-blox 9 p. 85)
+* UBX-MON-COMMS - Monitor utilization of communication ports. (u-blox 9 p. 131)
 * UBX-MON-HW - Monitor Hardware to detect jamming. (u-blox 8 R15 p. 285)
 * UBX-MON-VER - Monitor hardware and software Version. (u-blox 9 p. 139)
-* UBX-NAV-HPPOSLLH - Report high precision position and altitude. (u-blox 9 p. 145)
+* UBX-NAV-HPPOSLLH - Report high precision lat/lon and height. (u-blox 9 p. 145)
 * UBX-NAV-STATUS - Report Status to detect spoofing. (u-blox 8 R15 p. 316)
 * UBX-NAV-SVIN - Report Survey-in status on DGNSS Base. (u-blox 9 p. 163)
 * UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (u-blox 9 p. 181)
@@ -1497,6 +1498,12 @@ log command.
     2019-06-18T19:11:44.745419Z <INFO> [27876] {7f65cb0405c0} Parse NMEA TXT "$GNTXT,01,01,02,GNSS OTP=GPS;GLO*37"
     2019-06-18T19:11:44.745606Z <INFO> [27876] {7f65cb0405c0} Parse NMEA TXT "$GNTXT,01,01,02,LLC=FFFFFFFF-FFFF7CBF-FFED7FAA-FFFFFFFF-FFFFFFF9*52"
     2019-06-18T19:11:44.745764Z <INFO> [27876] {7f65cb0405c0} Parse NMEA TXT "$GNTXT,01,01,02,PF=3FF*4B"
+
+The u-blox ZED-F9P issues unsolicited warning and error messages as NMEA TXT
+messages. For the most part these are undocumented. Like all other such
+messages, they are logged.
+
+    2019-11-15T17:09:05.039345Z <INFO> [24404] {7f1c8e05f600} Parse NMEA TXT "$GNTXT,01,01,00,MISM c 2 t 82497615*6C"
 
 ## Phantom GPS Satellite PRN 4
 
