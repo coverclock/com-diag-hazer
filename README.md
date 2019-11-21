@@ -625,6 +625,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.sparkfun.com/products/15136>
 
+<https://register.gotowebinar.com/recording/6016509329100006146>
+
 # Soundtrack
 
 Leonid & Friends, "Does Anybody Really Know What Time It Is" (Chicago)
@@ -1861,10 +1863,16 @@ send RTK update datagrams. (I have used two different Tumbleweed bases;
 the portable version I use with a tripod-mounted anntenna is code-named
 "bodega" and the one whose antenna is permanently fixed is "hacienda".)
 
+In one window:
+
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    survey tumbleweed:tumbleweed /dev/tumbleweed &
-    peruse survey err# Control-C to exit upon seeing "Ready".
+    survey tumbleweed:tumbleweed /dev/tumbleweed & peruse survey err
+
+In another window:
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
     peruse survey out
 
 Depending on the specified accuracy - encoded in a message sent to the
@@ -1890,10 +1898,16 @@ script that runs the receiver in fixed mode, in which the receiver
 is told what its location is, and so immediately begins transmitting
 corrections based on this information.
 
+In one window:
+
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    fixed tumbleweed:tumbleweed /dev/tumbleweed &
-    peruse fixed err# Control-C to exit upon seeing "Ready".
+    fixed tumbleweed:tumbleweed /dev/tumbleweed & peruse fixed err
+
+In another window:
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
     peruse fixed out
 
 The choice between running the base in survey mode or in fixed mode
@@ -1902,9 +1916,17 @@ present and seems sane, and the former if it is not. This allows you to
 restart the base station and have it do the right thing depending on
 whether or not the survey had been previously completed.
 
+In one window:
+
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    base tumbleweed:tumbleweed /dev/tumbleweed &
+    base tumbleweed:tumbleweed /dev/tumbleweed & peruse base err
+
+In another window:
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    peruse base out
 
 The .fix file contains the following UBX variables in character hex format
 in this order.
@@ -1938,6 +1960,10 @@ and is agnostic as to the Internet connection (I use a USB LTE modem).
 and ":tumbleweed" the service on the router to which send keep alive
 datagrams and receive RTK update datagrams as defined in /etc/services.
 (My rover is code-named "mochila".)
+
+I use just one window in these examples, but you can use two like
+I did for survey etc. above to monitor the error and output streams
+in parallel.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
