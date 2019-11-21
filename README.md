@@ -381,6 +381,14 @@ Raspbian 10 "Buster"
 Linux 4.19.58    
 gcc 8.3.0    
 
+"Silicon10"
+VM running under Windows 10
+Intel x86_64 64-bit
+Intel Core i7-3520M @ 2.90GHz x 2
+Ubuntu 19.10 "Eoan"
+Linux 5.3.0
+gcc 9.2.1
+
 # Articles
 
 Chip Overclock, "Better Never Than Late",
