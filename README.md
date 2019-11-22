@@ -1826,6 +1826,13 @@ I've described this at length in the article
 
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
+## EOF on the Device
+
+Several times, while running this software under Ubunto 19.10 under a virtual
+machine on a Lenovo ThinkPad T430s running Windows 10 - and only under those
+circumstances - I've seen gpstool receive an EOF from the input stream. The
+tool fired right back up with no problems.
+
 ## Differential GNSS Using Tumbleweed
 
 Tumbleweed uses three Raspberry Pi 3B+ SBCs and two Ardusimple SimpleRTK2B

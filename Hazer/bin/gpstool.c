@@ -2314,7 +2314,15 @@ int main(int argc, char * argv[])
      * retry.
      */
 
-    if (device != (const char *)0) {
+    if (device == (const char *)0) {
+
+        /* Do nothing. */
+
+    } else if (strcmp(device, "-") == 0) {
+
+        in_fp = stdin;
+
+    } else {
 
         dev_fd = open(device, readonly ? O_RDONLY : O_RDWR);
         if (dev_fd < 0) { diminuto_perror(device); }
@@ -2659,8 +2667,18 @@ int main(int argc, char * argv[])
             do {
 
                 ch = fgetc(in_fp);
-                if (ch == EOF) {
+                if (ch != EOF) {
+                    /* Do nothing. */
+                } else if (ferror(in_fp)) {
+                    DIMINUTO_LOG_WARNING("ERROR");
+                    eof = !0;
+                    break;
+                } else if (feof(in_fp)) {
                     DIMINUTO_LOG_NOTICE("EOF");
+                    eof = !0;
+                    break;
+                } else {
+                    DIMINUTO_LOG_ERROR("FAILURE");
                     eof = !0;
                     break;
                 }
