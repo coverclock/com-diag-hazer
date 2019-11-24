@@ -1828,10 +1828,18 @@ I've described this at length in the article
 
 ## EOF on the Device
 
-Several times, while running this software under Ubunto 19.10 under a virtual
-machine on a Lenovo ThinkPad T430s running Windows 10 - and only under those
-circumstances - I've seen gpstool receive an EOF from the input stream. The
-tool fired right back up with no problems.
+Several times, while running this software under Ubunto 19.10 in a
+virtual machine on a Lenovo ThinkPad T430s running Windows 10 using a
+U-blox ZED-F9P receiver on a SparkFun GPS-RTK2 board - and only under
+those circumstances - I've seen gpstool receive an EOF from the input
+stream. The standard I/O function ferror() returned false and feof()
+returned true. The tool fired right back up with no problem. This happens
+very infrequently, and my suspicion is that VMware Workstation 15 Pro is
+disconnecting the USB interface from the VM for some reason, maybe as a
+result of Windows 10 power management on the laptop. This is something
+to especially worry about if you are running a long term survey which
+would be interrupted by this event. (I was doing this mostly to test
+VMware and my Ubuntu installation on my field laptop.)
 
 ## Differential GNSS Using Tumbleweed
 
