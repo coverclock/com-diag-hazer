@@ -2142,10 +2142,6 @@ seconds. Thirty seconds is a typical timeout after which a firewall or router
 will remove the UDP return route. (This mechanism was inspired by a similar one
 used by SIP to route RTP packets via UDP to VoIP phones.)
 
-Note that the UDP stream is not encrypted, nor is the source of the datagrams
-authenticated, so this mechanism is not secure. It should be. I'm pondering how
-best to accomplish that. Probably DTLS.
-
 ### Hardware
 
 Although Tumbleweed has been implemented using the Ardusimple SimpleRTK2B
@@ -2155,6 +2151,18 @@ F9P application board, the C099-F9P, but I haven't tried it. Since I ended
 up implementing the inter-board communication channel on the Raspberry Pi,
 I don't need the support for various radio technologies that both the
 Ardusimple and the Ublox boards provide.
+
+### Issues
+
+Note that the UDP data stream is not encrypted, nor is the source
+of the datagrams authenticated, so this mechanism is not secure.
+It should be. I'm pondering how best to accomplish that.
+
+Datagram Transport Layer Security (DTLS) provides encryption and
+authentication for UDP protocols by adapting TLS (SSL) to datagram
+semantics, specifically dealing with lost or reordered packets.
+Unfortunately in doing so, DTLS eliminates the very advantages that
+caused me to choose UDP over TCP.
 
 ## Google Maps
 
