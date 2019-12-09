@@ -1,0 +1,419 @@
+Frame 13557: 136 bytes on wire (1088 bits), 136 bytes captured (1088 bits)
+    Encapsulation type: USB packets with Linux header and padding (115)
+    Arrival Time: Nov  9, 2019 14:17:06.044367000 MST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1573334226.044367000 seconds
+    [Time delta from previous captured frame: 0.000064000 seconds]
+    [Time delta from previous displayed frame: 0.000064000 seconds]
+    [Time since reference or first frame: 180.668568000 seconds]
+    Frame Number: 13557
+    Frame Length: 136 bytes (1088 bits)
+    Capture Length: 136 bytes (1088 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: usb]
+USB URB
+    [Source: 1.9.2]
+    [Destination: host]
+    URB id: 0x00000000ef306840
+    URB type: URB_COMPLETE ('C')
+    URB transfer type: URB_BULK (0x03)
+    Endpoint: 0x82, Direction: IN
+        1... .... = Direction: IN (1)
+        .... 0010 = Endpoint number: 2
+    Device: 9
+    URB bus id: 1
+    Device setup request: not relevant ('-')
+    Data: present (0)
+    URB sec: 1573334226
+    URB usec: 44367
+    URB status: Success (0)
+    URB length [bytes]: 72
+    Data length [bytes]: 72
+    [Request in: 13526]
+    [Time from request: 0.001832000 seconds]
+    [bInterfaceClass: Unknown (0xffff)]
+    Unused Setup Header
+    Interval: 0
+    Start frame: 0
+    Copy of Transfer Flags: 0x00000204
+    Number of ISO descriptors: 0
+Leftover Capture Data: 2447414753562c322c322c30382c31332c32332c3330342c...
+
+0000  40 68 30 ef 00 00 00 00 43 03 82 09 01 00 2d 00   @h0.....C.....-.
+0010  d2 2c c7 5d 00 00 00 00 4f ad 00 00 00 00 00 00   .,.]....O.......
+0020  48 00 00 00 48 00 00 00 00 00 00 00 00 00 00 00   H...H...........
+0030  00 00 00 00 00 00 00 00 04 02 00 00 00 00 00 00   ................
+0040  24 47 41 47 53 56 2c 32 2c 32 2c 30 38 2c 31 33   $GAGSV,2,2,08,13
+0050  2c 32 33 2c 33 30 34 2c 32 37 2c 31 35 2c 33 32   ,23,304,27,15,32
+0060  2c 32 34 36 2c 33 37 2c 32 34 2c 33 30 2c 30 35   ,246,37,24,30,05
+0070  38 2c 32 36 2c 32 35 2c 34 30 2c 31 32 33 2c 34   8,26,25,40,123,4
+0080  31 2c 37 2a 37 31 0d 0a                           1,7*71..
+
+Frame 13558: 64 bytes on wire (512 bits), 64 bytes captured (512 bits)
+    Encapsulation type: USB packets with Linux header and padding (115)
+    Arrival Time: Nov  9, 2019 14:17:06.044378000 MST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1573334226.044378000 seconds
+    [Time delta from previous captured frame: 0.000011000 seconds]
+    [Time delta from previous displayed frame: 0.000011000 seconds]
+    [Time since reference or first frame: 180.668579000 seconds]
+    Frame Number: 13558
+    Frame Length: 64 bytes (512 bits)
+    Capture Length: 64 bytes (512 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: usb]
+USB URB
+    [Source: host]
+    [Destination: 1.9.2]
+    URB id: 0x00000000ef306840
+    URB type: URB_SUBMIT ('S')
+    URB transfer type: URB_BULK (0x03)
+    Endpoint: 0x82, Direction: IN
+        1... .... = Direction: IN (1)
+        .... 0010 = Endpoint number: 2
+    Device: 9
+    URB bus id: 1
+    Device setup request: not relevant ('-')
+    Data: not present ('<')
+    URB sec: 1573334226
+    URB usec: 44378
+    URB status: Operation now in progress (-EINPROGRESS) (-115)
+    URB length [bytes]: 128
+    Data length [bytes]: 0
+    [bInterfaceClass: Unknown (0xffff)]
+    Unused Setup Header
+    Interval: 0
+    Start frame: 0
+    Copy of Transfer Flags: 0x00000204
+    Number of ISO descriptors: 0
+
+0000  40 68 30 ef 00 00 00 00 53 03 82 09 01 00 2d 3c   @h0.....S.....-<
+0010  d2 2c c7 5d 00 00 00 00 5a ad 00 00 8d ff ff ff   .,.]....Z.......
+0020  80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+0030  00 00 00 00 00 00 00 00 04 02 00 00 00 00 00 00   ................
+
+Frame 13559: 64 bytes on wire (512 bits), 64 bytes captured (512 bits)
+    Encapsulation type: USB packets with Linux header and padding (115)
+    Arrival Time: Nov  9, 2019 14:17:06.044479000 MST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1573334226.044479000 seconds
+    [Time delta from previous captured frame: 0.000101000 seconds]
+    [Time delta from previous displayed frame: 0.000101000 seconds]
+    [Time since reference or first frame: 180.668680000 seconds]
+    Frame Number: 13559
+    Frame Length: 64 bytes (512 bits)
+    Capture Length: 64 bytes (512 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: usb]
+USB URB
+    [Source: 1.9.2]
+    [Destination: host]
+    URB id: 0x00000000ef306780
+    URB type: URB_COMPLETE ('C')
+    URB transfer type: URB_BULK (0x03)
+    Endpoint: 0x82, Direction: IN
+        1... .... = Direction: IN (1)
+        .... 0010 = Endpoint number: 2
+    Device: 9
+    URB bus id: 1
+    Device setup request: not relevant ('-')
+    Data: present (0)
+    URB sec: 1573334226
+    URB usec: 44479
+    URB status: Success (0)
+    URB length [bytes]: 0
+    Data length [bytes]: 0
+    [Request in: 13528]
+    [Time from request: 0.001918000 seconds]
+    [bInterfaceClass: Unknown (0xffff)]
+    Unused Setup Header
+    Interval: 0
+    Start frame: 0
+    Copy of Transfer Flags: 0x00000204
+    Number of ISO descriptors: 0
+
+0000  80 67 30 ef 00 00 00 00 43 03 82 09 01 00 2d 00   .g0.....C.....-.
+0010  d2 2c c7 5d 00 00 00 00 bf ad 00 00 00 00 00 00   .,.]............
+0020  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+0030  00 00 00 00 00 00 00 00 04 02 00 00 00 00 00 00   ................
+
+Frame 13560: 64 bytes on wire (512 bits), 64 bytes captured (512 bits)
+    Encapsulation type: USB packets with Linux header and padding (115)
+    Arrival Time: Nov  9, 2019 14:17:06.044490000 MST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1573334226.044490000 seconds
+    [Time delta from previous captured frame: 0.000011000 seconds]
+    [Time delta from previous displayed frame: 0.000011000 seconds]
+    [Time since reference or first frame: 180.668691000 seconds]
+    Frame Number: 13560
+    Frame Length: 64 bytes (512 bits)
+    Capture Length: 64 bytes (512 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: usb]
+USB URB
+    [Source: host]
+    [Destination: 1.9.2]
+    URB id: 0x00000000ef306780
+    URB type: URB_SUBMIT ('S')
+    URB transfer type: URB_BULK (0x03)
+    Endpoint: 0x82, Direction: IN
+        1... .... = Direction: IN (1)
+        .... 0010 = Endpoint number: 2
+    Device: 9
+    URB bus id: 1
+    Device setup request: not relevant ('-')
+    Data: not present ('<')
+    URB sec: 1573334226
+    URB usec: 44490
+    URB status: Operation now in progress (-EINPROGRESS) (-115)
+    URB length [bytes]: 128
+    Data length [bytes]: 0
+    [bInterfaceClass: Unknown (0xffff)]
+    Unused Setup Header
+    Interval: 0
+    Start frame: 0
+    Copy of Transfer Flags: 0x00000204
+    Number of ISO descriptors: 0
+
+0000  80 67 30 ef 00 00 00 00 53 03 82 09 01 00 2d 3c   .g0.....S.....-<
+0010  d2 2c c7 5d 00 00 00 00 ca ad 00 00 8d ff ff ff   .,.]............
+0020  80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+0030  00 00 00 00 00 00 00 00 04 02 00 00 00 00 00 00   ................
+
+Frame 13561: 64 bytes on wire (512 bits), 64 bytes captured (512 bits)
+    Encapsulation type: USB packets with Linux header and padding (115)
+    Arrival Time: Nov  9, 2019 14:17:06.044502000 MST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1573334226.044502000 seconds
+    [Time delta from previous captured frame: 0.000012000 seconds]
+    [Time delta from previous displayed frame: 0.000012000 seconds]
+    [Time since reference or first frame: 180.668703000 seconds]
+    Frame Number: 13561
+    Frame Length: 64 bytes (512 bits)
+    Capture Length: 64 bytes (512 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: usb]
+USB URB
+    [Source: 1.9.2]
+    [Destination: host]
+    URB id: 0x00000000ef3069c0
+    URB type: URB_COMPLETE ('C')
+    URB transfer type: URB_BULK (0x03)
+    Endpoint: 0x82, Direction: IN
+        1... .... = Direction: IN (1)
+        .... 0010 = Endpoint number: 2
+    Device: 9
+    URB bus id: 1
+    Device setup request: not relevant ('-')
+    Data: present (0)
+    URB sec: 1573334226
+    URB usec: 44502
+    URB status: Success (0)
+    URB length [bytes]: 0
+    Data length [bytes]: 0
+    [Request in: 13530]
+    [Time from request: 0.001579000 seconds]
+    [bInterfaceClass: Unknown (0xffff)]
+    Unused Setup Header
+    Interval: 0
+    Start frame: 0
+    Copy of Transfer Flags: 0x00000204
+    Number of ISO descriptors: 0
+
+0000  c0 69 30 ef 00 00 00 00 43 03 82 09 01 00 2d 00   .i0.....C.....-.
+0010  d2 2c c7 5d 00 00 00 00 d6 ad 00 00 00 00 00 00   .,.]............
+0020  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+0030  00 00 00 00 00 00 00 00 04 02 00 00 00 00 00 00   ................
+
+Frame 13562: 64 bytes on wire (512 bits), 64 bytes captured (512 bits)
+    Encapsulation type: USB packets with Linux header and padding (115)
+    Arrival Time: Nov  9, 2019 14:17:06.044508000 MST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1573334226.044508000 seconds
+    [Time delta from previous captured frame: 0.000006000 seconds]
+    [Time delta from previous displayed frame: 0.000006000 seconds]
+    [Time since reference or first frame: 180.668709000 seconds]
+    Frame Number: 13562
+    Frame Length: 64 bytes (512 bits)
+    Capture Length: 64 bytes (512 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: usb]
+USB URB
+    [Source: host]
+    [Destination: 1.9.2]
+    URB id: 0x00000000ef3069c0
+    URB type: URB_SUBMIT ('S')
+    URB transfer type: URB_BULK (0x03)
+    Endpoint: 0x82, Direction: IN
+        1... .... = Direction: IN (1)
+        .... 0010 = Endpoint number: 2
+    Device: 9
+    URB bus id: 1
+    Device setup request: not relevant ('-')
+    Data: not present ('<')
+    URB sec: 1573334226
+    URB usec: 44508
+    URB status: Operation now in progress (-EINPROGRESS) (-115)
+    URB length [bytes]: 128
+    Data length [bytes]: 0
+    [bInterfaceClass: Unknown (0xffff)]
+    Unused Setup Header
+    Interval: 0
+    Start frame: 0
+    Copy of Transfer Flags: 0x00000204
+    Number of ISO descriptors: 0
+
+0000  c0 69 30 ef 00 00 00 00 53 03 82 09 01 00 2d 3c   .i0.....S.....-<
+0010  d2 2c c7 5d 00 00 00 00 dc ad 00 00 8d ff ff ff   .,.]............
+0020  80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+0030  00 00 00 00 00 00 00 00 04 02 00 00 00 00 00 00   ................
+
+Frame 13563: 72 bytes on wire (576 bits), 72 bytes captured (576 bits)
+    Encapsulation type: USB packets with Linux header and padding (115)
+    Arrival Time: Nov  9, 2019 14:17:06.044519000 MST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1573334226.044519000 seconds
+    [Time delta from previous captured frame: 0.000011000 seconds]
+    [Time delta from previous displayed frame: 0.000011000 seconds]
+    [Time since reference or first frame: 180.668720000 seconds]
+    Frame Number: 13563
+    Frame Length: 72 bytes (576 bits)
+    Capture Length: 72 bytes (576 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: usb]
+USB URB
+    [Source: 1.9.2]
+    [Destination: host]
+    URB id: 0x00000000efa68780
+    URB type: URB_COMPLETE ('C')
+    URB transfer type: URB_BULK (0x03)
+    Endpoint: 0x82, Direction: IN
+        1... .... = Direction: IN (1)
+        .... 0010 = Endpoint number: 2
+    Device: 9
+    URB bus id: 1
+    Device setup request: not relevant ('-')
+    Data: present (0)
+    URB sec: 1573334226
+    URB usec: 44519
+    URB status: Success (0)
+    URB length [bytes]: 8
+    Data length [bytes]: 8
+    [Request in: 13532]
+    [Time from request: 0.001553000 seconds]
+    [bInterfaceClass: Unknown (0xffff)]
+    Unused Setup Header
+    Interval: 0
+    Start frame: 0
+    Copy of Transfer Flags: 0x00000204
+    Number of ISO descriptors: 0
+Leftover Capture Data: 382c322a37300d0a
+
+0000  80 87 a6 ef 00 00 00 00 43 03 82 09 01 00 2d 00   ........C.....-.
+0010  d2 2c c7 5d 00 00 00 00 e7 ad 00 00 00 00 00 00   .,.]............
+0020  08 00 00 00 08 00 00 00 00 00 00 00 00 00 00 00   ................
+0030  00 00 00 00 00 00 00 00 04 02 00 00 00 00 00 00   ................
+0040  38 2c 32 2a 37 30 0d 0a                           8,2*70..
+
+Frame 13564: 64 bytes on wire (512 bits), 64 bytes captured (512 bits)
+    Encapsulation type: USB packets with Linux header and padding (115)
+    Arrival Time: Nov  9, 2019 14:17:06.044527000 MST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1573334226.044527000 seconds
+    [Time delta from previous captured frame: 0.000008000 seconds]
+    [Time delta from previous displayed frame: 0.000008000 seconds]
+    [Time since reference or first frame: 180.668728000 seconds]
+    Frame Number: 13564
+    Frame Length: 64 bytes (512 bits)
+    Capture Length: 64 bytes (512 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: usb]
+USB URB
+    [Source: host]
+    [Destination: 1.9.2]
+    URB id: 0x00000000efa68780
+    URB type: URB_SUBMIT ('S')
+    URB transfer type: URB_BULK (0x03)
+    Endpoint: 0x82, Direction: IN
+        1... .... = Direction: IN (1)
+        .... 0010 = Endpoint number: 2
+    Device: 9
+    URB bus id: 1
+    Device setup request: not relevant ('-')
+    Data: not present ('<')
+    URB sec: 1573334226
+    URB usec: 44527
+    URB status: Operation now in progress (-EINPROGRESS) (-115)
+    URB length [bytes]: 128
+    Data length [bytes]: 0
+    [bInterfaceClass: Unknown (0xffff)]
+    Unused Setup Header
+    Interval: 0
+    Start frame: 0
+    Copy of Transfer Flags: 0x00000204
+    Number of ISO descriptors: 0
+
+0000  80 87 a6 ef 00 00 00 00 53 03 82 09 01 00 2d 3c   ........S.....-<
+0010  d2 2c c7 5d 00 00 00 00 ef ad 00 00 8d ff ff ff   .,.]............
+0020  80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+0030  00 00 00 00 00 00 00 00 04 02 00 00 00 00 00 00   ................
+
+Frame 13565: 136 bytes on wire (1088 bits), 136 bytes captured (1088 bits)
+    Encapsulation type: USB packets with Linux header and padding (115)
+    Arrival Time: Nov  9, 2019 14:17:06.045116000 MST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1573334226.045116000 seconds
+    [Time delta from previous captured frame: 0.000589000 seconds]
+    [Time delta from previous displayed frame: 0.000589000 seconds]
+    [Time since reference or first frame: 180.669317000 seconds]
+    Frame Number: 13565
+    Frame Length: 136 bytes (1088 bits)
+    Capture Length: 136 bytes (1088 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: usb]
+USB URB
+    [Source: 1.9.2]
+    [Destination: host]
+    URB id: 0x00000000dbf6b180
+    URB type: URB_COMPLETE ('C')
+    URB transfer type: URB_BULK (0x03)
+    Endpoint: 0x82, Direction: IN
+        1... .... = Direction: IN (1)
+        .... 0010 = Endpoint number: 2
+    Device: 9
+    URB bus id: 1
+    Device setup request: not relevant ('-')
+    Data: present (0)
+    URB sec: 1573334226
+    URB usec: 45116
+    URB status: Success (0)
+    URB length [bytes]: 72
+    Data length [bytes]: 72
+    [Request in: 13534]
+    [Time from request: 0.002069000 seconds]
+    [bInterfaceClass: Unknown (0xffff)]
+    Unused Setup Header
+    Interval: 0
+    Start frame: 0
+    Copy of Transfer Flags: 0x00000204
+    Number of ISO descriptors: 0
+Leftover Capture Data: 2447414753562c322c322c30382c31332c32332c3330342c...
+
+0000  80 b1 f6 db 00 00 00 00 43 03 82 09 01 00 2d 00   ........C.....-.
+0010  d2 2c c7 5d 00 00 00 00 3c b0 00 00 00 00 00 00   .,.]....<.......
+0020  48 00 00 00 48 00 00 00 00 00 00 00 00 00 00 00   H...H...........
+0030  00 00 00 00 00 00 00 00 04 02 00 00 00 00 00 00   ................
+0040  24 47 41 47 53 56 2c 32 2c 32 2c 30 38 2c 31 33   $GAGSV,2,2,08,13
+0050  2c 32 33 2c 33 30 34 2c 32 33 2c 31 35 2c 33 32   ,23,304,23,15,32
+0060  2c 32 34 36 2c 33 36 2c 32 34 2c 33 30 2c 30 35   ,246,36,24,30,05
+0070  38 2c 32 32 2c 32 35 2c 34 30 2c 31 32 33 2c 34   8,22,25,40,123,4
+0080  31 2c 32 2a 37 35 0d 0a                           1,2*75..

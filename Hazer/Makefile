@@ -21,8 +21,8 @@ default:	all
 TITLE				:=	Hazer
 
 MAJOR				:=	27# API changes that may require that applications be modified.
-MINOR				:=	2# Only functionality or features added with no legacy API changes.
-BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
+MINOR				:=	7# Only functionality or features added with no legacy API changes.
+BUILD				:=	1# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -703,12 +703,15 @@ install-include:
 
 ########## Unit Test
 
-unit-test:
+sanity:
 	R="PASSED."; \
 	mkdir -p $(OUT)/log; \
 	cp /dev/null $(OUT)/log/unit-test.log; \
 	for U in $(TARGETUNITTESTS); do \
 		echo "UNIT TEST" $$U >> $(OUT)/log/unit-test.log; \
-		$$U >> $(OUT)/log/unit-test.log 2>&1 || R="FAILED!"; \
+		T="PASSED."; \
+		$$U >> $(OUT)/log/unit-test.log 2>&1 || T="FAILED!"; \
+		echo "UNIT TEST" $$U: $$T; \
+		test "$$T" = "FAILED!" && R="$$T"; \
 	done; \
 	echo $$R 1>&2

@@ -68,7 +68,8 @@ enum {
  * support, plus a trailing NUL. It's not big enough to hold any datagram
  * (that would be in the neighborhood of 65508 bytes). But it will for sure
  * hold a NMEA, UBX, or RTCM payload. It includes a leading sequence number
- * field that is transmitted over wire or air in network byte order.
+ * field that is transmitted over wire or air in network byte order. The
+ * sequence number is uint32_t aligned, which Yodel/UBX cares about.
  */
 typedef struct DatagramBuffer {
     datagram_header_t header;

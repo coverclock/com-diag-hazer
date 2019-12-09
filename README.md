@@ -175,9 +175,10 @@ Yodel recognizes the following received UBX messages.
 * UBX-ACK-ACK - Acknowledge UBX input and indicate success. (u-blox 9 p. 38)
 * UBX-ACK-NAK - Acknowledge UBX input and indicate failure. (u-blox 9 p. 38)
 * UBX-CFG-VALGET - Get Configuration Value. (u-blox 9 p. 85)
+* UBX-MON-COMMS - Monitor utilization of communication ports. (u-blox 9 p. 131)
 * UBX-MON-HW - Monitor Hardware to detect jamming. (u-blox 8 R15 p. 285)
 * UBX-MON-VER - Monitor hardware and software Version. (u-blox 9 p. 139)
-* UBX-NAV-HPPOSLLH - Report high precision position and altitude. (u-blox 9 p. 145)
+* UBX-NAV-HPPOSLLH - Report high precision lat/lon and height. (u-blox 9 p. 145)
 * UBX-NAV-STATUS - Report Status to detect spoofing. (u-blox 8 R15 p. 316)
 * UBX-NAV-SVIN - Report Survey-in status on DGNSS Base. (u-blox 9 p. 163)
 * UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (u-blox 9 p. 181)
@@ -351,7 +352,7 @@ Raspbian 9.9 "Stretch"
 Linux 4.19.42    
 gcc 6.3.0    
 
-"Bodega", "Mochila", and "ElJefe" (updated)    
+"Bodega", "Mochila", "Hacienda", and "ElJefe" (updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
@@ -379,6 +380,14 @@ Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4
 Raspbian 10 "Buster"    
 Linux 4.19.58    
 gcc 8.3.0    
+
+"Silicon10"    
+VM running in VMware Workstation 15 Pro under Windows 10    
+Intel x86_64 64-bit    
+Intel Core i7-3520M @ 2.90GHz x 2    
+Ubuntu 19.10 "Eoan"    
+Linux 5.3.0    
+gcc 9.2.1    
 
 # Articles
 
@@ -616,6 +625,10 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.sparkfun.com/products/15136>
 
+<https://register.gotowebinar.com/recording/6016509329100006146>
+
+<https://www.cbsnews.com/news/global-positioning-system-preparing-the-next-generation-of-gps/> CBS Sunday Morning, "Preparing the next generation of GPS", 2019-12-01, video
+
 # Soundtrack
 
 Leonid & Friends, "Does Anybody Really Know What Time It Is" (Chicago)
@@ -718,24 +731,25 @@ lines that need to be added to the indicated files.
 # Utilities
 
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
-* base - configures and runs a UBX-ZED-F9P chip as a base station in survey mode.
-* benchmark - configures and runs a UBX-ZED-F9P chip as a corrected mobile rover saving a CSV.
+* base - configures and runs a UBX-ZED-F9P as a base in survey or fixed mode.
+* benchmark - configures and runs a UBX-ZED-F9P as a corrected rover saving a CSV.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
-* station - configures and runs a UBX-ZED-F9P chip as a base station in fixed mode.
+* fixed - configures and runs a UBX-ZED-F9P as a base station in fixed mode.
 * googlemaps - convert gpstool coordinate strings to formats accepted by Google Maps.
-* gpstool - serves as Hazer's all purpose GNSS pocket tool.
+* gpstool - serves as Hazer's multi purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
-* mobile - configures and runs a UBX-ZED-F9P chip as an uncorrected mobile rover.
+* mobile - configures and runs a UBX-ZED-F9P as an uncorrected rover.
 * peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
 * proxy - receive UDP packets from the Base and forward to the Rover.
 * router - routes UDP packets received from a base to all rovers.
-* rover - configures and runs a UBX-ZED-F9P chip as a corrected mobile rover.
+* rover - configures and runs a UBX-ZED-F9P as a corrected rover.
+* survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * ubxval - converts a number into a UBX-usable form.
 
@@ -784,12 +798,13 @@ lines that need to be added to the indicated files.
 ## gpstool
 
     > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ][ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE ]
+    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
            -B BYTES    Set the input Buffer size to BYTES bytes.
+           -C FILE     Catenate input to FILE or named pipe.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
            -F          Like -R but reFresh at 1Hz.
@@ -829,7 +844,7 @@ lines that need to be added to the indicated files.
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
-           -x          Run in the background as a daemon.
+           -x          EXit if a NAK is received.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
 
 ## rtktool
@@ -1128,7 +1143,7 @@ time in seconds. This can be set from the command line, in the range 0
 to the default of 255. If the data is not updated within that duration by
 new sentences or messages from the GPS device, it is no longer displayed.
 
-# Notes
+# Remarks
 
 > N.B. Most of the snapshots below were taken from earlier versions of Hazer and
 > its gpstool utility. The snapshots were cut and pasted from actual output and
@@ -1496,6 +1511,12 @@ log command.
     2019-06-18T19:11:44.745606Z <INFO> [27876] {7f65cb0405c0} Parse NMEA TXT "$GNTXT,01,01,02,LLC=FFFFFFFF-FFFF7CBF-FFED7FAA-FFFFFFFF-FFFFFFF9*52"
     2019-06-18T19:11:44.745764Z <INFO> [27876] {7f65cb0405c0} Parse NMEA TXT "$GNTXT,01,01,02,PF=3FF*4B"
 
+The u-blox ZED-F9P issues unsolicited warning and error messages as NMEA TXT
+messages. For the most part these are undocumented. Like all other such
+messages, they are logged.
+
+    2019-11-15T17:09:05.039345Z <INFO> [24404] {7f1c8e05f600} Parse NMEA TXT "$GNTXT,01,01,00,MISM c 2 t 82497615*6C"
+
 ## Phantom GPS Satellite PRN 4
 
 Around 2018-11-29T12:00-07:00, I was testing some changes to Hazer with
@@ -1792,41 +1813,35 @@ use SimpleRTK2B boards interchangeably in the field.
 > met my needs, although I tried both, the latter using AT&T LTE-M SIMs. As
 > far as I can tell, however, both worked as advertised.
 
-## Lost /dev/ttyACM Characters on Intel NUC/Ubuntu
+## Lost /dev/ttyACM Characters
 
 I've been troubleshooting a weird issue with sequences of characters being
-lost on the modem-ish (ttyACM) USB connection between a U-blox UBX-ZED-F9P
-(generation 9). This occurs when using the Ardusimple SimpleRTK2B and
-Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation
-8) in a GlobalSat BU353W10 dongle. I've described this at length in
-the article
+lost on the modem-ish (ttyACM) USB connection on a U-blox UBX-ZED-F9P
+(generation 9) chip. This occurs when using the Ardusimple SimpleRTK2B and
+Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation 8)
+chip in a GlobalSat BU353W10 dongle. I've seen in on Intel (Dell) and
+ARM (Raspberry Pi 3B+ and 4B) systems. I've seen it using my software,
+using socat, and even just using cat, to collect data off the USB port.
+I've seen it at a variety of baud rates.
+
+I've described this at length in the article
 
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
-I see this when I run Hazer under Ubuntu on Intel servers (Nickel,
-Cadmium, and Mercury as described above) and under Raspian on a Raspberry
-Pi 4B (Rhodium ibid). I to NOT see it running on under the SAME version
-of Raspbian on a Raspberry Pi 3B+ (Gold, Bodega, and Mochila ibid).
-Both Ubuntu and Raspbian are Debian-based Linux distributions.
+## EOF on the Device
 
-It is reproducible by removing Hazer from the test completely and just
-using standard utilities like cat and socat. Since presumably these
-utilities are consuming data from the device as quickly as possible, it
-doesn't seem to be a speed issue. (And it doesn't occur on the slower
-Pi 3B+.)
-
-This smells like a conflict with some other daemon like Modem Manager. But
-I have Modem Manager disabled (or else it doesn't exist); also, a looping
-lsof command doesn't find another process opening the ttyACM device.
-
-There doesn't seem to be a consistent pattern in what characters are lost.
-
-Enabling flow control on the device and in gpstool doesn't seem to have
-any effect.
-
-I haven't reported this to U-blox because it doesn't seem like a
-U-blox bug.  I would really like this to be a software bug on my part,
-because then I could fix it; but that strategy is looking iffy.
+Several times, while running this software under Ubunto 19.10 in a
+virtual machine on a Lenovo ThinkPad T430s running Windows 10 using a
+U-blox ZED-F9P receiver on a SparkFun GPS-RTK2 board - and only under
+those circumstances - I've seen gpstool receive an EOF from the input
+stream. The standard I/O function ferror() returned false and feof()
+returned true. The tool fired right back up with no problem. This happens
+very infrequently, and my suspicion is that VMware Workstation 15 Pro is
+disconnecting the USB interface from the VM for some reason, maybe as a
+result of Windows 10 power management on the laptop. This is something
+to especially worry about if you are running a long term survey which
+would be interrupted by this event. (I was doing this mostly to test
+VMware and my Ubuntu installation on my field laptop.)
 
 ## Differential GNSS Using Tumbleweed
 
@@ -1840,6 +1855,8 @@ one of the Pis is a router that receives RTK updates from one base station
 and forwards them to one or more rovers. (You can combine the base and the
 router on to one Pi, but I chose not to configure my set up that way.)
 
+### Router
+
 The Tumbleweed router, which is on my LAN, must have a static IP address
 or a usable Dynamic DNS (DDNS) address (which is what I do) that can be
 reached through the firewall. ":tumbleweed" identifies the service on the
@@ -1852,28 +1869,38 @@ this and related names in logs, screen shots, etc.)
     router :tumbleweed &
     peruse router err
 
-The Tumbleweed base is typically on my LAN, but can be on the WAN by changing
-the hostname through which the router is addressed. "tumbleweed:" idenfities
-the hostname of the router on the LAN as defined in /etc/hosts, and
-":tumbleweed" the service on the router on the LAN defined as in /etc/services
-(typically I defined this to be port 21010) to which to send RTK update
-datagrams. (I have used two different Tumbleweed bases; the portable version
-is code-named "bodega" and the one whose antenna is permanently fixed is
-"hacienda".)
+### Base
+
+The Tumbleweed base is typically on my LAN, but can be on the WAN by
+changing the hostname through which the router is addressed. "tumbleweed:"
+idenfities the hostname of the router on the LAN as defined in /etc/hosts,
+and ":tumbleweed" the service on the router on the LAN defined as in
+/etc/services (typically I defined this to be port 21010) to which to
+send RTK update datagrams. (I have used two different Tumbleweed bases;
+the portable version I use with a tripod-mounted anntenna is code-named
+"bodega" and the one whose antenna is permanently fixed is "hacienda".)
+
+In one window:
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    base tumbleweed:tumbleweed &
-    peruse base err# Control-C to exit upon seeing "Ready".
-    peruse base out
+    survey tumbleweed:tumbleweed /dev/tumbleweed & peruse survey err
+
+In another window:
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    peruse survey out
 
 Depending on the specified accuracy - encoded in a message sent to the
 chip by the script - it can take days for the receiver to arrive at a
-solution that has the required radius of error. This depends greatly
-on antenna placement as well as other factors that may be less under
-your control. Putting the antenna in my front yard, which has the usual
-ground clutter of trees and adjacent houses, resulted in taking about
-two days to get to ten centimeters, about four inches.
+solution that has the required radius of error. This depends greatly on
+antenna placement as well as other factors that may be less under your
+control. Putting the antenna in my front yard, which has the usual ground
+clutter of trees and adjacent houses, resulted in taking about two days
+to get to a resolution of ten centimeters, about four inches. Using a
+permanently attached antenna near the peak of the roof of my house took
+a little over twelve hours to get the same resolution.
 
 Because of this potentially lengthy duration of the survey, you don't want
 to do it more than once. First rule is: don't move the antenna. (If you
@@ -1894,11 +1921,60 @@ script that runs the receiver in fixed mode, in which the receiver
 is told what its location is, and so immediately begins transmitting
 corrections based on this information.
 
+In one window:
+
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    station tumbleweed:tumbleweed &
-    peruse station err# Control-C to exit upon seeing "Ready".
-    peruse station out
+    fixed tumbleweed:tumbleweed /dev/tumbleweed & peruse fixed err
+
+In another window:
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    peruse fixed out
+
+The choice between running the base in survey mode or in fixed mode
+is automated in a script that does latter if the base.fix file is
+present and seems sane, and the former if it is not. This allows you to
+restart the base station and have it do the right thing depending on
+whether or not the survey had been previously completed.
+
+In one window:
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    base tumbleweed:tumbleweed /dev/tumbleweed & peruse base err
+
+In another window:
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    peruse base out
+
+The .fix file contains the following UBX variables in character hex format
+in this order.
+
+    FIXED_POS_ACC
+    LAT
+    LATHP
+    LON
+    LONHP
+    HEIGHT
+    HEIGHTHP
+
+Here is an example of an actual base.fix file that resulted from a
+survey done with 10 cm (1000 x 0.1mm) accuracy; note that UBX stores
+its variables in little-endian byte order.
+
+    \xe8\x03\x00\x00
+    \xb1\x1f\xb8\x17
+    \x20
+    \x91\xdc\x52\xc1
+    \xe5
+    \x01\x94\x02\x00
+    \x1d
+
+### Rover
 
 A Tumbleweed rover (there can be more than one) is typically on the WAN,
 and is agnostic as to the Internet connection (I use a USB LTE modem).
@@ -1908,9 +1984,13 @@ and ":tumbleweed" the service on the router to which send keep alive
 datagrams and receive RTK update datagrams as defined in /etc/services.
 (My rover is code-named "mochila".)
 
+I use just one window in these examples, but you can use two like
+I did for survey etc. above to monitor the error and output streams
+in parallel.
+
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    rover tumbleweed.test:tumbleweed &
+    rover tumbleweed.test:tumbleweed /dev/tumblweed &
     peruse rover err# Control-C to exit upon seeing "Ready".
     peruse rover out
 
@@ -1927,7 +2007,7 @@ WGS84 datum based on space observations.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
-    benchmark tumbleweed.test:tumbleweed &
+    benchmark tumbleweed.test:tumbleweed /dev/tumbleweed &
     peruse benchmark err# Control-C to exit upon seeing "Ready".
     peruse benchmark csv
 
@@ -1939,9 +2019,28 @@ of the rover configuration seems to be sticky.)
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     # Power cycle the F9P if previously configured for corrections.
-    mobile &
+    mobile /dev/tumbleweed &
     peruse mobile err# Control-C to exit upon seeing "Ready".
     peruse mobile out
+
+### Daemons
+
+I'm running all three, router, base, and rover, as simple background
+processes.  But it is also possible to run them in daemon mode, in which
+case messages normally written to standard error are logged to the system
+log. Also, I run all three in "headless" mode, where the screens normally
+written to standard output are instead written to a file, and a script
+is used to display the file as it changes; this decouples the router,
+rover, and base software from the display terminal while still allowing
+an on-demand real-time display. (This requires that the inotify-tools
+package be installed on the Pi.)
+
+Both gpstool (which implements the base and the rover) and rtktool (which
+implements the router) can be run as daemons via a command line switch
+(although I have not done so in these examples); the headless mode can
+still be used.
+
+### Networking
 
 Note that the actual IP address of neither the base nor the rover need
 be known. This is important because the rover (and sometimes the base)
@@ -1963,30 +2062,17 @@ this; but it means the IP address you begin with in your survey will
 not be the one you end up with when the survey is complete or as the
 base sends subsequent updates to the rover.
 
-The Tumbleweed router does require a fixed IP address for this to work. In my
-setup, the Tumbleweed router connects to my home IP router (in my case,
-directly via wired Ethernet). But my IP router gets its globally routable
-WAN IP address from my internet provider via DHCP. My IP router supports Dynamic
-DNS (DDNS), in which it automatically sends an notification to my DDNS provider
-regarding the assigned IP address, who then changes the DNS database to map
-a fixed FQDN to the provided address. This FQDN is represented by
-"tumbleweed.test" above. I have configured the firewall in my IP router to 
-forward the port named "tumbleweed" above to and from the same port on the
-static IP address on my LAN that I assigned to the Tumbleweed router.
-
-I'm running all three, router, base, and rover, as simple background processes.
-But it is also possible to run them in daemon mode, in which case messages
-normally written to standard error are logged to the system log. Also, I run
-all three in "headless" mode, where the screens normally written to standard
-output are instead written to a file, and a script is used to display the file
-as it changes; this decouples the router, rover, and base software from the
-display terminal while still allowing an on-demand real-time display. (This
-requires that the inotify-tools package be installed on the Pi.)
-
-Both gpstool (which implements the base and the rover) and rtktool (which
-implements the router) can be run as daemons via a command line switch
-(although I have not done so in these examples); the headless mode can still
-be used.
+The Tumbleweed router does require a fixed IP address for this to
+work. In my setup, the Tumbleweed router connects to my home IP router
+(in my case, directly via wired Ethernet). But my IP router gets its
+globally routable WAN IP address from my internet provider via DHCP. My
+IP router supports Dynamic DNS (DDNS), in which it automatically sends
+an notification to my DDNS provider regarding the assigned IP address,
+who then changes the DNS database to map a fixed FQDN to the provided
+address. This FQDN is represented by "tumbleweed.test" above. I have
+configured the firewall in my IP router to forward the port named
+"tumbleweed" above to and from the same port on the static IP address
+on my LAN that I assigned to the Tumbleweed router.
 
 As mentioned above, it is not unusual to see a WAN connected rover or base
 drop off and reappear on the WAN, often with a different port number and
@@ -2064,9 +2150,7 @@ seconds. Thirty seconds is a typical timeout after which a firewall or router
 will remove the UDP return route. (This mechanism was inspired by a similar one
 used by SIP to route RTP packets via UDP to VoIP phones.)
 
-Note that the UDP stream is not encrypted, nor is the source of the datagrams
-authenticated, so this mechanism is not secure. It should be. I'm pondering how
-best to accomplish that. Probably DTLS.
+### Hardware
 
 Although Tumbleweed has been implemented using the Ardusimple SimpleRTK2B
 board, the same software runs on the SparkFun GPS-RTK2 board which uses the
@@ -2075,6 +2159,18 @@ F9P application board, the C099-F9P, but I haven't tried it. Since I ended
 up implementing the inter-board communication channel on the Raspberry Pi,
 I don't need the support for various radio technologies that both the
 Ardusimple and the Ublox boards provide.
+
+### Issues
+
+Note that the UDP data stream is not encrypted, nor is the source
+of the datagrams authenticated, so this mechanism is not secure.
+It should be. I'm pondering how best to accomplish that.
+
+Datagram Transport Layer Security (DTLS) provides encryption and
+authentication for UDP protocols by adapting TLS (SSL) to datagram
+semantics, specifically dealing with lost or reordered packets.
+Unfortunately in doing so, DTLS eliminates the very advantages that
+caused me to choose UDP over TCP.
 
 ## Google Maps
 
