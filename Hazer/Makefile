@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	27# API changes that may require that applications be modified.
 MINOR				:=	7# Only functionality or features added with no legacy API changes.
-BUILD				:=	1# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	2# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.

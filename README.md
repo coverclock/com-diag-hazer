@@ -1907,11 +1907,13 @@ to do it more than once. First rule is: don't move the antenna. (If you
 do, you'll have to do another survey, no matter what.) Second rule is:
 don't restart the receiver.
 
-N.B.: Experience in testing the F9P receiver suggests that survey mode
-has a maximum duration of thirty (30) days. At thirty days plus one second
+N.B.: Experience in testing the F9P receiver suggests that survey mode has
+a maximum duration of thirty (30) days. At thirty days plus one second
 (2592001 seconds total), the error distance calculated by the receiver
-ceases to become any smaller. The gpstool utility reports both of these
-values in the BAS output line. This is probably documented somewhere.
+ceases to become any smaller and the elapsed time of the survey ceases to
+become any larger. The gpstool utility reports both of these values in
+the BAS output line. This is probably mentioned somewhere in the U-blox
+9 interface document.
 
 Fortunately, once a survey is successfully completed, the base station
 script saves the pertinent results from a successful survey in a file
