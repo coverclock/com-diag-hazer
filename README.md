@@ -381,13 +381,13 @@ Raspbian 10 "Buster"
 Linux 4.19.58    
 gcc 8.3.0    
 
-"Silicon10"
-VM running under Windows 10
-Intel x86_64 64-bit
-Intel Core i7-3520M @ 2.90GHz x 2
-Ubuntu 19.10 "Eoan"
-Linux 5.3.0
-gcc 9.2.1
+"Silicon10"    
+VM running in VMware Workstation 15 Pro under Windows 10    
+Intel x86_64 64-bit    
+Intel Core i7-3520M @ 2.90GHz x 2    
+Ubuntu 19.10 "Eoan"    
+Linux 5.3.0    
+gcc 9.2.1    
 
 # Articles
 
@@ -628,6 +628,8 @@ astronomers in the audience, but it wasn't to me.
 <https://register.gotowebinar.com/recording/6016509329100006146>
 
 <https://www.scientificamerican.com/article/gps-is-easy-to-hack-and-the-u-s-has-no-backup/> Paul Tullis, "GPS Is Easy To Hack, And The U.S. Has No Backup", Scientific American, 2019-12-01 (published in the 2019-12 print edition under the title "GPS Down")
+
+<https://www.cbsnews.com/news/global-positioning-system-preparing-the-next-generation-of-gps/> CBS Sunday Morning, "Preparing the next generation of GPS", 2019-12-01, video
 
 # Soundtrack
 
@@ -1828,6 +1830,21 @@ I've described this at length in the article
 
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
+## EOF on the Device
+
+Several times, while running this software under Ubunto 19.10 in a
+virtual machine on a Lenovo ThinkPad T430s running Windows 10 using a
+U-blox ZED-F9P receiver on a SparkFun GPS-RTK2 board - and only under
+those circumstances - I've seen gpstool receive an EOF from the input
+stream. The standard I/O function ferror() returned false and feof()
+returned true. The tool fired right back up with no problem. This happens
+very infrequently, and my suspicion is that VMware Workstation 15 Pro is
+disconnecting the USB interface from the VM for some reason, maybe as a
+result of Windows 10 power management on the laptop. This is something
+to especially worry about if you are running a long term survey which
+would be interrupted by this event. (I was doing this mostly to test
+VMware and my Ubuntu installation on my field laptop.)
+
 ## Differential GNSS Using Tumbleweed
 
 Tumbleweed uses three Raspberry Pi 3B+ SBCs and two Ardusimple SimpleRTK2B
@@ -1891,6 +1908,14 @@ Because of this potentially lengthy duration of the survey, you don't want
 to do it more than once. First rule is: don't move the antenna. (If you
 do, you'll have to do another survey, no matter what.) Second rule is:
 don't restart the receiver.
+
+N.B.: Experience in testing the F9P receiver suggests that survey mode has
+a maximum duration of thirty (30) days. At thirty days plus one second
+(2592001 seconds total), the error distance calculated by the receiver
+ceases to become any smaller and the elapsed time of the survey ceases to
+become any larger. The gpstool utility reports both of these values in
+the BAS output line. This is probably mentioned somewhere in the U-blox
+9 interface document.
 
 Fortunately, once a survey is successfully completed, the base station
 script saves the pertinent results from a successful survey in a file
@@ -2129,10 +2154,6 @@ seconds. Thirty seconds is a typical timeout after which a firewall or router
 will remove the UDP return route. (This mechanism was inspired by a similar one
 used by SIP to route RTP packets via UDP to VoIP phones.)
 
-Note that the UDP stream is not encrypted, nor is the source of the datagrams
-authenticated, so this mechanism is not secure. It should be. I'm pondering how
-best to accomplish that. Probably DTLS.
-
 ### Hardware
 
 Although Tumbleweed has been implemented using the Ardusimple SimpleRTK2B
@@ -2142,6 +2163,18 @@ F9P application board, the C099-F9P, but I haven't tried it. Since I ended
 up implementing the inter-board communication channel on the Raspberry Pi,
 I don't need the support for various radio technologies that both the
 Ardusimple and the Ublox boards provide.
+
+### Issues
+
+Note that the UDP data stream is not encrypted, nor is the source
+of the datagrams authenticated, so this mechanism is not secure.
+It should be. I'm pondering how best to accomplish that.
+
+Datagram Transport Layer Security (DTLS) provides encryption and
+authentication for UDP protocols by adapting TLS (SSL) to datagram
+semantics, specifically dealing with lost or reordered packets.
+Unfortunately in doing so, DTLS eliminates the very advantages that
+caused me to choose UDP over TCP.
 
 ## Google Maps
 
