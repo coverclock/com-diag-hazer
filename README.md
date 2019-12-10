@@ -627,6 +627,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://register.gotowebinar.com/recording/6016509329100006146>
 
+<https://www.scientificamerican.com/article/gps-is-easy-to-hack-and-the-u-s-has-no-backup/> Paul Tullis, "GPS Is Easy To Hack, And The U.S. Has No Backup", Scientific American, 2019-12-01 (published in the 2019-12 print edition under the title "GPS Down")
+
 # Soundtrack
 
 Leonid & Friends, "Does Anybody Really Know What Time It Is" (Chicago)
