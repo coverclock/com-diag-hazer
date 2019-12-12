@@ -1914,8 +1914,9 @@ a maximum duration of thirty (30) days. At thirty days plus one second
 (2592001 seconds total), the error distance calculated by the receiver
 ceases to become any smaller and the elapsed time of the survey ceases to
 become any larger. The gpstool utility reports both of these values in
-the BAS output line. This is probably mentioned somewhere in the U-blox
-9 interface document.
+the BAS output line. The thirty day limit is probably documented somewhere,
+and may even be configurable, but if so I haven't found it. See [u-blox 9
+Integration, 3.1.5.5.1, "Survey-in"] for details about survey mode.
 
 Fortunately, once a survey is successfully completed, the base station
 script saves the pertinent results from a successful survey in a file
