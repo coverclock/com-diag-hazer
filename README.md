@@ -627,6 +627,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://register.gotowebinar.com/recording/6016509329100006146>
 
+<https://www.scientificamerican.com/article/gps-is-easy-to-hack-and-the-u-s-has-no-backup/> Paul Tullis, "GPS Is Easy To Hack, And The U.S. Has No Backup", Scientific American, 2019-12-01 (published in the 2019-12 print edition under the title "GPS Down")
+
 <https://www.cbsnews.com/news/global-positioning-system-preparing-the-next-generation-of-gps/> CBS Sunday Morning, "Preparing the next generation of GPS", 2019-12-01, video
 
 # Soundtrack
@@ -1912,8 +1914,9 @@ a maximum duration of thirty (30) days. At thirty days plus one second
 (2592001 seconds total), the error distance calculated by the receiver
 ceases to become any smaller and the elapsed time of the survey ceases to
 become any larger. The gpstool utility reports both of these values in
-the BAS output line. This is probably mentioned somewhere in the U-blox
-9 interface document.
+the BAS output line. The thirty day limit is probably documented somewhere,
+and may even be configurable, but if so I haven't found it. See [u-blox 9
+Integration, 3.1.5.5.1, "Survey-in"] for details about survey mode.
 
 Fortunately, once a survey is successfully completed, the base station
 script saves the pertinent results from a successful survey in a file
