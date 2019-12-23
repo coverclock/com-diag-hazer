@@ -5,9 +5,8 @@
 # https://github.com/coverclock/com-diag-hazer
 # Configure and run the U-blox ZED-UBX-F9P as a stationary Base in survey-in
 # mode sending corrections to Rovers.
-
 # IMPORTANT SAFETY TIP: when switching the F9P from FIXED back to SVIN mode,
-# power cycle or otherwise reset the device first.
+# consider power cycling or otherwise resetting the device first.
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
