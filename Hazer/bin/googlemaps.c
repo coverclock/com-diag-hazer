@@ -79,6 +79,7 @@
 #undef NDEBUG
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <locale.h>
@@ -104,8 +105,6 @@ int main(int argc, char *argv[])
     int millionths = 0;
     int direction = 0;
 
-    setlocale(LC_ALL, "");
-
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
     argv++;
     argc--;
@@ -121,6 +120,9 @@ int main(int argc, char *argv[])
         argv++;
         argc--;
     }
+
+    (void)setenv("LC_ALL", "en_US.utf8", 0);
+    (void)setlocale(LC_ALL, "");
 
     while (argc-- > 0) {
         if (strcmp(*argv, "-D") == 0) {

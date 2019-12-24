@@ -21,10 +21,6 @@ OUTFIL=${8-"./${PROGRAM}.out"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-export LANG=en_US.UTF-8
-export LANGUAGE=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
 if [[ ! -r ${FIXFIL} ]]; then
 	exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}
 elif [[ $(wc -l ${FIXFIL}) < 7 ]]; then

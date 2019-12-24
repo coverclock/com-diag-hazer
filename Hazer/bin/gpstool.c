@@ -1822,8 +1822,6 @@ int main(int argc, char * argv[])
     (void)gethostname(Hostname, sizeof(Hostname));
     Hostname[sizeof(Hostname) - 1] = '\0';
 
-    locale = setlocale(LC_ALL, "");
-
     /*
      * OPTIONS
      */
@@ -2088,13 +2086,24 @@ int main(int argc, char * argv[])
      ** INITIALIZATION
      **/
 
+    DIMINUTO_LOG_INFORMATION("Begin");
+
+    /*
+     * Necessary to get stuff like wchar_t and the "%lc" format to work,
+     * which we use to display stuff like the degree sign.
+     */
+    (void)setenv("LC_ALL", "en_US.utf8", 0);
+    if ((locale = setlocale(LC_ALL, "")) != (char *)0) {
+        DIMINUTO_LOG_INFORMATION("Locale \"%s\"", locale);
+    } else {
+        DIMINUTO_LOG_WARNING("Locale %p", locale);
+    }
+
     if (daemon) {
         rc = diminuto_daemon(Program);
         DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
         assert(rc == 0);
     }
-
-    DIMINUTO_LOG_INFORMATION("Begin");
 
     if (process) {
         DIMINUTO_LOG_INFORMATION("Processing");
