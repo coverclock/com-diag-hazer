@@ -46,6 +46,7 @@
 
 int main(int argc, char * argv[])
 {
+    int xc = 1;
     const char * program = (const char *)0;
     int debug = 0;
     double lat1 = 0.0;
@@ -61,54 +62,84 @@ int main(int argc, char * argv[])
     double c = 0.0;
     double d = 0.0;
     static const double R = 6378100;
+    char * end = (char *)0;
+    char * arg = "";
 
-    program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
-    argv++;
-    argc--;
+    do {
 
-    if ((argc > 0) && (strcmp(*argv, "-?") == 0)) {
-        fprintf(stderr, "usage: %s [ -? ] [ -d ] LATDD1 LONDD1 LATDD2 LONDD2\n", program);
+        program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
         argv++;
         argc--;
-    }
 
-    if ((argc > 0) && (strcmp(*argv, "-d") == 0)) {
-        debug = !0;
-        argv++;
-        argc--;
-    }
+        if ((argc > 0) && (strcmp(*argv, "-?") == 0)) {
+            fprintf(stderr, "usage: %s [ -? ] [ -d ] LATDD1 LONDD1 LATDD2 LONDD2\n", program);
+            argv++;
+            argc--;
+        }
 
-    if (argc < 4) {
-        return 1;
-    }
+        if ((argc > 0) && (strcmp(*argv, "-d") == 0)) {
+            debug = !0;
+            argv++;
+            argc--;
+        }
 
-    lat1 = atof(*(argv++));
-    lon1 = atof(*(argv++));
+        if (argc < 4) { break; }
 
-    lat2 = atof(*(argv++));
-    lon2 = atof(*(argv++));
+        if ((argc--) <= 0) { break; }
+        arg = *(argv++);
+        lat1 = strtold(arg, &end);
+        if (end == (char *)0) { break; }
+        if ((*end != '\0') && (*end != ',')) { break; }
+        if (!((-90.0 <= lat1) && (lat1 <= 90.0))) { break; }
 
-    if (debug) {
-        fprintf(stderr, "%s: ( %f , %f ) ( %f , %f )\n", program, lat1, lon1, lat2, lon2);
-    }
+        if ((argc--) <= 0) { break; }
+        arg = *(argv++);
+        lon1 = strtold(arg, &end);
+        if (end == (char *)0) { break; }
+        if (*end != '\0') { break; }
+        if (!((-180.0 <= lon1) && (lon1 <= 180.0))) { break; }
 
-    theta1 = (lat1 * M_PI) / 180.0;
-    theta2 = (lat2 * M_PI) / 180.0;
+        if ((argc--) <= 0) { break; }
+        arg = *(argv++);
+        lat2 = strtold(arg, &end);
+        if (end == (char *)0) { break; }
+        if ((*end != '\0') && (*end != ',')) { break; }
+        if (!((-90.0 <= lat2) && (lat2 <= 90.0))) { break; }
 
-    deltatheta = ((lat2 - lat1) * M_PI) / 180.0;
-    deltalambda = ((lon2 - lon1) * M_PI) / 180.0;
+        if ((argc--) <= 0) { break; }
+        arg = *(argv++);
+        lon2 = strtold(arg, &end);
+        if (end == (char *)0) { break; }
+        if (*end != '\0') { break; }
+        if (!((-180.0 <= lon2) && (lon2 <= 180.0))) { break; }
 
-    b = sin(deltalambda / 2.0);
-    b *= b;
+        if (debug) {
+            fprintf(stderr, "%s: ( %.10f , %.10f ) ( %.10f , %.10f )\n", program, lat1, lon1, lat2, lon2);
+        }
 
-    a = sin(deltatheta / 2.0);
-    a *= a;
+        theta1 = (lat1 * M_PI) / 180.0;
+        theta2 = (lat2 * M_PI) / 180.0;
 
-    a += cos(theta1) * cos(theta2) * b;
+        deltatheta = ((lat2 - lat1) * M_PI) / 180.0;
+        deltalambda = ((lon2 - lon1) * M_PI) / 180.0;
 
-    c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+        b = sin(deltalambda / 2.0);
+        b *= b;
 
-    d = R * c;
+        a = sin(deltatheta / 2.0);
+        a *= a;
 
-    printf("%f\n", d);
+        a += cos(theta1) * cos(theta2) * b;
+
+        c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+
+        d = R * c;
+
+        printf("%.10f\n", d);
+
+        xc = 0;
+
+    } while (0);
+
+    return xc;
 }

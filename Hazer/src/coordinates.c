@@ -26,7 +26,8 @@ static const char FORMAT_NGS[] = COORDINATES_SCANF_NGS " " COORDINATES_SCANF_NGS
 
 static int debug = 0;
 
-int coordinates_debug(int now) {
+int coordinates_debug(int now)
+{
     int was = -1;
 
     was = debug;
@@ -163,4 +164,34 @@ int coordinates_parse(const char * string, double * latitudep, double * longitud
     }
 
     return rc;
+}
+
+void coordinates_format_decimaldegrees2position(double decimaldegrees, int * degreesp, int * minutesp, int * secondsp, int * millionthsp, int * directionp)
+{
+    int value = 0;
+
+    if (decimaldegrees < 0.0) {
+        decimaldegrees = -decimaldegrees;
+        *directionp = -1;
+    } else {
+        *directionp = 1;
+    }
+
+    value = decimaldegrees;
+    *degreesp = value;
+    decimaldegrees -= value;
+
+    decimaldegrees *= 60.0;
+    value = decimaldegrees;
+    *minutesp = value;
+    decimaldegrees -= value;
+
+    decimaldegrees *= 60.0;
+    value = decimaldegrees;
+    *secondsp = value;
+    decimaldegrees -= value;
+
+    decimaldegrees *= 1000000.0;
+    value = decimaldegrees;
+    *millionthsp = value;
 }

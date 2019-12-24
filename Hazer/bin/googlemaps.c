@@ -10,11 +10,14 @@
  * ABSTRACT
  *
  * Converts coordinates in a string into a decimal degrees format that
- * Google Maps will understand.
+ * Google Maps will understand. The output format can be either in decimal
+ * degrees (-D, the default), or in DDDMMSS.FFFFFFC position format (-P).
+ * To make cutting and pasting from gpstool output simpler, the strings can
+ * be prefixed by the corresponding gpstool tags.
  *
  * USAGE
  *
- * googlemaps [ -? ] [ -d ] STRING [ STRING ... ]
+ * googlemaps [ -? ] [ -d ] [ -D | -P ] STRING [ [ -D | -P ] STRING ... ]
  *
  * EXAMPLES
  *
@@ -26,9 +29,57 @@
  *
  * $ googlemaps "39°47'39.163\"N, 105°09'12.060\"W"
  * 39.794211944, -105.153350000
+ *
+ * $ googlemaps -D "39.794212196, -105.153349930"
+ * 39.794212196, -105.153349930
+ *
+ * $ googlemaps -D "39 47 39.16390(N) 105 09 12.05974(W)"
+ * 39.794212194, -105.153349928
+ *
+ * $ googlemaps -D "39°47'39.163\"N, 105°09'12.060\"W"
+ * 39.794211944, -105.153350000
+ *
+ * $ googlemaps -P "39.794212196, -105.153349930"
+ * 39°47'39.163905"N, 105°09'12.059748"W
+ *
+ * $ googlemaps -P "39 47 39.16390(N) 105 09 12.05974(W)"
+ * 39°47'39.163899"N, 105°09'12.059740"W
+ *
+ * $ googlemaps -P "39°47'39.163\"N, 105°09'12.060\"W"
+ * 39°47'39.162999"N, 105°09'12.060000"W
+ *
+ * $ googlemaps "HPP   39.794212196, -105.153349930"
+ * 39.794212196, -105.153349930
+ *
+ * $ googlemaps "NGS  39 47 39.16390(N) 105 09 12.05974(W)"
+ * 39.794212194, -105.153349928
+ *
+ * $ googlemaps "POS 39°47'39.163\"N, 105°09'12.060\"W"
+ * 39.794211944, -105.153350000
+ *
+ * $ googlemaps -D "HPP   39.794212196, -105.153349930"
+ * 39.794212196, -105.153349930
+ *
+ * $ googlemaps -D "NGS  39 47 39.16390(N) 105 09 12.05974(W)"
+ * 39.794212194, -105.153349928
+ *
+ * $ googlemaps -D "POS 39°47'39.163\"N, 105°09'12.060\"W"
+ * 39.794211944, -105.153350000
+ *
+ * $ googlemaps -P "HPP    39.794212196, -105.153349930"
+ * 39°47'39.163905"N, 105°09'12.059748"W
+ *
+ * $ googlemaps -P "NGS  39 47 39.16390(N) 105 09 12.05974(W)"
+ * 39°47'39.163899"N, 105°09'12.059740"W
+ *
+ * $ googlemaps -P "POS 39°47'39.163\"N, 105°09'12.060\"W"
+ * 39°47'39.162999"N, 105°09'12.060000"W
  */
 
+#undef NDEBUG
+#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <locale.h>
@@ -37,20 +88,29 @@
 #include "com/diag/hazer/coordinates.h"
 #include "com/diag/diminuto/diminuto_log.h"
 
+/**
+ * This is the Unicode for the degree symbol.
+ */
+static const wchar_t DEGREE = 0x00B0;
+
 int main(int argc, char *argv[])
 {
     const char * program = (const char *)0;
+    int position = 0;
     double latitude = 0.0;
     double longitude = 0.0;
-
-    setlocale(LC_ALL, "");
+    int degrees = 0;
+    int minutes = 0;
+    int seconds = 0;
+    int millionths = 0;
+    int direction = 0;
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
     argv++;
     argc--;
 
     if ((argc > 0) && (strcmp(*argv, "-?") == 0)) {
-        fprintf(stderr, "usage: %s [ -? ] [ -d ] STRING [ STRING ... ]\n", program);
+        fprintf(stderr, "usage: %s [ -? ] [ -d ] [ -D | -P ] STRING [ STRING ... ]\n", program);
         argv++;
         argc--;
     }
@@ -61,11 +121,44 @@ int main(int argc, char *argv[])
         argc--;
     }
 
+    (void)setenv("LC_ALL", "en_US.utf8", 0);
+    (void)setlocale(LC_ALL, "");
+
     while (argc-- > 0) {
-        if (coordinates_parse(*argv, &latitude, &longitude) <= 0) {
+        if (strcmp(*argv, "-D") == 0) {
+            position = 0;
+            argv++;
+        } else if (strcmp(*argv, "-P") == 0) {
+            position = !0;
+            argv++;
+        } else if (coordinates_parse(*argv, &latitude, &longitude) <= 0) {
             errno = EINVAL;
             diminuto_perror(*argv);
             return 1;
+        } else if (position) {
+            degrees = 0;
+            minutes = 0;
+            seconds = 0;
+            millionths = 0;
+            direction = 0;
+            coordinates_format_decimaldegrees2position(latitude, &degrees, &minutes, &seconds, &millionths, &direction);
+            assert((0 <= degrees) && (degrees <= 90));
+            assert((0 <= minutes) && (minutes <= 59));
+            assert((0 <= seconds) && (seconds <= 59));
+            assert((0 <= millionths) && (millionths <= 999999));
+            printf("%2d%lc%02d'%02d.%06d\"%c,", degrees, DEGREE, minutes, seconds, millionths, (direction < 0) ? 'S' : 'N');
+            degrees = 0;
+            minutes = 0;
+            seconds = 0;
+            millionths = 0;
+            direction = 0;
+            coordinates_format_decimaldegrees2position(longitude, &degrees, &minutes, &seconds, &millionths, &direction);
+            assert((0 <= degrees) && (degrees <= 180));
+            assert((0 <= minutes) && (minutes <= 59));
+            assert((0 <= seconds) && (seconds <= 59));
+            assert((0 <= millionths) && (millionths <= 999999));
+            printf(" %3d%lc%02d'%02d.%06d\"%c\n", degrees, DEGREE, minutes, seconds, millionths, (direction < 0) ? 'W' : 'E');
+            argv++;
         } else {
             printf("%.9lf, %.9lf\n", latitude, longitude);
             argv++;

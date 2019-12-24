@@ -6,14 +6,15 @@
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-":tumbleweed"}
+ERRFIL=${2-"./${PROGRAM}.err"}
+
+cp /dev/null ${ERRFIL}
+exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
-
-LOGDIR=${TMPDIR:="/tmp"}/hazer/log
-mkdir -p ${LOGDIR}
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
 exec coreable rtktool \
     -p ${ROUTER} -t 30 \
-    < /dev/null 1> /dev/null 2> ${LOGDIR}/${PROGRAM}.err
+    < /dev/null 1> /dev/null
