@@ -116,6 +116,12 @@ can be found at
 
 and which is licensed under the MIT license.
 
+The gpstool, rtktool, and googlemaps utilities depend on running in a
+POSIX locale that allows the use of Unicode characters like the degree
+symbol.  Locales like "POSIX" and "C" don't support this, at least not
+on the systems I have. Locales like "en_US.UTF-8" work okay. Your
+mileage may vary.
+
 # Versioning
 
 Both Hazer and Diminuto are complex enough that I moved to a "master" and
