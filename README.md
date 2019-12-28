@@ -637,6 +637,8 @@ astronomers in the audience, but it wasn't to me.
 
 <https://www.cbsnews.com/news/global-positioning-system-preparing-the-next-generation-of-gps/> CBS Sunday Morning, "Preparing the next generation of GPS", 2019-12-01, video
 
+<http://www.aholme.co.uk/GPS/Main.htm>
+
 # Soundtrack
 
 Leonid & Friends, "Does Anybody Really Know What Time It Is" (Chicago)
