@@ -641,23 +641,7 @@ astronomers in the audience, but it wasn't to me.
 
 # Soundtrack
 
-Leonid & Friends, "Does Anybody Really Know What Time It Is" (Chicago)
-<https://youtu.be/FB-nXQc6LMU>
-
-Coldplay & Buena Vista Social Club, "Clocks" (Coldplay)
-<https://youtu.be/RH2h5iHO6ZU>
-
-Gerard Way featuring Ray Toro, "Hazy Shade of Winter" (Simon & Garfunkel), THE UMBRELLA ACADEMY
-<https://youtu.be/ZTCrqXpKHec>
-
-Pink Floyd live at Earls Court London, "Time" (Pink Floyd)
-<https://youtu.be/F_VjVqe3KJ0>
-
-Mark Williams & Tara Morice, "Time After Time" (Cyndi Lauper), STRICTLY BALLROOM
-<https://youtu.be/RcN0b7J_PfE>
-
-The World of Hans Zimmer, "Time" (Hans Zimmer), INCEPTION
-<https://youtu.be/xdYYN-4ttDg>
+<https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
 
 # Build
 
