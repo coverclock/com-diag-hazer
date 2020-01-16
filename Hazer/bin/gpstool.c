@@ -3830,10 +3830,10 @@ report:
                     onepps = poller.onepps;
                     poller.onepps = 0;
                 DIMINUTO_CRITICAL_SECTION_END;
-                print_hardware(out_fp, &hardware);
-                print_status(out_fp, &status);
                 print_local(out_fp, timetofirstfix);
                 print_positions(out_fp, position, onepps, dmyokay, totokay, network_total);
+                print_hardware(out_fp, &hardware);
+                print_status(out_fp, &status);
                 print_solution(out_fp, &solution);
                 print_corrections(out_fp, &base, &rover, &kinematics, &updates);
                 print_actives(out_fp, active);
