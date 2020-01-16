@@ -171,6 +171,8 @@ static const char * Program = (const char *)0;
  */
 static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 
+static pid_t Process = 0;
+
 /**
  * This is our POSIX thread mutual exclusion semaphore.
  */
@@ -868,10 +870,16 @@ static void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
     fprintf(fp, "%+2.2d%c", hour, zone);
 
     /*
-     * This is where we calculate time to first fix.
+     * This is where we calculate time to first fix. We display dashes
+     * if its negative, asterisks if it is a day or more, the actual
+     * values otherwise.
      */
 
-    if (timetofirstfix >= 0) {
+    if (timetofirstfix < 0) {
+
+        fprintf(fp, " %2s:%2s:%2s.%3s", "--", "--", "--", "---");
+
+    } else {
 
         rc = diminuto_time_duration(timetofirstfix, &day, &hour, &minute, &second, &fraction);
         assert(rc >= 0);
@@ -880,18 +888,24 @@ static void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
         assert((0 <= minute) && (minute <= 59));
         assert((0 <= second) && (second <= 59));
 
-        milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-        assert((0 <= milliseconds) && (milliseconds < 1000LL));
+        if (day > 0) {
 
-        fprintf(fp, " %10d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
+            fprintf(fp, " %2s:%2s:%2s.%3s", "**", "**", "**", "***");
 
-    } else {
+        } else {
 
-        fprintf(fp, " %10s/%2s:%2s:%2s.%3s", "*", "**", "**", "**", "***");
+            milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
+            assert((0 <= milliseconds) && (milliseconds < 1000LL));
+
+            fprintf(fp, " %02d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
+
+        }
 
     }
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
+
+    fprintf(fp, " %10d", Process);
 
     fprintf(fp, " %-8.8s", Hostname);
 
@@ -1822,6 +1836,8 @@ int main(int argc, char * argv[])
 
     (void)gethostname(Hostname, sizeof(Hostname));
     Hostname[sizeof(Hostname) - 1] = '\0';
+
+    Process = getpid();
 
     /*
      * OPTIONS
