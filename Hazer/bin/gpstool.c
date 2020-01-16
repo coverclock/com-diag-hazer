@@ -2590,8 +2590,7 @@ int main(int argc, char * argv[])
         /*
          * We keep working until out input goes away (end of file), or until
          * we are interrupted by a SIGINT or terminated by a SIGTERM. We
-         * also check for SIGHUP, which I might use for something in the
-         * future.
+         * also check for SIGHUP, which checkpoints the headless output.
          */
 
         if (diminuto_terminator_check()) {
@@ -3825,7 +3824,7 @@ report:
             if (headless != (const char *)0) {
                 if (checkpoint) {
                     out_fp = diminuto_observation_checkpoint(out_fp, &temporary);
-                    assert(out_fp == (FILE *)0);
+                    assert(out_fp != (FILE *)0);
                     checkpoint = 0;
                 }
                 out_fp = diminuto_observation_commit(out_fp, &temporary);
