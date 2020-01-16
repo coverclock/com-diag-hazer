@@ -1,5 +1,5 @@
 # vi: set ts=4 shiftwidth=4:
-# Copyright 2017-2019 Digital Aggregates Corporation
+# Copyright 2017-2020 Digital Aggregates Corporation
 # Licensed under the terms in README.h
 # author:Chip Overclock
 # mailto:coverclock@diag.com
@@ -21,8 +21,8 @@ default:	all
 TITLE				:=	Hazer
 
 MAJOR				:=	27# API changes that may require that applications be modified.
-MINOR				:=	7# Only functionality or features added with no legacy API changes.
-BUILD				:=	3# Only bugs fixed with no API changes or new functionality.
+MINOR				:=	8# Only functionality or features added with no legacy API changes.
+BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -45,7 +45,7 @@ TARGET				:=	host# Build for the x86_64 running Ubuntu 14.04 LTS.
 # complaint string with the time specified in UTC with nanosecond resolution.
 
 # This stuff all gets embedded in the vintage application.
-COPYRIGHT			:=	2017-2019 Digital Aggregates Corporation
+COPYRIGHT			:=	2017-2020 Digital Aggregates Corporation
 LICENSE				:=	GNU Lesser General Public License 2.1
 CONTACT				:=	coverclock@diag.com
 HOMEPAGE			:=	https://github.com/coverclock/com-diag-hazer

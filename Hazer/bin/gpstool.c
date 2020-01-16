@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2017-2019 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-hazer<BR>
@@ -1766,6 +1766,7 @@ int main(int argc, char * argv[])
      */
     char * temporary = (char *)0;
     size_t limitation = 0;
+    int checkpoint = 0;
     /**
      * Control variables.
      */
@@ -2611,6 +2612,7 @@ int main(int argc, char * argv[])
              * let it run.
              */
             DIMINUTO_LOG_INFORMATION("SIGHUP");
+            checkpoint = !0;
         }
 
         /**
@@ -3821,6 +3823,11 @@ report:
              */
 
             if (headless != (const char *)0) {
+                if (checkpoint) {
+                    out_fp = diminuto_observation_checkpoint(out_fp, &temporary);
+                    assert(out_fp == (FILE *)0);
+                    checkpoint = 0;
+                }
                 out_fp = diminuto_observation_commit(out_fp, &temporary);
                 assert(out_fp == (FILE *)0);
                 out_fp = diminuto_observation_create(headless, &temporary);
