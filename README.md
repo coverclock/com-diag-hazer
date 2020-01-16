@@ -2020,7 +2020,7 @@ of the rover configuration seems to be sticky.)
     peruse mobile err# Control-C to exit upon seeing "Ready".
     peruse mobile out
 
-### Daemons
+### Headless
 
 I'm running all three, router, base, and rover, as simple background
 processes.  But it is also possible to run them in daemon mode, in which
@@ -2036,6 +2036,13 @@ Both gpstool (which implements the base and the rover) and rtktool (which
 implements the router) can be run as daemons via a command line switch
 (although I have not done so in these examples); the headless mode can
 still be used.
+
+When running in headless mode and receving a hangup signal (SIGHUP),
+gpstool will checkpoint the headless file: it will create a copy of
+the headless output file with a timestamp prefix with a resolution in
+microseconds. This is particularly useful in field testing to capture
+the relevant data at a particualr point in time and space. The hup
+script uses the pkill command to send a SIGHUP to all gpstool instances.
 
 ### Networking
 
