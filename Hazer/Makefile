@@ -20,8 +20,8 @@ default:	all
 
 TITLE				:=	Hazer
 
-MAJOR				:=	27# API changes that may require that applications be modified.
-MINOR				:=	9# Only functionality or features added with no legacy API changes.
+MAJOR				:=	28# API changes that may require that applications be modified.
+MINOR				:=	0# Only functionality or features added with no legacy API changes.
 BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my

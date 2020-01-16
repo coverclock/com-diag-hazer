@@ -169,9 +169,11 @@ static const char * Program = (const char *)0;
 /**
  * This is our host name as provided by the run-time system.
  */
-static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
+static char Hostname[9] = { '\0' };
 
 static pid_t Process = 0;
+
+static const char * Device = (const char *)0;
 
 /**
  * This is our POSIX thread mutual exclusion semaphore.
@@ -969,7 +971,7 @@ static void print_hardware(FILE * fp, const yodel_hardware_t * hp)
 
         fprintf(fp, "%24s", ""); /* This is actually important. */
 
-        fprintf(fp, " %-8s", ""); /* This is actually important. */
+        fprintf(fp, " %-8s", Device);
 
         fputc('\n', fp);
     }
@@ -1036,9 +1038,9 @@ static void print_status(FILE * fp, const yodel_status_t * sp)
 
         fprintf(fp, " %cspoofing %chistory %10ums %10ums %5uepoch", spoofing, spoofing_history, sp->payload.ttff, sp->payload.msss, msss_epoch);
 
-        fprintf(fp, "%12s", ""); /* This is actually important. */
+        fprintf(fp, "%11s", ""); /* This is actually important. */
 
-        fprintf(fp, " %-8s", ""); /* This is actually important. */
+        fprintf(fp, " %-8s", Device);
 
         fputc('\n', fp);
     }
@@ -1264,7 +1266,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fprintf(fp, "%1s", "");
 
-            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8s", Device);
 
             fputc('\n', fp);
 
@@ -2342,13 +2344,21 @@ int main(int argc, char * argv[])
 
     if (device == (const char *)0) {
 
-        /* Do nothing. */
+        Device = "";
 
     } else if (strcmp(device, "-") == 0) {
 
         in_fp = stdin;
+        Device = "-";
 
     } else {
+
+        Device = strrchr(device, '/');
+        if (Device != (const char *)0) {
+            Device += 1;
+        } else {
+            Device = device;
+        }
 
         dev_fd = open(device, readonly ? O_RDONLY : O_RDWR);
         if (dev_fd < 0) { diminuto_perror(device); }
