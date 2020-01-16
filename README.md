@@ -2230,6 +2230,17 @@ geographiclib, which is licensed under the MIT license.
     $ geodesic 39.794212194, -105.153349928 39.794211944, -105.153350000
     0.0284344407
 
+## Memory leaks
+
+When testing for memory leaks, I strongly recommend using valgrind,
+specfically with the full leak check option.
+
+    valgrind --leak-check=full gpstool ...
+
+I was surprised to find it called out a twelve byte memory leak
+in the locale handling code, which gpstool requires to correctly
+display Unicode symbols like the degree symbol.
+
 # Acknowledgements
 
 Thanks to Charles F. F. Karney for his MIT licensed geographiclib.
