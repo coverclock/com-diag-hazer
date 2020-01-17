@@ -21,11 +21,14 @@
 #    peruse rover err
 #    peruse router err
 
+
+SAVDIR=./sav
+
 PROGRAM=$(basename ${0})
 
 TASK=${1}
 FILE=${2}
-DIRECTORY=${3:-"."}
+DIRECTORY=${3:-${SAVDIR}}
 LIMIT=${4:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup

@@ -7,13 +7,19 @@
 # corrections from a stationary Base and saving high precision solutions
 # to a CSV file (especially useful for testing on survey benchmarks).
 
+SAVDIR=./sav
+
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
-ERRFIL=${4-"./${PROGRAM}.err"}
-OUTFIL=${5-"./${PROGRAM}.out"}
-CSVFIL=${6-"./${PROGRAM}.csv"}
+ERRFIL=${4-"${SAVDIR}/${PROGRAM}.err"}
+OUTFIL=${5-"${SAVDIR}/${PROGRAM}.out"}
+CSVFIL=${6-"${SAVDIR}/${PROGRAM}.csv"}
+
+mkdir -p $(dirname ${ERRFIL})
+mkdir -p $(dirname ${OUTFIL})
+mkdir -p $(dirname ${CSVFIL})
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}

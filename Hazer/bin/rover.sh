@@ -6,12 +6,17 @@
 # Configure and run the U-blox ZED-UBX-F9P as a mobile Rover receiving
 # corrections from a stationary Base.
 
+SAVDIR=./sav
+
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
-ERRFIL=${4-"./${PROGRAM}.err"}
-OUTFIL=${5-"./${PROGRAM}.out"}
+ERRFIL=${4-"${SAVDIR}/${PROGRAM}.err"}
+OUTFIL=${5-"${SAVDIR}/${PROGRAM}.out"}
+
+mkdir -p $(dirname ${ERRFIL})
+mkdir -p $(dirname ${OUTFIL})
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}

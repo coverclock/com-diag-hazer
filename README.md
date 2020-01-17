@@ -743,6 +743,7 @@ lines that need to be added to the indicated files.
 * proxy - receive UDP packets from the Base and forward to the Rover.
 * router - routes UDP packets received from a base to all rovers.
 * rover - configures and runs a UBX-ZED-F9P as a corrected rover.
+* station - runs a UBX-ZED-F9P with no additional configuration.
 * survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * ubxval - converts a number into a UBX-usable form.

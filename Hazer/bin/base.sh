@@ -9,15 +9,21 @@
 # IMPORTANT SAFETY TIP: when switching the F9P from FIXED back to SVIN mode,
 # consider power cycling or otherwise resetting the device first.
 
+SAVDIR=./sav
+
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
 DURATION=${4:-300}
 ACCURACY=${5:-250}
-FIXFIL=${6-"./${PROGRAM}.fix"}
-ERRFIL=${7-"./${PROGRAM}.err"}
-OUTFIL=${8-"./${PROGRAM}.out"}
+FIXFIL=${6-"${SAVDIR}/${PROGRAM}.fix"}
+ERRFIL=${7-"${SAVDIR}/${PROGRAM}.err"}
+OUTFIL=${8-"${SAVDIR}/${PROGRAM}.out"}
+
+mkdir -p $(dirname ${FIXFIL})
+mkdir -p $(dirname ${ERRFIL})
+mkdir -p $(dirname ${OUTFIL})
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
