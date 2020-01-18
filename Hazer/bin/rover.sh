@@ -6,7 +6,7 @@
 # Configure and run the U-blox ZED-UBX-F9P as a mobile Rover receiving
 # corrections from a stationary Base.
 
-SAVDIR=./sav
+SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-"./sav"}
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}

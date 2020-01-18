@@ -9,7 +9,7 @@
 # IMPORTANT SAFETY TIP: when switching the F9P from FIXED back to SVIN mode,
 # consider power cycling or otherwise resetting the device first.
 
-SAVDIR=./sav
+SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-"./sav"}
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}

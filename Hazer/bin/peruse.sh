@@ -21,8 +21,7 @@
 #    peruse rover err
 #    peruse router err
 
-
-SAVDIR=./sav
+SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-"./sav"}
 
 PROGRAM=$(basename ${0})
 

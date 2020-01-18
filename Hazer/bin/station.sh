@@ -5,7 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # Run the U-blox ZED-UBX-F9P with no additional configuration.
 
-SAVDIR=./sav
+SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-"./sav"}
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/tumbleweed"}
