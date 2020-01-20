@@ -10,7 +10,13 @@
 
 # host: most Linux/GNU systems hosting the native toolchain.
 
+MACHINE				:=	$(shell uname -m)
+ifeq ($(MACHINE),x86_64)
 ARCH				:=	x86_64
+endif
+ifeq ($(MACHINE),armv7l)
+ARCH				:=	arm
+endif
 OS					:=	linux
 TOOLCHAIN			:=
 KERNELCHAIN			:=
