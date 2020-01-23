@@ -5,8 +5,8 @@
 /**
  * @file
  *
- * Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
+ * Copyright 2018-2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock <coverclock@diag.com><BR>
  * http://github.com/coverclock/com-diag-hazer<BR>
  * These are the private definitions for the yodel API.

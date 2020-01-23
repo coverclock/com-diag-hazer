@@ -2,8 +2,8 @@
 /**
  * @file
  *
- * Copyright 2014 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
+ * Copyright 2014-2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * http://www.diag.com/navigation/downloads/Hazer.html<BR>
  * The purpose of this translation unit is to embed the vintage string
