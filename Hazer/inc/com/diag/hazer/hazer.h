@@ -233,7 +233,7 @@ typedef enum HazerTalker {
 } hazer_talker_t;
 
 /**
- * @define HAZER_TALKER_NAME_INITIALIZER
+ * @def HAZER_TALKER_NAME_INITIALIZER
  * Initialize the array of character strings that map from a Hazer talker
  * enumerated value to the printable name of the talker. These strings must
  * be in collating sequence order.
@@ -282,7 +282,7 @@ typedef enum HazerSystem {
 } hazer_system_t;
 
 /**
- * @define HAZER_SYSTEM_NAME_INITIALIZER
+ * @def HAZER_SYSTEM_NAME_INITIALIZER
  * Initialize the array of character strings that map from a Hazer system
  * enumerated value to the printable name of the system. These strings should
  * be in order of preference for systems having (unlikely as it might be)
@@ -375,7 +375,7 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
 typedef uint8_t (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
 
 /**
- * @define HAZER_BUFFER_INITIALIZER
+ * @def HAZER_BUFFER_INITIALIZER
  * Initialize a HazerBuffer type.
  */
 #define HAZER_BUFFER_INITIALIZER  { '\0', }
@@ -465,8 +465,8 @@ extern int hazer_characters2checksum(uint8_t msn, uint8_t lsn, uint8_t * ckp);
 /**
  * Given an eight-bit checksum, concert into the two checksum characters.
  * @param ck is the checksum.
- * @param mnsp points where the most significant character is stored.
- * @param lnsp points where the least significant character is stored.
+ * @param msnp points where the most significant character is stored.
+ * @param lsnp points where the least significant character is stored.
  */
 extern void hazer_checksum2characters(uint8_t ck, uint8_t * msnp, uint8_t * lsnp);
 
@@ -500,7 +500,7 @@ extern ssize_t hazer_validate(const void * buffer, size_t size);
 typedef char * (hazer_vector_t)[HAZER_NMEA_LONGEST - HAZER_NMEA_SHORTEST + 1]; /* plus NULL */
 
 /**
- * @define HAZER_VECTOR_INITIALIZER
+ * @def HAZER_VECTOR_INITIALIZER
  * Initialize a HazerVector type.
  */
 #define HAZER_VECTOR_INITIALIZER  { (char *)0, }
@@ -665,7 +665,7 @@ extern uint16_t hazer_parse_dop(const char * string);
 #define HAZER_NMEA_SENTENCE_GSA "GSA"
 
 /**
- * @def HAZER_NMEA_SENTENCE_GST
+ * @def HAZER_NMEA_SENTENCE_GRT
  * ublox7 Protocol Reference, p. vi, GNSS pseudo range error statistics
  */
 #define HAZER_NMEA_SENTENCE_GRT "GST"
@@ -711,7 +711,7 @@ extern uint16_t hazer_parse_dop(const char * string);
  ******************************************************************************/
 
 /**
- * @def HAZER_NMEA_SENTENCE_PUBX
+ * @def HAZER_PROPRIETARY_SENTENCE_PUBX
  * ublox7 Protocol Reference, p. vi, PUBX
  */
 #define HAZER_PROPRIETARY_SENTENCE_PUBX "PUBX"
@@ -773,7 +773,7 @@ typedef struct HazerPosition {
 } hazer_position_t;
 
 /**
- * @define HAZER_POSITION_INITIALIZER
+ * @def HAZER_POSITION_INITIALIZER
  * Initialize a HazerPosition structure.
  */
 #define HAZER_POSITION_INITIALIZER \
@@ -846,7 +846,7 @@ typedef struct HazerActive {
 } hazer_active_t;
 
 /**
- * @define HAZER_ACTIVE_INITIALIZER
+ * @def HAZER_ACTIVE_INITIALIZER
  * Initialize a HazerActive structure.
  */
 #define HAZER_ACTIVE_INITIALIZER \
@@ -908,7 +908,7 @@ typedef struct HazerSatellite {
 } hazer_satellite_t;
 
 /**
- * @define HAZER_SATELLITE_INITIALIZER
+ * @def HAZER_SATELLITE_INITIALIZER
  * Initialize a HazerSatellite structure.
  */
 #define HAZER_SATELLITE_INITIALIZER \
@@ -936,7 +936,7 @@ typedef struct HazerView {
 } hazer_view_t;
 
 /**
- * @define HAZER_VIEW_INITIALIZER
+ * @def HAZER_VIEW_INITIALIZER
  * Initialize a HazerView structure.
  */
 #define HAZER_VIEW_INITIALIZER \
@@ -1034,7 +1034,7 @@ extern void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp
  * @param minutesp points to where the minutes (0..59) are stored.
  * @param secondsp points to where the seconds (0..59) are stored.
  * @param thousanthsp points to there the fractional seconds (0..999) are stored.
- * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
+ * @param directionp points to where 1 (N or E) or -1 (S or W) is stored.
  */
 extern void hazer_format_nanominutes2position(int64_t nanominutes, int * degreesp, int * minutesp, int * secondsp, int * thousanthsp, int * directionp);
 

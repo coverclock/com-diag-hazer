@@ -78,7 +78,7 @@ typedef struct YodelSolution {
 } yodel_solution_t;
 
 /**
- * @define YODEL_SOLUTION_INITIALIZER
+ * @def YODEL_SOLUTION_INITIALIZER
  * Initialize a YodelSolution structure.
  */
 #define YODEL_SOLUTION_INITIALIZER \
@@ -102,7 +102,7 @@ typedef struct YodelHardware {
 } yodel_hardware_t;
 
 /**
- * @define YODEL_HARDWARE_INITIALIZER
+ * @def YODEL_HARDWARE_INITIALIZER
  * Initialize a YodelHardware structure.
  */
 #define YODEL_HARDWARE_INITIALIZER \
@@ -126,7 +126,7 @@ typedef struct YodelStatus {
 } yodel_status_t;
 
 /**
- * @define YODEL_STATUS_INITIALIZER
+ * @def YODEL_STATUS_INITIALIZER
  * Initialize a YodelStatus structure.
  */
 #define YODEL_STATUS_INITIALIZER \
@@ -150,7 +150,7 @@ typedef struct YodelBase {
 } yodel_base_t;
 
 /**
- * @define YODEL_BASE_INITIALIZER
+ * @def YODEL_BASE_INITIALIZER
  * Initialize a YodelBase structure.
  */
 #define YODEL_BASE_INITIALIZER \
@@ -174,7 +174,7 @@ typedef struct YodelRover {
 } yodel_rover_t;
 
 /**
- * @define YODEL_ROVER_INITIALIZER
+ * @def YODEL_ROVER_INITIALIZER
  * Initialize a YodelRover structure.
  */
 #define YODEL_ROVER_INITIALIZER \
@@ -199,7 +199,7 @@ typedef struct TumbleweedMessage {
 } tumbleweed_message_t;
 
 /**
- * @define TUMBLEWEED_MESSAGE_INTIALIZER
+ * @def TUMBLEWEED_MESSAGE_INITIALIZER
  * Initialize a TumbleweedMessage structure.
  */
 #define TUMBLEWEED_MESSAGE_INITIALIZER \
@@ -219,7 +219,7 @@ typedef union TumbleweedUpdates {
 } tumbleweed_updates_t;
 
 /**
- * @define TUMBLEWEED_UPDATES_INITIALIZER
+ * @def TUMBLEWEED_UPDATES_INITIALIZER
  * Initialize a TumbleweedUpdates union.
  */
 #define TUMBLEWEED_UPDATES_INITIALIZER \

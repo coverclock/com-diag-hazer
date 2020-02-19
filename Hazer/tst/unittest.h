@@ -20,7 +20,7 @@
 #include "com/diag/diminuto/diminuto_dump.h"
 
 /**
- * @define BEGIN
+ * @def BEGIN
  * Begin a unit test using a test string that may contain escape sequences.
  * string points to the expanded _MESSAGE_. size is the number of bytes in the
  * expanded _MESSAGE_ including the terminating NUL. message points to the
@@ -42,7 +42,7 @@
             (void)0
 
 /**
- * @define END
+ * @def END
  * End a unit test using a test string.
  */
 #define END \

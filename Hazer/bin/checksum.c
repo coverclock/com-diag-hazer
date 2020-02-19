@@ -24,7 +24,6 @@ static const size_t UNLIMITED = ~(size_t)0;
  * Print an NMEA sentence or UBX message to a stream, expanding non-printable
  * characters into escape sequences.
  * @param fp points to the FILE stream.
- * @param ep points to the FILE stream for errors.
  * @param buffer points to the sentence or packet.
  * @param size is the size of the sentence or packet.
  * @param canonical is false to print standard special characters in hex.

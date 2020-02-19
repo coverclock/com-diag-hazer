@@ -82,7 +82,7 @@ typedef struct DatagramBuffer {
 } datagram_buffer_t;
 
 /**
- * @define DATAGRAM_BUFFER_INITIALIZER
+ * @def DATAGRAM_BUFFER_INITIALIZER
  * Initialize a DatagramBuffer type.
  */
 #define DATAGRAM_BUFFER_INITIALIZER  { { 0, }, { { '\0', } }, }
