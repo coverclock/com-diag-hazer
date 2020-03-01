@@ -27,19 +27,19 @@
  */
 
 /**
- * @define COORDINATES_SCANF_HPP
+ * @def COORDINATES_SCANF_HPP
  * Each number in the HPP format looks like this to sscanf(3).
  */
 #define COORDINATES_SCANF_HPP "%lf"
 
 /**
- * @define COORDINATES_SCANF_NGS
+ * @def COORDINATES_SCANF_NGS
  * Each number in the NGS format looks like this to sscanf(3).
  */
 #define COORDINATES_SCANF_NGS "%u %u %lf(%c)"
 
 /**
- * @define COORDINATES_SCANF_POS
+ * @def COORDINATES_SCANF_POS
  * Each number in the POS format looks like this to sscanf(3).
  */
 #define COORDINATES_SCANF_POS "%u\u00B0%u'%lf\"%c"
@@ -88,7 +88,7 @@ extern int coordinates_parse(const char * string, double * latitudep, double * l
  * @param minutesp points to where the minutes (0..59) are stored.
  * @param secondsp points to where the seconds (0..59) are stored.
  * @param millionthsp points to there the fractional seconds (0..999999) are stored.
- * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
+ * @param directionp points to where 1 (N or E) or -1 (S or W) is stored.
  */
 extern void coordinates_format_decimaldegrees2position(double decimaldegrees, int * degreesp, int * minutesp, int * secondsp, int * millionthsp, int * directionp);
 

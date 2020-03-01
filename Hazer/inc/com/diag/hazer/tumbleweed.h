@@ -86,7 +86,7 @@ enum TumbleweedRtcmConstants {
 typedef uint8_t (tumbleweed_buffer_t)[TUMBLEWEED_RTCM_LONGEST + 1];
 
 /**
- * @define TUMBLEWEED_BUFFER_INITIALIZER
+ * @def TUMBLEWEED_BUFFER_INITIALIZER
  * Initialize a TumbleweedBuffer type.
  */
 #define TUMBLEWEED_BUFFER_INITIALIZER  { '\0', }
@@ -233,7 +233,7 @@ static inline void tumbleweed_checksum(uint8_t ch, uint32_t * crcp)
  * Given three CRC characters, convert to an thirty-two bit CRC.
  * @param crc1 is the most significant byte.
  * @param crc2 is the middle significant byte.
- * @param crc2 is the least significant byte.
+ * @param crc3 is the least significant byte.
  * @param crcp points to where the CRC is stored.
  */
 static inline void tumbleweed_characters2checksum(uint8_t crc1, uint8_t crc2, uint8_t crc3, uint32_t * crcp)
@@ -246,7 +246,7 @@ static inline void tumbleweed_characters2checksum(uint8_t crc1, uint8_t crc2, ui
  * @param crc is the CRC.
  * @param crc1p points where the most significant byte is stored.
  * @param crc2p points where the middle significant byte is stored.
- * @param crc2p points where the least significant byte is stored.
+ * @param crc3p points where the least significant byte is stored.
  */
 static inline void tumbleweed_checksum2characters(uint32_t crc, uint8_t * crc1p, uint8_t * crc2p, uint8_t * crc3p)
 {
@@ -305,7 +305,7 @@ extern int tumbleweed_message(const void * buffer, size_t size);
  ******************************************************************************/
 
 /**
- * @edefine TUMBLEWEED_KEEPALIVE_INITIALIZER
+ * @def TUMBLEWEED_KEEPALIVE_INITIALIZER
  * This is what a keepalive message looks like.
  */
 #define TUMBLEWEED_KEEPALIVE_INITIALIZER { 0xd3, 0x00, 0x00, 0x47, 0xea, 0x4b, }

@@ -92,7 +92,7 @@ enum YodelUbxConstants {
 typedef uint8_t (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
 
 /**
- * @define YODEL_BUFFER_INITIALIZER
+ * @def YODEL_BUFFER_INITIALIZER
  * Initialize a YodelBuffer type.
  */
 #define YODEL_BUFFER_INITIALIZER  \
@@ -130,7 +130,7 @@ typedef struct YodelUbxHeader {
 } yodel_ubx_header_t __attribute__((__aligned__(2)));
 
 /**
- * @define YODEL_UBX_HEADER_INITIALIZER
+ * @def YODEL_UBX_HEADER_INITIALIZER
  * Initialize a YodelUbxHeader structure.
  */
 #define YODEL_UBX_HEADER_INITIALIZER \
@@ -289,7 +289,7 @@ typedef enum YodelSystem {
 } yodel_system_t;
 
 /**
- * @define YODEL_SYSTEM_NAME_INITIALIZER
+ * @def YODEL_SYSTEM_NAME_INITIALIZER
  * Initialize the array of character strings that map from a Hazer system
  * enumerated value to the printable name of the system. These strings should
  * be in order of preference for systems having (unlikely as it might be)
@@ -394,7 +394,7 @@ typedef struct YodelUbxNavHpposllh {
 } yodel_ubx_nav_hpposllh_t __attribute__((aligned(4)));
 
 /**
- * @define YODEL_UBX_NAV_HPPOSLLH_INITIALIZER
+ * @def YODEL_UBX_NAV_HPPOSLLH_INITIALIZER
  * Initialize a YodelUbxNavHpposllh structure.
  */
 #define YODEL_UBX_NAV_HPPOSLLH_INITIALIZER \
@@ -439,10 +439,11 @@ extern void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int32_t *
  * part in 10^-5 seconds conforming to the NGS format.
  * @param whole is the lat or lon value in the UBX-NAV-HPPOSLLH structure in 1/10^7 degrees.
  * @param fraction is the corresponding latHp or lonHp value in the UBX-NAV-HPPOSLLH structure in 1/10^9 degrees.
+ * @param degreesp points to where the degrees (0..360) are stored.
  * @param minutesp points to where the minutes (0..59) are stored.
  * @param secondsp points to where the seconds (0..59) are stored.
  * @param onehundredthousandsthp points to there the fractional seconds (0..99999) are stored.
- * @param direction points to where 1 (N or E) or -1 (S or W) is stored.
+ * @param directionp points to where 1 (N or E) or -1 (S or W) is stored.
  */
 extern void yodel_format_hppos2position(int32_t whole, int8_t fraction, uint32_t * degreesp, uint32_t * minutesp, uint32_t * secondsp, uint32_t * onehundredthousandsthp, int * directionp);
 
@@ -495,7 +496,7 @@ typedef struct YodelUbxMonHw {
 } yodel_ubx_mon_hw_t __attribute__((aligned(4)));
 
 /**
- * @define YODEL_UBX_MON_HW_INITIALIZER
+ * @def YODEL_UBX_MON_HW_INITIALIZER
  * Initialize a YodelUbxMonHw structure.
  */
 #define YODEL_UBX_MON_HW_INITIALIZER \
@@ -568,7 +569,7 @@ typedef struct YodelUbxNavStatus {
 } yodel_ubx_nav_status_t __attribute__((aligned(4)));
 
 /**
- * @define YODEL_UBX_NAV_STATUS_INITIALIZER
+ * @def YODEL_UBX_NAV_STATUS_INITIALIZER
  * Initialize a YodelUbxNavStatus structure.
  */
 #define YODEL_UBX_NAV_STATUS_INITIALIZER \
@@ -690,7 +691,7 @@ typedef struct YodelUbxAck {
 } yodel_ubx_ack_t;
 
 /**
- * @define YODEL_UBX_ACK_INITIALIZER
+ * @def YODEL_UBX_ACK_INITIALIZER
  * Initialize a YodelUbxAck structure.
  */
 #define YODEL_UBX_ACK_INITIALIZER \
@@ -738,7 +739,7 @@ typedef struct YodelUbxCfgValget {
 } yodel_ubx_cfg_valget_t;
 
 /**
- * @define YODEL_UBX_CFG_VALGET_INITIALIZER
+ * @def YODEL_UBX_CFG_VALGET_INITIALIZER
  * Initialize the fixed portion of a YodelUbxCfgValget structure.
  */
 #define YODEL_UBX_CFG_VALGET_INITIALIZER \
@@ -848,7 +849,7 @@ typedef struct YodelUbxNavSvin {
 } yodel_ubx_nav_svin_t __attribute__((aligned(4)));
 
 /**
- * @define YODEL_UBX_RXM_RTCM_INITIALIZER
+ * @def YODEL_UBX_RXM_RTCM_INITIALIZER
  * Initialize a YodelUbxAck structure.
  */
 #define YODEL_UBX_NAV_SVIN_INITIALIZER \
@@ -890,7 +891,7 @@ typedef struct YodelUbxRxmRtcm {
 } yodel_ubx_rxm_rtcm_t __attribute__((aligned(2)));
 
 /**
- * @define YODEL_UBX_RXM_RTCM_INITIALIZER
+ * @def YODEL_UBX_RXM_RTCM_INITIALIZER
  * Initialize a YodelUbxAck structure.
  */
 #define YODEL_UBX_RXM_RTCM_INITIALIZER \
@@ -963,7 +964,7 @@ typedef struct YodelUbxMonComms {
 } yodel_ubx_mon_comms_t  __attribute__((aligned(4)));
 
 /**
- * @define YODEL_UBX_MON_COMMS_INITIALIZER
+ * @def YODEL_UBX_MON_COMMS_INITIALIZER
  * Initialize a YodelUbxMonComms structure.
  */
 #define YODEL_UBX_MON_COMMS_INITIALIZER \
