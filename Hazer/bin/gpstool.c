@@ -173,7 +173,7 @@ static char Hostname[9] = { '\0' };
 
 static pid_t Process = 0;
 
-static const char * Device = (const char *)0;
+static const char * Device = "-";
 
 /**
  * This is our POSIX thread mutual exclusion semaphore.
@@ -2186,6 +2186,8 @@ int main(int argc, char * argv[])
 
     } else {
 
+        Device = remote_option;
+
         remote_protocol = IPV6;
 
         remote_fd = diminuto_ipc6_datagram_peer(remote_endpoint.udp);
@@ -2344,12 +2346,13 @@ int main(int argc, char * argv[])
 
     if (device == (const char *)0) {
 
-        Device = "";
+        /* Do nothing. */
 
     } else if (strcmp(device, "-") == 0) {
 
-        in_fp = stdin;
         Device = "-";
+
+        in_fp = stdin;
 
     } else {
 
@@ -2405,13 +2408,28 @@ int main(int argc, char * argv[])
      */
 
     if (source == (const char *)0) {
+
         /* Do nothing. */
+
     } else if (strcmp(source, "-") == 0) {
+
+        Device = "-";
+
         in_fp = stdin;
+
     } else {
+
+        Device = strrchr(source, '/');
+        if (Device != (const char *)0) {
+            Device += 1;
+        } else {
+            Device = source;
+        }
+
         in_fp = fopen(source, "r");
         if (in_fp == (FILE *)0) { diminuto_perror(source); }
         assert(in_fp != (FILE *)0);
+
     }
 
     /*
