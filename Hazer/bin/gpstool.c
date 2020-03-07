@@ -3,7 +3,7 @@
  * @file
  *
  * Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
+ * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-hazer<BR>
  *
@@ -290,7 +290,6 @@ static void emit_packet(FILE * fp, const void * packet, size_t size)
 /**
  * Write a buffer to the specified stream.
  * @param fp points to the output stream.
- * @param ep points to the error stream.
  * @param buffer points to the buffer.
  * @param size is the number of bytes to write.
  */
@@ -311,7 +310,6 @@ static void write_buffer(FILE * fp, const void * buffer, size_t size)
  * Print an NMEA sentence or UBX message to a stream, expanding non-printable
  * characters into escape sequences.
  * @param fp points to the FILE stream.
- * @param ep points to the FILE stream for errors.
  * @param buffer points to the sentence or packet.
  * @param size is the size of the sentence or packet.
  * @param limit is the maximum number of characters to display.
@@ -333,7 +331,6 @@ static void print_buffer(FILE * fp, const void * buffer, size_t size, size_t lim
  * Print an NMEA sentence or UBX message to a stream, expanding all
  * characters into hexadecimal escape sequences.
  * @param fp points to the FILE stream.
- * @param ep points to the FILE stream for errors.
  * @param buffer points to the sentence or packet.
  * @param size is the size of the sentence or packet.
  */
@@ -1280,7 +1277,8 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
  * @param fp points to the FILE stream.
  * @param bp points to the base structure.
  * @param rp points to the rover structure.
- * @param mp points to the kinematics structure.
+ * @param kp points to the message structure.
+ * @param up points to the updates structure.
  */
 static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp, const tumbleweed_updates_t * up)
 {

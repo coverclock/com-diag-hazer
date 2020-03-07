@@ -2,8 +2,8 @@
 /**
  * @file
  *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
+ * Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-hazer
  */
@@ -24,7 +24,6 @@ static const size_t UNLIMITED = ~(size_t)0;
  * Print an NMEA sentence or UBX message to a stream, expanding non-printable
  * characters into escape sequences.
  * @param fp points to the FILE stream.
- * @param ep points to the FILE stream for errors.
  * @param buffer points to the sentence or packet.
  * @param size is the size of the sentence or packet.
  * @param canonical is false to print standard special characters in hex.
