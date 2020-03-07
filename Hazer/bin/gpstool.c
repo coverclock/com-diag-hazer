@@ -2350,7 +2350,7 @@ int main(int argc, char * argv[])
 
     } else if (strcmp(device, "-") == 0) {
 
-        Device = "-";
+        Device = device;
 
         in_fp = stdin;
 
@@ -2369,17 +2369,13 @@ int main(int argc, char * argv[])
 
         if (serial) {
 
-            DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s %d %d%c%d%s%s%s\n", dev_fd, device, readonly ? "ro" : "rw", bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
+            DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\" %d %d%c%d%s%s%s\n", dev_fd, device, readonly ? "ro" : "rw", Device, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
 
             rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
             assert(rc == 0);
 
             rc = diminuto_serial_raw(dev_fd);
             assert(rc == 0);
-
-        } else {
-
-            DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s\n", dev_fd, device, readonly ? "ro" : "rw");
 
         }
 
@@ -2413,7 +2409,7 @@ int main(int argc, char * argv[])
 
     } else if (strcmp(source, "-") == 0) {
 
-        Device = "-";
+        Device = source;
 
         in_fp = stdin;
 
@@ -2430,6 +2426,10 @@ int main(int argc, char * argv[])
         if (in_fp == (FILE *)0) { diminuto_perror(source); }
         assert(in_fp != (FILE *)0);
 
+    }
+
+    if (!serial) {
+            DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\"\n", dev_fd, device, readonly ? "ro" : "rw", Device);
     }
 
     /*
