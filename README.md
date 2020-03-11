@@ -674,22 +674,6 @@ expects it, some minor Makefile hacking might be required.)
     make depend
     make all
 
-Set up environment and run tests and utilities. (This establishes the paths
-for both the Hazer and the Diminuto executables so you don't have to install
-the libraries and binaries in the system directories.)
-
-    cd ~/src/com-diag-hazer/Hazer
-    . out/host/bin/setup
-    unittest-checksum
-    unittest-format
-    unittest-nmea
-    unittest-parse
-    unittest-sanity
-    unittest-tokenize
-    unitest-ubx
-    gpstool -?
-    rtktool -?
-
 The fs directory contains a file system overlay of files that I've found
 useful to carefully install in system directories like /etc and /lib.
 It is not installed automatically, because whether they are helpful, or
@@ -697,6 +681,18 @@ they reduce your target system to a smoking heap of silicon, depends on your
 exact circumstances: the target system, the version of Linux it runs, etc.
 Some of the files under fs are new files in their entirety, some just contain
 lines that need to be added to the indicated files.
+
+# Unit Tests
+
+Set up environment and run tests and utilities. (This establishes the paths
+for both the Hazer and the Diminuto executables so you don't have to install
+the libraries and binaries in the system directories.)
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    make sanity
+    gpstool -?
+    rtktool -?
 
 # Directories
  
