@@ -5,17 +5,15 @@
 /**
  * @file
  *
- * Copyright 2017-2019 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock <coverclock@diag.com><BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
+ * Copyright 2017-2019 Digital Aggregates Corporation, Colorado, USA
+ * Licensed under the terms in LICENSE.txt
  *
- * This file is part of the Digital Aggregates Corporation Hazer package.
- * Hazer is a simple C-based parser of the National Marine Electronics
- * Association (NMEA) strings produced by typical consumer GPS devices.
- * (A hazer is a rodeo cowboy who rides along side a steer to keep it running
- * straight and true while the bulldogger or steer wrestler rides along
- * the other side.)
+ * THe Hazer feature is a simple C-based parser of the National Marine
+ * Electronics Association (NMEA) strings produced by typical consumer
+ * GNSS devices.
+ *
+ * The Hazer repository also contains APIs for dealing with messages
+ * in formats other than NMEA that are emitted by common GNSS devides.
  *
  * This code deliberately tries to avoid using floating poing arithmetic.
  * Some of the smaller embedded platforms I work on don't have floating

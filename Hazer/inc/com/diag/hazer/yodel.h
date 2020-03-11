@@ -5,19 +5,13 @@
 /**
  * @file
  *
- * Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock <coverclock@diag.com><BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
+ * Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA
+ * Licensed under the terms in LICENSE.txt
  *
- * This file is part of the Digital Aggregates Corporation Hazer package.
- * Hazer is a simple C-based parser of the National Marine Electronics
- * Association (NMEA) strings produced by typical consumer GPS devices.
- * Yodel is a C-based parser for the UBX binary packet format that is optionally
- * produced by GPS devices manufactured by ublox AG. Yodel can be used in
- * parallel with Hazer for devices that produce both output formats in the same
- * data stream. (ublox is based in Switzerland; yodeling was a style of singing
- * introduced to Western U.S. culture by cowboys who immigrated from there.)
+ * The Yodel feature provides support for the proprietary UBX binary packet
+ * format that is optionally produced by GNSS devices manufactured by ublox AG.
+ * Yodel can be used in parallel with Hazer for devices that produce both
+ * output formats in the same data stream.
  *
  * REFERENCES
  *

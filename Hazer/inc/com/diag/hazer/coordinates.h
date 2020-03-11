@@ -5,12 +5,12 @@
 /**
  * @file
  *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock <coverclock@diag.com><BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
+ * Copyright 2019 Digital Aggregates Corporation, Colorado, USA
+ * Licensed under the terms in LICENSE.txt
  *
- * This file is part of the Digital Aggregates Corporation Hazer package.
+ * The Coordinates Feature provides some common facilities for parsing and
+ * displaying latitude and longitude coordinates in a variety of useful
+ * formats.
  */
 
 /*

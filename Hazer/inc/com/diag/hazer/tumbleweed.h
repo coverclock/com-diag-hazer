@@ -5,17 +5,12 @@
 /**
  * @file
  *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock <coverclock@diag.com><BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
+ * Copyright 2019 Digital Aggregates Corporation, Colorado, USA
+ * Licensed under the terms in LICENSE.txt
  *
- * This file is part of the Digital Aggregates Corporation Hazer package.
- * Hazer is a simple C-based parser of the National Marine Electronics
- * Association (NMEA) strings produced by typical consumer GPS devices.
- * Tumbleweed is a C-based parser for the RTCM binary message format that is
- * produced by devices supporting Differential GNSS (DGNSS) using Real-Time
- * Kinematics (RTK).
+ * The Tumbleweed feature provides support for RTCM binary message format
+ * that is produced by devices supporting Differential GNSS (DGNSS) using
+ * Real-Time Kinematics (RTK).
  *
  * REFERENCES
  *

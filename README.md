@@ -397,32 +397,35 @@ gcc 9.2.1
 
 # Articles
 
-Chip Overclock, "Better Never Than Late",
+Chip Overclock, "Better Never Than Late", 2017-02,
 <http://coverclock.blogspot.com/2017/02/better-never-than-late.html>
 
-Chip Overclock, "Time and Space",
+Chip Overclock, "Time and Space", 2017-09,
 <https://coverclock.blogspot.com/2017/09/time-space.html>
 
-Chip Overclock, "A Menagerie of GPS Devices",
+Chip Overclock, "A Menagerie of GPS Devices", 2018-04,
 <https://coverclock.blogspot.com/2018/04/a-menagerie-of-gps-devices-with-usb.html>
 
-Chip Overclock, "Practical Geolocation",
+Chip Overclock, "Practical Geolocation", 2018-08,
 <https://coverclock.blogspot.com/2018/08/practical-geolocation.html>
 
-Chip Overclock, "Practical Geolocation II",
+Chip Overclock, "Practical Geolocation II", 2018-08,
 <https://coverclock.blogspot.com/2018/08/practical-geolocation-ii.html>
 
-Chip Overclock, "We Have Met the Enemy and He Is Us",
+Chip Overclock, "We Have Met the Enemy and He Is Us", 2018-09,
 <https://coverclock.blogspot.com/2018/09/we-have-met-enemy-and-he-is-us.html>
 
-Chip Overclock, "GPS Satellite PRN 4",
+Chip Overclock, "GPS Satellite PRN 4", 2018-11,
 <https://coverclock.blogspot.com/2018/11/gps-satellite-prn-4.html>
 
-Chip Overclock, "This Is What You Have To Deal With",
+Chip Overclock, "This Is What You Have To Deal With", 2019-06,
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
-Chip Overclock, "Geolocation While Airborne",
+Chip Overclock, "Geolocation While Airborne", 2019-09,
 <https://coverclock.blogspot.com/2019/09/geotagging-while-airborne.html>
+
+Chip Overclock, "When Learning By Doing Goes To Eleven", 2020-03,
+<https://coverclock.blogspot.com/2020/03/when-learning-by-doing-goes-to-eleven.html>
 
 # Media
 

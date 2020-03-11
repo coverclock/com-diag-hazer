@@ -5,12 +5,12 @@
 /**
  * @file
  *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock <coverclock@diag.com><BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
+ * Copyright 2019 Digital Aggregates Corporation, Colorado, USA
+ * Licensed under the terms in LICENSE.txt
  *
- * This file is part of the Digital Aggregates Corporation Hazer package.
+ * The Datagrams feature provides some common facilities for dealing
+ * with datagrams used for transmitting NMEA or RTK data between
+ * instances of gpstool.
  *
  * This file has some definitions common to both gpstool and rtktool that
  * are pertinent to handling datagrams.
