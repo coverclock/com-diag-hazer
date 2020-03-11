@@ -160,12 +160,6 @@ LDFLAGS				:=	$(LDARCH) -l$(PROJECT) $(LDLIBRARIES) $(DIMINUTO_LDFLAGS)
 MOFLAGS				:=	$(MOARCH) -l$(PROJECT) $(LDLIBRARIES)
 SOFLAGS				:=	$(SOARCH) $(LDLIBRARIES)
 
-BROWSER			:=	firefox
-#BROWSER		:=	epiphany
-#BROWSER		:=	evince
-
-GRIP				:=	grip
-
 ########## Build Artifacts
 
 TARGETOBJECTS		:=	$(addprefix $(OUT)/$(OBC_DIR)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.c))))
@@ -571,7 +565,14 @@ out:
 
 ########## Documentation
 
-.PHONY:	documentation manuals
+# sudo apt-get install doxygen
+# sudo apt-get install ghostscript
+# sudo apt-get install latex
+# sudo apt-get install texlive
+# sudo apt-get install tabu
+# sudo apt-get install texlive-latex-extra
+
+.PHONY:	documentation manuals readme
 
 DOCCOOKED := $(shell echo $(OUT)/$(DOC_DIR) | sed 's/\//\\\//g')
 
@@ -583,24 +584,18 @@ documentation $(OUT)/$(DOC_DIR)/latex $(OUT)/$(DOC_DIR)/man $(OUT)/$(DOC_DIR)/pd
 		cat > $(OUT)/$(DOC_DIR)/doxygen-local.cf
 	doxygen $(OUT)/$(DOC_DIR)/doxygen-local.cf
 
-# When I upgraded to Ubuntu 14.04, a pile of latex macros used by the Doxygen
-# PDF generation were missing. I was never able to figure out what (if any)
-# Ubuntu package they might have been in (although I did install a boatload
-# of packages for TeX and Latex). In the end I just kept rerunning the make
-# step below, examining the refman.log output file in the output directory,
-# and figuring out what Latex macro packages from CTAN to manually download,
-# install in a subdirectory of /usr/share/texmf/tex/latex, and then run texhash.
-# It was very tedius. Here's a list of what I installed.
-# https://www.ctan.org/tex-archive/macros/latex/contrib/xtab
-# https://www.ctan.org/tex-archive/macros/latex/contrib/multirow
-# https://www.ctan.org/pkg/sectsty
-# https://www.ctan.org/tex-archive/macros/latex/contrib/tocloft
 manuals:	$(OUT)/$(DOC_DIR)/latex $(OUT)/$(DOC_DIR)/man $(OUT)/$(DOC_DIR)/pdf
 	mkdir -p $(OUT)/$(DOC_DIR)/pdf
 	$(MAKE) -C $(OUT)/$(DOC_DIR)/latex refman.pdf || exit 0
 	cp $(OUT)/$(DOC_DIR)/latex/refman.pdf $(OUT)/$(DOC_DIR)/pdf
 	cat $(OUT)/$(DOC_DIR)/man/man3/*.3 | groff -man -Tps - > $(OUT)/$(DOC_DIR)/pdf/manpages.ps
 	ps2pdf $(OUT)/$(DOC_DIR)/pdf/manpages.ps $(OUT)/$(DOC_DIR)/pdf/manpages.pdf
+
+$(OUT)/$(DOC_DIR)/html/README.html:	../README.md
+	mkdir -p $(OUT)/$(DOC_DIR)/html
+	grip ../README.md --export $(OUT)/$(DOC_DIR)/html/README.html
+
+readme:	$(OUT)/$(DOC_DIR)/html/README.html
 
 ########## Diffs and Patches
 
