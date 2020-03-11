@@ -571,7 +571,7 @@ out:
 
 ########## Documentation
 
-.PHONY:	documentation browse refman manpages readme
+.PHONY:	documentation manuals
 
 DOCCOOKED := $(shell echo $(OUT)/$(DOC_DIR) | sed 's/\//\\\//g')
 
@@ -595,28 +595,12 @@ documentation $(OUT)/$(DOC_DIR)/latex $(OUT)/$(DOC_DIR)/man $(OUT)/$(DOC_DIR)/pd
 # https://www.ctan.org/tex-archive/macros/latex/contrib/multirow
 # https://www.ctan.org/pkg/sectsty
 # https://www.ctan.org/tex-archive/macros/latex/contrib/tocloft
-documentation-ancillary:	$(OUT)/$(DOC_DIR)/latex $(OUT)/$(DOC_DIR)/man $(OUT)/$(DOC_DIR)/pdf
+manuals:	$(OUT)/$(DOC_DIR)/latex $(OUT)/$(DOC_DIR)/man $(OUT)/$(DOC_DIR)/pdf
 	mkdir -p $(OUT)/$(DOC_DIR)/pdf
 	$(MAKE) -C $(OUT)/$(DOC_DIR)/latex refman.pdf || exit 0
 	cp $(OUT)/$(DOC_DIR)/latex/refman.pdf $(OUT)/$(DOC_DIR)/pdf
 	cat $(OUT)/$(DOC_DIR)/man/man3/*.3 | groff -man -Tps - > $(OUT)/$(DOC_DIR)/pdf/manpages.ps
 	ps2pdf $(OUT)/$(DOC_DIR)/pdf/manpages.ps $(OUT)/$(DOC_DIR)/pdf/manpages.pdf
-
-browse:
-	$(BROWSER) file:$(OUT)/$(DOC_DIR)/html/index.html
-
-refman:
-	$(BROWSER) file:$(OUT)/$(DOC_DIR)/pdf/refman.pdf
-
-manpages:
-	$(BROWSER) file:$(OUT)/$(DOC_DIR)/pdf/manpages.pdf
-
-$(OUT)/$(DOC_DIR)/html/README.html:	../README.md
-	mkdir -p $(OUT)/$(DOC_DIR)/html
-	$(GRIP) ../README.md --export $(OUT)/$(DOC_DIR)/html/README.html
-
-readme:	$(OUT)/$(DOC_DIR)/html/README.html
-	$(BROWSER) file:$(OUT)/$(DOC_DIR)/html/README.html
 
 ########## Diffs and Patches
 
