@@ -5,8 +5,8 @@
 /**
  * @file
  *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA
- * Licensed under the terms in LICENSE.txt
+ * Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
  *
  * The Tumbleweed feature provides support for RTCM binary message format
  * that is produced by devices supporting Differential GNSS (DGNSS) using

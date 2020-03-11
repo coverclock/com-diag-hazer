@@ -5,8 +5,8 @@
 /**
  * @file
  *
- * Copyright 2017-2019 Digital Aggregates Corporation, Colorado, USA
- * Licensed under the terms in LICENSE.txt
+ * Copyright 2017-2019 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
  *
  * THe Hazer feature is a simple C-based parser of the National Marine
  * Electronics Association (NMEA) strings produced by typical consumer

@@ -5,8 +5,8 @@
 /**
  * @file
  *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA
- * Licensed under the terms in LICENSE.txt
+ * Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
  *
  * The Coordinates Feature provides some common facilities for parsing and
  * displaying latitude and longitude coordinates in a variety of useful

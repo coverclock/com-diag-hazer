@@ -5,8 +5,8 @@
 /**
  * @file
  *
- * Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA
- * Licensed under the terms in LICENSE.txt
+ * Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
  *
  * The Yodel feature provides support for the proprietary UBX binary packet
  * format that is optionally produced by GNSS devices manufactured by ublox AG.

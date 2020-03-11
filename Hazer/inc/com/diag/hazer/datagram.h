@@ -5,8 +5,8 @@
 /**
  * @file
  *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA
- * Licensed under the terms in LICENSE.txt
+ * Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
  *
  * The Datagrams feature provides some common facilities for dealing
  * with datagrams used for transmitting NMEA or RTK data between
