@@ -1,7 +1,7 @@
 com-diag-hazer
 ==============
 
-Parse common NMEA strings and other typical output from GNSS devices.
+Parse NMEA strings and other typical output from GNSS devices.
 
 # Thanks
 
