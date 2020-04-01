@@ -660,7 +660,7 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
 
         fprintf(fp, "%2s", "");
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+        fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
         fputc('\n', fp);
 
@@ -682,7 +682,7 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
 
         fprintf(fp, "%2s", "");
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+        fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
         fputc('\n', fp);
 
@@ -699,7 +699,7 @@ static void print_actives(FILE * fp, const hazer_active_t aa[])
 
         fprintf(fp, "%34s", "");
 
-        fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+        fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
         fputc('\n', fp);
 
@@ -762,7 +762,7 @@ static void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t 
 
             fprintf(fp, "%15s", "");
 
-            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
             fputc('\n', fp);
 
@@ -968,7 +968,7 @@ static void print_hardware(FILE * fp, const yodel_hardware_t * hp)
 
         fprintf(fp, "%24s", ""); /* This is actually important. */
 
-        fprintf(fp, " %-8s", Device);
+        fprintf(fp, " %-8.8s", Device);
 
         fputc('\n', fp);
     }
@@ -1037,7 +1037,7 @@ static void print_status(FILE * fp, const yodel_status_t * sp)
 
         fprintf(fp, "%11s", ""); /* This is actually important. */
 
-        fprintf(fp, " %-8s", Device);
+        fprintf(fp, " %-8.8s", Device);
 
         fputc('\n', fp);
     }
@@ -1092,7 +1092,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fprintf(fp, "%28s", "");
 
-            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
             fputc('\n', fp);
 
@@ -1147,7 +1147,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fprintf(fp, "%7s", "");
 
-            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
             fputc('\n', fp);
 
@@ -1173,7 +1173,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fprintf(fp, "%43s", "");
 
-            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
             fputc('\n', fp);
 
@@ -1209,7 +1209,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fprintf(fp, "%30s", "");
 
-            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
             fputc('\n', fp);
 
@@ -1240,7 +1240,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fprintf(fp, "%14s", "");
 
-            fprintf(fp, " %-8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
             fputc('\n', fp);
 
@@ -1263,7 +1263,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fprintf(fp, "%1s", "");
 
-            fprintf(fp, " %-8s", Device);
+            fprintf(fp, " %-8.8s", Device);
 
             fputc('\n', fp);
 
@@ -1288,7 +1288,7 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
         fputs("BAS", fp);
         fprintf(fp, " %dactive %dvalid %10usec %10uobs %12.4lfm", !!bp->payload.active, !!bp->payload.valid, bp->payload.dur, bp->payload.obs, (double)bp->payload.meanAcc / 10000.0);
         fprintf(fp, "%10s", "");
-        fprintf(fp, " %-8s", "DGNSS");
+        fprintf(fp, " %-8.8s", "DGNSS");
         fputc('\n', fp);
 
     }
@@ -1298,7 +1298,7 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
         fputs("ROV", fp);
         fprintf(fp, " %5u: %5u (%5u)", rp->payload.refStation, rp->payload.msgType, rp->payload.subType);
         fprintf(fp, "%46s", "");
-        fprintf(fp, " %-8s", "DGNSS");
+        fprintf(fp, " %-8.8s", "DGNSS");
         fputc('\n', fp);
 
      }
@@ -1306,9 +1306,9 @@ static void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
      if (kp->ticks != 0) {
 
          fputs("RTK", fp);
-         fprintf(fp, " %4u [%4zu] %-8s <%8.8s>", kp->number, kp->length, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown", up->bytes);
+         fprintf(fp, " %4u [%4zu] %-8.8s <%8.8s>", kp->number, kp->length, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown", up->bytes);
          fprintf(fp, "%36s", "");
-         fprintf(fp, "%-8s", "DGNSS");
+         fprintf(fp, "%-8.8s", "DGNSS");
          fputc('\n', fp);
 
      }
@@ -1349,7 +1349,7 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fprintf(fp, "%22s", "");
 
-        fprintf(fp, " %-8s", "GNSS");
+        fprintf(fp, " %-8.8s", "GNSS");
 
         fputc('\n', fp);
 
@@ -1366,7 +1366,7 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fprintf(fp, "%17s", "");
 
-        fprintf(fp, " %-8s", "GNSS");
+        fprintf(fp, " %-8.8s", "GNSS");
 
         fputc('\n', fp);
 
@@ -1380,7 +1380,7 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
 
         fprintf(fp, "%29s", "");
 
-        fprintf(fp, " %-8s", "GNSS");
+        fprintf(fp, " %-8.8s", "GNSS");
 
         fputc('\n', fp);
 
