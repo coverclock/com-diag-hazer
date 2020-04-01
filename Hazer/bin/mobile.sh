@@ -6,7 +6,8 @@
 # Configure and run the U-blox ZED-UBX-F9P as a uncorrected independent
 # mobile Rover.
 
-SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-"./sav"}
+SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-$(readlink -e $(dirname ${0}))/../sav}
+mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/tumbleweed"}

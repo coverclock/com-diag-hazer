@@ -7,7 +7,8 @@
 # corrections from a stationary Base and saving high precision solutions
 # to a CSV file (especially useful for testing on survey benchmarks).
 
-SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-"./sav"}
+SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-$(readlink -e $(dirname ${0}))/../sav}
+mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
