@@ -1259,7 +1259,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             fprintf(fp, " %ddmy", dmyokay);
             fprintf(fp, " %dinc", totokay);
             fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
-            fprintf(fp, " %20llub", (unsigned long long)bytes); /* (2^64)-1 == 0xFFFFFFFFFFFFFFFF == 18,446,744,073,709,551,615. */
+            fprintf(fp, " %20lluB", (unsigned long long)bytes); /* (2^64)-1 == 0xFFFFFFFFFFFFFFFF == 18,446,744,073,709,551,615. */
 
             fprintf(fp, "%1s", "");
 
