@@ -29,17 +29,16 @@ TASK=${1}
 FILE=${2}
 DIRECTORY=${3:-${SAVDIR}}
 LIMIT=${4:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+PID=""
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 if [[ "${FILE}" == "err" ]]; then
-    CMD="tail -n ${LIMIT} -f"
+    exec tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
 elif [[ "${FILE}" == "out" ]]; then
-    CMD="headless"
+    exec headless ${DIRECTORY}/${TASK}.${FILE} ${DIRECTORY}/${TASK}.pid
 elif [[ "${FILE}" == "csv" ]]; then
-    CMD="tail -n ${LIMIT} -f"
+    exec tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
 else
-    CMD="cat"
+    exec cat ${DIRECTORY}/${TASK}.${FILE}
 fi
-
-exec ${CMD} ${DIRECTORY}/${TASK}.${FILE}
