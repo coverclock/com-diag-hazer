@@ -721,6 +721,7 @@ the libraries and binaries in the system directories.)
 * out/TARGET/log - log files produced at run-time.
 * out/TARGET/obc - object files.
 * out/TARGET/sym - utility unstripped binary executables.
+* out/TARGET/tmp - temporary files supporting headless operation.
 * out/TARGET/tst - unit test binary executables and scripts.
 
 # Utilities

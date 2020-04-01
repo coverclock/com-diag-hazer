@@ -8,7 +8,7 @@
 # IMPORTANT SAFETY TIP: when switching the F9P from FIXED back to SVIN mode,
 # consider power cycling or otherwise resetting the device first.
 
-SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-$(readlink -e $(dirname ${0}))/../sav}
+SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-$(readlink -e $(dirname ${0}))/../tmp}
 mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename ${0})
