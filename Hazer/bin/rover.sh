@@ -6,7 +6,7 @@
 # Configure and run the U-blox ZED-UBX-F9P as a mobile Rover receiving
 # corrections from a stationary Base.
 
-SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0}))/../tmp}
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename ${0})

@@ -4,7 +4,7 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 
-SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0}))/../tmp}
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename ${0})

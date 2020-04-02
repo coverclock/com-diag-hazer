@@ -3,4 +3,8 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-base localhost:tumbleweed & sleep 5; exec peruse base out
+PROGRAM=${1:-base}
+ARGUMENT=${2:-localhost:tumbleweed}
+FILE=${3:-${PROGRAM}}
+TYPE=${4:-out}
+${PROGRAM} ${ARGUMENT} & sleep 5; exec peruse ${FILE} ${TYPE}
