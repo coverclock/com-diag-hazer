@@ -5,7 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # Run the U-blox ZED-UBX-F9P with no additional configuration.
 
-SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-$(readlink -e $(dirname ${0}))/../tmp}
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0}))/../tmp}
 mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename ${0})

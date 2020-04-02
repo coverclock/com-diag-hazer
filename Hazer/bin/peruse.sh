@@ -21,7 +21,7 @@
 #    peruse rover err
 #    peruse router err
 
-SAVDIR=${COM_DIAG_HAZER_SAVE_DIR:-$(readlink -e $(dirname ${0}))/../tmp}
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0}))/../tmp}
 mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename ${0})
