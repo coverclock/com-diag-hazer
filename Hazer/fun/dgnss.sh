@@ -3,6 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# I use this script to test other scripts.
 PROGRAM=${1:-base}
 ARGUMENT=${2:-localhost:tumbleweed}
 FILE=${3:-${PROGRAM}}
