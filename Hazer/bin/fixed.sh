@@ -15,7 +15,7 @@ PROGRAM=$(basename ${0})
 ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
-FIXFIL=${4-"./base.fix"}
+FIXFIL=${4-"${SAVDIR}/base.fix"}
 ERRFIL=${5-"${SAVDIR}/${PROGRAM}.err"}
 OUTFIL=${6-"${SAVDIR}/${PROGRAM}.out"}
 

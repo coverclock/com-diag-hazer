@@ -1852,6 +1852,15 @@ one of the Pis is a router that receives RTK updates from one base station
 and forwards them to one or more rovers. (You can combine the base and the
 router on to one Pi, but I chose not to configure my set up that way.)
 
+N.B. The Diminuto logging system used by Hazer writes log messages
+to standard error if the caller is an interactive process, and to the
+system log if the caller is a daemon. Running some of these scripts in
+the background and then logging off to let them continue to run causes
+the logging system to perceive that they have transitioned from being
+interactive to being a daemon (and this isn't a mistake). Consequently,
+subsequent log messages will go to the system log and not the error
+log file. This can seem a little mysterious.
+
 ### Router
 
 The Tumbleweed router, which is on my LAN, must have a static IP address

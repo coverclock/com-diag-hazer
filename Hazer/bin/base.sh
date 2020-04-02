@@ -29,9 +29,12 @@ mkdir -p $(dirname ${OUTFIL})
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 if [[ ! -r ${FIXFIL} ]]; then
+	echo "exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}" 1>&2
 	exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}
 elif [[ $(wc -l ${FIXFIL}) < 7 ]]; then
+	echo "exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}" 1>&2
 	exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}
 else
+	echo "exec fixed ${ROUTER} ${DEVICE} ${RATE} ${FIXFIL} ${ERRFIL} ${OUTFIL}" 1>&2
 	exec fixed ${ROUTER} ${DEVICE} ${RATE} ${FIXFIL} ${ERRFIL} ${OUTFIL}
 fi
