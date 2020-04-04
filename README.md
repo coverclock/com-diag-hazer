@@ -737,6 +737,7 @@ the libraries and binaries in the system directories.)
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
+* iso8601 - converts seconds since the UNIX epoch into an ISO8601 timestamp.
 * mobile - configures and runs a UBX-ZED-F9P as an uncorrected rover.
 * peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
@@ -763,6 +764,7 @@ the libraries and binaries in the system directories.)
 * collect - collects output of a device into a file.
 * datagramsink - exercises a datagram source.
 * datagramsource - exercises a datagram sink.
+* dgnss - a script used to test other DNSS scripts.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
 * gr701w - exercises the NaviSys GR701W receiver.    
 * lowresolution - same as bin/base.sh but with much much lower standards.

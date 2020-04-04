@@ -564,10 +564,18 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
  * the maximum precision available in the underlying device and beyond which
  * NMEA can express.
  * @param fp points to the FILE stream.
+ * @param pa is the positions array.
  * @param sp points to the solutions structure.
  */
-static void emit_trace(FILE * fp, const yodel_solution_t * sp)
+static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp)
 {
+    int year = 0;
+    int month = 0;
+    int day = 0;
+    int hour = 0;
+    int minute = 0;
+    int second = 0;
+    uint64_t nanoseconds = 0;
     int32_t degrees = 0;
     uint64_t billionths = 0;
     int32_t meters = 0;
@@ -578,6 +586,7 @@ static void emit_trace(FILE * fp, const yodel_solution_t * sp)
     if (sn == 0) {
         epoch = diminuto_time_elapsed();
         fputs("OBSERVATION,", fp);
+        fputs(" CLOCK,", fp);
         fputs(" ELAPSED,", fp);
         fputs(" LATITUDE,", fp);
         fputs(" LONGITUDE,", fp);
@@ -588,29 +597,44 @@ static void emit_trace(FILE * fp, const yodel_solution_t * sp)
         sn++;
     }
 
-    fprintf(fp, "%llu,", (long long unsigned int)(sn++));
+    if (pa[HAZER_SYSTEM_GNSS].ticks == 0) {
+        /* Do nothing. */
+    } else if (pa[HAZER_SYSTEM_GNSS].utc_nanoseconds == 0) {
+        /* Do nothing. */
+    } else if (pa[HAZER_SYSTEM_GNSS].dmy_nanoseconds == 0) {
+        /* Do nothing. */
+    } else {
 
-    fprintf(fp, " %llu,", (long long unsigned int)((diminuto_time_elapsed() - epoch) / diminuto_time_frequency()));
+        hazer_format_nanoseconds2timestamp(pa[HAZER_SYSTEM_GNSS].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
 
-    yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
-    fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
+        fprintf(fp, "%llu,", (long long unsigned int)(sn++));
 
-    yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &billionths);
-    fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
+        fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ,", year, month, day, hour, minute, second);
 
-    yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
-    fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        fprintf(fp, " %llu,", (long long unsigned int)((diminuto_time_elapsed() - epoch) / diminuto_time_frequency()));
 
-    yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &tenthousandths);
-    fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
+        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
 
-    yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &tenthousandths);
-    fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &billionths);
+        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
 
-    yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
-    fprintf(fp, " %lld.%04llu\n", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
+        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
-    fflush(fp);
+        yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &tenthousandths);
+        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+        yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &tenthousandths);
+        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+        yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
+        fprintf(fp, " %lld.%04llu\n", (long long signed int)meters, (long long unsigned int)tenthousandths);
+
+        fflush(fp);
+
+    }
+
 }
 
 /*******************************************************************************
@@ -3766,7 +3790,7 @@ int main(int argc, char * argv[])
         } else if (!hpllh) {
             /* Do nothing. */
         } else {
-            emit_trace(trace_fp, &solution);
+            emit_trace(trace_fp, position, &solution);
             hpllh = 0;
         }
 
