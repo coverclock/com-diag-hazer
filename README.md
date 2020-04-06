@@ -2198,6 +2198,12 @@ semantics, specifically dealing with lost or reordered packets.
 Unfortunately in doing so, DTLS eliminates the very advantages that
 caused me to choose UDP over TCP.
 
+Most Linux distros will require that you either be in the "dialout"
+group (preferred), or run as root, in order to access serial devices
+like GPS receivers.
+
+Also read the Issues section in the Diminuto README.
+
 ## Google Maps
 
 The googlemaps utility converts strings containing latitude and longitude
