@@ -395,6 +395,14 @@ Ubuntu 19.10 "Eoan"
 Linux 5.3.0    
 gcc 9.2.1    
 
+"Gypsum"
+HP Mini 110-1100
+Intel Atom 32-bit
+Intel Atom N270 @ 1.6GHz x 2
+Mint 19.3 "Tricia"
+Linux 5.0.0
+gcc 7.5.0
+
 # Articles
 
 Chip Overclock, "Better Never Than Late", 2017-02,
