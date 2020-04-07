@@ -34,6 +34,7 @@ PID=""
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 if [[ "${TASK}" == "router" ]]; then
+    cat ${DIRECTORY}/${TASK}.${FILE}
     exec tail -n ${LIMIT} -f /var/log/syslog | grep rtktool
 elif [[ "${FILE}" == "err" ]]; then
     exec tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
