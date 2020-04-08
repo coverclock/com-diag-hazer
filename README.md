@@ -316,7 +316,7 @@ Ubuntu 16.04.2 "Xenial Xerus"
 Linux 4.10.0    
 gcc 5.4.0    
 
-"Nickel" (updated)    
+"Nickel" (Updated)    
 Intel NUC5i7RYH    
 Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
 Ubuntu 18.04.1 "Bionic Beaver"    
@@ -344,12 +344,21 @@ Raspbian 9.4 "Stretch"
 Linux 4.14.34    
 gcc 6.3.0    
 
-"Bodega" and "Mochila"    
+"Bodega"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.8 "Stretch"    
 Linux 4.14.98    
 gcc 6.3.0    
+DGNSS Base (Mobile)    
+
+"Mochila"    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 9.8 "Stretch"    
+Linux 4.14.98    
+gcc 6.3.0    
+DGNSS Rover (Mobile)    
 
 "ElJefe"    
 Raspberry Pi 3 Model B+    
@@ -357,13 +366,39 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 9.9 "Stretch"    
 Linux 4.19.42    
 gcc 6.3.0    
+DGNSS Router
 
-"Bodega", "Mochila", "Hacienda", and "ElJefe" (updated)    
+"Bodega" (Updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
 Linux 4.19.50    
 gcc 8.3.0    
+DGNSS Base (Mobile)    
+
+"Mochila" (Updated)
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.50    
+gcc 8.3.0    
+DGNSS Rover (Mobile)    
+
+"Hacienda" (Updated)
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.50    
+gcc 8.3.0    
+DGNSS Base (Fixed)    
+
+"ElJefe" (Updated)    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.50    
+gcc 8.3.0    
+DGNSS Router    
 
 "Cadmium"    
 Intel NUC7i7BNH    
@@ -372,7 +407,7 @@ Ubuntu 16.04.5 "Xenial Xerus"
 Linux 4.15.0    
 gcc 5.4.0    
 
-"Cadmium" (updated)    
+"Cadmium" (Updated)    
 Intel NUC7i7BNH    
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
 Ubuntu 19.04 "Disco Dingo"   
@@ -402,6 +437,12 @@ Intel Atom N270 @ 1.6GHz x 2
 Mint 19.3 "Tricia"
 Linux 5.0.0
 gcc 7.5.0
+
+"Vagabundo"    
+Raspberry Pi 3 Model B+    
+ARMv7 64-bit    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+TBD    
 
 # Articles
 
