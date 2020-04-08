@@ -112,11 +112,11 @@ Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
 and uses one .c file and one .h file, included in this repository, that was
 written by Mr. Karney and which can be found at
 
-The gpstool, rtktool, and googlemaps utilities depend on running in a
-POSIX locale that allows the use of Unicode characters like the degree
-symbol.  Locales like "POSIX" and "C" don't support this, at least not
-on the systems I have. Locales like "en_US.UTF-8" work okay. Your
-mileage may vary.
+The gpstool, rtktool, and mapstool utilities depend on running in a POSIX
+locale that allows the use of Unicode characters like the degree symbol.
+Locales like "POSIX" and "C" don't support this, at least not on the
+systems I have. Locales like "en_US.UTF-8" work okay. Your mileage
+may vary.
 
 <https://geographiclib.sourceforge.io>
 
@@ -740,7 +740,7 @@ the libraries and binaries in the system directories.)
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
 * fixed - configures and runs a UBX-ZED-F9P as a base station in fixed mode.
-* googlemaps - convert gpstool coordinate strings to formats accepted by Google Maps.
+* mapstool - convert gpstool coordinate strings to formats accepted by Google Maps.
 * gpstool - serves as Hazer's multi purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
@@ -2206,19 +2206,19 @@ Also read the Issues section in the Diminuto README.
 
 ## Google Maps
 
-The googlemaps utility converts strings containing latitude and longitude
+The mapstool  utility converts strings containing latitude and longitude
 coordinates of various formats (several of which are output by the gpstool
 utility) into a decimal degrees format that is understood by Google Maps.
-You can cut and paste the output of googlemaps directly into the search bar
+You can cut and paste the output of mapstool directly into the search bar
 of the Google Maps web page.
 
-    $ googlemaps "39.794212196, -105.153349930"# HPP format
+    $ mapstool "39.794212196, -105.153349930"# HPP format
     39.794212196, -105.153349930
     
-    $ googlemaps "39 47 39.16390(N) 105 09 12.05974(W)"# NGS format
+    $ mapstool "39 47 39.16390(N) 105 09 12.05974(W)"# NGS format
     39.794212194, -105.153349928
     
-    $ googlemaps "39°47'39.163\"N, 105°09'12.060\"W"# POS format
+    $ mapstool "39°47'39.163\"N, 105°09'12.060\"W"# POS format
     39.794211944, -105.153350000
 
 HPP is the U-blox UBX High Precision Position format. It is also a format
@@ -2241,7 +2241,7 @@ The utility haversine computes the distance between two coordinates expressed
 in decimal degrees using the Haversine algorithm based on great circles. This
 is a simple trigonometric approach that (incorrectly) assumes the Earth is a
 perfect sphere. The output is expressed in meters. The input can be cut and
-pasted directly from the googlemaps utility (see above).
+pasted directly from the mapstool utility (see above).
 
     $ haversine 39.794212194, -105.153349928 39.794211944, -105.153350000
     0.0285029342
@@ -2250,7 +2250,7 @@ The utility geodesic computes the distance between two coordinates expressed
 in decimal degress using the Geodesic algorithm based on an elliptical model
 of the Earth from the WGS84 datum (this is a model used by most GPS receivers).
 The output is expressed in meters. The input can be cut and pasted directly
-from the googlemaps utility (see above). This is a more accurate, but much
+from the mapstool utility (see above). This is a more accurate, but much
 more computationally complex, approach than using great circles. This utility
 makes use of the geodesic.h and geodesic.c files from Charles F. F. Karney's
 geographiclib, which is licensed under the MIT license.

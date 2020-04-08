@@ -782,7 +782,7 @@ static void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t 
 
             fputs("SAT", fp);
 
-            fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, DEGREE, va[system].sat[satellite].azm_degrees, DEGREE, va[system].sat[satellite].snr_dbhz, va[system].signal[sequence], ranged, phantom, untracked);
+            fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, (wint_t)DEGREE, va[system].sat[satellite].azm_degrees, (wint_t)DEGREE, va[system].sat[satellite].snr_dbhz, va[system].signal[sequence], ranged, phantom, untracked);
 
             fprintf(fp, "%15s", "");
 
@@ -1148,14 +1148,14 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             assert((0 <= minutes) && (minutes <= 59));
             assert((0 <= seconds) && (seconds <= 59));
             assert((0 <= thousandths) && (thousandths <= 999));
-            fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
+            fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, (wint_t)DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
 
             hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
             assert((0 <= degrees) && (degrees <= 180));
             assert((0 <= minutes) && (minutes <= 59));
             assert((0 <= seconds) && (seconds <= 59));
             assert((0 <= thousandths) && (thousandths <= 999));
-            fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
+            fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, (wint_t)DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
 
             fputc(' ', fp);
 
@@ -1225,11 +1225,11 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             degrees = pa[system].cog_nanodegrees / 1000000000LL;
             billionths = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
-            fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
+            fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)degrees, (long long unsigned int)billionths, (wint_t)DEGREE);
 
             degrees = pa[system].mag_nanodegrees / 1000000000LL;
             billionths = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
-            fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)degrees, (long long unsigned int)billionths, DEGREE);
+            fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)degrees, (long long unsigned int)billionths, (wint_t)DEGREE);
 
             fprintf(fp, "%30s", "");
 
@@ -1369,7 +1369,7 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         fprintf(fp, " %4d.%09llu", decimaldegrees, (long long unsigned int)billionths);
 
         yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
-        fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
+        fprintf(fp, " %lc%6lld.%04llum", (wint_t)PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
 
         fprintf(fp, "%22s", "");
 
@@ -1386,7 +1386,7 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         fprintf(fp, " %6lld.%04llum WGS84", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
         yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
-        fprintf(fp, " %lc%6lld.%04llum", PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
+        fprintf(fp, " %lc%6lld.%04llum", (wint_t)PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
 
         fprintf(fp, "%17s", "");
 
