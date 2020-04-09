@@ -376,7 +376,7 @@ Linux 4.19.50
 gcc 8.3.0    
 DGNSS Base (Mobile)    
 
-"Mochila" (Updated)
+"Mochila" (Updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
@@ -384,7 +384,7 @@ Linux 4.19.50
 gcc 8.3.0    
 DGNSS Rover (Mobile)    
 
-"Hacienda" (Updated)
+"Hacienda"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
