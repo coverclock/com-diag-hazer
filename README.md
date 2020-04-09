@@ -9,7 +9,7 @@ Parse NMEA strings and other typical output from GNSS devices.
 
 # Copyright
 
-Copyright 2017-2019 by the Digital Aggregates Corporation, Colorado, USA.
+Copyright 2017-2020 by the Digital Aggregates Corporation, Colorado, USA.
 
 # License
 
@@ -437,12 +437,6 @@ Intel Atom N270 @ 1.6GHz x 2
 Mint 19.3 "Tricia"    
 Linux 5.0.0    
 gcc 7.5.0    
-
-"Vagabundo"    
-Raspberry Pi 3 Model B+    
-ARMv7 64-bit    
-Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
-TBD    
 
 # Articles
 
