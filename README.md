@@ -350,7 +350,7 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 9.8 "Stretch"    
 Linux 4.14.98    
 gcc 6.3.0    
-DGNSS Base (Mobile)    
+DGNSS Base (Generation 1)    
 
 "Mochila"    
 Raspberry Pi 3 Model B+    
@@ -358,7 +358,7 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 9.8 "Stretch"    
 Linux 4.14.98    
 gcc 6.3.0    
-DGNSS Rover (Mobile)    
+DGNSS Rover (Generation 1)    
 
 "ElJefe"    
 Raspberry Pi 3 Model B+    
@@ -366,7 +366,7 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 9.9 "Stretch"    
 Linux 4.19.42    
 gcc 6.3.0    
-DGNSS Router
+DGNSS Router (Generation 2)    
 
 "Bodega" (Updated)    
 Raspberry Pi 3 Model B+    
@@ -374,7 +374,7 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 10 "Buster"    
 Linux 4.19.50    
 gcc 8.3.0    
-DGNSS Base (Mobile)    
+DGNSS Base (Generation 1)    
 
 "Mochila" (Updated)    
 Raspberry Pi 3 Model B+    
@@ -382,7 +382,7 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 10 "Buster"    
 Linux 4.19.50    
 gcc 8.3.0    
-DGNSS Rover (Mobile)    
+DGNSS Rover (Generation 1)    
 
 "Hacienda"    
 Raspberry Pi 3 Model B+    
@@ -390,7 +390,7 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 10 "Buster"    
 Linux 4.19.50    
 gcc 8.3.0    
-DGNSS Base (Fixed)    
+DGNSS Base (Generation 1)    
 
 "ElJefe" (Updated)    
 Raspberry Pi 3 Model B+    
@@ -398,7 +398,7 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 10 "Buster"    
 Linux 4.19.50    
 gcc 8.3.0    
-DGNSS Router    
+DGNSS Router (Generation 2)    
 
 "Cadmium"    
 Intel NUC7i7BNH    
@@ -437,6 +437,14 @@ Intel Atom N270 @ 1.6GHz x 2
 Mint 19.3 "Tricia"    
 Linux 5.0.0    
 gcc 7.5.0    
+
+"Vagabundo"    
+Pi-Top 3    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 9.11 "Stretch"    
+gcc 6.3.0    
+DGNSS Rover (Generation 3)    
 
 # Articles
 
