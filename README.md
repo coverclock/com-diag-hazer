@@ -2085,12 +2085,26 @@ of the rover configuration seems to be sticky.)
     peruse mobile err# Control-C to exit upon seeing "Ready".
     peruse mobile out
 
+Once I'm confident that everything works and I don't need to check the
+error log (you can always look at it later), I use this shorthand to
+fire up the rover. (Something similar works for the base, router, and
+mobile scripts too.)
+
+    cd ~/src/*hazer/Hazer
+    . out/host/bin/setup
+    rover tumbleweed.test:tumbleweed & sleep 5 ; peruse rover out
+
 ### Headless
 
 I'm running all three, router, base, and rover, as simple background
-processes.  But it is also possible to run them in daemon mode, in which
-case messages normally written to standard error are logged to the system
-log. Also, I run all three in "headless" mode, where the screens normally
+processes.  But it is also possible to run them in daemon mode, in
+which case messages normally written to standard error are logged to
+the system log, which on the Pi is typically in /var/log/syslog. (This
+also happens when you run the scripts in the background and then later
+logout. This can be a little confusing since the log will transition
+from going into the error log file to going into the system log.)
+
+Also, I run all three in "headless" mode, where the screens normally
 written to standard output are instead written to a file, and a script
 is used to display the file as it changes; this decouples the router,
 rover, and base software from the display terminal while still allowing
