@@ -106,21 +106,21 @@ inotify tools: sudo apt-get install inotify-tools .
 
 The geodesic utility is based on algorithms described in
 
-Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
-2013-01, 87.1, pp. 43..55
+> Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
+> 2013-01, 87.1, pp. 43..55
 
 and uses one .c file and one .h file, included in this repository, that was
 written by Mr. Karney and which can be found at
+
+> <https://geographiclib.sourceforge.io>
+
+and which is licensed under the MIT license.
 
 The gpstool, rtktool, and mapstool utilities depend on running in a POSIX
 locale that allows the use of Unicode characters like the degree symbol.
 Locales like "POSIX" and "C" don't support this, at least not on the
 systems I have. Locales like "en_US.UTF-8" work okay. Your mileage
 may vary.
-
-<https://geographiclib.sourceforge.io>
-
-and which is licensed under the MIT license.
 
 # Versioning
 
