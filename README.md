@@ -488,6 +488,9 @@ Chip Overclock, "Geolocation While Airborne", 2019-09,
 Chip Overclock, "When Learning By Doing Goes To Eleven", 2020-03,
 <https://coverclock.blogspot.com/2020/03/when-learning-by-doing-goes-to-eleven.html>
 
+Chip Overclock, "Improvisational Engineering", 2020-04,
+<https://coverclock.blogspot.com/2020/04/improvisational-engineering.html>
+
 # Media
 
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
