@@ -33,8 +33,9 @@ while read NUM CLK TIM LAT LON HOR MSL WGS VER; do
 		NS="S"
 	fi
 	NAN=${DAT#*.}
-	MIN=$((${NAN} * 60 / 1000000000))
-	MIL=$(((${NAN} * 60 / 1000) - (${MIN} * 1000000)))
+	TMP=$((${NAN} * 60))
+	MIN=$((${TMP} / 1000000000))
+	MIL=$((${TMP} % 1000000000 / 1000))
 	printf -v LATITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
 	
 	DAT=${LON%,}
@@ -46,8 +47,9 @@ while read NUM CLK TIM LAT LON HOR MSL WGS VER; do
 		EW="W"
 	fi
 	NAN=${DAT#*.}
-	MIN=$((${NAN} * 60 / 1000000000))
-	MIL=$(((${NAN} * 60 / 1000) - (${MIN} * 1000000)))
+	TMP=$((${NAN} * 60))
+	MIN=$((${TMP} / 1000000000))
+	MIL=$((${TMP} % 1000000000 / 1000))
 	printf -v LONGITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
 
 	RMC="\$GNRMC,${TIME},A,${LATITUDE},${NS},${LONGITUDE},${EW},0,0,${DATE},,,A,V"
