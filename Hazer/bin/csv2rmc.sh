@@ -7,34 +7,40 @@
 while read NUM CLK TIM LAT LON HOR MSL WGS VER; do
 	if [[ "${NUM}" != "OBSERVATION" ]]; then
 
-		TIM=${TIM%,}
-		TIME=$(date -d "@${TIM}" -u '+%H%M%S.00')
-		DATE=$(date -d "@${TIM}" -u '+%d%m%y')
-		echo $TIME $DATE
+		DAT=${TIM%,}
+		TIME=$(date -d "@${DAT}" -u '+%H%M%S.00')
+		DATE=$(date -d "@${DAT}" -u '+%d%m%y')
+		echo $TIM $TIME $DATE
 
-		LAT=${LAT%,}
-		NUM=${LAT%.*}
+		DAT=${LAT%,}
+		NUM=${DAT%.*}
 		DEG=${NUM#-}
 		if [[ "${DEG}" == "${NUM}" ]]; then
 			NORS="N"
 		else
 			NORS="S"
 		fi
-		NAN=${LAT#*.}
+		NAN=${DAT#*.}
 		MIN=$((${NAN} * 60 / 1000000000))
-		echo $DEG $MIN $NORS
+		NAN=$((${NAN} / 60))
+		MIL=$((${NAN} * 1000))
+		printf -v LATITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
+		echo $LAT $LATITUDE $NORS
 		
-		LON=${LON%,}
-		NUM=${LON%.*}
+		DAT=${LON%,}
+		NUM=${DAT%.*}
 		DEG=${NUM#-}
 		if [[ "${DEG}" == "${NUM}" ]]; then
 			EORW="E"
 		else
 			EORW="W"
 		fi
-		NAN=${LON#*.}
+		NAN=${DAT#*.}
 		MIN=$((${NAN} * 60 / 1000000000))
-		echo $DEG $MIN $EORW
+		NAN=$((${NAN} / 60))
+		MIL=$((${NAN} / 1000))
+		printf -v LONGITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
+		echo $LON $LONGITUDE $EORW
 
 	fi
 done
