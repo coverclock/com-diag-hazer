@@ -180,7 +180,7 @@ static pid_t Process = 0;
  * This is the path name to the serial device we are reading from
  * or writing to.
  */
-static const char * Device = "-";
+static const char * Device = "stdin";
 
 /**
  * This is our POSIX thread mutual exclusion semaphore.
