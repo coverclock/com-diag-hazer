@@ -11,45 +11,49 @@
 # $GNRMC,184127.00,A,3947.013237,N,10509.002556,W,0,0,240420,,,A,V*25\r\n
 # $GNRMC,184128.00,A,3947.013237,N,10509.002556,W,0,0,240420,,,A,V*2A\r\n
 # $GNRMC,184128.00,A,3947.013237,N,10509.002556,W,0,0,240420,,,A,V*2A\r\n
+#
+# e.g. tail -f file.csv | csv2rmc | gpstool -R
 
 while read NUM CLK TIM LAT LON HOR MSL WGS VER; do
-	if [[ "${NUM}" != "OBSERVATION" ]]; then
 
-		DAT=${TIM%,}
-		TIME=$(date -d "@${DAT}" -u '+%H%M%S.00')
-		DATE=$(date -d "@${DAT}" -u '+%d%m%y')
-
-		DAT=${LAT%,}
-		NUM=${DAT%.*}
-		DEG=${NUM#-}
-		if [[ "${DEG}" == "${NUM}" ]]; then
-			NS="N"
-		else
-			NS="S"
-		fi
-		NAN=${DAT#*.}
-		MIN=$((${NAN} * 60 / 1000000000))
-		MIL=$((${NAN} / 60000))
-		printf -v LATITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
-		
-		DAT=${LON%,}
-		NUM=${DAT%.*}
-		DEG=${NUM#-}
-		if [[ "${DEG}" == "${NUM}" ]]; then
-			EW="E"
-		else
-			EW="W"
-		fi
-		NAN=${DAT#*.}
-		MIN=$((${NAN} * 60 / 1000000000))
-		MIL=$((${NAN} / 60000))
-		printf -v LONGITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
-
-		BUF="\$GNRMC,${TIME},A,${LATITUDE},${NS},${LONGITUDE},${EW},0,0,${DATE},,,A,V"
-		RMC=$(checksum ${BUF})
-		echo -n -e ${RMC}
-
+	if [[ "${NUM}" == "OBSERVATION," ]]; then
+		continue
 	fi
+
+	DAT=${TIM%,}
+	TIME=$(date -d "@${DAT}" -u '+%H%M%S.00')
+	DATE=$(date -d "@${DAT}" -u '+%d%m%y')
+
+	DAT=${LAT%,}
+	NUM=${DAT%.*}
+	DEG=${NUM#-}
+	if [[ "${DEG}" == "${NUM}" ]]; then
+		NS="N"
+	else
+		NS="S"
+	fi
+	NAN=${DAT#*.}
+	MIN=$((${NAN} * 60 / 1000000000))
+	MIL=$(((${NAN} * 60 / 1000) - (${MIN} * 1000000)))
+	printf -v LATITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
+	
+	DAT=${LON%,}
+	NUM=${DAT%.*}
+	DEG=${NUM#-}
+	if [[ "${DEG}" == "${NUM}" ]]; then
+		EW="E"
+	else
+		EW="W"
+	fi
+	NAN=${DAT#*.}
+	MIN=$((${NAN} * 60 / 1000000000))
+	MIL=$(((${NAN} * 60 / 1000) - (${MIN} * 1000000)))
+	printf -v LONGITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
+
+	RMC="\$GNRMC,${TIME},A,${LATITUDE},${NS},${LONGITUDE},${EW},0,0,${DATE},,,A,V"
+	NMEA=$(checksum ${RMC})
+	echo -n -e ${NMEA}
+
 done
 
 exit 0
