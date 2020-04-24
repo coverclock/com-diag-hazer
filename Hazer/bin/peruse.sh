@@ -35,6 +35,7 @@ PID=""
 
 if [[ "${TASK}" == "router" ]]; then
     cat ${DIRECTORY}/${TASK}.${FILE}
+    test /var/log/syslog.1 && grep rtktool /var/log/syslog.1
     grep rtktool /var/log/syslog
     exec tail -n 0 -f /var/log/syslog | grep rtktool
 elif [[ "${FILE}" == "err" ]]; then
