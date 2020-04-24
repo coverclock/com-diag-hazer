@@ -9,7 +9,7 @@ Parse NMEA strings and other typical output from GNSS devices.
 
 # Copyright
 
-Copyright 2017-2019 by the Digital Aggregates Corporation, Colorado, USA.
+Copyright 2017-2020 by the Digital Aggregates Corporation, Colorado, USA.
 
 # License
 
@@ -106,21 +106,21 @@ inotify tools: sudo apt-get install inotify-tools .
 
 The geodesic utility is based on algorithms described in
 
-Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
-2013-01, 87.1, pp. 43..55
+> Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
+> 2013-01, 87.1, pp. 43..55
 
 and uses one .c file and one .h file, included in this repository, that was
 written by Mr. Karney and which can be found at
 
-The gpstool, rtktool, and googlemaps utilities depend on running in a
-POSIX locale that allows the use of Unicode characters like the degree
-symbol.  Locales like "POSIX" and "C" don't support this, at least not
-on the systems I have. Locales like "en_US.UTF-8" work okay. Your
-mileage may vary.
-
-<https://geographiclib.sourceforge.io>
+> <https://geographiclib.sourceforge.io>
 
 and which is licensed under the MIT license.
+
+The gpstool, rtktool, and mapstool utilities depend on running in a POSIX
+locale that allows the use of Unicode characters like the degree symbol.
+Locales like "POSIX" and "C" don't support this, at least not on the
+systems I have. Locales like "en_US.UTF-8" work okay. Your mileage
+may vary.
 
 # Versioning
 
@@ -316,7 +316,7 @@ Ubuntu 16.04.2 "Xenial Xerus"
 Linux 4.10.0    
 gcc 5.4.0    
 
-"Nickel" (updated)    
+"Nickel" (Updated)    
 Intel NUC5i7RYH    
 Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
 Ubuntu 18.04.1 "Bionic Beaver"    
@@ -344,12 +344,21 @@ Raspbian 9.4 "Stretch"
 Linux 4.14.34    
 gcc 6.3.0    
 
-"Bodega" and "Mochila"    
+"Bodega"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.8 "Stretch"    
 Linux 4.14.98    
 gcc 6.3.0    
+DGNSS Base (Generation 1)    
+
+"Mochila"    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 9.8 "Stretch"    
+Linux 4.14.98    
+gcc 6.3.0    
+DGNSS Rover (Generation 1)    
 
 "ElJefe"    
 Raspberry Pi 3 Model B+    
@@ -357,13 +366,39 @@ Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4
 Raspbian 9.9 "Stretch"    
 Linux 4.19.42    
 gcc 6.3.0    
+DGNSS Router (Generation 2)    
 
-"Bodega", "Mochila", "Hacienda", and "ElJefe" (updated)    
+"Bodega" (Updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
 Linux 4.19.50    
 gcc 8.3.0    
+DGNSS Base (Generation 1)    
+
+"Mochila" (Updated)    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.50    
+gcc 8.3.0    
+DGNSS Rover (Generation 1)    
+
+"Hacienda"    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.50    
+gcc 8.3.0    
+DGNSS Base (Generation 1)    
+
+"ElJefe" (Updated)    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.50    
+gcc 8.3.0    
+DGNSS Router (Generation 2)    
 
 "Cadmium"    
 Intel NUC7i7BNH    
@@ -372,7 +407,7 @@ Ubuntu 16.04.5 "Xenial Xerus"
 Linux 4.15.0    
 gcc 5.4.0    
 
-"Cadmium" (updated)    
+"Cadmium" (Updated)    
 Intel NUC7i7BNH    
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
 Ubuntu 19.04 "Disco Dingo"   
@@ -395,13 +430,31 @@ Ubuntu 19.10 "Eoan"
 Linux 5.3.0    
 gcc 9.2.1    
 
-"Gypsum"
-HP Mini 110-1100
-Intel Atom 32-bit
-Intel Atom N270 @ 1.6GHz x 2
-Mint 19.3 "Tricia"
-Linux 5.0.0
-gcc 7.5.0
+"Gypsum"    
+HP Mini 110-1100    
+Intel i686 32-bit    
+Intel Atom N270 @ 1.6GHz x 2    
+Mint 19.3 "Tricia"    
+Linux 5.0.0    
+gcc 7.5.0    
+
+"Vagabundo"    
+Pi-Top 3    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 9.11 "Stretch" (pi-topOS "Polaris")    
+Linux 4.19.66    
+gcc 6.3.0    
+DGNSS Rover (Generation 3)    
+
+"Vagabundo" (Updated)    
+Pi-Top 3    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.97    
+gcc 8.3.0    
+DGNSS Rover (Generation 3)    
 
 # Articles
 
@@ -434,6 +487,9 @@ Chip Overclock, "Geolocation While Airborne", 2019-09,
 
 Chip Overclock, "When Learning By Doing Goes To Eleven", 2020-03,
 <https://coverclock.blogspot.com/2020/03/when-learning-by-doing-goes-to-eleven.html>
+
+Chip Overclock, "Improvisational Engineering", 2020-04,
+<https://coverclock.blogspot.com/2020/04/improvisational-engineering.html>
 
 # Media
 
@@ -740,7 +796,7 @@ the libraries and binaries in the system directories.)
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
 * fixed - configures and runs a UBX-ZED-F9P as a base station in fixed mode.
-* googlemaps - convert gpstool coordinate strings to formats accepted by Google Maps.
+* mapstool - convert gpstool coordinate strings to formats accepted by Google Maps.
 * gpstool - serves as Hazer's multi purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
 * haversine - computes the great circle distance in meters between two coordinates.
@@ -2042,12 +2098,26 @@ of the rover configuration seems to be sticky.)
     peruse mobile err# Control-C to exit upon seeing "Ready".
     peruse mobile out
 
+Once I'm confident that everything works and I don't need to check the
+error log (you can always look at it later), I use this shorthand to
+fire up the rover. (Something similar works for the base, router, and
+mobile scripts too.)
+
+    cd ~/src/*hazer/Hazer
+    . out/host/bin/setup
+    rover tumbleweed.test:tumbleweed & sleep 5 ; peruse rover out
+
 ### Headless
 
 I'm running all three, router, base, and rover, as simple background
-processes.  But it is also possible to run them in daemon mode, in which
-case messages normally written to standard error are logged to the system
-log. Also, I run all three in "headless" mode, where the screens normally
+processes.  But it is also possible to run them in daemon mode, in
+which case messages normally written to standard error are logged to
+the system log, which on the Pi is typically in /var/log/syslog. (This
+also happens when you run the scripts in the background and then later
+logout. This can be a little confusing since the log will transition
+from going into the error log file to going into the system log.)
+
+Also, I run all three in "headless" mode, where the screens normally
 written to standard output are instead written to a file, and a script
 is used to display the file as it changes; this decouples the router,
 rover, and base software from the display terminal while still allowing
@@ -2206,19 +2276,19 @@ Also read the Issues section in the Diminuto README.
 
 ## Google Maps
 
-The googlemaps utility converts strings containing latitude and longitude
+The mapstool  utility converts strings containing latitude and longitude
 coordinates of various formats (several of which are output by the gpstool
 utility) into a decimal degrees format that is understood by Google Maps.
-You can cut and paste the output of googlemaps directly into the search bar
+You can cut and paste the output of mapstool directly into the search bar
 of the Google Maps web page.
 
-    $ googlemaps "39.794212196, -105.153349930"# HPP format
+    $ mapstool "39.794212196, -105.153349930"# HPP format
     39.794212196, -105.153349930
     
-    $ googlemaps "39 47 39.16390(N) 105 09 12.05974(W)"# NGS format
+    $ mapstool "39 47 39.16390(N) 105 09 12.05974(W)"# NGS format
     39.794212194, -105.153349928
     
-    $ googlemaps "39°47'39.163\"N, 105°09'12.060\"W"# POS format
+    $ mapstool "39°47'39.163\"N, 105°09'12.060\"W"# POS format
     39.794211944, -105.153350000
 
 HPP is the U-blox UBX High Precision Position format. It is also a format
@@ -2241,7 +2311,7 @@ The utility haversine computes the distance between two coordinates expressed
 in decimal degrees using the Haversine algorithm based on great circles. This
 is a simple trigonometric approach that (incorrectly) assumes the Earth is a
 perfect sphere. The output is expressed in meters. The input can be cut and
-pasted directly from the googlemaps utility (see above).
+pasted directly from the mapstool utility (see above).
 
     $ haversine 39.794212194, -105.153349928 39.794211944, -105.153350000
     0.0285029342
@@ -2250,7 +2320,7 @@ The utility geodesic computes the distance between two coordinates expressed
 in decimal degress using the Geodesic algorithm based on an elliptical model
 of the Earth from the WGS84 datum (this is a model used by most GPS receivers).
 The output is expressed in meters. The input can be cut and pasted directly
-from the googlemaps utility (see above). This is a more accurate, but much
+from the mapstool utility (see above). This is a more accurate, but much
 more computationally complex, approach than using great circles. This utility
 makes use of the geodesic.h and geodesic.c files from Charles F. F. Karney's
 geographiclib, which is licensed under the MIT license.

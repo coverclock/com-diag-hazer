@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock <coverclock@diag.com><BR>
  * https://github.com/coverclock/com-diag-hazer<BR>
@@ -17,62 +17,62 @@
  *
  * USAGE
  *
- * googlemaps [ -? ] [ -d ] [ -D | -P ] STRING [ [ -D | -P ] STRING ... ]
+ * maps [ -? ] [ -d ] [ -D | -P ] STRING [ [ -D | -P ] STRING ... ]
  *
  * EXAMPLES
  *
- * $ googlemaps "39.794212196, -105.153349930"
+ * $ maps "39.794212196, -105.153349930"
  * 39.794212196, -105.153349930
  *
- * $ googlemaps "39 47 39.16390(N) 105 09 12.05974(W)"
+ * $ maps "39 47 39.16390(N) 105 09 12.05974(W)"
  * 39.794212194, -105.153349928
  *
- * $ googlemaps "39°47'39.163\"N, 105°09'12.060\"W"
+ * $ maps "39°47'39.163\"N, 105°09'12.060\"W"
  * 39.794211944, -105.153350000
  *
- * $ googlemaps -D "39.794212196, -105.153349930"
+ * $ maps -D "39.794212196, -105.153349930"
  * 39.794212196, -105.153349930
  *
- * $ googlemaps -D "39 47 39.16390(N) 105 09 12.05974(W)"
+ * $ maps -D "39 47 39.16390(N) 105 09 12.05974(W)"
  * 39.794212194, -105.153349928
  *
- * $ googlemaps -D "39°47'39.163\"N, 105°09'12.060\"W"
+ * $ maps -D "39°47'39.163\"N, 105°09'12.060\"W"
  * 39.794211944, -105.153350000
  *
- * $ googlemaps -P "39.794212196, -105.153349930"
+ * $ maps -P "39.794212196, -105.153349930"
  * 39°47'39.163905"N, 105°09'12.059748"W
  *
- * $ googlemaps -P "39 47 39.16390(N) 105 09 12.05974(W)"
+ * $ maps -P "39 47 39.16390(N) 105 09 12.05974(W)"
  * 39°47'39.163899"N, 105°09'12.059740"W
  *
- * $ googlemaps -P "39°47'39.163\"N, 105°09'12.060\"W"
+ * $ maps -P "39°47'39.163\"N, 105°09'12.060\"W"
  * 39°47'39.162999"N, 105°09'12.060000"W
  *
- * $ googlemaps "HPP   39.794212196, -105.153349930"
+ * $ maps "HPP   39.794212196, -105.153349930"
  * 39.794212196, -105.153349930
  *
- * $ googlemaps "NGS  39 47 39.16390(N) 105 09 12.05974(W)"
+ * $ maps "NGS  39 47 39.16390(N) 105 09 12.05974(W)"
  * 39.794212194, -105.153349928
  *
- * $ googlemaps "POS 39°47'39.163\"N, 105°09'12.060\"W"
+ * $ maps "POS 39°47'39.163\"N, 105°09'12.060\"W"
  * 39.794211944, -105.153350000
  *
- * $ googlemaps -D "HPP   39.794212196, -105.153349930"
+ * $ maps -D "HPP   39.794212196, -105.153349930"
  * 39.794212196, -105.153349930
  *
- * $ googlemaps -D "NGS  39 47 39.16390(N) 105 09 12.05974(W)"
+ * $ maps -D "NGS  39 47 39.16390(N) 105 09 12.05974(W)"
  * 39.794212194, -105.153349928
  *
- * $ googlemaps -D "POS 39°47'39.163\"N, 105°09'12.060\"W"
+ * $ maps -D "POS 39°47'39.163\"N, 105°09'12.060\"W"
  * 39.794211944, -105.153350000
  *
- * $ googlemaps -P "HPP    39.794212196, -105.153349930"
+ * $ maps -P "HPP    39.794212196, -105.153349930"
  * 39°47'39.163905"N, 105°09'12.059748"W
  *
- * $ googlemaps -P "NGS  39 47 39.16390(N) 105 09 12.05974(W)"
+ * $ maps -P "NGS  39 47 39.16390(N) 105 09 12.05974(W)"
  * 39°47'39.163899"N, 105°09'12.059740"W
  *
- * $ googlemaps -P "POS 39°47'39.163\"N, 105°09'12.060\"W"
+ * $ maps -P "POS 39°47'39.163\"N, 105°09'12.060\"W"
  * 39°47'39.162999"N, 105°09'12.060000"W
  */
 
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
             assert((0 <= minutes) && (minutes <= 59));
             assert((0 <= seconds) && (seconds <= 59));
             assert((0 <= millionths) && (millionths <= 999999));
-            printf("%2d%lc%02d'%02d.%06d\"%c,", degrees, DEGREE, minutes, seconds, millionths, (direction < 0) ? 'S' : 'N');
+            printf("%2d%lc%02d'%02d.%06d\"%c,", degrees, (wint_t)DEGREE, minutes, seconds, millionths, (direction < 0) ? 'S' : 'N');
             degrees = 0;
             minutes = 0;
             seconds = 0;
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
             assert((0 <= minutes) && (minutes <= 59));
             assert((0 <= seconds) && (seconds <= 59));
             assert((0 <= millionths) && (millionths <= 999999));
-            printf(" %3d%lc%02d'%02d.%06d\"%c\n", degrees, DEGREE, minutes, seconds, millionths, (direction < 0) ? 'W' : 'E');
+            printf(" %3d%lc%02d'%02d.%06d\"%c\n", degrees, (wint_t)DEGREE, minutes, seconds, millionths, (direction < 0) ? 'W' : 'E');
             argv++;
         } else {
             printf("%.9lf, %.9lf\n", latitude, longitude);
