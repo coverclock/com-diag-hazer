@@ -171,14 +171,26 @@ static const char * Program = (const char *)0;
  */
 static char Hostname[9] = { '\0' };
 
+/**
+ * This is our process identifier.
+ */
 static pid_t Process = 0;
 
+/**
+ * This is the path name to the serial device we are reading from
+ * or writing to.
+ */
 static const char * Device = "-";
 
 /**
  * This is our POSIX thread mutual exclusion semaphore.
  */
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+/**
+ * THis is the current system (not GPS) time.
+ */
+static diminuto_sticks_t Now = 0;
 
 /*******************************************************************************
  * HELPERS
@@ -562,32 +574,27 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
  * Print information about the high-precision positioning solution that UBX
  * provides. I think this is the same result as NMEA but is expressed with
  * the maximum precision available in the underlying device and beyond which
- * NMEA can express.
+ * NMEA can express. The trace is emitted in human-readable Comma Seperated
+ * Value (CSV) form that can be imported into a spreadsheet.
  * @param fp points to the FILE stream.
  * @param pa is the positions array.
  * @param sp points to the solutions structure.
  */
 static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp)
 {
-    int year = 0;
-    int month = 0;
-    int day = 0;
-    int hour = 0;
-    int minute = 0;
-    int second = 0;
+    diminuto_ticks_t ticks = 0;
+    uint64_t seconds = 0;
     uint64_t nanoseconds = 0;
     int32_t degrees = 0;
     uint64_t billionths = 0;
     int32_t meters = 0;
     uint32_t tenthousandths = 0;
     static uint64_t sn = 0;
-    static diminuto_sticks_t epoch = 0;
 
     if (sn == 0) {
-        epoch = diminuto_time_elapsed();
         fputs("OBSERVATION,", fp);
         fputs(" CLOCK,", fp);
-        fputs(" ELAPSED,", fp);
+        fputs(" TIME,", fp);
         fputs(" LATITUDE,", fp);
         fputs(" LONGITUDE,", fp);
         fputs(" HORIZONTAL,", fp);
@@ -605,13 +612,18 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         /* Do nothing. */
     } else {
 
-        hazer_format_nanoseconds2timestamp(pa[HAZER_SYSTEM_GNSS].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
-
         fprintf(fp, "%llu,", (long long unsigned int)(sn++));
 
-        fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02dZ,", year, month, day, hour, minute, second);
+        ticks = diminuto_frequency_ticks2units(Now, 1000000000LL);
+        seconds = ticks / 1000000000LLU;
+        nanoseconds = ticks % 1000000000LLU;
 
-        fprintf(fp, " %llu,", (long long unsigned int)((diminuto_time_elapsed() - epoch) / diminuto_time_frequency()));
+        fprintf(fp, " %llu.%09llu,", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
+
+        seconds = pa[HAZER_SYSTEM_GNSS].tot_nanoseconds / 1000000000LLU;
+        nanoseconds = pa[HAZER_SYSTEM_GNSS].tot_nanoseconds % 1000000000LLU;
+
+        fprintf(fp, " %llu.%09llu,", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
 
         yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
         fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
@@ -832,7 +844,6 @@ static void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
     int minutes = 0;
     int seconds = 0;
     diminuto_sticks_t milliseconds = 0;
-    diminuto_sticks_t now = 0;
     diminuto_sticks_t offset = 0;
     diminuto_ticks_t fraction = 0;
     char zone = '\0';
@@ -840,9 +851,7 @@ static void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
 
     fputs("LOC", fp);
 
-    now = diminuto_time_clock();
-    assert(now >= 0);
-    rc = diminuto_time_juliet(now, &year, &month, &day, &hour, &minute, &second, &fraction);
+    rc = diminuto_time_juliet(Now, &year, &month, &day, &hour, &minute, &second, &fraction);
     assert(rc == 0);
     assert((1 <= month) && (month <= 12));
     assert((1 <= day) && (day <= 31));
@@ -870,7 +879,7 @@ static void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
      * another reason to admin your embedded system to UTC.)
      */
 
-    offset = diminuto_time_timezone(now);
+    offset = diminuto_time_timezone(Now);
     zone = diminuto_time_zonename(offset);
 
     offset = diminuto_frequency_ticks2wholeseconds(offset);
@@ -887,7 +896,7 @@ static void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
      * typically, fixed).
      */
 
-    offset = diminuto_time_daylightsaving(now);
+    offset = diminuto_time_daylightsaving(Now);
     offset = diminuto_frequency_ticks2wholeseconds(offset);
     hour = offset / 3600;
     fprintf(fp, "%+2.2d%c", hour, zone);
@@ -1109,7 +1118,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             assert((0 <= hour) && (hour <= 23));
             assert((0 <= minute) && (minute <= 59));
             assert((0 <= second) && (second <= 59));
-            assert((0 <= billionths) && (billionths < 1000000000ULL));
+            assert((0 <= billionths) && (billionths < 1000000000LLU));
             fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
 
             fprintf(fp, " %cpps", pps ? '1' : '0');
@@ -1192,7 +1201,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
 
             meters = pa[system].alt_millimeters / 1000LL;
-            thousandths = abs64(pa[system].alt_millimeters) % 1000ULL;
+            thousandths = abs64(pa[system].alt_millimeters) % 1000LLU;
             fprintf(fp, " %6lld.%03llum", (long long signed int)meters, (long long unsigned int)thousandths);
 
             fprintf(fp, "%43s", "");
@@ -1255,11 +1264,11 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             fprintf(fp, " %11.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
 
             knots = pa[system].sog_microknots / 1000000LL;
-            millionths = abs64(pa[system].sog_microknots) % 1000000ULL;
+            millionths = abs64(pa[system].sog_microknots) % 1000000LLU;
             fprintf(fp, " %7lld.%06lluknots", (long long signed int)knots, (long long unsigned int)millionths);
 
             kilometersperhour = pa[system].sog_millimeters / 1000000LL;
-            millionths = abs64(pa[system].sog_millimeters) % 1000000ULL;
+            millionths = abs64(pa[system].sog_millimeters) % 1000000LLU;
             fprintf(fp, " %7lld.%06llukph", (long long signed int)kilometersperhour, (long long unsigned int)millionths);
 
             fprintf(fp, "%14s", "");
@@ -1861,8 +1870,6 @@ int main(int argc, char * argv[])
     (void)gethostname(Hostname, sizeof(Hostname));
     Hostname[sizeof(Hostname) - 1] = '\0';
 
-    Process = getpid();
-
     /*
      * OPTIONS
      */
@@ -2142,9 +2149,13 @@ int main(int argc, char * argv[])
 
     if (daemon) {
         rc = diminuto_daemon(Program);
+        Process = getpid();
         DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)Process, (int)getppid(), (int)getsid(Process));
         assert(rc == 0);
+    } else {
+        Process = getpid();
     }
+
 
     if (process) {
         DIMINUTO_LOG_INFORMATION("Processing");
@@ -2576,7 +2587,10 @@ int main(int argc, char * argv[])
      * people may thank you.
      */
 
-    (void)diminuto_time_timezone(diminuto_time_clock());
+    Now = diminuto_time_clock();
+    assert(Now >= 0);
+
+    (void)diminuto_time_timezone(Now);
 
     /*
      * How much of each packet do we display? Depends on whether we're doing
@@ -3039,8 +3053,12 @@ int main(int argc, char * argv[])
          * At this point, either we have a buffer with a complete and validated
          * NMEA sentence, UBX packet, or RTCM message ready to process, acquired
          * either from a state machine or a socket, or there is no input pending
-         * and maybe this is a good time to update the display.
+         * and maybe this is a good time to update the display. It is also a
+         * good time to make a note of the current system (not GPS) time.
          */
+
+        Now = diminuto_time_clock();
+        assert(Now >= 0);
 
         /**
          ** KEEPALIVE
