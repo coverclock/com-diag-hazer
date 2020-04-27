@@ -2073,7 +2073,8 @@ in parallel.
 The rover can also generate a CSV file as it runs that will contain the
 results of the high precision solution every time is is generated and
 reported. This CSV file can be imported into a spreadsheet, or converted
-into a stream of NMEA RMC sentences using the csv2rmc script.
+into a stream of NMEA RMC sentences using the csv2rmc script. The output
+of the csv2rmc script can be piped into another instance of gpstool.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
