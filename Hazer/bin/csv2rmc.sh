@@ -52,6 +52,10 @@ while read NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 	MIL=$((${TMP} % 1000000000 / 1000))
 	printf -v LONGITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
 
+	SOG=${SOG%,}
+
+	COG=${COG%,}
+
 	RMC="\$GNRMC,${TIME},A,${LATITUDE},${NS},${LONGITUDE},${EW},${SOG},${COG},${DATE},,,A,V"
 	NMEA=$(checksum ${RMC})
 	echo -n -e ${NMEA}
