@@ -2072,20 +2072,14 @@ in parallel.
 
 The rover can also generate a CSV file as it runs that will contain the
 results of the high precision solution every time is is generated and
-reported. This is useful when testing the rover against a fixed location,
-for example a survey benchmark whose coordinates are well known.
-(Be aware that the surveyed coordinates of National Geodetic Survey
-markers in the U.S. are, in my experience anyway, typically based on the
-NAD83 datum - an abstract model of the shape of the Earth - which is
-used solely for the North American plate minute Mexico, and which are not
-directly comparable to GPS coordinates, which are determined using the
-WGS84 datum based on space observations.
+reported. This CSV file can be imported into a spreadsheet, or converted
+into a stream of NMEA RMC sentences using the csv2rmc script.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     benchmark tumbleweed.test:tumbleweed /dev/tumbleweed &
     peruse benchmark err# Control-C to exit upon seeing "Ready".
-    peruse benchmark csv
+    peruse benchmark csv | csv2rmc | gpstool -R
 
 The rover can also be run as an uncorrected mobile unit, basically a
 receiver that doesn't support Differential GNSS. (It might be a good
