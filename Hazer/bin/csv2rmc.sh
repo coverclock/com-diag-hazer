@@ -14,7 +14,7 @@
 #
 # e.g. tail -f file.csv | csv2rmc | gpstool -R
 
-while read NUM CLK TIM LAT LON HOR MSL WGS VER; do
+while read NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
 	if [[ "${NUM}" == "OBSERVATION," ]]; then
 		continue
@@ -52,7 +52,7 @@ while read NUM CLK TIM LAT LON HOR MSL WGS VER; do
 	MIL=$((${TMP} % 1000000000 / 1000))
 	printf -v LONGITUDE "%d%02d.%06d" ${DEG} ${MIN} ${MIL}
 
-	RMC="\$GNRMC,${TIME},A,${LATITUDE},${NS},${LONGITUDE},${EW},0,0,${DATE},,,A,V"
+	RMC="\$GNRMC,${TIME},A,${LATITUDE},${NS},${LONGITUDE},${EW},${SOG},${COG},${DATE},,,A,V"
 	NMEA=$(checksum ${RMC})
 	echo -n -e ${NMEA}
 

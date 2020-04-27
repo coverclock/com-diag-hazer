@@ -586,9 +586,11 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
     uint64_t seconds = 0;
     uint64_t nanoseconds = 0;
     int32_t degrees = 0;
-    uint64_t billionths = 0;
+    uint64_t nanodegrees = 0;
     int32_t meters = 0;
-    uint32_t tenthousandths = 0;
+    uint32_t decimillimeters = 0;
+    int32_t knots = 0;
+    uint32_t microknots = 0;
     static uint64_t sn = 0;
 
     if (sn == 0) {
@@ -600,11 +602,15 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         fputs(" HORIZONTAL,", fp);
         fputs(" MSL,", fp);
         fputs(" WGS84,", fp);
-        fputs(" VERTICAL\n", fp);
+        fputs(" VERTICAL,", fp);
+        fputs(" SPEED,", fp);
+        fputs(" COURSE\n", fp);
         sn++;
     }
 
-    if (pa[HAZER_SYSTEM_GNSS].ticks == 0) {
+    if (sp->ticks == 0) {
+        /* Do nothing. */
+    } else if (pa[HAZER_SYSTEM_GNSS].ticks == 0) {
         /* Do nothing. */
     } else if (pa[HAZER_SYSTEM_GNSS].utc_nanoseconds == 0) {
         /* Do nothing. */
@@ -625,23 +631,33 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
 
         fprintf(fp, " %llu.%09llu,", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
 
-        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &billionths);
-        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
+        yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &nanodegrees);
+        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)nanodegrees);
 
-        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &billionths);
-        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)billionths);
+        yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &nanodegrees);
+        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)nanodegrees);
 
-        yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
-        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &decimillimeters);
+        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
-        yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &tenthousandths);
-        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &decimillimeters);
+        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
-        yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &tenthousandths);
-        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &decimillimeters);
+        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
-        yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
-        fprintf(fp, " %lld.%04llu\n", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &decimillimeters);
+        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
+
+        knots = pa[HAZER_SYSTEM_GNSS].sog_microknots / 1000000LL;
+        microknots = abs64(pa[HAZER_SYSTEM_GNSS].sog_microknots % 1000000LL);
+
+        fprintf(fp, " %ld.%06lu,", (long signed int)knots, (long unsigned int)microknots);
+
+        degrees = pa[HAZER_SYSTEM_GNSS].cog_nanodegrees / 1000000000LL;
+        nanodegrees = abs64(pa[HAZER_SYSTEM_GNSS].cog_nanodegrees % 1000000000LL);
+
+        fprintf(fp, " %ld.%09llu\n", (long signed int)degrees, (long long unsigned int)nanodegrees);
 
         fflush(fp);
 
