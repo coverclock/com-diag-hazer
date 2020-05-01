@@ -442,7 +442,7 @@ gcc 7.5.0
 Pi-Top 3    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
-Raspbian 9.11 "Stretch" (pi-topOS "Polaris")    
+pi-topOS "Polaris" (Raspbian 9.11 "Stretch")    
 Linux 4.19.66    
 gcc 6.3.0    
 DGNSS Rover (Generation 3)    
@@ -797,6 +797,8 @@ the libraries and binaries in the system directories.)
 * consumer - consumes datagrams and reports on stdout.
 * csv2rmc - converts CSV file produced by gpstool -T to NMEA RMC sentences.
 * fixed - configures and runs a UBX-ZED-F9P as a base station in fixed mode.
+* hup - send SIGHUP to all running instances of gpstool.
+* hups - repeatedly send SIGHUP to all running instances of gpstool on demand.
 * mapstool - convert gpstool coordinate strings to formats accepted by Google Maps.
 * gpstool - serves as Hazer's multi purpose GNSS pocket tool.
 * client - runs Google Maps API in Firefox browser under MacOS.
@@ -2128,9 +2130,9 @@ still be used.
 When running in headless mode and receving a hangup signal (SIGHUP),
 gpstool will checkpoint the headless file: it will create a copy of
 the headless output file with a timestamp prefix with a resolution in
-microseconds. This is particularly useful in field testing to capture
-the relevant data at a particualr point in time and space. The hup
-script uses the pkill command to send a SIGHUP to all gpstool instances.
+microseconds. This is particularly useful in field testing to capture the
+relevant data at a particualr point in time and space. The hup and hups
+scripts use the pkill command to send a SIGHUP to all gpstool instances.
 
 ### Networking
 
