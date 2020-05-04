@@ -442,12 +442,12 @@ gcc 7.5.0
 Pi-Top 3    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
-pi-topOS "Polaris" (Raspbian 9.11 "Stretch")    
+pi-topOS "Polaris" (Raspbian 9.9 "Stretch")    
 Linux 4.19.66    
 gcc 6.3.0    
 DGNSS Rover (Generation 3)    
 
-"Vagabundo" (Updated)    
+"Vagabundo"    
 Pi-Top 3    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
@@ -456,12 +456,21 @@ Linux 4.19.97
 gcc 8.3.0    
 DGNSS Rover (Generation 3)    
 
-"Vagabundo" (Regressed)    
+"Vagabundo"    
 Pi-Top 3    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 pi-topOS "Sirius" (Raspbian 9.10 "Buster")    
 Linux 4.19.75    
+gcc 8.3.0    
+DGNSS Rover (Generation 3)    
+
+"Vagabundo" (Updated)    
+Pi-Top 3    
+Raspberry Pi 3 Model B+    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+pi-topOS "Sirius" (Raspbian 9.10 "Buster")    
+Linux 4.19.97    
 gcc 8.3.0    
 DGNSS Rover (Generation 3)    
 
