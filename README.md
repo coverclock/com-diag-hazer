@@ -708,6 +708,9 @@ astronomers in the audience, but it wasn't to me.
 
 <https://time.gov>
 
+<https://aerospaceamerica.aiaa.org/features/cosmic-gps/> Adam
+Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
