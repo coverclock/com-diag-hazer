@@ -795,6 +795,7 @@ the libraries and binaries in the system directories.)
 * benchmark - configures and runs a UBX-ZED-F9P as a corrected rover saving a CSV.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
+* csvmeter - meters lines from a CSV file based on interarrival times.
 * csv2rmc - converts CSV file produced by gpstool -T to NMEA RMC sentences.
 * fixed - configures and runs a UBX-ZED-F9P as a base station in fixed mode.
 * hup - send SIGHUP to all running instances of gpstool.
