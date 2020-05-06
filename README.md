@@ -621,6 +621,12 @@ ublox, 2018-12-20
 
 <https://tagis.dep.wv.gov/convert/>
 
+<https://www.gpsvisualizer.com/map_input?form=googleearth>
+
+<https://www.gpsbabel.org>
+
+<https://github.com/gpsbabel/gpsbabel>
+
 # Resources
 
 <http://www.catb.org/gpsd/NMEA.txt>
