@@ -3,6 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# Filter that converts a CSV file into a RMC file.
 #
 # 12835, 1587753687.036326445, 1587753687.000000000, 39.794262451, -105.153361514, 10.7277, 1705.2760, 1683.7761, 13.5318
 # 12836, 1587753688.036376364, 1587753688.000000000, 39.794264493, -105.153361858, 10.7360, 1705.0828, 1683.5829, 13.5288
@@ -12,7 +13,7 @@
 # $GNRMC,184128.00,A,3947.013237,N,10509.002556,W,0,0,240420,,,A,V*2A\r\n
 # $GNRMC,184128.00,A,3947.013237,N,10509.002556,W,0,0,240420,,,A,V*2A\r\n
 #
-# e.g. tail -f file.csv | csv2rmc | gpstool -R
+# e.g. tail -f file.csv | csv2rmc | gpstool -E
 
 while read NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
