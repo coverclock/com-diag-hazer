@@ -3,7 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Filter that converts a CSV file into a KML file.
+# Filter that reads CSV and outputs KML XML.
 # Based on output from GPS Visualizer <https://www.gpsvisualizer.com>.
 # Reference: "OGC KML 2.3", 2015 <http://docs.opengeospatial.org/is/12-007r2/12-007r2.html>
 
@@ -41,7 +41,7 @@ while read NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
 	LATITUDE=${LAT%,}
 	LONGITUDE=${LON%,}
-	ALTITUDE=${WGS%,}
+	ALTITUDE=${MSL%,}
 
 	echo -n "${LONGITUDE},${LATITUDE},${ALTITUDE} "
 
