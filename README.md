@@ -820,6 +820,7 @@ the libraries and binaries in the system directories.)
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
 * base - configures and runs a UBX-ZED-F9P as a base in survey or fixed mode.
 * benchmark - configures and runs a UBX-ZED-F9P as a corrected rover saving a CSV.
+* bucketbrigade - read from a serial port and forward to another serial port.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
 * csvmeter - meters lines from a CSV file based on interarrival times.
@@ -834,6 +835,7 @@ the libraries and binaries in the system directories.)
 * hazer - consumes data from a serial port and reports on stdout.
 * iso8601 - converts seconds since the UNIX epoch into an ISO8601 timestamp.
 * mobile - configures and runs a UBX-ZED-F9P as an uncorrected rover.
+* mobilize - like mobile but exit once initialization is complete or fails.
 * peruse - helper script to watch logs and screens from Tumbleweed scripts.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 * producer - consumes data from serial port and forwards as datagrams.
