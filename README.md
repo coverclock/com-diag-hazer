@@ -536,6 +536,8 @@ John Sloan, "Tumbleweed", album, <https://flic.kr/s/aHsmcdEgq6>
 
 # References
 
+David Burggraf ed., "OGC KML 2.3", Open Geospatial Consortium, 2015-08-04
+
 Paul E. Ceruzzi, *GPS*, MIT Press, 2018
 
 David Doyle, "NAD-83 vs WGS-84", NGS, 2000-05-10
