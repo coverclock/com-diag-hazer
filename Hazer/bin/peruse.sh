@@ -26,9 +26,10 @@ mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename ${0})
 TASK=${1}
-FILE=${2}
+FILE=${2:-"out"}
 DIRECTORY=${3:-${SAVDIR}}
 LIMIT=${4:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+
 PID=""
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
