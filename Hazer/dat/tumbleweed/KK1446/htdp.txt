@@ -1,0 +1,13 @@
+ HTDP (VERSION v3.2.8    ) OUTPUT
+
+ TRANSFORMING POSITIONS FROM NAD_83(2011/CORS96/2007) (EPOCH = 09-02-2019 (2019.6700))
+                          TO WGS_84(G873)             (EPOCH = 09-02-2019 (2019.6700))
+
+                         
+  LATITUDE     39 49 17.98000 N     39 49 17.99767 N        0.00 mm/yr  north
+  LONGITUDE   105 05 42.59000 W    105 05 42.64007 W        0.00 mm/yr  east
+  ELLIP. HT.            1717.717            1716.827 m      0.00 mm/yr  up
+  X                 -1277825.790        -1277826.671 m      0.00 mm/yr
+  Y                 -4737422.748        -4737421.441 m      0.00 mm/yr
+  Z                  4063896.995         4063896.843 m      0.00 mm/yr
+
