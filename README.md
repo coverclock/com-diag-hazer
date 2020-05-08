@@ -509,6 +509,9 @@ Chip Overclock, "When Learning By Doing Goes To Eleven", 2020-03,
 Chip Overclock, "Improvisational Engineering", 2020-04,
 <https://coverclock.blogspot.com/2020/04/improvisational-engineering.html>
 
+Chip Overclock, "Keyhole", 2020-05,
+<https://coverclock.blogspot.com/2020/05/keyhole.html>
+
 # Media
 
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
