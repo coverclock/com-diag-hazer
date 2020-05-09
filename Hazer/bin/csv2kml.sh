@@ -33,7 +33,7 @@ echo    '          <tessellate>1</tessellate>'
 echo    '          <altitudeMode>clampToGround</altitudeMode>'
 echo -n '          <coordinates>'
 
-while read NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
+while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
 	if [[ "${NUM}" == "OBSERVATION," ]]; then
 		continue

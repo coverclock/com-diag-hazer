@@ -6,7 +6,7 @@
 # Filter that reads CSV and outputs NMEA RMC.
 # e.g. tail -f file.csv | csv2rmc | gpstool -E
 
-while read NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
+while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
 	if [[ "${NUM}" == "OBSERVATION," ]]; then
 		continue

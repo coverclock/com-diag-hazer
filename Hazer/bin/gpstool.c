@@ -594,7 +594,8 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
     static uint64_t sn = 0;
 
     if (sn == 0) {
-        fputs("OBSERVATION,", fp);
+        fputs("HOSTNAME,", fp);
+        fputs(" OBSERVATION,", fp);
         fputs(" CLOCK,", fp);
         fputs(" TIME,", fp);
         fputs(" LATITUDE,", fp);
@@ -618,7 +619,9 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         /* Do nothing. */
     } else {
 
-        fprintf(fp, "%llu,", (long long unsigned int)(sn++));
+        fprintf(fp, "\"%s\",", Hostname);
+
+        fprintf(fp, " %llu,", (long long unsigned int)(sn++));
 
         ticks = diminuto_frequency_ticks2units(Now, 1000000000LL);
         seconds = ticks / 1000000000LLU;
@@ -1885,6 +1888,9 @@ int main(int argc, char * argv[])
 
     (void)gethostname(Hostname, sizeof(Hostname));
     Hostname[sizeof(Hostname) - 1] = '\0';
+    if (Hostname[0] == '\0') {
+        strncpy(Hostname, "hostname", sizeof(Hostname));
+    }
 
     /*
      * OPTIONS

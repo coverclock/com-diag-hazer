@@ -11,7 +11,13 @@ TASK=${2:-"benchmark"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
+TASKPID=0
+PERUSEPID=0
+trap "kill -9 ${TASKPID} ${PERUSEPID}" 1 2 3 15
+
 ${TASK} ${ROUTER}:tumbleweed &
+TASKPID=$!
 sleep 5
 peruse ${TASK} out < /dev/null &
+PERUSEPID=$!
 hups
