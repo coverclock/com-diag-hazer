@@ -9,10 +9,12 @@
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 INIT=""
+HEAD=""
 
 while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
 	if [[ "${NUM}" == "OBSERVATION," ]]; then
+		echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HOR} ${MSL} ${WGS} ${VER} ${SOG} ${COG}, HDIFF, VDIFF
 		continue
 	fi
 
