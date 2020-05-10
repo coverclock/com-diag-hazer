@@ -47,7 +47,7 @@ while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
 done
 
-echo -n '          </coordinates>'
+echo              '</coordinates>'
 echo    '        </LineString>'
 echo    '      </Placemark>'
 echo    '    </Folder>'
