@@ -14,11 +14,11 @@ HEAD=""
 while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
 	if [[ "${NUM}" == "OBSERVATION," ]]; then
-		echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HOR} ${MSL} ${WGS} ${VER} ${SOG} ${COG}, HDIFF, VDIFF
 		continue
 	fi
 
 	if [[ -z "${INIT}" ]]; then
+		echo HOSTNAME, OBSERVATION, CLOCK, TIME, LATITUDE, LONGITUDE, HORIZONTAL, MSL, WGS84, VERTICAL, SPEED, COURSE, HDIFF, VDIFF
 		LAT0=${LAT%,}
 		LON0=${LON%,}
 		MSL0=${MSL%,}
