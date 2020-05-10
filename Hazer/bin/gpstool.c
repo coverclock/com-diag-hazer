@@ -1190,14 +1190,14 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &tenmillionths);
             assert((-90 <= degrees) && (degrees <= 90));
             assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
-            fprintf(fp, " %4d.%07llu,", degrees, (long long unsigned int)tenmillionths);
+            fprintf(fp, " %4d.%07llu", degrees, (long long unsigned int)tenmillionths);
 
             hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &tenmillionths);
             assert((-180 <= degrees) && (degrees <= 180));
             fprintf(fp, " %4d.%07llu", degrees, (long long unsigned int)tenmillionths);
             assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
 
-            fprintf(fp, "%7s", "");
+            fprintf(fp, "%8s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
@@ -1391,7 +1391,7 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         fputs("HPP", fp);
 
         yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &decimaldegrees, &billionths);
-        fprintf(fp, " %4d.%09llu,", decimaldegrees, (long long unsigned int)billionths);
+        fprintf(fp, " %4d.%09llu", decimaldegrees, (long long unsigned int)billionths);
 
         yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &decimaldegrees, &billionths);
         fprintf(fp, " %4d.%09llu", decimaldegrees, (long long unsigned int)billionths);
@@ -1399,7 +1399,7 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
         fprintf(fp, " %lc%6lld.%04llum", (wint_t)PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
 
-        fprintf(fp, "%22s", "");
+        fprintf(fp, "%23s", "");
 
         fprintf(fp, " %-8.8s", "GNSS");
 
