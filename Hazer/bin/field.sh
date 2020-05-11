@@ -6,6 +6,7 @@
 # Combines benchmark, hups, and peruse into a single script for use
 # in field testing.
 
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 ROUTER=${1:-"tumbleweed"}
 TASK=${2:-"benchmark"}
 
@@ -13,7 +14,7 @@ TASK=${2:-"benchmark"}
 
 TASKPID=""
 PERUSEPID=""
-trap "kill -9 ${TASKPID} ${PERUSEPID}" 1 2 3 15
+trap 'test -n "${TASKPID}" && kill -9 ${TASKPID}; test -n "${PERUSEPID}" && kill -9 ${PERUSEPID}' 0 1 2 3 15
 
 ${TASK} ${ROUTER}:tumbleweed &
 TASKPID=$!
