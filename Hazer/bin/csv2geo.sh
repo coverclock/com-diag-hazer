@@ -9,7 +9,6 @@
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 INIT=""
-HEAD=""
 
 while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
