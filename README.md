@@ -831,6 +831,7 @@ the libraries and binaries in the system directories.)
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
 * csvmeter - meters lines from a CSV file based on interarrival times.
+* csv2geo - augments CSV file by adding geodesic distance and altitude difference fields.
 * csv2kml - converts CSV file produced by gpstool -T to KML 2.3 XML.
 * csv2rmc - converts CSV file produced by gpstool -T to NMEA RMC sentences.
 * field - integrates benchmark, peruse, and hups scripts for field testing.
@@ -897,6 +898,21 @@ the libraries and binaries in the system directories.)
 # Extras
 
 * geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
+
+# Comma Separated Value (CSV) Format
+
+* HOSTNAME - hostname of computer running gpstool.
+* OBSERVATION - sequence number of observation.
+* CLOCK - local time in decimal seconds since the POSIX Epoch.
+* TIME - GPS time in decimal seconds since the POSIX Epoch.
+* LATITUDE - WGS84 latitude in decimal degrees.
+* LONGITUDE - WGS84 longitude in decimal degrees.
+* HORIZONTAL - reported horizontal error in decimal meters.
+* MSL - altitude above Mean Sea Level in decimal meters.
+* WGS84 - altitude above WGS84 ellipse in decimal meters.
+* VERTICAL - reported vertical error in decimal meters.
+* SPEED - speed over ground in decimal knots.
+* COURSE - course over ground in decimal degrees.
 
 # Help
 
@@ -2113,9 +2129,11 @@ in parallel.
 
 The rover can also generate a CSV file as it runs that will contain the
 results of the high precision solution every time is is generated and
-reported. This CSV file can be imported into a spreadsheet, or converted
-into a stream of NMEA RMC sentences using the csv2rmc script. The output
-of the csv2rmc script can be piped into another instance of gpstool.
+reported. This CSV file can be imported into a spreadsheet like Excel,
+converted into a stream of NMEA RMC sentences using the csv2rmc script
+for use with other GPS tools (including gpstool itself), or converted
+into a KML (Keyhole Markup Language) XML file using the csv2kml script
+for use with geodesy tools like Google Earth.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
