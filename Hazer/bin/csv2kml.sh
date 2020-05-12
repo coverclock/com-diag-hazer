@@ -17,8 +17,7 @@ while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 	fi
 
 	if [[ -z "${INIT}" ]]; then
-		NAME=${NAM}
-		NAME=${NAME##\"}
+		NAME=${NAM##\"}
 		NAME=${NAME%%\",}
 		TIME=${CLK%,}
 		TIME=$(date -d "@${TIME}" -u '+%Y%m%dT%H%M%SZ%N')
