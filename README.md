@@ -1985,6 +1985,13 @@ interactive to being a daemon (and this isn't a mistake). Consequently,
 subsequent log messages will go to the system log and not the error
 log file. This can seem a little mysterious.
 
+(In the following examples, I use a script called "peruse", which in turn
+uses a Diminuto script called "headless". I also make use of the SIGHUP
+capability of gpstool using a script called "hups" which sends a HUP
+(hangup) signal to any running instance of gpstool everytime you hit
+the RETURN (ENTER) key. You can read more about these scripts in the
+section on headless operation below.)
+
 ### Router
 
 The Tumbleweed router, which is on my LAN, must have a static IP address
@@ -2161,6 +2168,22 @@ mobile scripts too.)
     cd ~/src/*hazer/Hazer
     . out/host/bin/setup
     rover tumbleweed.test:tumbleweed & sleep 5 ; peruse rover out
+
+In the field, I commonly run the rover using the benchmark script,
+which is a rover that saves each UBX precision fix by appending the
+values of the solution to a Comma Separated Value (CSV) file which can
+be post-processed in any number of ways for analysis. I combined the use
+of the benchmark script with the peruse script (to full-screen display
+the results in real-time) with the hups script (to save the most recent
+full-screen display to a time-stamped file) in a script named "field".
+This vastly simplifies field testing (which as I like to point out, is
+often literally in a field somewhere) and reduces the number of hands
+and fingers you need to do this kind of testing.
+
+    cd ~/src/*hazer/Hazer
+    . out/host/bin/setup
+    field tumbleweed.test
+    # Hit the return key to save the most recent display.
 
 ### Headless
 
