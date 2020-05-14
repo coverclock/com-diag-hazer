@@ -22,13 +22,14 @@
 #    peruse router err
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
-mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename ${0})
 TASK=${1}
 FILE=${2:-"out"}
-DIRECTORY=${3:-${SAVDIR}}
-LIMIT=${4:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+DIRECTORY=${4:-${SAVDIR}}
+
+mkdir -p ${SAVDIR}
 
 PID=""
 
@@ -42,7 +43,7 @@ if [[ "${TASK}" == "router" ]]; then
 elif [[ "${FILE}" == "err" ]]; then
     exec tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
 elif [[ "${FILE}" == "out" ]]; then
-    exec headless ${DIRECTORY}/${TASK}.${FILE} ${DIRECTORY}/${TASK}.pid
+    exec headless ${DIRECTORY}/${TASK}.${FILE} ${DIRECTORY}/${TASK}.pid ${LIMIT}
 elif [[ "${FILE}" == "csv" ]]; then
     exec tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
 else

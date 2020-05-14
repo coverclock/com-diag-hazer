@@ -9,6 +9,7 @@
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 ROUTER=${1:-"tumbleweed"}
 TASK=${2:-"benchmark"}
+LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -19,6 +20,6 @@ trap 'test -n "${TASKPID}" && kill -9 ${TASKPID}; test -n "${PERUSEPID}" && kill
 ${TASK} ${ROUTER}:tumbleweed &
 TASKPID=$!
 sleep 5
-peruse ${TASK} out < /dev/null &
+peruse ${TASK} out ${LIMIT} < /dev/null &
 PERUSEPID=$!
 hups
