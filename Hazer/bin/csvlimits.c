@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    printf("%s: [%d] ( %.9lf, %.9lf ) ( %.9lf, %.9lf )\n", program, count, minimum_latitude, minimum_longitude, maximum_latitude, maximum_longitude);
+    printf("%s: [%d] %.9lf, %.9lf %.9lf, %.9lf\n", program, count, minimum_latitude, minimum_longitude, maximum_latitude, maximum_longitude);
 
     return 0;
 }
