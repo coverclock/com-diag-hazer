@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <values.h>
 #include "./gpstool.h"
 
@@ -23,8 +24,11 @@ HOSTNAME, OBSERVATION, CLOCK, TIME, LATITUDE, LONGITUDE, HORIZONTAL, MSL, WGS84,
 
 int main(int argc, char *argv[])
 {
-    char buffer[512] = { '\0', };
+    const char * program = (const char *)0;
+    int opt = -1;
+    int debug = 0;
     int verbose = 0;
+    char buffer[512] = { '\0', };
     int count = 0;
     char * here = (char *)0;
     char * hostname = (char *)0;
@@ -43,25 +47,46 @@ int main(int argc, char *argv[])
     double maximum_latitude = -MAXDOUBLE;
     double minimum_longitude = MAXDOUBLE;
     double maximum_longitude = -MAXDOUBLE;
+    
+    extern char * optarg;
+    extern int optind;
+    extern int opterr;
+    extern int optopt;
 
-    if ((argc > 1) && (strcmp(argv[1], "-?") == 0)) {
-        fprintf(stderr, "usage: %s [ -? ] [ -v ]\n", argv[0]);
-        return 0;
-    }
+    program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-    if ((argc > 1) && (strcmp(argv[1], "-v") == 0)) {
-        verbose = !0;
+    while ((opt = getopt(argc, argv, "?dv")) >= 0) {
+        switch (opt) {
+        case '?':
+            fprintf(stderr, "usage: %s [ -? ] [ -d ] [ -v ]\n", program);
+            return 0;
+            break;
+        case 'd':
+            debug = !0;
+            break;
+        case 'v':
+            verbose = !0;
+            break;
+        default:
+            fprintf(stderr, "usage: %s [ -? ] [ -d ] [ -v ]\n", program);
+            return 1;
+            break;
+        }
     }
 
     //fprintf(stderr, "%.9lf %.9lf %.9lf %.9lf\n", minimum_latitude, maximum_latitude, minimum_longitude, maximum_longitude);
 
     while (fgets(buffer, sizeof(buffer), stdin) != (char *)0) {
 
+        if (debug) {
+            fputs(buffer, stderr);
+        }
+
         // fputs(here, stdout);
 
         if (strncmp(buffer, HEADINGS[0], sizeof(HEADINGS[0])) == 0) {
             if (verbose) {
-                fputs(buffer, stderr);
+                fprintf(stderr, "%s", buffer);
             }
             continue;
         }
@@ -138,7 +163,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    printf("%.9lf, %.9lf <= %.9lf, %.9lf\n", minimum_latitude, minimum_longitude, maximum_latitude, maximum_longitude);
+    printf("%s: [%d] ( %.9lf, %.9lf ) ( %.9lf, %.9lf )\n", program, count, minimum_latitude, minimum_longitude, maximum_latitude, maximum_longitude);
 
     return 0;
 }
