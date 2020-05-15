@@ -158,7 +158,7 @@ static const wchar_t DEGREE = 0x00B0;
 static const wchar_t PLUSMINUS = 0x00B1;
 
 /*******************************************************************************
- * GLOBALS
+ * GLOBALS (TRANSLATION UNIT)
  ******************************************************************************/
 
 /**
@@ -592,20 +592,14 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
     int32_t knots = 0;
     uint32_t microknots = 0;
     static uint64_t sn = 0;
+    size_t ii = 0;
 
     if (sn == 0) {
-        fputs("HOSTNAME,", fp);
-        fputs(" OBSERVATION,", fp);
-        fputs(" CLOCK,", fp);
-        fputs(" TIME,", fp);
-        fputs(" LATITUDE,", fp);
-        fputs(" LONGITUDE,", fp);
-        fputs(" HORIZONTAL,", fp);
-        fputs(" MSL,", fp);
-        fputs(" WGS84,", fp);
-        fputs(" VERTICAL,", fp);
-        fputs(" SPEED,", fp);
-        fputs(" COURSE\n", fp);
+        for (ii = 0; ii < countof(HEADINGS); ++ii) {
+            if (ii > 0) { fputc(' ', fp); }
+            fputs(HEADINGS[ii], fp);
+            if (ii < (countof(HEADINGS) - 1)) { fputc(',', fp); } else { fputc('\n', fp); }
+        }
         sn++;
     }
 

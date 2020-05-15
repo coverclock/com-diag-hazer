@@ -64,6 +64,25 @@ typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?',
 typedef enum Update { UPDATE = '.', RTCM_TYPE_1005 = 'B', RTCM_TYPE_1074 = 'N', RTCM_TYPE_1084 = 'R', RTCM_TYPE_1094 = 'E', RTCM_TYPE_1124 = 'C', RTCM_TYPE_1230 = 'r', RTCM_TYPE_9999 = '?', } update_t;
 
 /*******************************************************************************
+ * GLOBAL CONSTANTS (PROGRAM)
+ ******************************************************************************/
+
+static const char * const HEADINGS[] = {
+    "HOSTNAME",
+    "OBSERVATION",
+    "CLOCK",
+    "TIME",
+    "LATITUDE",
+    "LONGITUDE",
+    "HORIZONTAL",
+    "MSL",
+    "WGS84",
+    "VERTICAL",
+    "SPEED",
+    "COURSE",
+};
+
+/*******************************************************************************
  * HIGH PRECISION SOLUTION
  ******************************************************************************/
 
