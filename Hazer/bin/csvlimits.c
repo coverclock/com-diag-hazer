@@ -60,6 +60,9 @@ int main(int argc, char *argv[])
         // fputs(here, stdout);
 
         if (strncmp(buffer, HEADINGS[0], sizeof(HEADINGS[0])) == 0) {
+            if (verbose) {
+                fputs(buffer, stderr);
+            }
             continue;
         }
 
