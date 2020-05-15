@@ -24,6 +24,7 @@ HOSTNAME, OBSERVATION, CLOCK, TIME, LATITUDE, LONGITUDE, HORIZONTAL, MSL, WGS84,
 int main(int argc, char *argv[])
 {
     char buffer[512] = { '\0', };
+    int verbose = 0;
     int count = 0;
     char * here = (char *)0;
     char * hostname = (char *)0;
@@ -42,6 +43,15 @@ int main(int argc, char *argv[])
     double maximum_latitude = -MAXDOUBLE;
     double minimum_longitude = MAXDOUBLE;
     double maximum_longitude = -MAXDOUBLE;
+
+    if ((argc > 1) && (strcmp(argv[1], "-?") == 0)) {
+        fprintf(stderr, "usage: %s [ -? ] [ -v ]\n", argv[0]);
+        return 0;
+    }
+
+    if ((argc > 1) && (strcmp(argv[1], "-v") == 0)) {
+        verbose = !0;
+    }
 
     //fprintf(stderr, "%.9lf %.9lf %.9lf %.9lf\n", minimum_latitude, maximum_latitude, minimum_longitude, maximum_longitude);
 
@@ -113,6 +123,10 @@ int main(int argc, char *argv[])
 
         if (longitude > maximum_longitude) {
             maximum_longitude = longitude;
+        }
+
+        if (verbose) {
+            fprintf(stderr, "\"%s\", %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", hostname, observation, clock, time, latitude, longitude, horizontal, msl, wgs84, vertical, speed, course);
         }
 
     }
