@@ -11,3 +11,16 @@
   Y                 -4737423.914        -4737422.573 m      0.77 mm/yr
   Z                  4063898.099         4063897.923 m     -0.30 mm/yr
 
+HTDP (VERSION v3.2.8    ) OUTPUT
+
+ TRANSFORMING POSITIONS FROM NAD_83(2011/CORS96/2007) (EPOCH = 08-02-1993 (1993.5836))
+                          TO WGS_84(G730)             (EPOCH = 05-14-2020 (2020.3661))
+
+ KK1446                  
+  LATITUDE     39 49 17.98299 N     39 49 18.00109 N        0.60 mm/yr  north
+  LONGITUDE   105 05 42.59369 W    105 05 42.64145 W        1.87 mm/yr  east
+  ELLIP. HT.            1702.686            1701.743 m     -1.19 mm/yr  up
+  X                 -1277822.853        -1277823.668 m      2.14 mm/yr
+  Y                 -4737411.522        -4737410.181 m      0.77 mm/yr
+  Z                  4063887.440         4063887.264 m     -0.30 mm/yr
+
