@@ -830,6 +830,7 @@ the libraries and binaries in the system directories.)
 * bucketbrigade - read from a serial port and forward to another serial port.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
+* csvlimits - determines boundary of solutions in a CSV file.
 * csvmeter - meters lines from a CSV file based on interarrival times.
 * csv2geo - augments CSV file by adding geodesic distance and altitude difference fields.
 * csv2kml - converts CSV file produced by gpstool -T to KML 2.3 XML.
