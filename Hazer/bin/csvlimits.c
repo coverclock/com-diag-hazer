@@ -47,6 +47,10 @@ int main(int argc, char *argv[])
     double maximum_latitude = -MAXDOUBLE;
     double minimum_longitude = MAXDOUBLE;
     double maximum_longitude = -MAXDOUBLE;
+    double minimum_msl = MAXDOUBLE;
+    double maximum_msl = -MAXDOUBLE;
+    double minimum_wgs84 = MAXDOUBLE;
+    double maximum_wgs84 = -MAXDOUBLE;
     
     extern char * optarg;
     extern int optind;
@@ -153,6 +157,22 @@ int main(int argc, char *argv[])
             maximum_longitude = longitude;
         }
 
+        if (msl < minimum_msl) {
+            minimum_msl = msl;
+        }
+
+        if (msl > maximum_msl) {
+            maximum_msl = msl;
+        }
+
+        if (wgs84 < minimum_wgs84) {
+            minimum_wgs84 = wgs84;
+        }
+
+        if (wgs84 > maximum_wgs84) {
+            maximum_wgs84 = wgs84;
+        }
+
         if (verbose) {
             fprintf(stderr, "\"%s\", %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", hostname, observation, clock, time, latitude, longitude, horizontal, msl, wgs84, vertical, speed, course);
         }
@@ -163,7 +183,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    printf("%s: [%d] %.9lf, %.9lf %.9lf, %.9lf\n", program, count, minimum_latitude, minimum_longitude, maximum_latitude, maximum_longitude);
+    printf("%s: [%d] %.9lf, %.9lf %.9lf, %.9lf %.9lf %.9lf %.9lf %.9lf\n", program, count, minimum_latitude, minimum_longitude, maximum_latitude, maximum_longitude, minimum_msl, maximum_msl, minimum_wgs84, maximum_wgs84);
 
     return 0;
 }
