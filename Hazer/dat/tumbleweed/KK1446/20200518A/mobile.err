@@ -1,0 +1,23 @@
+2020-05-18T15:15:44.361982Z "vagabundo" <INFO> [1871] {76fdf210} Begin
+2020-05-18T15:15:44.363123Z "vagabundo" <INFO> [1871] {76fdf210} Locale "en_US.utf8"
+2020-05-18T15:15:44.363212Z "vagabundo" <INFO> [1871] {76fdf210} Processing
+2020-05-18T15:15:44.363899Z "vagabundo" <INFO> [1871] {76fdf210} Device (3) "/dev/tumbleweed" rw "tumbleweed" 230400 8N1 local
+2020-05-18T15:15:44.364493Z "vagabundo" <INFO> [1871] {76fdf210} Buffer (3) [8192] [8192]
+2020-05-18T15:15:44.365011Z "vagabundo" <INFO> [1871] {76fdf210} Start
+2020-05-18T15:15:44.656872Z "vagabundo" <NOTE> [1871] {76fdf210} Sync NMEA 0x0000000000000046
+2020-05-18T15:15:44.673396Z "vagabundo" <INFO> [1871] {76fdf210} Parse UBX ACK 0x06 0x8a (1)
+2020-05-18T15:15:45.663838Z "vagabundo" <NOTE> [1871] {76fdf210} Time 2020-05-18 16:23:05Z
+2020-05-18T15:15:45.677782Z "vagabundo" <INFO> [1871] {76fdf210} Parse UBX ACK 0x06 0x8a (1)
+2020-05-18T15:15:46.676033Z "vagabundo" <INFO> [1871] {76fdf210} Parse UBX ACK 0x06 0x8a (1)
+2020-05-18T15:15:47.675514Z "vagabundo" <INFO> [1871] {76fdf210} Parse UBX ACK 0x06 0x8a (1)
+2020-05-18T15:15:48.680729Z "vagabundo" <INFO> [1871] {76fdf210} Parse UBX ACK 0x06 0x8a (1)
+2020-05-18T15:15:49.679840Z "vagabundo" <INFO> [1871] {76fdf210} Parse UBX ACK 0x06 0x8a (1)
+2020-05-18T15:15:50.674141Z "vagabundo" <INFO> [1871] {76fdf210} Parse UBX ACK 0x06 0x8a (1)
+2020-05-18T15:15:51.677844Z "vagabundo" <INFO> [1871] {76fdf210} Parse UBX ACK 0x06 0x8a (1)
+2020-05-18T15:15:52.672020Z "vagabundo" <INFO> [1871] {76fdf210} Parse UBX ACK 0x06 0x01 (1)
+2020-05-18T15:15:53.654799Z "vagabundo" <NOTE> [1871] {76fdf210} Ready
+2020-05-18T15:16:43.192981Z "vagabundo" <INFO> [1871] {76fdf210} SIGHUP
+2020-05-18T15:39:01.877276Z "vagabundo" <INFO> [1871] {76fdf210} SIGHUP
+2020-05-18T15:39:19.074221Z "vagabundo" <NOTE> [1871] {76fdf210} SIGINT
+2020-05-18T15:39:19.074402Z "vagabundo" <INFO> [1871] {76fdf210} Stop
+2020-05-18T15:39:19.074425Z "vagabundo" <INFO> [1871] {76fdf210} Counters Remote=0 Surveyor=0 Keepalive=0 OutOfOrder=0 Missing=0

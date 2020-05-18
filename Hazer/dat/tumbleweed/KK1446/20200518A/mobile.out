@@ -1,0 +1,82 @@
+INP [ 72] $GPGSV,3,2,11,13,38,291,40,15,15,312,43,17,44,210,48,19,19,212,42,1*6B\r\n
+INP [ 54] $GPGSV,3,3,11,23,,,39,28,63,310,49,30,83,135,51,1*64\r\n
+INP [ 70] $GPGSV,3,1,10,01,32,095,43,07,48,132,45,08,13,044,35,11,33,060,,6*6B\r\n
+INP [ 68] $GPGSV,3,2,10,13,38,291,,15,15,312,42,17,44,210,46,19,19,212,,6*60\r\n
+INP [ 44] $GPGSV,3,3,10,28,63,310,,30,83,135,50,6*65\r\n
+INP [ 72] $GLGSV,3,1,11,67,02,223,37,68,18,269,48,69,14,320,46,76,10,104,48,1*78\r\n
+INP [ 72] $GLGSV,3,2,11,77,55,068,40,78,47,329,51,79,03,301,34,81,05,189,48,1*7B\r\n
+INP [ 59] $GLGSV,3,3,11,86,13,026,39,87,62,081,52,88,48,160,50,1*41\r\n
+INP [ 72] $GLGSV,3,1,11,67,02,223,30,68,18,269,43,69,14,320,43,76,10,104,21,3*7C\r\n
+INP [ 72] $GLGSV,3,2,11,77,55,068,41,78,47,329,46,79,03,301,32,81,05,189,38,3*7F\r\n
+INP [ 59] $GLGSV,3,3,11,86,13,026,41,87,62,081,44,88,48,160,47,3*4D\r\n
+INP [ 72] $GAGSV,3,1,10,02,56,313,50,03,18,216,43,07,10,320,41,08,28,271,43,7*7E\r\n
+INP [ 72] $GAGSV,3,2,10,11,43,078,43,12,09,033,18,24,09,092,34,25,56,065,47,7*78\r\n
+INP [ 46] $GAGSV,3,3,10,30,10,285,36,36,38,150,46,7*72\r\n
+INP [ 72] $GAGSV,3,1,10,02,56,313,52,03,18,216,47,07,10,320,44,08,28,271,46,2*7D\r\n
+INP [ 72] $GAGSV,3,2,10,11,43,078,46,12,09,033,33,24,09,092,40,25,56,065,51,2*75\r\n
+INP [ 46] $GAGSV,3,3,10,30,10,285,38,36,38,150,49,2*76\r\n
+INP [ 70] $GBGSV,2,1,07,14,00,327,,21,06,258,40,26,15,303,43,29,64,154,52,1*76\r\n
+INP [ 59] $GBGSV,2,2,07,30,41,054,50,35,21,200,45,36,50,105,50,1*44\r\n
+INP [ 64] $GBGSV,2,1,07,14,00,327,,21,06,258,,26,15,303,,29,64,154,,3*70\r\n
+INP [ 53] $GBGSV,2,2,07,30,41,054,,35,21,200,,36,50,105,,3*47\r\n
+INP [ 52] $GNGLL,3949.30026,N,10505.71014,W,164637.00,A,A*66\r\n
+INP [ 44] \xb5b\x01\x14$\0\0\0\0\0\0<\xc0\b\xf6\xbf[\xc1\aN\xbc\x17\xec\xfc\x19\0\0Q\x1a\0\xd4\xff\xfb\x04\xe7\x10\0\0\xe4\x18\0\0gy
+LOC 2020-05-18T09:39:18.681-07:00+01T 00:00:00.292 34.0.0         1871 vagabund
+TIM 2020-05-18T16:46:37.000-00:00+00Z 0pps                             GNSS    
+POS 39°49'18.015"N, 105°05'42.608"W    39.8216710, -105.0951690        GNSS    
+ALT    5658.40'   1724.700m                                            GNSS    
+COG N     0.000000000°T    0.000000000°M                               GNSS    
+SOG       0.003mph       0.003000knots       0.005000kph               GNSS    
+INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                    0B  tumblewe
+HPP   39.821671099, -105.095169044 ±     0.4327m                       GNSS    
+HPA   1724.6724m MSL   1703.1475m WGS84 ±     0.6372m                  GNSS    
+NGS  39 49 18.01595(N) 105 05 42.60855(W)                              GNSS    
+ACT [1]  {     1     7     8    11    13    15 } [ 6] [10] [31] [32]   NAVSTAR 
+ACT [2]  {    17    19    28    30             } [ 4] [10] [31] [32]   NAVSTAR 
+ACT [1]  {    68    77    78    86    76    69 } [ 6] [ 8] [31] [32]   GLONASS 
+ACT [2]  {    88    87                         } [ 2] [ 8] [31] [32]   GLONASS 
+ACT [1]  {    30     2     3     7    25    36 } [ 6] [ 8] [31] [32]   GALILEO 
+ACT [2]  {     8    11                         } [ 2] [ 8] [31] [32]   GALILEO 
+ACT [1]  {    30    29    35    36    26       } [ 5] [ 5] [31] [32]   COMPASS 
+DOP   0.89pdop   0.48hdop   0.75vdop                                   NAVSTAR 
+DOP   0.89pdop   0.48hdop   0.75vdop                                   GLONASS 
+DOP   0.89pdop   0.48hdop   0.75vdop                                   GALILEO 
+DOP   0.89pdop   0.48hdop   0.75vdop                                   COMPASS 
+SAT [  1]     1id  32°elv   95°azm   43dBHz  6sig <                    NAVSTAR 
+SAT [  2]     7id  48°elv  132°azm   45dBHz  6sig <                    NAVSTAR 
+SAT [  3]     8id  13°elv   44°azm   35dBHz  6sig <                    NAVSTAR 
+SAT [  4]    11id  33°elv   60°azm    0dBHz  6sig <   !                NAVSTAR 
+SAT [  5]    13id  38°elv  291°azm    0dBHz  6sig <   !                NAVSTAR 
+SAT [  6]    15id  15°elv  312°azm   42dBHz  6sig <                    NAVSTAR 
+SAT [  7]    17id  44°elv  210°azm   46dBHz  6sig <                    NAVSTAR 
+SAT [  8]    19id  19°elv  212°azm    0dBHz  6sig <   !                NAVSTAR 
+SAT [  9]    28id  63°elv  310°azm    0dBHz  6sig <   !                NAVSTAR 
+SAT [ 10]    30id  83°elv  135°azm   50dBHz  6sig <                    NAVSTAR 
+SAT [ 11]    67id   2°elv  223°azm   30dBHz  3sig                      GLONASS 
+SAT [ 12]    68id  18°elv  269°azm   43dBHz  3sig <                    GLONASS 
+SAT [ 13]    69id  14°elv  320°azm   43dBHz  3sig <                    GLONASS 
+SAT [ 14]    76id  10°elv  104°azm   21dBHz  3sig <                    GLONASS 
+SAT [ 15]    77id  55°elv   68°azm   41dBHz  3sig <                    GLONASS 
+SAT [ 16]    78id  47°elv  329°azm   46dBHz  3sig <                    GLONASS 
+SAT [ 17]    79id   3°elv  301°azm   32dBHz  3sig                      GLONASS 
+SAT [ 18]    81id   5°elv  189°azm   38dBHz  3sig                      GLONASS 
+SAT [ 19]    86id  13°elv   26°azm   41dBHz  3sig <                    GLONASS 
+SAT [ 20]    87id  62°elv   81°azm   44dBHz  3sig <                    GLONASS 
+SAT [ 21]    88id  48°elv  160°azm   47dBHz  3sig <                    GLONASS 
+SAT [ 22]     2id  56°elv  313°azm   52dBHz  2sig <                    GALILEO 
+SAT [ 23]     3id  18°elv  216°azm   47dBHz  2sig <                    GALILEO 
+SAT [ 24]     7id  10°elv  320°azm   44dBHz  2sig <                    GALILEO 
+SAT [ 25]     8id  28°elv  271°azm   46dBHz  2sig <                    GALILEO 
+SAT [ 26]    11id  43°elv   78°azm   46dBHz  2sig <                    GALILEO 
+SAT [ 27]    12id   9°elv   33°azm   33dBHz  2sig                      GALILEO 
+SAT [ 28]    24id   9°elv   92°azm   40dBHz  2sig                      GALILEO 
+SAT [ 29]    25id  56°elv   65°azm   51dBHz  2sig <                    GALILEO 
+SAT [ 30]    30id  10°elv  285°azm   38dBHz  2sig <                    GALILEO 
+SAT [ 31]    36id  38°elv  150°azm   49dBHz  2sig <                    GALILEO 
+SAT [ 32]    14id   0°elv  327°azm    0dBHz  3sig     !                COMPASS 
+SAT [ 33]    21id   6°elv  258°azm    0dBHz  3sig     !                COMPASS 
+SAT [ 34]    26id  15°elv  303°azm    0dBHz  3sig <   !                COMPASS 
+SAT [ 35]    29id  64°elv  154°azm    0dBHz  3sig <   !                COMPASS 
+SAT [ 36]    30id  41°elv   54°azm    0dBHz  3sig <   !                COMPASS 
+SAT [ 37]    35id  21°elv  200°azm    0dBHz  3sig <   !                COMPASS 
+SAT [ 38]    36id  50°elv  105°azm    0dBHz  3sig <   !                COMPASS 
