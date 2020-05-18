@@ -13,13 +13,10 @@ LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-TASKPID=""
-PERUSEPID=""
-trap 'test -n "${TASKPID}" && kill -9 ${TASKPID}; test -n "${PERUSEPID}" && kill -9 ${PERUSEPID}' 0 1 2 3 15
-
 ${TASK} ${ROUTER}:tumbleweed &
 TASKPID=$!
 sleep 5
 peruse ${TASK} out ${LIMIT} < /dev/null &
 PERUSEPID=$!
+trap "kill ${TASKPID} ${PERUSEPID}" 0 1 2 3 15
 hups
