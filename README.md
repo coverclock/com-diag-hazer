@@ -512,6 +512,9 @@ Chip Overclock, "Improvisational Engineering", 2020-04,
 Chip Overclock, "Keyhole", 2020-05,
 <https://coverclock.blogspot.com/2020/05/keyhole.html>
 
+Chip Overclock, "Pseudorange Multilateration", 2020-05,
+<https://coverclock.blogspot.com/2020/05/pseudorange-multilateration.html>
+
 # Media
 
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
