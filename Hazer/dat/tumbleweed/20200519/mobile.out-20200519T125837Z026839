@@ -1,0 +1,45 @@
+INP [ 70] $GLGSV,2,1,08,66,46,182,34,67,63,292,21,68,17,330,,76,40,036,23,1*7A\r\n
+INP [ 64] $GLGSV,2,2,08,77,61,300,,78,18,253,,85,10,033,,86,13,085,,1*7B\r\n
+INP [ 63] $GLGSV,2,1,08,66,46,182,,67,63,292,,68,17,330,,76,40,036,,*4E\r\n
+INP [ 63] $GLGSV,2,2,08,77,61,300,,78,18,253,,85,10,033,,86,13,085,,*4A\r\n
+INP [ 19] $GAGSV,1,1,00,*44\r\n
+INP [ 19] $GAGSV,1,1,00,*44\r\n
+INP [ 19] $GBGSV,1,1,00,*47\r\n
+INP [ 19] $GBGSV,1,1,00,*47\r\n
+INP [ 52] $GNGLL,3947.65621,N,10509.20562,W,125836.00,A,A*6F\r\n
+INP [ 44] \xb5b\x01\x14$\0\0\0\0\0\x98\xd6\x15\rd\xdcR\xc1\xa5\x1f\xb8\x17W\v\x1a\0S_\x1a\0\v\xda\0\xff\x86\x1e\x05\0g\x97\t\0\x8b\xb4
+INP [ 70] $GNRMC,125837.00,A,3947.65616,N,10509.20542,W,0.082,,190520,,,A,V*0E\r\n
+INP [ 35] $GNVTG,,T,,M,0.082,N,0.153,K,A*30\r\n
+INP [ 77] $GNGGA,125837.00,3947.65616,N,10509.20542,W,1,04,2.47,1728.3,M,-21.5,M,,*4C\r\n
+INP [ 50] $GNGSA,A,3,09,04,16,,,,,,,,,,5.74,2.47,5.17,1*0F\r\n
+INP [ 46] $GNGSA,A,3,66,,,,,,,,,,,,5.74,2.47,5.17,2*06\r\n
+INP [ 44] $GNGSA,A,3,,,,,,,,,,,,,5.74,2.47,5.17,3*07\r\n
+LOC 2020-05-19T06:58:37.026-07:00+01T 00:11:38.037 34.0.0        11279 cadmium 
+TIM 2020-05-19T12:58:37.000-00:00+00Z 0pps                             GNSS    
+POS 39°47'39.369"N, 105°09'12.325"W    39.7942693, -105.1534236        GNSS    
+ALT    5670.21'   1728.300m                                            GNSS    
+COG N     0.000000000°T    0.000000000°M                               GNSS    
+SOG       0.094mph       0.082000knots       0.153000kph               GNSS    
+INT GGA [ 4] 1dmy 1inc (  9 10  5  0  0  4  4 )                    0B  tumblewe
+HPP   39.794269262, -105.153423589 ±    33.5494m                       GNSS    
+HPA   1728.3389m MSL   1706.8390m WGS84 ±    62.8583m                  GNSS    
+NGS  39 47 39.36934(N) 105 09 12.32492(W)                              GNSS    
+ACT [1]  {     9     4    16                   } [ 3] [ 3] [ 4] [ 4]   NAVSTAR 
+ACT [1]  {    66                               } [ 1] [ 1] [ 4] [ 4]   GLONASS 
+DOP   5.74pdop   2.47hdop   5.17vdop                                   NAVSTAR 
+DOP   5.74pdop   2.47hdop   5.17vdop                                   GLONASS 
+SAT [  1]     3id  10°elv  189°azm    0dBHz  6sig     !                NAVSTAR 
+SAT [  2]     4id  69°elv  139°azm   21dBHz  6sig <                    NAVSTAR 
+SAT [  3]     5id   0°elv  332°azm    0dBHz  6sig     !                NAVSTAR 
+SAT [  4]     7id  39°elv  287°azm    0dBHz  6sig     !                NAVSTAR 
+SAT [  5]     9id  70°elv  303°azm    0dBHz  6sig <   !                NAVSTAR 
+SAT [  6]    16id  44°elv   48°azm    0dBHz  6sig <   !                NAVSTAR 
+SAT [  7]    27id  35°elv  103°azm    0dBHz  6sig     !                NAVSTAR 
+SAT [  8]    66id  46°elv  182°azm    0dBHz  0sig <   !                GLONASS 
+SAT [  9]    67id  63°elv  292°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 10]    68id  17°elv  330°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 11]    76id  40°elv   36°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 12]    77id  61°elv  300°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 13]    78id  18°elv  253°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 14]    85id  10°elv   33°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 15]    86id  13°elv   85°azm    0dBHz  0sig     !                GLONASS 
