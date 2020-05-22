@@ -751,6 +751,8 @@ astronomers in the audience, but it wasn't to me.
 <https://aerospaceamerica.aiaa.org/features/cosmic-gps/> Adam
 Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
+<https://www.gps.gov/systems/gps/performance/accuracy/>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
