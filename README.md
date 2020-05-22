@@ -515,6 +515,12 @@ Chip Overclock, "Keyhole", 2020-05,
 Chip Overclock, "Pseudorange Multilateration", 2020-05,
 <https://coverclock.blogspot.com/2020/05/pseudorange-multilateration.html>
 
+Chip Overclock, "Dilution of Precision", 2020-05,
+<https://coverclock.blogspot.com/2020/05/dilution-of-precision.html>
+
+Chip Overclock, "Practical Differential Geolocation", 2020-05,
+<https://coverclock.blogspot.com/2020/05/practical-differential-geolocation.html>
+
 # Media
 
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
