@@ -840,6 +840,7 @@ the libraries and binaries in the system directories.)
 * base - configures and runs a UBX-ZED-F9P as a base in survey or fixed mode.
 * benchmark - configures and runs a UBX-ZED-F9P as a corrected rover saving a CSV.
 * bucketbrigade - read from a serial port and forward to another serial port.
+* checkpoint - move the out/TARGET/tmp directory to a timestamped name.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
 * control - integrates mobile, peruse, and hups scripts for field testing.
