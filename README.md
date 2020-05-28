@@ -647,13 +647,7 @@ ublox, 2018-12-20
 
 <https://geodesy.noaa.gov/cgi-bin/HTDP/htdp.prl?f1=4&f2=1>
 
-# Locators
-
-<https://goo.gl/maps/QhDxRQUc3FfPvxrM8>39.794275645, -105.153414843
-
-<https://plus.codes/85FPQRVW+PJ>85FPQRVW+PJ
-
-<https://what3words.com/beard.hobby.funds>///beard.hobby.funds
+<http://www.earthpoint.us/Convert.aspx>
 
 # Resources
 
@@ -764,6 +758,29 @@ astronomers in the audience, but it wasn't to me.
 Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://www.gps.gov>
+
+# Base Geocodes
+
+<https://goo.gl/maps/QhDxRQUc3FfPvxrM8>
+39.794275645, -105.153414843
+
+<https://plus.codes/85FPQRVW+PJ>
+85FPQRVW+PJ
+
+<https://what3words.com/beard.hobby.funds>
+///beard.hobby.funds
+
+<http://www.earthpoint.us/Convert.aspx>
+Degrees Lat Long  39.7942756°, -105.1534148°
+Degrees Minutes 39°47.65654', -105°09.20489'
+Degrees Minutes Seconds  39°47'39.3923", -105°09'12.2934"
+UTM 13S 486865mE 4404935mN
+UTM centimeter 13S 486865.33mE 4404935.48mN
+MGRS 13SDE8686504935
+Grid North -0.1°
+GARS 150LV28
+Maidenhead DM79KT10OP10
+GEOREF EJQK50794765
 
 # Soundtrack
 
