@@ -647,6 +647,14 @@ ublox, 2018-12-20
 
 <https://geodesy.noaa.gov/cgi-bin/HTDP/htdp.prl?f1=4&f2=1>
 
+# Locators
+
+<https://goo.gl/maps/QhDxRQUc3FfPvxrM8>39.794275645, -105.153414843
+
+<https://plus.codes/85FPQRVW+PJ>85FPQRVW+PJ
+
+<https://what3words.com/beard.hobby.funds>///beard.hobby.funds
+
 # Resources
 
 <http://www.catb.org/gpsd/NMEA.txt>
