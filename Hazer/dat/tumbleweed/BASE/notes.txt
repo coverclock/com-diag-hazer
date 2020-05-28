@@ -1,0 +1,15 @@
+LOC 2020-05-27T14:18:34.019-07:00+01T 00:00:00.160 30.0.0          481 hacienda
+TIM 2020-05-27T20:18:33.000-00:00+00Z 0pps                             GNSS    
+POS 39°47'39.392"N, 105°09'12.293"W    39.7942756, -105.1534148        GNSS    
+ALT    5605.25'   1708.500m                                            GNSS    
+COG N     0.000000000°T    0.000000000°M                               GNSS    
+SOG       0.000mph       0.000000knots       0.000000kph               GNSS    
+INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )           1509819188B  tumblewe
+HPP   39.794275645, -105.153414843 ±     0.0204m                       GNSS    
+HPA   1708.4968m MSL   1686.9969m WGS84 ±     0.0144m                  GNSS    
+NGS  39 47 39.39232(N) 105 09 12.29343(W)                              GNSS    
+BAS 0active 0valid        100sec        101obs       0.7521m           DGNSS   
+RTK 1084 [ 158] base     <RNBrCERN>                                    DGNSS   
+
+What3Words.com:	///beard.hobby.funds
+plus.codes:	QRVW+PJ
