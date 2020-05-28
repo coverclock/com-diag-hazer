@@ -522,6 +522,9 @@ Chip Overclock, "Dilution of Precision", 2020-05,
 Chip Overclock, "Practical Differential Geolocation", 2020-05,
 <https://coverclock.blogspot.com/2020/05/practical-differential-geolocation.html>
 
+Chip Overclock, "Negative Results Are Still Results", 2020-05,
+<https://coverclock.blogspot.com/2020/05/negative-results-are-still-results.html>
+
 # Media
 
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
