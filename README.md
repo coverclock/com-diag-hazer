@@ -522,6 +522,9 @@ Chip Overclock, "Dilution of Precision", 2020-05,
 Chip Overclock, "Practical Differential Geolocation", 2020-05,
 <https://coverclock.blogspot.com/2020/05/practical-differential-geolocation.html>
 
+Chip Overclock, "Frames of Reference IV", 2020-05,
+<https://coverclock.blogspot.com/2020/05/frames-of-reference-iv.html>
+
 Chip Overclock, "Negative Results Are Still Results", 2020-05,
 <https://coverclock.blogspot.com/2020/05/negative-results-are-still-results.html>
 
