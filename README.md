@@ -759,29 +759,6 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://www.gps.gov>
 
-# Base Geocodes
-
-<https://goo.gl/maps/QhDxRQUc3FfPvxrM8>
-39.794275645, -105.153414843
-
-<https://plus.codes/85FPQRVW+PJ>
-85FPQRVW+PJ
-
-<https://what3words.com/beard.hobby.funds>
-///beard.hobby.funds
-
-<http://www.earthpoint.us/Convert.aspx>
-Degrees Lat Long  39.7942756°, -105.1534148°
-Degrees Minutes 39°47.65654', -105°09.20489'
-Degrees Minutes Seconds  39°47'39.3923", -105°09'12.2934"
-UTM 13S 486865mE 4404935mN
-UTM centimeter 13S 486865.33mE 4404935.48mN
-MGRS 13SDE8686504935
-Grid North -0.1°
-GARS 150LV28
-Maidenhead DM79KT10OP10
-GEOREF EJQK50794765
-
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
@@ -2156,6 +2133,25 @@ its variables in little-endian byte order.
     \xe5
     \x01\x94\x02\x00
     \x1d
+
+#### Geocodes
+
+Here are some geocodes - different ways of encoding and representing
+the location of the base I am using.
+
+* Decimal degrees: 39.794275645, -105.153414843
+* Plus Codes: 85FPQRVW+PJ
+* What3Words: ///beard.hobby.funds
+* Degrees Lat Long:  39.7942756°, -105.1534148°
+* Degrees Minutes: 39°47.65654', -105°09.20489'
+* Degrees Minutes Seconds:  39°47'39.3923", -105°09'12.2934"
+* UTM: 13S 486865mE 4404935mN
+* UTM centimeter: 13S 486865.33mE 4404935.48mN
+* MGRS: 13SDE8686504935
+* Grid North: -0.1°
+* GARS: 150LV28
+* Maidenhead: DM79KT10OP10
+* GEOREF: EJQK50794765
 
 ### Rover
 
