@@ -21,20 +21,19 @@ ACCURACY=${5:-250}
 FIXFIL=${6-"${SAVDIR}/${PROGRAM}.fix"}
 ERRFIL=${7-"${SAVDIR}/${PROGRAM}.err"}
 OUTFIL=${8-"${SAVDIR}/${PROGRAM}.out"}
+CSVFIL=${9-"${SAVDIR}/${PROGRAM}.csv"}
 
 mkdir -p $(dirname ${FIXFIL})
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
+mkdir -p $(dirname ${CSVFIL})
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 if [[ ! -r ${FIXFIL} ]]; then
-	echo "exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}" 1>&2
-	exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}
+	exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL} ${CSVFIL}
 elif [[ $(wc -l ${FIXFIL}) < 7 ]]; then
-	echo "exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}" 1>&2
-	exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL}
+	exec survey ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY} ${FIXFIL} ${ERRFIL} ${OUTFIL} ${CSVFIL}
 else
-	echo "exec fixed ${ROUTER} ${DEVICE} ${RATE} ${FIXFIL} ${ERRFIL} ${OUTFIL}" 1>&2
 	exec fixed ${ROUTER} ${DEVICE} ${RATE} ${FIXFIL} ${ERRFIL} ${OUTFIL}
 fi
