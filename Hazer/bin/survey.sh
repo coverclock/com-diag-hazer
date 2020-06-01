@@ -16,14 +16,16 @@ ROUTER=${1:-"tumbleweed:tumbleweed"}
 DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
 DURATION=${4:-300}
-ACCURACY=${5:-250}
+ACCURACY=${5:-100}
 FIXFIL=${6-"${SAVDIR}/base.fix"}
 ERRFIL=${7-"${SAVDIR}/${PROGRAM}.err"}
 OUTFIL=${8-"${SAVDIR}/${PROGRAM}.out"}
+CSVFIL=${9-"${SAVDIR}/${PROGRAM}.csv"}
 
 mkdir -p $(dirname ${FIXFIL})
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
+mkdir -p $(dirname ${CSVFIL})
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
@@ -61,6 +63,7 @@ log -I -N ${PROGRAM} -i SVIN_ACC_LIMIT="\"${SVIN_ACC_LIMIT}\""
 
 exec coreable gpstool \
     -F -H ${OUTFIL} -t 10 \
+    -T ${CSVFIL} \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -G ${ROUTER} -g 4 \
     -N ${FIXFIL} \

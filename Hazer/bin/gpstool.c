@@ -2185,9 +2185,10 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (strcmp(logging, "-") == 0) {
         log_fp = stdout;
+    } else if ((log_fp = fopen(logging, "ab")) != (FILE *)0) {
+        /* Do nothing. */
     } else {
-        log_fp = fopen(logging, "ab");
-        if (log_fp == (FILE *)0) { diminuto_perror(logging); }
+        diminuto_perror(logging);
         assert(log_fp != (FILE *)0);
     }
 
@@ -2471,9 +2472,12 @@ int main(int argc, char * argv[])
             Device = source;
         }
 
-        in_fp = fopen(source, "r");
-        if (in_fp == (FILE *)0) { diminuto_perror(source); }
-        assert(in_fp != (FILE *)0);
+        if ((in_fp = fopen(source, "r")) != (FILE *)0) {
+            /* Do nothing. */
+        } else {
+            diminuto_perror(source);
+            assert(in_fp != (FILE *)0);
+        }
 
     }
 
@@ -2490,9 +2494,10 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (strcmp(sink, "-") == 0) {
         sink_fp = stdout;
+    } else if ((sink_fp = fopen(sink, "a")) != (FILE *)0) {
+        /* Do nothing. */
     } else {
-        sink_fp = fopen(sink, "a");
-        if (sink_fp == (FILE *)0) { diminuto_perror(sink); }
+        diminuto_perror(sink);
         assert(sink_fp != (FILE *)0);
     }
 
@@ -2568,9 +2573,10 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (strcmp(trace, "-") == 0) {
         trace_fp = stdout;
+    } else if ((trace_fp = fopen(trace, "a")) != (FILE *)0) {
+        /* Do nothing. */
     } else {
-        trace_fp = fopen(trace, "a");
-        if (trace_fp == (FILE *)0) { diminuto_perror(trace); }
+        diminuto_perror(trace);
         assert(trace_fp != (FILE *)0);
     }
 
@@ -3828,6 +3834,25 @@ int main(int argc, char * argv[])
             hpllh = 0;
         }
 
+        /*
+         * If tracing is enabled and we transitioned from an active
+         * survey to a valid fix, disable tracing. This allows us to
+         * trace until the fix is established and no longer changing.
+         */
+
+        if (trace_fp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (base.payload.active) {
+            /* Do nothing. */
+        } else if (!base.payload.valid) {
+            /* Do nothing. */
+        } else if ((rc = fclose(trace_fp)) != EOF) {
+            diminuto_perror("fclose(trace_fp)");
+            trace_fp = (FILE *)0;
+        } else {
+            trace_fp = (FILE *)0;
+        }
+
         /**
          ** REPORT
          **/
@@ -3992,42 +4017,67 @@ report:
         assert(rc >= 0);
     }
 
+    if (trace_fp == (FILE *)0) {
+        /* Do nothing. */
+    } else if (trace_fp == stdout) {
+        /* Do nothing. */
+    } else if ((rc = fclose(trace_fp)) != EOF) {
+        /* Do nothing. */
+    } else {
+        diminuto_perror("fclose(trace_fp)");
+    }
+
     if (log_fp == (FILE *)0) {
         /* Do nothing. */
     } else if (log_fp == stdout) {
         /* Do nothing. */
+    } else if ((rc = fclose(log_fp)) != EOF) {
+        /* Do nothing. */
     } else {
-        rc = fclose(log_fp);
-        if (rc == EOF) { diminuto_perror("fclose(log_fp)"); }
+        diminuto_perror("fclose(log_fp)");
     }
 
-    if (dev_fp != (FILE *)0) {
-        rc = fclose(dev_fp);
-        if (rc == EOF) { diminuto_perror("fclose(dev_fp)"); }
+    if (dev_fp == (FILE *)0) {
+        /* Do nothing. */
+    } else if (dev_fp == stdout) {
+        /* Do nothing. */
+    } else if ((rc = fclose(dev_fp)) != EOF) {
+        /* Do nothing. */
+    } else {
+        diminuto_perror("fclose(dev_fp)");
     }
 
     DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS peak=%lldB\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)), (long long)io_peak);
 
     free(io_buffer);
 
-    if (sink_fp != (FILE *)0) {
-        rc = fclose(sink_fp);
-        if (rc == EOF) { diminuto_perror("fclose(sink_fp)"); }
+    if (sink_fp == (FILE *)0) {
+        /* Do nothing. */
+    } else if ((rc = fclose(sink_fp)) != EOF) {
+        /* Do nothing. */
+    } else {
+        diminuto_perror("fclose(sink_fp)");
     }
 
-    if (in_fp != dev_fp) {
-        rc = fclose(in_fp);
-        if (rc == EOF) { diminuto_perror("fclose(in_fp)"); }
+    if (in_fp == (FILE *)0) {
+        /* Do nothing. */
+    } else if (in_fp == dev_fp) {
+        /* Do nothing. */
+    } else if ((rc = fclose(in_fp)) != EOF) {
+        /* Do nothing. */
+    } else {
+        diminuto_perror("fclose(in_fp)");
     }
 
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_commit(out_fp, &temporary);
         assert(out_fp == (FILE *)0);
-    } else if (out_fp != dev_fp) {
-        rc = fclose(out_fp);
-        if (rc == EOF) { diminuto_perror("fclose(out_fp)"); }
-    } else {
+    } else if (out_fp == dev_fp) {
         /* Do nothing. */
+    } else if ((rc = fclose(out_fp)) != EOF) {
+        /* Do nothing. */
+    } else {
+        diminuto_perror("fclose(out_fp)");
     }
 
     while (!diminuto_list_isempty(&command_list)) {
