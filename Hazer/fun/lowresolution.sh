@@ -1,18 +1,15 @@
-#!/bin/bash 
+#!/bin/bash
 # Copyright 2019 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the U-blox ZED-UBX-F9P as a stationary Base with very
-# low standards sending corrections to Rovers.
+# Configure and run the U-blox ZED-UBX-F9P as a stationary Base sending
+# corrections to Rovers with parameters for low resolution.
 
-PROGRAM=$(basename ${0})
-ROUTER=${1:-"localhost:21010"}
-DEVICE=${2:-"/dev/ttyACM0"}
+ROUTER=${1:-"tumbleweed:tumbleweed"}
+DEVICE=${2:-"/dev/tumbleweed"}
 RATE=${3:-230400}
-DURATION=${4:-300}
+DURATION=${4:-600}
 ACCURACY=${5:-250000}
 
-. $(readlink -e $(dirname ${0})/../bin)/setup
-
-exec base ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY}
+exec $(readlink -e $(dirname ${0})/../bin)/base ${ROUTER} ${DEVICE} ${RATE} ${DURATION} ${ACCURACY}

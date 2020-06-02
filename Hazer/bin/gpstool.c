@@ -3847,9 +3847,9 @@ int main(int argc, char * argv[])
         } else if (!base.payload.valid) {
             /* Do nothing. */
         } else if ((rc = fclose(trace_fp)) != EOF) {
-            diminuto_perror("fclose(trace_fp)");
             trace_fp = (FILE *)0;
         } else {
+            diminuto_perror("fclose(trace_fp)");
             trace_fp = (FILE *)0;
         }
 
