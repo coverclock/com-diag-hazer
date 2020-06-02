@@ -12,11 +12,13 @@ LIMIT=${2:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
+# There is a tiny interval below when a signal will not be trapped.
+# My attempts to eliminate this have thus far not been successful.
+
 ${TASK} &
 TASKPID=$!
 sleep 5
 peruse ${TASK} out ${LIMIT} < /dev/null &
 PERUSEPID=$!
 trap "kill ${TASKPID} ${PERUSEPID}" 0 1 2 3 15
-
 hups

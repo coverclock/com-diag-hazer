@@ -13,6 +13,9 @@ LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
+# There is a tiny interval below when a signal will not be trapped.
+# My attempts to eliminate this have thus far not been successful.
+
 ${TASK} ${ROUTER}:tumbleweed &
 TASKPID=$!
 sleep 5
