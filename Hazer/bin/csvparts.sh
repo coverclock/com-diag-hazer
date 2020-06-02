@@ -35,9 +35,9 @@ while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 
 	COUNT=$((${COUNT} + 1))
 	if [[ ${COUNT} -ge ${MAXIMUM} ]]; then
-		TMPDIR=$((${INDEX} / ${MODULO}))".dir"
+		TMPDIR=$(printf "%04d" $((${INDEX} / ${MODULO})))".dir"
 		mkdir -p ${TMPDIR}
-		mv ${TMPFIL} ${TMPDIR}/${INDEX}.csv
+		mv ${TMPFIL} ${TMPDIR}/$(printf "%04d" ${INDEX}).csv
 		INDEX=$((${INDEX} + 1))
 		COUNT=0
 	fi
@@ -45,7 +45,7 @@ while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 done
 
 if [[ ${COUNT} -gt 0 ]]; then
-	mv ${TMPFIL} ${PREFIX}.${INDEX}
+	mv ${TMPFIL} ${TMPDIR}/$(printf "%04d" ${INDEX}).csv
 fi
 
 exit 0
