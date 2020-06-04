@@ -656,7 +656,7 @@ enum YodelUbxNavStatusFlags2PsmState {
 /**
  * UBX-NAV-STATUS.flags2.spoofDetState values.
  */
-enum YodelUbxNavStatusFLags2SpoolDetState {
+enum YodelUbxNavStatusFlags2SpoolDetState {
     YODEL_UBX_NAV_STATUS_flags2_spoofDetState_unknown	= 0,
     YODEL_UBX_NAV_STATUS_flags2_spoofDetState_none		= 1,
     YODEL_UBX_NAV_STATUS_flags2_spoofDetState_one		= 2,
@@ -1125,6 +1125,43 @@ typedef struct YodelUbxNavPvt {
     int16_t magDec;         /* Magnetic declination (1E-2 deg). */
     uint16_t magAcc;        /* Magnetic declination accuracy (1E-2 deg). */
 } yodel_ubx_nav_pvt_t __attribute__((aligned(4)));
+
+/**
+ * UBX-NAV-PVT valid values.
+ */
+enum YodelUbxNavPvtValid {
+    YODEL_UBX_NAV_PVT_valid_validMsg	    = 0x08,
+    YODEL_UBX_NAV_PVT_valid_fullyResolved	= 0x04,
+    YODEL_UBX_NAV_PVT_valid_validTime	    = 0x02,
+    YODEL_UBX_NAV_PVT_valid_validDate	    = 0x01,
+};
+
+/**
+ * UBX-NAV-PVT flags values.
+ */
+enum YodelUbxNavPvtFlags {
+    YODEL_UBX_NAV_PVT_flags_carrSoln	    = 0xc0,
+    YODEL_UBX_NAV_PVT_flags_headVehValid	= 0x20,
+    YODEL_UBX_NAV_PVT_flags_psmState	    = 0x1c,
+    YODEL_UBX_NAV_PVT_flags_diffSoln	    = 0x02,
+    YODEL_UBX_NAV_PVT_flags_gnssFixOK	    = 0x01,
+};
+
+/**
+ * UBX-NAV-PVT flags2 values.
+ */
+enum YodelUbxNavPvtFlags2 {
+    YODEL_UBX_NAV_PVT_flags2_confirmedTime  = 0x80,
+    YODEL_UBX_NAV_PVT_flags2_confirmedDate	= 0x40,
+    YODEL_UBX_NAV_PVT_flags2_confirmedAvai	= 0x20,
+};
+
+/**
+ * UBX-NAV-PVT flags3 values.
+ */
+enum YodelUbxNavPvtFlags3 {
+    YODEL_UBX_NAV_PVT_flags3_invalidLlh = 0x01,
+};
 
 /**
  * Process a possible UBX-NAV-PVT message.
