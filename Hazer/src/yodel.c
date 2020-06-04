@@ -639,6 +639,64 @@ int yodel_ubx_mon_comms(yodel_ubx_mon_comms_t * mp, const void * bp, ssize_t len
     return rc;
 }
 
+int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_ATT_Class) {
+        /* Do nothing. */
+    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_ATT_Id) {
+        /* Do nothing. */
+    } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_ATT_Length)) {
+        /* Do nothing. */
+    } else {
+        rc = 0;
+    }
+
+    return rc;
+}
+
+int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_ODO_Class) {
+        /* Do nothing. */
+    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_ODO_Id) {
+        /* Do nothing. */
+    } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_ODO_Length)) {
+        /* Do nothing. */
+    } else {
+        rc = 0;
+    }
+
+    return rc;
+}
+
+int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t length)
+{
+    int rc = -1;
+    const unsigned char * hp = (const unsigned char *)bp;
+
+    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_PVT_Class) {
+        /* Do nothing. */
+    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_PVT_Id) {
+        /* Do nothing. */
+    } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_PVT_Length)) {
+        /* Do nothing. */
+    } else {
+        rc = 0;
+    }
+
+    return rc;
+}
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
 void yodel_format_hppos2degrees(int32_t whole, int8_t fraction, int32_t * degreesp, uint64_t * billionthsp)
 {
     int64_t nanodegrees = 0;

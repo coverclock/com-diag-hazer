@@ -204,6 +204,78 @@ typedef struct YodelRover {
     }
 
 /*******************************************************************************
+ * VEHICLE ATTITUDE
+ ******************************************************************************/
+
+/**
+ * Structure combining both a UBX-RXM-RTCM payload and its expiry time in ticks.
+ */
+typedef struct YodelAttitude {
+    yodel_ubx_nav_att_t payload;	/* Payload from UBX-NAV_ATT message. */
+    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
+    uint8_t unused[7];
+} yodel_attitude_t;
+
+/**
+ * @def YODEL_ATTITUDE_INITIALIZER
+ * Initialize a YodelAttitude structure.
+ */
+#define YODEL_ATTITUDE_INITIALIZER \
+    { \
+        YODEL_UBX_NAV_ATT_INITIALIZER, \
+        0, \
+        { 0, }, \
+    }
+
+/*******************************************************************************
+ * VEHICLE ODOMETER
+ ******************************************************************************/
+
+/**
+ * Structure combining both a UBX-NAV_ODO payload and its expiry time in ticks.
+ */
+typedef struct YodelOdometer {
+    yodel_ubx_nav_odo_t payload;	/* Payload from UBX-NAV_ODO message. */
+    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
+    uint8_t unused[7];
+} yodel_odometer_t;
+
+/**
+ * @def YODEL_ODOMETER_INITIALIZER
+ * Initialize a YodelOdometer structure.
+ */
+#define YODEL_ODOMETER_INITIALIZER \
+    { \
+        YODEL_UBX_NAV_ODO_INITIALIZER, \
+        0, \
+        { 0, }, \
+    }
+
+/*******************************************************************************
+ * POSITION, VELOCITY, TIME SOLUTION
+ ******************************************************************************/
+
+/**
+ * Structure combining both a UBX-NAV-PVT payload and its expiry time in ticks.
+ */
+typedef struct YodelPosVelTim {
+    yodel_ubx_nav_pvt_t payload;	/* Payload from UBX-NAV-PVT message. */
+    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
+    uint8_t unused[7];
+} yodel_posveltim_t;
+
+/**
+ * @def YODEL_POSVELIM_INITIALIZER
+ * Initialize a YodelPosVelTim structure.
+ */
+#define YODEL_POSVELTIM_INITIALIZER \
+    { \
+        YODEL_UBX_NAV_PVT_INITIALIZER, \
+        0, \
+        { 0, }, \
+    }
+
+/*******************************************************************************
  * RTCM MESSAGE
  ******************************************************************************/
 

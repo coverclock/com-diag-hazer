@@ -1776,6 +1776,9 @@ int main(int argc, char * argv[])
     yodel_rover_t rover = YODEL_ROVER_INITIALIZER;
     yodel_ubx_ack_t acknak = YODEL_UBX_ACK_INITIALIZER;
     yodel_ubx_mon_comms_t ports = YODEL_UBX_MON_COMMS_INITIALIZER;
+    yodel_attitude_t attitude = YODEL_ATTITUDE_INITIALIZER;
+    yodel_odometer_t odometer = YODEL_ODOMETER_INITIALIZER;
+    yodel_posveltim_t posveltim = YODEL_POSVELTIM_INITIALIZER;
     int acknakpending = 0;
     int nakquit = 0;
     int nominal = 0;
@@ -3690,6 +3693,21 @@ int main(int argc, char * argv[])
             } else if (yodel_ubx_nav_svin(&base.payload, buffer, length) == 0) {
 
                 base.ticks = timeout;
+                refresh = !0;
+
+            } else if (yodel_ubx_nav_att(&(attitude.payload), buffer, length) == 0) {
+
+                hardware.ticks = timeout;
+                refresh = !0;
+
+            } else if (yodel_ubx_nav_odo(&(odometer.payload), buffer, length) == 0) {
+
+                hardware.ticks = timeout;
+                refresh = !0;
+
+            } else if (yodel_ubx_nav_pvt(&(posveltim.payload), buffer, length) == 0) {
+
+                hardware.ticks = timeout;
                 refresh = !0;
 
             } else if (yodel_ubx_rxm_rtcm(&rover.payload, buffer, length) == 0) {

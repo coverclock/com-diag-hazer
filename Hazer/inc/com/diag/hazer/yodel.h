@@ -889,7 +889,7 @@ typedef struct YodelUbxRxmRtcm {
 
 /**
  * @def YODEL_UBX_RXM_RTCM_INITIALIZER
- * Initialize a YodelUbxAck structure.
+ * Initialize a YodelUbxRxmRtcm structure.
  */
 #define YODEL_UBX_RXM_RTCM_INITIALIZER \
     { 0, }
@@ -1036,6 +1036,13 @@ typedef struct YodelUbxNavAtt {
 } yodel_ubx_nav_att_t __attribute__((aligned(4)));
 
 /**
+ * @def YODEL_UBX_NAV_ATT_INITIALIZER
+ * Initialize a YodelUbxNavAtt structure.
+ */
+#define YODEL_UBX_NAV_ATT_INITIALIZER \
+    { 0, }
+
+/**
  * Process a possible UBX-NAV-ATT message.
  * @param mp points to a UBX-NAV-ATT structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
@@ -1066,6 +1073,13 @@ typedef struct YodelUbxNavOdo {
     uint32_t totalDistance; /* Total cumulative ground distance (meters). */
     uint32_t distanceStd;   /* Ground distance accuracy @ 1-sigma (meters). */
 } yodel_ubx_nav_odo_t __attribute__((aligned(4)));
+
+/**
+ * @def YODEL_UBX_NAV_ODO_INITIALIZER
+ * Initialize a YodelUbxNavOdo structure.
+ */
+#define YODEL_UBX_NAV_ODO_INITIALIZER \
+    { 0, }
 
 /**
  * Process a possible UBX-NAV-ODO message.
@@ -1125,6 +1139,13 @@ typedef struct YodelUbxNavPvt {
     int16_t magDec;         /* Magnetic declination (1E-2 deg). */
     uint16_t magAcc;        /* Magnetic declination accuracy (1E-2 deg). */
 } yodel_ubx_nav_pvt_t __attribute__((aligned(4)));
+
+/**
+ * @def YODEL_UBX_NAV_PVT_INITIALIZER
+ * Initialize a YodelUbxNavPvt structure.
+ */
+#define YODEL_UBX_NAV_PVT_INITIALIZER \
+    { 0, }
 
 /**
  * UBX-NAV-PVT valid values.
