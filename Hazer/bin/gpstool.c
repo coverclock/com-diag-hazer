@@ -197,6 +197,16 @@ static diminuto_sticks_t Now = 0;
  ******************************************************************************/
 
 /**
+ * Return the absolute value of a signed thirty-two bit integer.
+ * @param datum is a signed thirty-two bit integer.
+ * @return an unsigned thirty-two bit integer.
+ */
+static inline uint32_t abs32(int32_t datum)
+{
+    return (datum >= 0) ? datum : -datum;
+}
+
+/**
  * Return the absolute value of a signed sixty-four bit integer.
  * @param datum is a signed sixty-four bit integer.
  * @return an unsigned sixty-four bit integer.
@@ -1425,6 +1435,92 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         fprintf(fp, " %3u %02u %02u.%05u(%c)", degrees, minutes, seconds, tenthousandths, (direction < 0) ? 'W' : 'E');
 
         fprintf(fp, "%29s", "");
+
+        fprintf(fp, " %-8.8s", "GNSS");
+
+        fputc('\n', fp);
+
+    }
+}
+
+/**
+ * @param fp points to the FILE stream.
+ * @param sp points to the attitude structure.
+ */
+static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
+{
+    if (sp->ticks != 0) {
+
+        fputs("ATT", fp);
+
+        fprintf(fp, " %4d.%01u%lcroll %lc%4d.%01u%lc",
+            sp->payload.roll / 100000,
+            abs32(sp->payload.roll) % 100000 / 10000,
+            (wint_t)DEGREE,
+            (wint_t)PLUSMINUS,
+            sp->payload.accRoll / 100000,
+            abs32(sp->payload.accRoll) % 100000 / 10000,
+            (wint_t)DEGREE);
+
+        fprintf(fp, " %4d.%01u%lcpitch %lc%4d.%01u%lc",
+            sp->payload.pitch / 100000,
+            abs32(sp->payload.pitch) % 100000 / 10000,
+            (wint_t)DEGREE,
+            (wint_t)PLUSMINUS,
+            sp->payload.accPitch / 100000,
+            abs32(sp->payload.accPitch) % 100000 / 10000,
+            (wint_t)DEGREE);
+
+        fprintf(fp, " %4d.%01u%lcheading %lc%4d.%01u%lc",
+            sp->payload.heading / 100000,
+            abs32(sp->payload.heading) % 100000 / 10000,
+            (wint_t)DEGREE,
+            (wint_t)PLUSMINUS,
+            sp->payload.accHeading / 100000,
+            abs32(sp->payload.accHeading) % 100000 / 10000,
+            (wint_t)DEGREE);
+
+        fprintf(fp, " %-8.8s", "GNSS");
+
+        fputc('\n', fp);
+
+    }
+}
+
+/**
+ * @param fp points to the FILE stream.
+ * @param sp points to the odometer structure.
+ */
+static void print_odometer(FILE * fp, const yodel_odometer_t * sp)
+{
+    if (sp->ticks != 0) {
+
+        fputs("ODO", fp);
+
+        fprintf(fp, " %9um", sp->payload.distance);
+        fprintf(fp, " (%9um)", sp->payload.totalDistance);
+        fprintf(fp, " %lc%9um", (wint_t)PLUSMINUS,  sp->payload.distanceStd);
+
+        fprintf(fp, "%31s", "");
+
+        fprintf(fp, " %-8.8s", "GNSS");
+
+        fputc('\n', fp);
+
+    }
+}
+
+/**
+ * @param fp points to the FILE stream.
+ * @param sp points to the position/velocity/time structure.
+ */
+static void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
+{
+    if (sp->ticks != 0) {
+
+        fputs("PVT", fp);
+
+        fprintf(fp, "%67s", "");
 
         fprintf(fp, " %-8.8s", "GNSS");
 
@@ -3697,17 +3793,17 @@ int main(int argc, char * argv[])
 
             } else if (yodel_ubx_nav_att(&(attitude.payload), buffer, length) == 0) {
 
-                hardware.ticks = timeout;
+                attitude.ticks = timeout;
                 refresh = !0;
 
             } else if (yodel_ubx_nav_odo(&(odometer.payload), buffer, length) == 0) {
 
-                hardware.ticks = timeout;
+                odometer.ticks = timeout;
                 refresh = !0;
 
             } else if (yodel_ubx_nav_pvt(&(posveltim.payload), buffer, length) == 0) {
 
-                hardware.ticks = timeout;
+                posveltim.ticks = timeout;
                 refresh = !0;
 
             } else if (yodel_ubx_rxm_rtcm(&rover.payload, buffer, length) == 0) {
@@ -3952,6 +4048,9 @@ report:
                 print_hardware(out_fp, &hardware);
                 print_status(out_fp, &status);
                 print_solution(out_fp, &solution);
+                print_attitude(out_fp, &attitude);
+                print_odometer(out_fp, &odometer);
+                print_posveltim(out_fp, &posveltim);
                 print_corrections(out_fp, &base, &rover, &kinematics, &updates);
                 print_actives(out_fp, active);
                 print_views(out_fp, view, active);
