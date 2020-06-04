@@ -5,6 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # Split a potentially very large CSV file into many individual CSV
 # files stored in individual directories.
+# e.g. csvparts < file.csv
 
 PROGRAM=$(basename ${0})
 MAXIMUM=${1:-3600}

@@ -852,12 +852,13 @@ the libraries and binaries in the system directories.)
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * consumer - consumes datagrams and reports on stdout.
 * control - integrates mobile, peruse, and hups scripts for field testing.
-* csvlimits - determines boundary of solutions in a CSV file.
-* csvmeter - meters lines from a CSV file based on interarrival times.
-* csvparts - splits a CSV file into smaller hour-sized files in day-sized directories.
-* csv2geo - augments CSV file by adding geodesic distance and altitude difference fields.
-* csv2kml - converts CSV file produced by gpstool -T to KML 2.3 XML.
-* csv2rmc - converts CSV file produced by gpstool -T to NMEA RMC sentences.
+* csvlimits - determines boundary of solutions in a gpstool CSV file.
+* csvmeter - meters lines from a gpstool CSV file based on interarrival times.
+* csvparts - splits gpstool CSV file into smaller files in subdirectories.
+* csv2geo - appends geodesic and altitude differences to gpstool CSV file.
+* csv2iso - converts times in gpstool CSV file into ISO8601-ish timestamps.
+* csv2kml - converts gpstool CSV file to KML 2.3 XML.
+* csv2rmc - converts gpstool CSV file to NMEA RMC sentences.
 * field - integrates benchmark, peruse, and hups scripts for field testing.
 * fixed - configures and runs a UBX-ZED-F9P as a base station in fixed mode.
 * hup - send SIGHUP to all running instances of gpstool.
