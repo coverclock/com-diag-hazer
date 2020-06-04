@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2018 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2018-2020 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-hazer<BR>
@@ -33,6 +33,9 @@ int main(void)
         assert(sizeof(yodel_ubx_nav_svin_t) == YODEL_UBX_NAV_SVIN_Length);
         assert(sizeof(yodel_ubx_nav_status_t) == YODEL_UBX_NAV_STATUS_Length);
         assert(sizeof(yodel_ubx_rxm_rtcm_t) == YODEL_UBX_RXM_RTCM_Length);
+        assert(sizeof(yodel_ubx_nav_att_t) == YODEL_UBX_NAV_ATT_Length);
+        assert(sizeof(yodel_ubx_nav_odo_t) == YODEL_UBX_NAV_ODO_Length);
+        assert(sizeof(yodel_ubx_nav_pvt_t) == YODEL_UBX_NAV_PVT_Length);
     }
 
     /**************************************************************************/

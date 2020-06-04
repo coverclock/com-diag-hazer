@@ -26,6 +26,9 @@
  *
  * "ZED-F9P u-blox F9 high precision GNSS module Integration Manual",
  * UBX-18010802-R05, ublox AG, 2019-07-11
+ *
+ * "u-blox 8 / u-blox M8 Receiver Description Including Protocol Specification",
+ * UBX-13003221-R19, ublox AG, 2020-05-20
  */
 
 #include <stdio.h>
@@ -1005,6 +1008,132 @@ enum YodelUbxMonCommsConstants {
  * @return the number of ports processed, <0 otherwise.
  */
 extern int yodel_ubx_mon_comms(yodel_ubx_mon_comms_t * mp, const void * bp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-NAV-ATT MESSAGES
+ ******************************************************************************/
+
+enum YodelUbxNavAttConstants {
+    YODEL_UBX_NAV_ATT_Class				= 0x01,
+    YODEL_UBX_NAV_ATT_Id				= 0x05,
+    YODEL_UBX_NAV_ATT_Length			= 32,
+};
+
+/**
+ * UBX-NAV-ATT (0x01, 0x05) [32] carries vehicle attitude.
+ * Ublox 8 R19, p. 317.
+ */
+typedef struct YodelUbxNavAtt {
+    uint32_t iTOW;          /* GPS Time Of Week. */
+    uint8_t version;        /* Message version. */
+    uint8_t reserved1[3];   /* Reserved. */
+    int32_t roll;           /* Vehicle roll (1E-5 deg). */
+    int32_t pitch;          /* Vehicle pitch (1E-5 deg). */
+    int32_t heading;        /* Vehicle heading (1E-5 deg). */
+    uint32_t accRoll;       /* Vehicle roll accuracy (1E-5 deg). */
+    uint32_t accPitch;      /* Vehicle pitch accuracy (1E-5 deg). */
+    uint32_t accHeading;    /* Vehicle heading accuracy (1E-5 deg). */
+} yodel_ubx_nav_att_t __attribute__((aligned(4)));
+
+/**
+ * Process a possible UBX-NAV-ATT message.
+ * @param mp points to a UBX-NAV-ATT structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * bp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-NAV-ODO MESSAGES
+ ******************************************************************************/
+
+enum YodelUbxNavOdoConstants {
+    YODEL_UBX_NAV_ODO_Class				= 0x01,
+    YODEL_UBX_NAV_ODO_Id				= 0x09,
+    YODEL_UBX_NAV_ODO_Length			= 20,
+};
+
+/**
+ * UBX-NAV-ODO (0x01, 0x09) [20] carries odometer solution.
+ * Ublox 8 R19, p. 327.
+ */
+typedef struct YodelUbxNavOdo {
+    uint8_t version;        /* Version. */
+    uint8_t reserved1[3];   /* Reserved. */
+    uint32_t iTOW;          /* GPS Time Of Week. */
+    uint32_t distance;      /* Ground distance since last reset (meters). */
+    uint32_t totalDistance; /* Total cumulative ground distance (meters). */
+    uint32_t distanceStd;   /* Ground distance accuracy @ 1-sigma (meters). */
+} yodel_ubx_nav_odo_t __attribute__((aligned(4)));
+
+/**
+ * Process a possible UBX-NAV-ODO message.
+ * @param mp points to a UBX-NAV-ODO structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * bp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-NAV-PVT MESSAGES
+ ******************************************************************************/
+
+enum YodelUbxNavPvtConstants {
+    YODEL_UBX_NAV_PVT_Class				= 0x01,
+    YODEL_UBX_NAV_PVT_Id				= 0x07,
+    YODEL_UBX_NAV_PVT_Length			= 92,
+};
+
+/**
+ * UBX-NAV-PVT (0x01, 0x07) [92] carries Position Velocity Time solution.
+ * Ublox 8 R19, p. 332.
+ */
+typedef struct YodelUbxNavPvt {
+    uint32_t iTOW;          /* GPS Time Of Week. */
+    uint16_t year;          /* Year (UTC). */
+    uint8_t month;          /* Month [1..12] (UTC). */
+    uint8_t day;            /* Day of month [1..31] (UTC). */
+    uint8_t hour;           /* Hour of day [0..23] (UTC). */
+    uint8_t minute;         /* Minute of hour [0..59] (UTC). */
+    uint8_t sec;            /* Second of minute [0..60] (UTC). */
+    uint8_t valid;          /* Validity flags. */
+    uint32_t tAcc;          /* Time accuracy estimate (UTC). */
+    int32_t nano;           /* Fraction of a second [-1E9..+1E9] (UTC). */
+    uint8_t fixType;        /* GNSSfix Type. */
+    uint8_t flags;          /* Fix status flags. */
+    uint8_t flags2;         /* Additional flags. */
+    uint8_t numSV;          /* Number of satellites in solution. */
+    int32_t lon;            /* Longitude (1e-7 deg). */
+    int32_t lat;            /* Latitude (1e-7 deg). */
+    int32_t height;         /* Height above ellipsoid (mm). */
+    int32_t hMSL;           /* Height about MSL (mm). */
+    uint32_t hAcc;          /* Horizontal accuracy estimate (mm). */
+    uint32_t vAcc;          /* Vertical accuracy estimate (mm). */
+    int32_t velN;           /* NED north velocity (mm/s). */
+    int32_t velE;           /* NED east velocity (mm/s). */
+    int32_t velD;           /* NED down velocity (mm/s). */
+    int32_t gSpeed;         /* Ground speed 2-D (mm/s). */
+    int32_t headMot;        /* Heading of motion 2-D (1E-5 deg). */
+    uint32_t sAcc;          /* Speed accuracy estimate (mm/s). */
+    uint32_t headAcc;       /* Heading accurach estimate (1E-5 deg). */
+    uint16_t pDOP;          /* Poition Dilution Of Precision (0.01). */
+    uint8_t flags3;         /* Additional flags (again). */
+    uint8_t reserved1[5];   /* Reserved. */
+    int32_t headVeh;        /* Heading of vehicle 2-D (1E-5 deg). */
+    int16_t magDec;         /* Magnetic declination (1E-2 deg). */
+    uint16_t magAcc;        /* Magnetic declination accuracy (1E-2 deg). */
+} yodel_ubx_nav_pvt_t __attribute__((aligned(4)));
+
+/**
+ * Process a possible UBX-NAV-PVT message.
+ * @param mp points to a UBX-NAV-PVT structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t length);
 
 /******************************************************************************
  * ENDIAN CONVERSION
