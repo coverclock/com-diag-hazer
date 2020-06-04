@@ -651,6 +651,14 @@ int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * bp, ssize_t length)
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_ATT_Length)) {
         /* Do nothing. */
     } else {
+        memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
+        COM_DIAG_YODEL_LETOH(mp->iTOW);
+        COM_DIAG_YODEL_LETOH(mp->roll);
+        COM_DIAG_YODEL_LETOH(mp->pitch);
+        COM_DIAG_YODEL_LETOH(mp->heading);
+        COM_DIAG_YODEL_LETOH(mp->accRoll);
+        COM_DIAG_YODEL_LETOH(mp->accPitch);
+        COM_DIAG_YODEL_LETOH(mp->accHeading);
         rc = 0;
     }
 
@@ -669,6 +677,11 @@ int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * bp, ssize_t length)
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_ODO_Length)) {
         /* Do nothing. */
     } else {
+        memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
+        COM_DIAG_YODEL_LETOH(mp->iTOW);
+        COM_DIAG_YODEL_LETOH(mp->distance);
+        COM_DIAG_YODEL_LETOH(mp->totalDistance);
+        COM_DIAG_YODEL_LETOH(mp->distanceStd);
         rc = 0;
     }
 
@@ -687,6 +700,28 @@ int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t length)
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_PVT_Length)) {
         /* Do nothing. */
     } else {
+        memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
+        COM_DIAG_YODEL_LETOH(mp->iTOW);
+        COM_DIAG_YODEL_LETOH(mp->year);
+        COM_DIAG_YODEL_LETOH(mp->tAcc);
+        COM_DIAG_YODEL_LETOH(mp->nano);
+        COM_DIAG_YODEL_LETOH(mp->lon);
+        COM_DIAG_YODEL_LETOH(mp->lat);
+        COM_DIAG_YODEL_LETOH(mp->height);
+        COM_DIAG_YODEL_LETOH(mp->hMSL);
+        COM_DIAG_YODEL_LETOH(mp->hAcc);
+        COM_DIAG_YODEL_LETOH(mp->vAcc);
+        COM_DIAG_YODEL_LETOH(mp->velN);
+        COM_DIAG_YODEL_LETOH(mp->velE);
+        COM_DIAG_YODEL_LETOH(mp->velD);
+        COM_DIAG_YODEL_LETOH(mp->gSpeed);
+        COM_DIAG_YODEL_LETOH(mp->headMot);
+        COM_DIAG_YODEL_LETOH(mp->sAcc);
+        COM_DIAG_YODEL_LETOH(mp->headAcc);
+        COM_DIAG_YODEL_LETOH(mp->pDOP);
+        COM_DIAG_YODEL_LETOH(mp->headVeh);
+        COM_DIAG_YODEL_LETOH(mp->magDec);
+        COM_DIAG_YODEL_LETOH(mp->magAcc);
         rc = 0;
     }
 
