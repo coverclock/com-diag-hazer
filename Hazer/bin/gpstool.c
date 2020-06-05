@@ -1480,7 +1480,7 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
             abs32(sp->payload.accHeading) % 100000 / 10000,
             (wint_t)DEGREE);
 
-        fprintf(fp, " %-8.8s", "GNSS");
+        fprintf(fp, " %-8.8s", "IMU");
 
         fputc('\n', fp);
 
@@ -1503,7 +1503,7 @@ static void print_odometer(FILE * fp, const yodel_odometer_t * sp)
 
         fprintf(fp, "%31s", "");
 
-        fprintf(fp, " %-8.8s", "GNSS");
+        fprintf(fp, " %-8.8s", "IMU");
 
         fputc('\n', fp);
 
@@ -1524,7 +1524,7 @@ static void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
 
         fprintf(fp, "%16s", "");
 
-        fprintf(fp, " %-8.8s", "GNSS");
+        fprintf(fp, " %-8.8s", "IMU");
 
         fputc('\n', fp);
 
