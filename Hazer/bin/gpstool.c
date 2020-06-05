@@ -1520,9 +1520,9 @@ static void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
 
         fputs("NED", fp);
 
-        fprintf(fp, " %10dmm/s N %10dmm/s E %10dmm/s D", sp->payload.velN, sp->payload.velE, sp->payload.velD);
+        fprintf(fp, " %10dmm/s north %10dmm/s east %10dmm/s down", sp->payload.velN, sp->payload.velE, sp->payload.velD);
 
-        fprintf(fp, "%16s", "");
+        fprintf(fp, "%6s", "");
 
         fprintf(fp, " %-8.8s", "IMU");
 
