@@ -1518,9 +1518,11 @@ static void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
 {
     if (sp->ticks != 0) {
 
-        fputs("PVT", fp);
+        fputs("NED", fp);
 
-        fprintf(fp, "%67s", "");
+        fprintf(fp, " %10dmm/s N %10dmm/s E %10dmm/s D", sp->payload.velN, sp->payload.velE, sp->payload.velD);
+
+        fprintf(fp, "%16s", "");
 
         fprintf(fp, " %-8.8s", "GNSS");
 
@@ -2024,6 +2026,7 @@ int main(int argc, char * argv[])
             break;
         case 'F':
             report = !0;
+            escape = !0;
             slow = !0;
             process = !0;
             break;
@@ -2035,8 +2038,9 @@ int main(int argc, char * argv[])
             break;
         case 'H':
             report = !0;
-            headless = optarg;
+            slow = !0;
             process = !0;
+            headless = optarg;
             break;
         case 'I':
             pps = optarg;
@@ -2197,7 +2201,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -C FILE     Catenate input to FILE or named pipe.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
-            fprintf(stderr, "       -F          Like -R but reFresh at 1Hz.\n");
+            fprintf(stderr, "       -F          Like -E but reFresh at 1Hz.\n");
             fprintf(stderr, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
             fprintf(stderr, "       -G :PORT    Use local PORT as dataGram source.\n");
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
