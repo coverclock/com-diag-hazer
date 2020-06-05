@@ -3456,6 +3456,9 @@ int main(int argc, char * argv[])
             countdown(&status.ticks, elapsed);
             countdown(&base.ticks, elapsed);
             countdown(&rover.ticks, elapsed);
+            countdown(&attitude.ticks, elapsed);
+            countdown(&odometer.ticks, elapsed);
+            countdown(&posveltim.ticks, elapsed);
             countdown(&kinematics.ticks, elapsed);
 
         }
