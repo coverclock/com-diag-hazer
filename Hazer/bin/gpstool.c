@@ -1471,7 +1471,7 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
             abs32(sp->payload.accPitch) % 100000 / 10000,
             (wint_t)DEGREE);
 
-        fprintf(fp, " %4d.%01u%lcheading %lc%4d.%01u%lc",
+        fprintf(fp, " %4d.%01u%lcyaw %lc%4d.%01u%lc",
             sp->payload.heading / 100000,
             abs32(sp->payload.heading) % 100000 / 10000,
             (wint_t)DEGREE,
@@ -1479,6 +1479,8 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
             sp->payload.accHeading / 100000,
             abs32(sp->payload.accHeading) % 100000 / 10000,
             (wint_t)DEGREE);
+
+        fprintf(fp, "%4s", "");
 
         fprintf(fp, " %-8.8s", "IMU");
 
