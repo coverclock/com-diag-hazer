@@ -104,6 +104,7 @@
 #include <wchar.h>
 #include <ctype.h>
 #include "./gpstool.h"
+#include "com/diag/hazer/helpers.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
@@ -195,26 +196,6 @@ static diminuto_sticks_t Now = 0;
 /*******************************************************************************
  * HELPERS
  ******************************************************************************/
-
-/**
- * Return the absolute value of a signed thirty-two bit integer.
- * @param datum is a signed thirty-two bit integer.
- * @return an unsigned thirty-two bit integer.
- */
-static inline uint32_t abs32(int32_t datum)
-{
-    return (datum >= 0) ? datum : -datum;
-}
-
-/**
- * Return the absolute value of a signed sixty-four bit integer.
- * @param datum is a signed sixty-four bit integer.
- * @return an unsigned sixty-four bit integer.
- */
-static inline uint64_t abs64(int64_t datum)
-{
-    return (datum >= 0) ? datum : -datum;
-}
 
 /**
  * Return monotonic time in seconds.
@@ -686,12 +667,12 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
 
         fprintf(fp, " %lld.%04llu,", (long long signed int)0, (long long unsigned int)0);
 
-        meters = pa[ss].alt_millimeters / 1000;
-        decimillimeters = (pa[ss].alt_millimeters % 1000) * 10;
+        meters = pa[ss].alt_millimeters / 1000LL;
+        decimillimeters = (abs64(pa[ss].alt_millimeters) % 1000LLU) * 10LLU;
         fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
-        meters += pa[ss].sep_millimeters / 1000;
-        decimillimeters += (pa[ss].sep_millimeters % 1000) * 10;
+        meters += pa[ss].sep_millimeters / 1000LL;
+        decimillimeters += (abs64(pa[ss].sep_millimeters) % 1000LLU) * 10LLU;
         fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
         fprintf(fp, " %lld.%04llu,", (long long signed int)0, (long long unsigned int)0);
@@ -699,12 +680,12 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
     }
 
     knots = pa[ss].sog_microknots / 1000000LL;
-    microknots = abs64(pa[ss].sog_microknots % 1000000LL);
+    microknots = abs64(pa[ss].sog_microknots) % 1000000LLU;
 
     fprintf(fp, " %ld.%06lu,", (long signed int)knots, (long unsigned int)microknots);
 
     degrees = pa[ss].cog_nanodegrees / 1000000000LL;
-    nanodegrees = abs64(pa[ss].cog_nanodegrees % 1000000000LL);
+    nanodegrees = abs64(pa[ss].cog_nanodegrees) % 1000000000LLU;
 
     fprintf(fp, " %ld.%09llu\n", (long signed int)degrees, (long long unsigned int)nanodegrees);
 

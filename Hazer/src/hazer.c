@@ -15,6 +15,7 @@
 #include <time.h>
 #include <math.h>
 #include "com/diag/hazer/hazer.h"
+#include "com/diag/hazer/helpers.h"
 #include "../src/hazer.h"
 
 /******************************************************************************
@@ -26,20 +27,6 @@ static FILE * debug  = (FILE *)0;
 const char * HAZER_TALKER_NAME[] = HAZER_TALKER_NAME_INITIALIZER;
 
 const char * HAZER_SYSTEM_NAME[] = HAZER_SYSTEM_NAME_INITIALIZER;
-
-/******************************************************************************
- *
- ******************************************************************************/
-
-/**
- * Return the absolute value of a signed sixty-four bit integer.
- * @param datum is a signed sixty-four bit integer.
- * @return an unsigned sixty-four bit integer.
- */
-static inline uint64_t abs64(int64_t datum)
-{
-    return (datum >= 0) ? datum : -datum;
-}
 
 /******************************************************************************
  *

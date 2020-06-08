@@ -5,7 +5,7 @@
 /**
  * @file
  *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock <coverclock@diag.com><BR>
  * https://github.com/coverclock/com-diag-hazer<BR>
@@ -13,6 +13,9 @@
  * This file is part of the Digital Aggregates Corporation Hazer package.
  */
 
+#include "com/diag/hazer/hazer.h"
+#include "com/diag/hazer/yodel.h"
+#include "com/diag/hazer/tumbleweed.h"
 #include "com/diag/hazer/datagram.h"
 #include "com/diag/diminuto/diminuto_list.h"
 
