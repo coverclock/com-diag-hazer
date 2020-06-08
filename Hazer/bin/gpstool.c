@@ -1520,7 +1520,7 @@ static void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
 {
     if (sp->ticks != 0) {
 
-        fputs("NED", fp);
+        fputs("GEO", fp);
 
         fprintf(fp, " %10dmm/s north %10dmm/s east %10dmm/s down", sp->payload.velN, sp->payload.velE, sp->payload.velD);
 
