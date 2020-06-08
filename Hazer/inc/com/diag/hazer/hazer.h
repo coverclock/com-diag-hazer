@@ -752,7 +752,8 @@ typedef struct HazerPosition {
     uint64_t dmy_nanoseconds;   /* Date in nanoseconds since POSIX epoch. */
     int64_t lat_nanominutes;    /* Latitude in nanominutes. */
     int64_t lon_nanominutes;    /* Longitude in nanominutes. */
-    int64_t alt_millimeters;    /* Altitude in millimeters. */
+    int64_t alt_millimeters;    /* Altitude above MSL in millimeters. */
+    int64_t sep_millimeters;    /* Geoid seperation in millimeters. */
     int64_t sog_microknots;     /* Speed On Ground in microknots. */
     int64_t sog_millimeters;    /* Speed On Ground in millimeters per hour. */
     int64_t cog_nanodegrees;    /* Course On Ground true in nanodegrees. */
@@ -762,6 +763,7 @@ typedef struct HazerPosition {
     uint8_t lat_digits;         /* Significant digits of latitude. */
     uint8_t lon_digits;         /* Significant digits of longitude. */
     uint8_t alt_digits;         /* Significant digits of altitude. */
+    uint8_t sep_digits;         /* Significant digits of seperation. */
     uint8_t sog_digits;         /* Significant digits of Speed On Ground. */
     uint8_t smm_digits;			/* Significant digits of SOG mm/h. */
     uint8_t cog_digits;         /* Significant digits of Course On Ground. */
@@ -777,11 +779,11 @@ typedef struct HazerPosition {
 #define HAZER_POSITION_INITIALIZER \
     { \
         0, 0, 0, 0, \
-        0, 0, 0, \
+        0, 0, 0, 0, \
         0, 0, 0, 0, \
         (const char *)0, \
         0, \
-        0, 0, 0, 0, 0, 0, 0, \
+        0, 0, 0, 0, 0, 0, 0, 0, \
         0, \
         { 0, } \
     }

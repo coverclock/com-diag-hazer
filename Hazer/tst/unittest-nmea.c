@@ -65,6 +65,8 @@ int main(void)
         assert(position.tot_nanoseconds == 50187000000000ULL);
         assert(position.lat_nanominutes == 2387653380000LL);
         assert(position.lon_nanominutes == -6309202160000LL);
+        assert(position.alt_millimeters == 1708600LL);
+        assert(position.sep_millimeters == -21500LL);
     }
 
     {

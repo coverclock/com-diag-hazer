@@ -581,17 +581,14 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
 }
 
 /**
- * Print information about the high-precision positioning solution that UBX
- * provides. I think this is the same result as NMEA but is expressed with
- * the maximum precision available in the underlying device and beyond which
- * NMEA can express. The trace is emitted in human-readable Comma Seperated
- * Value (CSV) form that can be imported into a spreadsheet.
+ * Save the current PVT solution to the trace file in CSV format.
  * @param fp points to the FILE stream.
- * @param pa is the positions array.
- * @param sp points to the solutions structure.
+ * @param pa is the positions (NMEA) array.
+ * @param sp points to the solutions (UBX HPPOSLLH) structure.
  */
 static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp)
 {
+    static uint64_t sn = 0;
     diminuto_ticks_t ticks = 0;
     uint64_t seconds = 0;
     uint64_t nanoseconds = 0;
@@ -601,8 +598,35 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
     uint32_t decimillimeters = 0;
     int32_t knots = 0;
     uint32_t microknots = 0;
-    static uint64_t sn = 0;
     size_t ii = 0;
+    ssize_t ss = -1;
+
+    /*
+     * We have to have a successful PVT solution from one of the four
+     * global navigation satellite systems (or maybe an ensemble fix
+     * based on more than one such system).
+     */
+
+    for (ii = HAZER_SYSTEM_GNSS; ii <= HAZER_SYSTEM_BEIDOU; ++ii) {
+        if (pa[ii].ticks == 0) {
+            /* Do nothing. */
+        } else if (pa[ii].utc_nanoseconds == 0) {
+            /* Do nothing. */
+        } else if (pa[ii].dmy_nanoseconds == 0) {
+            /* Do nothing. */
+        } else {
+            ss = ii;
+            break;
+        }
+    }
+
+    if (ss < 0) {
+        return;
+    }
+
+    /*
+     * Headings for Excel et al. are good.
+     */
 
     if (sn == 0) {
         for (ii = 0; ii < countof(HEADINGS); ++ii) {
@@ -613,30 +637,26 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         sn++;
     }
 
-    if (sp->ticks == 0) {
-        /* Do nothing. */
-    } else if (pa[HAZER_SYSTEM_GNSS].ticks == 0) {
-        /* Do nothing. */
-    } else if (pa[HAZER_SYSTEM_GNSS].utc_nanoseconds == 0) {
-        /* Do nothing. */
-    } else if (pa[HAZER_SYSTEM_GNSS].dmy_nanoseconds == 0) {
-        /* Do nothing. */
-    } else {
+    fprintf(fp, "\"%s\",", Hostname);
 
-        fprintf(fp, "\"%s\",", Hostname);
+    fprintf(fp, " %llu,", (long long unsigned int)(sn++));
 
-        fprintf(fp, " %llu,", (long long unsigned int)(sn++));
+    ticks = diminuto_frequency_ticks2units(Now, 1000000000LL);
+    seconds = ticks / 1000000000LLU;
+    nanoseconds = ticks % 1000000000LLU;
 
-        ticks = diminuto_frequency_ticks2units(Now, 1000000000LL);
-        seconds = ticks / 1000000000LLU;
-        nanoseconds = ticks % 1000000000LLU;
+    fprintf(fp, " %llu.%09llu,", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
 
-        fprintf(fp, " %llu.%09llu,", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
+    seconds = pa[ss].tot_nanoseconds / 1000000000LLU;
+    nanoseconds = pa[ss].tot_nanoseconds % 1000000000LLU;
 
-        seconds = pa[HAZER_SYSTEM_GNSS].tot_nanoseconds / 1000000000LLU;
-        nanoseconds = pa[HAZER_SYSTEM_GNSS].tot_nanoseconds % 1000000000LLU;
+    fprintf(fp, " %llu.%09llu,", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
 
-        fprintf(fp, " %llu.%09llu,", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
+    /*
+     * We use the high precision fix if it is available.
+     */
+
+    if (sp->ticks > 0) {
 
         yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &nanodegrees);
         fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)nanodegrees);
@@ -656,19 +676,39 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &decimillimeters);
         fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
-        knots = pa[HAZER_SYSTEM_GNSS].sog_microknots / 1000000LL;
-        microknots = abs64(pa[HAZER_SYSTEM_GNSS].sog_microknots % 1000000LL);
+    } else {
 
-        fprintf(fp, " %ld.%06lu,", (long signed int)knots, (long unsigned int)microknots);
+        hazer_format_nanominutes2degrees(pa[ss].lat_nanominutes, &degrees, &nanodegrees);
+        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)nanodegrees);
 
-        degrees = pa[HAZER_SYSTEM_GNSS].cog_nanodegrees / 1000000000LL;
-        nanodegrees = abs64(pa[HAZER_SYSTEM_GNSS].cog_nanodegrees % 1000000000LL);
+        hazer_format_nanominutes2degrees(pa[ss].lon_nanominutes, &degrees, &nanodegrees);
+        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)nanodegrees);
 
-        fprintf(fp, " %ld.%09llu\n", (long signed int)degrees, (long long unsigned int)nanodegrees);
+        fprintf(fp, " %lld.%04llu,", (long long signed int)0, (long long unsigned int)0);
 
-        fflush(fp);
+        meters = pa[ss].alt_millimeters / 1000;
+        decimillimeters = (pa[ss].alt_millimeters % 1000) * 10;
+        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
+
+        meters += pa[ss].sep_millimeters / 1000;
+        decimillimeters += (pa[ss].sep_millimeters % 1000) * 10;
+        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
+
+        fprintf(fp, " %lld.%04llu,", (long long signed int)0, (long long unsigned int)0);
 
     }
+
+    knots = pa[ss].sog_microknots / 1000000LL;
+    microknots = abs64(pa[ss].sog_microknots % 1000000LL);
+
+    fprintf(fp, " %ld.%06lu,", (long signed int)knots, (long unsigned int)microknots);
+
+    degrees = pa[ss].cog_nanodegrees / 1000000000LL;
+    nanodegrees = abs64(pa[ss].cog_nanodegrees % 1000000000LL);
+
+    fprintf(fp, " %ld.%09llu\n", (long signed int)degrees, (long long unsigned int)nanodegrees);
+
+    fflush(fp);
 
 }
 
@@ -1312,12 +1352,10 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fprintf(fp, " %s", pa[system].label);
             fprintf(fp, " [%2u]", pa[system].sat_used);
-            fprintf(fp, " %ddmy", dmyokay);
-            fprintf(fp, " %dinc", totokay);
-            fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
+            fprintf(fp, " %3s", dmyokay ? "DMY" : "dmy");
+            fprintf(fp, " %3s", totokay ? "TOT" : "tot");
+            fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].sep_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
             fprintf(fp, " %20lluB", (unsigned long long)bytes); /* (2^64)-1 == 0xFFFFFFFFFFFFFFFF == 18,446,744,073,709,551,615. */
-
-            fprintf(fp, "%1s", "");
 
             fprintf(fp, " %-8.8s", Device);
 
@@ -1680,7 +1718,7 @@ int main(int argc, char * argv[])
     const char * logging = (const char *)0;
     const char * headless = (const char *)0;
     const char * arp = (const char *)0;
-    const char * trace = (const char *)0;
+    const char * tracing = (const char *)0;
     int opt = -1;
     int debug = 0;
     int verbose = 0;
@@ -1937,7 +1975,7 @@ int main(int argc, char * argv[])
     int sync = 0;       /** If true then the input stream is synchronized. */
     int frame = 0;      /** If true then the input stream is at frame start. */
     int refresh = !0;   /** If true then the display needs to be refreshed. */
-    int hpllh = 0;      /** If true then the trace needs to be emitted. */
+    int trace = 0;      /** If true then the trace needs to be emitted. */
     /*
      * Command line processing variables.
      */
@@ -2073,7 +2111,7 @@ int main(int argc, char * argv[])
             source = optarg;
             break;
         case 'T':
-            trace = optarg;
+            tracing = optarg;
             process = !0; /* Have to process trace. */
             break;
         case 'U':
@@ -2215,7 +2253,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
-            fprintf(stderr, "       -T FILE     Save the high precision LLH trace to FILE.\n");
+            fprintf(stderr, "       -T FILE     Save the time and position trace to FILE.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
             fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
@@ -2674,14 +2712,14 @@ int main(int argc, char * argv[])
      * If we are saving the track, open the track file.
      */
 
-    if (trace == (const char *)0) {
+    if (tracing == (const char *)0) {
         /* Do nothing. */
-    } else if (strcmp(trace, "-") == 0) {
+    } else if (strcmp(tracing, "-") == 0) {
         trace_fp = stdout;
-    } else if ((trace_fp = fopen(trace, "a")) != (FILE *)0) {
+    } else if ((trace_fp = fopen(tracing, "a")) != (FILE *)0) {
         /* Do nothing. */
     } else {
-        diminuto_perror(trace);
+        diminuto_perror(tracing);
         assert(trace_fp != (FILE *)0);
     }
 
@@ -3537,6 +3575,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
+                trace = !0;
                 fix = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
@@ -3545,6 +3584,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
+                trace = !0;
                 fix = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
@@ -3553,6 +3593,7 @@ int main(int argc, char * argv[])
 
                 position[system].ticks = timeout;
                 refresh = !0;
+                trace = !0;
                 fix = diminuto_time_elapsed();
                 dmyokay = (position[system].dmy_nanoseconds > 0);
                 totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
@@ -3647,7 +3688,7 @@ int main(int argc, char * argv[])
 
                 solution.ticks = timeout;
                 refresh = !0;
-                hpllh = !0;
+                trace = !0;
 
             } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 
@@ -3950,11 +3991,11 @@ int main(int argc, char * argv[])
 
         if (trace_fp == (FILE *)0) {
             /* Do nothing. */
-        } else if (!hpllh) {
+        } else if (!trace) {
             /* Do nothing. */
         } else {
             emit_trace(trace_fp, position, &solution);
-            hpllh = 0;
+            trace = 0;
         }
 
         /*

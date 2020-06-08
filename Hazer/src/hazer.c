@@ -1020,6 +1020,7 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
         positionp->lon_nanominutes = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
         positionp->sat_used = strtol(vector[7], (char **)0, 10);
         positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits);
+        positionp->sep_millimeters = hazer_parse_alt(vector[11], *(vector[12]), &positionp->sep_digits);
         positionp->label = GGA;
         rc = 0;
     }
