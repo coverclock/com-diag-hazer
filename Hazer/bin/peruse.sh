@@ -31,21 +31,27 @@ DIRECTORY=${4:-${SAVDIR}}
 
 mkdir -p ${SAVDIR}
 
-PID=""
-
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 if [[ "${TASK}" == "router" ]]; then
     cat ${DIRECTORY}/${TASK}.${FILE}
     test /var/log/syslog.1 && grep rtktool /var/log/syslog.1
     grep rtktool /var/log/syslog
-    exec tail -n 0 -f /var/log/syslog | grep rtktool
+    tail -n 0 -f /var/log/syslog | grep rtktool
 elif [[ "${FILE}" == "err" ]]; then
-    exec tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
+    tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
 elif [[ "${FILE}" == "out" ]]; then
-    exec headless ${DIRECTORY}/${TASK}.${FILE} ${DIRECTORY}/${TASK}.pid ${LIMIT}
+    stdbuf -o0 headless ${DIRECTORY}/${TASK}.${FILE} ${DIRECTORY}/${TASK}.pid | \
+    	stdbuf -o0 awk '
+      		begin   { inp="INP [   ]"; out="OUT [   ]"; arm=1; }
+      		/^INP / { inp=substr($0,0,79); arm=1; next; }
+      		/^OUT / { out=substr($0,0,79); arm=1; next; }
+              		{ if (arm!=0) { print inp; print out; arm=0; } print $0; next; }
+      		end     { if (arm!=0) { print inp; print out; arm=0; } }
+    	' | \
+		stdbuf -o0 head -n ${LIMIT}
 elif [[ "${FILE}" == "csv" ]]; then
-    exec tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
+    tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
 else
-    exec cat ${DIRECTORY}/${TASK}.${FILE}
+    cat ${DIRECTORY}/${TASK}.${FILE}
 fi

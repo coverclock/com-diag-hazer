@@ -16,6 +16,11 @@ OUTFIL=${4-"${SAVDIR}/${PROGRAM}.out"}
 CSVFIL=${5-"${SAVDIR}/${PROGRAM}.csv"}
 LIMIT=${6:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
+DIRECTORY=$(dirname ${OUTFIL})
+FILENAME=$(basename ${OUTFIL})
+TASK=${FILENAME%%.*}
+FILE=${FILENAME#*.}
+
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
 mkdir -p $(dirname ${CSVFIL})
@@ -84,7 +89,7 @@ coreable gpstool \
 
 TASKPID=$!
 sleep 5
-peruse ${PROGRAM} out ${LIMIT} < /dev/null &
+peruse ${TASK} ${FILE} ${LIMIT} ${DIRECTORY} < /dev/null &
 PERUSEPID=$!
 trap "kill ${TASKPID} ${PERUSEPID}" 0 1 2 3 15
 hups
