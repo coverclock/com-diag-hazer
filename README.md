@@ -924,7 +924,16 @@ the libraries and binaries in the system directories.)
 
 * geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
 
-# Comma Separated Value (CSV) Format
+# Comma Separated Value (CSV) Output
+
+The -T flag for gpstool will cause the utility to save every Position,
+Velocity, Time solution to a "trace" file in CSV format as described
+below. This makes it easy to analyze results using tools like Excel and
+several tools provided by Hazer itself.  The PVT solution is taken from
+the high precision u-blox UBX-NAV-HPPOSLLH message if it is available,
+from the ensemble GNSS solution if it exists, or from one of the four
+Global Satellite Navigation Systems solutions in this order of preference:
+GPS, GLONASS, Galileo, Beidou.
 
 * HOSTNAME - hostname of computer running gpstool.
 * OBSERVATION - sequence number of observation.
@@ -965,7 +974,7 @@ the libraries and binaries in the system directories.)
            -P          Process incoming data even if no report is being generated.
            -R          Print a Report on standard output.
            -S FILE     Use source FILE or named pipe for input.
-           -T FILE     Save the high precision LLH trace to FILE.
+           -T FILE     Save the time and position trace to FILE.
            -U STRING   Like -W except expect UBX ACK or NAK response.
            -U ''       Exit when this empty UBX STRING is processed.
            -V          Log Version in the form of release, vintage, and revision.
@@ -2179,12 +2188,12 @@ in parallel.
     peruse rover out
 
 The rover can also generate a CSV file as it runs that will contain the
-results of the high precision solution every time is is generated and
-reported. This CSV file can be imported into a spreadsheet like Excel,
-converted into a stream of NMEA RMC sentences using the csv2rmc script
-for use with other GPS tools (including gpstool itself), or converted
-into a KML (Keyhole Markup Language) XML file using the csv2kml script
-for use with geodesy tools like Google Earth.
+results of the PVT solution every time is is generated and reported. This
+CSV file can be imported into a spreadsheet like Excel, converted into a
+stream of NMEA RMC sentences using the csv2rmc script for use with other
+GPS tools (including gpstool itself), or converted into a KML (Keyhole
+Markup Language) XML file using the csv2kml script for use with geodesy
+tools like Google Earth.
 
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
