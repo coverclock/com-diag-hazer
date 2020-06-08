@@ -2234,7 +2234,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
-            fprintf(stderr, "       -T FILE     Save the time and position trace to FILE.\n");
+            fprintf(stderr, "       -T FILE     Save the PVT trace to FILE.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
             fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
