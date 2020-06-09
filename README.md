@@ -2261,10 +2261,10 @@ implements the router) can be run as daemons via a command line switch
 still be used.
 
 When running in headless mode and receving a hangup signal (SIGHUP),
-gpstool will checkpoint the headless file: it will create a copy of
-the headless output file with a timestamp prefix with a resolution in
-microseconds. This is particularly useful in field testing to capture the
-relevant data at a specific point in time and space. The hup and hups
+gpstool will checkpoint the headless file: it will create a hardlink to
+the current headless output file with a timestamp prefix with a resolution
+in microseconds. This is particularly useful in field testing to capture
+the relevant data at a specific point in time and space. The hup and hups
 scripts use the pkill command to send a SIGHUP to all gpstool instances.
 
 ### Networking
