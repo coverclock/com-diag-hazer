@@ -21,6 +21,8 @@
 # peruse rover err
 # peruse router err
 
+SELF=$$
+
 ROOT=$(readlink -e $(dirname ${0})/..)
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-${ROOT}/tmp}
 
@@ -34,7 +36,7 @@ mkdir -p ${SAVDIR}
 
 . ${ROOT}/bin/setup
 
-trap "kill -TERM -- -$$" SIGINT SIGQUIT SIGTERM
+trap "kill -KILL -- -${SELF}" SIGINT SIGQUIT SIGTERM
 
 if [[ "${TASK}" == "router" ]]; then
     cat ${DIRECTORY}/${TASK}.${FILE}

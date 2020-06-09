@@ -5,6 +5,8 @@
 # https://github.com/coverclock/com-diag-hazer
 # Configure and run the U-blox NEO-M8U.
 
+SELF=$$
+
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
 
@@ -32,7 +34,7 @@ exec 2>>${ERRFIL}
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
-trap "kill -TERM -- -$$" SIGINT SIGQUIT SIGTERM
+trap "kill -KILL -- -${SELF}" SIGINT SIGQUIT SIGTERM
 
 # NMEA-PUBX-POSITION
 # NMEA-PUBX-SVSTATUS
