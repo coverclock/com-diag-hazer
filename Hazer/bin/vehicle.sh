@@ -32,6 +32,8 @@ exec 2>>${ERRFIL}
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
+trap "kill -TERM -- -$$" SIGINT SIGQUIT SIGTERM
+
 # NMEA-PUBX-POSITION
 # NMEA-PUBX-SVSTATUS
 # NMEA-PUBX-TIME
@@ -84,12 +86,6 @@ coreable gpstool \
 	-U '\xb5\x62\x06\x3e\x00\x00' \
 	< /dev/null 1> /dev/null &
 
-# There is a tiny interval below when a signal will not be trapped.
-# My attempts to eliminate this have thus far not been successful.
-
-TASKPID=$!
 sleep 5
 peruse ${TASK} ${FILE} ${LIMIT} ${DIRECTORY} < /dev/null &
-PERUSEPID=$!
-trap "kill ${TASKPID} ${PERUSEPID}" 0 1 2 3 15
 hups

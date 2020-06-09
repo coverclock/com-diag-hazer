@@ -34,13 +34,16 @@ mkdir -p ${SAVDIR}
 
 . ${ROOT}/bin/setup
 
+trap "kill -TERM -- -$$" SIGINT SIGQUIT SIGTERM
+
 if [[ "${TASK}" == "router" ]]; then
     cat ${DIRECTORY}/${TASK}.${FILE}
     test /var/log/syslog.1 && grep rtktool /var/log/syslog.1
     grep rtktool /var/log/syslog
     tail -n 0 -f /var/log/syslog | grep rtktool
 elif [[ "${FILE}" == "err" ]]; then
-    tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
+    cat ${DIRECTORY}/${TASK}.${FILE}
+    tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE}
 elif [[ "${FILE}" == "out" ]]; then
     stdbuf -oL headless ${DIRECTORY}/${TASK}.${FILE} ${DIRECTORY}/${TASK}.pid |
         while read FILENAME; do
@@ -50,7 +53,9 @@ elif [[ "${FILE}" == "out" ]]; then
             fi
         done
 elif [[ "${FILE}" == "csv" ]]; then
-    tail -n ${LIMIT} -f ${DIRECTORY}/${TASK}.${FILE}
+    cat ${DIRECTORY}/${TASK}.${FILE}
+    tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE}
 else
     cat ${DIRECTORY}/${TASK}.${FILE}
+    tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE}
 fi
