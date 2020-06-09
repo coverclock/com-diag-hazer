@@ -82,7 +82,7 @@ test -z "${HEIGHTHP}" && exit 3
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
 exec coreable gpstool \
-    -F -H ${OUTFIL} -t 10 \
+    -H ${OUTFIL} -t 10 \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -G ${ROUTER} -g 4 \
     -x \

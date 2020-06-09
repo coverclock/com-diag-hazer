@@ -2047,8 +2047,8 @@ int main(int argc, char * argv[])
             break;
         case 'F':
             report = !0;
-            escape = !0;
             slow = !0;
+            escape = !0;
             process = !0;
             break;
         case 'G':
@@ -2743,7 +2743,7 @@ int main(int argc, char * argv[])
      * cursor control or not.
      */
 
-    limitation = escape ? LIMIT : UNLIMITED;
+    limitation = (escape || headless) ? LIMIT : UNLIMITED;
 
     /*
      * Initialize the NMEA (Hazer) and UBX (Yodel) parsers. If you're into this
@@ -2792,7 +2792,8 @@ int main(int argc, char * argv[])
     frame = 0;
 
     /*
-     * Initialize screen.
+     * Initialize screen iff we're doing full-screen stuff with
+     * ANSI escape sequences.
      */
 
     if (escape) {

@@ -40,7 +40,7 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 # UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
 
 exec coreable gpstool \
-    -F -H ${OUTFIL} -t 10 \
+    -H ${OUTFIL} -t 10 \
     -T ${CSVFIL} \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -Y ${ROUTER} -y 20 \

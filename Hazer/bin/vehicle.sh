@@ -56,7 +56,7 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 # UBX-CFG-GNSS [0]
 
 coreable gpstool \
-	-F -H ${OUTFIL} \
+	-H ${OUTFIL} \
 	-t 10 \
 	-T ${CSVFIL} \
 	-D ${DEVICE} -b ${RATE} -8 -n -1 \

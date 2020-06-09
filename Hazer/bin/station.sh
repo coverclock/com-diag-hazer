@@ -25,6 +25,6 @@ exec 2>>${ERRFIL}
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
 exec coreable gpstool \
-    -F -H ${OUTFIL} -t 10 \
+    -H ${OUTFIL} -t 10 \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     < /dev/null 1> /dev/null

@@ -36,7 +36,7 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xff
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-UBX_RXM_RTCM_USB 0
 
 exec coreable gpstool \
-    -F -H ${OUTFIL} -t 10 \
+    -H ${OUTFIL} -t 10 \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -x \
     -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x00' \

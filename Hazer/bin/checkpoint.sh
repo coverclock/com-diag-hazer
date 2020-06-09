@@ -6,8 +6,8 @@
 # Renames the SAVDIR by adding a timestamp.
 # N.B. Probably bad is someone is using SAVDIR at the time.
 
-
-PROGRAM=$(basename ${0})
-SAVDIR=${1:-${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}}
 . $(readlink -e $(dirname ${0})/../bin)/setup
-exec mvdate ${SAVDIR}
+TIMESTAMP=$(date -u +%Y%m%dT%H%M%SZ%N)
+SAVDIR=${1:-${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}}
+OLDDIR="${SAVDIR}-${TIMESTAMP}"
+exec mv -i ${SAVDIR} ${OLDDIR} && chmod u-wx,g-wx,o-wx ${OLDDIR}

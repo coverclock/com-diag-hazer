@@ -62,7 +62,7 @@ log -I -N ${PROGRAM} -i SVIN_ACC_LIMIT="\"${SVIN_ACC_LIMIT}\""
 #    -U '\xb5\x62\x06\x01\x03\x00\x0a\x36\xf0' \
 
 exec coreable gpstool \
-    -F -H ${OUTFIL} -t 10 \
+    -H ${OUTFIL} -t 10 \
     -T ${CSVFIL} \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -G ${ROUTER} -g 4 \
