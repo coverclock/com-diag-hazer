@@ -1239,6 +1239,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
     }
 
     {
+        int64_t millimeters = 0;
         int64_t meters = 0;
         uint64_t thousandths = 0;
 
@@ -1249,13 +1250,23 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fputs("ALT", fp);
 
-            fprintf(fp, " %10.2lf'", pa[system].alt_millimeters * 3.2808 / 1000.0);
+            millimeters = pa[system].alt_millimeters;
 
-            meters = pa[system].alt_millimeters / 1000LL;
-            thousandths = abs64(pa[system].alt_millimeters) % 1000LLU;
-            fprintf(fp, " %6lld.%03llum", (long long signed int)meters, (long long unsigned int)thousandths);
+            fprintf(fp, " %10.2lf'", millimeters * 3.2808 / 1000.0);
 
-            fprintf(fp, "%43s", "");
+            meters = millimeters / 1000LL;
+            thousandths = abs64(millimeters) % 1000LLU;
+            fprintf(fp, " %6lld.%03llum MSL", (long long signed int)meters, (long long unsigned int)thousandths);
+
+            millimeters += pa[system].sep_millimeters;
+
+            fprintf(fp, " %10.2lf'", millimeters * 3.2808 / 1000.0);
+
+            meters = millimeters / 1000LL;
+            thousandths = abs64(millimeters) % 1000LLU;
+            fprintf(fp, " %6lld.%03llum GEO", (long long signed int)meters, (long long unsigned int)thousandths);
+
+            fprintf(fp, "%11s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
@@ -1441,12 +1452,12 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
         fprintf(fp, " %6lld.%04llum MSL", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
         yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &tenthousandths);
-        fprintf(fp, " %6lld.%04llum WGS84", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        fprintf(fp, " %6lld.%04llum GEO", (long long signed int)meters, (long long unsigned int)tenthousandths);
 
         yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
         fprintf(fp, " %lc%6lld.%04llum", (wint_t)PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
 
-        fprintf(fp, "%17s", "");
+        fprintf(fp, "%19s", "");
 
         fprintf(fp, " %-8.8s", "GNSS");
 
