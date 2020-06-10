@@ -574,9 +574,12 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
     uint64_t seconds = 0;
     uint64_t nanoseconds = 0;
     int32_t degrees = 0;
-    uint64_t nanodegrees = 0;
+    uint64_t nanodegrees = 0; /* UBX */
+    uint64_t decimicrodegrees = 0; /* NMEA */
     int32_t meters = 0;
-    uint32_t decimillimeters = 0;
+    uint32_t decimillimeters = 0; /* UBX */
+    uint32_t millimeters = 0; /* NMEA */
+    int32_t totalmillimeters = 0;
     int32_t knots = 0;
     uint32_t microknots = 0;
     size_t ii = 0;
@@ -659,23 +662,27 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
 
     } else {
 
-        hazer_format_nanominutes2degrees(pa[ss].lat_nanominutes, &degrees, &nanodegrees);
-        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)nanodegrees);
+        hazer_format_nanominutes2degrees(pa[ss].lat_nanominutes, &degrees, &decimicrodegrees);
+        fprintf(fp, " %d.%07llu,", degrees, (long long unsigned int)decimicrodegrees);
 
-        hazer_format_nanominutes2degrees(pa[ss].lon_nanominutes, &degrees, &nanodegrees);
-        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)nanodegrees);
+        hazer_format_nanominutes2degrees(pa[ss].lon_nanominutes, &degrees, &decimicrodegrees);
+        fprintf(fp, " %d.%07llu,", degrees, (long long unsigned int)decimicrodegrees);
 
-        fprintf(fp, " %lld.%04llu,", (long long signed int)0, (long long unsigned int)0);
+        fputs(" 0.0,", fp);
 
-        meters = pa[ss].alt_millimeters / 1000LL;
-        decimillimeters = (abs64(pa[ss].alt_millimeters) % 1000LLU) * 10LLU;
-        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        totalmillimeters = pa[ss].alt_millimeters; /* MSL */
 
-        meters += pa[ss].sep_millimeters / 1000LL;
-        decimillimeters += (abs64(pa[ss].sep_millimeters) % 1000LLU) * 10LLU;
-        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        meters = totalmillimeters / 1000LL;
+        millimeters = abs64(totalmillimeters) % 1000LLU;
+        fprintf(fp, " %lld.%03llu,", (long long signed int)meters, (long long unsigned int)millimeters);
 
-        fprintf(fp, " %lld.%04llu,", (long long signed int)0, (long long unsigned int)0);
+        totalmillimeters += pa[ss].sep_millimeters; /* GEO e.g. WGS84 */
+
+        meters = totalmillimeters / 1000LL;
+        millimeters = abs64(totalmillimeters) % 1000LLU;
+        fprintf(fp, " %lld.%03llu,", (long long signed int)meters, (long long unsigned int)millimeters);
+
+        fputs(" 0.0,", fp);
 
     }
 
@@ -2308,7 +2315,7 @@ int main(int argc, char * argv[])
     if (logging == (const char *)0) {
         /* Do nothing. */
     } else if (strcmp(logging, "-") == 0) {
-        log_fp = stdout;
+        log_fp = stderr;
     } else if ((log_fp = fopen(logging, "ab")) != (FILE *)0) {
         /* Do nothing. */
     } else {
@@ -3429,7 +3436,7 @@ int main(int argc, char * argv[])
          ** LOG
          **/
 
-        if (log_fp != (FILE *)0) {  write_buffer(log_fp, buffer, length); }
+        if (log_fp != (FILE *)0) { print_buffer(log_fp, buffer, length, UNLIMITED); }
 
         if (verbose) { fprintf(stderr, "INP [%zd] ", length); print_buffer(stderr, buffer, length, UNLIMITED); }
 
@@ -4178,7 +4185,7 @@ report:
 
     if (log_fp == (FILE *)0) {
         /* Do nothing. */
-    } else if (log_fp == stdout) {
+    } else if (log_fp == stderr) {
         /* Do nothing. */
     } else if ((rc = fclose(log_fp)) != EOF) {
         /* Do nothing. */
