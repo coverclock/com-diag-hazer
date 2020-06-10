@@ -882,6 +882,7 @@ the libraries and binaries in the system directories.)
 * survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * ubxval - converts a number into a UBX-usable form.
+* vehicle - configures and runs a UBX-NEO-M8U with peruse and hups.
 
 # Functional Tests
 
