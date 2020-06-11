@@ -1315,6 +1315,8 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
         int64_t knots = 0;
         int64_t kilometersperhour = 0;
         uint64_t millionths = 0;
+        int64_t meterspersecond = 0;
+        int32_t thousandths = 0;
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -1333,7 +1335,9 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             millionths = abs64(pa[system].sog_millimeters) % 1000000LLU;
             fprintf(fp, " %7lld.%06llukph", (long long signed int)kilometersperhour, (long long unsigned int)millionths);
 
-            fprintf(fp, "%14s", "");
+            meterspersecond = pa[system].sog_millimeters / 3600000LL;
+            thousandths = (abs64(pa[system].sog_millimeters) % 3600000LLU) / 3600;
+            fprintf(fp, " %6lld.%03llum/s", (long long signed int)meterspersecond, (long long unsigned int)thousandths);
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
