@@ -538,6 +538,9 @@ Chip Overclock, "Frames of Reference IV", 2020-05,
 Chip Overclock, "Negative Results Are Still Results", 2020-05,
 <https://coverclock.blogspot.com/2020/05/negative-results-are-still-results.html>
 
+Chip Overclock, "Location, Location, Location", 2020-06,
+<https://coverclock.blogspot.com/2020/06/location-location-location.html>
+
 # Media
 
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
@@ -1027,12 +1030,13 @@ GPS, GLONASS, Galileo, Beidou.
 # Display
 
 The display examples below were cut and pasted from actual running
-instances of gpstool, but not necessarily the same instance, running on
-the same target with the same GNSS hardware, with the same command line
-options. The gpstool display is event driven: each line is displayed if
-and only if the appropriate NMEA, UBX, or RTCM input was received from
-the device under test, within the timeout window, regardless of command
-line options.
+instances of gpstool, but not necessarily the same instance, running
+on the same target with the same GNSS hardware, with the same command
+line options, using the same version of gpstool. The gpstool display is
+event driven: each line is displayed if and only if the appropriate NMEA,
+UBX, or RTCM input was received from the device under test, within the
+timeout window, regardless of command line options or how the GNSS device
+was initialized.
 
 While NMEA (and UBX amd RTCM too for that matter) is good about updating
 the application with new information, it is not so good about letting the
