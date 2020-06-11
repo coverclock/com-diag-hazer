@@ -1555,13 +1555,25 @@ static void print_odometer(FILE * fp, const yodel_odometer_t * sp)
  */
 static void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
 {
+    static const char FIX[] = {
+        '-',    /* no fix */
+        '!',    /* dead reckoning only */
+        '2',    /* 2D-fix */
+        '3',    /* 3D-fix */
+        '+',    /* GNSS + dead reckoning combined */
+        '*',    /* time only fix */
+        '?',    /* error */
+    };
+
     if (sp->ticks != 0) {
 
-        fputs("GEO", fp);
+        fputs("NED", fp);
 
         fprintf(fp, " %10dmm/s north %10dmm/s east %10dmm/s down", sp->payload.velN, sp->payload.velE, sp->payload.velD);
 
-        fprintf(fp, "%6s", "");
+        fprintf(fp, " (%c)", (sp->payload.fixType < countof(FIX)) ? FIX[sp->payload.fixType] : FIX[countof(FIX) - 1]);
+
+        fprintf(fp, "%2s", "");
 
         fprintf(fp, " %-8.8s", "IMU");
 
