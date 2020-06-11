@@ -973,19 +973,19 @@ GPS, GLONASS, Galileo, Beidou.
            -C FILE     Catenate input to FILE or named pipe.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
-           -F          Like -R but reFresh at 1Hz.
+           -F          Like -E but reFresh at 1Hz.
            -G IP:PORT  Use remote IP and PORT as dataGram sink.
            -G :PORT    Use local PORT as dataGram source.
            -H HEADLESS Like -R but writes each iteration to HEADLESS file.
            -I PIN      Take 1PPS from GPIO Input PIN (requires -D).
            -K          Write input to DEVICE sinK from datagram source.
-           -L LOG      Write input to LOG file.
+           -L LOG      Write pretty-printed input to LOG file.
            -M          Run in the background as a daeMon.
            -N FILE     Use fix FILE to save ARP LLH for subsequeNt fixed mode.
            -P          Process incoming data even if no report is being generated.
            -R          Print a Report on standard output.
            -S FILE     Use source FILE or named pipe for input.
-           -T FILE     Save the time and position trace to FILE.
+           -T FILE     Save the PVT trace to FILE.
            -U STRING   Like -W except expect UBX ACK or NAK response.
            -U ''       Exit when this empty UBX STRING is processed.
            -V          Log Version in the form of release, vintage, and revision.
@@ -1026,66 +1026,33 @@ GPS, GLONASS, Galileo, Beidou.
 
 # Display
 
-When using the -E option with gpstool, so that it uses ANSI escape
-sequences to do cursor control for its report on standard output, the display
-looks something like this snapshot as it is continually updated. This example
-is from a Ublox 8 receiver.
+The display examples below were cut and pasted from actual running
+instances of gpstool, but not necessarily the same instance, running on
+the same target with the same GNSS hardware, with the same command line
+options. The gpstool display is event driven: each line is displayed if
+and only if the appropriate NMEA, UBX, or RTCM input was received from
+the device under test, within the timeout window, regardless of command
+line options.
 
-    INP [ 68] \xb5b\n\t<\0\0\xf4\x01\0\0\0\0\0\0\0\x01\0\xaf\xff\0\0_\0\x94\v\x02
-    OUT [  7] \xb5b\x06>\0\0\0
-    MON -jamming  -history   6indicator  24maximum
-    STA -spoofing -history      39973ms    5859871ms     0epoch
-    LOC 2019-06-13T12:24:32.119-07:00+01T          0/00:00:00.691 22.1.0   nickel
-    TIM 2019-06-13T18:24:32.000-00:00+00Z 0pps                             GNSS
-    POS 39°47'39.04"N, 105°09'12.26"W    39.794177999, -105.153405666      GNSS
-    ALT    5636.09'   1717.900m                                            GNSS
-    COG N     0.000000000°T    0.000000000°M                               GNSS
-    SOG       0.142mph       0.123000knots       0.228000kph               GNSS
-    INT GGA [12] 1dmy 1inc (  9 10  5  0  0  4  4 )                        GNSS
-    ACT [1]  {    28     1    19    30    17    13 } [ 6] [12] [18]        GPS
-    ACT [2]  {    51    48     6    24     3     2 } [ 6] [12] [18]        GPS
-    ACT [1]  {    73    74    83    84    85    75 } [ 6] [ 6] [18]        GLONASS
-    DOP   1.10pdop   0.70hdop   0.85vdop                                   GPS
-    DOP   1.10pdop   0.70hdop   0.85vdop                                   GLONASS
-    SAT [  1]     1id  13°elv   38°azm   26dBHz  0sig <                    GPS
-    SAT [  2]     2id  12°elv  202°azm   39dBHz  0sig <                    GPS
-    SAT [  3]     3id  11°elv   73°azm   18dBHz  0sig <                    GPS
-    SAT [  4]     6id  45°elv  177°azm   38dBHz  0sig <                    GPS
-    SAT [  5]    12id   3°elv  297°azm   17dBHz  0sig                      GPS
-    SAT [  6]    13id   9°elv  227°azm   32dBHz  0sig <                    GPS
-    SAT [  7]    15id   4°elv  259°azm   22dBHz  0sig                      GPS
-    SAT [  8]    17id  70°elv   19°azm   33dBHz  0sig <                    GPS
-    SAT [  9]    19id  74°elv  297°azm   29dBHz  0sig <                    GPS
-    SAT [ 10]    22id   7°elv   53°azm   20dBHz  0sig                      GPS
-    SAT [ 11]    24id  31°elv  307°azm   25dBHz  0sig <                    GPS
-    SAT [ 12]    28id  48°elv   92°azm   27dBHz  0sig <                    GPS
-    SAT [ 13]    30id   8°elv  159°azm   31dBHz  0sig <                    GPS
-    SAT [ 14]    48id  36°elv  220°azm   31dBHz  0sig <                    GPS
-    SAT [ 15]    51id  44°elv  183°azm   37dBHz  0sig <                    GPS
-    SAT [ 16]    73id  57°elv  139°azm   35dBHz  0sig <                    GLONASS
-    SAT [ 17]    74id  72°elv  337°azm   23dBHz  0sig <                    GLONASS
-    SAT [ 18]    75id  16°elv  325°azm   26dBHz  0sig <                    GLONASS
-    SAT [ 19]    83id  30°elv   33°azm   17dBHz  0sig <                    GLONASS
-    SAT [ 20]    84id  82°elv  296°azm   21dBHz  0sig <                    GLONASS
-    SAT [ 21]    85id  28°elv  225°azm   33dBHz  0sig <                    GLONASS
+While NMEA (and UBX amd RTCM too for that matter) is good about updating
+the application with new information, it is not so good about letting the
+application know when that data is no longer relevant. For that reason,
+all of the data read from the device has associated with it an expiration
+time in seconds. This can be set from the command line, in the range 0
+to the default of 255. If the data is not updated within that duration by
+new sentences or messages from the GPS device, it is no longer displayed.
+
+    INP [ 14] \xd3\0\bL\xe0\0\x8a\0\0\0\0\xa8\xf7*
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
 
-OUT is the most recent data written to the device, as specified on the command
-line using the -W (NMEA sentence) or -U (UBX message)  options.
+    OUT [  7] \xb5b\x06>\0\0\0
 
-MON displays some of the results received in the UBX-MON-HW message if enabled.
-Ublox 8 chips with firmware revision 18 and above can provide clues to jamming
-based on the received signal strength. (N.B. I don't have a way to test this.)
-This requires that the jamming/interference monitor (ITFM) be calibrated using
-the UBX-CFG-ITFM message.
+OUT is the most recent data written to the device, as specified on the
+command line using the -W (NMEA sentence) or -U (UBX message)  options.
 
-STA displays some of the results received in the UBX-NAV-STATUS message if
-enabled. Ublox 8 chips with firmware revision 18 and above can provide clues
-to spoofing based on comparing navigation solutions from multiple GNSSes if
-available. (N.B. I don't have a way to test this.) Also shown are the
-milliseconds since first fix and milliseconds uptime provided by the message.
+    LOC 2020-06-11T12:24:01.018-07:00+01T 00:00:00.871 34.2.0        11003 hacienda
 
 LOC is the current local time provided by the host system, the elapsed
 time to first fix, the software release number, and the local host name.
@@ -1097,51 +1064,132 @@ I'm looking at you), it will be a letter like "T" ("Tango") for Mountain
 Standard Time as found in Denver; otherwise it will be "J" ("Juliet")
 to indicate any local time zone.
 
-All subsequent lines represent the current state of Hazer data structures
-updated by data read from the device. Each line includes at its end the system
-(satellite constellation) with which it is associated. GNSS indicates that the
-device is computing an "ensemble" solution that uses transmissions from multiple
-constellations, for example, from both the U.S. GPS constellation and the
-Russian GLONASS constellation.
+    TIM 2020-06-11T18:24:00.000-00:00+00Z 0pps                             GNSS
 
-TIM is the most recent time solution, in UTC (or 'Z' for "Zulu"), and the
-current value of the One Pulse Per Second (1PPS) signal if the device provides
-it and it was enabled on the command line using -c (using data carrier detect
-or DCD) or -I (using general purpose input/output or GPIO).
+TIM is the most recent time solution, in UTC (or 'Z' for "Zulu"), and
+the current value of the One Pulse Per Second (1PPS) signal if the device
+provides it and it was enabled on the command line using -c (using data
+carrier detect or DCD) or -I (using general purpose input/output or GPIO).
 
-POS is the most recent position solution, latitude and longitude, in degrees,
-hours, minutes, and decimal seconds, and in decimal degrees. Either format
-can be cut and pasted directly into Google Maps, and the latter into Google
-Earth.
+    POS 39°47'39.364"N, 105°09'12.315"W    39.7942678, -105.1534210        GNSS
 
-> N.B. The underlying position data is stored as binary integers in billionths
-> of a minute (nanominutes). But the device under test may not provide that much
-> accuracy; the actual number of significant digits for various data is reported
-> by the INT line (below), but even this may be optimistic - or, for that matter,
-> pessimistic - when compared to what the device is capable of. In particular,
-> technologies like Wide Area Augmentation System (WAAS), multi-band GNSS,
-> differential GPS, Real-Time Kinematics (RTK), and long-term surveying, can
-> potentially achieve remarkable accuracy.
+POS is the most recent position solution, latitude and longitude,
+in degrees, hours, minutes, and decimal seconds, and in decimal
+degrees. Either format can be cut and pasted directly into Google Maps,
+and the latter into Google Earth.  The underlying position data is stored
+as binary integers in billionths of a minute (nanominutes). But the
+device under test may not provide that much accuracy; the actual number of
+significant digits for various data is reported by the INT line (below),
+but even this may be optimistic - or, for that matter, pessimistic - when
+compared to what the device is capable of. In particular, technologies
+like Wide Area Augmentation System (WAAS), multi-band GNSS, differential
+GPS, Real-Time Kinematics (RTK), and long-term surveying, can potentially
+achieve remarkable accuracy.
 
-ALT is the most recent altitude solution, in feet and meters. (Similar comments
-here regarding precision as those for POS.)
+    ALT    5608.53'   1709.500m MSL    5537.99'   1688.000m GEO            GNSS
+
+ALT is the most recent altitude solution, in feet and meters, both above
+Mean Sea Level (MSL), and above the selected GEOdetic datum (typically
+WGS84). (Similar comments here regarding precision as those for POS.)
+
+    COG N     0.000000000°T    0.000000000°M                               GNSS
 
 COG is the most recent course over ground solution, in cardinal compass
 direction, and the bearing in degrees true, and degrees magnetic (if available).
 (Similar comments here regarding precision as those for POS.)
 
-SOG is the most recent speed over ground solution, in miles per hour, knots
-(nautical miles per hour), and kilometers per hour. (Similar comments here
-regarding precision as those for POS.)
+    SOG       0.012mph       0.010knots       0.018kph       0.005m/s      GNSS
 
-INT is internal Hazer state including the name of the sentence (GLL in the
-example above) that most recently updated the solution, the total number of
-satellites that contributed to that solution, an indication as to whether the
-day-month-year value has been set (only occurs once the RMC sentence has been
-received), an indication as to whether time is incrementing monotonically (it
-can appear to run backwards when receiving UDP packets because UDP may reorder
-them), and some metrics as to the number of significant digits provided for
-various datums provided by the device.
+SOG is the most recent speed over ground solution, in miles per hour,
+knots (nautical miles per hour), kilometers per hour, and maters per
+second. (Similar comments here regarding precision as those for POS.)
+
+    INT GLL [12] DMY TOT (  9 10  5  3  0  0  4  4 )             39526129B tumblewe
+
+INT is internal Hazer state including the name of the sentence (GLL in
+the example above) that most recently updated the solution, the total
+number of satellites that contributed to that solution, an indication
+as to whether the day-month-year value has been set (only occurs once
+the RMC sentence has been received), an indication as to whether time is
+incrementing monotonically (it can appear to run backwards when receiving
+UDP packets because UDP may reorder them), and some metrics as to the
+number of significant digits provided for various datums provided by the
+device.  INT also includes the total number of bytes sent or received -
+395,261,29B in this example - over the network. This allows you to keep
+track of your network utilization, especially important when paying for
+data on your LTE mobile provider.
+
+    MON -jamming  +history  50indicator  63maximum                         ttyACM1
+
+MON displays some of the results received in the UBX-MON-HW message if
+enabled.  Ublox 8 chips with firmware revision 18 and above can provide
+clues to jamming based on the received signal strength. (N.B. I don't
+have a way to test this.)  This requires that the jamming/interference
+monitor (ITFM) be calibrated using the UBX-CFG-ITFM message.
+
+    STA -spoofing -history       1985ms     303985ms     0epoch            ttyACM1
+
+STA displays some of the results received in the UBX-NAV-STATUS message
+if enabled. Ublox 8 chips with firmware revision 18 and above can provide
+clues to spoofing based on comparing navigation solutions from multiple
+GNSSes if available. (N.B. I don't have a way to test this.) Also shown
+are the milliseconds since first fix and milliseconds uptime provided
+by the message.
+
+    ATT    0.0° roll ±  20.0°  -73.6° pitch ±  78.8°   57.7° yaw ±  85.0°  IMU
+
+ATT indicates the roll, pitch, and yaw orientation of the u-blox module in those
+units which are equipped with an intertial measurement unit with a gyroscope and
+accellerometers.
+
+    ODO         0m (     1571m) ±        0m                                IMU
+
+ODO indicates the resettable and semi-persistent odometer reading available
+from some u-blox modules.
+
+    NED         -5mm/s north         -2mm/s east        -41mm/s down (3)   IMU
+
+NED indicates the North-East-Down vehicle frame reading available from some
+u-blox modules.
+
+    HPP   39.794267897, -105.153420946 ±     0.5237m                       GNSS
+    HPA   1709.4855m MSL   1687.9856m WGS84 ±     0.8001m                  GNSS
+
+HPP and HPA show the high precision position and altitude available from
+some Ublox devices, along with their estimated accuracy. This may differ
+(slightly) from the position and altitude reported via POS and ALT due
+to the conversion of units done to conform to the NMEA format. When
+available, the HPP and HPA is expected to be more precise.
+
+    NGS  39 47 39.36442(N) 105 09 12.31540(W)                              GNSS
+
+NGS shows the same high precision position as HPP but in the format used
+in the National Geodetic Survey (NGS) data sheets for coordinates of
+artifacts such as NGS and municipal survey markers. This makes it easier
+to compare the Hazer position against examples from the NGS database.
+
+    BAS 1active 0valid      18019sec      18020obs       0.1675m           DGNSS
+    ROV     0:  1094 (    0)                                               DGNSS
+
+BAS or ROV show information about the Ublox device operating in base
+station or in rover modes. In base (stationary) mode, it shows if the
+device is actively surveying or if the survey has resolved to a valid
+location, how many seconds and observations have been consumed during
+the survey, and what the mean error is. In rover (mobile) mode, it shows
+what RTCM message was last received and from whom.
+
+    RTK 1094 [ 129] rover    <ERNrCERN>                                    DGNSS
+
+RTK show the latest RTCM message received, when operating in base mode
+(in which case the message was received from the device), or in rover
+mode (the message was received from the base in a datagram via UDP).
+The lengths of the most recent message is shown, as is the mode of the
+system, base or rover. The character sequence between the angle brackets
+records the last eight RTCM messages that were received, the newest one
+indicated by the rightmost character in the sequence, as the sequence
+is progressively shifted left as new messages are received.
+
+    ACT [1]  {    28     3    19    24     6     2 } [ 6] [ 8] [23] [32]   NAVSTAR
 
 ACT is the list of active satellites, typically provided seperately
 for each system or constellation by the device, showing each satellites
@@ -1154,13 +1202,27 @@ is derived from (in order, depending on availability) the system id in the
 GSA sentence (only available on devices that support later NMEA versions),
 or an analysis of the Space Vehicle Identifier based on NMEA conventions,
 or the talker specified at the beginning of the sentence. The reason
-for this is that some devices (I'm looking at you, GN803G), specify
-GNSS as the talker for all GSA sentences when they are computing an
-ensemble solution (one based on multiple constellations); this causes
-ambiguity between this case and the case of successive GSA sentences in
-which the active satellite list has changed. Hazer independently tries
-to determine the constellation to which the GSA sentence refers when
-the talker is GNSS.
+for this is that some devices (I'm looking at you, GN803G), specify GNSS
+as the talker for all GSA sentences when they are computing an ensemble
+solution (one based on multiple constellations); this causes ambiguity
+between this case and the case of successive GSA sentences in which the
+active satellite list has changed. Hazer independently tries to determine
+the constellation to which the GSA sentence refers when the talker is
+GNSS.  The fourth metric is the maximum number of space vehicles (SVs)
+or satellites used in the solution since the application began. This
+is useful when testing different antenna locations, particularly when
+using the device in a fixed base survey mode. In the example above,
+the first ACT line indicates that 6 SVs in the NAVSTAR constellation
+are represented in this particular line, the solution includes 10 total
+NAVSTAR SVs (so 4 more appear in a subsequent ACT line for NAVSTAR),
+the solution is using 29 SVs total among all constellations, and at one
+time as many as 31 SVs were used in the solution. (The U-blox 9 receiver
+used for this example has a maximum of 32 RF channels, so receiving 31
+SVs indicates that antenna placement is good; in this particular case
+I have the antenna installed in a skylight in my kitchen that is near
+the peak of the roof of my home.)
+
+    DOP   1.09pdop   0.61hdop   0.90vdop                                   NAVSTAR
 
 DOP is the position, horizontal, and vertical dilution of precision -
 measures of the quality of the position fix (smaller is better) - based on
@@ -1168,6 +1230,8 @@ the real-time geometry of the satellites upon which the current solution
 is based. If multiple constellations are reported, but the DOPs are all
 the same, the device is typically computing an ensemble solution using
 multiple constellations.
+
+    SAT [  1]     2id  40°elv  205°azm    0dBHz  6sig <   !                NAVSTAR
 
 SAT is the list of satellites in view, including an index that is
 purely an artifact of Hazer, the Space Vehicle IDentifier (specific to
@@ -1181,133 +1245,6 @@ elevation were empty but display as zero (likely that the satellite is
 not in the transmitted almanac); and an '!' indicates that the signal
 strength was empty but displays as zero (some receivers use this to
 indicate the satellite is not being tracked).
-
-Here is another example, this one from a Ublox 9 receiver, and reflecting some
-minor changes to the output format.
-
-    INP [ 14] \xd3\0\bL\xe0\0\x8a\0\0\0\0\xa8\xf7*
-    
-    LOC 2019-10-24T16:30:45.884-07:00+01T          0/00:00:00.122 27.2.0   hacienda
-    TIM 2019-10-24T22:30:45.000-00:00+00Z 0pps                             GNSS
-    POS 39°47'39.323"N, 105°09'12.309"W    39.7942565, -105.1534191        GNSS
-    ALT    5612.79'   1710.800m                                            GNSS
-    COG N     0.000000000°T    0.000000000°M                               GNSS
-    SOG       0.009mph       0.008000knots       0.014000kph               GNSS
-    INT GLL [12] 1dmy 1inc (  9 10  5  0  0  4  4 )              9932763b  GNSS
-    HPP   39.794256489, -105.153419128 ±     0.4660m                       GNSS
-    HPA   1710.7684m MSL   1689.2685m WGS84 ±     0.7809m                  GNSS
-    NGS  39 47 39.32336(N) 105 09 12.30886(W)                              GNSS
-    BAS 1active 0valid      18019sec      18020obs       0.1675m           DGNSS
-    RTK 1230 [  14] base     <rCERNrCE>                                    DGNSS
-    ACT [1]  {    10    25    11    14    22    26 } [ 6] [10] [29] [31]   NAVSTAR
-    ACT [2]  {     3     1    32    31             } [ 4] [10] [29] [31]   NAVSTAR
-    ACT [1]  {    74    73    72    81    87    71 } [ 6] [ 9] [29] [31]   GLONASS
-    ACT [2]  {    88    75    65                   } [ 3] [ 9] [29] [31]   GLONASS
-    ACT [1]  {     5     1    24     4     9    36 } [ 6] [ 7] [29] [31]   GALILEO
-    ACT [2]  {    31                               } [ 1] [ 7] [29] [31]   GALILEO
-    ACT [1]  {    14    24    26                   } [ 3] [ 3] [29] [31]   COMPASS
-    DOP   0.92pdop   0.47hdop   0.79vdop                                   NAVSTAR
-    DOP   0.92pdop   0.47hdop   0.79vdop                                   GLONASS
-    DOP   0.92pdop   0.47hdop   0.79vdop                                   GALILEO
-    DOP   0.92pdop   0.47hdop   0.79vdop                                   COMPASS
-    SAT [  1]     1id  42°elv  281°azm   45dBHz  6sig <                    NAVSTAR
-    SAT [  2]     3id  19°elv  310°azm   34dBHz  6sig <                    NAVSTAR
-    SAT [  3]    10id  24°elv  126°azm   46dBHz  6sig <                    NAVSTAR
-    SAT [  4]    11id  21°elv  264°azm    0dBHz  6sig <   !                NAVSTAR
-    SAT [  5]    12id   5°elv   33°azm   17dBHz  6sig                      NAVSTAR
-    SAT [  6]    14id  68°elv   21°azm    0dBHz  6sig <   !                NAVSTAR
-    SAT [  7]    22id  40°elv  309°azm    0dBHz  6sig <   !                NAVSTAR
-    SAT [  8]    23id   1°elv  266°azm    0dBHz  6sig     !                NAVSTAR
-    SAT [  9]    25id  23°elv   71°azm   41dBHz  6sig <                    NAVSTAR
-    SAT [ 10]    26id  10°elv  159°azm   43dBHz  6sig <                    NAVSTAR
-    SAT [ 11]    31id  76°elv  150°azm   49dBHz  6sig <                    NAVSTAR
-    SAT [ 12]    32id  46°elv   59°azm   47dBHz  6sig <                    NAVSTAR
-    SAT [ 13]    65id  47°elv  328°azm   42dBHz  3sig <                    GLONASS
-    SAT [ 14]    71id  18°elv   95°azm   45dBHz  3sig <                    GLONASS
-    SAT [ 15]    72id  57°elv   50°azm   50dBHz  3sig <                    GLONASS
-    SAT [ 16]    73id  26°elv   36°azm   42dBHz  3sig <                    GLONASS
-    SAT [ 17]    74id  17°elv  180°azm    0dBHz  3sig <   !                GLONASS
-    SAT [ 18]    75id  35°elv  168°azm   48dBHz  3sig <                    GLONASS
-    SAT [ 19]    81id  14°elv  328°azm   36dBHz  3sig <                    GLONASS
-    SAT [ 20]    87id  13°elv  235°azm   32dBHz  3sig <                    GLONASS
-    SAT [ 21]    88id  24°elv  281°azm   26dBHz  3sig <                    GLONASS
-    SAT [ 22]     1id  15°elv   39°azm   38dBHz  2sig <                    GALILEO
-    SAT [ 23]     3id   3°elv  280°azm    0dBHz  2sig     !                GALILEO
-    SAT [ 24]     4id  15°elv   88°azm   39dBHz  2sig <                    GALILEO
-    SAT [ 25]     5id  50°elv  301°azm   51dBHz  2sig <                    GALILEO
-    SAT [ 26]     9id  63°elv   54°azm   52dBHz  2sig <                    GALILEO
-    SAT [ 27]    15id   9°elv  327°azm   37dBHz  2sig                      GALILEO
-    SAT [ 28]    24id  30°elv  155°azm   49dBHz  2sig <                    GALILEO
-    SAT [ 29]    31id  43°elv   89°azm   51dBHz  2sig <                    GALILEO
-    SAT [ 30]    36id  23°elv  222°azm   46dBHz  2sig <                    GALILEO
-    SAT [ 31]    11id   3°elv  225°azm    0dBHz  0sig     !                COMPASS
-    SAT [ 32]    14id  52°elv  313°azm    0dBHz  0sig <   !                COMPASS
-    SAT [ 33]    21id  40°elv  103°azm    0dBHz  0sig     !                COMPASS
-    SAT [ 34]    24id  29°elv  189°azm    0dBHz  0sig <   !                COMPASS
-    SAT [ 35]    26id  63°elv  128°azm    0dBHz  0sig <   !                COMPASS
-    SAT [ 36]    28id  10°elv  295°azm    0dBHz  0sig     !                COMPASS
-
-The string used to identify the U.S. Navstar GPS constellation has been
-changed from "GPS" to "NAVSTAR" to discriminate it from the (incorrect)
-generic use of GPS to mean GNSS. The string used to identify the Chinese
-constellation has been changed from "BEIDOU" to "COMPASS" to reflect the
-nomenclature change by China for its second generation constellation. The
-string "DGNSS" identifies lines specific to Differential GNSS.
-
-INT now includes the total number of bytes sent and received - 67929 in this
-example - over the network. This allows you to keep track of your network
-utilization, especially important when paying for data on your LTE mobile
-provider.
-
-HPP and HPA (if present and enabled) show the high precision position and
-altitude available from some Ublox devices, along with their estimated
-accuracy. This may differ (slightly) from the position and altitude
-reported via POS and ALT due to the conversion of units done to conform
-to the NMEA format. When available, the HPP and HPA is expected to be
-more precise.
-
-BAS or ROV (if present and enabled) show information about the Ublox
-device operating in base station or in rover modes. In base (stationary)
-mode, it shows if the device is actively surveying or if the survey has
-resolved to a valid location, how many seconds and observations have
-been consumed during the survey, and what the mean error is. In rover
-(mobile) mode, it shows what RTCM message was last received and from whom.
-
-RTK (if present) show the latest RTCM message received, when operating in base
-mode (in which case the message was received from the device), or in
-rover mode (the message was received from the base in a datagram via UDP).
-The lengths of the most recent message is shown, as is the mode of the system,
-base or rover. The character sequence between the angle brackets records the
-last eight RTCM messages that were received, the newest one indicated by the
-rightmost character in the sequence, as the sequence is progressively shifted
-left as new messages are received.
-
-NGS shows the same high precision position as HPP but in the format used
-in the National Geodetic Survey (NGS) data sheets for coordinates of artifacts
-such as NGS and municipal survey markers. This makes it easier to compare
-the Hazer position against examples from the NGS database.
-
-ACT now adds a fourth metric: the maximum number of space vehicles (SVs)
-or satellites used in the solution since the application began. This
-is useful when testing different antenna locations, particularly when
-using the device in a fixed base survey mode. In the example above,
-the first ACT line indicates that 6 SVs in the NAVSTAR constellation
-are represented in this particular line, the solution includes 10 total
-NAVSTAR SVs (so 4 more appear in a subsequent ACT line for NAVSTAR),
-the solution is using 29 SVs total among all constellations, and at one
-time as many as 31 SVs were used in the solution. (The U-blox 9 receiver
-used for this example has a maximum of 32 RF channels, so receiving 31
-SVs indicates that antenna placement is good; in this particular case I
-have the antenna installed in a skylight in my kitchen that is near the
-peak of the roof of my home.)
-
-While NMEA (and UBX amd RTCM too for that matter) is good about updating
-the application with new information, it is not so good about letting the
-application know when that data is no longer relevant. For that reason,
-all of the data read from the device has associated with it an expiration
-time in seconds. This can be set from the command line, in the range 0
-to the default of 255. If the data is not updated within that duration by
-new sentences or messages from the GPS device, it is no longer displayed.
 
 # Remarks
 

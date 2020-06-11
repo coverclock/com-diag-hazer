@@ -2268,7 +2268,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
-            fprintf(stderr, "       -L LOG      Write input to LOG file.\n");
+            fprintf(stderr, "       -L LOG      Write pretty-printed input to LOG file.\n");
             fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
             fprintf(stderr, "       -N FILE     Use fix FILE to save ARP LLH for subsequeNt fixed mode.\n");
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
