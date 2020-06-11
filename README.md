@@ -857,45 +857,63 @@ the libraries and binaries in the system directories.)
 
 # Utilities
 
+## General Purpose
+
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
-* base - configures and runs a UBX-ZED-F9P as a base in survey or fixed mode.
-* benchmark - configures and runs a UBX-ZED-F9P as a corrected rover saving a CSV.
 * bucketbrigade - read from a serial port and forward to another serial port.
-* checkpoint - move the out/TARGET/tmp directory to a timestamped name.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
-* consumer - consumes datagrams and reports on stdout.
-* control - integrates mobile, peruse, and hups scripts for field testing.
-* csvlimits - determines boundary of solutions in a gpstool CSV file.
-* csvmeter - meters lines from a gpstool CSV file based on interarrival times.
-* csvparts - splits gpstool CSV file into smaller files in subdirectories.
+* geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
+* gpstool - serves as Hazer's multi purpose GNSS pocket tool.
+* haversine - computes the great circle distance in meters between two coordinates.
+* hazer - consumes data from a serial port and reports on stdout.
+* iso8601 - converts seconds since the UNIX epoch into an ISO8601 timestamp.
+* mapstool - convert gpstool coordinate strings to formats accepted by Google Maps.
+* pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
+
+## Data Analysis
+
 * csv2geo - appends geodesic and altitude differences to gpstool CSV file.
 * csv2iso - converts times in gpstool CSV file into ISO8601-ish timestamps.
 * csv2kml - converts gpstool CSV file to KML 2.3 XML.
 * csv2rmc - converts gpstool CSV file to NMEA RMC sentences.
+* csvlimits - determines boundary of solutions in a gpstool CSV file.
+* csvmeter - meters lines from a gpstool CSV file based on interarrival times.
+* csvparts - splits gpstool CSV file into smaller files in subdirectories.
+
+## Differential GNSS (Tumbleweed)
+
+* base - configures and runs a UBX-ZED-F9P as a base in survey or fixed mode.
+* benchmark - configures and runs a UBX-ZED-F9P as a corrected rover saving a CSV.
+* control - integrates mobile, peruse, and hups scripts for field testing.
 * field - integrates benchmark, peruse, and hups scripts for field testing.
 * fixed - configures and runs a UBX-ZED-F9P as a base station in fixed mode.
-* hup - send SIGHUP to all running instances of gpstool.
-* hups - repeatedly send SIGHUP to all running instances of gpstool on demand.
-* mapstool - convert gpstool coordinate strings to formats accepted by Google Maps.
-* gpstool - serves as Hazer's multi purpose GNSS pocket tool.
-* client - runs Google Maps API in Firefox browser under MacOS.
-* haversine - computes the great circle distance in meters between two coordinates.
-* hazer - consumes data from a serial port and reports on stdout.
-* iso8601 - converts seconds since the UNIX epoch into an ISO8601 timestamp.
 * mobile - configures and runs a UBX-ZED-F9P as an uncorrected rover.
 * mobilize - like mobile but exit once initialization is complete or fails.
-* peruse - helper script to watch logs and screens from Tumbleweed scripts.
-* pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
-* producer - consumes data from serial port and forwards as datagrams.
-* provider - consumes datagrams and forwards to serial port.
 * proxy - receive UDP packets from the Base and forward to the Rover.
 * router - routes UDP packets received from a base to all rovers.
 * rover - configures and runs a UBX-ZED-F9P as a corrected rover.
+* rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * station - runs a UBX-ZED-F9P with no additional configuration.
 * survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
-* rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
+
+## Moving Map (Hazer)
+
+* client - runs Google Maps API in Firefox browser under MacOS.
+* consumer - consumes datagrams and reports on stdout.
+* producer - consumes data from serial port and forwards as datagrams.
+* provider - consumes datagrams and forwards to serial port.
+
+## Intertial Measurement Unit (Yodel)
+
 * ubxval - converts a number into a UBX-usable form.
 * vehicle - configures and runs a UBX-NEO-M8U with peruse and hups.
+
+## Output Control
+
+* checkpoint - move the out/TARGET/tmp directory to a timestamped name.
+* hup - send SIGHUP to all running instances of gpstool.
+* hups - repeatedly send SIGHUP to all running instances of gpstool on demand.
+* peruse - helper script to watch logs and screens from headless scripts.
 
 # Functional Tests
 
@@ -933,10 +951,6 @@ the libraries and binaries in the system directories.)
 * ublox8 - exercises any Ublox 8 device.
 * ublox9 - exercises any Ublox 9 device.
 * uputronics - exercises the Uputronics GPS board for the Rasperry Pi.
-
-# Extras
-
-* geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
 
 # Comma Separated Value (CSV) Output
 
