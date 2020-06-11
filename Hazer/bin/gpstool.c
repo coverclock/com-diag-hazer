@@ -1312,11 +1312,11 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
     }
 
     {
+        double milesperhour = 0.0;
         int64_t knots = 0;
         int64_t kilometersperhour = 0;
-        uint64_t millionths = 0;
-        int64_t meterspersecond = 0;
-        int32_t thousandths = 0;
+        uint64_t thousandths = 0;
+        double meterspersecond = 0.0;
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -1325,19 +1325,25 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fputs("SOG", fp);
 
-            fprintf(fp, " %11.3lfmph", pa[system].sog_microknots * 1.150779 / 1000000.0);
+            milesperhour = pa[system].sog_microknots;
+            milesperhour *= 1.150779;
+            milesperhour /= 1000000.0;
+            fprintf(fp, " %11.3lfmph", milesperhour);
 
             knots = pa[system].sog_microknots / 1000000LL;
-            millionths = abs64(pa[system].sog_microknots) % 1000000LLU;
-            fprintf(fp, " %7lld.%06lluknots", (long long signed int)knots, (long long unsigned int)millionths);
+            thousandths = (abs64(pa[system].sog_microknots) % 1000000LLU) / 1000LLU;
+            fprintf(fp, " %7lld.%03lluknots", (long long signed int)knots, (long long unsigned int)thousandths);
 
             kilometersperhour = pa[system].sog_millimeters / 1000000LL;
-            millionths = abs64(pa[system].sog_millimeters) % 1000000LLU;
-            fprintf(fp, " %7lld.%06llukph", (long long signed int)kilometersperhour, (long long unsigned int)millionths);
+            thousandths = (abs64(pa[system].sog_millimeters) % 1000000LLU) / 1000LLU;
+            fprintf(fp, " %7lld.%03llukph", (long long signed int)kilometersperhour, (long long unsigned int)thousandths);
 
-            meterspersecond = pa[system].sog_millimeters / 3600000LL;
-            thousandths = (abs64(pa[system].sog_millimeters) % 3600000LLU) / 3600;
-            fprintf(fp, " %6lld.%03llum/s", (long long signed int)meterspersecond, (long long unsigned int)thousandths);
+            meterspersecond = pa[system].sog_millimeters;
+            meterspersecond /= 1000.0;
+            meterspersecond /= 3600.0;
+            fprintf(fp, " %11.3lfm/s", meterspersecond);
+
+            fprintf(fp, "%5s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
