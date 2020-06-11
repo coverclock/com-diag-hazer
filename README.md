@@ -55,6 +55,13 @@ degrees of precision down to centimeters. RTCM was developed by the Radio
 Technical Commision for Maritime services (RTCM). RTCM is supported by a
 parallel stack called Tumbleweed.
 
+> More broadly: Hazer was the first project I did, to support GPS, and
+> later GNSS, receivers; Yodel was the second project, to support special
+> features of specific u-blox devices, including the High Precision Position
+> and Altitude (HPP and HPA) solutions, and the Intertial Measurement Unit
+> (IMU); and Tumbleweed was the third project, to support Differential GNSS
+> (DGNSS). The two latter projects were extensions of the Hazer repository.
+
 Hazer includes a gpstool utility as a kind of Swiss Army knife for dealing
 with various GNSS devices. gpstool accepts data streams from standard input,
 from serial(ish) devices, or from a UDP socket, and can send validated data to
@@ -184,7 +191,10 @@ Yodel recognizes the following received UBX messages.
 * UBX-MON-COMMS - Monitor utilization of communication ports. (u-blox 9 p. 131)
 * UBX-MON-HW - Monitor Hardware to detect jamming. (u-blox 8 R15 p. 285)
 * UBX-MON-VER - Monitor hardware and software Version. (u-blox 9 p. 139)
+* UBX-NAV-ATT - Report IMU attitude relative to geodetic. (u-blox 8, p. 317)
 * UBX-NAV-HPPOSLLH - Report high precision lat/lon and height. (u-blox 9 p. 145)
+* UBX-NAV-ODO - Report internal odometer. (u-blox 8 p. 327)
+* UBX-NAV-PVT - Report Position, Velocity, Time solution. (u-blox 8 p. 332)
 * UBX-NAV-STATUS - Report Status to detect spoofing. (u-blox 8 R15 p. 316)
 * UBX-NAV-SVIN - Report Survey-in status on DGNSS Base. (u-blox 9 p. 163)
 * UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (u-blox 9 p. 181)
