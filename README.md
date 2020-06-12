@@ -58,9 +58,10 @@ parallel stack called Tumbleweed.
 > More broadly: Hazer was the first project I did, to support GPS, and
 > later GNSS, receivers; Yodel was the second project, to support special
 > features of specific u-blox devices, including the High Precision Position
-> and Altitude (HPP and HPA) solutions, and the Intertial Measurement Unit
-> (IMU); and Tumbleweed was the third project, to support Differential GNSS
-> (DGNSS). The two latter projects were extensions of the Hazer repository.
+> and Altitude (HPP and HPA) solutions, and most recently the Intertial
+> Measurement Unit (IMU); and Tumbleweed was the third project, to support
+> Differential GNSS (DGNSS). The two latter projects are extensions of the
+> Hazer repository.
 
 Hazer includes a gpstool utility as a kind of Swiss Army knife for dealing
 with various GNSS devices. gpstool accepts data streams from standard input,
