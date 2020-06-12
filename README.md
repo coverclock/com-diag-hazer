@@ -881,6 +881,13 @@ the libraries and binaries in the system directories.)
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvparts - splits gpstool CSV file into smaller files in subdirectories.
 
+## Moving Map (Hazer)
+
+* client - runs Google Maps API in Firefox browser under MacOS.
+* consumer - consumes datagrams and reports on stdout.
+* producer - consumes data from serial port and forwards as datagrams.
+* provider - consumes datagrams and forwards to serial port.
+
 ## Differential GNSS (Tumbleweed)
 
 * base - configures and runs a UBX-ZED-F9P as a base in survey or fixed mode.
@@ -896,13 +903,6 @@ the libraries and binaries in the system directories.)
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * station - runs a UBX-ZED-F9P with no additional configuration.
 * survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
-
-## Moving Map (Hazer)
-
-* client - runs Google Maps API in Firefox browser under MacOS.
-* consumer - consumes datagrams and reports on stdout.
-* producer - consumes data from serial port and forwards as datagrams.
-* provider - consumes datagrams and forwards to serial port.
 
 ## Intertial Measurement Unit (Yodel)
 
