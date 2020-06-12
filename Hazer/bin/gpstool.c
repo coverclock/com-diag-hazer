@@ -131,6 +131,7 @@
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_file.h"
 #include "com/diag/diminuto/diminuto_daemon.h"
+#include "com/diag/diminuto/diminuto_lock.h"
 
 /*******************************************************************************
  * CONSTANTS
@@ -1740,6 +1741,7 @@ int main(int argc, char * argv[])
     const char * headless = (const char *)0;
     const char * arp = (const char *)0;
     const char * tracing = (const char *)0;
+    const char * identity = (const char *)0;
     int opt = -1;
     int debug = 0;
     int verbose = 0;
@@ -2030,7 +2032,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:OPRS:T:U:VW:XY:b:cdeg:hk:lmnop:st:uvxy:?"; /* Unused: AJQZ afijqrwz Pairs: Aa Jj Qq Zz */
+    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:O:PRS:T:U:VW:XY:b:cdeg:hk:lmnop:st:uvxy:?";
 
     /**
      ** PREINITIALIZATION
@@ -2120,6 +2122,9 @@ int main(int argc, char * argv[])
             break;
         case 'N':
             arp = optarg;
+            break;
+        case 'O':
+            identity = optarg;
             break;
         case 'P':
             process = !0;
@@ -2242,6 +2247,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "usage: %s"
                            " [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ]"
                            " [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
+                           " [ -O FILE ]"
                            " [ -C FILE ]"
                            " [ -t SECONDS ]"
                            " [ -I PIN | -c ] [ -p PIN ]"
@@ -2271,6 +2277,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -L LOG      Write pretty-printed input to LOG file.\n");
             fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
             fprintf(stderr, "       -N FILE     Use fix FILE to save ARP LLH for subsequeNt fixed mode.\n");
+            fprintf(stderr, "       -O FILE     Save process identifier in FILE.\n");
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
@@ -2329,13 +2336,19 @@ int main(int argc, char * argv[])
 
     if (daemon) {
         rc = diminuto_daemon(Program);
+        assert(rc == 0);
         Process = getpid();
         DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)Process, (int)getppid(), (int)getsid(Process));
-        assert(rc == 0);
     } else {
         Process = getpid();
     }
+    assert(Process >= 0);
 
+    if (identity != (const char *)0) {
+        rc = diminuto_lock_file(identity);
+        assert(rc >= 0);
+    }
+        
 
     if (process) {
         DIMINUTO_LOG_INFORMATION("Processing");
@@ -4267,6 +4280,10 @@ report:
         /* Do nothing. */
     } else {
         diminuto_perror("fclose(out_fp)");
+    }
+
+    if (identity != (const char *)0) {
+        (void)diminuto_lock_unlock(identity);
     }
 
     while (!diminuto_list_isempty(&command_list)) {

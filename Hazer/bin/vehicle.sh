@@ -16,7 +16,8 @@ RATE=${2:-9600}
 ERRFIL=${3-"${SAVDIR}/${PROGRAM}.err"}
 OUTFIL=${4-"${SAVDIR}/${PROGRAM}.out"}
 CSVFIL=${5-"${SAVDIR}/${PROGRAM}.csv"}
-LIMIT=${6:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+PIDFIL=${6-"${SAVDIR}/${PROGRAM}.pid"}
+LIMIT=${7:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 DIRECTORY=$(dirname ${OUTFIL})
 FILENAME=$(basename ${OUTFIL})
@@ -26,6 +27,7 @@ FILE=${FILENAME#*.}
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
 mkdir -p $(dirname ${CSVFIL})
+mkdir -p $(dirname ${PIDFIL})
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
@@ -59,6 +61,7 @@ coreable gpstool \
 	-H ${OUTFIL} \
 	-t 10 \
 	-T ${CSVFIL} \
+	-O ${PIDFIL} \
 	-D ${DEVICE} -b ${RATE} -8 -n -1 \
 	-x \
 	-W '$PUBX,00' \
@@ -83,4 +86,4 @@ coreable gpstool \
 
 sleep 5
 peruse ${TASK} ${FILE} ${LIMIT} ${DIRECTORY} < /dev/null &
-hups
+hups $(cat ${PIDFIL})

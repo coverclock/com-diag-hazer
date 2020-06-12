@@ -17,10 +17,12 @@ RATE=${3:-230400}
 ERRFIL=${4-"${SAVDIR}/${PROGRAM}.err"}
 OUTFIL=${5-"${SAVDIR}/${PROGRAM}.out"}
 CSVFIL=${6-"${SAVDIR}/${PROGRAM}.csv"}
+PIDFIL=${7-"${SAVDIR}/${PROGRAM}.pid"}
 
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
 mkdir -p $(dirname ${CSVFIL})
+mkdir -p $(dirname ${PIDFIL})
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
@@ -42,6 +44,7 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 exec coreable gpstool \
     -H ${OUTFIL} -t 10 \
     -T ${CSVFIL} \
+    -O ${PIDFIL} \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -Y ${ROUTER} -y 20 \
     -x \

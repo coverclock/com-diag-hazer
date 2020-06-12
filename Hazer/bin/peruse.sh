@@ -47,7 +47,7 @@ elif [[ "${FILE}" == "err" ]]; then
     cat ${DIRECTORY}/${TASK}.${FILE}
     tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE}
 elif [[ "${FILE}" == "out" ]]; then
-    stdbuf -oL headless ${DIRECTORY}/${TASK}.${FILE} ${DIRECTORY}/${TASK}.pid |
+    stdbuf -oL headless ${DIRECTORY}/${TASK}.${FILE} |
         while read FILENAME; do
             if [[ -f ${FILENAME} ]]; then
                 clear

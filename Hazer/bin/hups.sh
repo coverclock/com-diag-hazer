@@ -4,12 +4,12 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Send a SIGHUP to all gpstool instances if any whenever
-# user presses RETURN key.
+# user presses any key.
 
-SIG=${1:-"HUP"}
-PGM=${2:-"gpstool"}
-while read -p "${SIG}? "; do
-	pkill -${SIG} ${PGM}
+PID=${1:-$$}
+SIG=${2:-"HUP"}
+while read -p "${SIG}? " -N 1 INPUT; do
+	kill -${SIG} ${PID}
 done
 echo
 exit 0

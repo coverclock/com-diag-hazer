@@ -20,4 +20,4 @@ trap "kill -KILL -- -${SELF}" SIGINT SIGQUIT SIGTERM
 ${TASK} ${ROUTER}:tumbleweed &
 sleep 5
 peruse ${TASK} out ${LIMIT} < /dev/null &
-hups
+hups $(cat ${SAVDIR}/${TASK}.pid)
