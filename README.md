@@ -1074,7 +1074,8 @@ command line using the -W (NMEA sentence) or -U (UBX message)  options.
     LOC 2020-06-11T12:24:01.018-07:00+01T 00:00:00.871 34.2.0        11003 hacienda
 
 LOC is the current local time provided by the host system, the elapsed
-time to first fix, the software release number, and the local host name.
+time to first fix, the software release number, the process id, and the
+local host name.
 The local time, with a fractional part in milliseconds, includes the time
 zone offset from UTC in hours and minutes, the current daylight saving
 time (DST) offset in hours, and the military time zone letter. If the
@@ -1132,11 +1133,12 @@ as to whether the day-month-year value has been set (only occurs once
 the RMC sentence has been received), an indication as to whether time is
 incrementing monotonically (it can appear to run backwards when receiving
 UDP packets because UDP may reorder them), and some metrics as to the
-number of significant digits provided for various datums provided by the
+number of significant digits provided for various values provided by the
 device.  INT also includes the total number of bytes sent or received -
 395,261,29B in this example - over the network. This allows you to keep
 track of your network utilization, especially important when paying for
-data on your LTE mobile provider.
+data on your LTE mobile provider. The right-most field is the name of the
+device from which gpstool is reading.
 
     MON -jamming  +history  50indicator  63maximum                         ttyACM1
 
