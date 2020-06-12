@@ -58,9 +58,10 @@ parallel stack called Tumbleweed.
 > More broadly: Hazer was the first project I did, to support GPS, and
 > later GNSS, receivers; Yodel was the second project, to support special
 > features of specific u-blox devices, including the High Precision Position
-> and Altitude (HPP and HPA) solutions, and the Intertial Measurement Unit
-> (IMU); and Tumbleweed was the third project, to support Differential GNSS
-> (DGNSS). The two latter projects were extensions of the Hazer repository.
+> and Altitude (HPP and HPA) solutions, and most recently the Intertial
+> Measurement Unit (IMU); and Tumbleweed was the third project, to support
+> Differential GNSS (DGNSS). The two latter projects are extensions of the
+> Hazer repository.
 
 Hazer includes a gpstool utility as a kind of Swiss Army knife for dealing
 with various GNSS devices. gpstool accepts data streams from standard input,
@@ -880,6 +881,13 @@ the libraries and binaries in the system directories.)
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvparts - splits gpstool CSV file into smaller files in subdirectories.
 
+## Moving Map (Hazer)
+
+* client - runs Google Maps API in Firefox browser under MacOS.
+* consumer - consumes datagrams and reports on stdout.
+* producer - consumes data from serial port and forwards as datagrams.
+* provider - consumes datagrams and forwards to serial port.
+
 ## Differential GNSS (Tumbleweed)
 
 * base - configures and runs a UBX-ZED-F9P as a base in survey or fixed mode.
@@ -895,13 +903,6 @@ the libraries and binaries in the system directories.)
 * rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * station - runs a UBX-ZED-F9P with no additional configuration.
 * survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
-
-## Moving Map (Hazer)
-
-* client - runs Google Maps API in Firefox browser under MacOS.
-* consumer - consumes datagrams and reports on stdout.
-* producer - consumes data from serial port and forwards as datagrams.
-* provider - consumes datagrams and forwards to serial port.
 
 ## Intertial Measurement Unit (Yodel)
 
@@ -1073,7 +1074,8 @@ command line using the -W (NMEA sentence) or -U (UBX message)  options.
     LOC 2020-06-11T12:24:01.018-07:00+01T 00:00:00.871 34.2.0        11003 hacienda
 
 LOC is the current local time provided by the host system, the elapsed
-time to first fix, the software release number, and the local host name.
+time to first fix, the software release number, the process id, and the
+local host name.
 The local time, with a fractional part in milliseconds, includes the time
 zone offset from UTC in hours and minutes, the current daylight saving
 time (DST) offset in hours, and the military time zone letter. If the
@@ -1131,11 +1133,12 @@ as to whether the day-month-year value has been set (only occurs once
 the RMC sentence has been received), an indication as to whether time is
 incrementing monotonically (it can appear to run backwards when receiving
 UDP packets because UDP may reorder them), and some metrics as to the
-number of significant digits provided for various datums provided by the
+number of significant digits provided for various values provided by the
 device.  INT also includes the total number of bytes sent or received -
 395,261,29B in this example - over the network. This allows you to keep
 track of your network utilization, especially important when paying for
-data on your LTE mobile provider.
+data on your LTE mobile provider. The right-most field is the name of the
+device from which gpstool is reading.
 
     MON -jamming  +history  50indicator  63maximum                         ttyACM1
 
