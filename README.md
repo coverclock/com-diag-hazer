@@ -1989,7 +1989,7 @@ subsequent log messages will go to the system log and not the error
 log file. This can seem a little mysterious.
 
 (In the following examples, I use a script called "peruse", which in turn
-uses a Diminuto script called "headless". I also make use of the SIGHUP
+uses a Diminuto script called "observe". I also make use of the SIGHUP
 capability of gpstool using a script called "hups" which sends a HUP
 (hangup) signal to any running instance of gpstool everytime you hit
 the RETURN (ENTER) key. You can read more about these scripts in the
