@@ -1,0 +1,53 @@
+INP [100] \xb5b\x01\a\\\00I~\b\xe4\a\x06\x0f\x0f\"$7\\\0\0\07\x83\xff\xff\x01
+INP [ 24] \xb5b\x01\x03\x10\00I~\b\x01\xdd\0\b\xc5\x06\0\0\a\x8a\x19\0n\x11
+INP [ 40] \xb5b\x01\x05 \00I~\b\0\0\0\0a\x9f\x01\0\x06#\x10\0\a\xf9\xa8\x01\x8f
+INP [ 28] \xb5b\x01\t\x14\0\0\0\0\00I~\bSS\0\0bS\0\0\x1b\0\0\0\x93h
+INP [ 75] $GNRMC,153436.00,A,3944.48373,N,10519.65022,W,13.014,278.51,150620,
+INP [ 43] $GNVTG,278.51,T,,M,13.014,N,24.102,K,E*2C\r\n
+INP [ 78] $GNGGA,153436.00,3944.48373,N,10519.65022,W,6,00,99.99,2011.9,M,-21
+INP [ 45] $GNGSA,A,2,,,,,,,,,,,,,99.99,99.99,99.99*2D\r\n
+INP [ 45] $GNGSA,A,2,,,,,,,,,,,,,99.99,99.99,99.99*2D\r\n
+INP [ 62] $GPGSV,3,1,11,01,34,071,,07,28,143,,11,20,047,,13,37,266,*75\r\n
+INP [ 62] $GPGSV,3,2,11,15,19,295,,17,63,223,,19,37,221,,28,69,356,*72\r\n
+INP [ 51] $GPGSV,3,3,11,30,62,151,,46,38,215,,51,44,183,*4A\r\n
+INP [ 62] $GLGSV,3,1,09,65,10,292,,66,02,349,,72,04,252,,73,53,090,*66\r\n
+INP [ 62] $GLGSV,3,2,09,74,64,002,,75,16,313,,83,30,033,,84,73,128,*61\r\n
+INP [ 29] $GLGSV,3,3,09,85,24,193,*5C\r\n
+INP [ 52] $GNGLL,3944.48373,N,10519.65022,W,153436.00,A,E*69\r\n
+INP [ 68] \xb5b\n\t<\0\0\xc4\x01\0\0(\0\0\0\0\x01\0\xef\xef\x01\0n\0\\\n\x02\x01
+LOC 2020-06-15T09:34:37.255-07:00+01T 00:00:00.714 34.9.0         2034 gypsum  
+TIM 2020-06-15T15:34:36.000-00:00+00Z 0pps                             GNSS    
+POS 39°44'29.023"N, 105°19'39.013"W    39.7413955, -105.3275036        GNSS    
+ALT    6600.64'   2011.900m MSL    6530.43'   1990.500m GEO            GNSS    
+COG W   278.510000000°T    0.000000000°M                               GNSS    
+SOG      14.976mph      13.014knots      24.102kph       6.695m/s      GNSS    
+INT GLL [ 0] DMY TOT (  9 10  5  3  5  0  5  5 )                    0B ttyACM0 
+MON +jamming  +history  28indicator  39maximum                         ttyACM0 
+STA -spoofing -history       1733ms    1673735ms     0epoch            ttyACM0 
+ATT    1.0° roll ±   0.4°   10.5° pitch ±   0.3°  278.5° yaw ±   0.4°  IMU     
+ODO     21331m (    21346m) ±       27m                                IMU     
+NED        954mm/s north      -6627mm/s east      -1261mm/s down (!)   IMU     
+ACT [1]  {     7    30    28    17     1       } [ 5] [ 5] [ 8] [18]   NAVSTAR 
+ACT [1]  {    73    84    85                   } [ 3] [ 3] [ 8] [18]   GLONASS 
+DOP   2.85pdop   1.69hdop   2.30vdop                                   NAVSTAR 
+DOP   2.85pdop   1.69hdop   2.30vdop                                   GLONASS 
+SAT [  1]     1id  34°elv   71°azm    0dBHz  0sig <   !                NAVSTAR 
+SAT [  2]     7id  28°elv  143°azm    0dBHz  0sig <   !                NAVSTAR 
+SAT [  3]    11id  20°elv   47°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [  4]    13id  37°elv  266°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [  5]    15id  19°elv  295°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [  6]    17id  63°elv  223°azm    0dBHz  0sig <   !                NAVSTAR 
+SAT [  7]    19id  37°elv  221°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [  8]    28id  69°elv  356°azm    0dBHz  0sig <   !                NAVSTAR 
+SAT [  9]    30id  62°elv  151°azm    0dBHz  0sig <   !                NAVSTAR 
+SAT [ 10]    46id  38°elv  215°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [ 11]    51id  44°elv  183°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [ 12]    65id  10°elv  292°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 13]    66id   2°elv  349°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 14]    72id   4°elv  252°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 15]    73id  53°elv   90°azm    0dBHz  0sig <   !                GLONASS 
+SAT [ 16]    74id  64°elv    2°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 17]    75id  16°elv  313°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 18]    83id  30°elv   33°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 19]    84id  73°elv  128°azm    0dBHz  0sig <   !                GLONASS 
+SAT [ 20]    85id  24°elv  193°azm    0dBHz  0sig <   !                GLONASS 
