@@ -1170,8 +1170,12 @@ from some u-blox modules.
 
     NED         -5mm/s north         -2mm/s east        -41mm/s down (3)   IMU
 
-NED indicates the North-East-Down vehicle frame reading available from some
-u-blox modules.
+NED indicates the North-East-Down vehicle frame reading available from the
+Intertial Measurement Unit (IMU) in some u-blox modules. The number in the
+parenthesis indicates the nature of the ensemble GNSS and IMU fix: '-' for
+no fix; '!' for a dead reckoning fix only; '2' for a 2D GNSS fix; '3' for a
+3D GNSS fix; '+' for a combined GNSS + dead reckoning fix; '\*' for a time
+only fix; and '?' for an error.
 
     HPP   39.794267897, -105.153420946 ±     0.5237m                       GNSS
     HPA   1709.4855m MSL   1687.9856m WGS84 ±     0.8001m                  GNSS
