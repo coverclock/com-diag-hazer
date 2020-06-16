@@ -15,7 +15,7 @@ LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-trap "kill -KILL -- -${SELF}" SIGINT SIGQUIT SIGTERM
+trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF}; exit 0" SIGINT SIGQUIT SIGTERM
 
 ${TASK} ${ROUTER}:tumbleweed &
 sleep 5
