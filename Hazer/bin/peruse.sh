@@ -36,7 +36,7 @@ mkdir -p ${SAVDIR}
 
 . ${ROOT}/bin/setup
 
-trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF}; exit 0" SIGINT SIGQUIT SIGTERM
+trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF} 2> /dev/null; exit 0" SIGINT SIGQUIT SIGTERM
 
 if [[ "${TASK}" == "router" ]]; then
     cat ${DIRECTORY}/${TASK}.${FILE}
