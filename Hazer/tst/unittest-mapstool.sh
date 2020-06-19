@@ -8,6 +8,14 @@
 # The best I can say is that it passes on the specific
 # target on which I built and ran the unit test.
 
+# The mapstool utility and its unit test depends upon the
+# appropriate interpretation of the Unicode encoding for
+# the degree symbol This depends on the specific settings
+# of the environmental variables that affect locale and
+# internationalization. The defaults used in, for example,
+# Ubuntu 19.10, worked just fine for me, but other values
+# did not.
+
 PROGRAM=$(basename ${0})
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
