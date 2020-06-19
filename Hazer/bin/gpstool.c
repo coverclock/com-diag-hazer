@@ -86,8 +86,6 @@
  *  gpstool -D /dev/ttyACM0 E 2> >(log -S)
  */
 
-#undef NDEBUG
-#include <assert.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -116,6 +114,7 @@
 #include "com/diag/diminuto/diminuto_pin.h"
 #include "com/diag/diminuto/diminuto_mux.h"
 #include "com/diag/diminuto/diminuto_log.h"
+#include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_coherentsection.h"
 #include "com/diag/diminuto/diminuto_criticalsection.h"
 #include "com/diag/diminuto/diminuto_interrupter.h"
@@ -904,19 +903,19 @@ static void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
     fputs("LOC", fp);
 
     rc = diminuto_time_juliet(Now, &year, &month, &day, &hour, &minute, &second, &fraction);
-    assert(rc == 0);
-    assert((1 <= month) && (month <= 12));
-    assert((1 <= day) && (day <= 31));
-    assert((0 <= hour) && (hour <= 23));
-    assert((0 <= minute) && (minute <= 59));
-    assert((0 <= second) && (second <= 59));
+    diminuto_assert(rc == 0);
+    diminuto_assert((1 <= month) && (month <= 12));
+    diminuto_assert((1 <= day) && (day <= 31));
+    diminuto_assert((0 <= hour) && (hour <= 23));
+    diminuto_assert((0 <= minute) && (minute <= 59));
+    diminuto_assert((0 <= second) && (second <= 59));
 
     /*
      * I arbitrarily decided to render the fractional part in milliseconds.
      */
 
     milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-    assert((0 <= milliseconds) && (milliseconds < 1000LL));
+    diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
     fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.%03lu", year, month, day, hour, minute, second, (long unsigned int)milliseconds);
 
     /*
@@ -966,11 +965,11 @@ static void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
     } else {
 
         rc = diminuto_time_duration(timetofirstfix, &day, &hour, &minute, &second, &fraction);
-        assert(rc >= 0);
-        assert(day >= 0);
-        assert((0 <= hour) && (hour <= 23));
-        assert((0 <= minute) && (minute <= 59));
-        assert((0 <= second) && (second <= 59));
+        diminuto_assert(rc >= 0);
+        diminuto_assert(day >= 0);
+        diminuto_assert((0 <= hour) && (hour <= 23));
+        diminuto_assert((0 <= minute) && (minute <= 59));
+        diminuto_assert((0 <= second) && (second <= 59));
 
         if (day > 0) {
 
@@ -979,7 +978,7 @@ static void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
         } else {
 
             milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-            assert((0 <= milliseconds) && (milliseconds < 1000LL));
+            diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
 
             fprintf(fp, " %02d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
 
@@ -1165,12 +1164,12 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             fputs("TIM", fp);
 
             hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &billionths);
-            assert((1 <= month) && (month <= 12));
-            assert((1 <= day) && (day <= 31));
-            assert((0 <= hour) && (hour <= 23));
-            assert((0 <= minute) && (minute <= 59));
-            assert((0 <= second) && (second <= 59));
-            assert((0 <= billionths) && (billionths < 1000000000LLU));
+            diminuto_assert((1 <= month) && (month <= 12));
+            diminuto_assert((1 <= day) && (day <= 31));
+            diminuto_assert((0 <= hour) && (hour <= 23));
+            diminuto_assert((0 <= minute) && (minute <= 59));
+            diminuto_assert((0 <= second) && (second <= 59));
+            diminuto_assert((0 <= billionths) && (billionths < 1000000000LLU));
             fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
 
             fprintf(fp, " %cpps", pps ? '1' : '0');
@@ -1205,30 +1204,30 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             fputs("POS", fp);
 
             hazer_format_nanominutes2position(pa[system].lat_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
-            assert((0 <= degrees) && (degrees <= 90));
-            assert((0 <= minutes) && (minutes <= 59));
-            assert((0 <= seconds) && (seconds <= 59));
-            assert((0 <= thousandths) && (thousandths <= 999));
+            diminuto_assert((0 <= degrees) && (degrees <= 90));
+            diminuto_assert((0 <= minutes) && (minutes <= 59));
+            diminuto_assert((0 <= seconds) && (seconds <= 59));
+            diminuto_assert((0 <= thousandths) && (thousandths <= 999));
             fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, (wint_t)DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
 
             hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
-            assert((0 <= degrees) && (degrees <= 180));
-            assert((0 <= minutes) && (minutes <= 59));
-            assert((0 <= seconds) && (seconds <= 59));
-            assert((0 <= thousandths) && (thousandths <= 999));
+            diminuto_assert((0 <= degrees) && (degrees <= 180));
+            diminuto_assert((0 <= minutes) && (minutes <= 59));
+            diminuto_assert((0 <= seconds) && (seconds <= 59));
+            diminuto_assert((0 <= thousandths) && (thousandths <= 999));
             fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, (wint_t)DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
 
             fputc(' ', fp);
 
             hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &tenmillionths);
-            assert((-90 <= degrees) && (degrees <= 90));
-            assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
+            diminuto_assert((-90 <= degrees) && (degrees <= 90));
+            diminuto_assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
             fprintf(fp, " %4d.%07llu,", degrees, (long long unsigned int)tenmillionths);
 
             hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &tenmillionths);
-            assert((-180 <= degrees) && (degrees <= 180));
+            diminuto_assert((-180 <= degrees) && (degrees <= 180));
             fprintf(fp, " %4d.%07llu", degrees, (long long unsigned int)tenmillionths);
-            assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
+            diminuto_assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
 
             fprintf(fp, "%7s", "");
 
@@ -1288,11 +1287,11 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             fputs("COG", fp);
 
-            assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
+            diminuto_assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
 
             compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
-            assert(compass != (const char *)0);
-            assert(strlen(compass) <= 4);
+            diminuto_assert(compass != (const char *)0);
+            diminuto_assert(strlen(compass) <= 4);
             fprintf(fp, " %-2s", compass);
 
             degrees = pa[system].cog_nanodegrees / 1000000000LL;
@@ -1672,7 +1671,7 @@ static void * gpiopoller(void * argp)
     diminuto_mux_init(&mux);
     ppsfd = fileno(pollerp->ppsfp);
     rc = diminuto_mux_register_interrupt(&mux, ppsfd);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
     while (!0) {
         DIMINUTO_COHERENT_SECTION_BEGIN;
@@ -1687,7 +1686,7 @@ static void * gpiopoller(void * argp)
         while (!0) {
             fd = diminuto_mux_ready_interrupt(&mux);
             if (fd < 0) { break; }
-            assert(fd == ppsfd);
+            diminuto_assert(fd == ppsfd);
             rc = diminuto_pin_get(pollerp->ppsfp);
             if (rc < 0) { break; }
             nowpps = !!rc;
@@ -2143,7 +2142,7 @@ int main(int argc, char * argv[])
         case 'U':
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
-            assert(command != (command_t *)0);
+            diminuto_assert(command != (command_t *)0);
             command->acknak = !0;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
@@ -2156,7 +2155,7 @@ int main(int argc, char * argv[])
         case 'W':
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
-            assert(command != (command_t *)0);
+            diminuto_assert(command != (command_t *)0);
             command->acknak = 0;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
@@ -2336,17 +2335,17 @@ int main(int argc, char * argv[])
 
     if (daemon) {
         rc = diminuto_daemon(Program);
-        assert(rc == 0);
+        diminuto_assert(rc == 0);
         Process = getpid();
         DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)Process, (int)getppid(), (int)getsid(Process));
     } else {
         Process = getpid();
     }
-    assert(Process >= 0);
+    diminuto_assert(Process >= 0);
 
     if (identity != (const char *)0) {
         rc = diminuto_lock_file(identity);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
     }
         
 
@@ -2366,7 +2365,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else {
         diminuto_perror(logging);
-        assert(log_fp != (FILE *)0);
+        diminuto_assert(log_fp != (FILE *)0);
     }
 
     /*
@@ -2392,10 +2391,10 @@ int main(int argc, char * argv[])
         remote_protocol = IPV6;
 
         remote_fd = diminuto_ipc6_datagram_peer(0);
-        assert(remote_fd >= 0);
+        diminuto_assert(remote_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(remote_fd, !0);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         role = PRODUCER;
 
@@ -2404,10 +2403,10 @@ int main(int argc, char * argv[])
         remote_protocol = IPV4;
 
         remote_fd = diminuto_ipc4_datagram_peer(0);
-        assert(remote_fd >= 0);
+        diminuto_assert(remote_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(remote_fd, !0);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         role = PRODUCER;
 
@@ -2418,10 +2417,10 @@ int main(int argc, char * argv[])
         remote_protocol = IPV6;
 
         remote_fd = diminuto_ipc6_datagram_peer(remote_endpoint.udp);
-        assert(remote_fd >= 0);
+        diminuto_assert(remote_fd >= 0);
 
         rc = diminuto_mux_register_read(&mux, remote_fd);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         role = CONSUMER;
 
@@ -2452,13 +2451,13 @@ int main(int argc, char * argv[])
         surveyor_protocol = IPV6;
 
         surveyor_fd = diminuto_ipc6_datagram_peer(0);
-        assert(surveyor_fd >= 0);
+        diminuto_assert(surveyor_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
     } else if (!diminuto_ipc4_is_unspecified(&surveyor_endpoint.ipv4)) {
 
@@ -2469,13 +2468,13 @@ int main(int argc, char * argv[])
         surveyor_protocol = IPV4;
 
         surveyor_fd = diminuto_ipc4_datagram_peer(0);
-        assert(surveyor_fd >= 0);
+        diminuto_assert(surveyor_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
     } else {
 
@@ -2484,10 +2483,10 @@ int main(int argc, char * argv[])
          */
 
         surveyor_fd = diminuto_ipc6_datagram_peer(surveyor_endpoint.udp);
-        assert(surveyor_fd >= 0);
+        diminuto_assert(surveyor_fd >= 0);
 
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         keepalive = -1;
 
@@ -2505,10 +2504,10 @@ int main(int argc, char * argv[])
     if (strobe != (const char *)0) {
 
         strobe_fp = diminuto_pin_output(strobepin);
-        assert(strobe_fp != (FILE *)0);
+        diminuto_assert(strobe_fp != (FILE *)0);
 
         rc = diminuto_pin_clear(strobe_fp);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
     }
 
@@ -2524,22 +2523,22 @@ int main(int argc, char * argv[])
     if (pps != (const char *)0) {
 
         rc = diminuto_pin_export(ppspin);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         rc = diminuto_pin_direction(ppspin, 0);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         rc = diminuto_pin_active(ppspin, !0);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_BOTH);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         pps_fp = diminuto_pin_open(ppspin);
-        assert(pps_fp != (FILE *)0);
+        diminuto_assert(pps_fp != (FILE *)0);
 
         rc = diminuto_pin_get(pps_fp);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
 
         poller.ppsfp = pps_fp;
         poller.strobefp = strobe_fp;
@@ -2551,7 +2550,7 @@ int main(int argc, char * argv[])
             errno = pthreadrc;
             diminuto_perror("pthread_create");
         }
-        assert(pthreadrc == 0);
+        diminuto_assert(pthreadrc == 0);
 
     }
 
@@ -2566,7 +2565,7 @@ int main(int argc, char * argv[])
      * N.B. For USB GPS devices, it takes a moment or three for the device to
      * enumerate and show up in the file system. If you, for example, plug in
      * the GPS device and start gpstool too quickly, the open(2) will fail, the
-     * assert(3) will fire, and the application will dump core. I do this
+     * diminuto_assert(3) will fire, and the application will dump core. I do this
      * routinely, alas. Maybe in the future I'll add a check, a delay, and a
      * retry.
      */
@@ -2592,17 +2591,17 @@ int main(int argc, char * argv[])
 
         dev_fd = open(device, readonly ? O_RDONLY : O_RDWR);
         if (dev_fd < 0) { diminuto_perror(device); }
-        assert(dev_fd >= 0);
+        diminuto_assert(dev_fd >= 0);
 
         if (serial) {
 
             DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\" %d %d%c%d%s%s%s\n", dev_fd, device, readonly ? "ro" : "rw", Device, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
 
             rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
-            assert(rc == 0);
+            diminuto_assert(rc == 0);
 
             rc = diminuto_serial_raw(dev_fd);
-            assert(rc == 0);
+            diminuto_assert(rc == 0);
 
         }
 
@@ -2614,7 +2613,7 @@ int main(int argc, char * argv[])
 
         dev_fp = fdopen(dev_fd, readonly ? "r" : "a+");
         if (dev_fp == (FILE *)0) { diminuto_perror(device); }
-        assert(dev_fp != (FILE *)0);
+        diminuto_assert(dev_fp != (FILE *)0);
 
         /*
          * Note that we set our input file pointer provisionally; we may
@@ -2653,7 +2652,7 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else {
             diminuto_perror(source);
-            assert(in_fp != (FILE *)0);
+            diminuto_assert(in_fp != (FILE *)0);
         }
 
     }
@@ -2675,7 +2674,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else {
         diminuto_perror(sink);
-        assert(sink_fp != (FILE *)0);
+        diminuto_assert(sink_fp != (FILE *)0);
     }
 
     /*
@@ -2691,12 +2690,12 @@ int main(int argc, char * argv[])
     serial = diminuto_serial_valid(in_fd);
 
     rc = diminuto_mux_register_read(&mux, in_fd);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
     io_buffer = malloc(io_size);
-    assert(io_buffer != (void *)0);
+    diminuto_assert(io_buffer != (void *)0);
     rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
-    assert(rc == 0);
+    diminuto_assert(rc == 0);
 
     DIMINUTO_LOG_INFORMATION("Buffer (%d) [%zu] [%zu]\n", in_fd, io_size, (size_t)BUFSIZ);
 
@@ -2707,7 +2706,7 @@ int main(int argc, char * argv[])
 
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_create(headless, &temporary);
-        assert(out_fp != (FILE *)0);
+        diminuto_assert(out_fp != (FILE *)0);
     }
 
     /*
@@ -2738,7 +2737,7 @@ int main(int argc, char * argv[])
             errno = pthreadrc;
             diminuto_perror("pthread_create");
         }
-        assert(pthreadrc == 0);
+        diminuto_assert(pthreadrc == 0);
 
     }
 
@@ -2754,7 +2753,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else {
         diminuto_perror(tracing);
-        assert(trace_fp != (FILE *)0);
+        diminuto_assert(trace_fp != (FILE *)0);
     }
 
     /*
@@ -2762,13 +2761,13 @@ int main(int argc, char * argv[])
      */
 
     rc = diminuto_terminator_install(0);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
     rc = diminuto_interrupter_install(!0);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
     rc = diminuto_hangup_install(!0);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
     /*
      * Initialize our time zone. The underlying tzset(3) call is relatively
@@ -2787,7 +2786,7 @@ int main(int argc, char * argv[])
      */
 
     Now = diminuto_time_clock();
-    assert(Now >= 0);
+    diminuto_assert(Now >= 0);
 
     (void)diminuto_time_timezone(Now);
 
@@ -2807,13 +2806,13 @@ int main(int argc, char * argv[])
      */
 
     rc = hazer_initialize();
-    assert(rc == 0);
+    diminuto_assert(rc == 0);
 
     rc = yodel_initialize();
-    assert(rc == 0);
+    diminuto_assert(rc == 0);
 
     rc = tumbleweed_initialize();
-    assert(rc == 0);
+    diminuto_assert(rc == 0);
 
     if (debug) {
         hazer_debug(stderr);
@@ -2920,11 +2919,11 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (ready > 0) {
             fd = diminuto_mux_ready_read(&mux);
-            assert(fd >= 0);
+            diminuto_assert(fd >= 0);
         } else if (errno == EINTR) {
             continue;
         } else {
-            assert(0);
+            diminuto_assert(0);
         }
 
         /*
@@ -3238,7 +3237,7 @@ int main(int argc, char * argv[])
              */
 
             DIMINUTO_LOG_ERROR("Multiplexor Fail [%d] (%d) <%d %d %d>\n", ready, fd, dev_fd, remote_fd, surveyor_fd);
-            assert(0);
+            diminuto_assert(0);
 
         }
 
@@ -3258,7 +3257,7 @@ int main(int argc, char * argv[])
          */
 
         Now = diminuto_time_clock();
-        assert(Now >= 0);
+        diminuto_assert(Now >= 0);
 
         /**
          ** KEEPALIVE
@@ -3332,11 +3331,11 @@ int main(int argc, char * argv[])
         } else {
 
             command_node = diminuto_list_dequeue(&command_list);
-            assert(command_node != (diminuto_list_t *)0);
+            diminuto_assert(command_node != (diminuto_list_t *)0);
 
             command = diminuto_containerof(command_t, link, command_node);
             command_string = diminuto_list_data(command_node);
-            assert(command_string != (uint8_t *)0);
+            diminuto_assert(command_string != (uint8_t *)0);
 
             if (command_string[0] == '\0') {
 
@@ -3421,7 +3420,7 @@ int main(int argc, char * argv[])
 
         if (sink_fp != (FILE *)0) {
             sz = fwrite(buffer, 1, length, sink_fp);
-            assert(sz == length);
+            diminuto_assert(sz == length);
         }
 
         /**
@@ -3560,9 +3559,9 @@ int main(int argc, char * argv[])
             strncpy(tokenized, buffer, sizeof(tokenized));
             tokenized[sizeof(tokenized) - 1] = '\0';
             count = hazer_tokenize(vector, diminuto_countof(vector), tokenized, length);
-            assert(count >= 0);
-            assert(vector[count - 1] == (char *)0);
-            assert(count <= diminuto_countof(vector));
+            diminuto_assert(count >= 0);
+            diminuto_assert(vector[count - 1] == (char *)0);
+            diminuto_assert(count <= diminuto_countof(vector));
 
             /*
              * Make sure it's a talker and a GNSS that we care about.
@@ -3900,9 +3899,9 @@ int main(int argc, char * argv[])
                 int ii = 0;
                 int jj = 0;
 
-                assert(sizeof(ports.prefix) == 8);
-                assert(sizeof(ports.port[0]) == 40);
-                assert(sizeof(ports) == (8 + (5 * 40)));
+                diminuto_assert(sizeof(ports.prefix) == 8);
+                diminuto_assert(sizeof(ports.port[0]) == 40);
+                diminuto_assert(sizeof(ports) == (8 + (5 * 40)));
 
                 DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS version = %u\n", ports.prefix.version);
                 DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS nPorts = %u\n", ports.prefix.nPorts);
@@ -4151,13 +4150,13 @@ report:
             if (headless != (const char *)0) {
                 if (checkpoint) {
                     out_fp = diminuto_observation_checkpoint(out_fp, &temporary);
-                    assert(out_fp != (FILE *)0);
+                    diminuto_assert(out_fp != (FILE *)0);
                     checkpoint = 0;
                 }
                 out_fp = diminuto_observation_commit(out_fp, &temporary);
-                assert(out_fp == (FILE *)0);
+                diminuto_assert(out_fp == (FILE *)0);
                 out_fp = diminuto_observation_create(headless, &temporary);
-                assert(out_fp != (FILE *)0);
+                diminuto_assert(out_fp != (FILE *)0);
             }
 
             display_was = display_now;
@@ -4178,13 +4177,13 @@ report:
     DIMINUTO_LOG_INFORMATION("Counters Remote=%lu Surveyor=%lu Keepalive=%lu OutOfOrder=%u Missing=%u", (unsigned long)remote_sequence, (unsigned long)surveyor_sequence, (unsigned long)keepalive_sequence, outoforder_counter, missing_counter);
 
     rc = tumbleweed_finalize();
-    assert(rc == 0);
+    diminuto_assert(rc == 0);
 
     rc = yodel_finalize();
-    assert(rc == 0);
+    diminuto_assert(rc == 0);
 
     rc = hazer_finalize();
-    assert(rc == 0);
+    diminuto_assert(rc == 0);
 
     diminuto_mux_fini(&mux);
 
@@ -4206,17 +4205,17 @@ report:
 
     if (pps_fp != (FILE *)0) {
         pps_fp = diminuto_pin_unused(pps_fp, ppspin);
-        assert(pps_fp == (FILE *)0);
+        diminuto_assert(pps_fp == (FILE *)0);
     }
 
     if (strobe_fp != (FILE *)0) {
         strobe_fp = diminuto_pin_unused(strobe_fp, strobepin);
-        assert(strobe_fp == (FILE *)0);
+        diminuto_assert(strobe_fp == (FILE *)0);
     }
 
     if (remote_fd >= 0) {
         rc = diminuto_ipc_close(remote_fd);
-        assert(rc >= 0);
+        diminuto_assert(rc >= 0);
     }
 
     if (trace_fp == (FILE *)0) {
@@ -4273,7 +4272,7 @@ report:
 
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_commit(out_fp, &temporary);
-        assert(out_fp == (FILE *)0);
+        diminuto_assert(out_fp == (FILE *)0);
     } else if (out_fp == dev_fp) {
         /* Do nothing. */
     } else if ((rc = fclose(out_fp)) != EOF) {
@@ -4288,7 +4287,7 @@ report:
 
     while (!diminuto_list_isempty(&command_list)) {
         command_node = diminuto_list_dequeue(&command_list);
-        assert(command_node != (diminuto_list_t *)0);
+        diminuto_assert(command_node != (diminuto_list_t *)0);
         free(command_node);
     }
 
