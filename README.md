@@ -509,8 +509,8 @@ DGNSS Rover (Generation 3)
 
 "Neon"    
 GPD Micro PC    
-Intel x86_64
-Intel Celeron N4100 @ 1.10GHz x 2 x 2
+Intel x86_64    
+Intel Celeron N4100 @ 1.10GHz x 2 x 2    
 Ubuntu MATE 19.10 "eoan"    
 Linux 5.3.0    
 gcc 9.2.1    
