@@ -1,0 +1,1574 @@
+2020-06-22T15:27:59.066680Z "neon" <INFO> [2359] {7fd171c03740} Begin
+2020-06-22T15:27:59.066890Z "neon" <INFO> [2359] {7fd171c03740} Locale "en_US.utf8"
+2020-06-22T15:27:59.067026Z "neon" <INFO> [2359] {7fd171c03740} Processing
+2020-06-22T15:27:59.067335Z "neon" <INFO> [2359] {7fd171c03740} Device (3) "/dev/ttyACM0" rw "ttyACM0" 9600 8N1 local
+2020-06-22T15:27:59.067445Z "neon" <INFO> [2359] {7fd171c03740} Buffer (3) [8192] [8192]
+2020-06-22T15:27:59.067571Z "neon" <INFO> [2359] {7fd171c03740} Start
+2020-06-22T15:27:59.303628Z "neon" <NOTE> [2359] {7fd171c03740} Sync UBX 0x0000000000000064
+2020-06-22T15:27:59.312259Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX ACK 0x06 0x00 (1)
+2020-06-22T15:27:59.314487Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX ACK 0x06 0x01 (1)
+2020-06-22T15:27:59.317407Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX ACK 0x06 0x01 (1)
+2020-06-22T15:27:59.321032Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX ACK 0x06 0x01 (1)
+2020-06-22T15:27:59.322151Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX ACK 0x06 0x1e (1)
+2020-06-22T15:27:59.481367Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,u-blox AG - www.u-blox.com*4E"
+2020-06-22T15:27:59.481538Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,ROM BASE 2.01 (75331)*19"
+2020-06-22T15:27:59.481639Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,FWVER=UDR 1.00*42"
+2020-06-22T15:27:59.481740Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,PROTVER=19.00*10"
+2020-06-22T15:27:59.481870Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,MOD=NEO-M8U-0*7C"
+2020-06-22T15:27:59.482060Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX ACK 0x01 0x10 (1)
+2020-06-22T15:27:59.482238Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,FIS=0xEF4015 (84524)*67"
+2020-06-22T15:27:59.482372Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,GPS;GLO;GAL;BDS*77"
+2020-06-22T15:27:59.482472Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,SBAS;IMES;QZSS*49"
+2020-06-22T15:27:59.482668Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,GNSS OTP=GPS;GLO*37"
+2020-06-22T15:27:59.483430Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX ACK 0x06 0x01 (1)
+2020-06-22T15:27:59.484332Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,LLC=FFFFFFFF-FFFFFFFF-FFFFFFFF-4FFFFBFE-FFFFFF49*55"
+2020-06-22T15:27:59.484470Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,ANTSUPERV=AC *00"
+2020-06-22T15:27:59.484631Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,ANTSTATUS=OK*25"
+2020-06-22T15:27:59.486327Z "neon" <INFO> [2359] {7fd171c03740} Parse NMEA TXT "$GNTXT,01,01,02,PF=3BF*4F"
+2020-06-22T15:27:59.487257Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX ACK 0x06 0x01 (1)
+2020-06-22T15:27:59.488513Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX ACK 0x06 0x39 (1)
+2020-06-22T15:28:00.371886Z "neon" <NOTE> [2359] {7fd171c03740} Time 2020-06-22 15:27:59Z
+2020-06-22T15:28:00.372129Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 43
+2020-06-22T15:28:00.372176Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX NAV spoofing 1
+2020-06-22T15:28:00.373920Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX MON VER SW "EXT CORE 3.01 (16559b)"
+2020-06-22T15:28:00.373973Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX MON VER HW "00080000"
+2020-06-22T15:28:00.374011Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX MON VER EX "ROM BASE 2.01 (75331)"
+2020-06-22T15:28:00.374048Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX MON VER EX "FWVER=UDR 1.00"
+2020-06-22T15:28:00.374085Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX MON VER EX "PROTVER=19.00"
+2020-06-22T15:28:00.374122Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX MON VER EX "MOD=NEO-M8U-0"
+2020-06-22T15:28:00.374160Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX MON VER EX "FIS=0xEF4015 (84524)"
+2020-06-22T15:28:00.374196Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX MON VER EX "GPS;GLO;GAL;BDS"
+2020-06-22T15:28:00.374232Z "neon" <INFO> [2359] {7fd171c03740} Parse UBX MON VER EX "SBAS;IMES;QZSS"
+HUP? 2020-06-22T15:28:23.395912Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:28:24.331769Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T15:28:25.324914Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T15:28:27.326753Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T15:28:29.342934Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T15:28:31.327079Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:28:32.329081Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T15:28:34.322945Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 39
+2020-06-22T15:28:35.312030Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:28:36.328197Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T15:28:40.322337Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:28:41.328440Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T15:28:45.330103Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:28:46.332511Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:28:47.326392Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:28:50.333568Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:28:51.326534Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+HUP? 2020-06-22T15:28:51.870135Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T15:28:52.334545Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T15:28:53.324760Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T15:31:05.314872Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 41
+2020-06-22T15:31:06.374902Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T15:32:03.310307Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T15:32:04.308179Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:32:05.293481Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T15:32:06.301534Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:32:10.292669Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:32:15.303865Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T15:32:44.307020Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:32:45.307833Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:32:55.303362Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T15:32:56.306394Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T15:32:58.316654Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:33:11.298532Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T15:33:12.377784Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T15:33:36.307606Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T15:33:41.317966Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:33:42.314604Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T15:33:43.312806Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:34:31.335752Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T15:34:37.316141Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T15:35:30.343141Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:35:33.349708Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:35:36.419399Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:35:39.353672Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:35:40.420744Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:35:49.346019Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T15:37:09.343573Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000084f78 0x34 '4'
+2020-06-22T15:37:09.343732Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000084fc3
+2020-06-22T15:38:57.363679Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000009fa82 0x30 '0'
+2020-06-22T15:38:57.363749Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000009fab5
+2020-06-22T15:39:18.375086Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T15:39:31.372530Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 45
+2020-06-22T15:40:16.469995Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:40:17.471574Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+HUP? 2020-06-22T15:40:20.200818Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T15:40:27.501347Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T15:40:43.461684Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T15:40:44.457112Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T15:40:46.514069Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T15:40:48.468030Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:40:49.465386Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:40:50.467331Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T15:40:52.464695Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T15:40:53.459599Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:40:54.487773Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T15:40:56.457785Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:40:57.498141Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T15:40:59.506238Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T15:41:03.474506Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:41:04.488680Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T15:41:20.459992Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T15:41:21.460989Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T15:41:22.470240Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T15:41:23.460197Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T15:41:25.460307Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T15:41:26.452744Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T15:41:33.464097Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T15:41:34.469216Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T15:42:02.479614Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T15:42:03.488711Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 7
+2020-06-22T15:42:18.523075Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:43:32.529865Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T15:43:45.477030Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T15:44:03.498491Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T15:44:06.510877Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T15:44:08.491031Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:44:09.516956Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+HUP? 2020-06-22T15:44:12.864936Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T15:44:50.507788Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:44:51.512710Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T15:44:53.512748Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:44:54.517154Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T15:45:38.504386Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T15:45:42.510934Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T15:45:43.521697Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T15:45:57.531039Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T15:46:00.534550Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 38
+2020-06-22T15:46:01.499605Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:46:03.448321Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 38
+2020-06-22T15:46:04.526607Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:46:12.497400Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:46:13.515513Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 38
+2020-06-22T15:46:29.488714Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:46:30.503569Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T15:46:51.505431Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:46:52.516005Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T15:46:53.524261Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000117f3e 0x0d
+2020-06-22T15:46:53.524777Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000117f85
+2020-06-22T15:46:56.512062Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:46:57.511277Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T15:47:11.495294Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:47:12.484156Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 39
+2020-06-22T15:47:29.473601Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 38
+2020-06-22T15:47:30.452870Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:47:38.472921Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000123310 0x0d
+2020-06-22T15:47:38.473043Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000123357
+2020-06-22T15:48:42.490676Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:48:43.479170Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 40
+2020-06-22T15:48:58.480302Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 39
+2020-06-22T15:48:59.499352Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T15:49:01.470365Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 39
+2020-06-22T15:49:02.480630Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:49:31.481155Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T15:49:32.501042Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:49:40.505888Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:49:41.493438Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:49:45.496076Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 39
+2020-06-22T15:49:46.499500Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:49:48.483223Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 35
+2020-06-22T15:49:50.501428Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T15:49:53.504473Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:49:54.480511Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:49:55.484002Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 39
+2020-06-22T15:49:56.505157Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:50:49.508114Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 40
+2020-06-22T15:50:50.503194Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:50:54.488859Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:50:55.493648Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:51:02.495465Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000157289 0x36 '6'
+2020-06-22T15:51:02.495588Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000001572d4
+2020-06-22T15:51:10.487014Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 38
+2020-06-22T15:51:11.495154Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T15:51:35.489367Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 41
+2020-06-22T15:51:36.489040Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T15:52:16.495396Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 35
+2020-06-22T15:52:17.497570Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T15:52:18.505492Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 37
+2020-06-22T15:52:21.526903Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:52:22.534886Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:52:23.537090Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:52:28.507363Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:52:29.511619Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T15:52:33.503096Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:52:34.517160Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:52:35.501008Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 38
+2020-06-22T15:52:36.515932Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:52:39.520400Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:52:40.538623Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T15:52:44.566779Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:52:45.553917Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:52:46.537903Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 37
+2020-06-22T15:52:47.546222Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:52:51.539445Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:52:52.541651Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:52:53.513611Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:52:56.533784Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:53:03.553520Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:53:04.524582Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:53:10.539888Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:53:11.522323Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 38
+2020-06-22T15:53:13.570145Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T15:53:29.542555Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T15:53:35.547414Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:53:36.508998Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:54:09.515970Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 36
+2020-06-22T15:54:10.520805Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:54:14.505145Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:54:15.512167Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:54:19.501007Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:54:20.509730Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:54:31.510952Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:54:32.531454Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:54:47.537284Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:54:48.521026Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 39
+2020-06-22T15:54:54.551630Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:54:56.588464Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T15:54:59.543229Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:55:00.569156Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 39
+2020-06-22T15:55:02.535135Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:55:03.543377Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:55:07.540680Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:55:09.531488Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T15:55:10.525594Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:55:11.543802Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:55:16.545140Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T15:55:19.529453Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:55:23.510214Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:55:25.512989Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T15:55:31.508765Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T15:55:44.502791Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T15:55:48.520869Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:55:49.511999Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:55:51.528147Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 37
+2020-06-22T15:55:52.533124Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:55:54.532310Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:55:55.512536Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:55:58.522676Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T15:55:59.529034Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:56:00.533744Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 36
+2020-06-22T15:56:01.545814Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T15:56:06.531231Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:56:07.536375Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:56:11.533313Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 35
+2020-06-22T15:56:13.535971Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:56:14.546061Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:56:16.555376Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:56:17.538315Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:56:18.564574Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T15:56:20.550573Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:56:21.556924Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T15:56:25.547937Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:56:27.528061Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:56:30.530585Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T15:56:32.560770Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T15:56:33.534820Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T15:56:34.541935Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T15:56:35.524940Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T15:56:36.552852Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T15:56:42.546327Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T15:56:44.546599Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T15:56:52.559629Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T15:56:54.537308Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T15:56:55.516669Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T15:57:02.517883Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T15:57:08.508500Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T15:57:11.534914Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T15:57:12.521801Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 12
+2020-06-22T15:57:13.547146Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T15:57:17.532580Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T15:57:19.519516Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:57:20.518764Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:57:21.539474Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:57:33.529395Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:57:36.528534Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:57:44.524472Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T15:57:45.522649Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:57:49.539768Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 35
+2020-06-22T15:57:51.550018Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:58:03.544080Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 36
+2020-06-22T15:58:07.521281Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T15:58:08.526472Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 37
+2020-06-22T15:58:09.525424Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T15:58:16.543601Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000001c5d3d 0x32 '2'
+2020-06-22T15:58:16.544373Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000001c5d73
+2020-06-22T15:58:19.522190Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 36
+2020-06-22T15:58:20.529374Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:58:24.530691Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 37
+2020-06-22T15:58:25.528994Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:58:28.522881Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T15:58:29.550073Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:58:32.539495Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T15:58:33.545371Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T15:58:35.540933Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 11
+2020-06-22T15:58:40.526046Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 11
+2020-06-22T15:58:41.536219Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T15:58:42.528076Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 13
+2020-06-22T15:58:43.535131Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:58:45.530423Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T15:58:47.530619Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 36
+2020-06-22T15:58:48.522875Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T15:59:02.507086Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T15:59:03.505170Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:59:05.509048Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T15:59:06.512061Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:59:08.499805Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000001d31b2 0x37 '7'
+2020-06-22T15:59:08.500701Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000001d31f9
+2020-06-22T15:59:12.497494Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:59:13.505762Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:59:15.505174Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 36
+2020-06-22T15:59:16.520189Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 39
+2020-06-22T15:59:24.509101Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T15:59:25.503396Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T15:59:27.498902Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 35
+2020-06-22T15:59:28.491840Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T15:59:30.490248Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T15:59:32.492570Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T15:59:43.509002Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:59:44.498225Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 39
+2020-06-22T15:59:55.499921Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T15:59:56.525757Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T15:59:57.529121Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T15:59:58.544505Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:00:00.552800Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T16:00:04.550930Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:00:08.549735Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:00:21.514326Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T16:00:25.522798Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T16:00:26.527875Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T16:00:35.524328Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:00:36.521516Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T16:00:39.507766Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T16:00:40.534897Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:00:41.525479Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000001eaae8 0x0d
+2020-06-22T16:00:41.525552Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000001eab2d
+2020-06-22T16:00:43.535863Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+HUP? 2020-06-22T16:00:51.188369Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:01:03.521024Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:01:05.504011Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:01:06.513282Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:01:07.519983Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:01:08.507973Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:01:10.506339Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:01:11.497945Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:01:13.497743Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:01:29.501941Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:01:30.549164Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:01:30.556310Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000001f7123 0x0d
+2020-06-22T16:01:30.556655Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000001f7166
+2020-06-22T16:01:33.514228Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:01:36.489665Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:01:37.496559Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:01:39.497000Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T16:01:41.507815Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:01:43.520229Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T16:01:52.503860Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T16:01:56.495305Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:01:58.497216Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T16:01:59.499382Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 35
+2020-06-22T16:02:01.498679Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:02:02.495702Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T16:02:03.497988Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:02:06.500431Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:02:07.502040Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:02:09.496217Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:02:10.513451Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 36
+2020-06-22T16:02:15.515761Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T16:02:30.532441Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:02:32.527083Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:02:34.524290Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:02:35.524482Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:02:50.539929Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:02:52.524034Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T16:02:53.517283Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:02:54.519771Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:02:55.521106Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:03:01.528555Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:03:04.540661Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+HUP? 2020-06-22T16:03:36.402622Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:03:43.516174Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+HUP? 2020-06-22T16:03:54.328480Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:04:16.534313Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:05:06.560876Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX NAV spoofing 2
+2020-06-22T16:05:07.553979Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX NAV spoofing 1
+2020-06-22T16:06:06.616501Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T16:06:08.597949Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T16:06:42.551755Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000245058 0x37 '7'
+2020-06-22T16:06:42.551880Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000002450a1
+2020-06-22T16:06:58.583880Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:07:12.560000Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:07:34.566941Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T16:07:49.535872Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:07:53.538990Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T16:08:08.526753Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:08:19.551839Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T16:08:32.537466Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:08:54.577468Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:09:18.551599Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:09:40.573432Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T16:10:08.569594Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T16:10:09.582603Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T16:10:17.576357Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:10:18.570232Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T16:10:19.565416Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:10:20.569519Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:10:21.578676Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T16:10:24.579784Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T16:10:26.582987Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:10:27.579069Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T16:10:32.583504Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:10:35.585957Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:10:36.578955Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:10:37.561745Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:10:38.571865Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:10:39.561408Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:10:40.554972Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T16:10:41.552110Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:10:47.559864Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:10:48.561084Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:10:49.556898Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:10:51.569023Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:10:54.562670Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:10:56.553587Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:10:58.552656Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:10:59.556562Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:11:01.561170Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:11:02.560222Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:11:03.562236Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:11:05.561385Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:11:06.551368Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:11:07.553646Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T16:11:09.559362Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:11:10.553756Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:11:20.553895Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:11:21.563724Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:11:24.558656Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:11:25.564626Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:11:26.563380Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:11:27.564201Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:11:33.577401Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:11:34.573723Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:11:35.574926Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:11:36.579708Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:11:42.575638Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:11:43.575221Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:11:46.582654Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:11:48.575674Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:11:49.586928Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:11:51.568026Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:11:52.570944Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:11:53.566405Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:11:54.573434Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T16:11:55.563358Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:11:57.587552Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T16:11:59.587017Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:12:00.597755Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:12:01.593783Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:12:03.589959Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:12:05.572283Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:12:09.596346Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:12:10.598506Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:12:14.608856Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:12:15.600980Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:12:16.593202Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:12:17.589100Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:12:18.573278Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:12:19.578297Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:12:25.581060Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:12:27.591110Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:12:30.589374Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:12:31.581465Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:12:33.568690Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:12:34.575523Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:12:44.577463Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:12:45.589585Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:12:47.579538Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T16:12:48.577760Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:12:50.582789Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:12:51.581980Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:12:57.594520Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:13:02.596814Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:13:06.583063Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:13:08.587417Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:13:08.592980Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000002a61da 0x36 '6'
+2020-06-22T16:13:08.593152Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000002a621a
+2020-06-22T16:13:10.582549Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:13:11.573461Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:13:17.601136Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:13:18.582105Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:13:19.584379Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:13:19.589782Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000002a8c56 0x0d
+2020-06-22T16:13:19.589890Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000002a8c83
+2020-06-22T16:13:21.583358Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:13:23.584580Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:13:24.576708Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:13:25.594204Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:13:26.581989Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:13:28.583052Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:13:29.583915Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:13:31.577325Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:13:32.592302Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:13:35.593760Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:13:36.587818Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:13:37.593866Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:13:38.585853Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:13:40.588068Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:13:42.555182Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:13:48.564952Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:13:49.571575Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:13:54.583399Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:13:55.594259Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:13:57.584265Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:13:58.592381Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:14:00.579528Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:14:01.593590Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:14:08.583894Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000002b498b 0x32 '2'
+2020-06-22T16:14:08.584006Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000002b49c0
+2020-06-22T16:14:10.576689Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:14:11.567664Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:14:27.585262Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:14:29.561028Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:14:32.578401Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T16:14:35.580551Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:15:08.591081Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:15:09.566026Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:15:12.642057Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:15:13.562124Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:15:14.562706Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:15:15.562811Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:15:16.562398Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000002c53d8 0x0d
+2020-06-22T16:15:16.562465Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000002c541f
+2020-06-22T16:15:22.572621Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:15:23.571458Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:15:29.564170Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:15:30.565760Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:15:33.564293Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:15:36.571436Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:15:38.555919Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:15:40.576940Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:15:41.583920Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:15:42.583170Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T16:15:47.583746Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000002ccd4c 0x0d
+2020-06-22T16:15:47.583865Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000002ccd8a
+2020-06-22T16:15:55.553347Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:15:58.567431Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:15:59.565409Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:16:02.565428Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T16:16:03.564690Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:16:08.563213Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T16:16:09.560216Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T16:18:39.595731Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T16:18:53.577953Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:18:56.597112Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000002fae0e 0x32 '2'
+2020-06-22T16:18:56.597181Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000002fae44
+2020-06-22T16:19:00.576240Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:19:01.576635Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:19:03.569594Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:19:04.564653Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:19:10.599332Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:19:23.593572Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:19:28.609691Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:19:29.609811Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:21:00.617269Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:21:49.589468Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:22:10.638535Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000032b962 0x0d
+2020-06-22T16:22:10.638597Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000032b980
+2020-06-22T16:22:11.614625Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T16:22:25.612348Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:23:07.650851Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:23:08.652744Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:23:10.661161Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:23:11.642239Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:23:22.635886Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:23:23.658154Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:23:37.650987Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000341503 0x37 '7'
+2020-06-22T16:23:37.651799Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000341532
+2020-06-22T16:23:41.651188Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000003424b3 0x37 '7'
+2020-06-22T16:23:41.651305Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000003424e2
+2020-06-22T16:24:18.645680Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:24:19.645241Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T16:24:20.653144Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:24:33.618996Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:24:47.642617Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000352c27 0x36 '6'
+2020-06-22T16:24:47.642682Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000352c42
+2020-06-22T16:25:05.618673Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:25:07.640058Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:25:24.611181Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:25:25.618138Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:25:31.611871Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:25:32.612896Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:25:45.643824Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:25:46.647104Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:26:07.627852Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:26:08.626268Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:26:14.643282Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:26:15.632181Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:26:30.630893Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 12
+2020-06-22T16:26:31.624042Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T16:26:33.632817Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T16:26:35.643864Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T16:26:41.651467Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:26:42.653635Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T16:26:44.634674Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T16:26:45.630814Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 37
+2020-06-22T16:27:11.661966Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:27:12.646628Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:27:24.636482Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 35
+2020-06-22T16:27:25.655060Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:27:27.641612Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 35
+2020-06-22T16:27:28.649745Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:27:32.634071Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:27:33.654704Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:27:35.640095Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:27:38.639273Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:27:39.646325Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:27:41.649578Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:27:43.639052Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:27:44.649729Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T16:27:48.628887Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:27:50.640255Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:27:53.637615Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:27:54.629748Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:27:55.635859Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:28:05.639591Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:28:06.651694Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:28:16.662843Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:28:17.656586Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:28:20.656565Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:28:21.651995Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:28:24.671020Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T16:28:25.666401Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:28:27.685275Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T16:28:28.683358Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:28:30.710516Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:28:31.696930Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:28:33.699690Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:28:34.698248Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:28:35.716211Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:28:37.715361Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:28:39.687343Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:28:40.695447Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:28:41.686514Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:28:44.684353Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:28:47.687357Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:28:49.691280Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:28:50.689456Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:28:52.694601Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:28:53.676577Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:28:54.679778Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:28:57.685843Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:28:58.675071Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:29:01.671084Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:29:02.682443Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:29:06.684004Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:29:07.676777Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:29:08.684017Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:29:09.672907Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:29:11.673050Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:29:12.667216Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:29:15.657486Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:29:17.659603Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:29:18.653554Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:29:20.663767Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:29:21.665362Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:29:24.668332Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:29:25.661455Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:29:28.668861Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:29:36.651189Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:29:40.636494Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:29:41.661567Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:29:43.655766Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:29:44.654056Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:29:45.652881Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:29:47.649447Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:29:49.646311Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:29:52.650683Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:29:53.677714Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:30:08.643952Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:30:10.677024Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:30:13.662138Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:30:14.664287Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:30:15.664335Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:30:24.673152Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+HUP? 2020-06-22T16:30:32.569396Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:30:33.069209Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:30:34.674955Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T16:30:38.672534Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+HUP? 2020-06-22T16:30:51.964475Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:31:05.630292Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:31:16.778948Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:31:28.403929Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:31:39.864300Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:31:50.332126Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:32:00.933081Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:32:01.433706Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:32:12.521309Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:32:21.575699Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000003c2791 0x2d '-'
+2020-06-22T16:32:21.575768Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000003c27cb
+HUP? 2020-06-22T16:32:24.737395Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:32:27.565957Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000003c3ed3 0x0d
+2020-06-22T16:32:27.567552Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000003c3efc
+HUP? 2020-06-22T16:32:34.932838Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:32:44.955722Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:32:45.457002Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:32:45.490850Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:32:54.610420Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:33:13.672296Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+HUP? 2020-06-22T16:33:20.606845Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:33:21.108089Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:34:12.664434Z "neon" <WARN> [2359] {7fd171c03740} Sync Stop 0x00000000003dd9dd 0x24
+2020-06-22T16:34:12.664520Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000003dda38
+2020-06-22T16:37:58.741597Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000004166f6 0x37 '7'
+2020-06-22T16:37:58.741728Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000041673d
+2020-06-22T16:39:52.744254Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:39:54.753538Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:39:55.762680Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T16:39:58.751698Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T16:40:00.743962Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:40:01.741262Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T16:40:03.757969Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:40:07.741319Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:40:14.760078Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:40:15.759255Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:40:17.766254Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:40:19.748471Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T16:40:20.760692Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:40:24.758756Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:40:25.755774Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:40:28.749316Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T16:40:29.744415Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T16:40:31.726614Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:40:33.715560Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T16:40:55.735026Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:40:56.746559Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:40:57.741707Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:41:07.760887Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:41:08.745607Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:41:13.738148Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:41:14.747223Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:41:18.738393Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:41:19.754688Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:41:20.747426Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:41:22.749462Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:41:23.753700Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:41:24.729969Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T16:41:25.743358Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:41:26.740099Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:41:28.737216Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:41:31.736582Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:41:32.734541Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T16:41:36.750959Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T16:41:37.745010Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T16:41:40.769547Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000044e7a2 0x0d
+2020-06-22T16:41:40.769673Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000044e7e7
+2020-06-22T16:41:41.748394Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:41:42.741233Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T16:41:45.748645Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T16:41:50.745330Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:41:51.756666Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:41:53.734256Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:41:55.743418Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:41:56.740552Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:42:08.743347Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T16:42:09.730663Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T16:42:24.769025Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 13
+2020-06-22T16:42:25.745010Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T16:42:39.745262Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:42:40.739240Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T16:42:41.746260Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:42:46.750553Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T16:42:48.729835Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T16:42:51.744555Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:46:17.752102Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T16:46:19.746895Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T16:48:09.732999Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T16:48:10.737650Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T16:48:17.735668Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T16:48:20.746298Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:48:24.732540Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T16:48:25.730575Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T16:48:32.729042Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T16:48:33.724262Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:48:36.722407Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T16:48:43.723917Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T16:48:51.742355Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T16:48:52.737587Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+HUP? 2020-06-22T16:48:52.936654Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:48:53.436898Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:48:53.470686Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:48:53.503782Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:48:53.743925Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T16:48:54.732971Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T16:48:57.725930Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T16:48:58.737203Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+HUP? 2020-06-22T16:49:11.475785Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:49:39.426816Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:49:50.381086Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:50:00.268509Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:50:00.335113Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:50:09.755418Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:50:19.508103Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:50:28.658258Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:50:37.803732Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:50:47.779465Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:50:57.092774Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:51:03.961232Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+HUP? 2020-06-22T16:51:10.334358Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:51:24.752333Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T16:51:29.780428Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:51:31.752672Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T16:51:32.754846Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+HUP? 2020-06-22T16:51:36.457129Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T16:51:57.737557Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T16:52:03.730578Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T16:52:26.742268Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T16:52:27.760332Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T16:52:28.763287Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T16:52:29.759297Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T16:52:39.777990Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+2020-06-22T16:52:40.793339Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T16:52:46.771756Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:52:49.761937Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T16:52:50.772068Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T16:52:56.751753Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T16:52:57.772821Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T16:53:04.737470Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T16:53:23.747398Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T16:53:24.761080Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T16:53:32.734661Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 13
+2020-06-22T16:53:33.745622Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T16:53:50.751163Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T16:53:51.747435Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T16:53:52.748307Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 12
+2020-06-22T16:53:53.746237Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T16:53:59.754965Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T16:54:00.762118Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:54:18.761436Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T16:54:19.758390Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:54:24.769407Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T16:54:25.773957Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:54:28.762369Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T16:54:29.761312Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T16:54:37.769363Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T16:54:38.760274Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T16:54:44.771616Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T16:54:45.767610Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:54:56.769569Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T16:54:57.762980Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:55:25.745970Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T16:55:26.746292Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:55:35.754971Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T16:55:36.756147Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:56:01.758512Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T16:56:02.776000Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:56:22.787645Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T16:56:23.757659Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:56:51.778739Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T16:56:52.789458Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T16:56:57.771735Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 12
+2020-06-22T16:56:58.766875Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T16:57:09.778750Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 13
+2020-06-22T16:57:11.769069Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:57:17.791482Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000535ef8 0x32 '2'
+2020-06-22T16:57:17.791551Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000535f2e
+2020-06-22T16:57:21.753420Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T16:57:23.774452Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T16:57:28.764376Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T16:57:29.776312Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:58:06.777127Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 13
+2020-06-22T16:58:07.778247Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T16:58:09.788233Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 13
+2020-06-22T16:58:11.777423Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T16:58:12.771498Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T16:58:13.799888Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T16:58:27.785052Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T16:58:28.777100Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T16:58:29.770902Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T16:58:30.780323Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T16:59:03.772830Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T16:59:04.775729Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T16:59:05.773123Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T16:59:06.751215Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T16:59:07.740220Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T16:59:08.748239Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:01:36.766547Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000574c4c 0x30 '0'
+2020-06-22T17:01:36.766667Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000574c80
+2020-06-22T17:03:08.779903Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000058b427 0x0d
+2020-06-22T17:03:08.780091Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000058b467
+2020-06-22T17:08:57.806219Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 35
+2020-06-22T17:09:00.820794Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T17:09:05.815521Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T17:09:07.831311Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T17:09:10.857679Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T17:09:13.842707Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T17:09:15.840887Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T17:09:16.840224Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T17:12:53.840046Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000619157 0x32 '2'
+2020-06-22T17:12:53.841601Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000006191a3
+2020-06-22T17:12:53.844312Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000006192c1 0x36 '6'
+2020-06-22T17:12:53.844475Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000619301
+2020-06-22T17:13:18.831025Z "neon" <WARN> [2359] {7fd171c03740} Sync Stop 0x000000000061f205 0x24
+2020-06-22T17:13:18.831156Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000061f28a
+2020-06-22T17:14:32.830467Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000630d49 0x0d
+2020-06-22T17:14:32.830549Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000630d8c
+2020-06-22T17:15:06.840738Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T17:15:07.855778Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T17:15:07.858214Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000006392e0 0x36 '6'
+2020-06-22T17:15:07.858279Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000639322
+2020-06-22T17:15:15.842550Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:15:16.842356Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:15:51.851773Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000643a83 0x37 '7'
+2020-06-22T17:15:51.851847Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000643ac8
+2020-06-22T17:16:06.842957Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:16:09.855110Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:16:12.845440Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:16:13.861798Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:16:14.845454Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:16:15.852580Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:16:15.859711Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000649760 0x36 '6'
+2020-06-22T17:16:15.859803Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000064979a
+2020-06-22T17:16:17.855454Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:16:18.846738Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:16:22.855145Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:16:23.861806Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:16:25.861883Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000064bcab 0x37 '7'
+2020-06-22T17:16:25.861950Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000064bcf0
+2020-06-22T17:16:34.849331Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:16:34.851939Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000064df92 0x37 '7'
+2020-06-22T17:16:34.852060Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000064dfb4
+2020-06-22T17:16:35.860139Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:16:44.873227Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000065056a 0x39 '9'
+2020-06-22T17:16:44.873292Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000006505b1
+2020-06-22T17:16:45.876889Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:16:46.873995Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:16:47.862235Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:16:48.865178Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:16:52.869523Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T17:16:53.865617Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:16:56.868322Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:16:57.882760Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:17:01.858269Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:17:03.875261Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:17:05.871336Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:17:07.858826Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:17:20.871700Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:17:21.874708Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:17:23.869980Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:17:25.847311Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:17:28.896209Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:17:29.877687Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:17:30.881555Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:17:31.882702Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:17:33.886822Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:17:34.871162Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:17:36.889053Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:17:38.881303Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:17:39.874489Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:17:40.878401Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:17:44.877837Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:17:45.861875Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:17:52.872404Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:17:53.878674Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T17:17:58.880026Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:18:00.873262Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:18:11.871131Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:18:12.883208Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:18:14.877262Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:18:15.881435Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:18:21.878192Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:18:22.874875Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:18:31.873608Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:18:32.861787Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:18:33.866021Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:18:34.875444Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:18:38.874047Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:18:39.883276Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:18:41.876780Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:18:42.876730Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:18:45.883004Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:18:46.884090Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:18:50.889357Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:18:51.888338Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:18:54.872498Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:18:55.877619Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:18:59.880815Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:19:00.877280Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:19:12.880375Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:19:13.876384Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:19:23.871975Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:19:24.868947Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:19:26.870252Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:19:28.867247Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:19:29.862435Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:19:30.860762Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:19:31.857765Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:19:33.858142Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:19:34.856909Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:19:35.859015Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:19:36.861060Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:19:37.879153Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:19:38.866171Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:19:39.870428Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+HUP? 2020-06-22T17:19:59.468334Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T17:20:10.791722Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 30
+HUP? 2020-06-22T17:20:16.021790Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T17:20:20.886671Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T17:20:47.888059Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:20:49.888294Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:20:50.882213Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:20:52.893340Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:20:55.912731Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:20:56.893677Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:20:57.886903Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:21:02.896077Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:21:04.896302Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:21:06.894627Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:21:08.878663Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:21:09.891767Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:21:10.889840Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:21:11.884960Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:21:12.884248Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:21:14.887989Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:21:15.889214Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:21:17.894225Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:21:18.889545Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:21:19.884657Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:21:20.893014Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:21:22.893040Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:21:27.896331Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:21:28.889274Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:21:35.883010Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:21:36.887092Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:22:24.882133Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:22:25.889907Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:22:28.876585Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:22:29.880356Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:22:39.893199Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:22:41.887585Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:22:47.892232Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:22:48.896064Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:22:51.902359Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:22:52.912322Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:22:57.912971Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:22:58.915703Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:23:04.910942Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:23:05.903532Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:23:06.914877Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:23:07.902884Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:23:08.898744Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:23:09.919748Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:23:14.908153Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:23:15.907365Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:23:16.918210Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:23:18.898385Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:23:19.917401Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:23:20.897138Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:23:23.904781Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:23:24.909961Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:23:39.934297Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:23:40.938433Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:23:48.916996Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:23:49.938158Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:23:52.914529Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:23:53.931638Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:23:54.920411Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:23:55.912558Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:23:57.939623Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:23:59.914712Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:24:01.938972Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:24:03.936152Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:24:04.938163Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:24:05.934673Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:24:06.935605Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:24:07.945690Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:24:09.924558Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:24:11.927171Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:24:15.918146Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:24:16.919385Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:24:20.920648Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:24:21.906065Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:24:22.917668Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:24:23.916879Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:24:27.925302Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:24:28.919321Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:24:29.927233Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:24:32.921939Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:24:35.921169Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:24:38.941185Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:24:40.922142Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:24:48.913793Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:24:49.913210Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:24:50.916062Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:24:51.922585Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:24:53.919330Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:24:55.930656Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:25:01.932095Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:25:05.942223Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:25:08.921647Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:25:09.937542Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:25:11.931832Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:25:12.928831Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:25:16.933285Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T17:25:17.937367Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:25:18.925497Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T17:25:20.937660Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:25:28.930478Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:25:29.926331Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:25:30.922416Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:25:30.925632Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000006cb650 0x39 '9'
+2020-06-22T17:25:30.925755Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000006cb699
+2020-06-22T17:25:31.919511Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:25:32.915500Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:25:34.914634Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:25:36.926942Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:25:38.925157Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:25:49.925104Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:25:51.924262Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:25:52.937216Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:25:53.932359Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:25:54.928478Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:25:56.927809Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:25:57.915565Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:26:00.935854Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:26:02.921326Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T17:26:03.924201Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:26:04.929262Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:26:07.925226Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:26:08.919656Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:26:11.916844Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:26:15.939511Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:26:16.919210Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:26:17.914321Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:26:20.924871Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:26:21.926746Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:26:22.928955Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:26:23.922200Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:26:27.921319Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:26:28.932202Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:26:31.936684Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:26:32.928656Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:26:34.922950Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:26:38.947142Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:26:42.931556Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 13
+2020-06-22T17:26:43.936673Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:26:44.933507Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:26:50.929385Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:26:52.934028Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:27:03.936246Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:27:05.933394Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:27:06.934499Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:27:09.916760Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:27:13.929078Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:27:14.922354Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:27:16.930876Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:27:17.931341Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:27:20.917724Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:27:23.935795Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:27:24.942790Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:27:28.937305Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T17:27:30.936559Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:27:31.938408Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:27:33.935971Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:27:34.944817Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:27:36.948883Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:27:37.931259Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:27:38.956212Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:27:40.949573Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:27:44.925635Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:27:45.936828Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:27:48.933961Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T17:27:49.950845Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:27:50.940108Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:27:51.945025Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:27:56.951578Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:27:57.950425Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:27:58.947726Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:27:59.951701Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:28:06.939404Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:28:07.944419Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:28:09.941617Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:28:10.939673Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:28:12.948932Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:28:13.939980Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:28:16.952383Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:28:18.939865Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:28:19.961175Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:28:20.949564Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:28:26.943266Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:28:27.953194Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:28:28.950389Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T17:28:45.934721Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:28:47.926939Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:28:59.950947Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:29:00.942848Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:29:47.929917Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:29:48.932748Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:29:52.931598Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:29:53.932452Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:29:55.935679Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:29:56.936546Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T17:30:04.937199Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:30:05.935199Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:30:08.950513Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:30:10.947744Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:30:11.951122Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:30:12.938014Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:30:15.947551Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:30:18.950364Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:30:18.954070Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000070fd8b 0x37 '7'
+2020-06-22T17:30:18.954435Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000070fdd4
+2020-06-22T17:30:21.941187Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:30:22.962906Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:30:23.949683Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:30:26.933418Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:30:27.925327Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:30:28.935066Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:30:31.937418Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T17:30:32.933721Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:30:33.952767Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:30:37.941068Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:30:39.934149Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:30:40.933527Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:30:41.945448Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:30:42.946909Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000007158ad 0x32 '2'
+2020-06-22T17:30:42.947130Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000007158f6
+2020-06-22T17:30:43.941540Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:30:47.948869Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:30:48.945151Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:30:52.954456Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:30:53.954608Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:30:53.960894Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000718345 0x0d
+2020-06-22T17:30:53.961080Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000071838c
+2020-06-22T17:30:54.945731Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:30:56.947490Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:30:57.943698Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:31:00.945930Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:31:02.933275Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:31:03.981329Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:31:05.930398Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:31:06.945573Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:31:09.949896Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:31:11.927874Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:31:18.936578Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:31:20.971040Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:31:27.952169Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:31:28.947412Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:31:29.952492Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:31:38.960225Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:31:42.964903Z "neon" <WARN> [2359] {7fd171c03740} Sync Stop 0x0000000000723def 0x0d
+2020-06-22T17:31:42.964987Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000723e6e
+2020-06-22T17:31:45.935874Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:31:46.955984Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:31:47.964634Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:31:49.961034Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:31:51.953928Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:31:53.973407Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:31:55.949637Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:31:56.938546Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:31:57.943558Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:32:03.962384Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:32:04.949421Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:32:07.949685Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:32:08.962722Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:32:11.959345Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:32:12.959749Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:32:22.970813Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:32:23.962813Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:32:26.961160Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:32:27.963174Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:32:30.963413Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T17:32:33.962884Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:32:36.961362Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:32:43.942639Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:32:48.960947Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:32:55.958567Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:32:56.947587Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T17:33:02.939229Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:33:03.944177Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:33:05.928299Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:33:06.941490Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:33:07.932630Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:33:09.937898Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:33:09.940777Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000738ac2 0x38 '8'
+2020-06-22T17:33:09.940890Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000738b0b
+2020-06-22T17:33:10.942887Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:33:10.943972Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000738d07 0x30 '0'
+2020-06-22T17:33:10.944087Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000738d3b
+2020-06-22T17:33:15.945204Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T17:33:17.954469Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:33:21.922992Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:33:35.963998Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:33:36.970972Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:33:41.934618Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:33:43.951752Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:33:50.958547Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:33:51.942543Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:33:55.930745Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:33:56.938804Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:33:57.945787Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:33:59.958057Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:34:07.945654Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000746611 0x37 '7'
+2020-06-22T17:34:07.945772Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x0000000000746658
+2020-06-22T17:34:10.937006Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T17:34:11.937012Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:34:35.963058Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:34:37.972338Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:34:38.956526Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:34:39.948060Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:34:40.945741Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T17:34:41.947632Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:34:49.970195Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T17:34:50.939766Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:35:11.955091Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:35:12.948160Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:35:18.950675Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:35:19.946645Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:35:20.949551Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T17:35:21.954974Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T17:35:24.955067Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:35:25.953049Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T17:35:29.970270Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:35:30.955724Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:35:33.968014Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:35:35.961333Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:35:45.970872Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:35:46.988446Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:35:52.978340Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:35:53.980452Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:35:54.982825Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:35:55.982788Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:35:58.987986Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:35:59.975897Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:36:00.989241Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:36:07.968877Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:36:08.976677Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:36:13.972424Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:36:14.979425Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:36:16.999663Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:36:17.978463Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:36:21.964157Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:36:23.980117Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:36:25.990057Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:36:28.986493Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:36:29.991502Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:36:30.996049Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:36:32.993308Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:36:33.996118Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:36:35.992207Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:36:37.996383Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:36:45.990872Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:36:46.977924Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:36:49.983245Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:36:50.979245Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:36:53.999516Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:36:54.982859Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:36:56.000642Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T17:36:58.961217Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 13
+2020-06-22T17:36:59.995042Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:37:06.974543Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:37:08.980089Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 13
+2020-06-22T17:37:15.984677Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:37:16.992830Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:37:19.997728Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:37:20.991925Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:37:21.984806Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:37:22.985235Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:37:23.996272Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:37:45.983336Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:37:47.994308Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:37:48.997196Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:37:49.003421Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000077afa1 0x38 '8'
+2020-06-22T17:37:49.003598Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000077afec
+2020-06-22T17:37:49.995088Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:37:50.981456Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:37:51.984644Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:37:56.992153Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:37:57.991064Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:37:58.995290Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:38:02.014785Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T17:38:03.000465Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T17:38:18.999694Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:38:21.002039Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:38:21.997183Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:38:23.008128Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:38:24.008188Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:38:30.017865Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:38:31.009997Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:38:34.008242Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:38:35.022334Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:38:38.009524Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:38:39.003562Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 23
+2020-06-22T17:38:41.027479Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:38:43.027616Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:38:45.025069Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:38:50.025094Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:38:51.998685Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:38:54.012806Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:38:54.994946Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:38:56.013289Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:39:00.005290Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T17:39:18.013784Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:39:19.012020Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:40:34.007761Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000007a2643 0x30 '0'
+2020-06-22T17:40:34.007893Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000007a2677
+2020-06-22T17:40:58.029313Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:41:00.029628Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:41:08.010291Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:41:09.013277Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:41:10.012446Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:41:19.019086Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T17:41:20.016287Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:41:22.003189Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:41:25.000658Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T17:41:29.007919Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:41:31.003150Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 26
+2020-06-22T17:41:32.006575Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000007b0632 0x38 '8'
+2020-06-22T17:41:32.006686Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000007b067d
+2020-06-22T17:41:33.003346Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:41:40.013907Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T17:41:41.007969Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T17:41:43.012270Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T17:41:55.000384Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 26
+2020-06-22T17:41:56.014147Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:41:58.020298Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:42:08.986272Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 27
+2020-06-22T17:42:10.980387Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T17:42:11.985725Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T17:42:13.985547Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T17:42:23.969883Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:42:26.991854Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:42:34.974420Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T17:42:35.983619Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T17:43:02.025006Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:43:23.005478Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:43:24.017824Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:43:27.015788Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:43:28.009997Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T17:43:29.022158Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:43:30.016185Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:43:39.007930Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:43:40.004146Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T17:43:44.011299Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T17:43:46.998538Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T17:44:07.000749Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 33
+2020-06-22T17:44:08.001547Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T17:44:17.010023Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T17:44:18.008460Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T17:44:24.005858Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T17:44:25.011858Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T17:44:31.000294Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 29
+2020-06-22T17:44:40.045316Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T17:44:41.004092Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 27
+2020-06-22T17:44:44.986353Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T17:44:47.004569Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 31
+2020-06-22T17:44:50.001055Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T17:44:54.010250Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:44:56.023508Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 28
+2020-06-22T17:44:57.008747Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T17:45:06.004173Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 33
+2020-06-22T17:45:07.993395Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 32
+2020-06-22T17:45:09.984499Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 31
+2020-06-22T17:45:10.991556Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 28
+2020-06-22T17:45:32.983488Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 32
+2020-06-22T17:45:33.977497Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 30
+2020-06-22T17:45:39.984065Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 34
+2020-06-22T17:45:40.982197Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 34
+2020-06-22T17:45:42.985353Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:45:43.979381Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:46:01.993322Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:46:05.004369Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 22
+2020-06-22T17:46:07.004230Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:46:08.999534Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:46:10.996464Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 29
+2020-06-22T17:46:14.012361Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T17:46:14.014327Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x00000000007f2b81 0x30 '0'
+2020-06-22T17:46:14.014440Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000007f2bcc
+2020-06-22T17:46:20.018370Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:46:21.033457Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:46:28.038498Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 24
+2020-06-22T17:46:29.031723Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:46:31.016165Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:46:38.043029Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:46:40.033135Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:46:41.013242Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:46:47.035703Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:46:48.037913Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 24
+2020-06-22T17:46:49.040019Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:46:53.033166Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:46:54.025729Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:46:58.044443Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:46:59.038646Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:47:00.048278Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 25
+2020-06-22T17:47:02.029851Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:47:11.037579Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:47:12.030823Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T17:47:13.025961Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:47:14.027966Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:47:23.033869Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:47:24.046107Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:47:28.032099Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:47:30.020571Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 25
+2020-06-22T17:47:32.007678Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:47:34.023667Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:47:49.027877Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:47:50.034947Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:48:24.018740Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:48:25.025058Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:48:41.012433Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 19
+2020-06-22T17:49:01.019116Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 19
+2020-06-22T17:50:39.050776Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x000000000083189f 0x32 '2'
+2020-06-22T17:50:39.051722Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000008318ea
+2020-06-22T17:51:04.050847Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000837943 0x31 '1'
+2020-06-22T17:51:04.050917Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x000000000083796b
+2020-06-22T17:51:11.047005Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:51:12.037010Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:51:21.042991Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 15
+2020-06-22T17:51:22.048243Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:51:26.053059Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:51:27.043277Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:51:41.057712Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 16
+2020-06-22T17:51:42.049654Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 18
+2020-06-22T17:51:47.042234Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:51:48.049036Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 15
+2020-06-22T17:51:52.041461Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:51:53.043615Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:51:54.034845Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:51:56.035680Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:52:04.041677Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:52:05.037026Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 22
+2020-06-22T17:52:06.029610Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:52:09.034946Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:52:12.031266Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:52:15.032081Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 14
+2020-06-22T17:52:16.046600Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:52:18.031886Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:52:20.040868Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:52:21.046148Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:52:22.037347Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:52:23.043270Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:52:25.030255Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 21
+2020-06-22T17:52:26.032783Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:52:42.017834Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 14
+2020-06-22T17:52:45.020798Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 13
+2020-06-22T17:52:46.024202Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:52:47.031047Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 16
+2020-06-22T17:52:49.031074Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 23
+2020-06-22T17:52:50.028346Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 20
+2020-06-22T17:52:57.028899Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 17
+2020-06-22T17:52:58.037006Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 17
+2020-06-22T17:53:06.049885Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 18
+2020-06-22T17:53:07.051714Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:53:10.049984Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 20
+2020-06-22T17:53:11.058115Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 2 indicator 21
+2020-06-22T17:53:13.059276Z "neon" <WARN> [2359] {7fd171c03740} Sync Lost 0x0000000000856460 0x34 '4'
+2020-06-22T17:53:13.059404Z "neon" <NOTE> [2359] {7fd171c03740} Sync NMEA 0x00000000008564ab
+2020-06-22T17:53:21.062176Z "neon" <NOTE> [2359] {7fd171c03740} Signal UBX MON jamming 1 indicator 35
+HUP? 2020-06-22T17:53:52.624383Z "neon" <INFO> [2359] {7fd171c03740} SIGHUP
+2020-06-22T17:53:57.206478Z "neon" <NOTE> [2359] {7fd171c03740} SIGINT
+2020-06-22T17:53:57.206566Z "neon" <INFO> [2359] {7fd171c03740} Stop
+2020-06-22T17:53:57.206606Z "neon" <INFO> [2359] {7fd171c03740} Counters Remote=0 Surveyor=0 Keepalive=0 OutOfOrder=0 Missing=0
+2020-06-22T17:53:57.207894Z "neon" <INFO> [2359] {7fd171c03740} Buffer size=8192B maximum=855B total=8785355B speed=1003BPS peak=855B
+2020-06-22T17:53:57.208384Z "neon" <INFO> [2359] {7fd171c03740} End
+Terminated
