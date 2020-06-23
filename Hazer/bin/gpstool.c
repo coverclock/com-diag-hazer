@@ -1542,15 +1542,29 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
  */
 static void print_odometer(FILE * fp, const yodel_odometer_t * sp)
 {
+    double miles = 0.0;
+
     if (sp->ticks != 0) {
 
         fputs("ODO", fp);
 
-        fprintf(fp, " %9um", sp->payload.distance);
-        fprintf(fp, " (%9um)", sp->payload.totalDistance);
-        fprintf(fp, " %lc%9um", (wint_t)PLUSMINUS,  sp->payload.distanceStd);
+        miles = sp->payload.distance;
+        miles /= 1000.0;
+        miles *= 0.621371;
 
-        fprintf(fp, "%31s", "");
+        fprintf(fp, " %10.3lfmi", miles);
+        fprintf(fp, " %6u.%03ukm", sp->payload.distance / 1000, sp->payload.distance % 1000);
+
+        miles = sp->payload.totalDistance;
+        miles /= 1000.0;
+        miles *= 0.621371;
+
+        fputs(" (", fp);
+        fprintf(fp, " %10.3lfmi", miles);
+        fprintf(fp, " %6u.%03ukm", sp->payload.totalDistance / 1000, sp->payload.totalDistance % 1000);
+        fputs(" )", fp);
+
+        fprintf(fp, " %lc%8um", (wint_t)PLUSMINUS,  sp->payload.distanceStd);
 
         fprintf(fp, " %-8.8s", "IMU");
 
