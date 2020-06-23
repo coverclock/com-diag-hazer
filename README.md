@@ -1195,10 +1195,11 @@ ATT indicates the roll, pitch, and yaw orientation of the u-blox module in those
 units which are equipped with an intertial measurement unit with a gyroscope and
 accellerometers.
 
-    ODO         0m (     1571m) ±        0m                                IMU
+    ODO      7.671mi     12.345km (     42.185mi     67.890km ) ±       0m IMU
 
 ODO indicates the resettable and semi-persistent odometer reading available
-from some u-blox modules.
+from some u-blox modules, in both miles and kilometers (the native units are
+meters), along with the error estimate in meters.
 
     NED         -5mm/s north         -2mm/s east        -41mm/s down (3)   IMU
 
