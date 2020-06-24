@@ -1658,9 +1658,9 @@ As Rube Goldberg as this is, it seems to work.
 
 > In the summer of 2019, Google Earth Pro 7.1.8 no longer works on the most
 > recent edition of MacOS, 10.15 "Catalina". I can no longer do real-time
-> moving map displays using Google Earth Pro. Instead, I use the '''-C'''
-> command line option of '''gpstool''' to save the PVT fixes to a CSV file,
-> use the '''csv2kml''' script in Hazer to convert the CSV file to Keyhole
+> moving map displays using Google Earth Pro. Instead, I use the -C
+> command line option of gpstool to save the PVT fixes to a CSV file,
+> use the csv2kml script in Hazer to convert the CSV file to Keyhole
 > Markup Langauge (KML), then import the resulting KML file into Google Earth
 > Pro for visualization.
 
