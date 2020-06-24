@@ -1656,6 +1656,14 @@ As Rube Goldberg as this is, it seems to work.
 > though it was documented). Neither did the prior version of 7.3.1. But 7.1.8,
 > which was still available, worked as expected.
 
+> In the summer of 2019, Google Earth Pro 7.1.8 no longer works on the most
+> recent edition of MacOS, 10.15 "Catalina". I can no longer do real-time
+> moving map displays using Google Earth Pro. Instead, I use the '''-C'''
+> command line option of '''gpstool''' to save the PVT fixes to a CSV file,
+> use the '''csv2kml''' script in Hazer to convert the CSV file to Keyhole
+> Markup Langauge (KML), then import the resulting KML file into Google Earth
+> Pro for visualization.
+
 ## NMEA TXT Sentences
 
 Some devices are chatty and emit interesting and sometimes useful information
