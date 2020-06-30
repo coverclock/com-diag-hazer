@@ -1976,6 +1976,8 @@ int main(int argc, char * argv[])
     long display_now = 0;
     long keepalive_was = 0;
     long keepalive_now = 0;
+    long trace_was = 0;
+    long trace_now = 0;
     /*
      * I/O buffer variables.
      */
@@ -2838,7 +2840,15 @@ int main(int argc, char * argv[])
      * Start the clock.
      */
 
-    display_now = display_was = expiration_now = expiration_was = keepalive_now = keepalive_was = (epoch = diminuto_time_elapsed()) / (frequency = diminuto_frequency());
+    epoch = diminuto_time_elapsed();
+
+    frequency = diminuto_frequency();
+
+    display_now = display_was =
+        expiration_now = expiration_was =
+            keepalive_now = keepalive_was =
+                trace_now = trace_was =
+                    epoch / frequency;
 
     delay = frequency; /* May be mutatable some day. */
 
@@ -4041,8 +4051,11 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (!trace) {
             /* Do nothing. */
+        } else if (trace_was == (trace_now = ticktock(frequency))) {
+            /* Do nothing. */
         } else {
             emit_trace(trace_fp, position, &solution);
+            trace_was = trace_now;
             trace = 0;
         }
 
@@ -4053,6 +4066,8 @@ int main(int argc, char * argv[])
          */
 
         if (trace_fp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (base.ticks == 0) {
             /* Do nothing. */
         } else if (base.payload.active) {
             /* Do nothing. */
@@ -4174,7 +4189,6 @@ report:
             }
 
             display_was = display_now;
-
             refresh = 0;
         }
 
