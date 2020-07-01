@@ -3,9 +3,8 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Meters CSV entries from stdin to stdout based
-# on the interarrival time between successive
-# lines.
+# Added a column with the local interarrival
+# time in seconds.
 #
 
 PREVIOUS=0
