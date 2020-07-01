@@ -4073,6 +4073,8 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (!base.payload.valid) {
             /* Do nothing. */
+        } else if (trace_fp == stdout) {
+            trace_fp = (FILE *)0;
         } else if ((rc = fclose(trace_fp)) != EOF) {
             trace_fp = (FILE *)0;
         } else {
