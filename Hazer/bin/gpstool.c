@@ -1496,18 +1496,20 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
  */
 static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 {
+    static const int32_t SCALE1EM5 = 100000;
+
     if (sp->ticks != 0) {
 
         fputs("ATT", fp);
 
         if (sp->payload.accRoll != 0) {
             fprintf(fp, " %4d.%01u%lc roll %lc%4d.%01u%lc",
-                sp->payload.roll / 100000,
-                abs32(sp->payload.roll) % 100000 / 10000,
+                sp->payload.roll / SCALE1EM5,
+                abs32(sp->payload.roll) % SCALE1EM5 / (SCALE1EM5 / 10),
                 (wint_t)DEGREE,
                 (wint_t)PLUSMINUS,
-                sp->payload.accRoll / 100000,
-                abs32(sp->payload.accRoll) % 100000 / 10000,
+                sp->payload.accRoll / SCALE1EM5,
+                abs32(sp->payload.accRoll) % SCALE1EM5 / (SCALE1EM5 / 10),
                 (wint_t)DEGREE);
         } else {
             fprintf(fp, " %21s", "");
@@ -1515,12 +1517,12 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 
         if (sp->payload.accPitch != 0) {
             fprintf(fp, " %4d.%01u%lc pitch %lc%4d.%01u%lc",
-                sp->payload.pitch / 100000,
-                abs32(sp->payload.pitch) % 100000 / 10000,
+                sp->payload.pitch / SCALE1EM5,
+                abs32(sp->payload.pitch) % SCALE1EM5 / (SCALE1EM5 / 10),
                 (wint_t)DEGREE,
                 (wint_t)PLUSMINUS,
-                sp->payload.accPitch / 100000,
-                abs32(sp->payload.accPitch) % 100000 / 10000,
+                sp->payload.accPitch / SCALE1EM5,
+                abs32(sp->payload.accPitch) % SCALE1EM5 / (SCALE1EM5 / 10),
                 (wint_t)DEGREE);
         } else {
             fprintf(fp, " %22s", "");
@@ -1528,12 +1530,12 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 
         if (sp->payload.accHeading != 0) {
             fprintf(fp, " %4d.%01u%lc yaw %lc%4d.%01u%lc",
-                sp->payload.heading / 100000,
-                abs32(sp->payload.heading) % 100000 / 10000,
+                sp->payload.heading / SCALE1EM5,
+                abs32(sp->payload.heading) % SCALE1EM5 / (SCALE1EM5 / 10),
                 (wint_t)DEGREE,
                 (wint_t)PLUSMINUS,
-                sp->payload.accHeading / 100000,
-                abs32(sp->payload.accHeading) % 100000 / 10000,
+                sp->payload.accHeading / SCALE1EM5,
+                abs32(sp->payload.accHeading) % SCALE1EM5 / (SCALE1EM5 / 10),
                 (wint_t)DEGREE);
         } else {
             fprintf(fp, " %20s", "");
@@ -3260,7 +3262,7 @@ int main(int argc, char * argv[])
 
                 DIMINUTO_LOG_DEBUG("Surveyor RTCM [%zd] [%zd] [%zd] <%d>\n", surveyor_total, surveyor_size, surveyor_length, kinematics.number);
 
-                if (verbose) { diminuto_dump(stderr, &surveyor_buffer, surveyor_total); }
+                if (verbose) { fputs("NET:\n", stderr); diminuto_dump(stderr, &surveyor_buffer, surveyor_total); }
                 write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
 
             }
@@ -3402,7 +3404,7 @@ int main(int argc, char * argv[])
 
                 if (rc == 0) {
                     if (command->acknak) { acknakpending += 1; }
-                    if (verbose) { fprintf(stderr, "OUT [%zd] ", command_length); print_buffer(stderr, command_string, command_length, UNLIMITED); }
+                    if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_string, command_length); }
                     if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
                     if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }
                 }
@@ -3518,9 +3520,7 @@ int main(int argc, char * argv[])
          **/
 
         if (log_fp != (FILE *)0) { print_buffer(log_fp, buffer, length, UNLIMITED); }
-
-        if (verbose) { fprintf(stderr, "INP [%zd] ", length); print_buffer(stderr, buffer, length, UNLIMITED); }
-
+        if (verbose) { fputs("INP:\n", stderr); diminuto_dump(stderr, buffer, length); }
         if (escape) { fputs("\033[1;1H\033[0K", out_fp); }
         if (report) { fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation); fflush(out_fp); }
 
@@ -3758,8 +3758,6 @@ int main(int argc, char * argv[])
              * UBX PACKETS
              */
 
-            if (verbose) { diminuto_dump(stderr, buffer, length); }
-
             if (yodel_ubx_nav_hpposllh(&(solution.payload), buffer, length) == 0) {
 
                 solution.ticks = timeout;
@@ -3985,8 +3983,6 @@ int main(int argc, char * argv[])
             /*
              * RTCM MESSAGES
              */
-
-            if (verbose) { diminuto_dump(stderr, buffer, length); }
 
             kinematics.source = DEVICE;
 
