@@ -1500,32 +1500,44 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 
         fputs("ATT", fp);
 
-        fprintf(fp, " %4d.%01u%lc roll %lc%4d.%01u%lc",
-            sp->payload.roll / 100000,
-            abs32(sp->payload.roll) % 100000 / 10000,
-            (wint_t)DEGREE,
-            (wint_t)PLUSMINUS,
-            sp->payload.accRoll / 100000,
-            abs32(sp->payload.accRoll) % 100000 / 10000,
-            (wint_t)DEGREE);
+        if (sp->payload.accRoll != 0) {
+            fprintf(fp, " %4d.%01u%lc roll %lc%4d.%01u%lc",
+                sp->payload.roll / 100000,
+                abs32(sp->payload.roll) % 100000 / 10000,
+                (wint_t)DEGREE,
+                (wint_t)PLUSMINUS,
+                sp->payload.accRoll / 100000,
+                abs32(sp->payload.accRoll) % 100000 / 10000,
+                (wint_t)DEGREE);
+        } else {
+            fprintf(fp, " %21s", "");
+        }
 
-        fprintf(fp, " %4d.%01u%lc pitch %lc%4d.%01u%lc",
-            sp->payload.pitch / 100000,
-            abs32(sp->payload.pitch) % 100000 / 10000,
-            (wint_t)DEGREE,
-            (wint_t)PLUSMINUS,
-            sp->payload.accPitch / 100000,
-            abs32(sp->payload.accPitch) % 100000 / 10000,
-            (wint_t)DEGREE);
+        if (sp->payload.accPitch != 0) {
+            fprintf(fp, " %4d.%01u%lc pitch %lc%4d.%01u%lc",
+                sp->payload.pitch / 100000,
+                abs32(sp->payload.pitch) % 100000 / 10000,
+                (wint_t)DEGREE,
+                (wint_t)PLUSMINUS,
+                sp->payload.accPitch / 100000,
+                abs32(sp->payload.accPitch) % 100000 / 10000,
+                (wint_t)DEGREE);
+        } else {
+            fprintf(fp, " %22s", "");
+        }
 
-        fprintf(fp, " %4d.%01u%lc yaw %lc%4d.%01u%lc",
-            sp->payload.heading / 100000,
-            abs32(sp->payload.heading) % 100000 / 10000,
-            (wint_t)DEGREE,
-            (wint_t)PLUSMINUS,
-            sp->payload.accHeading / 100000,
-            abs32(sp->payload.accHeading) % 100000 / 10000,
-            (wint_t)DEGREE);
+        if (sp->payload.accHeading != 0) {
+            fprintf(fp, " %4d.%01u%lc yaw %lc%4d.%01u%lc",
+                sp->payload.heading / 100000,
+                abs32(sp->payload.heading) % 100000 / 10000,
+                (wint_t)DEGREE,
+                (wint_t)PLUSMINUS,
+                sp->payload.accHeading / 100000,
+                abs32(sp->payload.accHeading) % 100000 / 10000,
+                (wint_t)DEGREE);
+        } else {
+            fprintf(fp, " %20s", "");
+        }
 
         fprintf(fp, "%1s", "");
 
@@ -3724,7 +3736,13 @@ int main(int argc, char * argv[])
              * a fix.
              */
 
-            if (fix < 0) {
+            if (position[system].ticks == 0) {
+                /* Do nothing. */
+            } else if (position[system].utc_nanoseconds == 0) {
+                /* Do nothing. */
+            } else if (position[system].dmy_nanoseconds == 0) {
+                /* Do nothing. */
+            } else if (fix < 0) {
                 /* Do nothing. */
             } else if (timetofirstfix >= 0) {
                 /* Do nothing. */
