@@ -246,6 +246,12 @@ observed in the wild.
 
 # Identifiers
 
+Receivers that implement the GSA System ID field introduced in NMEA 4.10
+may reuse satellite identifiers. For example, I see GPS and Galileo both
+using identifier 9 on the U-Blox 9 receiver. Despite NMEA and vendor
+documentation to the contrary, I do not find the satellite identifer
+convention reliable and only use it as a last resort on older receivers
+that do not implement the System ID field to identify the constellation.
 Hazer recognizes the following satellite identifiers in the GSA and GSV
 messages.
 
@@ -256,20 +262,14 @@ GPS receivers.
 * SBAS - 33..64
 * GLONASS - 65..96
 
-Support for these satellite identifiers has been unit tested but has never been
-exercised using actual GPS receivers.
+Support for these satellite identifiers has been unit tested but has
+never been exercised using actual GPS receivers.
 
 * IMES - 173..182
 * QZSS - 193..197
 * BeiDou - 201..235
 * Galileo - 301..336
 * BeiDou 2 - 401..437
-
-However, receivers that implement the GSA System ID field introduced in
-NMEA 4.10 may reuse satellite identifiers (e.g. I see GPS and Galileo both
-using identifier 9 on the U-Blox 9 receiver). Despite NMEA and vendor
-documentation to the contrary, I do not find the satellite identifer convention
-reliable and only use it as a last resort.
 
 # Devices
 
@@ -994,7 +994,7 @@ several tools provided by Hazer itself.  The PVT solution is taken from
 the high precision u-blox UBX-NAV-HPPOSLLH message if it is available,
 from the ensemble GNSS solution if it exists, or from one of the four
 Global Satellite Navigation Systems solutions in this order of preference:
-GPS, GLONASS, Galileo, Beidou.
+GPS, GLONASS, Galileo, BeiDou.
 
 * HOSTNAME - hostname of computer running gpstool.
 * OBSERVATION - sequence number of observation.
