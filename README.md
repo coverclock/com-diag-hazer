@@ -1001,9 +1001,10 @@ the high precision u-blox UBX-NAV-HPPOSLLH message if it is available,
 from the ensemble GNSS solution if it exists, or from one of the four
 Global Satellite Navigation Systems solutions in this order of preference:
 GPS, GLONASS, Galileo, BeiDou. The attitude (roll, pitch, yaw) is taken
-from the UBX-NAV-ATT message from the IMU if it is available. Fields which
-are not available or supported by the receiver are null (empty). The CSV
-output is only generated once a 3D fix is available.
+from the UBX-NAV-ATT message from the IMU if it is available. Fields
+which are not available or are not supported by the receiver have values
+coded as "0." instead of empty to simplify parsing. The CSV output is
+only generated once a 3D fix is available.
 
 * HOSTNAME - hostname of computer running gpstool.
 * OBSERVATION - sequence number of observation.
