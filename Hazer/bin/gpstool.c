@@ -1040,7 +1040,7 @@ static void print_hardware(FILE * fp, const yodel_hardware_t * hp)
         }
 
         if (jamming != jamming_prior) {
-            DIMINUTO_LOG_NOTICE("Signal UBX MON jamming %u indicator %u\n", value, hp->payload.jamInd);
+            DIMINUTO_LOG_INFORMATION("Signal UBX MON jamming %u indicator %u\n", value, hp->payload.jamInd);
             jamming_prior = jamming;
         }
 
