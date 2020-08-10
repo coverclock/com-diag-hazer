@@ -994,7 +994,9 @@ several tools provided by Hazer itself.  The PVT solution is taken from
 the high precision u-blox UBX-NAV-HPPOSLLH message if it is available,
 from the ensemble GNSS solution if it exists, or from one of the four
 Global Satellite Navigation Systems solutions in this order of preference:
-GPS, GLONASS, Galileo, BeiDou.
+GPS, GLONASS, Galileo, BeiDou. The attitude (roll, pitch, yaw) is taken
+from the UBX-NAV-ATT message from the IMU if it is available. Fields which
+are not available or supported by the receiver are null (empty).
 
 * HOSTNAME - hostname of computer running gpstool.
 * OBSERVATION - sequence number of observation.
@@ -1002,12 +1004,18 @@ GPS, GLONASS, Galileo, BeiDou.
 * TIME - GPS time in decimal seconds since the POSIX Epoch.
 * LATITUDE - WGS84 latitude in decimal degrees.
 * LONGITUDE - WGS84 longitude in decimal degrees.
-* HORIZONTAL - reported horizontal error in decimal meters.
+* HACCURACY - reported horizontal error in decimal meters.
 * MSL - altitude above Mean Sea Level in decimal meters.
 * WGS84 - altitude above WGS84 ellipse in decimal meters.
-* VERTICAL - reported vertical error in decimal meters.
+* VACCURACY - reported vertical error in decimal meters.
 * SPEED - speed over ground in decimal knots.
 * COURSE - course over ground in decimal degrees.
+* ROLL - roll in decimal degrees from IMU.
+* PITCH - pitch in decimal degrees from IMU.
+* YAW - yaw in decimal degrees form IMU.
+* RACCURACY - roll accuracy in decimal degrees.
+* PACCURACY - pitch accuracy in decimal degrees.
+* YACCURACY - yaw accuracy in decimal degrees.
 
 # Help
 

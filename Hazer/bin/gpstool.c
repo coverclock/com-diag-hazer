@@ -565,9 +565,10 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
  * Save the current PVT solution to the trace file in CSV format.
  * @param fp points to the FILE stream.
  * @param pa is the positions (NMEA) array.
- * @param sp points to the solutions (UBX HPPOSLLH) structure.
+ * @param sp points to the solution (UBX HPPOSLLH) structure.
+ * @param ap points to the attitude (UBX UBXNAVATT) structure.
  */
-static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp)
+static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp, const yodel_attitude_t * ap)
 {
     static uint64_t sn = 0;
     diminuto_ticks_t ticks = 0;
@@ -576,6 +577,7 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
     int32_t degrees = 0;
     uint64_t nanodegrees = 0; /* UBX */
     uint64_t decimicrodegrees = 0; /* NMEA */
+    uint32_t centimillidegrees = 0; /* IMU */
     int32_t meters = 0;
     uint32_t decimillimeters = 0; /* UBX */
     uint32_t millimeters = 0; /* NMEA */
@@ -584,11 +586,29 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
     uint32_t microknots = 0;
     size_t ii = 0;
     ssize_t ss = -1;
+    static const int64_t NANO = 1000000000;
+    static const int64_t MICRO = 1000000;
+    static const int64_t MILLI = 1000;
+    static const int32_t CENTIMILLI = 100000;
+
+    /*
+     * HEADINGS
+     */
+
+    if (sn == 0) {
+        for (ii = 0; ii < countof(HEADINGS); ++ii) {
+            if (ii > 0) { fputc(' ', fp); }
+            fputs(HEADINGS[ii], fp);
+            if (ii < (countof(HEADINGS) - 1)) { fputc(',', fp); } else { fputc('\n', fp); }
+        }
+        sn++;
+    }
 
     /*
      * We have to have a successful PVT solution from one of the four
-     * global navigation satellite systems (or maybe an ensemble fix
-     * based on more than one such system).
+     * global navigation satellite systems, or maybe an ensemble fix
+     * based on more than one such system, or even a fix made in part
+     * via an Inertial Measurement Unit (IMU).
      */
 
     for (ii = HAZER_SYSTEM_GNSS; ii <= HAZER_SYSTEM_BEIDOU; ++ii) {
@@ -608,33 +628,25 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         return;
     }
 
-    /*
-     * Headings for Excel et al. are good.
-     */
+    /* HOSTNAME AND INDEX */
 
-    if (sn == 0) {
-        for (ii = 0; ii < countof(HEADINGS); ++ii) {
-            if (ii > 0) { fputc(' ', fp); }
-            fputs(HEADINGS[ii], fp);
-            if (ii < (countof(HEADINGS) - 1)) { fputc(',', fp); } else { fputc('\n', fp); }
-        }
-        sn++;
-    }
+    fprintf(fp, "\"%s\"", Hostname);
 
-    fprintf(fp, "\"%s\",", Hostname);
+    fprintf(fp, ", %llu", (long long unsigned int)(sn++));
 
-    fprintf(fp, " %llu,", (long long unsigned int)(sn++));
+    /* LOCAL AND GNSS TIME */
 
-    ticks = diminuto_frequency_ticks2units(Now, 1000000000LL);
-    seconds = ticks / 1000000000LLU;
-    nanoseconds = ticks % 1000000000LLU;
+    ticks = diminuto_frequency_ticks2units(Now, NANO);
 
-    fprintf(fp, " %llu.%09llu,", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
+    seconds = ticks / NANO;
+    nanoseconds = ticks % NANO;
+    fprintf(fp, ", %llu.%09llu", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
 
-    seconds = pa[ss].tot_nanoseconds / 1000000000LLU;
-    nanoseconds = pa[ss].tot_nanoseconds % 1000000000LLU;
+    seconds = pa[ss].tot_nanoseconds / NANO;
+    nanoseconds = pa[ss].tot_nanoseconds % NANO;
+    fprintf(fp, ", %llu.%09llu", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
 
-    fprintf(fp, " %llu.%09llu,", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
+    /* POSITION */
 
     /*
      * We use the high precision fix if it is available.
@@ -643,61 +655,106 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
     if (sp->ticks > 0) {
 
         yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &nanodegrees);
-        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)nanodegrees);
+        fprintf(fp, ", %d.%09llu", degrees, (long long unsigned int)nanodegrees);
 
         yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &nanodegrees);
-        fprintf(fp, " %d.%09llu,", degrees, (long long unsigned int)nanodegrees);
+        fprintf(fp, ", %d.%09llu", degrees, (long long unsigned int)nanodegrees);
 
         yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &decimillimeters);
-        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
         yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &decimillimeters);
-        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
         yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &decimillimeters);
-        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
         yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &decimillimeters);
-        fprintf(fp, " %lld.%04llu,", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
 
     } else {
 
         hazer_format_nanominutes2degrees(pa[ss].lat_nanominutes, &degrees, &decimicrodegrees);
-        fprintf(fp, " %d.%07llu,", degrees, (long long unsigned int)decimicrodegrees);
+        fprintf(fp, ", %d.%07llu", degrees, (long long unsigned int)decimicrodegrees);
 
         hazer_format_nanominutes2degrees(pa[ss].lon_nanominutes, &degrees, &decimicrodegrees);
-        fprintf(fp, " %d.%07llu,", degrees, (long long unsigned int)decimicrodegrees);
+        fprintf(fp, ", %d.%07llu", degrees, (long long unsigned int)decimicrodegrees);
 
-        fputs(" 0.0,", fp);
+        fputs(", ", fp); /* missing horizontal accuracy */
 
         totalmillimeters = pa[ss].alt_millimeters; /* MSL */
 
-        meters = totalmillimeters / 1000LL;
-        millimeters = abs64(totalmillimeters) % 1000LLU;
-        fprintf(fp, " %lld.%03llu,", (long long signed int)meters, (long long unsigned int)millimeters);
+        meters = totalmillimeters / MILLI;
+        millimeters = abs64(totalmillimeters) % MILLI;
+        fprintf(fp, ", %lld.%03llu", (long long signed int)meters, (long long unsigned int)millimeters);
 
         totalmillimeters += pa[ss].sep_millimeters; /* GEO e.g. WGS84 */
 
-        meters = totalmillimeters / 1000LL;
-        millimeters = abs64(totalmillimeters) % 1000LLU;
-        fprintf(fp, " %lld.%03llu,", (long long signed int)meters, (long long unsigned int)millimeters);
+        meters = totalmillimeters / MILLI;
+        millimeters = abs64(totalmillimeters) % MILLI;
+        fprintf(fp, ", %lld.%03llu", (long long signed int)meters, (long long unsigned int)millimeters);
 
-        fputs(" 0.0,", fp);
+        fputs(", ", fp); /* missing vertical accuracy */
 
     }
 
-    knots = pa[ss].sog_microknots / 1000000LL;
-    microknots = abs64(pa[ss].sog_microknots) % 1000000LLU;
+    /* SPEED OVER GROUND AND COURSE OVER GROUND */
 
-    fprintf(fp, " %ld.%06lu,", (long signed int)knots, (long unsigned int)microknots);
+    /*
+     * I was tempted to convert knots into meters/second, but knots or
+     * nautical miles per hour are actually the typical units used in
+     * meterology, aviation, and maritime; that's probably why they are
+     * the standard units of speed for NMEA, even though the knot is not
+     * an SI unit.
+     */
 
-    degrees = pa[ss].cog_nanodegrees / 1000000000LL;
-    nanodegrees = abs64(pa[ss].cog_nanodegrees) % 1000000000LLU;
+    knots = pa[ss].sog_microknots / MICRO;
+    microknots = abs64(pa[ss].sog_microknots) % MICRO;
+    fprintf(fp, ", %ld.%06lu", (long signed int)knots, (long unsigned int)microknots);
 
-    fprintf(fp, " %ld.%09llu\n", (long signed int)degrees, (long long unsigned int)nanodegrees);
+    degrees = pa[ss].cog_nanodegrees / NANO;
+    nanodegrees = abs64(pa[ss].cog_nanodegrees) % NANO;
+    fprintf(fp, ", %ld.%09llu", (long signed int)degrees, (long long unsigned int)nanodegrees);
+
+    /* ATTITUDE */
+
+    if (ap->ticks > 0) {
+
+        degrees = ap->payload.roll / CENTIMILLI;
+        centimillidegrees = abs(ap->payload.roll) % CENTIMILLI;
+        fprintf(fp, ", %ld.%05lu", (long signed int)degrees, (long unsigned int)centimillidegrees);
+
+        degrees = ap->payload.pitch / CENTIMILLI;
+        centimillidegrees = abs(ap->payload.pitch) % CENTIMILLI;
+        fprintf(fp, ", %ld.%05lu", (long signed int)degrees, (long unsigned int)centimillidegrees);
+
+        degrees = ap->payload.heading / CENTIMILLI;
+        centimillidegrees = abs(ap->payload.heading) % CENTIMILLI;
+        fprintf(fp, ", %ld.%05lu", (long signed int)degrees, (long unsigned int)centimillidegrees);
+
+        degrees = ap->payload.accRoll / CENTIMILLI;
+        centimillidegrees = abs(ap->payload.accRoll) % CENTIMILLI;
+        fprintf(fp, ", %ld.%05lu", (long signed int)degrees, (long unsigned int)centimillidegrees);
+
+        degrees = ap->payload.accPitch / CENTIMILLI;
+        centimillidegrees = abs(ap->payload.accPitch) % CENTIMILLI;
+        fprintf(fp, ", %ld.%05lu", (long signed int)degrees, (long unsigned int)centimillidegrees);
+
+        degrees = ap->payload.accHeading / CENTIMILLI;
+        centimillidegrees = abs(ap->payload.accHeading) % CENTIMILLI;
+        fprintf(fp, ", %ld.%05lu", (long signed int)degrees, (long unsigned int)centimillidegrees);
+
+    } else {
+
+        fputs(", , , , , , ", fp); /* missing roll, pitch, yaw, acc, acc, acc */
+
+    }
+
+    /* END */
+
+    fputs("\n", fp);
 
     fflush(fp);
-
 }
 
 /*******************************************************************************
@@ -1496,7 +1553,7 @@ static void print_solution(FILE * fp, const yodel_solution_t * sp)
  */
 static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 {
-    static const int32_t SCALE1EM5 = 100000;
+    static const int32_t CENTIMILLI = 100000;
 
     if (sp->ticks != 0) {
 
@@ -1504,12 +1561,12 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 
         if (sp->payload.accRoll != 0) {
             fprintf(fp, " %4d.%01u%lc roll %lc%4d.%01u%lc",
-                sp->payload.roll / SCALE1EM5,
-                abs32(sp->payload.roll) % SCALE1EM5 / (SCALE1EM5 / 10),
+                sp->payload.roll / CENTIMILLI,
+                abs32(sp->payload.roll) % CENTIMILLI / (CENTIMILLI / 10),
                 (wint_t)DEGREE,
                 (wint_t)PLUSMINUS,
-                sp->payload.accRoll / SCALE1EM5,
-                abs32(sp->payload.accRoll) % SCALE1EM5 / (SCALE1EM5 / 10),
+                sp->payload.accRoll / CENTIMILLI,
+                abs32(sp->payload.accRoll) % CENTIMILLI / (CENTIMILLI / 10),
                 (wint_t)DEGREE);
         } else {
             fprintf(fp, " %21s", "");
@@ -1517,12 +1574,12 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 
         if (sp->payload.accPitch != 0) {
             fprintf(fp, " %4d.%01u%lc pitch %lc%4d.%01u%lc",
-                sp->payload.pitch / SCALE1EM5,
-                abs32(sp->payload.pitch) % SCALE1EM5 / (SCALE1EM5 / 10),
+                sp->payload.pitch / CENTIMILLI,
+                abs32(sp->payload.pitch) % CENTIMILLI / (CENTIMILLI / 10),
                 (wint_t)DEGREE,
                 (wint_t)PLUSMINUS,
-                sp->payload.accPitch / SCALE1EM5,
-                abs32(sp->payload.accPitch) % SCALE1EM5 / (SCALE1EM5 / 10),
+                sp->payload.accPitch / CENTIMILLI,
+                abs32(sp->payload.accPitch) % CENTIMILLI / (CENTIMILLI / 10),
                 (wint_t)DEGREE);
         } else {
             fprintf(fp, " %22s", "");
@@ -1530,12 +1587,12 @@ static void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 
         if (sp->payload.accHeading != 0) {
             fprintf(fp, " %4d.%01u%lc yaw %lc%4d.%01u%lc",
-                sp->payload.heading / SCALE1EM5,
-                abs32(sp->payload.heading) % SCALE1EM5 / (SCALE1EM5 / 10),
+                sp->payload.heading / CENTIMILLI,
+                abs32(sp->payload.heading) % CENTIMILLI / (CENTIMILLI / 10),
                 (wint_t)DEGREE,
                 (wint_t)PLUSMINUS,
-                sp->payload.accHeading / SCALE1EM5,
-                abs32(sp->payload.accHeading) % SCALE1EM5 / (SCALE1EM5 / 10),
+                sp->payload.accHeading / CENTIMILLI,
+                abs32(sp->payload.accHeading) % CENTIMILLI / (CENTIMILLI / 10),
                 (wint_t)DEGREE);
         } else {
             fprintf(fp, " %20s", "");
@@ -1593,16 +1650,6 @@ static void print_odometer(FILE * fp, const yodel_odometer_t * sp)
  */
 static void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
 {
-    static const char FIX[] = {
-        '-',    /* no fix */
-        '!',    /* dead reckoning only */
-        '2',    /* 2D-fix */
-        '3',    /* 3D-fix */
-        '+',    /* GNSS + dead reckoning combined */
-        '*',    /* time only fix */
-        '?',    /* error */
-    };
-
     if (sp->ticks != 0) {
 
         fputs("NED", fp);
@@ -4068,7 +4115,7 @@ int main(int argc, char * argv[])
         } else if (trace_was == (trace_now = ticktock(frequency))) {
             /* Do nothing. */
         } else {
-            emit_trace(trace_fp, position, &solution);
+            emit_trace(trace_fp, position, &solution, &attitude);
             trace_was = trace_now;
             trace = 0;
         }

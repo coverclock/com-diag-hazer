@@ -26,49 +26,103 @@
 /**
  * Are we producing datagrams, consuming datagrams, or neither?
  */
-typedef enum Role { ROLE = '?', PRODUCER = 'P', CONSUMER = 'C', } role_t;
+typedef enum Role {
+    ROLE        = '?',
+    PRODUCER    = 'P',
+    CONSUMER    = 'C',
+} role_t;
 
 /**
  * Are we inputting serial data, outputting serial data, or neither?
  */
-typedef enum Direction { DIRECTION = '?', INPUT = 'I', OUTPUT = 'O' } direction_t;
+typedef enum Direction {
+    DIRECTION   = '?',
+    INPUT       = 'I',
+    OUTPUT      = 'O',
+} direction_t;
 
 /**
  * Are we using IPv4, IPv6, or not using IP at all?
  */
-typedef enum Protocol { PROTOCOL = '?', IPV4 = '4', IPV6 = '6', } protocol_t;
+typedef enum Protocol {
+    PROTOCOL    = '?',
+    IPV4        = '4',
+    IPV6        = '6',
+} protocol_t;
 
 /**
  * Are we processing an NMEA sentence, a UBX packet, an RTCM message, or none
  * of the above?
  */
-typedef enum Format { FORMAT = 0, NMEA = (1<<0), UBX = (1<<1), RTCM = (1<<2), ANY = NMEA | UBX | RTCM, } format_t;
+typedef enum Format {
+    FORMAT  = 0,
+    NMEA    = (1<<0),
+    UBX     = (1<<1),
+    RTCM    = (1<<2),
+    ANY     = NMEA | UBX | RTCM,
+} format_t;
 
 /**
  * Are we receiving RTCM updates from the device (in which case we are a fixed
  * base station in survey mode) or from the network (in which case we are a
  * mobile rover)?
  */
-typedef enum Source { SOURCE = '?', DEVICE = 'D', NETWORK = 'N', } source_t;
+typedef enum Source {
+    SOURCE  = '?',
+    DEVICE  = 'D',
+    NETWORK = 'N',
+} source_t;
 
 /**
- * What is our jamming state?
+ * What is our jamming status?
  */
-typedef enum Status { STATUS = '#', UNKNOWN = '?', NONE = '-', WARNING = '+', CRITICAL = '!', INVALID = '*', } status_t;
+typedef enum Status {
+    STATUS      = '#',
+    UNKNOWN     = '?',
+    NONE        = '-',
+    WARNING     = '+',
+    CRITICAL    = '!',
+    INVALID     = '*',
+} status_t;
 
 /**
  * How have we classified a satellite track?
  */
-typedef enum Marker { MARKER = '#', INACTIVE = ' ', ACTIVE = '<', PHANTOM = '?', UNTRACKED = '!', } marker_t;
+typedef enum Marker {
+    MARKER      = '#',
+    INACTIVE    = ' ',
+    ACTIVE      = '<',
+    PHANTOM     = '?',
+    UNTRACKED   = '!',
+} marker_t;
 
 /**
  * What update did we receive?
  */
-typedef enum Update { UPDATE = '.', RTCM_TYPE_1005 = 'B', RTCM_TYPE_1074 = 'N', RTCM_TYPE_1084 = 'R', RTCM_TYPE_1094 = 'E', RTCM_TYPE_1124 = 'C', RTCM_TYPE_1230 = 'r', RTCM_TYPE_9999 = '?', } update_t;
+typedef enum Update {
+    UPDATE          = '.',
+    RTCM_TYPE_1005  = 'B',
+    RTCM_TYPE_1074  = 'N',
+    RTCM_TYPE_1084  = 'R',
+    RTCM_TYPE_1094  = 'E',
+    RTCM_TYPE_1124  = 'C',
+    RTCM_TYPE_1230  = 'r',
+    RTCM_TYPE_9999  = '?',
+} update_t;
 
 /*******************************************************************************
- * GLOBAL CONSTANTS (PROGRAM)
+ * GLOBAL TRANSLATION UNIT CONSTANTS
  ******************************************************************************/
+
+static const char FIX[] = {
+    '-',    /* no fix */
+    '!',    /* dead reckoning only */
+    '2',    /* 2D-fix */
+    '3',    /* 3D-fix */
+    '+',    /* GNSS + dead reckoning combined */
+    '*',    /* time only fix */
+    '?',    /* error */
+};
 
 static const char * const HEADINGS[] = {
     "HOSTNAME",
@@ -77,12 +131,18 @@ static const char * const HEADINGS[] = {
     "TIME",
     "LATITUDE",
     "LONGITUDE",
-    "HORIZONTAL",
+    "HACCURACY",
     "MSL",
     "WGS84",
-    "VERTICAL",
+    "VACCURACY",
     "SPEED",
     "COURSE",
+    "ROLL",
+    "PITCH",
+    "YAW",
+    "RACCURACY",
+    "PACCURACY",
+    "YACCURACY",
 };
 
 /*******************************************************************************
