@@ -111,7 +111,7 @@ typedef enum Update {
 } update_t;
 
 /*******************************************************************************
- * GLOBAL TRANSLATION UNIT CONSTANTS
+ * TRANSLATION UNIT GLOBAL CONSTANTS
  ******************************************************************************/
 
 static const char FIX[] = {
@@ -144,6 +144,8 @@ static const char * const HEADINGS[] = {
     "PACCURACY",
     "YACCURACY",
 };
+
+static const char const EMPTY[] = ", 0.";
 
 /*******************************************************************************
  * HIGH PRECISION SOLUTION

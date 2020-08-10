@@ -684,7 +684,7 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         hazer_format_nanominutes2degrees(pa[ss].lon_nanominutes, &degrees, &decimicrodegrees);
         fprintf(fp, ", %d.%07llu", degrees, (long long unsigned int)decimicrodegrees);
 
-        fputs(", 0.", fp); /* missing horizontal accuracy */
+        fputs(EMPTY, fp); /* missing horizontal accuracy */
 
         totalmillimeters = pa[ss].alt_millimeters; /* MSL */
 
@@ -698,7 +698,7 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         millimeters = abs64(totalmillimeters) % MILLI;
         fprintf(fp, ", %lld.%03llu", (long long signed int)meters, (long long unsigned int)millimeters);
 
-        fputs(", 0.", fp); /* missing vertical accuracy */
+        fputs(EMPTY, fp); /* missing vertical accuracy */
 
     }
 
@@ -750,7 +750,12 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
 
     } else {
 
-        fputs(", 0., 0., 0., 0., 0., 0.", fp); /* missing roll, pitch, yaw, acc, acc, acc */
+        fputs(EMPTY, fp); /* missing roll */
+        fputs(EMPTY, fp); /* missing pitch */
+        fputs(EMPTY, fp); /* missing heading */
+        fputs(EMPTY, fp); /* missing roll accuracy */
+        fputs(EMPTY, fp); /* missing pitch accurady */
+        fputs(EMPTY, fp); /* missing heading accuracy */
 
     }
 
