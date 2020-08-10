@@ -15,10 +15,13 @@ HEADER=""
 COUNT=0
 INDEX=0
 
-while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
+BASDIR=${PROGRAM}.dir
+mkdir ${BASDIR}
+
+while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC YAC; do
 
 	if [[ "${NUM}" == "OBSERVATION," ]]; then
-		HEADER="$NAM $NUM $CLK $TIM $LAT $LON $HOR $MSL $WGS $VER $SOG $COG"
+		HEADER="$NAM $NUM $CLK $TIM $LAT $LON $HAC $MSL $WGS $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC"
 		continue
 	fi
 
@@ -32,13 +35,13 @@ while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 		echo ${HEADER}
 	fi
 
-	echo $NAM $NUM $CLK $TIM $LAT $LON $HOR $MSL $WGS $VER $SOG $COG
+	echo $NAM $NUM $CLK $TIM $LAT $LON $HAC $MSL $WGS $VAC $SOG $COG $ROL $PIT $YAC $RAC $PAC $YAC
 
 	COUNT=$((${COUNT} + 1))
 	if [[ ${COUNT} -ge ${MAXIMUM} ]]; then
-		TMPDIR=$(printf "%04d" $((${INDEX} / ${MODULO})))".dir"
-		mkdir -p ${TMPDIR}
-		mv ${TMPFIL} ${TMPDIR}/$(printf "%04d" ${INDEX}).csv
+		DATDIR=$(printf "%04d" $((${INDEX} / ${MODULO})))".dir"
+		mkdir -p ${BASDIR}/${DATDIR}
+		mv ${TMPFIL} ${BASDIR}/${DATDIR}/$(printf "%04d" ${INDEX}).csv
 		INDEX=$((${INDEX} + 1))
 		COUNT=0
 	fi
@@ -46,7 +49,7 @@ while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 done
 
 if [[ ${COUNT} -gt 0 ]]; then
-	mv ${TMPFIL} ${TMPDIR}/$(printf "%04d" ${INDEX}).csv
+	mv ${TMPFIL} ${BASDIR}/${DATDIR}/$(printf "%04d" ${INDEX}).csv
 fi
 
 exit 0

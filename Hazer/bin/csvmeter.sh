@@ -10,7 +10,7 @@
 
 PREVIOUS=0
 
-while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
+while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC YAC; do
 
     if [[ "${NUM}" == "OBSERVATION," ]]; then
         continue
@@ -23,7 +23,7 @@ while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
     fi
     PREVIOUS=${CURRENT}
 
-    echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HOR} ${MSL} ${WGS} ${VER} ${SOG} ${COG}
+    echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HAC} ${MSL} ${WGS} ${VAC} ${SOG} ${COG} ${ROL} ${PIT} ${YAW} ${RAC} ${PAC} ${YAC}
 
 done
 

@@ -10,7 +10,7 @@
 DATE=$(date -u +%Y%m%dT%H%M%SZ%N)
 INIT=""
 
-while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
+while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC YAC; do
 
 	if [[ "${NUM}" == "OBSERVATION," ]]; then
 		continue

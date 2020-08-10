@@ -8,21 +8,25 @@
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
+HEAD=""
 INIT=""
 
-while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
+while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC YAC; do
 
 	if [[ "${NUM}" == "OBSERVATION," ]]; then
+		if [[ -z "${HEAD}" ]]; then
+			echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HAC} ${MSL} ${WGS} ${VAC} ${SOG} ${COG} ${ROL} ${PIT} ${YAW} ${RAC} ${PAC} ${YAC}, HDELTA, VDELTA
+			HEAD=Y
+		fi
 		continue
 	fi
 
 	if [[ -z "${INIT}" ]]; then
-		echo HOSTNAME, OBSERVATION, CLOCK, TIME, LATITUDE, LONGITUDE, HORIZONTAL, MSL, WGS84, VERTICAL, SPEED, COURSE, HDIFF, VDIFF
 		LAT0=${LAT%,}
 		LON0=${LON%,}
 		MSL0=${MSL%,}
 		WGS0=${WGS%,}
-		echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HOR} ${MSL} ${WGS} ${VER} ${SOG} ${COG}, 0.0, 0.0
+		echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HAC} ${MSL} ${WGS} ${VAC} ${SOG} ${COG} ${ROL} ${PIT} ${YAW} ${RAC} ${PAC} ${YAC}, 0.0, 0.0
 		INIT=Y
 		continue
 	fi
@@ -32,15 +36,15 @@ while read NAM NUM CLK TIM LAT LON HOR MSL WGS VER SOG COG; do
 	MSL1=${MSL%,}
 	WGS1=${WGS%,}
 
-        HORD=$(geodesic ${LAT0} ${LON0} ${LAT1} ${LON1})
-	VERD=$(echo "print ${WGS1} - ${WGS0}" | bc)
+        HDELTA=$(geodesic ${LAT0} ${LON0} ${LAT1} ${LON1})
+	VDELTA=$(echo "print ${WGS1} - ${WGS0}" | bc)
 
 	LAT0=${LAT1}
 	LON0=${LON1}
 	MSL0=${MSL1}
 	WGS0=${WGS1}
 
-	echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HOR} ${MSL} ${WGS} ${VER} ${SOG} ${COG}, ${HORD}, ${VERD}
+	echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HAC} ${MSL} ${WGS} ${VAC} ${SOG} ${COG} ${ROL} ${PIT} ${YAW} ${RAC} ${PAC} ${YAC}, ${HDELTA}, ${VDELTA}
 
 done
 

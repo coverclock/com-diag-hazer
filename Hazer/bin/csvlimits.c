@@ -17,11 +17,6 @@
 #include <values.h>
 #include "./gpstool.h"
 
-/*
-HOSTNAME, OBSERVATION, CLOCK, TIME, LATITUDE, LONGITUDE, HORIZONTAL, MSL, WGS84, VERTICAL, SPEED, COURSE
-"cadmium", 1, 1589566960.035580274, 1589566960.000000000, 39.794248017, -105.153353729, 10.4399, 1705.4152, 1683.9153, 14.7053, 0.602000, 0.000000000
-*/
-
 int main(int argc, char *argv[])
 {
     const char * program = (const char *)0;
@@ -37,12 +32,18 @@ int main(int argc, char *argv[])
     double time = 0.0;
     double latitude = 0.0;
     double longitude = 0.0;
-    double horizontal = 0.0;
+    double haccuracy = 0.0;
     double msl = 0.0;
     double wgs84 = 0.0;
-    double vertical = 0.0;
+    double vaccuracy = 0.0;
     double speed = 0.0;
     double course = 0.0;
+    double roll = 0.0;
+    double pitch = 0.0;
+    double yaw = 0.0;
+    double raccuracy = 0.0;
+    double paccuracy = 0.0;
+    double yaccuracy = 0.0;
     double minimum_latitude = MAXDOUBLE;
     double maximum_latitude = -MAXDOUBLE;
     double minimum_longitude = MAXDOUBLE;
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
 
         here += 1;
 
-        if (sscanf(here, "%d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", &observation, &clock, &time, &latitude, &longitude, &horizontal, &msl, &wgs84, &vertical, &speed, &course) != 11) {
+        if (sscanf(here, "%d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", &observation, &clock, &time, &latitude, &longitude, &haccuracy, &msl, &wgs84, &vaccuracy, &speed, &course, &roll, &pitch, &yaw, &raccuracy, &paccuracy, &yaccuracy) != 17) {
             continue;
         }
 
@@ -174,7 +175,7 @@ int main(int argc, char *argv[])
         }
 
         if (verbose) {
-            fprintf(stderr, "\"%s\", %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", hostname, observation, clock, time, latitude, longitude, horizontal, msl, wgs84, vertical, speed, course);
+            fprintf(stderr, "\"%s\", %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", hostname, observation, clock, time, latitude, longitude, haccuracy, msl, wgs84, vaccuracy, speed, course, roll, pitch, yaw, raccuracy, paccuracy, yaccuracy);
         }
 
     }

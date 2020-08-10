@@ -608,7 +608,9 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
      * We have to have a successful PVT solution from one of the four
      * global navigation satellite systems, or maybe an ensemble fix
      * based on more than one such system, or even a fix made in part
-     * via an Inertial Measurement Unit (IMU).
+     * via an Inertial Measurement Unit (IMU). The PVT solution has to
+     * be a 3D fix so we can get the altitude (otherwise the altitude
+     * is ambiguous as to whether it really is zero MSL or unavailable).
      */
 
     for (ii = HAZER_SYSTEM_GNSS; ii <= HAZER_SYSTEM_BEIDOU; ++ii) {
@@ -617,6 +619,8 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         } else if (pa[ii].utc_nanoseconds == 0) {
             /* Do nothing. */
         } else if (pa[ii].dmy_nanoseconds == 0) {
+            /* Do nothing. */
+        } else if ((pa[ii].alt_digits == 0) && (pa[ii].sep_digits == 0)) {
             /* Do nothing. */
         } else {
             ss = ii;
@@ -680,7 +684,7 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         hazer_format_nanominutes2degrees(pa[ss].lon_nanominutes, &degrees, &decimicrodegrees);
         fprintf(fp, ", %d.%07llu", degrees, (long long unsigned int)decimicrodegrees);
 
-        fputs(", ", fp); /* missing horizontal accuracy */
+        fputs(", 0.", fp); /* missing horizontal accuracy */
 
         totalmillimeters = pa[ss].alt_millimeters; /* MSL */
 
@@ -694,7 +698,7 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         millimeters = abs64(totalmillimeters) % MILLI;
         fprintf(fp, ", %lld.%03llu", (long long signed int)meters, (long long unsigned int)millimeters);
 
-        fputs(", ", fp); /* missing vertical accuracy */
+        fputs(", 0.", fp); /* missing vertical accuracy */
 
     }
 
@@ -746,7 +750,7 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
 
     } else {
 
-        fputs(", , , , , , ", fp); /* missing roll, pitch, yaw, acc, acc, acc */
+        fputs(", 0., 0., 0., 0., 0., 0.", fp); /* missing roll, pitch, yaw, acc, acc, acc */
 
     }
 

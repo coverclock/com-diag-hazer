@@ -111,6 +111,12 @@ so much C code. I use Diminuto in virtually all of my C-based projects,
 and sometimes in other languages too that support C-linkage.  Portions of
 Diminuto have also shipped in products from several of my clients.
 
+If you want to use several of the post-processing scripts for the optional
+CSV output file, you may need to install the standard command line (lab)
+bench calculator (bc) utility.
+
+    sudo apt-get install bc
+
 If you want to run the peruse script, which several other scripts make use
 of, you may need to install the inotify tools package.
 
