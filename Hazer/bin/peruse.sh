@@ -55,8 +55,8 @@ elif [[ "${FILE}" == "out" ]]; then
             fi
         done
 elif [[ "${FILE}" == "csv" ]]; then
-    cat ${DIRECTORY}/${TASK}.${FILE}
-    tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE}
+    # csv2out < ${DIRECTORY}/${TASK}.${FILE}
+    tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE} | csv2out
 else
     cat ${DIRECTORY}/${TASK}.${FILE}
     tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE}
