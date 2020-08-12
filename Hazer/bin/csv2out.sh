@@ -76,7 +76,7 @@ while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW R
 		COMPASS="?"
 	fi
 
-	echo ${NUM%,} ${TYPE} ${SYSTEM} ${TIME} "[" ${POSITION} "] [" ${MSL%,}m ${GEO%,}m "] [" ${SOG%,}kn ${COG%,}${DEG} ${COMPASS} "] ["  ${ROL%,}${DEG} ${PIT%,}${DEG} ${YAW%,}${DEG} "]"
+	echo ${NUM%,} ${TYPE} ${SYSTEM} ${TIME} "[" ${POSITION} "] [" ${MSL%.*}m ${GEO%.*}m "] [" ${SOG%.*}kn ${COG%.*}${DEG} ${COMPASS} "] ["  ${ROL%.*}${DEG} ${PIT%.*}${DEG} ${YAW%.*}${DEG} "]"
 
 done
 
