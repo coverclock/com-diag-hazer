@@ -39,44 +39,44 @@ while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW R
 
 	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%S')
 
-	COG=${COG%.*}
-	if [[ ${COG} -lt 11 ]]; then
+	DEGREES=${COG%.*}
+	if [[ ${DEGREES} -lt 11 ]]; then
 		COMPASS="N"
-	elif [[ ${COG} -lt 34 ]]; then
+	elif [[ ${DEGREES} -lt 34 ]]; then
 		COMPASS="NNE"
-	elif [[ ${COG} -lt 56 ]]; then
+	elif [[ ${DEGREES} -lt 56 ]]; then
 		COMPASS="NE"
-	elif [[ ${COG} -lt 79 ]]; then
+	elif [[ ${DEGREES} -lt 79 ]]; then
 		COMPASS="ENE"
-	elif [[ ${COG} -lt 101 ]]; then
+	elif [[ ${DEGREES} -lt 101 ]]; then
 		COMPASS="E"
-	elif [[ ${COG} -lt 124 ]]; then
+	elif [[ ${DEGREES} -lt 124 ]]; then
 		COMPASS="ESE"
-	elif [[ ${COG} -lt 146 ]]; then
+	elif [[ ${DEGREES} -lt 146 ]]; then
 		COMPASS="SE"
-	elif [[ ${COG} -lt 169 ]]; then
+	elif [[ ${DEGREES} -lt 169 ]]; then
 		COMPASS="SSE"
-	elif [[ ${COG} -lt 191 ]]; then
+	elif [[ ${DEGREES} -lt 191 ]]; then
 		COMPASS="S"
-	elif [[ ${COG} -lt 213 ]]; then
+	elif [[ ${DEGREES} -lt 213 ]]; then
 		COMPASS="SSW"
-	elif [[ ${COG} -lt 236 ]]; then
+	elif [[ ${DEGREES} -lt 236 ]]; then
 		COMPASS="SW"
-	elif [[ ${COG} -lt 259 ]]; then
+	elif [[ ${DEGREES} -lt 259 ]]; then
 		COMPASS="WSW"
-	elif [[ ${COG} -lt 281 ]]; then
+	elif [[ ${DEGREES} -lt 281 ]]; then
 		COMPASS="W"
-	elif [[ ${COG} -lt 304 ]]; then
+	elif [[ ${DEGREES} -lt 304 ]]; then
 		COMPASS="WNW"
-	elif [[ ${COG} -lt 326 ]]; then
+	elif [[ ${DEGREES} -lt 326 ]]; then
 		COMPASS="NW"
-	elif [[ ${COG} -lt 349 ]]; then
+	elif [[ ${DEGREES} -lt 349 ]]; then
 		COMPASS="NNW"
 	else
 		COMPASS="?"
 	fi
 
-	echo "[" ${NUM%,} ${TYPE} ${SYSTEM} "] [" ${TIME} "] [" ${POSITION} "] [" ${MSL%,}m ${GEO%,}m "] [" ${SOG%,}kn "] [" ${COG}${DEG} ${COMPASS} "] ["  ${ROL%,}${DEG} ${PIT%,}${DEG} ${YAW%,}${DEG} "]"
+	echo ${NUM%,} ${TYPE} ${SYSTEM} ${TIME} "[" ${POSITION} "] [" ${MSL%,}m ${GEO%,}m "] [" ${SOG%,}kn ${COG%,}${DEG} ${COMPASS} "] ["  ${ROL%,}${DEG} ${PIT%,}${DEG} ${YAW%,}${DEG} "]"
 
 done
 
