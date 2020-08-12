@@ -15,26 +15,28 @@ while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW R
 		continue
 	fi
 
-	POSITION=$(mapstool -P "${LAT%,} ${LON%,}")
-	POSITION=${POSITION/,/}
+	# 39°47'39.190559"N, 105°09'12.088799"W
 
-	case "${FIX%,}" in
-	0) TYPE="NONE";;
-	1) TYPE="IMU";;
-	2) TYPE="2D";;
-	3) TYPE="3D";;
-	4) TYPE="BOTH";;
-	5) TYPE="TIME";;
-	*) TYPE="OTHER";;
-	esac
+	POSITION=$(mapstool -P "${LAT%,} ${LON%,}")
+	POSITION=$(echo ${POSITION} | sed 's/\.[0-9][0-9]*"/"/g')
 
 	case "${SYS%,}" in
-	0) SYSTEM="GNSS";;
-	1) SYSTEM="NAVSTAR";;
-	2) SYSTEM="GLONASS";;
-	3) SYSTEM="GALILEO";;
-	4) SYSTEM="BEIDOU";;
-	*) SYSTEM="OTHER";;
+	0) SYSTEM="GN";;
+	1) SYSTEM="GP";;
+	2) SYSTEM="GL";;
+	3) SYSTEM="GA";;
+	4) SYSTEM="BD";;
+	*) SYSTEM="XX";;
+	esac
+
+	case "${FIX%,}" in
+	0) TYPE="N";;
+	1) TYPE="I";;
+	2) TYPE="2";;
+	3) TYPE="3";;
+	4) TYPE="B";;
+	5) TYPE="T";;
+	*) TYPE="X";;
 	esac
 
 	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -73,10 +75,10 @@ while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW R
 	elif [[ ${DEGREES} -lt 349 ]]; then
 		COMPASS="NNW"
 	else
-		COMPASS="?"
+		COMPASS="X"
 	fi
 
-	echo ${TYPE} "   " ${TIME} "   " ${POSITION} "   " ${MSL%.*}m "   " ${SOG%.*}kn "   " ${COG%.*}${DEG} ${COMPASS} "   "  ${ROL%.*}${DEG} ${PIT%.*}${DEG} ${YAW%.*}${DEG}
+	echo ${SYSTEM} ${TYPE} "|" ${TIME} "|" ${POSITION} "|" ${MSL%.*}m "|" ${SOG%.*}kn "|" ${COG%.*}${DEG} ${COMPASS} "|"  ${ROL%.*}${DEG}, ${PIT%.*}${DEG}, ${YAW%.*}${DEG}
 
 done
 
