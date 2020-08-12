@@ -1001,24 +1001,26 @@ which are not available or are not supported by the receiver have values
 coded as "0." instead of empty to simplify parsing. The CSV output is
 only generated once a 3D fix is available.
 
-* HOSTNAME - hostname of computer running gpstool.
-* OBSERVATION - sequence number of observation.
-* CLOCK - local time in decimal seconds since the POSIX Epoch.
-* TIME - GPS time in decimal seconds since the POSIX Epoch.
-* LATITUDE - WGS84 latitude in decimal degrees.
-* LONGITUDE - WGS84 longitude in decimal degrees.
-* HACCURACY - reported horizontal error in decimal meters.
+* NAM - hostname of computer running gpstool.
+* NUM - sequence number of observation.
+* FIX - 0=no fix, 1=dead reckoning, 2=2D, 3=3D, 4=combined, 5=time only
+* SYS - 0=ensemble, 1=GPS, 2=GLONASS, 3=GALILEO, 4=BEIDOU
+* CLK - local time in decimal seconds since the POSIX Epoch.
+* TIM - GPS time in decimal seconds since the POSIX Epoch.
+* LAT - WGS84 latitude in decimal degrees.
+* LON - WGS84 longitude in decimal degrees.
+* HAC - reported horizontal error in decimal meters.
 * MSL - altitude above Mean Sea Level in decimal meters.
-* WGS84 - altitude above WGS84 ellipse in decimal meters.
-* VACCURACY - reported vertical error in decimal meters.
-* SPEED - speed over ground in decimal knots.
-* COURSE - course over ground in decimal degrees.
-* ROLL - roll in decimal degrees from IMU.
-* PITCH - pitch in decimal degrees from IMU.
+* GEO - altitude above WGS84 ellipse in decimal meters.
+* VAC - reported vertical error in decimal meters.
+* SOG - speed over ground in decimal knots.
+* COG - course over ground in decimal degrees.
+* ROL - roll in decimal degrees from IMU.
+* PIT - pitch in decimal degrees from IMU.
 * YAW - yaw in decimal degrees form IMU.
-* RACCURACY - roll accuracy in decimal degrees.
-* PACCURACY - pitch accuracy in decimal degrees.
-* YACCURACY - yaw accuracy in decimal degrees.
+* RAC - roll accuracy in decimal degrees.
+* PAC  - pitch accuracy in decimal degrees.
+* YAC  - yaw accuracy in decimal degrees.
 
 # Help
 

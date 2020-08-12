@@ -28,13 +28,15 @@ int main(int argc, char *argv[])
     char * here = (char *)0;
     char * hostname = (char *)0;
     int observation = 0;
+    int fix = 0;
+    int system = 0;
     double clock = 0.0;
     double time = 0.0;
     double latitude = 0.0;
     double longitude = 0.0;
     double haccuracy = 0.0;
     double msl = 0.0;
-    double wgs84 = 0.0;
+    double geo = 0.0;
     double vaccuracy = 0.0;
     double speed = 0.0;
     double course = 0.0;
@@ -50,8 +52,8 @@ int main(int argc, char *argv[])
     double maximum_longitude = -MAXDOUBLE;
     double minimum_msl = MAXDOUBLE;
     double maximum_msl = -MAXDOUBLE;
-    double minimum_wgs84 = MAXDOUBLE;
-    double maximum_wgs84 = -MAXDOUBLE;
+    double minimum_geo = MAXDOUBLE;
+    double maximum_geo = -MAXDOUBLE;
     
     extern char * optarg;
     extern int optind;
@@ -134,7 +136,7 @@ int main(int argc, char *argv[])
 
         here += 1;
 
-        if (sscanf(here, "%d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", &observation, &clock, &time, &latitude, &longitude, &haccuracy, &msl, &wgs84, &vaccuracy, &speed, &course, &roll, &pitch, &yaw, &raccuracy, &paccuracy, &yaccuracy) != 17) {
+        if (sscanf(here, "%d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", &observation, &fix, &system, &clock, &time, &latitude, &longitude, &haccuracy, &msl, &geo, &vaccuracy, &speed, &course, &roll, &pitch, &yaw, &raccuracy, &paccuracy, &yaccuracy) != 19) {
             continue;
         }
 
@@ -166,16 +168,16 @@ int main(int argc, char *argv[])
             maximum_msl = msl;
         }
 
-        if (wgs84 < minimum_wgs84) {
-            minimum_wgs84 = wgs84;
+        if (geo < minimum_geo) {
+            minimum_geo = geo;
         }
 
-        if (wgs84 > maximum_wgs84) {
-            maximum_wgs84 = wgs84;
+        if (geo > maximum_geo) {
+            maximum_geo = geo;
         }
 
         if (verbose) {
-            fprintf(stderr, "\"%s\", %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", hostname, observation, clock, time, latitude, longitude, haccuracy, msl, wgs84, vaccuracy, speed, course, roll, pitch, yaw, raccuracy, paccuracy, yaccuracy);
+            fprintf(stderr, "\"%s\", %d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", hostname, observation, fix, system, clock, time, latitude, longitude, haccuracy, msl, geo, vaccuracy, speed, course, roll, pitch, yaw, raccuracy, paccuracy, yaccuracy);
         }
 
     }
@@ -184,7 +186,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    printf("%s: [%d] %.9lf, %.9lf %.9lf, %.9lf %.9lf %.9lf %.9lf %.9lf\n", program, count, minimum_latitude, minimum_longitude, maximum_latitude, maximum_longitude, minimum_msl, maximum_msl, minimum_wgs84, maximum_wgs84);
+    printf("%s: [%d] %.9lf, %.9lf %.9lf, %.9lf %.9lf %.9lf %.9lf %.9lf\n", program, count, minimum_latitude, minimum_longitude, maximum_latitude, maximum_longitude, minimum_msl, maximum_msl, minimum_geo, maximum_geo);
 
     return 0;
 }

@@ -11,11 +11,11 @@
 HEAD=""
 INIT=""
 
-while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC YAC; do
+while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW RAC PAC YAC; do
 
-	if [[ "${NUM}" == "OBSERVATION," ]]; then
+	if [[ "${NUM}" == "NUM," ]]; then
 		if [[ -z "${HEAD}" ]]; then
-			echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HAC} ${MSL} ${WGS} ${VAC} ${SOG} ${COG} ${ROL} ${PIT} ${YAW} ${RAC} ${PAC} ${YAC}, HDELTA, VDELTA
+			echo $NAM $NUM $FIX $SYS $CLK $TIM $LAT $LON $HAC $MSL $GEO $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC, HDELTA, VDELTA
 			HEAD=Y
 		fi
 		continue
@@ -25,8 +25,8 @@ while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC Y
 		LAT0=${LAT%,}
 		LON0=${LON%,}
 		MSL0=${MSL%,}
-		WGS0=${WGS%,}
-		echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HAC} ${MSL} ${WGS} ${VAC} ${SOG} ${COG} ${ROL} ${PIT} ${YAW} ${RAC} ${PAC} ${YAC}, 0.0, 0.0
+		GEO0=${GEO%,}
+		echo $NAM $NUM $FIX $SYS $CLK $TIM $LAT $LON $HAC $MSL $GEO $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC, 0.0, 0.0
 		INIT=Y
 		continue
 	fi
@@ -34,17 +34,17 @@ while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC Y
 	LAT1=${LAT%,}
 	LON1=${LON%,}
 	MSL1=${MSL%,}
-	WGS1=${WGS%,}
+	GEO1=${GEO%,}
 
         HDELTA=$(geodesic ${LAT0} ${LON0} ${LAT1} ${LON1})
-	VDELTA=$(echo "print ${WGS1} - ${WGS0}" | bc)
+	VDELTA=$(echo "print ${GEO1} - ${GEO0}" | bc)
 
 	LAT0=${LAT1}
 	LON0=${LON1}
 	MSL0=${MSL1}
-	WGS0=${WGS1}
+	GEO0=${GEO1}
 
-	echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HAC} ${MSL} ${WGS} ${VAC} ${SOG} ${COG} ${ROL} ${PIT} ${YAW} ${RAC} ${PAC} ${YAC}, ${HDELTA}, ${VDELTA}
+	echo $NAM $NUM $FIX $SYS $CLK $TIM $LAT $LON $HAC $MSL $GEO $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC, ${HDELTA}, ${VDELTA}
 
 done
 

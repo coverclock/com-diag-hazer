@@ -114,7 +114,7 @@ typedef enum Update {
  * TRANSLATION UNIT GLOBAL CONSTANTS
  ******************************************************************************/
 
-static const char FIX[] = {
+static const char FIXES[] = {
     '-',    /* no fix */
     '!',    /* dead reckoning only */
     '2',    /* 2D-fix */
@@ -125,24 +125,26 @@ static const char FIX[] = {
 };
 
 static const char * const HEADINGS[] = {
-    "HOSTNAME",
-    "OBSERVATION",
-    "CLOCK",
-    "TIME",
-    "LATITUDE",
-    "LONGITUDE",
-    "HACCURACY",
+    "NAM",
+    "NUM",
+    "FIX",
+    "SYS",
+    "CLK",
+    "TIM",
+    "LAT",
+    "LON",
+    "HAC",
     "MSL",
-    "WGS84",
-    "VACCURACY",
-    "SPEED",
-    "COURSE",
-    "ROLL",
-    "PITCH",
+    "GEO",
+    "VAC",
+    "SOG",
+    "COG",
+    "ROL",
+    "PIT",
     "YAW",
-    "RACCURACY",
-    "PACCURACY",
-    "YACCURACY",
+    "RAC",
+    "PAC",
+    "YAC",
 };
 
 static const char const EMPTY[] = ", 0.";

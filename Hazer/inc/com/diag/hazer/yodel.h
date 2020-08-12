@@ -1158,6 +1158,18 @@ enum YodelUbxNavPvtValid {
 };
 
 /**
+ * UBX=NAV-PVT fixType values.
+ */
+enum YodelUbxNavPvtFixTypes {
+    YODEL_UBX_NAV_PVT_fixType_noFix             = 0,
+    YODEL_UBX_NAV_PVT_fixType_deadReckoningOnly = 1,
+    YODEL_UBX_NAV_PVT_fixType_2D                = 2,
+    YODEL_UBX_NAV_PVT_fixType_3D                = 3,
+    YODEL_UBX_NAV_PVT_fixType_combined          = 4,
+    YODEL_UBX_NAV_PVT_fixType_timeOnly          = 5,
+};
+
+/**
  * UBX-NAV-PVT flags values.
  */
 enum YodelUbxNavPvtFlags {

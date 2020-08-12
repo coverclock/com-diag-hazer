@@ -7,10 +7,10 @@
 # This makes it easier for humans to pick out intervals of interest.
 # e.g. tail -f file.csv | csv2iso 
 
-while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC YAC; do
+while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEP VAC SOG COG ROL PIT YAW RAC PAC YAC; do
 
-	if [[ "${NUM}" == "OBSERVATION," ]]; then
-		echo $NAM $NUM $CLK $TIM $LAT $LON $HAC $MSL $WGS $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC
+	if [[ "${NUM}" == "NUM," ]]; then
+		echo $NAM $NUM $FIX $SYS $CLK $TIM $LAT $LON $HAC $MSL $GEO $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC
 		continue
 	fi
 
@@ -18,7 +18,7 @@ while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC Y
 
 	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%S.%N+00:00,')
 
-	echo $NAM $NUM ${CLOCK} ${TIME} $LAT $LON $HAC $MSL $WGS $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC
+	echo $NAM $NUM $FIX $SYS ${CLOCK} ${TIME} $LAT $LON $HAC $MSL $GEO $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC
 
 done
 

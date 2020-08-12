@@ -13,10 +13,10 @@ COUNT=0
 TOTAL=0.0
 MEAN=0.0
 
-while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC YAC; do
+while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW RAC PAC YAC; do
 
-    if [[ "${NUM}" == "OBSERVATION," ]]; then
-    	echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HAC} ${MSL} ${WGS} ${VAC} ${SOG} ${COG} ${ROL} ${PIT} ${YAW} ${RAC} ${PAC} ${YAC}, ELAPSED, MEAN
+    if [[ "${NUM}" == "NUM," ]]; then
+    	echo $NAM $NUM $FIX $SYS $CLK $TIM $LAT $LON $HAC $MSL $GEO $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC, ELAPSED, MEAN
         continue
     fi
 
@@ -29,7 +29,7 @@ while read NAM NUM CLK TIM LAT LON HAC MSL WGS VAC SOG COG ROL PIT YAW RAC PAC Y
     PREVIOUS=${CURRENT}
     COUNT=$((${COUNT} + 1))
 
-    echo ${NAM} ${NUM} ${CLK} ${TIM} ${LAT} ${LON} ${HAC} ${MSL} ${WGS} ${VAC} ${SOG} ${COG} ${ROL} ${PIT} ${YAW} ${RAC} ${PAC} ${YAC}, ${ELAPSED}, ${MEAN}
+    echo $NAM $NUM $FIX $SYS $CLK $TIM $LAT $LON $HAC $MSL $GEO $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC, ${ELAPSED}, ${MEAN}
 
 done
 
