@@ -14,8 +14,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "com/diag/diminuto/diminuto_absolute.h"
 #include "com/diag/hazer/hazer.h"
-#include "com/diag/hazer/helpers.h"
 #include "../src/hazer.h"
 
 /******************************************************************************

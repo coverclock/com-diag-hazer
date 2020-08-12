@@ -97,19 +97,14 @@ Corporation PNT division.
 
 # Dependencies
 
-The Hazer library, which includes the Hazer, Yodel, and Tumbleweed software
-stacks, depends on no more than the usual standard C, GNU, and POSIX libraries
-and commands that come as part of (for example) the full Raspbian 10 (based
-on Debian "Buster") install for the Raspberry Pi.
-
-The gpstool and rtktool utilities are built on top of the Hazer library
-and also my Diminuto library. Diminuto is a general purpose C-based systems
-programming library that supports serial port configuration, socket-based
-communication, and a passle of other useful stuff. gpstool and rtktool are
-excellent examples of how to leverage Diminuto to get a lot done in not
-so much C code. I use Diminuto in virtually all of my C-based projects,
-and sometimes in other languages too that support C-linkage.  Portions of
-Diminuto have also shipped in products from several of my clients.
+The Hazer library and its utilities depend on my Diminuto library.
+Diminuto is a general purpose C-based systems programming library that
+supports serial port configuration, socket-based communication, and a
+passle of other useful stuff. gpstool and rtktool are excellent examples
+of how to leverage Diminuto to get a lot done in not so much C code. I
+use Diminuto in virtually all of my C-based projects, and sometimes in
+other languages too that support C-linkage.  Portions of Diminuto have
+also shipped in products from several of my clients.
 
 If you want to use several of the post-processing scripts for the optional
 CSV output file, you may need to install the standard command line (lab)

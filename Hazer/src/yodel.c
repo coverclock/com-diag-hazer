@@ -14,22 +14,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "com/diag/diminuto/diminuto_absolute.h"
 #include "com/diag/hazer/yodel.h"
 #include "../src/yodel.h"
-
-/******************************************************************************
- *
- ******************************************************************************/
-
-/**
- * Return the absolute value of a signed sixty-four bit integer.
- * @param datum is a signed sixty-four bit integer.
- * @return an unsigned sixty-four bit integer.
- */
-static inline uint64_t abs64(int64_t datum)
-{
-    return (datum >= 0) ? datum : -datum;
-}
 
 /******************************************************************************
  *

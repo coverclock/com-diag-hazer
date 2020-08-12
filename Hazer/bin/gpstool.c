@@ -102,7 +102,6 @@
 #include <wchar.h>
 #include <ctype.h>
 #include "./gpstool.h"
-#include "com/diag/hazer/helpers.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
@@ -131,6 +130,7 @@
 #include "com/diag/diminuto/diminuto_file.h"
 #include "com/diag/diminuto/diminuto_daemon.h"
 #include "com/diag/diminuto/diminuto_lock.h"
+#include "com/diag/diminuto/diminuto_absolute.h"
 
 /*******************************************************************************
  * CONSTANTS
