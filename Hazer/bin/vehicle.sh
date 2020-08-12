@@ -19,8 +19,8 @@ CSVFIL=${5-"${SAVDIR}/${PROGRAM}.csv"}
 PIDFIL=${6-"${SAVDIR}/${PROGRAM}.pid"}
 LIMIT=${7:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
-DIRECTORY=$(dirname ${OUTFIL})
-FILENAME=$(basename ${OUTFIL})
+DIRECTORY=$(dirname ${CSVFIL})
+FILENAME=$(basename ${CSVFIL})
 TASK=${FILENAME%%.*}
 FILE=${FILENAME#*.}
 

@@ -37,7 +37,7 @@ while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW R
 	*) SYSTEM="OTHER";;
 	esac
 
-	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%S')
+	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%SZ')
 
 	DEGREES=${COG%.*}
 	if [[ ${DEGREES} -lt 11 ]]; then
@@ -76,7 +76,7 @@ while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW R
 		COMPASS="?"
 	fi
 
-	echo ${NUM%,} ${TYPE} ${SYSTEM} ${TIME} "[" ${POSITION} "] [" ${MSL%.*}m ${GEO%.*}m "] [" ${SOG%.*}kn ${COG%.*}${DEG} ${COMPASS} "] ["  ${ROL%.*}${DEG} ${PIT%.*}${DEG} ${YAW%.*}${DEG} "]"
+	echo ${TYPE} "   " ${TIME} "   " ${POSITION} "   " ${MSL%.*}m "   " ${SOG%.*}kn "   " ${COG%.*}${DEG} ${COMPASS} "   "  ${ROL%.*}${DEG} ${PIT%.*}${DEG} ${YAW%.*}${DEG}
 
 done
 
