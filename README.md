@@ -1003,8 +1003,9 @@ only generated once a 3D fix is available.
 
 * NAM - hostname of computer running gpstool.
 * NUM - sequence number of observation.
-* FIX - 0=no fix, 1=dead reckoning, 2=2D, 3=3D, 4=combined, 5=time only
-* SYS - 0=ensemble, 1=GPS, 2=GLONASS, 3=GALILEO, 4=BEIDOU
+* FIX - 0=no fix, 1=dead reckoning, 2=2D, 3=3D, 4=combined, 5=time only.
+* SYS - 0=ensemble, 1=GPS, 2=GLONASS, 3=GALILEO, 4=BEIDOU.
+* SAT - number of satellites used in position fix.
 * CLK - local time in decimal seconds since the POSIX Epoch.
 * TIM - GPS time in decimal seconds since the POSIX Epoch.
 * LAT - WGS84 latitude in decimal degrees.

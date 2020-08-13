@@ -9,7 +9,7 @@
 
 DEG="°"
 
-while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW RAC PAC YAC; do
+while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW RAC PAC YAC; do
 
 	if [[ "${NUM}" == "NUM," ]]; then
 		continue
@@ -30,13 +30,13 @@ while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW R
 	esac
 
 	case "${FIX%,}" in
-	0) TYPE="N";;
-	1) TYPE="I";;
-	2) TYPE="2";;
-	3) TYPE="3";;
-	4) TYPE="B";;
-	5) TYPE="T";;
-	*) TYPE="X";;
+	0) TYPE="NO";;
+	1) TYPE="IN";;
+	2) TYPE="2D";;
+	3) TYPE="3D";;
+	4) TYPE="GI";;
+	5) TYPE="TM";;
+	*) TYPE="XX";;
 	esac
 
 	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -78,7 +78,7 @@ while read NAM NUM FIX SYS CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW R
 		COMPASS="X"
 	fi
 
-	echo ${SYSTEM} ${TYPE} "|" ${TIME} "|" ${POSITION} "|" ${MSL%.*}m "|" ${SOG%.*}kn "|" ${COG%.*}${DEG} ${COMPASS} "|"  ${ROL%.*}${DEG}, ${PIT%.*}${DEG}, ${YAW%.*}${DEG}
+	echo ${SYSTEM} ${SAT%,} ${TYPE} "|" ${TIME} "|" ${POSITION} "|" ${MSL%.*}m "|" ${SOG%.*}kn "|" ${COG%.*}${DEG} ${COMPASS} "|"  ${ROL%.*}${DEG}, ${PIT%.*}${DEG}, ${YAW%.*}${DEG}
 
 done
 

@@ -648,6 +648,18 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
 
     fprintf(fp, ", %d", system);
 
+    /* SAT */
+
+    if (pa[system].ticks > 0) {
+
+        fprintf(fp, ", %d", pa[system].sat_used);
+
+    } else {
+
+        fputs(EMPTY, fp); /* missing sat used */
+
+    }
+
     /* CLK */
 
     ticks = diminuto_frequency_ticks2units(Now, NANO);

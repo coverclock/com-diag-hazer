@@ -129,6 +129,7 @@ static const char * const HEADINGS[] = {
     "NUM",
     "FIX",
     "SYS",
+    "SAT",
     "CLK",
     "TIM",
     "LAT",

@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
     int observation = 0;
     int fix = 0;
     int system = 0;
+    int satellites = 0;
     double clock = 0.0;
     double time = 0.0;
     double latitude = 0.0;
@@ -136,7 +137,7 @@ int main(int argc, char *argv[])
 
         here += 1;
 
-        if (sscanf(here, "%d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", &observation, &fix, &system, &clock, &time, &latitude, &longitude, &haccuracy, &msl, &geo, &vaccuracy, &speed, &course, &roll, &pitch, &yaw, &raccuracy, &paccuracy, &yaccuracy) != 19) {
+        if (sscanf(here, "%d, %d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", &observation, &fix, &system, &satellites, &clock, &time, &latitude, &longitude, &haccuracy, &msl, &geo, &vaccuracy, &speed, &course, &roll, &pitch, &yaw, &raccuracy, &paccuracy, &yaccuracy) != 20) {
             continue;
         }
 
@@ -177,7 +178,7 @@ int main(int argc, char *argv[])
         }
 
         if (verbose) {
-            fprintf(stderr, "\"%s\", %d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", hostname, observation, fix, system, clock, time, latitude, longitude, haccuracy, msl, geo, vaccuracy, speed, course, roll, pitch, yaw, raccuracy, paccuracy, yaccuracy);
+            fprintf(stderr, "\"%s\", %d, %d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", hostname, observation, fix, system, satellites, clock, time, latitude, longitude, haccuracy, msl, geo, vaccuracy, speed, course, roll, pitch, yaw, raccuracy, paccuracy, yaccuracy);
         }
 
     }
