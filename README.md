@@ -1024,7 +1024,7 @@ only generated once a 3D fix is available.
 * PAC  - pitch accuracy in decimal degrees.
 * YAC  - yaw accuracy in decimal degrees.
 * OBS - number of survey observations.
-* ERR - estimated error in survey fix.
+* MAC - mean accuracy of survey fix.
 
 # Help
 

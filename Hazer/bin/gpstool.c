@@ -656,7 +656,7 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
 
     } else {
 
-        fputs(EMPTY, fp); /* missing sat used */
+        fputs(", 0", fp); /* missing sat used */
 
     }
 
@@ -856,7 +856,7 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
 
     }
 
-    /* OBS, ERR */
+    /* OBS, MAC */
 
     if (bp->ticks > 0) {
 
@@ -867,7 +867,7 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
 
     } else {
 
-        fputs(EMPTY, fp); /* missing survey observations */
+        fputs(", 0", fp); /* missing survey observations */
         fputs(EMPTY, fp); /* missing survey mean accuracy */
 
     }

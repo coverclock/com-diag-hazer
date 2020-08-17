@@ -47,6 +47,8 @@ int main(int argc, char *argv[])
     double raccuracy = 0.0;
     double paccuracy = 0.0;
     double yaccuracy = 0.0;
+    int observations = 0;
+    double maccuracy = 0.0;
     double minimum_latitude = MAXDOUBLE;
     double maximum_latitude = -MAXDOUBLE;
     double minimum_longitude = MAXDOUBLE;
@@ -137,7 +139,7 @@ int main(int argc, char *argv[])
 
         here += 1;
 
-        if (sscanf(here, "%d, %d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", &observation, &fix, &system, &satellites, &clock, &time, &latitude, &longitude, &haccuracy, &msl, &geo, &vaccuracy, &speed, &course, &roll, &pitch, &yaw, &raccuracy, &paccuracy, &yaccuracy) != 20) {
+        if (sscanf(here, "%d, %d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %d, %lf\n", &observation, &fix, &system, &satellites, &clock, &time, &latitude, &longitude, &haccuracy, &msl, &geo, &vaccuracy, &speed, &course, &roll, &pitch, &yaw, &raccuracy, &paccuracy, &yaccuracy, &observations, &maccuracy) != 22) {
             continue;
         }
 
@@ -178,7 +180,7 @@ int main(int argc, char *argv[])
         }
 
         if (verbose) {
-            fprintf(stderr, "\"%s\", %d, %d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", hostname, observation, fix, system, satellites, clock, time, latitude, longitude, haccuracy, msl, geo, vaccuracy, speed, course, roll, pitch, yaw, raccuracy, paccuracy, yaccuracy);
+            fprintf(stderr, "\"%s\", %d, %d, %d, %d, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %d, %lf\n", hostname, observation, fix, system, satellites, clock, time, latitude, longitude, haccuracy, msl, geo, vaccuracy, speed, course, roll, pitch, yaw, raccuracy, paccuracy, yaccuracy, observations, maccuracy);
         }
 
     }
