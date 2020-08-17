@@ -1022,6 +1022,8 @@ only generated once a 3D fix is available.
 * RAC - roll accuracy in decimal degrees.
 * PAC  - pitch accuracy in decimal degrees.
 * YAC  - yaw accuracy in decimal degrees.
+* OBS - number of survey observations.
+* ERR - estimated error in survey fix.
 
 # Help
 

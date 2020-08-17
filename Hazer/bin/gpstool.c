@@ -568,7 +568,7 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
  * @param sp points to the solution (UBX HPPOSLLH) structure.
  * @param ap points to the attitude (UBX UBXNAVATT) structure.
  */
-static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp, const yodel_attitude_t * ap, const yodel_posveltim_t * pp)
+static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp, const yodel_attitude_t * ap, const yodel_posveltim_t * pp, const yodel_base_t * bp)
 {
     static uint64_t sn = 0;
     diminuto_ticks_t ticks = 0;
@@ -853,6 +853,22 @@ static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solut
         fputs(EMPTY, fp); /* missing roll accuracy */
         fputs(EMPTY, fp); /* missing pitch accurady */
         fputs(EMPTY, fp); /* missing heading accuracy */
+
+    }
+
+    /* OBS, ERR */
+
+    if (bp->ticks > 0) {
+
+        fprintf(fp, ", %d", bp->payload.obs);
+
+        yodel_format_hpacc2accuracy(bp->payload.meanAcc, &meters, &decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
+
+    } else {
+
+        fputs(EMPTY, fp); /* missing survey observations */
+        fputs(EMPTY, fp); /* missing survey mean accuracy */
 
     }
 
@@ -4221,7 +4237,7 @@ int main(int argc, char * argv[])
         } else if (trace_was == (trace_now = ticktock(frequency))) {
             /* Do nothing. */
         } else {
-            emit_trace(trace_fp, position, &solution, &attitude, &posveltim);
+            emit_trace(trace_fp, position, &solution, &attitude, &posveltim, &base);
             trace_was = trace_now;
             trace = 0;
         }
