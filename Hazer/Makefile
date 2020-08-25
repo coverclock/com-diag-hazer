@@ -186,7 +186,7 @@ TARGETALL			:=	$(TARGETLIBRARIES) $(TARGETPROGRAMS)
 
 ########## Main Entry Points
 
-.PHONY:	all dist clean pristine clobber
+.PHONY:	all dist clean pristine clobber scratch
 
 all:	$(TARGETALL)
 
@@ -200,10 +200,7 @@ pristine:	clean
 	rm -rf $(OUT_DIR)
 
 # This is not the same as simply listing the targets as dependencies.
-scratch:
-	make pristine
-	make depend
-	make all
+scratch:	pristine depend all
 
 clobber:	pristine
 	rm -f .cscope.lst .cscope.out .cscope.out.in .cscope.out.po
