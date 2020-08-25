@@ -146,6 +146,8 @@ static const char * const HEADINGS[] = {
     "RAC",
     "PAC",
     "YAC",
+    "OBS",
+    "MAC",
 };
 
 static const char const EMPTY[] = ", 0.";
