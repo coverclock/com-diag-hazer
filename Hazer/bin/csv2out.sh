@@ -74,6 +74,8 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 		COMPASS="NW"
 	elif [[ ${DEGREES} -lt 349 ]]; then
 		COMPASS="NNW"
+	elif [[ ${DEGREES} -lt 361 ]]; then
+		COMPASS="N"
 	else
 		COMPASS="X"
 	fi
