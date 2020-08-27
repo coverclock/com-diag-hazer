@@ -25,7 +25,7 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 
 	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%SZ')
 
-	COMPASS=$(csvcog2str ${COG})
+	COMPASS=$(compasstool ${COG})
 
 	echo ${SYSTEM} ${SAT%,} ${TYPE} "|" ${TIME} "|" ${POSITION} "|" ${MSL%.*}m "|" ${SOG%.*}kn "|" ${COG%.*}${DEG} ${COMPASS} "|"  ${ROL%.*}${DEG}, ${PIT%.*}${DEG}, ${YAW%.*}${DEG}
 
