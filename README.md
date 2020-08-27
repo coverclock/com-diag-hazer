@@ -896,7 +896,7 @@ the libraries and binaries in the system directories.)
 * bakepi - monitors Raspberry Pi core temperature which throttles at 82C.
 * bucketbrigade - read from a serial port and forward to another serial port.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
-* compasstool - converts a bearing in decimal degrees to a compass point.
+* compasstool - converts a bearing in decimal degrees to an 8, 16, or 32 compass point.
 * geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
 * gpstool - serves as Hazer's multi purpose GNSS pocket tool.
 * haversine - computes the great circle distance in meters between two coordinates.
