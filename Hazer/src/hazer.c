@@ -799,6 +799,26 @@ const char * hazer_format_nanodegrees2compass32(int64_t nanodegrees)
     return COMPASS[index];
 }
 
+const char * hazer_format_nanodegrees2compass16(int64_t nanodegrees)
+{
+    static const char * COMPASS[] = {
+        "N", "NNE", "NE", "ENE",
+        "E", "ESE", "SE", "SSE", 
+        "S", "SSW", "SW", "WSW",
+        "W", "WNW", "NW", "NNW",
+    };
+    static const int DIVISION = 360000 / (sizeof(COMPASS) / sizeof(COMPASS[0]));
+    unsigned long index = 0;
+
+    index = nanodegrees / 1000000LL;
+    index += DIVISION / 2;
+    index %= 360000;
+    if (index < 0) { index += 360000; }
+    index /= DIVISION;
+
+    return COMPASS[index];
+}
+
 const char * hazer_format_nanodegrees2compass8(int64_t nanodegrees)
 {
     static const char * COMPASS[] = {

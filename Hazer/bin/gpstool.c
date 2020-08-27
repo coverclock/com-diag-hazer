@@ -1468,10 +1468,10 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
 
             diminuto_assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
 
-            compass = hazer_format_nanodegrees2compass8(pa[system].cog_nanodegrees);
+            compass = hazer_format_nanodegrees2compass16(pa[system].cog_nanodegrees);
             diminuto_assert(compass != (const char *)0);
             diminuto_assert(strlen(compass) <= 4);
-            fprintf(fp, " %-2s", compass);
+            fprintf(fp, " %-3s", compass);
 
             degrees = pa[system].cog_nanodegrees / 1000000000LL;
             billionths = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
@@ -1481,7 +1481,7 @@ static void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int
             billionths = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
             fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)degrees, (long long unsigned int)billionths, (wint_t)DEGREE);
 
-            fprintf(fp, "%30s", "");
+            fprintf(fp, "%29s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 

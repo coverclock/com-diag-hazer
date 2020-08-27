@@ -35,17 +35,18 @@ int main(void)
             { "W", 247500, 292500 },
             { "NW", 292500, 337500 },
         };
+        static const int DIVISIONS = (sizeof(POINT) / sizeof(POINT[0]));
         double degrees = 0.0;
         const char * name = (const char *)0;
         int index = 0;
         uint64_t nanodegrees = 0;
         uint32_t millidegrees = 0;
 
-        for (degrees = 0.00; degrees < 360.00; degrees += 0.01) {
+        for (degrees = 0.0; degrees < 360.0; degrees += 0.001) {
             nanodegrees = degrees * 1000000000.0;
             name = hazer_format_nanodegrees2compass8(nanodegrees);
             millidegrees = degrees * 1000.0;
-            for (index = 0; index < (sizeof(POINT) / sizeof(POINT[0])); ++index) {
+            for (index = 0; index < DIVISIONS; ++index) {
                 if (index == 0) {
                     if ((POINT[index].minimum <= millidegrees) && (millidegrees < 360000)) {
                         break;
@@ -59,7 +60,69 @@ int main(void)
                     }
                 }
             }
-            assert(index < (sizeof(POINT) / sizeof(POINT[0])));
+            assert(index < DIVISIONS);
+            if ((millidegrees % 1000) == 0) {
+                fprintf(stderr, "COMPASS %2d %7.3lf %2d %s %s\n", DIVISIONS, ((double)millidegrees) / 1000.0, index, POINT[index].name, name);
+            }
+            assert(strcmp(name, POINT[index].name) == 0);
+        }
+    }
+
+    {
+        /**
+         * Derived from "Points of the compass" in Wikipedia.
+         */
+        static struct {
+            const char name[8];
+            unsigned int minimum;
+            unsigned int maximum;
+        } POINT[] = {
+            { "N", 348750, 11250 },
+            { "NNE", 11250, 33750 },
+            { "NE", 33750, 56250 },
+            { "ENE", 56250, 78750 },
+            { "E", 78750, 101250 },
+            { "ESE", 101250, 123750 },
+            { "SE", 123750, 146250 },
+            { "SSE", 146250, 168750 },
+            { "S", 168750, 191250 },
+            { "SSW", 191250, 213750 },
+            { "SW", 213750, 236250 },
+            { "WSW", 236250, 258750 },
+            { "W", 258750, 281250 },
+            { "WNW", 281250, 303750 },
+            { "NW", 303750, 326250 },
+            { "NNW", 326250, 348750 },
+        };
+        static const int DIVISIONS = (sizeof(POINT) / sizeof(POINT[0]));
+        double degrees = 0.0;
+        const char * name = (const char *)0;
+        int index = 0;
+        uint64_t nanodegrees = 0;
+        uint32_t millidegrees = 0;
+
+        for (degrees = 0.0; degrees < 360.0; degrees += 0.001) {
+            nanodegrees = degrees * 1000000000.0;
+            name = hazer_format_nanodegrees2compass16(nanodegrees);
+            millidegrees = degrees * 1000.0;
+            for (index = 0; index < DIVISIONS; ++index) {
+                if (index == 0) {
+                    if ((POINT[index].minimum <= millidegrees) && (millidegrees < 360000)) {
+                        break;
+                    }
+                    if ((0 <= millidegrees) && (millidegrees < POINT[index].maximum)) {
+                        break;
+                    }
+                } else {
+                    if ((POINT[index].minimum <= millidegrees) && (millidegrees < POINT[index].maximum)) {
+                        break;
+                    }
+                }
+            }
+            assert(index < DIVISIONS);
+            if ((millidegrees % 1000) == 0) {
+                fprintf(stderr, "COMPASS %2d %7.3lf %2d %s %s\n", DIVISIONS, ((double)millidegrees) / 1000.0, index, POINT[index].name, name);
+            }
             assert(strcmp(name, POINT[index].name) == 0);
         }
     }
@@ -108,17 +171,18 @@ int main(void)
             { "NNW", 331875, 343125 },
             { "NbW", 343125, 354375 },
         };
+        static const int DIVISIONS = (sizeof(POINT) / sizeof(POINT[0]));
         double degrees = 0.0;
         const char * name = (const char *)0;
         int index = 0;
         uint64_t nanodegrees = 0;
         uint32_t millidegrees = 0;
 
-        for (degrees = 0.00; degrees < 360.00; degrees += 0.01) {
+       for (degrees = 0.0; degrees < 360.0; degrees += 0.001) {
             nanodegrees = degrees * 1000000000.0;
             name = hazer_format_nanodegrees2compass32(nanodegrees);
             millidegrees = degrees * 1000.0;
-            for (index = 0; index < (sizeof(POINT) / sizeof(POINT[0])); ++index) {
+            for (index = 0; index < DIVISIONS; ++index) {
                 if (index == 0) {
                     if ((POINT[index].minimum <= millidegrees) && (millidegrees < 360000)) {
                         break;
@@ -132,7 +196,10 @@ int main(void)
                     }
                 }
             }
-            assert(index < (sizeof(POINT) / sizeof(POINT[0])));
+            assert(index < DIVISIONS);
+            if ((millidegrees % 1000) == 0) {
+                fprintf(stderr, "COMPASS %2d %7.3lf %2d %s %s\n", DIVISIONS, ((double)millidegrees) / 1000.0, index, POINT[index].name, name);
+            }
             assert(strcmp(name, POINT[index].name) == 0);
         }
     }

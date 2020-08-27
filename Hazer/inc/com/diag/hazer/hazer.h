@@ -1056,6 +1056,14 @@ extern const char * hazer_format_nanodegrees2compass32(int64_t nanodegrees);
 
 /**
  * Format nanodegrees of compass bearing in a pointer to a name of a
+ * compass point on a sixteen point compass.
+ * @param nanodegrees is a bearing or heading in compass nanodegrees.
+ * @return a compass point string in upper case.
+ */
+extern const char * hazer_format_nanodegrees2compass16(int64_t nanodegrees);
+
+/**
+ * Format nanodegrees of compass bearing in a pointer to a name of a
  * compass point on an eight point compass.
  * @param nanodegrees is a bearing or heading in compass nanodegrees.
  * @return a compass point string in upper case.
