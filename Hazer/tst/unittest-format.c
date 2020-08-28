@@ -61,11 +61,17 @@ int main(void)
                 }
             }
             assert(index < DIVISIONS);
+            assert(name != (const char *)0);
             if ((millidegrees % 1000) == 0) {
                 fprintf(stderr, "COMPASS %2d %7.3lf %2d %s %s\n", DIVISIONS, ((double)millidegrees) / 1000.0, index, POINT[index].name, name);
             }
             assert(strcmp(name, POINT[index].name) == 0);
         }
+
+        assert(strcmp(hazer_format_nanodegrees2compass8(-720000000000LL), "N") == 0);
+        assert(strcmp(hazer_format_nanodegrees2compass8(-360000000000LL), "N") == 0);
+        assert(strcmp(hazer_format_nanodegrees2compass8(360000000000LL), "N") == 0);
+        assert(strcmp(hazer_format_nanodegrees2compass8(720000000000LL), "N") == 0);
     }
 
     {
@@ -120,11 +126,17 @@ int main(void)
                 }
             }
             assert(index < DIVISIONS);
+            assert(name != (const char *)0);
             if ((millidegrees % 1000) == 0) {
                 fprintf(stderr, "COMPASS %2d %7.3lf %2d %s %s\n", DIVISIONS, ((double)millidegrees) / 1000.0, index, POINT[index].name, name);
             }
             assert(strcmp(name, POINT[index].name) == 0);
         }
+
+        assert(strcmp(hazer_format_nanodegrees2compass16(-720000000000LL), "N") == 0);
+        assert(strcmp(hazer_format_nanodegrees2compass16(-360000000000LL), "N") == 0);
+        assert(strcmp(hazer_format_nanodegrees2compass16(360000000000LL), "N") == 0);
+        assert(strcmp(hazer_format_nanodegrees2compass16(720000000000LL), "N") == 0);
     }
 
     {
@@ -197,11 +209,17 @@ int main(void)
                 }
             }
             assert(index < DIVISIONS);
+            assert(name != (const char *)0);
             if ((millidegrees % 1000) == 0) {
                 fprintf(stderr, "COMPASS %2d %7.3lf %2d %s %s\n", DIVISIONS, ((double)millidegrees) / 1000.0, index, POINT[index].name, name);
             }
             assert(strcmp(name, POINT[index].name) == 0);
         }
+
+        assert(strcmp(hazer_format_nanodegrees2compass32(-720000000000LL), "N") == 0);
+        assert(strcmp(hazer_format_nanodegrees2compass32(-360000000000LL), "N") == 0);
+        assert(strcmp(hazer_format_nanodegrees2compass32(360000000000LL), "N") == 0);
+        assert(strcmp(hazer_format_nanodegrees2compass32(720000000000LL), "N") == 0);
     }
 
     {
