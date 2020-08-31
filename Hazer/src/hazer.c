@@ -779,6 +779,14 @@ void hazer_format_nanominutes2degrees(int64_t nanominutes, int * degreesp, uint6
     *tenmillionthsp = nanominutes / 6000ULL;                 /* Get ten millionths of a degree. */
 }
 
+/**
+ * Return the name of a compass point given a bearing in billionths of a
+ * degree, an array of compass point names, and the dimension of the array.
+ * @param nanodegrees is the bearing.
+ * @param compass is an array of compass point names.
+ * @param count is the dimension of the array.
+ * @return a compass point name.
+ */
 static const char * hazer_format_nanodegrees2compass(int64_t nanodegrees, const char * compass[], size_t count)
 {
     size_t division = 0;
