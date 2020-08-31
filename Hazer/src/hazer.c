@@ -787,7 +787,7 @@ void hazer_format_nanominutes2degrees(int64_t nanominutes, int * degreesp, uint6
  * @param count is the dimension of the array.
  * @return a compass point name.
  */
-static const char * hazer_format_nanodegrees2compass(int64_t nanodegrees, const char * compass[], size_t count)
+static inline const char * hazer_format_nanodegrees2compass(int64_t nanodegrees, const char * compass[], size_t count)
 {
     size_t division = 0;
     size_t index = 0;
