@@ -335,7 +335,7 @@ typedef struct YodelPosVelTim {
 } yodel_posveltim_t;
 
 /**
- * @def YODEL_POSVELIM_INITIALIZER
+ * @def YODEL_POSVELTIM_INITIALIZER
  * Initialize a YodelPosVelTim structure.
  */
 #define YODEL_POSVELTIM_INITIALIZER \

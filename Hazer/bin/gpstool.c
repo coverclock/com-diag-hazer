@@ -567,6 +567,8 @@ static int save_solution(const char * arp, const yodel_base_t * bp, const yodel_
  * @param pa is the positions (NMEA) array.
  * @param sp points to the solution (UBX HPPOSLLH) structure.
  * @param ap points to the attitude (UBX UBXNAVATT) structure.
+ * @param pp points to the PVT (UBX UBXPOSVELTIM) structure
+ * @param bp points the DGNSS base (UBX UBXNAVSVIN) structure.
  */
 static void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp, const yodel_attitude_t * ap, const yodel_posveltim_t * pp, const yodel_base_t * bp)
 {
