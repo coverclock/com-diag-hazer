@@ -990,18 +990,18 @@ the libraries and binaries in the system directories.)
 
 # Comma Separated Value (CSV) Output
 
-The -T flag for gpstool will cause the utility to save every Position,
-Velocity, Time solution to a "trace" file in CSV format as described
-below. This makes it easy to analyze results using tools like Excel and
-several tools provided by Hazer itself.  The PVT solution is taken from
-the high precision u-blox UBX-NAV-HPPOSLLH message if it is available,
-from the ensemble GNSS solution if it exists, or from one of the four
-Global Satellite Navigation Systems solutions in this order of preference:
-GPS, GLONASS, Galileo, BeiDou. The attitude (roll, pitch, yaw) is taken
-from the UBX-NAV-ATT message from the IMU if it is available. Fields
-which are not available or are not supported by the receiver have values
-coded as "0." instead of empty to simplify parsing. The CSV output is
-only generated once a 3D fix is available.
+The -T flag for gpstool will cause the utility to a Position, Velocity,
+Time (PVT) solution once a second to a "trace" file in CSV format as
+described below. This makes it easy to analyze results using tools like
+Excel and several tools provided by Hazer itself.  The PVT solution
+is taken from the high precision u-blox UBX-NAV-HPPOSLLH message if
+it is available, from the ensemble GNSS solution if it exists, or from
+one of the four Global Satellite Navigation Systems solutions in this
+order of preference: GPS, GLONASS, Galileo, BeiDou. The attitude (roll,
+pitch, yaw) is taken from the UBX-NAV-ATT message from the IMU if it
+is available. Fields which are not available or are not supported by
+the receiver have values coded as "0." instead of an empty string to
+simplify parsing in post-processing.
 
 * NAM - hostname of computer running gpstool.
 * NUM - sequence number of observation.
