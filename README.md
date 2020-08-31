@@ -2498,9 +2498,10 @@ specfically with the full leak check option.
 
     valgrind --leak-check=full gpstool ...
 
-I was surprised to find it called out a twelve byte memory leak
-in the locale handling code, which gpstool requires to correctly
-display Unicode symbols like the degree symbol.
+I was surprised to find it called out a twelve byte memory leak in the
+C library's locale handling, which gpstool requires to correctly display
+Unicode symbols like the degree symbol. Perhaps this will be fixed in a
+future GNU update (or it's a bug in my code that I can't see).
 
 # Acknowledgements
 
