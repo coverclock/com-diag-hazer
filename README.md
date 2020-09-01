@@ -1057,6 +1057,14 @@ These columns contain the following information.
 * 80°, - this is the pitch of the vehicle reference frame from the IMU if available.
 * 0° - this is the yaw of the vehicle reference frame from the IMU if available.
 
+The following command pipeline is useful.
+
+    tail -f out/host/tmp/example.csv | csv2out
+
+The peruse command supports this directly when used with a CSV file.
+
+    peruse example csv
+
 # Help
 
 ## gpstool
