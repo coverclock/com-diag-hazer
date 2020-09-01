@@ -7,8 +7,6 @@
 # This makes it easier for humans to pick out intervals of interest.
 # e.g. tail -f file.csv | csv2iso 
 
-DEG="°"
-
 while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW RAC PAC YAC OBS MAC; do
 
 	if [[ "${NUM}" == "NUM," ]]; then
@@ -18,6 +16,8 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 	# 39°47'39.190559"N, 105°09'12.088799"W
 
 	POSITION=$(echo $(mapstool -P "${LAT%,} ${LON%,}") | sed 's/\.[0-9][0-9]*"/"/g')
+	LATITUDE=${POSITION%%,*}
+	LONGITUDE=${POSITION##*, }
 
 	SYSTEM=$(csvsys2str ${SYS})
 
@@ -27,7 +27,7 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 
 	COMPASS=$(compasstool ${COG})
 
-	echo ${SYSTEM} ${SAT%,} ${TYPE} "|" ${TIME} "|" ${POSITION} "|" ${MSL%.*}m "|" ${SOG%.*}kn "|" ${COG%.*}${DEG} ${COMPASS} "|"  ${ROL%.*}${DEG}, ${PIT%.*}${DEG}, ${YAW%.*}${DEG}
+	printf "%-2s %-2s %-2s | %-20s | %12s, %12s | %5sm | %4skn | %3s° %-3s | %3s°, %3s°, %3s°\n" "${SYSTEM}" "${SAT%,}" "${TYPE}" "${TIME}" "${LATITUDE}" "${LONGITUDE}" "${MSL%.*}" "${SOG%.*}" "${COG%.*}" "${COMPASS}" "${ROL%.*}" "${PIT%.*}" "${YAW%.*}" 
 
 done
 
