@@ -2269,7 +2269,7 @@ tools like Google Earth.
     . out/host/bin/setup
     benchmark tumbleweed.test:tumbleweed /dev/tumbleweed &
     peruse benchmark err# Control-C to exit upon seeing "Ready".
-    peruse benchmark csv | csv2rmc | gpstool -R
+    tail -f out/host/tmp/benchmark.csv | csv2rmc | gpstool -R
 
 The rover can also be run as an uncorrected mobile unit, basically a
 receiver that doesn't support Differential GNSS. (It might be a good
