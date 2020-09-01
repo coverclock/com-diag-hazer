@@ -1027,6 +1027,36 @@ simplify parsing in post-processing.
 * OBS - number of survey observations.
 * MAC - mean accuracy of survey fix.
 
+A snippet of an actual CSV file looks like this.
+
+    "neon", 116, 3, 0, 12, 1598455524.895094741, 1598455524.000000000, 39.7943026, -105.1533253, 0., 1708.000, 1686.500, 0., 0.071000, 0., 0.00000, 80.98829, 0.00000, 20.00000, 43.29752, 167.44616, 0, 0.
+    "neon", 117, 3, 0, 12, 1598455525.895126606, 1598455525.000000000, 39.7943030, -105.1533263, 0., 1708.100, 1686.600, 0., 0.017000, 0., 0.00000, 80.98829, 0.00000, 20.00000, 43.29752, 167.44616, 0, 0.
+    "neon", 118, 3, 0, 12, 1598455526.895211419, 1598455526.000000000, 39.7943030, -105.1533276, 0., 1708.200, 1686.700, 0., 0.012000, 0., 0.00000, 80.98829, 0.00000, 20.00000, 43.29752, 167.44616, 0, 0.
+    "neon", 119, 3, 0, 12, 1598455527.895183560, 1598455527.000000000, 39.7943031, -105.1533286, 0., 1708.300, 1686.800, 0., 0.016000, 0., 0.00000, 80.98829, 0.00000, 20.00000, 43.29752, 167.44616, 0, 0.
+    "neon", 120, 3, 0, 12, 1598455528.901673983, 1598455528.000000000, 39.7943035, -105.1533300, 0., 1708.500, 1687.000, 0., 0.039000, 0., 0.00000, 80.98829, 0.00000, 20.00000, 43.29752, 167.44616, 0, 0.
+
+Piping this snippet into the script csv2out produces readable output in fixed columns that looks like this.
+
+    GN 12 3D | 2020-08-26T15:25:24Z |  39°47'39"N, 105°09'11"W |  1708m |    0kn |   0° N   |   0°,  80°,   0°
+    GN 12 3D | 2020-08-26T15:25:25Z |  39°47'39"N, 105°09'11"W |  1708m |    0kn |   0° N   |   0°,  80°,   0°
+    GN 12 3D | 2020-08-26T15:25:26Z |  39°47'39"N, 105°09'11"W |  1708m |    0kn |   0° N   |   0°,  80°,   0°
+    GN 12 3D | 2020-08-26T15:25:27Z |  39°47'39"N, 105°09'11"W |  1708m |    0kn |   0° N   |   0°,  80°,   0°
+    GN 12 3D | 2020-08-26T15:25:28Z |  39°47'39"N, 105°09'11"W |  1708m |    0kn |   0° N   |   0°,  80°,   0°
+
+These columns contain the following information.
+
+* GN - this fix was made using this talker (GN is an ensemble solution). 
+* 12 - twelve satellites were used for this fix.
+* 3D - the fix is three-dimensional (NO=none, IN=IMU, 2D, 3D, GI=GNSS+IMU, TM=time, OT=other).
+* 2020-08-26T15:25:24Z - this is the computed date and time in UTC (Zulu).
+* 39°47'39"N, 105°09'11"W - this is the latitude and longitude in the GNSS datum (typically WGS84).
+* 1708m - this is the altitude above mean sea level (MSL).
+* 0kn - this is the ground speed in knots (nautical miles per hour).
+* 0° N - this is the current true bearing and compass direction.
+* 0°, - this is the roll of the vehicle reference frame from the IMU if available.
+* 80°, - this is the pitch of the vehicle reference frame from the IMU if available.
+* 0° - this is the yaw of the vehicle reference frame from the IMU if available.
+
 # Help
 
 ## gpstool
