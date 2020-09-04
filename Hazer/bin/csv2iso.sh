@@ -14,9 +14,9 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEP VAC SOG COG ROL PIT Y
 		continue
 	fi
 
-	CLOCK=$(date -d "@${CLK%,}" -u '+%Y-%m-%dT%H:%M:%S.%N+00:00,')
+	CLOCK=$(date -d "@${CLK%,}" '+%Y-%m-%dT%H:%M:%S.%N%:z,')
 
-	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%S.%N+00:00,')
+	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%S.%N%:z,')
 
 	echo $NAM $NUM $FIX $SYS $SAT ${CLOCK} ${TIME} $LAT $LON $HAC $MSL $GEO $VAC $SOG $COG $ROL $PIT $YAW $RAC $PAC $YAC $OBS $MAC
 
