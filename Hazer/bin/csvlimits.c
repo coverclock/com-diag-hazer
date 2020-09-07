@@ -15,7 +15,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <values.h>
-#include "./gpstool.h"
+#include "../app/gpstool/gpstool.h"
 
 int main(int argc, char *argv[])
 {
