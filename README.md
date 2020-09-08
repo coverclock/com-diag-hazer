@@ -876,6 +876,7 @@ the libraries and binaries in the system directories.)
 
 # Artifacts
 
+* out/TARGET/app - application binary executables.
 * out/TARGET/arc - object file archives for static linking.
 * out/TARGET/bin - utility stripped binary executables and scripts.
 * out/TARGET/dep - make dependencies.
