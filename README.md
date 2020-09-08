@@ -912,7 +912,8 @@ the libraries and binaries in the system directories.)
 * csv2dat - converts gpstool CSV file to a real-time readable output.
 * csv2geo - appends geodesic and altitude differences to gpstool CSV file.
 * csv2iso - converts times in gpstool CSV file into ISO8601-ish timestamps.
-* csv2kml - converts gpstool CSV file to KML 2.3 XML.
+* csv2kmllines - converts gpstool CSV file to KML 2.3 XML to visualize a line.
+* csv2kmlpoints - converts gpstool CSV file to KML 2.3 XML to visualize points.
 * csv2out - converts gpstool CSV file to a (different) real-time readable output.
 * csv2rmc - converts gpstool CSV file to NMEA RMC sentences.
 * csvlimits - determines boundary of solutions in a gpstool CSV file.
