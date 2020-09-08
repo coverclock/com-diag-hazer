@@ -3,9 +3,11 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Filter that reads CSV and outputs KML XML.
-# Based on output from GPS Visualizer <https://www.gpsvisualizer.com>.
-# Reference: "OGC KML 2.3", 2015 <http://docs.opengeospatial.org/is/12-007r2/12-007r2.html>
+# Filter that reads CSV and outputs KML XML to visualize a continuous line.
+# References:
+#     <https://www.gpsvisualizer.com>.
+#     "OGC KML 2.3", 2015 <http://docs.opengeospatial.org/is/12-007r2/12-007r2.html>
+#     J. Wernecke, "The KML Handbook", Addison-Wesley, 2009
 
 DATE=$(date -u +%Y%m%dT%H%M%SZ%N)
 INIT=""
