@@ -860,7 +860,8 @@ the libraries and binaries in the system directories.)
     rtktool -?
 
 # Directories
- 
+
+* app - application source files. 
 * bin - utility source files.
 * cfg - configuration makefiles.
 * dat - NMEA and UBX output captured from actual receivers.

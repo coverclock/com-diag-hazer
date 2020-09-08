@@ -1,6 +1,6 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
-#ifndef _H_COM_DIAG_HAZER_GPSTOOL_
-#define _H_COM_DIAG_HAZER_GPSTOOL_
+#ifndef _H_COM_DIAG_HAZER_GPSTOOL_TYPES_
+#define _H_COM_DIAG_HAZER_GPSTOOL_TYPES_
 
 /**
  * @file
@@ -13,11 +13,13 @@
  * This file is part of the Digital Aggregates Corporation Hazer package.
  */
 
+#include <pthread.h>
+#include "com/diag/diminuto/diminuto_types.h"
+#include "com/diag/diminuto/diminuto_list.h"
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/tumbleweed.h"
 #include "com/diag/hazer/datagram.h"
-#include "com/diag/diminuto/diminuto_list.h"
 
 /*******************************************************************************
  * ENUMERATIONS
@@ -109,48 +111,6 @@ typedef enum Update {
     RTCM_TYPE_1230  = 'r',
     RTCM_TYPE_9999  = '?',
 } update_t;
-
-/*******************************************************************************
- * TRANSLATION UNIT GLOBAL CONSTANTS
- ******************************************************************************/
-
-static const char FIXES[] = {
-    '-',    /* no fix */
-    '!',    /* dead reckoning only */
-    '2',    /* 2D-fix */
-    '3',    /* 3D-fix */
-    '+',    /* GNSS + dead reckoning combined */
-    '*',    /* time only fix */
-    '?',    /* error */
-};
-
-static const char * const HEADINGS[] = {
-    "NAM",
-    "NUM",
-    "FIX",
-    "SYS",
-    "SAT",
-    "CLK",
-    "TIM",
-    "LAT",
-    "LON",
-    "HAC",
-    "MSL",
-    "GEO",
-    "VAC",
-    "SOG",
-    "COG",
-    "ROL",
-    "PIT",
-    "YAW",
-    "RAC",
-    "PAC",
-    "YAC",
-    "OBS",
-    "MAC",
-};
-
-static const char const EMPTY[] = ", 0.";
 
 /*******************************************************************************
  * HIGH PRECISION SOLUTION
