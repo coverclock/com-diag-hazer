@@ -21,8 +21,6 @@
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
-#include "com/diag/hazer/hazer.h"
-#include "com/diag/hazer/yodel.h"
 #include "types.h"
 #include "constants.h"
 #include "globals.h"

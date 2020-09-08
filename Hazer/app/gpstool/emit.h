@@ -12,10 +12,6 @@
  */
 
 #include <stdio.h>
-#include "com/diag/diminuto/diminuto_log.h"
-#include "com/diag/diminuto/diminuto_observation.h"
-#include "com/diag/hazer/hazer.h"
-#include "com/diag/hazer/yodel.h"
 #include "types.h"
 
 /**

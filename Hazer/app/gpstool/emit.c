@@ -17,8 +17,6 @@
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_countof.h"
-#include "com/diag/hazer/hazer.h"
-#include "com/diag/hazer/yodel.h"
 #include "types.h"
 #include "globals.h"
 #include "constants.h"

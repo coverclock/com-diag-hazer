@@ -12,8 +12,6 @@
  */
 
 #include "com/diag/diminuto/diminuto_time.h"
-#include "com/diag/hazer/hazer.h"
-#include "com/diag/hazer/tumbleweed.h"
 #include "types.h"
 
 /**
