@@ -29,7 +29,7 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 		echo '    <name><![CDATA['${NAME}']]></name>'
 		echo '    <visibility>1</visibility>'
 		echo '    <open>1</open>'
-		echo '    <Snippet><![CDATA[See <a href="https://github.com/coverclock/com-diag-hazer/Hazer/bin/csv2kmlpoints.sh">csv2kmlpoints</a>]]></Snippet>'
+		echo '    <Snippet><![CDATA[See <a href="https://github.com/coverclock/com-diag-hazer/blob/master/Hazer/bin/csv2kmlpoints.sh">csv2kmlpoints</a>]]></Snippet>'
 		echo '    <Folder id="Points">'
 		echo '      <name>Points</name>'
 		echo '      <visibility>1</visibility>'
