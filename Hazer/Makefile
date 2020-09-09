@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	37# API changes that may require that applications be modified.
 MINOR				:=	5# Only functionality or features added with no legacy API changes.
-BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	1# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -653,7 +653,7 @@ DEPENDENCIES := $(OUT)/$(DEP_DIR)/dependencies.mk
 depend:	$(TARGETSYNTHESIZED)
 	M=`dirname $(DEPENDENCIES)`; mkdir -p $$M
 	cp /dev/null $(DEPENDENCIES)
-	for S in $(BIN_DIR) $(MOD_DIR) $(SRC_DIR) $(TST_DIR) $(FUN_DIR); do \
+	for S in $(APP_DIR)/* $(BIN_DIR) $(MOD_DIR) $(SRC_DIR) $(TST_DIR) $(FUN_DIR); do \
 		if [ -d $$S ]; then \
 			for F in $$S/*.c; do \
 				D=`dirname $$F`; \
