@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	37# API changes that may require that applications be modified.
 MINOR				:=	4# Only functionality or features added with no legacy API changes.
-BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	1# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -201,7 +201,10 @@ pristine:	clean
 	rm -rf $(OUT_DIR)
 
 # This is not the same as simply listing the targets as dependencies.
-scratch:	pristine depend all
+scratch:
+	make pristine
+	make depend
+	make all
 
 clobber:	pristine
 	rm -f .cscope.lst .cscope.out .cscope.out.in .cscope.out.po
