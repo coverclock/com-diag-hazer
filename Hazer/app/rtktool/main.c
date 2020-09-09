@@ -35,11 +35,6 @@
 #include <signal.h>
 #include <pthread.h>
 #include <locale.h>
-#include "./rtktool.h"
-#include "com/diag/hazer/hazer_release.h"
-#include "com/diag/hazer/hazer_revision.h"
-#include "com/diag/hazer/hazer_vintage.h"
-#include "com/diag/hazer/tumbleweed.h"
 #include "com/diag/diminuto/diminuto_fd.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_mux.h"
@@ -52,6 +47,11 @@
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_delay.h"
 #include "com/diag/diminuto/diminuto_daemon.h"
+#include "com/diag/hazer/hazer_release.h"
+#include "com/diag/hazer/hazer_revision.h"
+#include "com/diag/hazer/hazer_vintage.h"
+#include "com/diag/hazer/tumbleweed.h"
+#include "types.h"
 
 /*******************************************************************************
  * GLOBALS

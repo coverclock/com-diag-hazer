@@ -1,6 +1,6 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
-#ifndef _H_COM_DIAG_HAZER_RTKTOOL_
-#define _H_COM_DIAG_HAZER_RTKTOOL_
+#ifndef _H_COM_DIAG_HAZER_RTKTOOL_TYPES_
+#define _H_COM_DIAG_HAZER_RTKTOOL_TYPES_
 
 /**
  * @file
@@ -13,10 +13,10 @@
  * This file is part of the Digital Aggregates Corporation Hazer package.
  */
 
-#include "com/diag/hazer/datagram.h"
 #include "com/diag/diminuto/diminuto_tree.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_time.h"
+#include "com/diag/hazer/datagram.h"
 
 /**
  * Clients of the router can be in one of two classes: a stationary base

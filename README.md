@@ -66,13 +66,13 @@ parallel stack called Tumbleweed.
 When I use the term "Hazer", I am not very good about distinguishing whether
 I am talking about the software stack, the project, or the entire repo.
 
-Hazer includes a gpstool utility as a kind of Swiss Army knife for dealing
+Hazer includes a gpstool application as a kind of Swiss Army knife for dealing
 with various GNSS devices. gpstool accepts data streams from standard input,
 from serial(ish) devices, or from a UDP socket, and can send validated data to
 a remote UDP socket, write it to a device, and display the interpreted
 information.
 
-Hazer also includes a rtktool utility that is a point-to-multipoint GNSS
+Hazer also includes a rtktool application that is a point-to-multipoint GNSS
 router that can receive data via a UDP socket from a remote gpstool and
 forward it to one or more remote gpstools via UDP. This is used along with
 gpstool to implement a DGNSS system using a stationary base station in survey
@@ -138,7 +138,7 @@ written by Mr. Karney and which can be found at
 
 and which is licensed under the MIT license.
 
-The gpstool, rtktool, and mapstool utilities depend on running in a POSIX
+The gpstool, rtktool, and mapstool programs depend on running in a POSIX
 locale that allows the use of Unicode characters like the degree symbol.
 Locales like "POSIX" and "C" don't support this, at least not on the
 systems I have. Locales like "en_US.UTF-8" work okay. Your mileage
@@ -184,7 +184,7 @@ modules in the Hazer and Diminuto libraries. Those modules can be linked into
 an application. Each project has a binary executable named vintage that
 displays this information.
 
-The gpstool and rtktool utilities can be run with a -V flag to display the
+The gpstool and rtktool applications can be run with a -V flag to display the
 release, vintage, and revision of the Hazer library with which they were
 built.
 
