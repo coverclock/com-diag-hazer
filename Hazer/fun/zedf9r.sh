@@ -32,6 +32,7 @@ exec 2>>${ERRFIL}
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
+# UBX-MON-VER [0]
 # NMEA-PUBX-POSITION
 # NMEA-PUBX-SVSTATUS
 # NMEA-PUBX-TIME
@@ -53,7 +54,6 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 # UBX-CFG-MSG [3] UBX-NAV-ODO @1Hz (ublox8 > fw15)
 # UBX-CFG-MSG [3] UBX-NAV-PVT @1Hz (ublox8 > fw15)
 # UBX-CFG-ITFM [8] LE(0x96b156YX) LE(0x0000631e) (X[4]=broadband threshold signed dB, Y[5]=continuous wave threshold signed dB)
-# UBX-MON-VER [0]
 # UBX-CFG-DAT [0]
 # UBX-CFG-TPS [0]
 # UBX-CFG-GNSS [0]
@@ -65,6 +65,7 @@ exec coreable gpstool \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -Y ${ROUTER} -y 20 \
     -x \
+    -U '\xb5\x62\x0a\x04\x00\x00' \
     -W '$PUBX,00' \
     -W '$PUBX,03' \
     -W '$PUBX,04' \
@@ -86,7 +87,6 @@ exec coreable gpstool \
     -U '\xb5\x62\x06\x01\x03\x00\x01\x09\x01' \
     -U '\xb5\x62\x06\x01\x03\x00\x01\x07\x01' \
     -U '\xb5\x62\x06\x39\x08\x00\xf7\x56\xb1\x96\x1e\x63\x00\x00' \
-    -U '\xb5\x62\x0a\x04\x00\x00' \
     -U '\xb5\x62\x06\x06\x00\x00' \
     -U '\xb5\x62\x06\x31\x00\x00' \
     -U '\xb5\x62\x06\x3e\x00\x00' \
