@@ -864,7 +864,7 @@ the libraries and binaries in the system directories.)
 * app - application source files. 
 * bin - utility source files.
 * cfg - configuration makefiles.
-* dat - data captured from Hazer, Yodel, and Tumbleweed tests.
+* dat - data captured from Hazer, Yodel, and Tumbleweed tests (some in LFS).
 * ext - sources for extra files not part of this library.
 * fun - functional test source files.
 * inc - public header files.
