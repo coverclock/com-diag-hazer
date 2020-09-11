@@ -13,21 +13,36 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 		continue
 	fi
 
-	# 39°47'39.190559"N, 105°09'12.088799"W
+	FIX=${FIX%,}
+	TYPE=$(csvfix2str ${FIX})
 
-	POSITION=$(echo $(mapstool -P "${LAT%,} ${LON%,}") | sed 's/\.[0-9][0-9]*"/"/g')
+	SYS=${SYS%,}
+	SYSTEM=$(csvsys2str ${SYS})
+
+	SAT=${SAT%,}
+
+	TIM=${TIM%,}
+	TIME=$(date -d "@${TIM}" -u '+%Y-%m-%dT%H:%M:%SZ')
+
+	LAT=${LAT%,}
+	LON=${LON%,}
+	POSITION=$(mapstool -P "${LAT} ${LON}" | sed 's/\.[0-9][0-9]*"/"/g')
 	LATITUDE=${POSITION%%,*}
 	LONGITUDE=${POSITION##*, }
 
-	SYSTEM=$(csvsys2str ${SYS})
+	MSL=${MSL%.*}
 
-	TYPE=$(csvfix2str ${FIX})
+	SOG=${SOG%.*}
 
-	TIME=$(date -d "@${TIM%,}" -u '+%Y-%m-%dT%H:%M:%SZ')
-
+	COG=${COG%,}
 	COMPASS=$(compasstool ${COG})
+	COG=${COG%.*}
 
-	printf "%-2s %-2s %-2s | %-20s | %12s, %12s | %5sm | %4skn | %3s° %-3s | %3s°, %3s°, %3s°\n" "${SYSTEM}" "${SAT%,}" "${TYPE}" "${TIME}" "${LATITUDE}" "${LONGITUDE}" "${MSL%.*}" "${SOG%.*}" "${COG%.*}" "${COMPASS}" "${ROL%.*}" "${PIT%.*}" "${YAW%.*}" 
+	ROL=${ROL%.*}
+	PIT=${PIT%.*}
+	YAW=${YAW%.*}
+
+	printf "%-2s %-2s %-2s | %-20s | %12s, %12s | %5sm | %4skn | %3s° %-3s | %3s°, %3s°, %3s°\n" "${SYSTEM}" "${SAT}" "${TYPE}" "${TIME}" "${LATITUDE}" "${LONGITUDE}" "${MSL}" "${SOG}" "${COG}" "${COMPASS}" "${ROL}" "${PIT}" "${YAW}" 
 
 done
 
