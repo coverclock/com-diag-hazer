@@ -55,13 +55,11 @@ degrees of precision down to centimeters. RTCM was developed by the Radio
 Technical Commision for Maritime services (RTCM). RTCM is supported by a
 parallel stack called Tumbleweed.
 
-> More broadly: Hazer was the first project I did, to support GPS, and
-> later GNSS, receivers; Yodel was the second project, to support special
-> features of specific u-blox devices, including the High Precision Position
-> and Altitude (HPP and HPA) solutions, and most recently the Intertial
-> Measurement Unit (IMU); and Tumbleweed was the third project, to support
-> Differential GNSS (DGNSS). The two latter projects are extensions of the
-> Hazer repository.
+> More broadly: Hazer used GNSS to do real-time moving map displays
+> using Google Earth; Yodel used GNSS with high precision GNSS and
+> integrated inertial measurement features of specific u-blox devices;
+> and Tumbleweed used Differental GNSS with specific u-blox devices.
+> All three projects reside in the Hazer repository.
 
 When I use the term "Hazer", I am not very good about distinguishing whether
 I am talking about the software stack, the project, or the entire repo.
@@ -864,7 +862,7 @@ the libraries and binaries in the system directories.)
 * app - application source files. 
 * bin - utility source files.
 * cfg - configuration makefiles.
-* dat - NMEA and UBX output captured from actual receivers.
+* dat - data captured from Hazer, Yodel, and Tumbleweed tests.
 * ext - sources for extra files not part of this library.
 * fun - functional test source files.
 * inc - public header files.
