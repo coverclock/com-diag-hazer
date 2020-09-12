@@ -891,6 +891,11 @@ the libraries and binaries in the system directories.)
 * out/TARGET/tmp - temporary files supporting headless operation.
 * out/TARGET/tst - unit test binary executables and scripts.
 
+# Applications
+
+* gpstool - Hazer's multi purpose GNSS pocket tool.
+* rtktool - Tumbleweed's point-to-multipoint datagram router.
+
 # Utilities
 
 ## General Purpose
@@ -900,7 +905,6 @@ the libraries and binaries in the system directories.)
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * compasstool - converts a bearing in decimal degrees to an 8, 16, or 32 compass point.
 * geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
-* gpstool - serves as Hazer's multi purpose GNSS pocket tool.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
 * iso8601 - converts seconds since the UNIX epoch into an ISO8601 timestamp.
@@ -939,13 +943,12 @@ the libraries and binaries in the system directories.)
 * proxy - receive UDP packets from the Base and forward to the Rover.
 * router - routes UDP packets received from a base to all rovers.
 * rover - configures and runs a UBX-ZED-F9P as a corrected rover.
-* rtktool - serves as Tumbleweed's point-to-multipoint datagram router.
 * station - runs a UBX-ZED-F9P with no additional configuration.
 * survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
+* ubxval - converts a number into a UBX-usable form.
 
 ## Intertial Measurement Unit (Yodel)
 
-* ubxval - converts a number into a UBX-usable form.
 * vehicle - configures and runs a UBX-NEO-M8U with peruse and hups.
 
 ## Output Control
@@ -991,6 +994,7 @@ the libraries and binaries in the system directories.)
 * ublox8 - exercises any Ublox 8 device.
 * ublox9 - exercises any Ublox 9 device.
 * uputronics - exercises the Uputronics GPS board for the Rasperry Pi.
+* zedf9r - exercise UBX-ZED-F9R device.
 
 # Comma Separated Value (CSV) Output
 
