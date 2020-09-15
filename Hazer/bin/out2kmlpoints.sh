@@ -47,6 +47,7 @@ awk '
 		COUNT=1
 	fi
 
+	TIME=${TIM%.000-00:00+00Z}
 	LATITUDE=${LAT%,}
 	LONGITUDE=${LON%,}
 	ALTITUDE=${MSL%m}
@@ -55,7 +56,7 @@ awk '
 
 	echo '      <Placemark>'
 	echo '        <name><![CDATA['${COUNT}']]></name>'
-	echo '        <Snippet></Snippet>'
+	echo '        <Snippet>![CDATA['${TIME}']]</Snippet>'
 	echo '        <description><![CDATA['${COURSE},${SPEED}']]></description>'
 	echo '        <Point>'
 	echo '          <coordinates>'
