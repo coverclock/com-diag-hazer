@@ -923,6 +923,7 @@ the libraries and binaries in the system directories.)
 * csvlimits - determines boundary of solutions in a gpstool CSV file.
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvparts - splits gpstool CSV file into smaller files in subdirectories.
+* out2kmlpoints - converts gpstool OUT files to KML 2.3 XML to visualize points.
 
 ## Moving Map (Hazer)
 
