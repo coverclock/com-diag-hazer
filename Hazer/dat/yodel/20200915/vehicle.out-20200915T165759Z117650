@@ -1,0 +1,57 @@
+INP [100] \xb5b\x01\a\\\0p\xf0\xf0\r\xe4\a\t\x0f\x10987\v\0\0\0f\x9c\x05\0\x04
+INP [ 24] \xb5b\x01\x03\x10\0p\xf0\xf0\r\x04\xdf\0\b=\x93\0\0\xf6^k\0\xeb\b
+INP [ 40] \xb5b\x01\x05 \0p\xf0\xf0\r\0\0\0\0\xbc\x06\xf8\xff\t\r\xfd\xfft\xf6
+INP [ 28] \xb5b\x01\t\x14\0\0\0\0\0p\xf0\xf0\r\xa6\x98\x02\0\xa6\x98\x02\0\xb4
+INP [ 74] $GNRMC,165756.00,A,3944.69015,N,10524.33838,W,36.892,17.01,150920,,
+INP [ 42] $GNVTG,17.01,T,,M,36.892,N,68.324,K,D*1C\r\n
+INP [ 81] $GNGGA,165756.00,3944.69015,N,10524.33838,W,2,10,1.05,2133.1,M,-21.
+INP [ 54] $GNGSA,A,3,51,18,13,15,29,05,,,,,,,2.63,1.05,2.41*1D\r\n
+INP [ 50] $GNGSA,A,3,69,83,68,84,,,,,,,,,2.63,1.05,2.41*1E\r\n
+INP [ 66] $GPGSV,4,1,14,02,19,085,,05,42,049,47,12,05,182,,13,30,108,43*71\r\n
+INP [ 66] $GPGSV,4,2,14,15,31,150,37,16,00,333,,18,40,289,40,20,21,231,*73\r\n
+INP [ 64] $GPGSV,4,3,14,23,17,225,,25,23,210,,26,20,305,,29,88,313,39*7C\r\n
+INP [ 42] $GPGSV,4,4,14,46,38,215,,51,44,183,43*7A\r\n
+INP [ 66] $GLGSV,3,1,09,67,02,025,,68,48,046,44,69,61,155,47,70,10,194,*6A\r\n
+INP [ 66] $GLGSV,3,2,09,74,10,259,,75,12,313,,83,39,090,32,84,56,351,37*64\r\n
+INP [ 29] $GLGSV,3,3,09,85,10,308,*5B\r\n
+INP [ 52] $GNGLL,3944.69015,N,10524.33838,W,165756.00,A,D*66\r\n
+INP [ 68] \xb5b\n\t<\0\0\xc4\x01\0\0(\0\0\0\0\x01\0\xef\xc7\x01\0h\0\xf8\n\x02
+LOC 2020-09-15T10:57:59.117-07:00+01T 00:00:04.046 37.5.1         1954 neon    
+TIM 2020-09-15T16:57:56.000-00:00+00Z 0pps                             GNSS    
+POS 39°44'41.409"N, 105°24'20.302"W    39.7448358, -105.4056396        GNSS    
+ALT    6998.27'   2133.100m MSL    6928.07'   2111.700m GEO            GNSS    
+COG NNE   17.010000000°T    0.000000000°M                              GNSS    
+SOG      42.455mph      36.892knots      68.324kph      18.979m/s      GNSS    
+INT GLL [10] DMY TOT (  9 10  5  3  4  0  5  5 )                    0B ttyACM0 
+MON -jamming  +history  15indicator  46maximum                         ttyACM0 
+STA -spoofing +history      37693ms    7036662ms     0epoch            ttyACM0 
+ATT   -5.2° roll ±   0.4°   -1.9° pitch ±   0.4°   17.0° yaw ±   0.3°  IMU     
+ODO    105.726mi    170.150km (    105.726mi    170.150km ) ±     180m IMU     
+NED      18148mm/s north       5554mm/s east        676mm/s down (+)   IMU     
+ACT [1]  {    51    18    13    15    29     5 } [ 6] [ 6] [10] [18]   NAVSTAR 
+ACT [1]  {    69    83    68    84             } [ 4] [ 4] [10] [18]   GLONASS 
+DOP   2.63pdop   1.05hdop   2.41vdop                                   NAVSTAR 
+DOP   2.63pdop   1.05hdop   2.41vdop                                   GLONASS 
+SAT [  1]     2id  19°elv   85°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [  2]     5id  42°elv   49°azm   47dBHz  0sig <                    NAVSTAR 
+SAT [  3]    12id   5°elv  182°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [  4]    13id  30°elv  108°azm   43dBHz  0sig <                    NAVSTAR 
+SAT [  5]    15id  31°elv  150°azm   37dBHz  0sig <                    NAVSTAR 
+SAT [  6]    16id   0°elv  333°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [  7]    18id  40°elv  289°azm   40dBHz  0sig <                    NAVSTAR 
+SAT [  8]    20id  21°elv  231°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [  9]    23id  17°elv  225°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [ 10]    25id  23°elv  210°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [ 11]    26id  20°elv  305°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [ 12]    29id  88°elv  313°azm   39dBHz  0sig <                    NAVSTAR 
+SAT [ 13]    46id  38°elv  215°azm    0dBHz  0sig     !                NAVSTAR 
+SAT [ 14]    51id  44°elv  183°azm   43dBHz  0sig <                    NAVSTAR 
+SAT [ 15]    67id   2°elv   25°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 16]    68id  48°elv   46°azm   44dBHz  0sig <                    GLONASS 
+SAT [ 17]    69id  61°elv  155°azm   47dBHz  0sig <                    GLONASS 
+SAT [ 18]    70id  10°elv  194°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 19]    74id  10°elv  259°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 20]    75id  12°elv  313°azm    0dBHz  0sig     !                GLONASS 
+SAT [ 21]    83id  39°elv   90°azm   32dBHz  0sig <                    GLONASS 
+SAT [ 22]    84id  56°elv  351°azm   37dBHz  0sig <                    GLONASS 
+SAT [ 23]    85id  10°elv  308°azm    0dBHz  0sig     !                GLONASS 
