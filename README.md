@@ -95,6 +95,8 @@ Corporation PNT division.
 
 # Dependencies
 
+## Diminuto
+
 The Hazer library and its utilities depend on my Diminuto library.
 Diminuto is a general purpose C-based systems programming library that
 supports serial port configuration, socket-based communication, and a
@@ -104,18 +106,24 @@ use Diminuto in virtually all of my C-based projects, and sometimes in
 other languages too that support C-linkage.  Portions of Diminuto have
 also shipped in products from several of my clients.
 
+## bc
+
 If you want to use several of the post-processing scripts for the optional
 CSV output file, you may need to install the standard command line (lab)
 bench calculator (bc) utility.
 
     sudo apt-get install bc
 
+## inotifywait
+
 If you want to run the peruse script, which several other scripts make use
 of, you may need to install the inotify tools package.
 
     sudo apt-get install inotify-tools
+
+## Workflow
     
-For my own development work flow, I have also found it useful to install
+For my own development workflow, I have also found it useful to install
 other packages that are often optional in various Linux/GNU distros. Your
 mileage may vary.
 
@@ -123,6 +131,8 @@ mileage may vary.
     sudo apt-get install git
     sudo apt-get install vim
     sudo apt-get install screen
+
+## geodesic
 
 The geodesic utility is based on algorithms described in
 
@@ -136,11 +146,15 @@ written by Mr. Karney and which can be found at
 
 and which is licensed under the MIT license.
 
+## locale
+
 The gpstool, rtktool, and mapstool programs depend on running in a POSIX
 locale that allows the use of Unicode characters like the degree symbol.
 Locales like "POSIX" and "C" don't support this, at least not on the
 systems I have. Locales like "en_US.UTF-8" work okay. Your mileage
 may vary.
+
+## dialout
 
 GNSS modules typically express a serial port - either an actual serial
 port, a USB serial port emulation ('''ttyUSB'''), or a modem emulation
@@ -149,6 +163,21 @@ as a non-root user is by adding that user to the '''dialout''' group.
 The user may have to log out and back in again to have this take effect.
 
     sudo adduser pi dialout
+
+## LFS
+
+The dat directory is where I collect data from tests of Hazer (moving
+map), Tumblweeed (differential GNSS), and Yodel (integrated intertial
+measurement). Some of the comma separated value (CSV) files are too large
+(over a hundred megabytes uncompressed) to be pushed to GitHub in the
+normal way. These files use GitHub's Large File Storage (LFS). Unless you
+install GitHub's LFS feature (which manifests as the "git lfs" command),
+files stored in LFS will appear to have contents that look something
+like this.
+
+    version https://git-lfs.github.com/spec/v1
+    oid sha256:bcb222ac76e51cad8010086754d4cadeeebd0161b51029d6870a0d806db5f42f
+    size 137136500
 
 # Versioning
 
