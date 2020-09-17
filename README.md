@@ -918,8 +918,8 @@ the libraries and binaries in the system directories.)
 * csv2iso - converts times in gpstool CSV file into ISO8601-ish timestamps.
 * csv2kmllines - converts gpstool CSV file to KML 2.3 XML to visualize a line.
 * csv2kmlpoints - converts gpstool CSV file to KML 2.3 XML to visualize points.
-* csv2out - converts gpstool CSV file to a (different) real-time readable output.
 * csv2rmc - converts gpstool CSV file to NMEA RMC sentences.
+* csv2tty - converts gpstool CSV file to a (different) real-time readable output.
 * csvlimits - determines boundary of solutions in a gpstool CSV file.
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvparts - splits gpstool CSV file into smaller files in subdirectories.
@@ -1044,9 +1044,9 @@ A snippet of an actual CSV file looks like this.
     "neon", 119, 3, 0, 12, 1598455527.895183560, 1598455527.000000000, 39.7943031, -105.1533286, 0., 1708.300, 1686.800, 0., 0.016000, 0., 0.00000, 80.98829, 0.00000, 20.00000, 43.29752, 167.44616, 0, 0.
     "neon", 120, 3, 0, 12, 1598455528.901673983, 1598455528.000000000, 39.7943035, -105.1533300, 0., 1708.500, 1687.000, 0., 0.039000, 0., 0.00000, 80.98829, 0.00000, 20.00000, 43.29752, 167.44616, 0, 0.
 
-## csv2out
+## csv2tty
 
-Piping the CSV snippet into the script csv2out produces readable output in fixed columns that looks like this.
+Piping the CSV snippet into the script csv2tty produces readable output in fixed columns that looks like this.
 
     GN 12 3D | 2020-08-26T15:25:24Z |  39°47'39"N, 105°09'11"W |  1708m |    0kn |   0° N   |   0°,  80°,   0°
     GN 12 3D | 2020-08-26T15:25:25Z |  39°47'39"N, 105°09'11"W |  1708m |    0kn |   0° N   |   0°,  80°,   0°
@@ -1070,7 +1070,7 @@ These columns contain the following information.
 
 The following command pipeline is useful.
 
-    tail -f out/host/tmp/example.csv | csv2out
+    tail -f out/host/tmp/example.csv | csv2tty
 
 The peruse command supports this directly when used with a CSV file.
 
