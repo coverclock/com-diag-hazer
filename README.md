@@ -909,20 +909,20 @@ the libraries and binaries in the system directories.)
 
 # Artifacts
 
-* out/TARGET/app - application binary executables.
-* out/TARGET/arc - object file archives for static linking.
-* out/TARGET/bin - utility stripped binary executables and scripts.
-* out/TARGET/dep - make dependencies.
-* out/TARGET/ext - executables of extra files if you choose to compile them.
-* out/TARGET/fun - functional test binary executables and scripts.
-* out/TARGET/gen - generated source files.
-* out/TARGET/inc - include (header) files.
-* out/TARGET/lib - shared objects for dynamic linking.
-* out/TARGET/log - log files produced at run-time.
-* out/TARGET/obc - object files.
-* out/TARGET/sym - utility unstripped binary executables.
-* out/TARGET/tmp - temporary files supporting headless operation.
-* out/TARGET/tst - unit test binary executables and scripts.
+* out/$(TARGET)/app - application binary executables.
+* out/$(TARGET)/arc - object file archives for static linking.
+* out/$(TARGET)/bin - utility stripped binary executables and scripts.
+* out/$(TARGET)/dep - make dependencies.
+* out/$(TARGET)/ext - executables of extra files if you choose to compile them.
+* out/$(TARGET)/fun - functional test binary executables and scripts.
+* out/$(TARGET)/gen - generated source files.
+* out/$(TARGET)/inc - include (header) files.
+* out/$(TARGET)/lib - shared objects for dynamic linking.
+* out/$(TARGET)/log - log files produced at run-time.
+* out/$(TARGET)/obc - object files.
+* out/$(TARGET)/sym - utility unstripped binary executables.
+* out/$(TARGET)/tmp - temporary files supporting headless operation.
+* out/$(TARGET)/tst - unit test binary executables and scripts.
 
 # Applications
 
@@ -942,6 +942,7 @@ the libraries and binaries in the system directories.)
 * hazer - consumes data from a serial port and reports on stdout.
 * iso8601 - converts seconds since the UNIX epoch into an ISO8601 timestamp.
 * mapstool - convert gpstool coordinate strings to formats accepted by Google Maps.
+* monitor - uses gpstool to monitor device without any configuration.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
 
 ## Data Analysis
