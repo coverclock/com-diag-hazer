@@ -95,6 +95,8 @@ Corporation PNT division.
 
 # Dependencies
 
+## Diminuto
+
 The Hazer library and its utilities depend on my Diminuto library.
 Diminuto is a general purpose C-based systems programming library that
 supports serial port configuration, socket-based communication, and a
@@ -104,18 +106,24 @@ use Diminuto in virtually all of my C-based projects, and sometimes in
 other languages too that support C-linkage.  Portions of Diminuto have
 also shipped in products from several of my clients.
 
+## bc
+
 If you want to use several of the post-processing scripts for the optional
 CSV output file, you may need to install the standard command line (lab)
 bench calculator (bc) utility.
 
     sudo apt-get install bc
 
+## inotifywait
+
 If you want to run the peruse script, which several other scripts make use
 of, you may need to install the inotify tools package.
 
     sudo apt-get install inotify-tools
+
+## Workflow
     
-For my own development work flow, I have also found it useful to install
+For my own development workflow, I have also found it useful to install
 other packages that are often optional in various Linux/GNU distros. Your
 mileage may vary.
 
@@ -123,6 +131,8 @@ mileage may vary.
     sudo apt-get install git
     sudo apt-get install vim
     sudo apt-get install screen
+
+## geodesic
 
 The geodesic utility is based on algorithms described in
 
@@ -136,11 +146,15 @@ written by Mr. Karney and which can be found at
 
 and which is licensed under the MIT license.
 
+## locale
+
 The gpstool, rtktool, and mapstool programs depend on running in a POSIX
 locale that allows the use of Unicode characters like the degree symbol.
 Locales like "POSIX" and "C" don't support this, at least not on the
 systems I have. Locales like "en_US.UTF-8" work okay. Your mileage
 may vary.
+
+## dialout
 
 GNSS modules typically express a serial port - either an actual serial
 port, a USB serial port emulation ('''ttyUSB'''), or a modem emulation
@@ -149,6 +163,21 @@ as a non-root user is by adding that user to the '''dialout''' group.
 The user may have to log out and back in again to have this take effect.
 
     sudo adduser pi dialout
+
+## LFS
+
+The dat directory is where I collect data from tests of Hazer (moving
+map), Tumblweeed (differential GNSS), and Yodel (integrated intertial
+measurement). Some of the comma separated value (CSV) files are too large
+(over a hundred megabytes uncompressed) to be pushed to GitHub in the
+normal way. These files use GitHub's Large File Storage (LFS). Unless you
+install GitHub's LFS feature (which manifests as the "git lfs" command),
+files stored in LFS will appear to have contents that look something
+like this.
+
+    version https://git-lfs.github.com/spec/v1
+    oid sha256:bcb222ac76e51cad8010086754d4cadeeebd0161b51029d6870a0d806db5f42f
+    size 137136500
 
 # Versioning
 
@@ -922,11 +951,12 @@ the libraries and binaries in the system directories.)
 * csv2iso - converts times in gpstool CSV file into ISO8601-ish timestamps.
 * csv2kmllines - converts gpstool CSV file to KML 2.3 XML to visualize a line.
 * csv2kmlpoints - converts gpstool CSV file to KML 2.3 XML to visualize points.
-* csv2out - converts gpstool CSV file to a (different) real-time readable output.
 * csv2rmc - converts gpstool CSV file to NMEA RMC sentences.
+* csv2tty - converts gpstool CSV file to a (different) real-time readable output.
 * csvlimits - determines boundary of solutions in a gpstool CSV file.
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvparts - splits gpstool CSV file into smaller files in subdirectories.
+* out2kmlpoints - converts gpstool OUT files to KML 2.3 XML to visualize points.
 
 ## Moving Map (Hazer)
 
@@ -1047,9 +1077,9 @@ A snippet of an actual CSV file looks like this.
     "neon", 119, 3, 0, 12, 1598455527.895183560, 1598455527.000000000, 39.7943031, -105.1533286, 0., 1708.300, 1686.800, 0., 0.016000, 0., 0.00000, 80.98829, 0.00000, 20.00000, 43.29752, 167.44616, 0, 0.
     "neon", 120, 3, 0, 12, 1598455528.901673983, 1598455528.000000000, 39.7943035, -105.1533300, 0., 1708.500, 1687.000, 0., 0.039000, 0., 0.00000, 80.98829, 0.00000, 20.00000, 43.29752, 167.44616, 0, 0.
 
-## csv2out
+## csv2tty
 
-Piping the CSV snippet into the script csv2out produces readable output in fixed columns that looks like this.
+Piping the CSV snippet into the script csv2tty produces readable output in fixed columns that looks like this.
 
     GN 12 3D | 2020-08-26T15:25:24Z |  39°47'39"N, 105°09'11"W |  1708m |    0kn |   0° N   |   0°,  80°,   0°
     GN 12 3D | 2020-08-26T15:25:25Z |  39°47'39"N, 105°09'11"W |  1708m |    0kn |   0° N   |   0°,  80°,   0°
@@ -1073,7 +1103,7 @@ These columns contain the following information.
 
 The following command pipeline is useful.
 
-    tail -f out/host/tmp/example.csv | csv2out
+    tail -f out/host/tmp/example.csv | csv2tty
 
 The peruse command supports this directly when used with a CSV file.
 
