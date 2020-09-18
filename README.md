@@ -577,6 +577,8 @@ Chip Overclock, "Headless", 2020-06,
 
 # Media
 
+John Sloan, "Dead Reckoning", album, <https://flic.kr/s/aHsmPsGqjA>
+
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
 
 John Sloan, "GPS Receiver Gallery", album, <https://flic.kr/s/aHsmvoXqSH>
@@ -599,6 +601,8 @@ John Sloan, "Time and Space", album, <https://flic.kr/s/aHsm3ghwxP>
 John Sloan, "Time and Space", video, <https://youtu.be/szoT23ZBcVU>
 
 John Sloan, "Tumbleweed", album, <https://flic.kr/s/aHsmcdEgq6>
+
+John Sloan, "Yodel", album, <https://flic.kr/s/aHsmNDPmDN>
 
 # References
 
