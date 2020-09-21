@@ -604,6 +604,9 @@ Chip Overclock, "Location, Location, Location", 2020-06,
 Chip Overclock, "Headless", 2020-06,
 <https://coverclock.blogspot.com/2020/06/headless.html>>
 
+Chip Overclock, "Dead Reckoning", 2020-09,
+<https://coverclock.blogspot.com/2020/09/dead-reckoning.html>
+
 # Media
 
 John Sloan, "Dead Reckoning", album, <https://flic.kr/s/aHsmPsGqjA>
