@@ -170,10 +170,13 @@ The dat directory is where I collect data from tests of Hazer (moving
 map), Tumblweeed (differential GNSS), and Yodel (integrated intertial
 measurement). Some of the comma separated value (CSV) files are too large
 (over a hundred megabytes uncompressed) to be pushed to GitHub in the
-normal way. These files use GitHub's Large File Storage (LFS). Unless you
-install GitHub's LFS feature (which manifests as the "git lfs" command),
-files stored in LFS will appear to have contents that look something
-like this.
+normal way. These files use GitHub's Large File Storage (LFS).
+
+    sudo apt-get install git-lfs
+
+Unless you install GitHub's LFS feature (which manifests as the "git lfs"
+command), files stored in LFS will appear to have contents that look
+something like this.
 
     version https://git-lfs.github.com/spec/v1
     oid sha256:bcb222ac76e51cad8010086754d4cadeeebd0161b51029d6870a0d806db5f42f
