@@ -106,6 +106,27 @@ use Diminuto in virtually all of my C-based projects, and sometimes in
 other languages too that support C-linkage.  Portions of Diminuto have
 also shipped in products from several of my clients.
 
+## Building
+
+These days most Linux distributions do not include the basic tools
+to build C and C++ software (despite having themselves been developed
+using them).
+
+    sudo apt-get install gcc
+    sudo apt-get install g++
+    sudo apt-get install make
+
+## Workflow
+    
+For my own development workflow, I have also found it useful to install
+other packages that are often optional in various Linux/GNU distros. Your
+mileage may vary.
+
+    sudo apt-get install openssh-server
+    sudo apt-get install git
+    sudo apt-get install vim
+    sudo apt-get install screen
+
 ## bc
 
 If you want to use several of the post-processing scripts for the optional
@@ -121,16 +142,23 @@ of, you may need to install the inotify tools package.
 
     sudo apt-get install inotify-tools
 
-## Workflow
-    
-For my own development workflow, I have also found it useful to install
-other packages that are often optional in various Linux/GNU distros. Your
-mileage may vary.
+## LFS
 
-    sudo apt-get install openssh-server
-    sudo apt-get install git
-    sudo apt-get install vim
-    sudo apt-get install screen
+The dat directory is where I collect data from tests of Hazer (moving
+map), Tumblweeed (differential GNSS), and Yodel (integrated intertial
+measurement). Some of the comma separated value (CSV) files are too large
+(over a hundred megabytes uncompressed) to be pushed to GitHub in the
+normal way. These files use GitHub's Large File Storage (LFS).
+
+    sudo apt-get install git-lfs
+
+Unless you install GitHub's LFS feature (which manifests as the "git lfs"
+command), files stored in LFS will appear to have contents that look
+something like this.
+
+    version https://git-lfs.github.com/spec/v1
+    oid sha256:bcb222ac76e51cad8010086754d4cadeeebd0161b51029d6870a0d806db5f42f
+    size 137136500
 
 ## geodesic
 
@@ -163,24 +191,6 @@ as a non-root user is by adding that user to the '''dialout''' group.
 The user may have to log out and back in again to have this take effect.
 
     sudo adduser pi dialout
-
-## LFS
-
-The dat directory is where I collect data from tests of Hazer (moving
-map), Tumblweeed (differential GNSS), and Yodel (integrated intertial
-measurement). Some of the comma separated value (CSV) files are too large
-(over a hundred megabytes uncompressed) to be pushed to GitHub in the
-normal way. These files use GitHub's Large File Storage (LFS).
-
-    sudo apt-get install git-lfs
-
-Unless you install GitHub's LFS feature (which manifests as the "git lfs"
-command), files stored in LFS will appear to have contents that look
-something like this.
-
-    version https://git-lfs.github.com/spec/v1
-    oid sha256:bcb222ac76e51cad8010086754d4cadeeebd0161b51029d6870a0d806db5f42f
-    size 137136500
 
 # Versioning
 
