@@ -122,6 +122,10 @@ If you want to make documentation, doxygen and related tools will
 need to be installed.
 
     sudo apt-get install doxygen
+    sudo apt-get install texlive-base
+    sudo apt-get install texlive-fonts-recommended
+    sudo apt-get install texlive-fonts-extra
+    sudo apt-get install texlive-science
 
 ## Workflow
     
