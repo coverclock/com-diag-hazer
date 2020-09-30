@@ -116,6 +116,13 @@ using them).
     sudo apt-get install g++
     sudo apt-get install make
 
+## Documentation
+
+If you want to make documentation, doxygen and related tools will
+need to be installed.
+
+    sudo apt-get install doxygen
+
 ## Workflow
     
 For my own development workflow, I have also found it useful to install
