@@ -6,6 +6,11 @@
 # "Chip Overclock" is a registered trademark.
 # "Digital Aggregates Corporation" is a registered trademark.
 
+.PHONY: all bootstrap release
+
+all bootstrap release:
+	make -C Hazer all
+
 .PHONY:	scope
 
 scope:
