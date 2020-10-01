@@ -171,6 +171,10 @@ something like this.
     oid sha256:bcb222ac76e51cad8010086754d4cadeeebd0161b51029d6870a0d806db5f42f
     size 137136500
 
+You have to initialize LFS once per machine for every repo it is used in.
+
+    git lfs install
+
 ## geodesic
 
 The geodesic utility is based on algorithms described in
