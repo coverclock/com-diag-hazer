@@ -393,49 +393,42 @@ Footnotes:
 Various releases of Hazer have been tested on one or more the following targets
 and platforms.
 
-"Mercury"    
 Dell OptiPlex 7040    
 Intel Core i7-6700T x86_64 @ 2.8GHz x 4 x 2    
 Ubuntu 14.04.4 "Trusty Tahr"    
 Linux 4.2.0    
 gcc 4.8.4    
 
-"Nickel"    
 Intel NUC5i7RYH    
 Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
 Ubuntu 16.04.2 "Xenial Xerus"    
 Linux 4.10.0    
 gcc 5.4.0    
 
-"Nickel" (Updated)    
 Intel NUC5i7RYH    
 Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
 Ubuntu 18.04.1 "Bionic Beaver"    
 Linux 4.15.0    
 gcc 7.3.0    
 
-"Bronze"    
 Raspberry Pi 2 Model B    
 Broadcom BCM2836 Cortex-A7 ARMv7 @ 900MHz x 4    
 Raspbian 8.0 "Jessie"    
 Linux 4.4.34    
 gcc 4.9.2    
 
-"Zinc" and "Lead"    
 Raspberry Pi 3 Model B    
 Broadcom BCM2837 Cortex-A53 ARMv7 @ 1.2GHz x 4    
 Raspbian 8.0 "Jessie"    
 Linux 4.4.34    
 gcc 4.9.2    
 
-"Gold"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.4 "Stretch"    
 Linux 4.14.34    
 gcc 6.3.0    
 
-"Bodega"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.8 "Stretch"    
@@ -443,7 +436,6 @@ Linux 4.14.98
 gcc 6.3.0    
 DGNSS Base (Generation 1)    
 
-"Mochila"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.8 "Stretch"    
@@ -451,7 +443,6 @@ Linux 4.14.98
 gcc 6.3.0    
 DGNSS Rover (Generation 1)    
 
-"ElJefe"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.9 "Stretch"    
@@ -459,7 +450,6 @@ Linux 4.19.42
 gcc 6.3.0    
 DGNSS Router (Generation 2)    
 
-"Bodega" (Updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
@@ -467,7 +457,6 @@ Linux 4.19.50
 gcc 8.3.0    
 DGNSS Base (Generation 1)    
 
-"Mochila" (Updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
@@ -475,7 +464,6 @@ Linux 4.19.50
 gcc 8.3.0    
 DGNSS Rover (Generation 1)    
 
-"Hacienda"    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
@@ -483,7 +471,6 @@ Linux 4.19.50
 gcc 8.3.0    
 DGNSS Base (Generation 1)    
 
-"ElJefe" (Updated)    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 10 "Buster"    
@@ -491,21 +478,18 @@ Linux 4.19.50
 gcc 8.3.0    
 DGNSS Router (Generation 2)    
 
-"Cadmium"    
 Intel NUC7i7BNH    
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
 Ubuntu 16.04.5 "Xenial Xerus"    
 Linux 4.15.0    
 gcc 5.4.0    
 
-"Cadmium" (Updated)    
 Intel NUC7i7BNH    
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
 Ubuntu 19.04 "Disco Dingo"   
 Linux 5.0.0    
 gcc 8.3.0    
 
-"Rhodium"    
 Raspberry Pi 4 Model B    
 ARMv8 64-bit    
 Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
@@ -513,7 +497,6 @@ Raspbian 10 "Buster"
 Linux 4.19.58    
 gcc 8.3.0    
 
-"Silicon10"    
 VM running in VMware Workstation 15 Pro under Windows 10    
 Intel x86_64 64-bit    
 Intel Core i7-3520M @ 2.90GHz x 2    
@@ -521,7 +504,6 @@ Ubuntu 19.10 "Eoan"
 Linux 5.3.0    
 gcc 9.2.1    
 
-"Gypsum"    
 HP Mini 110-1100    
 Intel i686 32-bit    
 Intel Atom N270 @ 1.6GHz x 2    
@@ -529,7 +511,6 @@ Mint 19.3 "Tricia"
 Linux 5.0.0    
 gcc 7.5.0    
 
-"Vagabundo"    
 Pi-Top 3    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
@@ -538,7 +519,6 @@ Linux 4.19.66
 gcc 6.3.0    
 DGNSS Rover (Generation 3)    
 
-"Vagabundo"    
 Pi-Top 3    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
@@ -547,7 +527,6 @@ Linux 4.19.97
 gcc 8.3.0    
 DGNSS Rover (Generation 3)    
 
-"Vagabundo"    
 Pi-Top 3    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
@@ -556,7 +535,6 @@ Linux 4.19.75
 gcc 8.3.0    
 DGNSS Rover (Generation 3)    
 
-"Vagabundo" (Updated)    
 Pi-Top 3    
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
@@ -565,7 +543,6 @@ Linux 4.19.97
 gcc 8.3.0    
 DGNSS Rover (Generation 3)    
 
-"Neon"    
 GPD Micro PC    
 Intel x86_64    
 Intel Celeron N4100 @ 1.10GHz x 2 x 2    
