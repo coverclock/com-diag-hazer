@@ -1,15 +1,19 @@
 # vi: set ts=4 shiftwidth=4:
-# Copyright 2017 Digital Aggregates Corporation
+# Copyright 20172-2020 Digital Aggregates Corporation
 # author:Chip Overclock
 # mailto:coverclock@diag.com
 # https://github.com/coverclock/com-diag-hazer
 # "Chip Overclock" is a registered trademark.
 # "Digital Aggregates Corporation" is a registered trademark.
 
-.PHONY: all bootstrap release
+.PHONY:	all bootstrap release
 
-all bootstrap release:
+all:
 	make -C Hazer all
+
+bootstrap:
+
+release:	all
 
 .PHONY:	scope
 
