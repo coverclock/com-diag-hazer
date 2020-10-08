@@ -1019,6 +1019,7 @@ the libraries and binaries in the system directories.)
 * gn803g - exercises the TOPGNSS GN-803G receiver.
 * gr701w - exercises the NaviSys GR701W receiver.    
 * lowresolution - same as bin/base.sh but with much much lower standards.
+* makerfocus - exercises the MakerFocus GPS board for the Rasperry Pi.
 * simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
 * simplertk2b - exercises the Ardusimple SimpleRTK2B board.
 * simplertk2bquery - queries the configuration of an Ardusimple SimpleRTK2B board.

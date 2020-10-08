@@ -86,21 +86,6 @@
  *  gpstool -D /dev/ttyACM0 E 2> >(log -S)
  */
 
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <signal.h>
-#include <pthread.h>
-#include <locale.h>
-#include <wchar.h>
-#include <ctype.h>
 #include "com/diag/diminuto/diminuto_absolute.h"
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_coherentsection.h"
@@ -127,6 +112,21 @@
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
+#include "com/diag/diminuto/diminuto_thread.h"
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <signal.h>
+#include <locale.h>
+#include <wchar.h>
+#include <ctype.h>
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
@@ -259,8 +259,9 @@ int main(int argc, char * argv[])
     const char * pps = (const char *)0;
     poller_t poller = { 0 };
     void * result = (void *)0;
-    pthread_t thread;
-    int pthreadrc = -1;
+    diminuto_thread_t thread = DIMINUTO_THREAD_INITIALIZER((diminuto_thread_function_t *)0);
+    diminuto_thread_t * threadp = (diminuto_thread_t *)0;
+    int threadrc = -1;
     int onepps = 0;
     /*
      * NMEA parser state variables.
@@ -955,7 +956,7 @@ int main(int argc, char * argv[])
         rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_BOTH);
         diminuto_assert(rc >= 0);
 
-        pps_fp = diminuto_pin_open(ppspin);
+        pps_fp = diminuto_pin_open(ppspin, 0);
         diminuto_assert(pps_fp != (FILE *)0);
 
         rc = diminuto_pin_get(pps_fp);
@@ -966,12 +967,11 @@ int main(int argc, char * argv[])
         poller.onepps = 0;
         poller.done = 0;
 
-        pthreadrc = pthread_create(&thread, 0, gpiopoller, &poller);
-        if (pthreadrc != 0) {
-            errno = pthreadrc;
-            diminuto_perror("pthread_create");
-        }
-        diminuto_assert(pthreadrc == 0);
+        threadp = diminuto_thread_init(&thread, gpiopoller);
+        diminuto_assert(threadp == &thread);
+
+        threadrc = diminuto_thread_start(&thread, &poller);
+        diminuto_assert(threadrc == 0);
 
     }
 
@@ -1153,12 +1153,11 @@ int main(int argc, char * argv[])
         poller.onepps = 0;
         poller.done = 0;
 
-        pthreadrc = pthread_create(&thread, 0, dcdpoller, &poller);
-        if (pthreadrc != 0) {
-            errno = pthreadrc;
-            diminuto_perror("pthread_create");
-        }
-        diminuto_assert(pthreadrc == 0);
+        threadp = diminuto_thread_init(&thread, dcdpoller);
+        diminuto_assert(threadp == &thread);
+
+        threadrc = diminuto_thread_start(&thread, &poller);
+        diminuto_assert(threadrc == 0);
 
     }
 
@@ -2622,20 +2621,14 @@ report:
 
     diminuto_mux_fini(&mux);
 
-    if (pthreadrc == 0) {
+    if (threadrc == 0) {
         DIMINUTO_COHERENT_SECTION_BEGIN;
             poller.done = !0;
         DIMINUTO_COHERENT_SECTION_END;
-        pthreadrc = pthread_kill(thread, SIGINT);
-        if (pthreadrc != 0) {
-            errno = pthreadrc;
-            diminuto_perror("pthread_join");
-        }
-        pthreadrc = pthread_join(thread, &result);
-        if (pthreadrc != 0) {
-            errno = pthreadrc;
-            diminuto_perror("pthread_join");
-        }
+        DIMINUTO_THREAD_BEGIN(&thread);
+            threadrc = diminuto_thread_notify(&thread);
+        DIMINUTO_THREAD_END;
+        threadrc = diminuto_thread_join(&thread, &result);
     }
 
     if (pps_fp != (FILE *)0) {
