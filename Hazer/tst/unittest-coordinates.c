@@ -56,9 +56,9 @@ int main(int argc, char * argv[])
     }
 
     {
-        fprintf(stderr, "COORDINATES_SCANF_HPP: " COORDINATES_SCANF_HPP "\n", 359.999999999 );
-        fprintf(stderr, "COORDINATES_SCANF_NGS: " COORDINATES_SCANF_NGS "\n", 359, 59, 59.999999, 'W');
-        fprintf(stderr, "COORDINATES_SCANF_POS: " COORDINATES_SCANF_POS "\n", 359, 59, 59.999999, 'W');
+        fprintf(stderr, "COORDINATES_SCANF_HPP: " COORDINATES_SCANF_HPP "\n", -179.999999 );
+        fprintf(stderr, "COORDINATES_SCANF_NGS: " COORDINATES_SCANF_NGS "\n", 179, 59, 59.999999, 'W');
+        fprintf(stderr, "COORDINATES_SCANF_POS: " COORDINATES_SCANF_POS "\n", 179, 59, 59.999999, 'W');
     }
 
     {
