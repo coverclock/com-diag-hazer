@@ -50,6 +50,18 @@ int main(int argc, char * argv[])
     if (argc > 1) { (void)coordinates_debug(!0); }
 
     {
+        fputs("COORDINATES_SCANF_HPP=\"" COORDINATES_SCANF_HPP "\"\n", stderr);
+        fputs("COORDINATES_SCANF_NGS=\"" COORDINATES_SCANF_NGS "\"\n", stderr);
+        fputs("COORDINATES_SCANF_POS=\"" COORDINATES_SCANF_POS "\"\n", stderr);
+    }
+
+    {
+        fprintf(stderr, "COORDINATES_SCANF_HPP: " COORDINATES_SCANF_HPP "\n", 359.999999999 );
+        fprintf(stderr, "COORDINATES_SCANF_NGS: " COORDINATES_SCANF_NGS "\n", 359, 59, 59.999999, 'W');
+        fprintf(stderr, "COORDINATES_SCANF_POS: " COORDINATES_SCANF_POS "\n", 359, 59, 59.999999, 'W');
+    }
+
+    {
         int latituderc = 0;
         int longituderc = 0;
         double latitude = 0.0;
