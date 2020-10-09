@@ -62,6 +62,38 @@ int main(int argc, char * argv[])
     }
 
     {
+        int rc;
+        double ff;
+        unsigned int dd;
+        unsigned int mm;
+        char cc;
+
+        ff = 0.0;
+        rc = sscanf("-179.999999", COORDINATES_SCANF_HPP, &ff);
+        assert(ff == -179.999999);
+
+        dd = 0;
+        mm = 0;
+        ff = 0.0;
+        cc = '\0';
+        rc = sscanf("179 59 59.999999(W)", COORDINATES_SCANF_NGS, &dd, &mm, &ff, &cc);
+        assert(dd == 179);
+        assert(mm == 59);
+        assert(ff = 59.999999);
+        assert(cc == 'W');
+
+        dd = 0;
+        mm = 0;
+        ff = 0.0;
+        cc = '\0';
+        rc = sscanf("179°59'59.999999\"W", COORDINATES_SCANF_POS, &dd, &mm, &ff, &cc);
+        assert(dd == 179);
+        assert(mm == 59);
+        assert(ff = 59.999999);
+        assert(cc == 'W');
+    } 
+
+    {
         int latituderc = 0;
         int longituderc = 0;
         double latitude = 0.0;
