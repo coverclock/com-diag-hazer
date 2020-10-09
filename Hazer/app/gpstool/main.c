@@ -1388,8 +1388,8 @@ int main(int argc, char * argv[])
                     /* Do nothing. */
                 } else if (ferror(in_fp)) {
                     DIMINUTO_LOG_WARNING("ERROR");
-                    eof = !0;
-                    break;
+                    clearerr(in_fp);
+                    continue;
                 } else if (feof(in_fp)) {
                     DIMINUTO_LOG_NOTICE("EOF");
                     eof = !0;

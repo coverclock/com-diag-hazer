@@ -1,14 +1,19 @@
 #!/bin/bash
-# Copyright 2018 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2018-2020 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 #
-# I use a NaviSys Technology GR-701W USB GPS device for this.
-# The GR-701W exports 1PPS via DCD, which the "-c" option below
-# expects. But you could use this on any Ublox 7 GPS device and
-# if it doesn't implement 1PPS, the script should still otherwise
-# work.
+# This script tests the NaviSys Technology GR-701W, a USB GPS
+# device that is based on a Ublox 7 receiver. The GR-701W is
+# unusual amongst GPS devices that have a USB interface in that
+# it exports the 1PPS signal via data carrier detect (DCD), which
+# is the reason for the "-c" option below. This script also
+# configures the gpstool to forward the 1PPS signal by strobing a
+# GPIO pin, the "-p" option. In this case, it uses GPIO pin 20 on
+# a hardware test fixture I fabricated. I run this script on a
+# Raspberry Pi as user "pi", which has access to the GPIO pins
+# by virtue of being in group "gpio".
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
@@ -20,4 +25,7 @@ STROBE=${3:-20}
 DIR=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${DIR}
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c  -p ${STROBE} -E -t 10 2> ${DIR}/${PROGRAM}.log
+export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+
+coreable pintool -p ${STROBE} -e
+coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c  -p ${STROBE} -E -t 10 2>> ${DIR}/${PROGRAM}.err
