@@ -28,6 +28,4 @@ mkdir -p ${LOG}
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
-coreable pintool -p ${ONEPPS} -e
-coreable pintool -p ${STROBE} -e
 coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -I ${ONEPPS} -p ${STROBE} -E -t 10 2>> ${LOG}/${PROGRAM}.err

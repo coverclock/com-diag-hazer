@@ -166,8 +166,8 @@ int main(int argc, char * argv[])
     int escape = 0;
     int report = 0;
     int process = 0;
-    int strobepin = -1;
-    int ppspin = -1;
+    int strobepin = (((int)1)<<((sizeof(int)*8)-1));
+    int ppspin = (((int)1)<<((sizeof(int)*8)-1));
     int slow = 0;
     int expire = 0;
     int unknown = 0;
@@ -529,7 +529,7 @@ int main(int argc, char * argv[])
         case 'I':
             pps = optarg;
             ppspin = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (ppspin < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case 'K':
             readonly = 0;
@@ -641,7 +641,7 @@ int main(int argc, char * argv[])
         case 'p':
             strobe = optarg;
             strobepin = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (strobepin < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case 's':
             xonxoff = !0;
@@ -693,7 +693,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
             fprintf(stderr, "       -G :PORT    Use local PORT as dataGram source.\n");
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
-            fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D).\n");
+            fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).\n");
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
             fprintf(stderr, "       -L LOG      Write pretty-printed input to LOG file.\n");
             fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
@@ -721,7 +721,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -l          Use Local control for DEVICE.\n");
             fprintf(stderr, "       -m          Use Modem control for DEVICE.\n");
             fprintf(stderr, "       -o          Use Odd parity for DEVICE.\n");
-            fprintf(stderr, "       -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c).\n");
+            fprintf(stderr, "       -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).\n");
             fprintf(stderr, "       -n          Use No parity for DEVICE.\n");
             fprintf(stderr, "       -s          Use XON/XOFF (control-Q/control-S) for DEVICE.\n");
             fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
@@ -924,13 +924,29 @@ int main(int argc, char * argv[])
      */
 
     if (strobe != (const char *)0) {
+        int activehigh = !0;
 
-        strobe_fp = diminuto_pin_output(strobepin);
+        if (strobepin < 0) {
+            activehigh = 0;
+            strobepin = -strobepin;
+        }
+
+        (void)diminuto_pin_unexport_ignore(strobepin);
+
+        rc = diminuto_pin_export(strobepin);
+        diminuto_assert(rc >= 0);
+
+        rc = diminuto_pin_direction(strobepin, !0);
+        diminuto_assert(rc >= 0);
+
+        rc = diminuto_pin_active(strobepin, activehigh);
+        diminuto_assert(rc >= 0);
+
+        strobe_fp = diminuto_pin_open(strobepin, !0);
         diminuto_assert(strobe_fp != (FILE *)0);
 
         rc = diminuto_pin_clear(strobe_fp);
         diminuto_assert(rc >= 0);
-
     }
 
     /*
@@ -943,6 +959,14 @@ int main(int argc, char * argv[])
      */
 
     if (pps != (const char *)0) {
+        int activehigh = !0;
+
+        if (ppspin < 0) {
+            activehigh = 0;
+            ppspin = -ppspin;
+        }
+
+        (void)diminuto_pin_unexport_ignore(ppspin);
 
         rc = diminuto_pin_export(ppspin);
         diminuto_assert(rc >= 0);
@@ -950,7 +974,7 @@ int main(int argc, char * argv[])
         rc = diminuto_pin_direction(ppspin, 0);
         diminuto_assert(rc >= 0);
 
-        rc = diminuto_pin_active(ppspin, !0);
+        rc = diminuto_pin_active(ppspin, activehigh);
         diminuto_assert(rc >= 0);
 
         rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_BOTH);
@@ -972,7 +996,6 @@ int main(int argc, char * argv[])
 
         threadrc = diminuto_thread_start(&thread, &poller);
         diminuto_assert(threadrc == 0);
-
     }
 
     /*

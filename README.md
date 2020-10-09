@@ -1156,7 +1156,7 @@ I find this format more suitable for viewing the data during post-processing.
 ## gpstool
 
     > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE ]
+    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -O FILE ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -F | -H HEADLESS | -P ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
@@ -1169,11 +1169,12 @@ I find this format more suitable for viewing the data during post-processing.
            -G IP:PORT  Use remote IP and PORT as dataGram sink.
            -G :PORT    Use local PORT as dataGram source.
            -H HEADLESS Like -R but writes each iteration to HEADLESS file.
-           -I PIN      Take 1PPS from GPIO Input PIN (requires -D).
+           -I PIN      Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).
            -K          Write input to DEVICE sinK from datagram source.
            -L LOG      Write pretty-printed input to LOG file.
            -M          Run in the background as a daeMon.
            -N FILE     Use fix FILE to save ARP LLH for subsequeNt fixed mode.
+           -O FILE     Save process identifier in FILE.
            -P          Process incoming data even if no report is being generated.
            -R          Print a Report on standard output.
            -S FILE     Use source FILE or named pipe for input.
@@ -1196,7 +1197,7 @@ I find this format more suitable for viewing the data during post-processing.
            -l          Use Local control for DEVICE.
            -m          Use Modem control for DEVICE.
            -o          Use Odd parity for DEVICE.
-           -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c).
+           -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).
            -n          Use No parity for DEVICE.
            -s          Use XON/XOFF (control-Q/control-S) for DEVICE.
            -t SECONDS  Timeout GNSS data after SECONDS seconds.

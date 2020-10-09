@@ -18,7 +18,7 @@
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-9600}
-STROBE=${3:-20}
+STROBE=${3:-"-20"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -27,5 +27,4 @@ mkdir -p ${DIR}
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
-coreable pintool -p ${STROBE} -e
 coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c  -p ${STROBE} -E -t 10 2>> ${DIR}/${PROGRAM}.err
