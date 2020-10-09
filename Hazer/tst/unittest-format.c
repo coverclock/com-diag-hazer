@@ -364,4 +364,6 @@ int main(void)
         assert(meters == -2);
         assert(tenthousandths == 3456);
     }
+
+    return 0;
 }

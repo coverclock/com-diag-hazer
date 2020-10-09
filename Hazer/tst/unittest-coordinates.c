@@ -104,7 +104,7 @@ int main(int argc, char * argv[])
         locale = setlocale(LC_ALL, "");
         latituderc = sscanf(EXAMPLE_POS_LATITUDE, COORDINATES_SCANF_POS, &latitudedegrees, &latitudeminutes, &latitudeseconds, &latitudedirection);
         longituderc = sscanf(EXAMPLE_POS_LONGITUDE, COORDINATES_SCANF_POS, &longitudedegrees, &longitudeminutes, &longitudeseconds, &longitudedirection);
-        fprintf(stderr, "POS LATITUDE=\"%s\"[%d] latitude=%u\u00b0%02u'%012.9lf\"%c LONGITUDE=\"%s\"[%d] longitude=%u\u00b0%02u'%012.9lf\"%c\n", EXAMPLE_POS_LATITUDE, latituderc, latitudedegrees, latitudeminutes, latitudeseconds, latitudedirection, EXAMPLE_POS_LONGITUDE, longituderc, longitudedegrees, longitudeminutes, longitudeseconds, longitudedirection);
+        fprintf(stderr, "POS LATITUDE=\"%s\"[%d] latitude=%u°%02u'%012.9lf\"%c LONGITUDE=\"%s\"[%d] longitude=%u°%02u'%012.9lf\"%c\n", EXAMPLE_POS_LATITUDE, latituderc, latitudedegrees, latitudeminutes, latitudeseconds, latitudedirection, EXAMPLE_POS_LONGITUDE, longituderc, longitudedegrees, longitudeminutes, longitudeseconds, longitudedirection);
         assert(latituderc == 4);
         assert(latitudedegrees == 39);
         assert(latitudeminutes == 47);

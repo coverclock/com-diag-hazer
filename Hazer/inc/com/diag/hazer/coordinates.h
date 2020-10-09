@@ -42,7 +42,8 @@
  * @def COORDINATES_SCANF_POS
  * Each number in the POS format looks like this to sscanf(3).
  */
-#define COORDINATES_SCANF_POS "%u\u00B0%u'%lf\"%c"
+#define COORDINATES_SCANF_POS "%u°%u'%lf\"%c"
+
 
 /**
  * These are the coordinate formats that are supported. An "invalid" value
