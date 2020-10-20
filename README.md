@@ -127,6 +127,24 @@ need to be installed.
     sudo apt-get install texlive-fonts-extra
     sudo apt-get install texlive-science
 
+You can make HTML, man page, and PDF documentation based on the Doxygen
+comments embedded in the source code by using the following make targets.
+
+    make documentation
+    make manuals
+
+You can find the resulting documentation in the following directories.
+The variable TARGET will be replaced by "host" unless you are using some
+special Makefile configuration (for example, for cross-compilation).
+
+    out/${TARGET}/doc/html
+    out/${TARGET}/doc/man
+    out/${TARGET}/doc/pdf
+
+The gpstool application is a good example of how to use the Hazer,
+Tumbleweed, and Yodel features. (It is also a good example of how to
+use the features of the Diminuto library.)
+
 ## Workflow
     
 For my own development workflow, I have also found it useful to install
