@@ -193,6 +193,9 @@ You have to initialize LFS once per machine for every repo it is used in.
 
     git lfs install
 
+You can also safely skip installing LFS, and ignore the large data files, to
+use this repo.
+
 ## geodesic
 
 The geodesic utility is based on algorithms described in
