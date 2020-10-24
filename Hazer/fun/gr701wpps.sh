@@ -27,4 +27,4 @@ mkdir -p ${DIR}
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
 
-coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c  -p ${STROBE} -E -t 10 2>> ${DIR}/${PROGRAM}.err
+coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -p ${STROBE} -E -t 10 2>> ${DIR}/${PROGRAM}.err
