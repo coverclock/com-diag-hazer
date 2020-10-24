@@ -387,6 +387,7 @@ Hazer has been successfully tested with the following GPS receivers.
 * Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
 * Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]    
 * SparkFun GPS Dead Reckoning gen 8 (U-Blox 8, UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [12]
+* SparkFun GPS NEO-M8N (U-Blox 8, UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [8] [10]
 * SparkFun GPS-RTK2 (U-Blox 9, UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]    
 * SparkFun GPS Dead Reckoning gen 9 (U-Blox 9, UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [12]
 * Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
@@ -1039,8 +1040,11 @@ the libraries and binaries in the system directories.)
 * dgnss - a script used to test other DNSS scripts.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
 * gr701w - exercises the NaviSys GR701W receiver.    
+* gr701wpps - exercises the NaviSys GR701W receiver and its 1PPS output.    
 * lowresolution - same as bin/base.sh but with much much lower standards.
-* makerfocus - exercises the MakerFocus GPS board for the Rasperry Pi.
+* makerfocus - exercises the MakerFocus GPS board.
+* makerfocuspps - exercises the MakerFocus GPS board and its 1PPS output.
+* neom8npps - exercises the SparkFun NEO-M8N board and its 1PPS output.
 * simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
 * simplertk2b - exercises the Ardusimple SimpleRTK2B board.
 * simplertk2bquery - queries the configuration of an Ardusimple SimpleRTK2B board.
