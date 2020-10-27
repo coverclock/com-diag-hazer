@@ -20,8 +20,6 @@
  * rtktool -p :21010 -t 30
  */
 
-#undef NDEBUG
-#include <assert.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -47,6 +45,7 @@
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_delay.h"
 #include "com/diag/diminuto/diminuto_daemon.h"
+#include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
@@ -227,35 +226,35 @@ int main(int argc, char * argv[])
     if (daemon) {
         rc = diminuto_daemon(Program);
         DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
-        assert(rc == 0);
+        diminuto_assert(rc == 0);
     }
 
     rc = diminuto_terminator_install(0);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
     rc = diminuto_interrupter_install(!0);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
     rc = diminuto_hangup_install(!0);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
     (void)diminuto_time_timezone(diminuto_time_clock());
 
     diminuto_mux_init(&mux);
 
     sock = diminuto_ipc6_datagram_peer(endpoint.udp);
-    assert(sock >= 0);
+    diminuto_assert(sock >= 0);
     DIMINUTO_LOG_INFORMATION("Router (%d) \"%s\" [%s]:%d", sock, rendezvous, diminuto_ipc6_address2string(endpoint.ipv6, ipv6, sizeof(ipv6)), endpoint.udp);
 
 
     rc = diminuto_mux_register_read(&mux, sock);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
     frequency = diminuto_frequency();
-    assert(frequency > 0);
+    diminuto_assert(frequency > 0);
 
     now = was = diminuto_time_elapsed() / frequency;
-    assert(now >= 0);
+    diminuto_assert(now >= 0);
 
     /***************************************************************************
      * WORK
@@ -296,7 +295,7 @@ int main(int argc, char * argv[])
         } else if (errno == EINTR) {
             continue;
         } else {
-            assert(0);
+            diminuto_assert(0);
         }
 
         /*
@@ -318,9 +317,9 @@ int main(int argc, char * argv[])
 
             if (this == (client_t *)0) {
                 this = (client_t *)malloc(sizeof(client_t));
-                assert(this != (client_t *)0);
+                diminuto_assert(this != (client_t *)0);
                 temp = diminuto_tree_datainit(&(this->node), this);
-                assert(temp != (diminuto_tree_t *)0);
+                diminuto_assert(temp != (diminuto_tree_t *)0);
                 this->last = 0;
                 this->sequence = 0;
                 this->classification = CLASS;
@@ -356,12 +355,12 @@ int main(int argc, char * argv[])
             } else if (comparison != 0) {
                 that = (client_t *)0;
                 then = (client_t *)diminuto_tree_data(node);
-                assert(then != (client_t *)0);
+                diminuto_assert(then != (client_t *)0);
                 thou = this;
                 this->sequence = 0; /* RESET */
             } else {
                 that = (client_t *)diminuto_tree_data(node);
-                assert(that != (client_t *)0);
+                diminuto_assert(that != (client_t *)0);
                 then = (client_t *)0;
                 thou = that;
             }
@@ -476,10 +475,10 @@ int main(int argc, char * argv[])
             } else {
 
                 node = diminuto_tree_first(&root);
-                assert(node != (diminuto_tree_t *)0);
+                diminuto_assert(node != (diminuto_tree_t *)0);
 
                 last = diminuto_tree_last(&root);
-                assert(last != (diminuto_tree_t *)0);
+                diminuto_assert(last != (diminuto_tree_t *)0);
 
                 while (!0) {
                     thee = (client_t *)diminuto_tree_data(node);
@@ -513,29 +512,29 @@ int main(int argc, char * argv[])
             if (that != (client_t *)0) {
                 /* Do nothing. */
             } else if (diminuto_tree_isempty(&root)) {
-                assert(this != (client_t *)0);
+                diminuto_assert(this != (client_t *)0);
                 node = diminuto_tree_insert_root(&(this->node), &root);
-                assert(node != (diminuto_tree_t *)0);
+                diminuto_assert(node != (diminuto_tree_t *)0);
                 this = (client_t *)0; /* CONSUMED */
             } else if (comparison < 0) {
-                assert(this != (client_t *)0);
-                assert(then != (client_t *)0);
+                diminuto_assert(this != (client_t *)0);
+                diminuto_assert(then != (client_t *)0);
                 node = diminuto_tree_insert_right(&(this->node), &(then->node));
-                assert(node != (diminuto_tree_t *)0);
+                diminuto_assert(node != (diminuto_tree_t *)0);
                 this = (client_t *)0; /* CONSUMED */
             } else if (comparison > 0) {
-                assert(this != (client_t *)0);
-                assert(then != (client_t *)0);
+                diminuto_assert(this != (client_t *)0);
+                diminuto_assert(then != (client_t *)0);
                 node = diminuto_tree_insert_left(&(this->node), &(then->node));
-                assert(node != (diminuto_tree_t *)0);
+                diminuto_assert(node != (diminuto_tree_t *)0);
                 this = (client_t *)0; /* CONSUMED */
             } else {
-                assert(0);
+                diminuto_assert(0);
             }
 
             if (debug) {
                 node = diminuto_tree_audit(&root);
-                assert(node == (diminuto_tree_t *)0);
+                diminuto_assert(node == (diminuto_tree_t *)0);
             }
 
             /*
@@ -565,10 +564,10 @@ int main(int argc, char * argv[])
         } else {
 
             node = diminuto_tree_first(&root);
-            assert(node != (diminuto_tree_t *)0);
+            diminuto_assert(node != (diminuto_tree_t *)0);
 
             last = diminuto_tree_last(&root);
-            assert(last != (diminuto_tree_t *)0);
+            diminuto_assert(last != (diminuto_tree_t *)0);
 
             while (!0) {
                 thee = (client_t *)diminuto_tree_data(node);
@@ -576,14 +575,14 @@ int main(int argc, char * argv[])
                 if ((now - thee->last) > timeout) {
                     DIMINUTO_LOG_NOTICE("Client Old %s [%s]:%d", (thee->classification == BASE) ? "base" : (thee->classification == ROVER) ? "rover" : "unknown", diminuto_ipc6_address2string(thee->address, ipv6, sizeof(ipv6)), thee->port);
                     node = diminuto_tree_remove(&(thee->node));
-                    assert(node != (diminuto_tree_t *)0);
+                    diminuto_assert(node != (diminuto_tree_t *)0);
                     if (thee == base) {
                         base = (client_t *)0;
                     }
                     free(thee);
                 }
                 if (node == last) { break; }
-                assert(next != (diminuto_tree_t *)0);
+                diminuto_assert(next != (diminuto_tree_t *)0);
                 node = next;
             }
 
@@ -604,25 +603,25 @@ int main(int argc, char * argv[])
     diminuto_mux_fini(&mux);
 
     rc = diminuto_ipc_close(sock);
-    assert(rc >= 0);
+    diminuto_assert(rc >= 0);
 
 
     if (!diminuto_tree_isempty(&root)) {
 
         node = diminuto_tree_first(&root);
-        assert(node != (diminuto_tree_t *)0);
+        diminuto_assert(node != (diminuto_tree_t *)0);
 
         last = diminuto_tree_last(&root);
-        assert(last != (diminuto_tree_t *)0);
+        diminuto_assert(last != (diminuto_tree_t *)0);
 
         while (!0) {
             thee = (client_t *)diminuto_tree_data(node);
             next = diminuto_tree_next(node);
             node = diminuto_tree_remove(&(thee->node));
-            assert(node != (diminuto_tree_t *)0);
+            diminuto_assert(node != (diminuto_tree_t *)0);
             free(thee);
             if (node == last) { break; }
-            assert(next != (diminuto_tree_t *)0);
+            diminuto_assert(next != (diminuto_tree_t *)0);
             node = next;
         }
 

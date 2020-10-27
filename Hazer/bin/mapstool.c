@@ -76,8 +76,6 @@
  * 39°47'39.162999"N, 105°09'12.060000"W
  */
 
-#undef NDEBUG
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,6 +85,7 @@
 #include <errno.h>
 #include "com/diag/hazer/coordinates.h"
 #include "com/diag/diminuto/diminuto_log.h"
+#include "com/diag/diminuto/diminuto_assert.h"
 
 /**
  * This is the Unicode for the degree symbol.
@@ -142,10 +141,10 @@ int main(int argc, char *argv[])
             millionths = 0;
             direction = 0;
             coordinates_format_decimaldegrees2position(latitude, &degrees, &minutes, &seconds, &millionths, &direction);
-            assert((0 <= degrees) && (degrees <= 90));
-            assert((0 <= minutes) && (minutes <= 59));
-            assert((0 <= seconds) && (seconds <= 59));
-            assert((0 <= millionths) && (millionths <= 999999));
+            diminuto_assert((0 <= degrees) && (degrees <= 90));
+            diminuto_assert((0 <= minutes) && (minutes <= 59));
+            diminuto_assert((0 <= seconds) && (seconds <= 59));
+            diminuto_assert((0 <= millionths) && (millionths <= 999999));
             printf("%2d%lc%02d'%02d.%06d\"%c,", degrees, (wint_t)DEGREE, minutes, seconds, millionths, (direction < 0) ? 'S' : 'N');
             degrees = 0;
             minutes = 0;
@@ -153,10 +152,10 @@ int main(int argc, char *argv[])
             millionths = 0;
             direction = 0;
             coordinates_format_decimaldegrees2position(longitude, &degrees, &minutes, &seconds, &millionths, &direction);
-            assert((0 <= degrees) && (degrees <= 180));
-            assert((0 <= minutes) && (minutes <= 59));
-            assert((0 <= seconds) && (seconds <= 59));
-            assert((0 <= millionths) && (millionths <= 999999));
+            diminuto_assert((0 <= degrees) && (degrees <= 180));
+            diminuto_assert((0 <= minutes) && (minutes <= 59));
+            diminuto_assert((0 <= seconds) && (seconds <= 59));
+            diminuto_assert((0 <= millionths) && (millionths <= 999999));
             printf(" %3d%lc%02d'%02d.%06d\"%c\n", degrees, (wint_t)DEGREE, minutes, seconds, millionths, (direction < 0) ? 'W' : 'E');
             argv++;
         } else {
