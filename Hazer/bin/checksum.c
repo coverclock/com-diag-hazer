@@ -1,11 +1,20 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
+ * @copyright Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Computes and displays the checksum of an NMEA, UBX, or RTCM message.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
  *
- * Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-hazer
+ * ABSTRACT
+ *
+ * Computes and displays the checksum of an NMEA, UBX, or RTCM message.
+ *
+ * USAGE
+ * 
+ * checksum [ ESCAPEDSEQUENCE ... ]
  */
 
 #include <stdio.h>

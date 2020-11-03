@@ -1,11 +1,12 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- *
- * Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
+ * @copyright Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Computes the Haversine distance between two points.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
  *
  * ABSTRACT
  *
@@ -35,7 +36,7 @@
  *
  * EXAMPLE
  *
- * haversine 39.794366985, -105.153063138 39.794237168, -105.153370541
+ * > haversine 39.794366985, -105.153063138 39.794237168, -105.153370541
  * 30.002282
  */
 

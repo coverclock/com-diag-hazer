@@ -4,11 +4,13 @@
 
 /**
  * @file
- *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
- * Licensed under the terms in LICENSE.txt.
- *
- * The Tumbleweed feature provides support for RTCM binary message format
+ * @copyright Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Support for RTCM messaging as used by DGNSS devices.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
+ * The Tumbleweed module provides support for RTCM binary message format
  * that is produced by devices supporting Differential GNSS (DGNSS) using
  * Real-Time Kinematics (RTK).
  *

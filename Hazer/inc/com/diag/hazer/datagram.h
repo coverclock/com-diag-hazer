@@ -4,11 +4,13 @@
 
 /**
  * @file
- *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
- * Licensed under the terms in LICENSE.txt.
- *
- * The Datagrams feature provides some common facilities for dealing
+ * @copyright Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Common facilities for using datagrams.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
+ * The Datagrams module provides some common facilities for dealing
  * with datagrams used for transmitting NMEA or RTK data between
  * instances of gpstool.
  *

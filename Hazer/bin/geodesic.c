@@ -1,11 +1,12 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock <coverclock@diag.com><BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
+ * @copyright Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Computes the WGS84 geodesic distance between, two points.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
  *
  * ABSTRACT
  *
@@ -22,6 +23,10 @@
  * the MIT license, and is NOT part of the Digital Aggregates intellectual
  * property.
  *
+ * USAGE
+ * 
+ * geodesic [ -? ] LATDD1 LONDD1 LATDD2 LONDD2
+ *
  * REFERENCES
  *
  * Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
@@ -33,7 +38,7 @@
  *
  * EXAMPLE
  *
- * geodesic 39.794366985, -105.153063138 39.794237168, -105.153370541
+ * > geodesic 39.794366985, -105.153063138 39.794237168, -105.153370541
  * 30.0160979302
 */
 

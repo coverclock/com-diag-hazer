@@ -4,11 +4,13 @@
 
 /**
  * @file
- *
- * Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
- * Licensed under the terms in LICENSE.txt.
- *
- * The Coordinates Feature provides some common facilities for parsing and
+ * @copyright Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Common facilities for parsing, formatting, and displaying.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
+ * The Coordinates module provides some common facilities for parsing and
  * displaying latitude and longitude coordinates in a variety of useful
  * formats.
  */

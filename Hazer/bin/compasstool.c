@@ -1,12 +1,28 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
+ * @copyright Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Converts a decimal bearing to a 8, 16, or 32 compass point.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock <coverclock@diag.com><BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
- * Converts a decimal bearing to a 8, 16, or 32 compass point.
+ * ABSTRACT
+ *
+ * Converts a decimal bearing to an 8, 16, or 32 compass point.
+ *
+ * USAGE
+ *
+ * compasstool [ -? ] [ -d ] [ -e | -s | -t ] BEARING
+ *
+ * NOTE
+ *
+ * -e means 8.
+ *
+ * -s means 16.
+ *
+ * -t means 32.
  */
 
 #include <stdint.h>

@@ -4,11 +4,13 @@
 
 /**
  * @file
- *
- * Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA.
- * Licensed under the terms in LICENSE.txt.
- *
- * The Yodel feature provides support for the proprietary UBX binary packet
+ * @copyright Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Support for proprietary UBX messaging as used by ublox AG devices.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
+ * The Yodel module provides support for the proprietary UBX binary packet
  * format that is optionally produced by GNSS devices manufactured by ublox AG.
  * Yodel can be used in parallel with Hazer for devices that produce both
  * output formats in the same data stream.

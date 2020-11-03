@@ -1,14 +1,25 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
+ * @copyright Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Filter that determines the boundaries of the solutions in a CSV file.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock <coverclock@diag.com><BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
- * Filter that etermines the boundaries of the solutions in a CSV file.
+ * ABSTRACT
+ *
+ * Filter that determines the boundaries of the solutions in a CSV file.
  * Also useful as a model for other code that reads the CSV file.
- * E.G. csvlimits < data.csv
+ *
+ * USAGE
+ *
+ * csvlimits [ -? ] [ -d ] [ -v ]
+ *
+ * EXAMPLE
+ *
+ * csvlimits < data.csv
  */
 
 #include <stdio.h>

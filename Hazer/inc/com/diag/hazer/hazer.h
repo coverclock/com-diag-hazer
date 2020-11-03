@@ -4,11 +4,13 @@
 
 /**
  * @file
- *
- * Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
- * Licensed under the terms in LICENSE.txt.
- *
- * THe Hazer feature is a simple C-based parser of the National Marine
+ * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief Parse common NMEA strings from GNSS devices.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
+ * THe Hazer module is a simple C-based parser of the National Marine
  * Electronics Association (NMEA) strings produced by typical consumer
  * GNSS devices.
  *
