@@ -22,7 +22,7 @@ exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+export COM_DIAG_DIMINUTO_LOG_MASK=${COM_DIAG_DIMINUTO_LOG_MASK:=0xfe}
 
 exec coreable gpstool \
     -H ${OUTFIL} -t 10 \

@@ -1079,7 +1079,7 @@ Makefile configuration file (typically "host"). The DGNSS paramters are
 saved in ${HOME}/fix, or if ${HOME} is not set, in /var/tmp/fix. All of
 these defaults are overridden if the environmental variable is set.
 
-    COM_DIAG_DIMINUTO_LOGMASK
+    COM_DIAG_DIMINUTO_LOG_MASK
 
 Sets the default log mask for Diminuto for those applications that set
 the log mask from the environment. The value is an eight-bit number

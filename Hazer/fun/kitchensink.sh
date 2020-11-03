@@ -38,7 +38,7 @@ cp /dev/null ${SRCFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-export COM_DIAG_DIMINUTO_LOG_MASK=0xff
+export COM_DIAG_DIMINUTO_LOG_MASK=${COM_DIAG_DIMINUTO_LOG_MASK:=0xfe}
 
 coreable gpstool \
 	-B 1024 \

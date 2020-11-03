@@ -27,7 +27,7 @@ RATE=${2:-9600}
 LOG=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${LOG}
 
-export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+export COM_DIAG_DIMINUTO_LOG_MASK=${COM_DIAG_DIMINUTO_LOG_MASK:=0xfe}
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do

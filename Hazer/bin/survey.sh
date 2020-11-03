@@ -32,7 +32,7 @@ exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+export COM_DIAG_DIMINUTO_LOG_MASK=${COM_DIAG_DIMINUTO_LOG_MASK:=0xfe}
 
 SVIN_MIN_DUR=$(ubxval -4 ${DURATION})
 SVIN_ACC_LIMIT=$(ubxval -4 ${ACCURACY})

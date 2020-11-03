@@ -19,6 +19,6 @@ for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} -W ${OPTION}"
 done
 
-export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+export COM_DIAG_DIMINUTO_LOG_MASK=${COM_DIAG_DIMINUTO_LOG_MASK:=0xfe}
 
 eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F ${OPTIONS} 2>> ERRORS

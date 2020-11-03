@@ -25,6 +25,6 @@ STROBE=${4:-16}
 LOG=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${LOG}
 
-export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+export COM_DIAG_DIMINUTO_LOG_MASK=${COM_DIAG_DIMINUTO_LOG_MASK:=0xfe}
 
 coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -I ${ONEPPS} -p ${STROBE} -E -t 10 2>> ${LOG}/${PROGRAM}.err
