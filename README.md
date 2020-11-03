@@ -1066,6 +1066,26 @@ the libraries and binaries in the system directories.)
 * uputronics - exercises the Uputronics GPS board for the Rasperry Pi.
 * zedf9r - exercise UBX-ZED-F9R device.
 
+# Environmental Variables
+
+    COM_DIAG_HAZER_SAVDIR
+
+Some scripts in the bin and fun directories save stdout, stderr, CSV,
+or DGNSS parameters in files.  Setting this environmental variable
+changes the directory in which these files are stored. By default,
+stdout, stderr, and CSV files are stored in the out/${TARGET}/tmp
+subdirectory of the code base, where TARGET is set to the name of the
+Makefile configuration file (typically "host"). The DGNSS paramters are
+saved in ${HOME}/fix, or if ${HOME} is not set, in /var/tmp/fix. All of
+these defaults are overridden if the environmental variable is set.
+
+    COM_DIAG_DIMINUTO_LOGMASK
+
+Sets the default log mask for Diminuto for those applications that set
+the log mask from the environment. The value is an eight-bit number
+in decimal, hexadecimal, or even octal. In addition, the string "~0"
+can be used to enable all log levels.
+
 # Comma Separated Value (CSV) Output
 
 The -T flag for gpstool will cause the utility to save the current
