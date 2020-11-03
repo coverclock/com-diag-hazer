@@ -4,13 +4,12 @@
 
 /**
  * @file
- *
- * Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock <coverclock@diag.com><BR>
- * https://github.com/coverclock/com-diag-hazer<BR>
- *
- * This file is part of the Digital Aggregates Corporation Hazer package.
+ * @copyright Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief This declares the gpstool Globals.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
  */
 
 #include <sys/types.h>
