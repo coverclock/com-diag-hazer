@@ -22,7 +22,11 @@
  * station sending RTK updates, or a mobile (maybe) rover sending keepalives
  * and receiving RTK updates.
  */
-typedef enum Class { CLASS = '?', BASE = 'B', ROVER = 'R', } class_t;
+typedef enum Class {
+    CLASS   = '?',
+    BASE    = 'B',
+    ROVER   = 'R',
+} class_t;
 
 /**
  * This structure describes the state we have to maintain about clients.
