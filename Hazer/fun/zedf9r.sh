@@ -1,4 +1,3 @@
-
 #!/bin/bash
 # Copyright 2020 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
