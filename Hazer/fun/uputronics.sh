@@ -15,8 +15,6 @@ ONEPPS=${3:-18}
 LOG=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${LOG}
 
-export COM_DIAG_DIMINUTO_LOG_MASK=${COM_DIAG_DIMINUTO_LOG_MASK:=0xfe}
-
 stty sane
 
 coreable pintool -p ${ONEPPS} -e

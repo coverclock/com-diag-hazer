@@ -19,6 +19,4 @@ RATE=${2:-9600}
 DIR=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${DIR}
 
-export COM_DIAG_DIMINUTO_LOG_MASK=${COM_DIAG_DIMINUTO_LOG_MASK:=0xfe}
-
 coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -c -E -t 10 2>> ${DIR}/${PROGRAM}.err
