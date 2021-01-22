@@ -1120,8 +1120,8 @@ simplify parsing in post-processing.
 * PIT - pitch in decimal degrees from IMU.
 * YAW - yaw in decimal degrees form IMU.
 * RAC - roll accuracy in decimal degrees.
-* PAC  - pitch accuracy in decimal degrees.
-* YAC  - yaw accuracy in decimal degrees.
+* PAC - pitch accuracy in decimal degrees.
+* YAC - yaw accuracy in decimal degrees.
 * OBS - number of survey observations.
 * MAC - mean accuracy of survey fix.
 
