@@ -17,11 +17,11 @@
  *
  * USAGE
  * 
- * csv2udp HOST:PORT < CSV
+ * csv2udp HOST:PORT
  *
  * EXAMPLE
  *
- * socat -u UDP4-RECV:8080 - & csv2udp tesoro:8080 < CSV
+ * socat -u UDP4-RECV:8080 - & csv2udp tesoro:8080 < ./dat/yodel/20200903/vehicle.csv
  *
  * SAMPLE
  *
