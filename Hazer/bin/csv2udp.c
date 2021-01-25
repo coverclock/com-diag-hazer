@@ -39,13 +39,19 @@ int main(int argc, char * argv[])
     int ii = -1;
     diminuto_ipc_endpoint_t endpoint = { 0, };
     char input[512] = { '\0', };
+    const char * program = (const char *)0;
     char * token[23] = { 0, };
     char * pointer = (char *)0;
     char output[256] = { '\0', };
     size_t length = 0;
     ssize_t size = 0;
+    enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
+    diminuto_ipv4_buffer_t ipv4buffer = { '\0', }; \
+    diminuto_ipv6_buffer_t ipv6buffer = { '\0', }; \
 
     do {
+
+        program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
         diminuto_log_setmask();
 
@@ -56,6 +62,18 @@ int main(int argc, char * argv[])
         }
 
         if (diminuto_ipc_endpoint(argv[1], &endpoint) < 0) {
+            errno = EINVAL;
+            diminuto_perror(argv[1]);
+            break;
+        }
+
+        DIMINUTO_LOG_DEBUG("%s: endpoint=%s:%u\n", program, (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) ?  diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)) : (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) ? diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)) : "", endpoint.udp);
+
+        if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
+            sock = diminuto_ipc4_datagram_peer(0);
+        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
+            sock = diminuto_ipc6_datagram_peer(0);
+        } else {
             errno = EINVAL;
             diminuto_perror(argv[1]);
             break;
@@ -72,6 +90,8 @@ int main(int argc, char * argv[])
         } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
             sock = diminuto_ipc6_datagram_peer(0);
         } else {
+            errno = EINVAL;
+            diminuto_perror(argv[1]);
             break;
         }
 
@@ -102,7 +122,7 @@ int main(int argc, char * argv[])
                 if (token[ii] == (char *)0) {
                     break;
                 }
-                DIMINUTO_LOG_DEBUG("token[%d]=\"%s\"\n", ii, token[ii]);
+                DIMINUTO_LOG_DEBUG("%s: token[%d]=\"%s\"\n", program, ii, token[ii]);
             }
 
             if (ii != diminuto_countof(token)) {
@@ -111,11 +131,11 @@ int main(int argc, char * argv[])
                 continue;
             }
 
-            snprintf(output, sizeof(output), "%s %s %s %s", token[6], token[7], token[8], token[10]);
+            snprintf(output, sizeof(output), "%s %s %s %s", token[TIM], token[LAT], token[LON], token[MSL]);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
 
-            DIMINUTO_LOG_DEBUG("output=\"%s\"\n", output);
+            DIMINUTO_LOG_DEBUG("%s: output=\"%s\"\n", program, output);
 
             if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
                 size = diminuto_ipc4_datagram_send(sock, output, length, endpoint.ipv4, endpoint.udp);

@@ -1102,29 +1102,29 @@ if it is available. Fields which are not available or are not supported
 by the receiver have values coded as "0." instead of an empty string to
 simplify parsing in post-processing.
 
-* NAM - hostname of computer running gpstool.
-* NUM - sequence number of observation.
-* FIX - 0=no fix, 1=dead reckoning, 2=2D, 3=3D, 4=combined, 5=time only.
-* SYS - 0=ensemble, 1=GPS, 2=GLONASS, 3=GALILEO, 4=BEIDOU.
-* SAT - number of satellites used in position fix.
-* CLK - local time in decimal seconds since the POSIX Epoch.
-* TIM - GPS time in decimal seconds since the POSIX Epoch.
-* LAT - WGS84 latitude in decimal degrees.
-* LON - WGS84 longitude in decimal degrees.
-* HAC - reported horizontal error in decimal meters.
-* MSL - altitude above Mean Sea Level in decimal meters.
-* GEO - altitude above WGS84 ellipse in decimal meters.
-* VAC - reported vertical error in decimal meters.
-* SOG - speed over ground in decimal knots.
-* COG - course over ground in decimal degrees.
-* ROL - roll in decimal degrees from IMU.
-* PIT - pitch in decimal degrees from IMU.
-* YAW - yaw in decimal degrees form IMU.
-* RAC - roll accuracy in decimal degrees.
-* PAC - pitch accuracy in decimal degrees.
-* YAC - yaw accuracy in decimal degrees.
-* OBS - number of survey observations.
-* MAC - mean accuracy of survey fix.
+* NAM - 0: hostname of computer running gpstool.
+* NUM - 1: sequence number of observation.
+* FIX - 2: 0=no fix, 1=dead reckoning, 2=2D, 3=3D, 4=combined, 5=time only.
+* SYS - 3: 0=ensemble, 1=GPS, 2=GLONASS, 3=GALILEO, 4=BEIDOU.
+* SAT - 4: number of satellites used in position fix.
+* CLK - 5: local time in decimal seconds since the POSIX Epoch.
+* TIM - 6: GPS time in decimal seconds since the POSIX Epoch.
+* LAT - 7: WGS84 latitude in decimal degrees.
+* LON - 8: WGS84 longitude in decimal degrees.
+* HAC - 9: reported horizontal error in decimal meters.
+* MSL - 10: altitude above Mean Sea Level in decimal meters.
+* GEO - 11: altitude above WGS84 ellipse in decimal meters.
+* VAC - 12: reported vertical error in decimal meters.
+* SOG - 13: speed over ground in decimal knots.
+* COG - 14: course over ground in decimal degrees.
+* ROL - 15: roll in decimal degrees from IMU.
+* PIT - 16: pitch in decimal degrees from IMU.
+* YAW - 17: yaw in decimal degrees form IMU.
+* RAC - 18: roll accuracy in decimal degrees.
+* PAC - 19: pitch accuracy in decimal degrees.
+* YAC - 20: yaw accuracy in decimal degrees.
+* OBS - 21: number of survey observations.
+* MAC - 22: mean accuracy of survey fix.
 
 A snippet of an actual CSV file looks like this.
 
