@@ -11,11 +11,13 @@
  * ABSTRACT
  *
  * Forwards a fixed subset of the CSV output as a datagram to a UDP endpoint.
- * Developed for use with Tesoro, the OpenStreetMaps tile server project.
+ * Developed for use with Tesoro, the OpenStreetMaps tile server project. (I
+ * would have much preferred to have used socat(1) in a bash script to do this,
+ * but AFAICT there is no way in socat to preserve datagram boundaries.)
  *
  * USAGE
  * 
- * csv2udp HOST:PORT
+ * csv2udp HOST:PORT < CSV
  *
  * INPUT
  *
