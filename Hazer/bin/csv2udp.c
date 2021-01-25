@@ -21,7 +21,7 @@
  *
  * EXAMPLE
  *
- * csv2udp tesoro:8080 < CSV
+ * socat -u UDP4-RECV:8080 - & csv2udp tesoro:8080 < CSV
  *
  * SAMPLE
  *
@@ -162,6 +162,16 @@ int main(int argc, char * argv[])
                 break;
             }
 
+        }
+
+        if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
+            (void)diminuto_ipc4_datagram_send(sock, "", 0, endpoint.ipv4, endpoint.udp);
+            (void)diminuto_ipc4_close(sock);
+        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
+            (void)diminuto_ipc6_datagram_send(sock, "", 0, endpoint.ipv6, endpoint.udp);
+            (void)diminuto_ipc6_close(sock);
+        } else {
+            break;
         }
 
     } while (0);
