@@ -25,11 +25,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include "com/diag/diminuto/diminuto_countof.h"
+#include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_ipc.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_log.h"
-#include "com/diag/diminuto/diminuto_countof.h"
+
+static const char * expand(char * to, const char * from, size_t tsize, size_t fsize) {
+    (void)diminuto_escape_expand(to, from, tsize, fsize, (const char *)0);
+    return to;
+}
 
 int main(int argc, char * argv[])
 {
@@ -38,16 +44,17 @@ int main(int argc, char * argv[])
     int rc = -1;
     int ii = -1;
     diminuto_ipc_endpoint_t endpoint = { 0, };
-    char input[512] = { '\0', };
     const char * program = (const char *)0;
     char * token[23] = { 0, };
     char * pointer = (char *)0;
-    char output[256] = { '\0', };
     size_t length = 0;
     ssize_t size = 0;
-    enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
+    char input[512] = { '\0', };
+    char output[256] = { '\0', };
+    char buffer[512] = { '\0', };
     diminuto_ipv4_buffer_t ipv4buffer = { '\0', }; \
     diminuto_ipv6_buffer_t ipv6buffer = { '\0', }; \
+    enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
 
     do {
 
@@ -131,11 +138,11 @@ int main(int argc, char * argv[])
                 continue;
             }
 
-            snprintf(output, sizeof(output), "%s %s %s %s", token[TIM], token[LAT], token[LON], token[MSL]);
+            snprintf(output, sizeof(output), "%s %s %s %s\n", token[TIM], token[LAT], token[LON], token[MSL]);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
 
-            DIMINUTO_LOG_DEBUG("%s: output=\"%s\"\n", program, output);
+            DIMINUTO_LOG_DEBUG("%s: output=\"%s\"\n", program, expand(buffer, output, sizeof(buffer), length));
 
             if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
                 size = diminuto_ipc4_datagram_send(sock, output, length, endpoint.ipv4, endpoint.udp);
