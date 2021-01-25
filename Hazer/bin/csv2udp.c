@@ -88,13 +88,13 @@ int main(int argc, char * argv[])
             break;
         }
 
+        DIMINUTO_LOG_DEBUG("%s: endpoint=%s:%u\n", program, (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) ?  diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)) : (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) ? diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)) : "", endpoint.udp);
+
         if (endpoint.udp == 0) {
             errno = EINVAL;
             diminuto_perror(argv[1]);
             break;
         }
-
-        DIMINUTO_LOG_DEBUG("%s: endpoint=%s:%u\n", program, (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) ?  diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)) : (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) ? diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)) : "", endpoint.udp);
 
         /*
          * Create a datagram socket with an ephemeral port number.
