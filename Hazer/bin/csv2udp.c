@@ -72,6 +72,10 @@ int main(int argc, char * argv[])
 
         diminuto_log_setmask();
 
+        /*
+         * Parse the endpoint string on the command line.
+         */
+
         if (argc < 2) {
             errno = EINVAL;
             diminuto_perror(argv[0]);
@@ -84,23 +88,17 @@ int main(int argc, char * argv[])
             break;
         }
 
-        DIMINUTO_LOG_DEBUG("%s: endpoint=%s:%u\n", program, (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) ?  diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)) : (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) ? diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)) : "", endpoint.udp);
-
-        if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
-            sock = diminuto_ipc4_datagram_peer(0);
-        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
-            sock = diminuto_ipc6_datagram_peer(0);
-        } else {
-            errno = EINVAL;
-            diminuto_perror(argv[1]);
-            break;
-        }
-
         if (endpoint.udp == 0) {
             errno = EINVAL;
             diminuto_perror(argv[1]);
             break;
         }
+
+        DIMINUTO_LOG_DEBUG("%s: endpoint=%s:%u\n", program, (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) ?  diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)) : (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) ? diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)) : "", endpoint.udp);
+
+        /*
+         * Create a datagram socket with an ephemeral port number.
+         */
 
         if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
             sock = diminuto_ipc4_datagram_peer(0);
@@ -116,7 +114,15 @@ int main(int argc, char * argv[])
             break;
         }
 
+        /*
+         * Enter the work loop.
+         */
+
         for (;;) {
+
+            /*
+             * Read an entire line terminated by a newline.
+             */
 
             if (fgets(input, sizeof(input), stdin) == (char *)0) {
                 xc = 0;
@@ -124,9 +130,9 @@ int main(int argc, char * argv[])
             }
             input[sizeof(input) - 1] = '\0';
 
-            if (strncmp(input, "NAM, ", sizeof("NAM, ")  - 1) == 0) {
-                continue;
-            }
+            /*
+             * Parse the input line into tokens.
+             */
 
             for (ii = 0; ii < diminuto_countof(token); ++ii) {
                 if (ii == 0) {
@@ -142,17 +148,38 @@ int main(int argc, char * argv[])
                 DIMINUTO_LOG_DEBUG("%s: token[%d]=\"%s\"\n", program, ii, token[ii]);
             }
 
+            /*
+             * If there aren't the right number of tokens, try again.
+             */
+
             if (ii != diminuto_countof(token)) {
                 errno = EIO;
                 diminuto_perror("strtok_r");
                 continue;
             }
 
+            /*
+             * If the first token looks like a column header for the
+             * CSV data, try again.
+             */
+
+            if (strncmp(token[0], "NAM, ", sizeof("NAM, ")  - 1) == 0) {
+                continue;
+            }
+
+            /*
+             * Extract the fields we want and create an output line.
+             */
+
             snprintf(output, sizeof(output), "%s %s %s %s\n", token[TIM], token[LAT], token[LON], token[MSL]);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
 
             DIMINUTO_LOG_DEBUG("%s: output=\"%s\"\n", program, expand(buffer, output, sizeof(buffer), length));
+
+            /*
+             * Send the output line as an IPv4 or IPv6 datagram.
+             */
 
             if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
                 size = diminuto_ipc4_datagram_send(sock, output, length, endpoint.ipv4, endpoint.udp);
@@ -167,6 +194,11 @@ int main(int argc, char * argv[])
             }
 
         }
+
+        /*
+         * Upon EOF on the input stream, send a zero length datagram and
+         * close the socket.
+         */
 
         if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
             (void)diminuto_ipc4_datagram_send(sock, "", 0, endpoint.ipv4, endpoint.udp);
