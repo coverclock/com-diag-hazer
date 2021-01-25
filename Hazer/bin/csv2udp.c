@@ -47,6 +47,8 @@ int main(int argc, char * argv[])
 
     do {
 
+        diminuto_log_setmask();
+
         if (argc < 2) {
             errno = EINVAL;
             diminuto_perror(argv[0]);
@@ -100,9 +102,7 @@ int main(int argc, char * argv[])
                 if (token[ii] == (char *)0) {
                     break;
                 }
-#if !0
-                fprintf(stderr, "token[%d]=\"%s\"\n", ii, token[ii]);
-#endif
+                DIMINUTO_LOG_DEBUG("token[%d]=\"%s\"\n", ii, token[ii]);
             }
 
             if (ii != diminuto_countof(token)) {
@@ -115,9 +115,7 @@ int main(int argc, char * argv[])
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
 
-#if !0
-            fprintf(stderr, "%s\n", output);
-#endif
+            DIMINUTO_LOG_DEBUG("output=\"%s\"\n", output);
 
             if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
                 size = diminuto_ipc4_datagram_send(sock, output, length, endpoint.ipv4, endpoint.udp);
