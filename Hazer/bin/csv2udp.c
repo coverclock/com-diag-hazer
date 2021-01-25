@@ -21,7 +21,7 @@
  *
  * EXAMPLE
  *
- * socat -u UDP4-RECV:8080 - & csv2udp tesoro:8080 < ./dat/yodel/20200903/vehicle.csv
+ * socat -u UDP6-RECV:8080 - & csv2udp localhost:8080 < ./dat/yodel/20200903/vehicle.csv
  *
  * INPUT
  *
