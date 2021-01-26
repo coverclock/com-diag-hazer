@@ -35,6 +35,8 @@
  * REFERENCES
  *
  * <https://github.com/coverclock/com-diag-tesoro>
+ *
+ * <https://jsonformatter.org>
  */
 
 #include <stdlib.h>
