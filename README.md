@@ -1197,6 +1197,26 @@ These columns contain the following information.
 
 I find this format more suitable for viewing the data during post-processing.
 
+## csv2udp
+
+Piping the CSV snippet into the script csv2udp and providing an IP host
+address and port number like this
+
+    csv2udp localhost:8080
+
+sends a subset of the CSV line to an endpoint as a UDP datagram in JSON
+format. Receiving the datagrams using a command like this
+
+    socat -u UDP6-RECV:8080 -
+
+produces output that looks like this.
+
+    { "TIM": 1598455524, "LAT": 39.7943026, "LON": -105.1533253, "MSL": 1708.000, "LBL": "20200826T152524Z" }
+    { "TIM": 1598455525, "LAT": 39.7943030, "LON": -105.1533263, "MSL": 1708.100, "LBL": "20200826T152525Z" }
+    { "TIM": 1598455526, "LAT": 39.7943030, "LON": -105.1533276, "MSL": 1708.200, "LBL": "20200826T152526Z" }
+    { "TIM": 1598455527, "LAT": 39.7943031, "LON": -105.1533286, "MSL": 1708.300, "LBL": "20200826T152527Z" }
+    { "TIM": 1598455528, "LAT": 39.7943035, "LON": -105.1533300, "MSL": 1708.500, "LBL": "20200826T152528Z" }
+
 # Help
 
 ## gpstool
