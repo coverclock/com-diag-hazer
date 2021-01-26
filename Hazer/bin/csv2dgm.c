@@ -33,6 +33,10 @@
  *
  * { "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }
  *
+ * OUTPUT (non-JSON)
+ *
+ * 1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z
+ *
  * REFERENCES
  *
  * <https://github.com/coverclock/com-diag-tesoro>
