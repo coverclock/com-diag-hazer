@@ -10,10 +10,10 @@
  *
  * ABSTRACT
  *
- * Forwards a fixed subset of the CSV output as a datagram to a UDP endpoint.
- * Developed for use with Tesoro, the OpenStreetMaps tile server project. (I
- * would have much preferred to have used socat(1) in a bash script to do this,
- * but AFAICT there is no way in socat to preserve datagram boundaries.)
+ * Forwards a fixed subset of the CSV output as a datagram in JSON format
+ * to a UDP endpoint.
+ *
+ * Developed for use with Tesoro, my OpenStreetMaps tile server project.
  *
  * USAGE
  * 
@@ -21,15 +21,20 @@
  *
  * EXAMPLE
  *
- * socat -u UDP6-RECV:8080 - & csv2udp localhost:8080 < ./dat/yodel/20200903/vehicle.csv
+ * socat -u UDP6-RECV:8080 - &
+ * csv2udp localhost:8080 < ./dat/yodel/20200903/vehicle.csv
  *
- * INPUT
+ * INPUT (CSV)
  *
  * "neon", 2, 3, 0, 11, 1599145249.632000060, 1599145249.000000000, 39.7943071, -105.1533805, 0., 1710.300, 1688.800, 0., 0.005000, 0., 0., 0., 0., 0., 0., 0., 0, 0.\n
  *
- * OUTPUT
+ * OUTPUT (JSON)
  *
- * 1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z\n
+ * { "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }
+ *
+ * REFERENCES
+ *
+ * <https://github.com/coverclock/com-diag-tesoro>
  */
 
 #include <stdlib.h>
@@ -219,11 +224,11 @@ int main(int argc, char * argv[])
             }
 
             /*
-             * Generate an output line using the fields in which we're
+             * Generate an output line in JSONe using the fields in which we're
              * interested.
              */
 
-            snprintf(output, sizeof(output), "%s %s %s %s %04d%02d%02dT%02d%02d%02dZ\n", token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
+            snprintf(output, sizeof(output), "{ \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n", token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
 
