@@ -32,6 +32,7 @@
  * 1599156755.000000000 39.7943205 -105.1533455 1708.600\n
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -41,6 +42,8 @@
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_log.h"
+#include "com/diag/diminuto/diminuto_time.h"
+#include "com/diag/diminuto/diminuto_types.h"
 
 static const char * expand(char * to, const char * from, size_t tsize, size_t fsize) {
     (void)diminuto_escape_expand(to, from, tsize, fsize, (const char *)0);
@@ -56,14 +59,22 @@ int main(int argc, char * argv[])
     diminuto_ipc_endpoint_t endpoint = { 0, };
     const char * program = (const char *)0;
     char * token[23] = { 0, };
-    char * pointer = (char *)0;
+    char * here = (char *)0;
     size_t length = 0;
     ssize_t size = 0;
     char input[512] = { '\0', };
-    char output[256] = { '\0', };
+    char output[512] = { '\0', };
     char buffer[512] = { '\0', };
     diminuto_ipv4_buffer_t ipv4buffer = { '\0', }; \
     diminuto_ipv6_buffer_t ipv6buffer = { '\0', }; \
+    diminuto_sticks_t ticks = 0;
+    int year = 0;
+    int month = 0;
+    int day = 0;
+    int hour = 0;
+    int minute = 0;
+    int second = 0;
+    diminuto_ticks_t fraction = 0;
     enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
 
     do {
@@ -136,11 +147,11 @@ int main(int argc, char * argv[])
 
             for (ii = 0; ii < diminuto_countof(token); ++ii) {
                 if (ii == 0) {
-                    token[ii] = strtok_r(input, ", ", &pointer);
+                    token[ii] = strtok_r(input, ", ", &here);
                 } else if (ii == (diminuto_countof(token) - 1)) {
-                    token[ii] = strtok_r(pointer, "\n", &pointer);
+                    token[ii] = strtok_r(here, "\n", &here);
                 } else {
-                    token[ii] = strtok_r(pointer, ", ", &pointer);
+                    token[ii] = strtok_r(here, ", ", &here);
                 }
                 if (token[ii] == (char *)0) {
                     break;
@@ -182,10 +193,37 @@ int main(int argc, char * argv[])
             }
 
             /*
-             * Extract the fields we want and create an output line.
+             * Truncate the fractional portion of the TIM field because it
+             * should always be all zeros.
              */
 
-            snprintf(output, sizeof(output), "%s %s %s %s\n", token[TIM], token[LAT], token[LON], token[MSL]);
+            ticks = strtoull(token[TIM], &here, 10);
+            if ((here == (char *)0) || (*here != '.')) {
+                errno = EINVAL;
+                diminuto_perror(token[TIM]);
+                continue;
+            }
+            *here = '\0';
+
+            /*
+             * A UTC timestamp is generated mostly so that the farend can use
+             * it as a label. The format is {YYYY}{MM}{DD}T{HH}{MM}{SS}Z.
+             */
+
+            ticks *= diminuto_time_frequency();
+            rc = diminuto_time_zulu(ticks, &year, &month, &day, &hour, &minute, &second, &fraction);
+            if (rc != 0) {
+                errno = EINVAL;
+                diminuto_perror(token[TIM]);
+                continue;
+            }
+
+            /*
+             * Generate an output line using the fields in which we're
+             * interested.
+             */
+
+            snprintf(output, sizeof(output), "%s %s %s %s %04d%02d%02dT%02d%02d%02dZ\n", token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
 
