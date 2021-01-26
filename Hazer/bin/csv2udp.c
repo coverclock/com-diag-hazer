@@ -168,6 +168,20 @@ int main(int argc, char * argv[])
             }
 
             /*
+             * If the first token doesn't look like a valid value for
+             * that CSV field, try again.
+             */
+
+            length = strnlen(token[0], 14);
+            if (length < 2) {
+                continue;
+            } else if ((token[0][0] == '"') && (token[0][length - 1] == '"')) {
+                /* Do nothing. */
+            } else {
+                continue;
+            }
+
+            /*
              * Extract the fields we want and create an output line.
              */
 
