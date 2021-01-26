@@ -17,12 +17,13 @@
  *
  * USAGE
  * 
- * csv2udp HOST:PORT
+ * csv2dgm [ -j ] HOST:PORT
  *
- * EXAMPLE
+ * EXAMPLES
  *
- * socat -u UDP6-RECV:8080 - &
- * csv2udp localhost:8080 < ./dat/yodel/20200903/vehicle.csv
+ * socat -u UDP6-RECV:8080 - & csv2jsn localhost:8080 < ./dat/yodel/20200903/vehicle.csv
+ *
+ * socat -u UDP6-RECV:8080 - & csv2jsn -j localhost:8080 < ./dat/yodel/20200903/vehicle.csv
  *
  * INPUT (CSV)
  *
@@ -60,6 +61,7 @@ static const char * expand(char * to, const char * from, size_t tsize, size_t fs
 int main(int argc, char * argv[])
 {
     int xc = 1;
+    int json = 0;
     int sock = -1;
     int rc = -1;
     int ii = -1;
@@ -67,6 +69,7 @@ int main(int argc, char * argv[])
     const char * program = (const char *)0;
     char * token[23] = { 0, };
     char * here = (char *)0;
+    const char * format = (const char *)0;
     size_t length = 0;
     ssize_t size = 0;
     char input[512] = { '\0', };
@@ -86,29 +89,39 @@ int main(int argc, char * argv[])
 
     do {
 
-        program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
-
         diminuto_log_setmask();
 
         /*
-         * Parse the endpoint string on the command line.
+         * Parse the command line.
          */
+
+        program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
+
+        if (argc < 3) {
+            /* Do nothing. */
+        } else if (strcmp(argv[1], "-j") != 0) {
+            /* Do nothing. */
+        } else {
+            json = !0;
+            --argc;
+            ++argv;
+        }
 
         if (argc < 2) {
             errno = EINVAL;
             diminuto_perror(argv[0]);
             break;
-        }
-
-        if (diminuto_ipc_endpoint(argv[1], &endpoint) < 0) {
+        } else if (diminuto_ipc_endpoint(argv[1], &endpoint) != 0) {
             errno = EINVAL;
             diminuto_perror(argv[1]);
             break;
+        } else {
+            /* Do nothing. */
         }
 
         DIMINUTO_LOG_DEBUG("%s: endpoint=%s:%u\n", program, (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) ?  diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)) : (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) ? diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)) : "", endpoint.udp);
 
-        if (endpoint.udp == 0) {
+        if ((diminuto_ipc4_is_unspecified(&endpoint.ipv4) && diminuto_ipc6_is_unspecified(&endpoint.ipv6)) || (endpoint.udp == 0)) {
             errno = EINVAL;
             diminuto_perror(argv[1]);
             break;
@@ -226,11 +239,16 @@ int main(int argc, char * argv[])
             }
 
             /*
-             * Generate an output line in JSONe using the fields in which we're
-             * interested.
+             * Generate an output line using specific fields.
              */
 
-            snprintf(output, sizeof(output), "{ \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n", token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
+            if (json) {
+                format = "{ \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n";
+            } else {
+                format = "%s %s %s %s %04d%02d%02dT%02d%02d%02dZ\n";
+            }
+
+            snprintf(output, sizeof(output), format, token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
 

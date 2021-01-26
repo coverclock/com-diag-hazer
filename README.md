@@ -985,7 +985,7 @@ the libraries and binaries in the system directories.)
 * csv2kmlpoints - converts gpstool CSV file to KML 2.3 XML to visualize points.
 * csv2rmc - converts gpstool CSV file to NMEA RMC sentences.
 * csv2tty - converts gpstool CSV file to a (different) real-time readable output.
-* csv2udp - forwards subset of gpstool CSV fields from stdin to a UDP port.
+* csv2dgm - forwards subset of gpstool CSV fields from stdin to a UDP port.
 * csvlimits - determines boundary of solutions in a gpstool CSV file.
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvparts - splits gpstool CSV file into smaller files in subdirectories.
@@ -1197,12 +1197,12 @@ These columns contain the following information.
 
 I find this format more suitable for viewing the data during post-processing.
 
-## csv2udp
+## csv2dgm
 
-Piping the CSV snippet into the script csv2udp and providing an IP host
+Piping the CSV snippet into the script csv2dgm and providing an IP host
 address and port number like this
 
-    csv2udp localhost:8080
+    csv2dgm -j localhost:8080
 
 sends a subset of the CSV line to an endpoint as a UDP datagram in JSON
 format. Receiving the datagrams using a command like this
