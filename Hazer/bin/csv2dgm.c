@@ -17,25 +17,39 @@
  *
  * USAGE
  * 
- * csv2dgm [ -j ] HOST:PORT
+ * csv2dgm [ -d ] [ -c | -j | -x ] HOST:PORT
  *
- * EXAMPLES
+ * EXAMPLE
  *
  * socat -u UDP6-RECV:8080 - & csv2jsn localhost:8080 < ./dat/yodel/20200903/vehicle.csv
  *
- * socat -u UDP6-RECV:8080 - & csv2jsn -j localhost:8080 < ./dat/yodel/20200903/vehicle.csv
- *
  * INPUT (CSV)
  *
- * "neon", 2, 3, 0, 11, 1599145249.632000060, 1599145249.000000000, 39.7943071, -105.1533805, 0., 1710.300, 1688.800, 0., 0.005000, 0., 0., 0., 0., 0., 0., 0., 0, 0.\n
+ *      "neon", 2, 3, 0, 11, 1599145249.632000060, 1599145249.000000000, 39.7943071, -105.1533805, 0., 1710.300, 1688.800, 0., 0.005000, 0., 0., 0., 0., 0., 0., 0., 0, 0.\n
  *
- * OUTPUT (JSON)
+ * OUTPUT (default)
  *
- * { "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }
+ *      1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z
  *
- * OUTPUT (non-JSON)
+ * OUTPUT (-c)
  *
- * 1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z
+ *      1599145249, 39.7943071, -105.1533805, 1710.300, "20200903T150049Z"
+ *
+ * OUTPUT (-j)
+ *
+ *      { "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }
+ *
+ * OUTPUT (-q)
+ *
+ *      ?TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL="20200903T150049Z"
+ *
+ * OUTPUT (-v)
+ *
+ *      TIM=1599145249; LAT=39.7943071; LON=-105.1533805; MSL=1710.300; LBL="20200903T150049Z"
+ *
+ * OUTPUT (-x)
+ *
+ *      <?xml version="1.0" encoding="UTF-8" ?><TIM>1599145249</TIM><LAT>39.7943071</LAT><LON>-105.1533805</LON><MSL>1710.300</MSL><LBL>20200903T150049Z</LBL>
  *
  * REFERENCES
  *
@@ -44,10 +58,6 @@
  * <https://jsonformatter.org>
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_ipc.h"
@@ -56,6 +66,11 @@
 #include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_types.h"
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 static const char * expand(char * to, const char * from, size_t tsize, size_t fsize) {
     (void)diminuto_escape_expand(to, from, tsize, fsize, (const char *)0);
@@ -65,7 +80,11 @@ static const char * expand(char * to, const char * from, size_t tsize, size_t fs
 int main(int argc, char * argv[])
 {
     int xc = 1;
-    int json = 0;
+    enum Type { CSV = 'c', DEFAULT = 'd',  JSON = 'j', QUERY='q', VAR = 'v', XML = 'x', } type = DEFAULT;
+    enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
+    int opt = -1;
+    int error = 0;
+    int debug = 0;
     int sock = -1;
     int rc = -1;
     int ii = -1;
@@ -89,7 +108,11 @@ int main(int argc, char * argv[])
     int minute = 0;
     int second = 0;
     diminuto_ticks_t fraction = 0;
-    enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
+    extern char * optarg;
+    extern int optind;
+    extern int opterr;
+    extern int optopt;
+
 
     do {
 
@@ -101,33 +124,59 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        if (argc < 3) {
-            /* Do nothing. */
-        } else if (strcmp(argv[1], "-j") != 0) {
-            /* Do nothing. */
-        } else {
-            json = !0;
-            --argc;
-            ++argv;
+        while ((opt = getopt(argc, argv, "cdjqvx")) >= 0) {
+            switch (opt) {
+            case 'c':
+                type = CSV;
+                break;
+            case 'd':
+                debug = !0;
+                break;
+            case 'j':
+                type = JSON;
+                break;
+            case 'q':
+                type = QUERY;
+                break;
+            case 'v':
+                type = VAR;
+                break;
+            case 'x':
+                type = XML;
+                break;
+            case '?':
+            default:
+                fprintf(stderr, "usage: %s [ -d ] [ -c | -j | -x ] ENDPOINT\n", program);
+                error = !0;
+                break;
+            }
         }
 
-        if (argc < 2) {
+        if (error || (optind >= argc)) {
             errno = EINVAL;
-            diminuto_perror(argv[0]);
+            diminuto_perror(program);
             break;
-        } else if (diminuto_ipc_endpoint(argv[1], &endpoint) != 0) {
-            errno = EINVAL;
-            diminuto_perror(argv[1]);
-            break;
-        } else {
-            /* Do nothing. */
         }
 
-        DIMINUTO_LOG_DEBUG("%s: endpoint=%s:%u\n", program, (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) ?  diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)) : (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) ? diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)) : "", endpoint.udp);
+        if (diminuto_ipc_endpoint(argv[optind], &endpoint) != 0) {
+            errno = EINVAL;
+            diminuto_perror(argv[optind]);
+            break;
+        }
+
+        if (!debug) {
+            /* Do nothing. */
+        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
+            fprintf (stderr, "%s: endpoint=\"%s\"=%s:%u\n", program, argv[optind], diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)), endpoint.udp);
+        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
+            fprintf (stderr, "%s: endpoint=\"%s\"=[%s]:%u\n", program, argv[optind], diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)), endpoint.udp);
+        } else {
+            fprintf (stderr, "%s: endpoint=\"%s\"\n", program, argv[optind]);
+        }
 
         if ((diminuto_ipc4_is_unspecified(&endpoint.ipv4) && diminuto_ipc6_is_unspecified(&endpoint.ipv6)) || (endpoint.udp == 0)) {
             errno = EINVAL;
-            diminuto_perror(argv[1]);
+            diminuto_perror(argv[optind]);
             break;
         }
 
@@ -141,11 +190,36 @@ int main(int argc, char * argv[])
             sock = diminuto_ipc6_datagram_peer(0);
         } else {
             errno = EINVAL;
-            diminuto_perror(argv[1]);
+            diminuto_perror(argv[optind]);
             break;
         }
 
         if (sock < 0) {
+            break;
+        }
+
+        /*
+         * Select the appropriate output format.
+         */
+
+        switch (type) {
+        case CSV:
+            format = "%s, %s, %s, %s, \"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            break;
+        case JSON:
+            format = "{ \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n";
+            break;
+        case QUERY:
+            format = "?TIM=%s&LAT=%s&LON=%s&MSL=%s&LBL=\"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            break;
+        case VAR:
+            format = "TIM=%s; LAT=%s; LON=%s; MSL=%s; LBL=\"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            break;
+        case XML:
+            format = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><TIM>%s</TIM><LAT>%s</LAT><LON>%s</LON><MSL>%s</MSL><LBL>%04d%02d%02dT%02d%02d%02dZ</LBL>\n";
+            break;
+        default:
+            format = "%s %s %s %s %04d%02d%02dT%02d%02d%02dZ\n";
             break;
         }
 
@@ -180,7 +254,9 @@ int main(int argc, char * argv[])
                 if (token[ii] == (char *)0) {
                     break;
                 }
-                DIMINUTO_LOG_DEBUG("%s: token[%d]=\"%s\"\n", program, ii, token[ii]);
+                if (debug) {
+                    fprintf(stderr, "%s: token[%d]=\"%s\"\n", program, ii, token[ii]);
+                }
             }
 
             /*
@@ -246,17 +322,11 @@ int main(int argc, char * argv[])
              * Generate an output line using specific fields.
              */
 
-            if (json) {
-                format = "{ \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n";
-            } else {
-                format = "%s %s %s %s %04d%02d%02dT%02d%02d%02dZ\n";
-            }
-
             snprintf(output, sizeof(output), format, token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
 
-            DIMINUTO_LOG_DEBUG("%s: output=\"%s\"\n", program, expand(buffer, output, sizeof(buffer), length));
+            if (debug) { fprintf(stderr, "%s: output=\"%s\"\n", program, expand(buffer, output, sizeof(buffer), length)); }
 
             /*
              * Send the output line as an IPv4 or IPv6 datagram.
