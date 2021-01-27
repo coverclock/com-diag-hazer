@@ -41,7 +41,7 @@
  *
  * OUTPUT (-q)
  *
- *      ?TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL="20200903T150049Z"
+ *      ?TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL=20200903T150049Z
  *
  * OUTPUT (-v)
  *
@@ -210,7 +210,7 @@ int main(int argc, char * argv[])
             format = "{ \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n";
             break;
         case QUERY:
-            format = "?TIM=%s&LAT=%s&LON=%s&MSL=%s&LBL=\"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            format = "?TIM=%s&LAT=%s&LON=%s&MSL=%s&LBL=%04d%02d%02dT%02d%02d%02dZ\n";
             break;
         case VAR:
             format = "TIM=%s; LAT=%s; LON=%s; MSL=%s; LBL=\"%04d%02d%02dT%02d%02d%02dZ\"\n";
