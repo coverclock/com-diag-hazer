@@ -146,7 +146,7 @@ int main(int argc, char * argv[])
                 break;
             case '?':
             default:
-                fprintf(stderr, "usage: %s [ -d ] [ -c | -j | -x ] ENDPOINT\n", program);
+                fprintf(stderr, "usage: %s [ -d ] [ -c | -j | | -q | -v | -x ] ENDPOINT\n", program);
                 error = !0;
                 break;
             }
