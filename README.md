@@ -106,6 +106,13 @@ use Diminuto in virtually all of my C-based projects, and sometimes in
 other languages too that support C-linkage.  Portions of Diminuto have
 also shipped in products from several of my clients.
 
+## Tesoro
+
+The Tesoro project, a work in progress, attempts to integrate Hazer
+with an OpenStreetMaps (OSM) tile server to create a moving map
+display. The osmtool in Hazer was developed to support this effort.
+Hazer has no dependency on Tesoro.
+
 ## Building
 
 These days most Linux distributions do not include the basic tools
@@ -269,6 +276,8 @@ built.
 <https://github.com/coverclock/com-diag-hazer>
 
 <https://github.com/coverclock/com-diag-diminuto>
+
+<https://github.com/coverclock/com-diag-tesoro>
 
 # Sentences
 
@@ -957,6 +966,7 @@ the libraries and binaries in the system directories.)
 # Applications
 
 * gpstool - Hazer's multi purpose GNSS pocket tool.
+* osmtool - Tesoro's multipoint-to-multipoint datagram forwarder.
 * rtktool - Tumbleweed's point-to-multipoint datagram router.
 
 # Utilities

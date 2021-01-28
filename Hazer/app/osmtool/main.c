@@ -28,7 +28,9 @@
  *
  * EXAMPLES
  *
- * osmtool -u :22020 -t :22020
+ * csvmeter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -j localhost:22020 &
+ * osmtool -u :22020 -t :22020 &
+ * socat TCP:localhost:22020 -
  */
 
 #include "com/diag/diminuto/diminuto_fd.h"
@@ -224,16 +226,25 @@ int main(int argc, char * argv[])
          * Wait until a socket needs to be serviced... or we time out.
          */
 
-        if ((ready = diminuto_mux_wait(&mux, frequency)) == 0) {
+        if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
+            /* Fall out. */
+        } else if ((fd = diminuto_mux_ready_accept(&mux)) >= 0) {
+            /* Fall out. */
+        } else if (diminuto_mux_ready_write(&mux) >= 0) {
+            while (diminuto_mux_ready_write(&mux) >= 0) { }
+            continue;
+        } else if ((ready = diminuto_mux_wait(&mux, frequency)) == 0) {
             continue;
         } else if (ready > 0) {
             if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
-                /* Fall through. */
+                /* Fall out. */
             } else if ((fd = diminuto_mux_ready_accept(&mux)) >= 0) {
-                /* Fall through. */
-            } else if ((fd = diminuto_mux_ready_write(&mux)) >= 0) {
+                /* Fall out. */
+            } else if (diminuto_mux_ready_write(&mux) >= 0) {
+                while (diminuto_mux_ready_write(&mux) >= 0) { }
                 continue;
             } else {
+                DIMINUTO_LOG_WARNING("Unexpected %d\n", ready);
                 continue;
             }
         } else if (errno == EINTR) {
@@ -270,14 +281,14 @@ int main(int argc, char * argv[])
 
             fd = diminuto_ipc6_stream_accept_generic(tcpsock, &address, &port);
             if (fd >= 0) {
-                DIMINUTO_LOG_INFORMATION("Accept %d [%s]:%d\n", fd, size, diminuto_ipc6_address2string(address, ipv6, sizeof(ipv6)), port);
+                DIMINUTO_LOG_INFORMATION("Accept %d [%s]:%d\n", fd, diminuto_ipc6_address2string(address, ipv6, sizeof(ipv6)), port);
                 rc = diminuto_mux_register_write(&mux, fd);
                 diminuto_assert(rc >= 0);
             }
 
         } else {
 
-            DIMINUTO_LOG_WARNING("Unexpected %d\n", fd);
+            DIMINUTO_LOG_WARNING("Invalid %d\n", fd);
 
         }
 
