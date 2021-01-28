@@ -66,11 +66,6 @@
  */
 static const char * Program = (const char *)0;
 
-/**
- * This is our host name as provided by the run-time system.
- */
-static char Hostname[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
-
 /*******************************************************************************
  * HELPERS
  ******************************************************************************/
@@ -164,9 +159,6 @@ int main(int argc, char * argv[])
 
     diminuto_log_setmask();
 
-    (void)gethostname(Hostname, sizeof(Hostname));
-    Hostname[sizeof(Hostname) - 1] = '\0';
-
     /***************************************************************************
      * OPTIONS
      **************************************************************************/
@@ -185,7 +177,7 @@ int main(int argc, char * argv[])
         case 'p':
             rendezvous = optarg;
             rc = diminuto_ipc_endpoint(rendezvous, &endpoint);
-            if (rc < 0) { diminuto_perror(optarg); error = !0; }
+            if ((rc < 0) || (endpoint.udp == 0)) { diminuto_perror(optarg); error = !0; }
             break;
         case 't':
             timeout = strtol(optarg, &end, 0);
@@ -195,7 +187,7 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -? ] [ -d ] [ -v ] [ -M ] [ -V ] [ -M ] [ -p :PORT ] [ -t SECONDS ]\n", Program);
+            fprintf(stderr, "usage: %s [ -? ] [ -d ] [ -v ] [ -M ] [ -V ] [ -p :PORT ] [ -t SECONDS ]\n", Program);
             fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
