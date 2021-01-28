@@ -29,33 +29,37 @@
  *
  * OUTPUT (default)
  *
- *      1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z
+ *      1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z\n
  *
  * OUTPUT (-c)
  *
- *      1599145249, 39.7943071, -105.1533805, 1710.300, "20200903T150049Z"
+ *      1599145249, 39.7943071, -105.1533805, 1710.300, "20200903T150049Z"\n
  *
  * OUTPUT (-j)
  *
- *      { "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }
+ *      { "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }\n
  *
  * OUTPUT (-q)
  *
- *      ?TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL=20200903T150049Z
+ *      ?TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL=20200903T150049Z\n
  *
  * OUTPUT (-v)
  *
- *      TIM=1599145249; LAT=39.7943071; LON=-105.1533805; MSL=1710.300; LBL="20200903T150049Z"
+ *      TIM=1599145249; LAT=39.7943071; LON=-105.1533805; MSL=1710.300; LBL="20200903T150049Z"\n
+ *
+ * OUTPUT (-y)
+ *
+ *      TIM: 1599145249\nLAT: 39.7943071\nLON: -105.1533805\nMSL: 1710.3\n LBL: 20200903T150049Z\n
  *
  * OUTPUT (-x)
  *
- *      <?xml version="1.0" encoding="UTF-8" ?><TIM>1599145249</TIM><LAT>39.7943071</LAT><LON>-105.1533805</LON><MSL>1710.300</MSL><LBL>20200903T150049Z</LBL>
+ *      <?xml version="1.0" encoding="UTF-8" ?><TIM>1599145249</TIM><LAT>39.7943071</LAT><LON>-105.1533805</LON><MSL>1710.300</MSL><LBL>20200903T150049Z</LBL>\n
  *
  * REFERENCES
  *
- * <https://github.com/coverclock/com-diag-tesoro>
+ * https://github.com/coverclock/com-diag-tesoro
  *
- * <https://jsonformatter.org>
+ * https://jsonformatter.org
  */
 
 #include "com/diag/diminuto/diminuto_countof.h"
@@ -80,7 +84,7 @@ static const char * expand(char * to, const char * from, size_t tsize, size_t fs
 int main(int argc, char * argv[])
 {
     int xc = 1;
-    enum Type { CSV = 'c', DEFAULT = 'd',  JSON = 'j', QUERY='q', VAR = 'v', XML = 'x', } type = DEFAULT;
+    enum Type { CSV = 'c', DEFAULT = 'd',  JSON = 'j', QUERY='q', VAR = 'v', YAML = 'y', XML = 'x', } type = DEFAULT;
     enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
     int opt = -1;
     int error = 0;
@@ -124,7 +128,7 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "cdjqvx")) >= 0) {
+        while ((opt = getopt(argc, argv, "cdjqvyx")) >= 0) {
             switch (opt) {
             case 'c':
                 type = CSV;
@@ -141,12 +145,15 @@ int main(int argc, char * argv[])
             case 'v':
                 type = VAR;
                 break;
+            case 'y':
+                type = YAML;
+                break;
             case 'x':
                 type = XML;
                 break;
             case '?':
             default:
-                fprintf(stderr, "usage: %s [ -d ] [ -c | -j | | -q | -v | -x ] ENDPOINT\n", program);
+                fprintf(stderr, "usage: %s [ -d ] [ -c | -j | | -q | -v | -y | -x ] HOST:PORT\n", program);
                 error = !0;
                 break;
             }
@@ -214,6 +221,9 @@ int main(int argc, char * argv[])
             break;
         case VAR:
             format = "TIM=%s; LAT=%s; LON=%s; MSL=%s; LBL=\"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            break;
+        case YAML:
+            format = "TIM: %s\nLAT: %s\nLON: %s\nMSL: %s\nLBL: %04d%02d%02dT%02d%02d%02dZ\n";
             break;
         case XML:
             format = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><TIM>%s</TIM><LAT>%s</LAT><LON>%s</LON><MSL>%s</MSL><LBL>%04d%02d%02dT%02d%02d%02dZ</LBL>\n";
