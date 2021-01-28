@@ -10,15 +10,17 @@
  *
  * ABSTRACT
  *
- * osmtool is a point-to-multipoint forwarder that receives UDP datagrams from
- * a source and forwards them over a connected TCP stream to a sink. The
- * source is typically a mobile unit sending GPS/GNSS updates, and the
- * sink is a fixed unit using an OpenStreetMaps tile server to create a
- * moving map display. Both the source and the sink connect to the forwarder,
+ * osmtool is a multipoint-to-multipoint forwarder that receives UDP datagrams
+ * from sources and forwards them over connected TCP streams to sinks. A
+ * source is typically a mobile unit sending GPS/GNSS updates, and a
+ * sink is a fixed computer using an OpenStreetMaps (OWM) tile server to create
+ * a moving map display. Both sources and sinks connect to the forwarder,
  * so the only configuration necessary to the forwarder is its UDP and TCP
  * port numbers. Note that the same port number can be (and typically is)
  * used for both the UDP source and the TCP sink side. osmtool was developed
  * in support of the Tesoro project, which has its own source code repository.
+ * Although osmtool is agnostic as to how many sources and sinks are conneected
+ * to it, best results are achieved when there is one of each.
  *
  * USAGE
  *
@@ -77,8 +79,6 @@ static const char * Program = (const char *)0;
 int main(int argc, char * argv[])
 {
     int opt = -1;
-    int debug = 0;
-    int verbose = 0;
     int daemon = 0;
     int udpsock = -1;
     int tcpsock = -1;
@@ -98,9 +98,8 @@ int main(int argc, char * argv[])
     diminuto_ticks_t frequency = 0;
     ssize_t total = 512;
     ssize_t size = 0;
-    ssize_t length = 0;
     diminuto_mux_t mux = { 0 };
-    static const char OPTIONS[] = "MVb:dt:u:v?";
+    static const char OPTIONS[] = "MVb:t:u:?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -132,9 +131,6 @@ int main(int argc, char * argv[])
             total = strtol(optarg, &here, 0);
             if ((here == (char *)0) || (*here != '\0') || (total <= 0)) { diminuto_perror(optarg); error = !0; }
             break;
-        case 'd':
-            debug = !0;
-            break;
         case 't':
             tcprendezvous = optarg;
             rc = diminuto_ipc_endpoint(tcprendezvous, &tcpendpoint);
@@ -145,11 +141,8 @@ int main(int argc, char * argv[])
             rc = diminuto_ipc_endpoint(udprendezvous, &udpendpoint);
             if ((rc < 0) || (udpendpoint.udp == 0)) { diminuto_perror(optarg); error = !0; }
             break;
-        case 'v':
-            verbose = !0;
-            break;
         case '?':
-            fprintf(stderr, "usage: %s [ -? ] [ -d ] [ -v ] [ -M ] [ -V ] [ -b BYTES ] [ -t :PORT ] [ -u :PORT ]\n", Program);
+            fprintf(stderr, "usage: %s [ -? ] [ -M ] [ -V ] [ -b BYTES ] [ -t :PORT ] [ -u :PORT ]\n", Program);
             fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
             fprintf(stderr, "       -b BYTES    Allocate a buffer of size BYTES.\n");
@@ -189,14 +182,12 @@ int main(int argc, char * argv[])
     udpsock = diminuto_ipc6_datagram_peer(udpendpoint.udp);
     diminuto_assert(udpsock >= 0);
     DIMINUTO_LOG_NOTICE("Sink (%d) \"%s\" [%s]:%d", udpsock, udprendezvous, diminuto_ipc6_address2string(udpendpoint.ipv6, ipv6, sizeof(ipv6)), udpendpoint.udp);
-
     rc = diminuto_mux_register_read(&mux, udpsock);
     diminuto_assert(rc >= 0);
 
     tcpsock = diminuto_ipc6_stream_provider(tcpendpoint.tcp);
     diminuto_assert(tcpsock >= 0);
     DIMINUTO_LOG_NOTICE("Source (%d) \"%s\" [%s]:%d", tcpsock, tcprendezvous, diminuto_ipc6_address2string(tcpendpoint.ipv6, ipv6, sizeof(ipv6)), tcpendpoint.udp);
-
     rc = diminuto_mux_register_accept(&mux, tcpsock);
     diminuto_assert(rc >= 0);
 
