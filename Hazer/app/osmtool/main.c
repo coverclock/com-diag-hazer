@@ -28,8 +28,9 @@
  *
  * EXAMPLES
  *
- * csvmeter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -j localhost:22020 &
+ * export COM_DIAG_DIMINUTO_LOG_MASK=0xff
  * osmtool -u :22020 -t :22020 &
+ * csvmeter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -j localhost:22020 &
  * socat TCP:localhost:22020 -
  */
 
@@ -39,6 +40,7 @@
 #include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_interrupter.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
+#include "com/diag/diminuto/diminuto_pipe.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/diminuto/diminuto_frequency.h"
 #include "com/diag/diminuto/diminuto_daemon.h"
@@ -179,21 +181,25 @@ int main(int argc, char * argv[])
     rc = diminuto_interrupter_install(!0);
     diminuto_assert(rc >= 0);
 
+    rc = diminuto_pipe_install(0);
+    diminuto_assert(rc >= 0);
+
     diminuto_mux_init(&mux);
 
     udpsock = diminuto_ipc6_datagram_peer(udpendpoint.udp);
     diminuto_assert(udpsock >= 0);
-    DIMINUTO_LOG_NOTICE("Sink (%d) \"%s\" [%s]:%d", udpsock, udprendezvous, diminuto_ipc6_address2string(udpendpoint.ipv6, ipv6, sizeof(ipv6)), udpendpoint.udp);
+    DIMINUTO_LOG_NOTICE("Source (%d) \"%s\" [%s]:%d", udpsock, udprendezvous, diminuto_ipc6_address2string(udpendpoint.ipv6, ipv6, sizeof(ipv6)), udpendpoint.udp);
     rc = diminuto_mux_register_read(&mux, udpsock);
     diminuto_assert(rc >= 0);
 
     tcpsock = diminuto_ipc6_stream_provider(tcpendpoint.tcp);
     diminuto_assert(tcpsock >= 0);
-    DIMINUTO_LOG_NOTICE("Source (%d) \"%s\" [%s]:%d", tcpsock, tcprendezvous, diminuto_ipc6_address2string(tcpendpoint.ipv6, ipv6, sizeof(ipv6)), tcpendpoint.udp);
+    DIMINUTO_LOG_NOTICE("Sink (%d) \"%s\" [%s]:%d", tcpsock, tcprendezvous, diminuto_ipc6_address2string(tcpendpoint.ipv6, ipv6, sizeof(ipv6)), tcpendpoint.udp);
     rc = diminuto_mux_register_accept(&mux, tcpsock);
     diminuto_assert(rc >= 0);
 
     frequency = diminuto_frequency();
+    DIMINUTO_LOG_NOTICE("Frequency %llu\n", (unsigned long long)frequency);
     diminuto_assert(frequency > 0);
 
     DIMINUTO_LOG_NOTICE("Buffer %zd\n", total);
@@ -268,6 +274,10 @@ int main(int argc, char * argv[])
             for (fd = mux.write.min; fd <= mux.write.max; ++fd) {
                 if (FD_ISSET(fd, &mux.write.active)) {
                     size = diminuto_ipc6_stream_write(fd, buffer, size);
+                    if (diminuto_pipe_check()) {
+                        DIMINUTO_LOG_INFORMATION("SIGPIPE");
+                        size = 0;
+                    }
                     DIMINUTO_LOG_DEBUG("Write %d %zd\n", fd, size);
                     if (size <= 0) {
                         DIMINUTO_LOG_INFORMATION("Close %d", fd);
