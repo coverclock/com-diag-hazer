@@ -17,11 +17,11 @@
  *
  * USAGE
  * 
- * csv2dgm [ -d ] [ -c | -j | -x ] HOST:PORT
+ * csv2dgm [ -d ] [ -c | -j | -q | -v | -y | -x ] [ -F FILE ] [ -U HOST:PORT ]
  *
  * EXAMPLE
  *
- * socat -u UDP6-RECV:8080 - & csv2jsn localhost:8080 < ./dat/yodel/20200903/vehicle.csv
+ * socat -u UDP6-RECV:8080 - & csv2dgm -U localhost:8080 < ./dat/yodel/20200903/vehicle.csv
  *
  * INPUT (CSV)
  *
@@ -68,6 +68,7 @@
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_log.h"
+#include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_types.h"
 #include <errno.h>
@@ -84,6 +85,7 @@ static const char * expand(char * to, const char * from, size_t tsize, size_t fs
 int main(int argc, char * argv[])
 {
     int xc = 1;
+    const char * program = (const char *)0;
     enum Type { CSV = 'c', DEFAULT = 'd',  JSON = 'j', QUERY='q', VAR = 'v', YAML = 'y', XML = 'x', } type = DEFAULT;
     enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
     int opt = -1;
@@ -93,10 +95,13 @@ int main(int argc, char * argv[])
     int rc = -1;
     int ii = -1;
     diminuto_ipc_endpoint_t endpoint = { 0, };
-    const char * program = (const char *)0;
+    char * endpointname = (char *)0;
+    char * filename = (char *)0;
     char * token[23] = { 0, };
     char * here = (char *)0;
+    char * temp = (char *)0;
     const char * format = (const char *)0;
+    FILE * fp = (FILE *)0;
     size_t length = 0;
     ssize_t size = 0;
     char input[512] = { '\0', };
@@ -117,7 +122,6 @@ int main(int argc, char * argv[])
     extern int opterr;
     extern int optopt;
 
-
     do {
 
         diminuto_log_setmask();
@@ -128,8 +132,35 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "cdjqvyx")) >= 0) {
+        while ((opt = getopt(argc, argv, "U:F:cdjqvyx")) >= 0) {
             switch (opt) {
+            case 'F':
+                filename = optarg;
+                if (strcmp(filename, "-") == 0) {
+                    fp = stdout;
+                } else if ((fp = diminuto_observation_create(filename, &temp)) == (FILE *)0) {
+                    errno = EINVAL;
+                    diminuto_perror(filename);
+                    error = !0;
+                } else {
+                    /* Do nothing. */
+                }
+                break;
+            case 'U':
+                endpointname = optarg;
+                if (
+                        (diminuto_ipc_endpoint(endpointname, &endpoint) != 0) ||
+                        ((endpoint.type != DIMINUTO_IPC_TYPE_IPV4) &&
+                            (endpoint.type != DIMINUTO_IPC_TYPE_IPV6)) ||
+                        ((diminuto_ipc4_is_unspecified(&endpoint.ipv4) &&
+                            diminuto_ipc6_is_unspecified(&endpoint.ipv6))) ||
+                        (endpoint.udp == 0)
+                ) {
+                    errno = EINVAL;
+                    diminuto_perror(endpointname);
+                    error = !0;
+                }
+                break;
             case 'c':
                 type = CSV;
                 break;
@@ -153,55 +184,61 @@ int main(int argc, char * argv[])
                 break;
             case '?':
             default:
-                fprintf(stderr, "usage: %s [ -d ] [ -c | -j | | -q | -v | -y | -x ] HOST:PORT\n", program);
+                fprintf(stderr, "usage: %s [ -d ] [ -c | -j | | -q | -v | -y | -x ] [ -F FILE ] [ -U HOST:PORT ]\n", program);
                 error = !0;
                 break;
             }
         }
 
-        if (error || (optind >= argc)) {
+        if (error) {
             errno = EINVAL;
             diminuto_perror(program);
             break;
         }
 
-        if (diminuto_ipc_endpoint(argv[optind], &endpoint) != 0) {
-            errno = EINVAL;
-            diminuto_perror(argv[optind]);
-            break;
+        if (!debug) {
+            /* Do nothing. */
+        } else if (endpointname == (char *)0) {
+            /* Do nothing. */
+        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
+            fprintf (stderr, "%s: endpoint=\"%s\"=%s:%u\n", program, endpointname, diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)), endpoint.udp);
+        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
+            fprintf (stderr, "%s: endpoint=\"%s\"=[%s]:%u\n", program, endpointname, diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)), endpoint.udp);
+        } else {
+            fprintf (stderr, "%s: endpoint=\"%s\"\n", program, endpointname);
         }
 
         if (!debug) {
             /* Do nothing. */
-        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
-            fprintf (stderr, "%s: endpoint=\"%s\"=%s:%u\n", program, argv[optind], diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)), endpoint.udp);
-        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
-            fprintf (stderr, "%s: endpoint=\"%s\"=[%s]:%u\n", program, argv[optind], diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)), endpoint.udp);
+        } else if (filename == (char *)0) {
+            /* Do nothing. */
+        } else if (fp != (FILE *)0) {
+            fprintf(stderr, "%s: file=\"%s\" fd=%d\n", program, filename, fileno(fp));
         } else {
-            fprintf (stderr, "%s: endpoint=\"%s\"\n", program, argv[optind]);
+            fprintf(stderr, "%s: file=\"%s\"\n", program, filename);
         }
-
-        if ((diminuto_ipc4_is_unspecified(&endpoint.ipv4) && diminuto_ipc6_is_unspecified(&endpoint.ipv6)) || (endpoint.udp == 0)) {
-            errno = EINVAL;
-            diminuto_perror(argv[optind]);
-            break;
-        }
-
+ 
         /*
          * Create a datagram socket with an ephemeral port number.
          */
 
-        if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
+        if (endpointname == (char *)0) {
+            /* Do nothing. */
+        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
             sock = diminuto_ipc4_datagram_peer(0);
         } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
             sock = diminuto_ipc6_datagram_peer(0);
         } else {
             errno = EINVAL;
-            diminuto_perror(argv[optind]);
+            diminuto_perror(endpointname);
             break;
         }
 
-        if (sock < 0) {
+        if (endpointname == (char *)0) {
+            /* Do nothing. */
+        } else if (sock >= 0) {
+            /* Do nothing. */
+        } else {
             break;
         }
 
@@ -342,16 +379,43 @@ int main(int argc, char * argv[])
              * Send the output line as an IPv4 or IPv6 datagram.
              */
 
-            if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
+            if (sock < 0) {
+                /* Do nothing. */
+            } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
                 size = diminuto_ipc4_datagram_send(sock, output, length, endpoint.ipv4, endpoint.udp);
             } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
                 size = diminuto_ipc6_datagram_send(sock, output, length, endpoint.ipv6, endpoint.udp);
             } else {
+                /* Do nothing. */
+            }
+
+            if (sock < 0) {
+                /* Do nothing. */
+            } else if (size > 0) {
+                /* Do nothing. */
+            } else {
                 break;
             }
 
-            if (size <= 0) {
+            /*
+             * Write the output line to the file.
+             */
+
+            if (fp != (FILE *)0) {
+                fputs(output, fp);
+                fflush(fp);
+            }
+
+            if (fp == (FILE *)0) {
+                /* Do nothing. */
+            } else if (fp == stdout) {
+                /* Do nothing. */
+            } else if ((fp = diminuto_observation_commit(fp, &temp)) != (FILE *)0) {
                 break;
+            } else if ((fp = diminuto_observation_create(filename, &temp)) == (FILE *)0) {
+                break;
+            } else {
+                /* Do nothing. */
             }
 
         }
@@ -361,14 +425,24 @@ int main(int argc, char * argv[])
          * close the socket.
          */
 
-        if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
+        if (sock < 0) {
+            /* Do nothing. */
+        } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
             (void)diminuto_ipc4_datagram_send(sock, "", 0, endpoint.ipv4, endpoint.udp);
             (void)diminuto_ipc4_close(sock);
         } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
             (void)diminuto_ipc6_datagram_send(sock, "", 0, endpoint.ipv6, endpoint.udp);
             (void)diminuto_ipc6_close(sock);
         } else {
-            break;
+            /* Do nothing. */
+        }
+
+        if (fp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (fp == stdout) {
+            /* Do nothing. */
+        } else {
+            fp = diminuto_observation_discard(fp, &temp);
         }
 
     } while (0);
