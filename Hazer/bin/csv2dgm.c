@@ -64,11 +64,14 @@
 
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_escape.h"
+#include "com/diag/diminuto/diminuto_interrupter.h"
 #include "com/diag/diminuto/diminuto_ipc.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_observation.h"
+#include "com/diag/diminuto/diminuto_pipe.h"
+#include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_types.h"
 #include <errno.h>
@@ -271,10 +274,41 @@ int main(int argc, char * argv[])
         }
 
         /*
+         * Install the signal handlers.
+         */
+
+        if (diminuto_interrupter_install(0) < 0) {
+            break;
+        }
+
+        if (diminuto_pipe_install(0) < 0) {
+            break;
+        }
+
+        if (diminuto_terminator_install(0) < 0) {
+            break;
+        }
+
+        /*
          * Enter the work loop.
          */
 
         for (;;) {
+
+            if (diminuto_interrupter_check()) {
+                if (debug) { fprintf(stderr, "%s: SIGINT!\n", program); }
+                break;
+            }
+
+            if (diminuto_pipe_check()) {
+                if (debug) { fprintf(stderr, "%s: SIGPIPE!\n", program); }
+                break;
+            }
+
+            if (diminuto_terminator_check()) {
+                if (debug) { fprintf(stderr, "%s: SIGTERM!\n", program); }
+                break;
+            }
 
             /*
              * Read an entire line terminated by a newline.
