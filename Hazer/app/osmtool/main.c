@@ -24,42 +24,44 @@
  *
  * USAGE
  *
- * osmtool [ -? ] [ -d ] [ -v ] [ -b BYTES ] [ -M ] [ -V ] [ -u :PORT ] [ -t :PORT ]
+ * osmtool [ -? ] [ -m ] [ -B BYTES ] [ -F FILE ] [ -T :PORT ] [ -V ] [ -U :PORT ]
  *
  * EXAMPLES
  *
  * export COM_DIAG_DIMINUTO_LOG_MASK=0xff
- * osmtool -u :22020 -t :22020 &
- * csvmeter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -j localhost:22020 &
+ * osmtool -U :22020 -T :22020 -F Observation.txt  &
+ * csvmeter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -j -U localhost:22020 &
  * socat TCP:localhost:22020 -
  */
 
-#include "com/diag/diminuto/diminuto_fd.h"
-#include "com/diag/diminuto/diminuto_ipc6.h"
-#include "com/diag/diminuto/diminuto_mux.h"
-#include "com/diag/diminuto/diminuto_log.h"
-#include "com/diag/diminuto/diminuto_interrupter.h"
-#include "com/diag/diminuto/diminuto_terminator.h"
-#include "com/diag/diminuto/diminuto_pipe.h"
-#include "com/diag/diminuto/diminuto_dump.h"
-#include "com/diag/diminuto/diminuto_frequency.h"
-#include "com/diag/diminuto/diminuto_daemon.h"
 #include "com/diag/diminuto/diminuto_assert.h"
+#include "com/diag/diminuto/diminuto_daemon.h"
+#include "com/diag/diminuto/diminuto_dump.h"
+#include "com/diag/diminuto/diminuto_fd.h"
+#include "com/diag/diminuto/diminuto_frequency.h"
+#include "com/diag/diminuto/diminuto_interrupter.h"
+#include "com/diag/diminuto/diminuto_ipc4.h"
+#include "com/diag/diminuto/diminuto_ipc6.h"
+#include "com/diag/diminuto/diminuto_log.h"
+#include "com/diag/diminuto/diminuto_mux.h"
+#include "com/diag/diminuto/diminuto_observation.h"
+#include "com/diag/diminuto/diminuto_pipe.h"
+#include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <errno.h>
-#include <signal.h>
+#include <fcntl.h>
 #include <pthread.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 /*******************************************************************************
  * GLOBALS
@@ -90,20 +92,24 @@ int main(int argc, char * argv[])
     int ready = 0;
     int rc = 0;
     int fd = -1;
+    FILE * fp = (FILE *)0;
     char * udprendezvous = (char *)0;
     char * tcprendezvous = (char *)0;
+    char * filename = (char *)0;
+    char * temp = (char *)0;
     char * buffer = (char *)0;
     char * here = (char *)0;
     diminuto_ipc_endpoint_t udpendpoint = { 0, };
     diminuto_ipc_endpoint_t tcpendpoint = { 0, };
-    diminuto_ipv6_t address = { 0, };
+    diminuto_ipv6_t address6 = { 0, };
     diminuto_port_t port = 0;
-    diminuto_ipv6_buffer_t ipv6 = { 0, };
+    diminuto_ipv6_buffer_t buffer6 = { 0, };
     diminuto_ticks_t frequency = 0;
     ssize_t total = 512;
     ssize_t size = 0;
+    size_t length = 0;
     diminuto_mux_t mux = { 0 };
-    static const char OPTIONS[] = "MVb:t:u:?";
+    static const char OPTIONS[] = "B:F:T:U:Vm?";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -125,35 +131,65 @@ int main(int argc, char * argv[])
 
     while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
-        case 'M':
+        case 'm':
             daemon = !0;
+            break;
+        case 'B':
+            total = strtol(optarg, &here, 0);
+            if ((here == (char *)0) || (*here != '\0') || (total <= 0)) { diminuto_perror(optarg); error = !0; }
+            break;
+        case 'F':
+            filename = optarg;
+            if (strcmp(filename, "-") == 0) {
+                fp = stdout;
+            } else if ((fp = diminuto_observation_create(filename, &temp)) == (FILE *)0) {
+                errno = EINVAL;
+                diminuto_perror(filename);
+                error = !0;
+            } else {
+                /* Do nothing. */
+            }
+            break;
+        case 'T':
+            tcprendezvous = optarg;
+            if (
+                    (diminuto_ipc_endpoint(tcprendezvous, &tcpendpoint) != 0) ||
+                    ((tcpendpoint.type != DIMINUTO_IPC_TYPE_IPV4) &&
+                        (tcpendpoint.type != DIMINUTO_IPC_TYPE_IPV6)) ||
+                    (!((diminuto_ipc4_is_unspecified(&tcpendpoint.ipv4) &&
+                        diminuto_ipc6_is_unspecified(&tcpendpoint.ipv6)))) ||
+                    (tcpendpoint.tcp == 0)
+            ) {
+                diminuto_perror(tcprendezvous);
+                error = !0;
+            }
+            break;
+        case 'U':
+            udprendezvous = optarg;
+            if (
+                    (diminuto_ipc_endpoint(udprendezvous, &udpendpoint) != 0) ||
+                    ((udpendpoint.type != DIMINUTO_IPC_TYPE_IPV4) &&
+                        (udpendpoint.type != DIMINUTO_IPC_TYPE_IPV6)) ||
+                    (!((diminuto_ipc4_is_unspecified(&udpendpoint.ipv4) &&
+                        diminuto_ipc6_is_unspecified(&udpendpoint.ipv6)))) ||
+                    (udpendpoint.udp == 0)
+            ) {
+                diminuto_perror(udprendezvous);
+                error = !0;
+            }
             break;
         case 'V':
             DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
-        case 'b':
-            total = strtol(optarg, &here, 0);
-            if ((here == (char *)0) || (*here != '\0') || (total <= 0)) { diminuto_perror(optarg); error = !0; }
-            break;
-        case 't':
-            tcprendezvous = optarg;
-            rc = diminuto_ipc_endpoint(tcprendezvous, &tcpendpoint);
-            if ((rc < 0) || (tcpendpoint.tcp == 0)) { diminuto_perror(optarg); error = !0; }
-            break;
-        case 'u':
-            udprendezvous = optarg;
-            rc = diminuto_ipc_endpoint(udprendezvous, &udpendpoint);
-            if ((rc < 0) || (udpendpoint.udp == 0)) { diminuto_perror(optarg); error = !0; }
-            break;
         case '?':
-            fprintf(stderr, "usage: %s [ -? ] [ -M ] [ -V ] [ -b BYTES ] [ -t :PORT ] [ -u :PORT ]\n", Program);
-            fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
+        default:
+            fprintf(stderr, "usage: %s [ -? ] [ -m ] [ -V ] [ -B BYTES ] [ -T :PORT ] [ -U :PORT ] [ -F FILE ]\n", Program);
+            fprintf(stderr, "       -m          Run in the background as a daeMon.\n");
+            fprintf(stderr, "       -B BYTES    Allocate a buffer of size BYTES.\n");
+            fprintf(stderr, "       -F FILE     Save latest datagram in FILE.\n");
+            fprintf(stderr, "       -T :PORT    Use PORT as the TCP source port.\n");
+            fprintf(stderr, "       -U :PORT    Use PORT as the UDP sink port.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
-            fprintf(stderr, "       -b BYTES    Allocate a buffer of size BYTES.\n");
-            fprintf(stderr, "       -d          Display Debug output on standard error.\n");
-            fprintf(stderr, "       -t :PORT    Use PORT as the TCP source port.\n");
-            fprintf(stderr, "       -u :PORT    Use PORT as the UDP sink port.\n");
-            fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
             return 1;
             break;
         }
@@ -186,17 +222,21 @@ int main(int argc, char * argv[])
 
     diminuto_mux_init(&mux);
 
-    udpsock = diminuto_ipc6_datagram_peer(udpendpoint.udp);
-    diminuto_assert(udpsock >= 0);
-    DIMINUTO_LOG_NOTICE("Source (%d) \"%s\" [%s]:%d", udpsock, udprendezvous, diminuto_ipc6_address2string(udpendpoint.ipv6, ipv6, sizeof(ipv6)), udpendpoint.udp);
-    rc = diminuto_mux_register_read(&mux, udpsock);
-    diminuto_assert(rc >= 0);
+    if (udprendezvous != (char *)0) {
+        udpsock = diminuto_ipc6_datagram_peer(udpendpoint.udp);
+        diminuto_assert(udpsock >= 0);
+        DIMINUTO_LOG_NOTICE("Source (%d) \"%s\" [%s]:%d", udpsock, udprendezvous, diminuto_ipc6_address2string(udpendpoint.ipv6, buffer6, sizeof(buffer6)), udpendpoint.udp);
+        rc = diminuto_mux_register_read(&mux, udpsock);
+        diminuto_assert(rc >= 0);
+    }
 
-    tcpsock = diminuto_ipc6_stream_provider(tcpendpoint.tcp);
-    diminuto_assert(tcpsock >= 0);
-    DIMINUTO_LOG_NOTICE("Sink (%d) \"%s\" [%s]:%d", tcpsock, tcprendezvous, diminuto_ipc6_address2string(tcpendpoint.ipv6, ipv6, sizeof(ipv6)), tcpendpoint.udp);
-    rc = diminuto_mux_register_accept(&mux, tcpsock);
-    diminuto_assert(rc >= 0);
+    if (tcprendezvous != (char *)0) {
+        tcpsock = diminuto_ipc6_stream_provider(tcpendpoint.tcp);
+        diminuto_assert(tcpsock >= 0);
+        DIMINUTO_LOG_NOTICE("Sink (%d) \"%s\" [%s]:%d", tcpsock, tcprendezvous, diminuto_ipc6_address2string(tcpendpoint.ipv6, buffer6, sizeof(buffer6)), tcpendpoint.udp);
+        rc = diminuto_mux_register_accept(&mux, tcpsock);
+        diminuto_assert(rc >= 0);
+    }
 
     frequency = diminuto_frequency();
     DIMINUTO_LOG_NOTICE("Frequency %llu\n", (unsigned long long)frequency);
@@ -260,13 +300,15 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * Service the socket.
+         * Service the socket. Note that if the UDP or TCP sockets aren't
+         * open, the checks below will never be true.
          */
 
         if (fd == udpsock) {
 
-            size = diminuto_ipc6_datagram_receive_generic(udpsock, buffer, total, &address, &port, 0);
-            DIMINUTO_LOG_DEBUG("Receive %d %zd [%s]:%d\n", udpsock, size, diminuto_ipc6_address2string(address, ipv6, sizeof(ipv6)), port);
+            size = diminuto_ipc6_datagram_receive_generic(udpsock, buffer, total, &address6, &port, 0);
+            DIMINUTO_LOG_DEBUG("Receive %d %zd [%s]:%d\n", udpsock, size, diminuto_ipc6_address2string(address6, buffer6, sizeof(buffer6)), port);
+
             if (size <= 0) {
                 continue;
             }
@@ -287,11 +329,35 @@ int main(int argc, char * argv[])
                 }
             }
 
+            if (fp == (FILE *)0) {
+                /* Do nothing. */
+            } else if ((length = fwrite(buffer, size, 1, fp)) == 1) {
+                /* Do nothing. */
+            } else {
+                errno = EIO;
+                diminuto_perror(feof(fp) ? "EOF" : ferror(fp) ? "ERROR" : "UNEXPECTED");
+                fclose(fp);
+                fp = (FILE *)0;
+            }
+
+            if (fp == (FILE *)0) {
+                /* Do nothing. */
+            } else if (fp == stdout) {
+                /* Do nothing. */
+            } else if ((fp = diminuto_observation_commit(fp, &temp)) != (FILE *)0) {
+                fclose(fp);
+                fp = (FILE *)0;
+            } else if ((fp = diminuto_observation_create(filename, &temp)) == (FILE *)0) {
+                /* Do nothing. */
+            } else {
+                /* Do nothing. */
+            }
+
         } else if (fd == tcpsock) {
 
-            fd = diminuto_ipc6_stream_accept_generic(tcpsock, &address, &port);
+            fd = diminuto_ipc6_stream_accept_generic(tcpsock, &address6, &port);
             if (fd >= 0) {
-                DIMINUTO_LOG_INFORMATION("Accept %d [%s]:%d\n", fd, diminuto_ipc6_address2string(address, ipv6, sizeof(ipv6)), port);
+                DIMINUTO_LOG_INFORMATION("Accept %d [%s]:%d\n", fd, diminuto_ipc6_address2string(address6, buffer6, sizeof(buffer6)), port);
                 rc = diminuto_mux_register_write(&mux, fd);
                 diminuto_assert(rc >= 0);
             }
@@ -310,9 +376,13 @@ int main(int argc, char * argv[])
 
     DIMINUTO_LOG_INFORMATION("Stop");
 
-    (void)diminuto_mux_close(&mux, udpsock);
+    if (udpsock >= 0) {
+        (void)diminuto_mux_close(&mux, udpsock);
+    }
 
-    (void)diminuto_mux_close(&mux, tcpsock);
+    if (tcpsock >= 0) {
+        (void)diminuto_mux_close(&mux, tcpsock);
+    }
 
     for (fd = mux.write.min; fd <= mux.write.max; ++fd) {
         if (FD_ISSET(fd, &mux.write.active)) {
@@ -321,6 +391,14 @@ int main(int argc, char * argv[])
     }
 
     diminuto_mux_fini(&mux);
+
+    if (fp == (FILE *)0) {
+        /* Do nothing. */
+    } else if (fp == stdout) {
+        /* Do nothing. */
+    } else {
+        fp = diminuto_observation_discard(fp, &temp);
+    }
 
     DIMINUTO_LOG_INFORMATION("Exit");
 

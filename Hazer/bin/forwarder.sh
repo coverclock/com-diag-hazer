@@ -18,5 +18,5 @@ exec 2>>${ERRFIL}
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 exec coreable osmtool \
-    -u ${SOURCE} -t ${SINK} \
+    -U ${SOURCE} -T ${SINK} \
     < /dev/null 1> /dev/null
