@@ -160,6 +160,7 @@ int main(int argc, char * argv[])
                         diminuto_ipc6_is_unspecified(&tcpendpoint.ipv6)))) ||
                     (tcpendpoint.tcp == 0)
             ) {
+                errno = EINVAL;
                 diminuto_perror(tcprendezvous);
                 error = !0;
             }
@@ -174,6 +175,7 @@ int main(int argc, char * argv[])
                         diminuto_ipc6_is_unspecified(&udpendpoint.ipv6)))) ||
                     (udpendpoint.udp == 0)
             ) {
+                errno = EINVAL;
                 diminuto_perror(udprendezvous);
                 error = !0;
             }
@@ -221,6 +223,10 @@ int main(int argc, char * argv[])
     diminuto_assert(rc >= 0);
 
     diminuto_mux_init(&mux);
+
+    if (fp != (FILE *)0) {
+        DIMINUTO_LOG_NOTICE("Observation (%d) \"%s\"", fileno(fp), filename);
+    }
 
     if (udprendezvous != (char *)0) {
         udpsock = diminuto_ipc6_datagram_peer(udpendpoint.udp);
