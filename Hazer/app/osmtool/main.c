@@ -209,7 +209,7 @@ int main(int argc, char * argv[])
 
     if (daemon) {
         rc = diminuto_daemon(Program);
-        DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
+        DIMINUTO_LOG_INFORMATION("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
         diminuto_assert(rc == 0);
     }
 
@@ -225,13 +225,13 @@ int main(int argc, char * argv[])
     diminuto_mux_init(&mux);
 
     if (fp != (FILE *)0) {
-        DIMINUTO_LOG_NOTICE("Observation (%d) \"%s\"", fileno(fp), filename);
+        DIMINUTO_LOG_INFORMATION("Observation (%d) \"%s\"", fileno(fp), filename);
     }
 
     if (udprendezvous != (char *)0) {
         udpsock = diminuto_ipc6_datagram_peer(udpendpoint.udp);
         diminuto_assert(udpsock >= 0);
-        DIMINUTO_LOG_NOTICE("Source (%d) \"%s\" [%s]:%d", udpsock, udprendezvous, diminuto_ipc6_address2string(udpendpoint.ipv6, buffer6, sizeof(buffer6)), udpendpoint.udp);
+        DIMINUTO_LOG_INFORMATION("Source (%d) \"%s\" [%s]:%d", udpsock, udprendezvous, diminuto_ipc6_address2string(udpendpoint.ipv6, buffer6, sizeof(buffer6)), udpendpoint.udp);
         rc = diminuto_mux_register_read(&mux, udpsock);
         diminuto_assert(rc >= 0);
     }
@@ -239,16 +239,16 @@ int main(int argc, char * argv[])
     if (tcprendezvous != (char *)0) {
         tcpsock = diminuto_ipc6_stream_provider(tcpendpoint.tcp);
         diminuto_assert(tcpsock >= 0);
-        DIMINUTO_LOG_NOTICE("Sink (%d) \"%s\" [%s]:%d", tcpsock, tcprendezvous, diminuto_ipc6_address2string(tcpendpoint.ipv6, buffer6, sizeof(buffer6)), tcpendpoint.udp);
+        DIMINUTO_LOG_INFORMATION("Sink (%d) \"%s\" [%s]:%d", tcpsock, tcprendezvous, diminuto_ipc6_address2string(tcpendpoint.ipv6, buffer6, sizeof(buffer6)), tcpendpoint.udp);
         rc = diminuto_mux_register_accept(&mux, tcpsock);
         diminuto_assert(rc >= 0);
     }
 
     frequency = diminuto_frequency();
-    DIMINUTO_LOG_NOTICE("Frequency %llu\n", (unsigned long long)frequency);
+    DIMINUTO_LOG_INFORMATION("Frequency %llu\n", (unsigned long long)frequency);
     diminuto_assert(frequency > 0);
 
-    DIMINUTO_LOG_NOTICE("Buffer %zd\n", total);
+    DIMINUTO_LOG_INFORMATION("Buffer %zd\n", total);
     buffer = (char *)malloc(total);
     diminuto_assert(buffer != (char *)0);
 
