@@ -152,6 +152,15 @@ The gpstool application is a good example of how to use the Hazer,
 Tumbleweed, and Yodel features. (It is also a good example of how to
 use the features of the Diminuto library.)
 
+## Utilities
+
+Some of the Hazer scripts use command line utilities that not all
+Linux/GNU distros install by default.
+
+    sudo apt-get install bc
+    sudo apt-get install inotify-tools
+    sudo apt-get install socat
+
 ## Workflow
     
 For my own development workflow, I have also found it useful to install
@@ -162,21 +171,6 @@ mileage may vary.
     sudo apt-get install git
     sudo apt-get install vim
     sudo apt-get install screen
-
-## bc
-
-If you want to use several of the post-processing scripts for the optional
-CSV output file, you may need to install the standard command line (lab)
-bench calculator (bc) utility.
-
-    sudo apt-get install bc
-
-## inotifywait
-
-If you want to run the peruse script, which several other scripts make use
-of, you may need to install the inotify tools package.
-
-    sudo apt-get install inotify-tools
 
 ## LFS
 
