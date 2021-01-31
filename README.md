@@ -966,8 +966,8 @@ the libraries and binaries in the system directories.)
 # Applications
 
 * gpstool - Hazer's multi purpose GNSS pocket tool.
-* osmtool - Tesoro's multipoint-to-multipoint datagram forwarder.
-* rtktool - Tumbleweed's point-to-multipoint datagram router.
+* osmtool - Tesoro's multipoint-to-multipoint OSM datagram forwarder.
+* rtktool - Tumbleweed's point-to-multipoint RTK datagram router.
 
 # Utilities
 

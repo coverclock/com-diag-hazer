@@ -106,8 +106,9 @@ int main(int argc, char * argv[])
     diminuto_ipv6_buffer_t buffer6 = { 0, };
     diminuto_ticks_t frequency = 0;
     ssize_t total = 512;
-    ssize_t size = 0;
-    size_t length = 0;
+    ssize_t received = 0;
+    ssize_t sent = 0;
+    size_t written = 0;
     diminuto_mux_t mux = { 0 };
     static const char OPTIONS[] = "B:F:T:U:Vm?";
     extern char * optarg;
@@ -181,7 +182,7 @@ int main(int argc, char * argv[])
             }
             break;
         case 'V':
-            DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            DIMINUTO_LOG_NOTICE("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case '?':
         default:
@@ -209,17 +210,17 @@ int main(int argc, char * argv[])
 
     if (daemon) {
         rc = diminuto_daemon(Program);
-        DIMINUTO_LOG_INFORMATION("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
+        DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
         diminuto_assert(rc == 0);
     }
 
-    rc = diminuto_terminator_install(0);
+    rc = diminuto_terminator_install(!0);
     diminuto_assert(rc >= 0);
 
     rc = diminuto_interrupter_install(!0);
     diminuto_assert(rc >= 0);
 
-    rc = diminuto_pipe_install(0);
+    rc = diminuto_pipe_install(!0);
     diminuto_assert(rc >= 0);
 
     diminuto_mux_init(&mux);
@@ -312,38 +313,37 @@ int main(int argc, char * argv[])
 
         if (fd == udpsock) {
 
-            size = diminuto_ipc6_datagram_receive_generic(udpsock, buffer, total, &address6, &port, 0);
-            DIMINUTO_LOG_DEBUG("Receive %d %zd [%s]:%d\n", udpsock, size, diminuto_ipc6_address2string(address6, buffer6, sizeof(buffer6)), port);
+            received = diminuto_ipc6_datagram_receive_generic(udpsock, buffer, total, &address6, &port, 0);
+            DIMINUTO_LOG_DEBUG("Received %d %zd [%s]:%d\n", udpsock, received, diminuto_ipc6_address2string(address6, buffer6, sizeof(buffer6)), port);
 
-            if (size <= 0) {
+            if (received <= 0) {
                 continue;
-            }
-
-            for (fd = mux.write.min; fd <= mux.write.max; ++fd) {
-                if (FD_ISSET(fd, &mux.write.active)) {
-                    size = diminuto_ipc6_stream_write(fd, buffer, size);
-                    if (diminuto_pipe_check()) {
-                        DIMINUTO_LOG_INFORMATION("SIGPIPE");
-                        size = 0;
-                    }
-                    DIMINUTO_LOG_DEBUG("Write %d %zd\n", fd, size);
-                    if (size <= 0) {
-                        DIMINUTO_LOG_INFORMATION("Close %d", fd);
-                        rc = diminuto_mux_close(&mux, fd);
-                        diminuto_assert(rc >= 0);
-                    }
-                }
             }
 
             if (fp == (FILE *)0) {
                 /* Do nothing. */
-            } else if ((length = fwrite(buffer, size, 1, fp)) == 1) {
-                /* Do nothing. */
+            } else if ((written = fwrite(buffer, received, 1, fp)) == 1) {
+                DIMINUTO_LOG_DEBUG("Written %d %zu \"%s\"\n", fileno(fp), written, filename);
             } else {
                 errno = EIO;
                 diminuto_perror(feof(fp) ? "EOF" : ferror(fp) ? "ERROR" : "UNEXPECTED");
                 fclose(fp);
                 fp = (FILE *)0;
+            }
+
+            for (fd = mux.write.min; fd <= mux.write.max; ++fd) {
+                if (FD_ISSET(fd, &mux.write.active)) {
+                    sent = diminuto_ipc6_stream_write(fd, buffer, received);
+                    if (diminuto_pipe_check()) {
+                        DIMINUTO_LOG_INFORMATION("SIGPIPE");
+                    }
+                    DIMINUTO_LOG_DEBUG("Sent %d %zd\n", fd, sent);
+                    if (sent <= 0) {
+                        DIMINUTO_LOG_NOTICE("Close %d", fd);
+                        rc = diminuto_mux_close(&mux, fd);
+                        diminuto_assert(rc >= 0);
+                    }
+                }
             }
 
             if (fp == (FILE *)0) {
@@ -363,7 +363,7 @@ int main(int argc, char * argv[])
 
             fd = diminuto_ipc6_stream_accept_generic(tcpsock, &address6, &port);
             if (fd >= 0) {
-                DIMINUTO_LOG_INFORMATION("Accept %d [%s]:%d\n", fd, diminuto_ipc6_address2string(address6, buffer6, sizeof(buffer6)), port);
+                DIMINUTO_LOG_NOTICE("Accept %d [%s]:%d\n", fd, diminuto_ipc6_address2string(address6, buffer6, sizeof(buffer6)), port);
                 rc = diminuto_mux_register_write(&mux, fd);
                 diminuto_assert(rc >= 0);
             }
@@ -406,7 +406,7 @@ int main(int argc, char * argv[])
         fp = diminuto_observation_discard(fp, &temp);
     }
 
-    DIMINUTO_LOG_INFORMATION("Exit");
+    DIMINUTO_LOG_NOTICE("Exit");
 
     return 0;
 }
