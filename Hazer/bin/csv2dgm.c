@@ -89,7 +89,7 @@ int main(int argc, char * argv[])
 {
     int xc = 1;
     const char * program = (const char *)0;
-    enum Type { CSV = 'c', DEFAULT = 'd',  JSON = 'j', QUERY='q', VAR = 'v', YAML = 'y', XML = 'x', } type = DEFAULT;
+    enum Type { CSV = 'c', DEFAULT = 'd', HTML = 'h',  JSON = 'j', QUERY='q', VAR = 'v', YAML = 'y', XML = 'x', } type = DEFAULT;
     enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
     int opt = -1;
     int error = 0;
@@ -107,9 +107,9 @@ int main(int argc, char * argv[])
     FILE * fp = (FILE *)0;
     size_t length = 0;
     ssize_t size = 0;
-    char input[512] = { '\0', };
-    char output[512] = { '\0', };
-    char buffer[512] = { '\0', };
+    char input[1024] = { '\0', };
+    char output[1024] = { '\0', };
+    char buffer[1024] = { '\0', };
     diminuto_ipv4_buffer_t ipv4buffer = { '\0', }; \
     diminuto_ipv6_buffer_t ipv6buffer = { '\0', }; \
     diminuto_sticks_t ticks = 0;
@@ -135,7 +135,7 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "U:F:cdjqvyx")) >= 0) {
+        while ((opt = getopt(argc, argv, "U:F:cdhjqvyx")) >= 0) {
             switch (opt) {
             case 'F':
                 filename = optarg;
@@ -170,6 +170,9 @@ int main(int argc, char * argv[])
             case 'd':
                 debug = !0;
                 break;
+            case 'h':
+                type = HTML;
+                break;
             case 'j':
                 type = JSON;
                 break;
@@ -187,7 +190,7 @@ int main(int argc, char * argv[])
                 break;
             case '?':
             default:
-                fprintf(stderr, "usage: %s [ -d ] [ -c | -j | | -q | -v | -y | -x ] [ -F FILE ] [ -U HOST:PORT ]\n", program);
+                fprintf(stderr, "usage: %s [ -d ] [ -c | -h | -j | | -q | -v | -y | -x ] [ -F FILE ] [ -U HOST:PORT ]\n", program);
                 error = !0;
                 break;
             }
@@ -252,6 +255,9 @@ int main(int argc, char * argv[])
         switch (type) {
         case CSV:
             format = "%s, %s, %s, %s, \"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            break;
+        case HTML:
+            format = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><meta http-equiv=\"Content-Style-Type\" content=\"text/css\"></head><body><h1>TIM</h1><p>%s</p><h1>LAT</h1><p>%s</p><h1>LON</h1><p>%s</p><h1>MSL</h1><p>%s</p><h1>LBL</h1><p>%04d%02d%02dT%02d%02d%02dZ</p></body></html>\n";
             break;
         case JSON:
             format = "{ \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n";
