@@ -21,7 +21,8 @@
  *
  * EXAMPLE
  *
- * socat -u UDP6-RECV:8080 - & csv2dgm -U localhost:8080 < ./dat/yodel/20200903/vehicle.csv
+ * socat -u UDP6-RECV:8080 - &
+ * csv2dgm -U localhost:8080 -F Observation.txt -j < ./dat/yodel/20200903/vehicle.csv
  *
  * INPUT (CSV)
  *
@@ -31,27 +32,31 @@
  *
  *      1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z\n
  *
- * OUTPUT (-c)
+ * OUTPUT (-c for CSV)
  *
  *      1599145249, 39.7943071, -105.1533805, 1710.300, "20200903T150049Z"\n
  *
- * OUTPUT (-j)
+ * OUTPUT (-h for HTML)
+ *
+ *      <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="Content-Style-Type" content="text/css"></head><body><h1>TIM</h1><p>1599145249</p><h1>LAT</h1><p>39.7943071</p><h1>LON</h1><p>-105.1533805</p><h1>MSL</h1><p>1710.300</p><h1>LBL</h1><p>20200903T150049Z</p></body></html>
+ *
+ * OUTPUT (-j for JSON)
  *
  *      { "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }\n
  *
- * OUTPUT (-q)
+ * OUTPUT (-q for Query)
  *
  *      ?TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL=20200903T150049Z\n
  *
- * OUTPUT (-v)
+ * OUTPUT (-v for Variables)
  *
  *      TIM=1599145249; LAT=39.7943071; LON=-105.1533805; MSL=1710.300; LBL="20200903T150049Z"\n
  *
- * OUTPUT (-y)
+ * OUTPUT (-y for YAML)
  *
  *      TIM: 1599145249\nLAT: 39.7943071\nLON: -105.1533805\nMSL: 1710.3\n LBL: 20200903T150049Z\n
  *
- * OUTPUT (-x)
+ * OUTPUT (-x for XML)
  *
  *      <?xml version="1.0" encoding="UTF-8" ?><TIM>1599145249</TIM><LAT>39.7943071</LAT><LON>-105.1533805</LON><MSL>1710.300</MSL><LBL>20200903T150049Z</LBL>\n
  *
@@ -62,6 +67,7 @@
  * https://jsonformatter.org
  */
 
+#include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_interrupter.h"
@@ -325,6 +331,8 @@ int main(int argc, char * argv[])
                 break;
             }
             input[sizeof(input) - 1] = '\0';
+            length = strnlen(input, sizeof(input));
+            diminuto_assert((length > 0) && (input[length - 1] == '\n'));
 
             /*
              * Parse the input line into tokens.
@@ -412,6 +420,7 @@ int main(int argc, char * argv[])
             snprintf(output, sizeof(output), format, token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
+            diminuto_assert((length > 0) && (output[length - 1] == '\n'));
 
             if (debug) { fprintf(stderr, "%s: output=\"%s\"\n", program, expand(buffer, output, sizeof(buffer), length)); }
 
