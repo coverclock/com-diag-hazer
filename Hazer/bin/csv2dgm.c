@@ -205,7 +205,7 @@ int main(int argc, char * argv[])
                 fprintf(stderr, "       -v              Emit shell Variables.\n");
                 fprintf(stderr, "       -y              Emit YAML.\n");
                 fprintf(stderr, "       -x              Emit XML.\n");
-                fprintf(stderr, "       -F FILE         Store observation in FILE\n");
+                fprintf(stderr, "       -F FILE         Save latest datagram in FILE\n");
                 fprintf(stderr, "       -U HOST:PORT    Forward datagrams to HOST:PORT\n");
                 error = !0;
                 break;
