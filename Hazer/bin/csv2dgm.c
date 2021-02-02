@@ -30,35 +30,35 @@
  *
  * OUTPUT (default)
  *
- *      1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z\n
+ *      neon 2 1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z\n
  *
  * OUTPUT (-c for CSV)
  *
- *      1599145249, 39.7943071, -105.1533805, 1710.300, "20200903T150049Z"\n
+ *      "neon", 2, 1599145249, 39.7943071, -105.1533805, 1710.300, "20200903T150049Z"\n
  *
  * OUTPUT (-h for HTML)
  *
- *      <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="Content-Style-Type" content="text/css"></head><body><h1>TIM</h1><p>1599145249</p><h1>LAT</h1><p>39.7943071</p><h1>LON</h1><p>-105.1533805</p><h1>MSL</h1><p>1710.300</p><h1>LBL</h1><p>20200903T150049Z</p></body></html>
+ *      <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="Content-Style-Type" content="text/css"></head><body><h1>NAM</h1><p>neon</p><h1>NUM</h1><p>2</p><h1>TIM</h1><p>1599145249</p><h1>LAT</h1><p>39.7943071</p><h1>LON</h1><p>-105.1533805</p><h1>MSL</h1><p>1710.300</p><h1>LBL</h1><p>20200903T150049Z</p></body></html>
  *
  * OUTPUT (-j for JSON)
  *
- *      { "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }\n
+ *      { "NAM": "neon", "NUM": 2, "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }\n
  *
  * OUTPUT (-q for Query)
  *
- *      ?TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL=20200903T150049Z\n
+ *      ?NAM=neon&NUM=2&TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL=20200903T150049Z\n
  *
  * OUTPUT (-v for Variables)
  *
- *      TIM=1599145249; LAT=39.7943071; LON=-105.1533805; MSL=1710.300; LBL="20200903T150049Z"\n
+ *      NAM="neon"; NUM=2; TIM=1599145249; LAT=39.7943071; LON=-105.1533805; MSL=1710.300; LBL="20200903T150049Z"\n
  *
  * OUTPUT (-y for YAML)
  *
- *      TIM: 1599145249\nLAT: 39.7943071\nLON: -105.1533805\nMSL: 1710.3\n LBL: 20200903T150049Z\n
+ *      NAM: neon\nNUM: 2\nTIM: 1599145249\nLAT: 39.7943071\nLON: -105.1533805\nMSL: 1710.3\n LBL: 20200903T150049Z\n
  *
  * OUTPUT (-x for XML)
  *
- *      <?xml version="1.0" encoding="UTF-8" ?><TIM>1599145249</TIM><LAT>39.7943071</LAT><LON>-105.1533805</LON><MSL>1710.300</MSL><LBL>20200903T150049Z</LBL>\n
+ *      <?xml version="1.0" encoding="UTF-8" ?><NAM>neon</NAM><NUM>2</NUM><TIM>1599145249</TIM><LAT>39.7943071</LAT><LON>-105.1533805</LON><MSL>1710.300</MSL><LBL>20200903T150049Z</LBL>\n
  *
  * REFERENCES
  *
