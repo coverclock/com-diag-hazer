@@ -86,6 +86,16 @@
 #include <string.h>
 #include <unistd.h>
 
+static int numeric(const char * str)
+{
+    char * end = (char *)0;
+
+    errno = 0;
+    (void)strtod(str, &end);
+
+    return ((*str != '\0') && (errno == 0) && (end != (char *)0) && (*end == '\0'));
+}
+
 static const char * expand(char * to, const char * from, size_t tsize, size_t fsize) {
     (void)diminuto_escape_expand(to, from, tsize, fsize, (const char *)0);
     return to;
@@ -96,7 +106,7 @@ int main(int argc, char * argv[])
     int xc = 1;
     const char * program = (const char *)0;
     enum Type { CSV = 'c', DEFAULT = 'd', HTML = 'h',  JSON = 'j', QUERY='q', VAR = 'v', YAML = 'y', XML = 'x', } type = DEFAULT;
-    enum Tokens { TIM = 6, LAT = 7, LON = 8, MSL = 10, };
+    enum Tokens { NAM = 0, NUM = 1, TIM = 6, LAT = 7, LON = 8, MSL = 10, };
     int opt = -1;
     int error = 0;
     int debug = 0;
@@ -268,28 +278,28 @@ int main(int argc, char * argv[])
 
         switch (type) {
         case CSV:
-            format = "%s, %s, %s, %s, \"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            format = "\"%s\", %s, %s, %s, %s, %s, \"%04d%02d%02dT%02d%02d%02dZ\"\n";
             break;
         case HTML:
-            format = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><meta http-equiv=\"Content-Style-Type\" content=\"text/css\"></head><body><h1>TIM</h1><p>%s</p><h1>LAT</h1><p>%s</p><h1>LON</h1><p>%s</p><h1>MSL</h1><p>%s</p><h1>LBL</h1><p>%04d%02d%02dT%02d%02d%02dZ</p></body></html>\n";
+            format = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><meta http-equiv=\"Content-Style-Type\" content=\"text/css\"></head><body><h1>NAM</h1><p>%s</p><h1>NUM</h1><p>%s</p><h1>TIM</h1><p>%s</p><h1>LAT</h1><p>%s</p><h1>LON</h1><p>%s</p><h1>MSL</h1><p>%s</p><h1>LBL</h1><p>%04d%02d%02dT%02d%02d%02dZ</p></body></html>\n";
             break;
         case JSON:
-            format = "{ \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n";
+            format = "{ \"NAM\": \"%s\", \"NUM\": %s, \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n";
             break;
         case QUERY:
-            format = "?TIM=%s&LAT=%s&LON=%s&MSL=%s&LBL=%04d%02d%02dT%02d%02d%02dZ\n";
+            format = "?NAM=%s&NUM=%s&TIM=%s&LAT=%s&LON=%s&MSL=%s&LBL=%04d%02d%02dT%02d%02d%02dZ\n";
             break;
         case VAR:
-            format = "TIM=%s; LAT=%s; LON=%s; MSL=%s; LBL=\"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            format = "NAM=\"%s\"; NUM=%s; TIM=%s; LAT=%s; LON=%s; MSL=%s; LBL=\"%04d%02d%02dT%02d%02d%02dZ\"\n";
             break;
         case YAML:
-            format = "TIM: %s\nLAT: %s\nLON: %s\nMSL: %s\nLBL: %04d%02d%02dT%02d%02d%02dZ\n";
+            format = "NAM: %s\nNUM: %s\nTIM: %s\nLAT: %s\nLON: %s\nMSL: %s\nLBL: %04d%02d%02dT%02d%02d%02dZ\n";
             break;
         case XML:
-            format = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><TIM>%s</TIM><LAT>%s</LAT><LON>%s</LON><MSL>%s</MSL><LBL>%04d%02d%02dT%02d%02d%02dZ</LBL>\n";
+            format = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><NAM>%s</NAM><NUM>%s</NUM><TIM>%s</TIM><LAT>%s</LAT><LON>%s</LON><MSL>%s</MSL><LBL>%04d%02d%02dT%02d%02d%02dZ</LBL>\n";
             break;
         default:
-            format = "%s %s %s %s %04d%02d%02dT%02d%02d%02dZ\n";
+            format = "%s %s %s %s %s %s %04d%02d%02dT%02d%02d%02dZ\n";
             break;
         }
 
@@ -386,13 +396,47 @@ int main(int argc, char * argv[])
              * that CSV field, try again.
              */
 
-            length = strnlen(token[0], 14);
-            if (length < 2) {
+            length = strnlen(token[NAM], 14);
+            if ((length < (sizeof("\"?\"") - 1)) || (token[NAM][0] != '"') || (token[NAM][length - 1] != '"') || (strchr(token[NAM], ' ') != (char *)0)) {
+                errno = EINVAL;
+                diminuto_perror(token[NAM]);
                 continue;
-            } else if ((token[0][0] == '"') && (token[0][length - 1] == '"')) {
-                /* Do nothing. */
+            }
+
+            /*
+             * Strip off the double quotes (which CSV expects) from the
+             * NAM field. (We know they're there because of the check above.)
+             */
+
+            token[NAM][length - 1] = '\0';
+            token[NAM] += 1;
+
+            /*
+             * If the numeric tokens aren't, try again.
+             */
+
+            if (!numeric(token[NUM])) {
+                errno = EINVAL;
+                diminuto_perror(token[NUM]);
+                continue;
+            } else if (!numeric(token[TIM])) {
+                errno = EINVAL;
+                diminuto_perror(token[TIM]);
+                continue;
+            } else if (!numeric(token[LAT])) {
+                errno = EINVAL;
+                diminuto_perror(token[LAT]);
+                continue;
+            } else if (!numeric(token[LON])) {
+                errno = EINVAL;
+                diminuto_perror(token[LON]);
+                continue;
+            } else if (!numeric(token[MSL])) {
+                errno = EINVAL;
+                diminuto_perror(token[MSL]);
+                continue;
             } else {
-                continue;
+                /* Do nothing. */
             }
 
             /*
@@ -425,7 +469,7 @@ int main(int argc, char * argv[])
              * Generate an output line using specific fields.
              */
 
-            snprintf(output, sizeof(output), format, token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
+            snprintf(output, sizeof(output), format, token[NAM], token[NUM], token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
             diminuto_assert((length > 0) && (output[length - 1] == '\n'));
