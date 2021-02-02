@@ -194,17 +194,25 @@ int main(int argc, char * argv[])
             case 'x':
                 type = XML;
                 break;
-            case '?':
             default:
+            case '?':
                 fprintf(stderr, "usage: %s [ -d ] [ -c | -h | -j | | -q | -v | -y | -x ] [ -F FILE ] [ -U HOST:PORT ]\n", program);
+                fprintf(stderr, "       -c              Emit CSV.\n");
+                fprintf(stderr, "       -d              Enable debug output\n");
+                fprintf(stderr, "       -h              Emit HTML.\n");
+                fprintf(stderr, "       -j              Emit JSON.\n");
+                fprintf(stderr, "       -q              Emit URL Query.\n");
+                fprintf(stderr, "       -v              Emit shell Variables.\n");
+                fprintf(stderr, "       -y              Emit YAML.\n");
+                fprintf(stderr, "       -x              Emit XML.\n");
+                fprintf(stderr, "       -F FILE         Store observation in FILE\n");
+                fprintf(stderr, "       -U HOST:PORT    Forward datagrams to HOST:PORT\n");
                 error = !0;
                 break;
             }
         }
 
         if (error) {
-            errno = EINVAL;
-            diminuto_perror(program);
             break;
         }
 
