@@ -468,7 +468,7 @@ int main(int argc, char * argv[])
              * CSV data, try again.
              */
 
-            if (strncmp(token[0], "NAM, ", sizeof("NAM, ")  - 1) == 0) {
+            if (strncmp(token[0], "NAM", sizeof("NAM")  - 1) == 0) {
                 continue;
             }
 
