@@ -15,6 +15,8 @@
  *
  * Developed for use with Tesoro, my OpenStreetMaps tile server project.
  *
+ * See tst/unittest-csv2dgm.sh for examples of all the output formats.
+ *
  * USAGE
  * 
  * csv2dgm [ -d ] [ -c | -j | -q | -v | -y | -x ] [ -F FILE ] [ -U HOST:PORT ]
@@ -22,43 +24,7 @@
  * EXAMPLE
  *
  * socat -u UDP6-RECV:8080 - &
- * csv2dgm -U localhost:8080 -F Observation.txt -j < ./dat/yodel/20200903/vehicle.csv
- *
- * INPUT (CSV)
- *
- *      "neon", 2, 3, 0, 11, 1599145249.632000060, 1599145249.000000000, 39.7943071, -105.1533805, 0., 1710.300, 1688.800, 0., 0.005000, 0., 0., 0., 0., 0., 0., 0., 0, 0.\n
- *
- * OUTPUT (default)
- *
- *      neon 2 1599145249 39.7943071 -105.1533805 1710.300 20200903T150049Z\n
- *
- * OUTPUT (-c for CSV)
- *
- *      "neon", 2, 1599145249, 39.7943071, -105.1533805, 1710.300, "20200903T150049Z"\n
- *
- * OUTPUT (-h for HTML)
- *
- *      <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="Content-Style-Type" content="text/css"></head><body><h1>NAM</h1><p>neon</p><h1>NUM</h1><p>2</p><h1>TIM</h1><p>1599145249</p><h1>LAT</h1><p>39.7943071</p><h1>LON</h1><p>-105.1533805</p><h1>MSL</h1><p>1710.300</p><h1>LBL</h1><p>20200903T150049Z</p></body></html>
- *
- * OUTPUT (-j for JSON)
- *
- *      { "NAM": "neon", "NUM": 2, "TIM": 1599145249, "LAT": 39.7943071, "LON": -105.1533805, "MSL": 1710.300, "LBL": "20200903T150049Z" }\n
- *
- * OUTPUT (-q for Query)
- *
- *      ?NAM=neon&NUM=2&TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL=20200903T150049Z\n
- *
- * OUTPUT (-v for Variables)
- *
- *      NAM="neon"; NUM=2; TIM=1599145249; LAT=39.7943071; LON=-105.1533805; MSL=1710.300; LBL="20200903T150049Z"\n
- *
- * OUTPUT (-y for YAML)
- *
- *      NAM: neon\nNUM: 2\nTIM: 1599145249\nLAT: 39.7943071\nLON: -105.1533805\nMSL: 1710.3\n LBL: 20200903T150049Z\n
- *
- * OUTPUT (-x for XML)
- *
- *      <?xml version="1.0" encoding="UTF-8" ?><NAM>neon</NAM><NUM>2</NUM><TIM>1599145249</TIM><LAT>39.7943071</LAT><LON>-105.1533805</LON><MSL>1710.300</MSL><LBL>20200903T150049Z</LBL>\n
+ * csv2meter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -U localhost:8080 -F Observation.json -j
  *
  * REFERENCES
  *
@@ -66,6 +32,10 @@
  *
  * https://jsonformatter.org
  */
+
+/*******************************************************************************
+ * DEPENDENCIES
+ ******************************************************************************/
 
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_countof.h"
@@ -86,6 +56,112 @@
 #include <string.h>
 #include <unistd.h>
 
+/*******************************************************************************
+ * SYMBOLS
+ ******************************************************************************/
+
+#define TIMESTAMP "%04d-%02d-%02dT%02d:%02d:%02dZ"
+
+/*******************************************************************************
+ * CONSTANTS
+ ******************************************************************************/
+
+static const char FORMAT_CSV[] =
+    "\"%s\", "
+    "%s, "
+    "%s, "
+    "%s, "
+    "%s, "
+    "%s, "
+    "\"" TIMESTAMP "\""
+    "\n";
+
+static const char FORMAT_HTML[] =
+    "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">"
+    "<html>"
+        "<head>"
+            "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
+            "<meta http-equiv=\"Content-Style-Type\" content=\"text/css\">"
+        "</head>"
+        "<body>"
+            "<h1>NAM</h1><p>%s</p>"
+            "<h1>NUM</h1><p>%s</p>"
+            "<h1>TIM</h1><p>%s</p>"
+            "<h1>LAT</h1><p>%s</p>"
+            "<h1>LON</h1><p>%s</p>"
+            "<h1>MSL</h1><p>%s</p>"
+            "<h1>LBL</h1><p>" TIMESTAMP "</p>"
+        "</body>"
+    "</html>"
+    "\n";
+
+static const char FORMAT_JSON[] =
+    "{ "
+        "\"NAM\": \"%s\", "
+        "\"NUM\": %s, "
+        "\"TIM\": %s, "
+        "\"LAT\": %s, "
+        "\"LON\": %s, "
+        "\"MSL\": %s, "
+        "\"LBL\": \"" TIMESTAMP "\" "
+    "}"
+    "\n";
+
+static const char FORMAT_QUERY[] =
+    "?NAM=%s"
+    "&NUM=%s"
+    "&TIM=%s"
+    "&LAT=%s"
+    "&LON=%s"
+    "&MSL=%s"
+    "&LBL=" TIMESTAMP 
+    "\n";
+
+static const char FORMAT_VAR[] =
+    "NAM=\"%s\"; "
+    "NUM=%s; "
+    "TIM=%s; "
+    "LAT=%s; "
+    "LON=%s; "
+    "MSL=%s; "
+    "LBL=\"" TIMESTAMP "\""
+    "\n";
+
+static const char FORMAT_YAML[] =
+    "NAM: %s\n"
+    "NUM: %s\n"
+    "TIM: %s\n"
+    "LAT: %s\n"
+    "LON: %s\n"
+    "MSL: %s\n"
+    "LBL: " TIMESTAMP "\n"
+    "\n";
+
+static const char FORMAT_XML[] =
+    "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+    "<NAM>%s</NAM>"
+    "<NUM>%s</NUM>"
+    "<TIM>%s</TIM>"
+    "<LAT>%s</LAT>"
+    "<LON>%s</LON>"
+    "<MSL>%s</MSL>"
+    "<LBL>" TIMESTAMP "</LBL>"
+    "\n";
+
+static const char FORMAT_DEFAULT[] =
+    "%s "
+    "%s "
+    "%s "
+    "%s "
+    "%s "
+    "%s "
+    TIMESTAMP
+    "\n";
+
+/*******************************************************************************
+ * HELPERS
+ ******************************************************************************/
+
 static int numeric(const char * str)
 {
     char * end = (char *)0;
@@ -96,10 +172,15 @@ static int numeric(const char * str)
     return ((*str != '\0') && (errno == 0) && (end != (char *)0) && (*end == '\0'));
 }
 
-static const char * expand(char * to, const char * from, size_t tsize, size_t fsize) {
+static const char * expand(char * to, const char * from, size_t tsize, size_t fsize)
+{
     (void)diminuto_escape_expand(to, from, tsize, fsize, (const char *)0);
     return to;
 }
+
+/*******************************************************************************
+ * MAIN PROGRAM
+ ******************************************************************************/
 
 int main(int argc, char * argv[])
 {
@@ -278,28 +359,28 @@ int main(int argc, char * argv[])
 
         switch (type) {
         case CSV:
-            format = "\"%s\", %s, %s, %s, %s, %s, \"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            format = FORMAT_CSV;
             break;
         case HTML:
-            format = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><meta http-equiv=\"Content-Style-Type\" content=\"text/css\"></head><body><h1>NAM</h1><p>%s</p><h1>NUM</h1><p>%s</p><h1>TIM</h1><p>%s</p><h1>LAT</h1><p>%s</p><h1>LON</h1><p>%s</p><h1>MSL</h1><p>%s</p><h1>LBL</h1><p>%04d%02d%02dT%02d%02d%02dZ</p></body></html>\n";
+            format = FORMAT_HTML;
             break;
         case JSON:
-            format = "{ \"NAM\": \"%s\", \"NUM\": %s, \"TIM\": %s, \"LAT\": %s, \"LON\": %s, \"MSL\": %s, \"LBL\": \"%04d%02d%02dT%02d%02d%02dZ\" }\n";
+            format = FORMAT_JSON;
             break;
         case QUERY:
-            format = "?NAM=%s&NUM=%s&TIM=%s&LAT=%s&LON=%s&MSL=%s&LBL=%04d%02d%02dT%02d%02d%02dZ\n";
+            format = FORMAT_QUERY;
             break;
         case VAR:
-            format = "NAM=\"%s\"; NUM=%s; TIM=%s; LAT=%s; LON=%s; MSL=%s; LBL=\"%04d%02d%02dT%02d%02d%02dZ\"\n";
+            format = FORMAT_VAR;
             break;
         case YAML:
-            format = "NAM: %s\nNUM: %s\nTIM: %s\nLAT: %s\nLON: %s\nMSL: %s\nLBL: %04d%02d%02dT%02d%02d%02dZ\n";
+            format = FORMAT_YAML;
             break;
         case XML:
-            format = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><NAM>%s</NAM><NUM>%s</NUM><TIM>%s</TIM><LAT>%s</LAT><LON>%s</LON><MSL>%s</MSL><LBL>%04d%02d%02dT%02d%02d%02dZ</LBL>\n";
+            format = FORMAT_XML;
             break;
         default:
-            format = "%s %s %s %s %s %s %04d%02d%02dT%02d%02d%02dZ\n";
+            format = FORMAT_DEFAULT;
             break;
         }
 
