@@ -4,12 +4,15 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 
+
 PROGRAM=$(basename ${0})
-INPUT=${1:-$(readlink -e $(dirname ${0})/../dat)/yodel/20200903/vehicle.csv}
-ROOT=${2:-${HOME}/Desktop/Observations}
+INPUT=${1:-$(readlink -e $(dirname ${0})/../../../dat/yodel)/20200917/vehicle.csv}
+OUTPUT=${2:-${HOME}/Desktop/Observations/Observation.json}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-mkdir -P ${ROOT}
+mkdir -p $(dirname ${OUTPUT})
 
-csv2meter < ${INPUT} | csv2dgm -F ${ROOT}/Observation.json -j
+rm -f ${OUTPUT}
+
+csvmeter < ${INPUT} | csv2dgm -F ${OUTPUT} -j
