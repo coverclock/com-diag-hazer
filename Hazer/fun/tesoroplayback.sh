@@ -7,7 +7,8 @@
 
 PROGRAM=$(basename ${0})
 INPUT=${1:-$(readlink -e $(dirname ${0})/../../../dat/yodel)/20200917/vehicle.csv}
-OUTPUT=${2:-${HOME}/Desktop/Observations/Observation.json}
+OUTPUT=${2:-/var/www/html/tesoro/channel/neon.json}
+#OUTPUT=${2:-${HOME}/Desktop/Observations/Observation.json}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 

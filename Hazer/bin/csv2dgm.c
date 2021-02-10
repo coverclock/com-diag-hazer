@@ -13,13 +13,13 @@
  * Forwards a fixed subset of the CSV output as a datagram in JSON format
  * to a UDP endpoint.
  *
- * Developed for use with Tesoro, my OpenStreetMaps tile server project.
+ * Developed for use with Tesoro, an OpenStreetMaps tile server project.
  *
  * See tst/unittest-csv2dgm.sh for examples of all the output formats.
  *
  * USAGE
  * 
- * csv2dgm [ -d ] [ -c | -j | -q | -v | -y | -x ] [ -F FILE ] [ -U HOST:PORT ]
+ * csv2dgm [ -d ] [ -v ]  [ -c | -j | -q | -s | -x | -y ] [ -F FILE ] [ -U HOST:PORT ]
  *
  * EXAMPLE
  *
@@ -117,7 +117,7 @@ static const char FORMAT_QUERY[] =
     "&LBL=" TIMESTAMP 
     "\n";
 
-static const char FORMAT_VAR[] =
+static const char FORMAT_SHELL[] =
     "NAM=\"%s\"; "
     "NUM=%s; "
     "TIM=%s; "
@@ -174,7 +174,7 @@ static int numeric(const char * str)
 
 static const char * expand(char * to, const char * from, size_t tsize, size_t fsize)
 {
-    (void)diminuto_escape_expand(to, from, tsize, fsize, (const char *)0);
+    (void)diminuto_escape_expand(to, from, tsize, fsize, "\"");
     return to;
 }
 
@@ -186,11 +186,12 @@ int main(int argc, char * argv[])
 {
     int xc = 1;
     const char * program = (const char *)0;
-    enum Type { CSV = 'c', DEFAULT = 'd', HTML = 'h',  JSON = 'j', QUERY='q', VAR = 'v', YAML = 'y', XML = 'x', } type = DEFAULT;
+    enum Type { CSV = 'c', DEFAULT = 'd', HTML = 'h',  JSON = 'j', QUERY='q', SHELL = 's', XML = 'x', YAML = 'y', } type = DEFAULT;
     enum Tokens { NAM = 0, NUM = 1, TIM = 6, LAT = 7, LON = 8, MSL = 10, };
     int opt = -1;
     int error = 0;
     int debug = 0;
+    int verbose = 0;
     int sock = -1;
     int rc = -1;
     int ii = -1;
@@ -232,7 +233,7 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "U:F:cdhjqvyx")) >= 0) {
+        while ((opt = getopt(argc, argv, "U:F:cdhjqsvxy")) >= 0) {
             switch (opt) {
             case 'F':
                 filename = optarg;
@@ -276,26 +277,30 @@ int main(int argc, char * argv[])
             case 'q':
                 type = QUERY;
                 break;
-            case 'v':
-                type = VAR;
+            case 's':
+                type = SHELL;
                 break;
-            case 'y':
-                type = YAML;
+            case 'v':
+                verbose = !0;
                 break;
             case 'x':
                 type = XML;
                 break;
+            case 'y':
+                type = YAML;
+                break;
             default:
             case '?':
-                fprintf(stderr, "usage: %s [ -d ] [ -c | -h | -j | | -q | -v | -y | -x ] [ -F FILE ] [ -U HOST:PORT ]\n", program);
+                fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -c | -h | -j | | -q | -s | -x | -y ] [ -F FILE ] [ -U HOST:PORT ]\n", program);
                 fprintf(stderr, "       -c              Emit CSV.\n");
                 fprintf(stderr, "       -d              Enable debug output\n");
                 fprintf(stderr, "       -h              Emit HTML.\n");
                 fprintf(stderr, "       -j              Emit JSON.\n");
                 fprintf(stderr, "       -q              Emit URL Query.\n");
-                fprintf(stderr, "       -v              Emit shell Variables.\n");
-                fprintf(stderr, "       -y              Emit YAML.\n");
+                fprintf(stderr, "       -s              Emit Shell commands.\n");
+                fprintf(stderr, "       -v              Enable verbose output\n");
                 fprintf(stderr, "       -x              Emit XML.\n");
+                fprintf(stderr, "       -y              Emit YAML.\n");
                 fprintf(stderr, "       -F FILE         Save latest datagram in FILE\n");
                 fprintf(stderr, "       -U HOST:PORT    Forward datagrams to HOST:PORT\n");
                 error = !0;
@@ -370,8 +375,8 @@ int main(int argc, char * argv[])
         case QUERY:
             format = FORMAT_QUERY;
             break;
-        case VAR:
-            format = FORMAT_VAR;
+        case SHELL:
+            format = FORMAT_SHELL;
             break;
         case YAML:
             format = FORMAT_YAML;
@@ -432,6 +437,8 @@ int main(int argc, char * argv[])
             input[sizeof(input) - 1] = '\0';
             length = strnlen(input, sizeof(input));
             diminuto_assert((length > 0) && (input[length - 1] == '\n'));
+
+            if (verbose) { fprintf(stderr, "%s: input=\"%s\"\n", program, expand(buffer, input, sizeof(buffer), length)); }
 
             /*
              * Parse the input line into tokens.
@@ -555,7 +562,7 @@ int main(int argc, char * argv[])
             length = strnlen(output, sizeof(output));
             diminuto_assert((length > 0) && (output[length - 1] == '\n'));
 
-            if (debug) { fprintf(stderr, "%s: output=\"%s\"\n", program, expand(buffer, output, sizeof(buffer), length)); }
+            if (verbose) { fprintf(stderr, "%s: output=\"%s\"\n", program, expand(buffer, output, sizeof(buffer), length)); }
 
             /*
              * Send the output line as an IPv4 or IPv6 datagram.

@@ -18,7 +18,7 @@ OUTPUT_JSON="{ \"NAM\": \"neon\", \"NUM\": 2, \"TIM\": 1599145249, \"LAT\": 39.7
 
 OUTPUT_QUERY="?NAM=neon&NUM=2&TIM=1599145249&LAT=39.7943071&LON=-105.1533805&MSL=1710.300&LBL=2020-09-03T15:00:49Z\n"
 
-OUTPUT_VARIABLES="NAM=\"neon\"; NUM=2; TIM=1599145249; LAT=39.7943071; LON=-105.1533805; MSL=1710.300; LBL=\"2020-09-03T15:00:49Z\"\n"
+OUTPUT_SHELL="NAM=\"neon\"; NUM=2; TIM=1599145249; LAT=39.7943071; LON=-105.1533805; MSL=1710.300; LBL=\"2020-09-03T15:00:49Z\"\n"
 
 OUTPUT_YAML="NAM: neon\nNUM: 2\nTIM: 1599145249\nLAT: 39.7943071\nLON: -105.1533805\nMSL: 1710.300\nLBL: 2020-09-03T15:00:49Z\n"
 
@@ -90,10 +90,10 @@ if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then
 fi
 
 echo "**********"
-echo "VARIABLES"
+echo "SHELL"
 echo "**********"
-EXPECTED="$(echo -e -n "${OUTPUT_VARIABLES}")"
-ACTUAL="$(echo -e -n "${INPUT}" | csv2dgm -F - -v)"
+EXPECTED="$(echo -e -n "${OUTPUT_SHELL}")"
+ACTUAL="$(echo -e -n "${INPUT}" | csv2dgm -F - -s)"
 echo "${INPUT}"
 echo "${EXPECTED}"
 echo "${ACTUAL}"
