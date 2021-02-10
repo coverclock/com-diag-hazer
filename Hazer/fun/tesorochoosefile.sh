@@ -7,7 +7,8 @@
 
 PROGRAM=$(basename ${0})
 INPUT=${1:-$(readlink -e $(dirname ${0})/../../../dat/yodel)/20200917/vehicle.csv}
-OUTPUT=${2:-${HOME}/Desktop/Observations/Observation.json}
+OUTPUT=${2:-/var/www/html/tesoro/channel/observation.json}
+#OUTPUT=${2:-${HOME}/Desktop/Observations/Observation.json}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -15,4 +16,4 @@ mkdir -p $(dirname ${OUTPUT})
 
 rm -f ${OUTPUT}
 
-csvmeter < ${INPUT} | csv2dgm -F ${OUTPUT} -j
+csvmeter < ${INPUT} | csv2dgm -v -F ${OUTPUT} -M 0644 -j

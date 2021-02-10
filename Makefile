@@ -1,5 +1,5 @@
 # vi: set ts=4 shiftwidth=4:
-# Copyright 20172-2020 Digital Aggregates Corporation
+# Copyright 2012-2020 Digital Aggregates Corporation
 # author:Chip Overclock
 # mailto:coverclock@diag.com
 # https://github.com/coverclock/com-diag-hazer
