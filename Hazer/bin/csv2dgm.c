@@ -19,12 +19,12 @@
  *
  * USAGE
  * 
- * csv2dgm [ -d ] [ -v ]  [ -c | -j | -q | -s | -x | -y ] [ -F FILE ] [ -U HOST:PORT ]
+ * csv2dgm [ -d ] [ -v ]  [ -c | -j | -q | -s | -x | -y ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]
  *
  * EXAMPLE
  *
  * socat -u UDP6-RECV:8080 - &
- * csv2meter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -U localhost:8080 -F Observation.json -j
+ * csv2meter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -U localhost:8080 -F Observation.json -M 0644 -j
  *
  * REFERENCES
  *
@@ -55,6 +55,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 /*******************************************************************************
  * SYMBOLS
@@ -195,12 +196,14 @@ int main(int argc, char * argv[])
     int sock = -1;
     int rc = -1;
     int ii = -1;
+    mode_t mode = COM_DIAG_DIMINUTO_OBSERVATION_MODE;
     diminuto_ipc_endpoint_t endpoint = { 0, };
     char * endpointname = (char *)0;
     char * filename = (char *)0;
     char * token[23] = { 0, };
     char * here = (char *)0;
     char * temp = (char *)0;
+    char * end = (char *)0;
     const char * format = (const char *)0;
     FILE * fp = (FILE *)0;
     size_t length = 0;
@@ -233,34 +236,21 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "U:F:cdhjqsvxy")) >= 0) {
+        while ((opt = getopt(argc, argv, "F:M:U:cdhjqsvxy")) >= 0) {
             switch (opt) {
             case 'F':
                 filename = optarg;
-                if (strcmp(filename, "-") == 0) {
-                    fp = stdout;
-                } else if ((fp = diminuto_observation_create(filename, &temp)) == (FILE *)0) {
+                break;
+            case 'M':
+                mode = strtoul(optarg, &end, 0) & 0777;
+                if ((end == (char *)0) || (*end != '\0')) {
                     errno = EINVAL;
-                    diminuto_perror(filename);
+                    diminuto_perror(optarg);
                     error = !0;
-                } else {
-                    /* Do nothing. */
                 }
                 break;
             case 'U':
                 endpointname = optarg;
-                if (
-                        (diminuto_ipc_endpoint(endpointname, &endpoint) != 0) ||
-                        ((endpoint.type != DIMINUTO_IPC_TYPE_IPV4) &&
-                            (endpoint.type != DIMINUTO_IPC_TYPE_IPV6)) ||
-                        ((diminuto_ipc4_is_unspecified(&endpoint.ipv4) &&
-                            diminuto_ipc6_is_unspecified(&endpoint.ipv6))) ||
-                        (endpoint.udp == 0)
-                ) {
-                    errno = EINVAL;
-                    diminuto_perror(endpointname);
-                    error = !0;
-                }
                 break;
             case 'c':
                 type = CSV;
@@ -291,24 +281,42 @@ int main(int argc, char * argv[])
                 break;
             default:
             case '?':
-                fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -c | -h | -j | | -q | -s | -x | -y ] [ -F FILE ] [ -U HOST:PORT ]\n", program);
+                fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -c | -h | -j | | -q | -s | -x | -y ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]\n", program);
                 fprintf(stderr, "       -c              Emit CSV.\n");
-                fprintf(stderr, "       -d              Enable debug output\n");
+                fprintf(stderr, "       -d              Enable debug output.\n");
                 fprintf(stderr, "       -h              Emit HTML.\n");
                 fprintf(stderr, "       -j              Emit JSON.\n");
                 fprintf(stderr, "       -q              Emit URL Query.\n");
                 fprintf(stderr, "       -s              Emit Shell commands.\n");
-                fprintf(stderr, "       -v              Enable verbose output\n");
+                fprintf(stderr, "       -v              Enable verbose output.\n");
                 fprintf(stderr, "       -x              Emit XML.\n");
                 fprintf(stderr, "       -y              Emit YAML.\n");
-                fprintf(stderr, "       -F FILE         Save latest datagram in FILE\n");
-                fprintf(stderr, "       -U HOST:PORT    Forward datagrams to HOST:PORT\n");
+                fprintf(stderr, "       -F FILE         Save latest datagram in FILE.\n");
+                fprintf(stderr, "       -M MODE         Set FILE mode to MODE.\n");
+                fprintf(stderr, "       -U HOST:PORT    Forward datagrams to HOST:PORT.\n");
                 error = !0;
                 break;
             }
         }
 
         if (error) {
+            break;
+        }
+
+        if (endpointname == (char *)0) {
+            /* Do nothing. */
+        } else if (diminuto_ipc_endpoint(endpointname, &endpoint) != 0) {
+            diminuto_perror(endpointname);
+            break;
+        } else if (
+            ((endpoint.type != DIMINUTO_IPC_TYPE_IPV4) &&
+                (endpoint.type != DIMINUTO_IPC_TYPE_IPV6)) ||
+            ((diminuto_ipc4_is_unspecified(&endpoint.ipv4) &&
+                diminuto_ipc6_is_unspecified(&endpoint.ipv6))) ||
+            (endpoint.udp == 0)
+        ) {
+            errno = EINVAL;
+            diminuto_perror(endpointname);
             break;
         }
 
@@ -321,17 +329,26 @@ int main(int argc, char * argv[])
         } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
             fprintf (stderr, "%s: endpoint=\"%s\"=[%s]:%u\n", program, endpointname, diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)), endpoint.udp);
         } else {
-            fprintf (stderr, "%s: endpoint=\"%s\"\n", program, endpointname);
+            /* Do nothing. */
+        }
+
+        if (filename == (char *)0) {
+            /* Do nothing. */
+        } else if (strcmp(filename, "-") == 0) {
+            fp = stdout;
+        } else if ((fp = diminuto_observation_create_generic(filename, &temp, mode)) == (FILE *)0) {
+            diminuto_perror(filename);
+            break;
+        } else {
+            /* Do nothing. */
         }
 
         if (!debug) {
             /* Do nothing. */
         } else if (filename == (char *)0) {
             /* Do nothing. */
-        } else if (fp != (FILE *)0) {
-            fprintf(stderr, "%s: file=\"%s\" fd=%d\n", program, filename, fileno(fp));
         } else {
-            fprintf(stderr, "%s: file=\"%s\"\n", program, filename);
+            fprintf(stderr, "%s: file=\"%s\" mode=0%03o fd=%d\n", program, filename, mode, fileno(fp));
         }
  
         /*
@@ -601,7 +618,7 @@ int main(int argc, char * argv[])
                 /* Do nothing. */
             } else if ((fp = diminuto_observation_commit(fp, &temp)) != (FILE *)0) {
                 break;
-            } else if ((fp = diminuto_observation_create(filename, &temp)) == (FILE *)0) {
+            } else if ((fp = diminuto_observation_create_generic(filename, &temp, mode)) == (FILE *)0) {
                 break;
             } else {
                 /* Do nothing. */

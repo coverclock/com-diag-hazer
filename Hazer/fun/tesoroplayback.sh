@@ -16,4 +16,4 @@ mkdir -p $(dirname ${OUTPUT})
 
 rm -f ${OUTPUT}
 
-csvmeter < ${INPUT} | csv2dgm -F ${OUTPUT} -j
+csvmeter < ${INPUT} | csv2dgm -v -F ${OUTPUT} -j
