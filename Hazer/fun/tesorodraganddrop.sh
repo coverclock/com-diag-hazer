@@ -4,10 +4,9 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 
-
 PROGRAM=$(basename ${0})
 INPUT=${1:-$(readlink -e $(dirname ${0})/../../../dat/yodel)/20200917/vehicle.csv}
-OUTPUT=${2:-${HOME}/Desktop/Observations/Observation.json}
+OUTPUT=${2:-${TMPDIR:="/tmp"}/${PROGRAM}.json}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
