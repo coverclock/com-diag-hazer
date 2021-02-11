@@ -927,7 +927,7 @@ the libraries and binaries in the system directories.)
 
 # Directories
 
-* app - application source files. 
+* app - application source files (utilities that can be daemons). 
 * bin - utility source files.
 * cfg - configuration makefiles.
 * dat - data captured from Hazer, Yodel, and Tumbleweed tests (some in LFS).
@@ -959,9 +959,9 @@ the libraries and binaries in the system directories.)
 
 # Applications
 
-* gpstool - Hazer's multi purpose GNSS pocket tool.
-* osmtool - Tesoro's multipoint-to-multipoint OSM datagram forwarder.
-* rtktool - Tumbleweed's point-to-multipoint RTK datagram router.
+* dgmtool - Tesoro's multipoint-to-multipoint CSV UDP-to-TCP forwarder.
+* gpstool - Hazer's multi-purpose GNSS tool.
+* rtktool - Tumbleweed's point-to-multipoint RTK UDP-to-UDP router.
 
 # Utilities
 
