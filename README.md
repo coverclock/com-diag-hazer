@@ -106,13 +106,6 @@ use Diminuto in virtually all of my C-based projects, and sometimes in
 other languages too that support C-linkage.  Portions of Diminuto have
 also shipped in products from several of my clients.
 
-## Tesoro
-
-The Tesoro project, a work in progress, attempts to integrate Hazer
-with an OpenStreetMaps (OSM) tile server to create a moving map
-display. The osmtool in Hazer was developed to support this effort.
-Hazer has no dependency on Tesoro.
-
 ## Building
 
 These days most Linux distributions do not include the basic tools
@@ -228,6 +221,16 @@ as a non-root user is by adding that user to the '''dialout''' group.
 The user may have to log out and back in again to have this take effect.
 
     sudo adduser pi dialout
+
+# Reverse Dependencies
+
+## Tesoro
+
+The Tesoro project, a work in progress, attempts to integrate Hazer with
+an OpenStreetMaps (OSM) tile server to create a moving map display. The
+current design calls for Tesoro to draw its updates, either in real-time
+or from playback, from Hazer using tools like gpstool, dgmtool, csv2dgm,
+and csvmeter.
 
 # Versioning
 
