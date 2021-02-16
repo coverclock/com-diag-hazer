@@ -6,12 +6,8 @@
 
 PROGRAM=$(basename ${0})
 INPUT=${1:-$(readlink -e $(dirname ${0})/../../../dat/yodel)/20200917/vehicle.csv}
-OUTPUT=${2:-${TMPDIR:="/tmp"}/${PROGRAM}/observation.json}
+OUTPUT=${2:-"localhost:tesoro"}}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-mkdir -p $(dirname ${OUTPUT})
-
-rm -f ${OUTPUT}
-
-csvmeter < ${INPUT} | csv2dgm -v -F ${OUTPUT} -M 0644 -j
+csvmeter < ${INPUT} | csv2dgm -v -U ${OUTPUT} -j
