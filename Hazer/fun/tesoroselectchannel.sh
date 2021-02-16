@@ -6,7 +6,7 @@
 
 PROGRAM=$(basename ${0})
 INPUT=${1:-$(readlink -e $(dirname ${0})/../../../dat/yodel)/20200917/vehicle.csv}
-OUTPUT=${2:-"localhost:tesoro"}}
+OUTPUT=${2:-"localhost:tesoro"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
