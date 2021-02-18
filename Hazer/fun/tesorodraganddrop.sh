@@ -5,8 +5,9 @@
 # https://github.com/coverclock/com-diag-hazer
 
 PROGRAM=$(basename ${0})
-INPUT=${1:-$(readlink -e $(dirname ${0})/../../../dat/yodel)/20200917/vehicle.csv}
-OUTPUT=${2:-${TMPDIR:="/tmp"}/${PROGRAM}/observation.json}
+OUTPUT=${1:-${TMPDIR:="/tmp"}/${PROGRAM}/observation.json}
+INPUT=${2:-$(readlink -e $(dirname ${0})/../../../dat/yodel)/20200917/vehicle.csv}
+
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
