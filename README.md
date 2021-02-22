@@ -672,6 +672,10 @@ John Sloan, "Tumbleweed", album, <https://flic.kr/s/aHsmcdEgq6>
 
 John Sloan, "Yodel", album, <https://flic.kr/s/aHsmNDPmDN>
 
+John Sloan, "Tesoro", album, <https://flic.kr/s/aHsmTB3tme>
+
+John Sloan, "Screen Recording 2021 02 18 at 8 55 20 AM", video, <https://youtu.be/GjR7fPQRCZc>
+
 # References
 
 David Burggraf ed., "OGC KML 2.3", Open Geospatial Consortium, 2015-08-04
