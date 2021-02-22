@@ -640,6 +640,9 @@ Chip Overclock, "Headless", 2020-06,
 Chip Overclock, "Dead Reckoning", 2020-09,
 <https://coverclock.blogspot.com/2020/09/dead-reckoning.html>
 
+Chip Overclock, "A Moving Map Display Using OpenStreetMap", 2021-02,
+<https://coverclock.blogspot.com/2021/02/a-moving-map-display-using.html>
+
 # Media
 
 John Sloan, "Dead Reckoning", album, <https://flic.kr/s/aHsmPsGqjA>
