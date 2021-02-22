@@ -6,8 +6,8 @@
 # Plays back a CSV file at approximately the same
 # rate it was generated, converts it into Tesoro
 # JSON, and sends it to the specified endpoint.
-# usage: csvplayback CSVFILE ENDPOINT
-# example: csvplayback vehicle.csv channelhost:tesoro
+# usage: csvplayback ENDPOINT CSVFILE
+# example: csvplayback channelhost:tesoro vehicle.csv
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
