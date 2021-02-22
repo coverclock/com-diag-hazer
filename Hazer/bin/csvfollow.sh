@@ -6,13 +6,15 @@
 # Follows a CSV file as it is updated, converts
 # it line by line into Tesoro JSON, and sends it
 # to the specified endpoint.
-# usage: csvfollow CSVFILE ENDPOINT
-# example: csvfollow vehicle.csv channelhost:tesoro
+# usage: csvfollow ENDPOINT CSVFILE
+# example: csvfollow channelhost:tesoro vehicle.csv
+
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
 PROGRAM=$(basename ${0})
-INPUT=${1}
-OUTPUT=${2}
+OUTPUT=${1}
+INPUT=${2-"${SAVDIR}/vehicle.csv"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-tail -f ${INPUT} | csv2dgm -U ${OUTPUT} -j
+tail -n 0 -f ${INPUT} | csv2dgm -U ${OUTPUT} -j

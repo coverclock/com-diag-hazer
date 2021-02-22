@@ -9,9 +9,11 @@
 # usage: csvplayback CSVFILE ENDPOINT
 # example: csvplayback vehicle.csv channelhost:tesoro
 
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
+
 PROGRAM=$(basename ${0})
-INPUT=${1}
-OUTPUT=${2}
+OUTPUT=${1}
+INPUT=${2-"${SAVDIR}/vehicle.csv"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
