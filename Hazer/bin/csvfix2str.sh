@@ -4,6 +4,7 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Converts a fix type to a string.
+# usage: FIXSTRING=$(csvfix2str FIXNUMBER)
 
 FIX=${1:-""}
 TYPE="XX"

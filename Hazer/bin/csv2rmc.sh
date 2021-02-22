@@ -5,6 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # Filter that reads CSV and outputs NMEA RMC.
 # e.g. tail -f file.csv | csv2rmc | gpstool -E
+# usage: csv2rmc < CSVFILE > RMCFILE
 
 while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW RAC PAC YAC OBS MAC; do
 

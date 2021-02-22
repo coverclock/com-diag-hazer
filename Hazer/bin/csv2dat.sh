@@ -4,6 +4,7 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Similar to csv2tty but IMO better for post-processing analysis.
+# usage: csv2dat < CSVFILE
 
 while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW RAC PAC YAC OBS MAC; do
 

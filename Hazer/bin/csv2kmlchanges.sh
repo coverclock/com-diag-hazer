@@ -5,6 +5,7 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Create KML of points where position fix changes.
+# usage: csv2kmlchanges < CSVFILE > KMLFILECHANGES
 
 INIT=""
 FIX0=""

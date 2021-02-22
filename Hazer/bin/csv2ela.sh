@@ -5,7 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # Added a column with the local interarrival
 # time in seconds.
-#
+# usage: csv2ela < CSVFILE > CSVFILEWITHELAPSED
 
 PREVIOUS=0
 ELAPSED=0.0

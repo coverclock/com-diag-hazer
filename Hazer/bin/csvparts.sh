@@ -6,6 +6,7 @@
 # Split a potentially very large CSV file into many individual CSV
 # files stored in individual directories.
 # e.g. csvparts < file.csv
+# usage: csvparts < CSVFILE
 
 PROGRAM=$(basename ${0})
 MAXIMUM=${1:-3600}

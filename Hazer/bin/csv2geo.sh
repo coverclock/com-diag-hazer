@@ -5,6 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # Compute the horizontal geodesic difference and vertical difference between
 # successive points in the CSV file.
+# usage; csv2geo < CSVFILE > CSVFILEWITHDELTAS
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 

@@ -8,6 +8,7 @@
 #     <https://www.gpsvisualizer.com>.
 #     "OGC KML 2.3", 2015 <http://docs.opengeospatial.org/is/12-007r2/12-007r2.html>
 #     J. Wernecke, "The KML Handbook", Addison-Wesley, 2009
+# usage: csv2kmlpoints < CSVFILE > KMLFILEPOINTS
 
 INIT=""
 

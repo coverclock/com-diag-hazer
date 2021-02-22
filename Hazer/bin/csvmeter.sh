@@ -6,7 +6,7 @@
 # Meters CSV entries from stdin to stdout based
 # on the interarrival time between successive
 # lines.
-#
+# usage: csvmeter < CSVFILE | ...
 
 PREVIOUS=0
 

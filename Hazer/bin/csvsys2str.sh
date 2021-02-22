@@ -4,6 +4,7 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Converts a system number to a string.
+# usage: SYSTEMSTRING=$(csvsys2str SYSTEMNUMBER)
 
 SYS=${1:-""}
 SYSTEM="XX"

@@ -5,7 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # Added columns with tha local interarrival time
 # and its running average.
-#
+# usage: csv2avg < CSVFILE
 
 PREVIOUS=0
 ELAPSED=0.0

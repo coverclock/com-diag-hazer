@@ -6,6 +6,7 @@
 # Filter that reads CSV and outputs same with time converted to ISO8601.
 # This makes it easier for humans to pick out intervals of interest.
 # e.g. tail -f file.csv | csv2iso 
+# usage: csv2tty < CSVFILE
 
 while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW RAC PAC YAC OBS MAC; do
 
