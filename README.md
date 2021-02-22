@@ -993,9 +993,11 @@ the libraries and binaries in the system directories.)
 * csv2rmc - converts gpstool CSV file to NMEA RMC sentences.
 * csv2tty - converts gpstool CSV file to a (different) real-time readable output.
 * csv2dgm - forwards subset of gpstool CSV fields from stdin to a UDP port.
+* csvfollow - follow a CSV file in real-time, emit as JSON to a UDP endpoint.
 * csvlimits - determines boundary of solutions in a gpstool CSV file.
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvparts - splits gpstool CSV file into smaller files in subdirectories.
+* csvplayback - playback a stored CSV file, emit as JSON to a UDP endpoint.
 * out2kmlpoints - converts gpstool OUT files to KML 2.3 XML to visualize points.
 
 ## Moving Map (Hazer)
