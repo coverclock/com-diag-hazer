@@ -16,7 +16,7 @@
 
 DEVICE=${1:-"/dev/ttyUSB1"}
 SPEED=${2:-"4800"}
-PORT=${3:-"29470"}
+PORT=${3:-"hazer"}
 
 stty sane
 clear

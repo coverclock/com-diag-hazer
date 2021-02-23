@@ -1,3 +1,6 @@
-tesoro          22020/tcp                       # Tesoro sinks
-tesoro          22020/udp                       # Tesoro sources
-tumbleweed	21010/udp			# Tumbleweed RTK updates
+# http://www.diag.com
+# mailto:coverclock@diag.com
+tumbleweed	21010/udp			# Tumbleweed RTK source/sink
+tesoro          22020/tcp                       # Tesoro JSON source
+tesoro          22020/udp                       # Tesoro JSON sink
+hazer		29470/udp			# Hazer NMEA source/sink

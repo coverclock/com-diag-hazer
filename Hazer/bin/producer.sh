@@ -14,8 +14,8 @@
 
 DEVICE=${1:-"/dev/ttyUSB0"}
 SPEED=${2:-"4800"}
-HOST=${3:-"ip6-localhost"}
-PORT=${4:-"29470"}
+HOST=${3:-"localhost"}
+PORT=${4:-"hazer"}
 
 stty sane
 clear

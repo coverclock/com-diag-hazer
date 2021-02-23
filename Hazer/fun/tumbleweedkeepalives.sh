@@ -7,7 +7,7 @@
 # This script is specific to the Ardusimple SimpleRTK2B.
 
 PROGRAM=$(basename ${0})
-PORT=${1:-"21010"}
+PORT=${1:-"tumbleweed"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 

@@ -7,8 +7,8 @@
 # This script is specific to the Ardusimple SimpleRTK2B.
 
 PROGRAM=$(basename ${0})
-DATAGRAM=${1:-"localhost:29470"}
-SURVEYOR=${2:-"localhost:21010"}
+DATAGRAM=${1:-"localhost:hazer"}
+SURVEYOR=${2:-"localhost:tumbleweed"}
 DEVICE=${3:-"/dev/ttyACM0"}
 RATE=${4:-115200}
 

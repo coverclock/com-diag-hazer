@@ -10,7 +10,7 @@
 
 ROOT=$(dirname ${0})
 PROGRAM=$(basename ${0})
-PORT=${1:-"21010"}
+PORT=${1:-"tumbleweed"}
 
 . $(readlink -e ${ROOT}/../bin)/setup
 
