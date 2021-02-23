@@ -4,8 +4,9 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Run a GNSS receiver, saving its data, and forwarding JSON datagrams.
-# usage: tracker [ DEVICE [ RATE [ ENDPOINT [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ]
-# example: tracker /dev/ttyACM0 9600 hostname:tesoro
+# The DEVICE and RATE default to those of the BU-353S4 USB device.
+# usage: tracker [ ENDPOINT [ DEVICE [ RATE [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ]
+# example: tracker tumbleweed:tesoro /dev/ttyUSB0 4800
 
 ##
 ## SETUP
@@ -16,9 +17,9 @@ SELF=$$
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
 PROGRAM=$(basename ${0})
-DEVICE=${1:-"/dev/ttyACM0"}
-RATE=${2:-9600}
-ENDPOINT=${3:-"localhost:tesoro"}
+ENDPOINT=${1:-"tumbleweed:tesoro"}
+DEVICE=${2:-"/dev/ttyUSB0"}
+RATE=${3:-4800}
 ERRFIL=${4-"${SAVDIR}/${PROGRAM}.err"}
 OUTFIL=${5-"${SAVDIR}/${PROGRAM}.out"}
 CSVFIL=${6-"${SAVDIR}/${PROGRAM}.csv"}
@@ -51,9 +52,13 @@ sleep 5
 
 tail -n 0 -f ${CSVFIL} | csv2dgm -U ${ENDPOINT} -j &
 
+sleep 2
+
 ##
 ## OUTPUT DISPLAY
 ##
+
+cat ${ERRFIL}
 
 DIRECTORY=$(dirname ${CSVFIL})
 FILENAME=$(basename ${CSVFIL})
