@@ -5,6 +5,10 @@
 # https://github.com/coverclock/com-diag-hazer
 # Configure and run the U-blox NEO-M8U.
 
+##
+## SETUP
+##
+
 SELF=$$
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
@@ -19,11 +23,6 @@ CSVFIL=${5-"${SAVDIR}/${PROGRAM}.csv"}
 PIDFIL=${6-"${SAVDIR}/${PROGRAM}.pid"}
 LIMIT=${7:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
-DIRECTORY=$(dirname ${CSVFIL})
-FILENAME=$(basename ${CSVFIL})
-TASK=${FILENAME%%.*}
-FILE=${FILENAME#*.}
-
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
 mkdir -p $(dirname ${CSVFIL})
@@ -35,6 +34,10 @@ exec 2>>${ERRFIL}
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF} 2> /dev/null; exit 0" SIGINT SIGQUIT SIGTERM
+
+##
+## CAPTURE CSV GEOLOCATION
+##
 
 # NMEA-PUBX-POSITION
 # NMEA-PUBX-SVSTATUS
@@ -55,7 +58,7 @@ trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF} 2> /dev/null; exit 
 # UBX-CFG-TPS [0]
 # UBX-CFG-GNSS [0]
 
-coreable gpstool \
+gpstool \
 	-H ${OUTFIL} \
 	-t 10 \
 	-T ${CSVFIL} \
@@ -83,5 +86,22 @@ coreable gpstool \
 	< /dev/null 1> /dev/null &
 
 sleep 5
+
+##
+## OUTPUT DISPLAY
+##
+
+cat ${ERRFIL}
+
+DIRECTORY=$(dirname ${CSVFIL})
+FILENAME=$(basename ${CSVFIL})
+TASK=${FILENAME%%.*}
+FILE=${FILENAME#*.}
+
 peruse ${TASK} ${FILE} ${LIMIT} ${DIRECTORY} < /dev/null &
+
+##
+## INPUT KEYBOARD
+##
+
 hups $(cat ${PIDFIL})
