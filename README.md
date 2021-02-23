@@ -923,6 +923,19 @@ exact circumstances: the target system, the version of Linux it runs, etc.
 Some of the files under fs are new files in their entirety, some just contain
 lines that need to be added to the indicated files.
 
+Depending on what features of Hazer you choose to use, you will need
+to define some services in the /etc/services file. The port numbers are
+your choices to make. Note that the TCP and UDP port numbers for the same
+service (e.g.  tesoro) can be (and typically are) the same number. Port
+number values may range from 0 to 65353 and must be unique. Linux also
+assigns "ephemeral" or temporary port numbers which will not appear in
+the /etc/services file.
+
+    tumbleweed 22222/udp  # Tumbleweed RTK source/sink
+    tesoro     33333/tcp  # Tesoro JSON source
+    tesoro     33333/udp  # Tesoro JSON sink
+    hazer      44444/udp  # Hazer NMEA source/sink
+
 # Unit Tests
 
 Set up environment and run tests and utilities. (This establishes the paths
