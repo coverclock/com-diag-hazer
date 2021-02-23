@@ -1,0 +1,69 @@
+#!/bin/bash
+# Copyright 2021 Digital Aggregates Corporation, Colorado, USA
+# Licensed under the terms in LICENSE.txt
+# Chip Overclock <coverclock@diag.com>
+# https://github.com/coverclock/com-diag-hazer
+# Run a GNSS receiver, saving its data, and forwarding JSON datagrams.
+# usage: tracker [ DEVICE [ RATE [ ENDPOINT [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ]
+# example: tracker /dev/ttyACM0 9600 hostname:tesoro
+
+##
+## SETUP
+##
+
+SELF=$$
+
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
+
+PROGRAM=$(basename ${0})
+DEVICE=${1:-"/dev/ttyACM0"}
+RATE=${2:-9600}
+ENDPOINT=${3:-"localhost:tesoro"}
+ERRFIL=${4-"${SAVDIR}/${PROGRAM}.err"}
+OUTFIL=${5-"${SAVDIR}/${PROGRAM}.out"}
+CSVFIL=${6-"${SAVDIR}/${PROGRAM}.csv"}
+PIDFIL=${7-"${SAVDIR}/${PROGRAM}.pid"}
+LIMIT=${8:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+
+mkdir -p $(dirname ${ERRFIL})
+mkdir -p $(dirname ${OUTFIL})
+mkdir -p $(dirname ${CSVFIL})
+mkdir -p $(dirname ${PIDFIL})
+
+cp /dev/null ${ERRFIL}
+exec 2>>${ERRFIL}
+
+. $(readlink -e $(dirname ${0})/../bin)/setup
+
+trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF} 2> /dev/null; exit 0" SIGINT SIGQUIT SIGTERM
+
+##
+## CAPTURE CSV GEOLOCATION
+##
+
+gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${OUTFIL} -t 10 -T ${CSVFIL} -O ${PIDFIL} < /dev/null 1> /dev/null &
+
+sleep 5
+
+##
+## FORWARD JSON DATAGRAMS
+##
+
+tail -n 0 -f ${CSVFIL} | csv2dgm -U ${ENDPOINT} -j &
+
+##
+## OUTPUT DISPLAY
+##
+
+DIRECTORY=$(dirname ${CSVFIL})
+FILENAME=$(basename ${CSVFIL})
+TASK=${FILENAME%%.*}
+FILE=${FILENAME#*.}
+
+peruse ${TASK} ${FILE} ${LIMIT} ${DIRECTORY} < /dev/null &
+
+##
+## INPUT KEYBOARD
+##
+
+hups $(cat ${PIDFIL})
