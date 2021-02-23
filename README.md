@@ -926,7 +926,7 @@ lines that need to be added to the indicated files.
 Depending on what features of Hazer you choose to use, you will need
 to define some services in the /etc/services file. The port numbers are
 your choices to make. Note that the TCP and UDP port numbers for the same
-service (e.g.  tesoro) can be (and typically are) the same number. Port
+service (e.g. tesoro) can be (and typically are) the same number. Port
 number values may range from 0 to 65353 and must be unique. Linux also
 assigns "ephemeral" or temporary port numbers which will not appear in
 the /etc/services file.
@@ -994,6 +994,7 @@ the libraries and binaries in the system directories.)
 * bucketbrigade - read from a serial port and forward to another serial port.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * compasstool - converts a bearing in decimal degrees to an 8, 16, or 32 compass point.
+* csv2dgm - forwards subset of gpstool CSV fields from stdin to a UDP port.
 * geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
@@ -1007,25 +1008,31 @@ the libraries and binaries in the system directories.)
 * csv2dat - converts gpstool CSV file to a real-time readable output.
 * csv2geo - appends geodesic and altitude differences to gpstool CSV file.
 * csv2iso - converts times in gpstool CSV file into ISO8601-ish timestamps.
-* csv2kml - converts gpstool CSV file to KML 2.3 XML to visualize a line.
-* csv2kmlchanges - converts gpstool CSV file to KML 2.3 XML to visualize fix changes.
-* csv2kmlpoints - converts gpstool CSV file to KML 2.3 XML to visualize points.
 * csv2rmc - converts gpstool CSV file to NMEA RMC sentences.
 * csv2tty - converts gpstool CSV file to a (different) real-time readable output.
-* csv2dgm - forwards subset of gpstool CSV fields from stdin to a UDP port.
-* csvfollow - follow a CSV file in real-time, emit as JSON to a UDP endpoint.
 * csvlimits - determines boundary of solutions in a gpstool CSV file.
-* csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvparts - splits gpstool CSV file into smaller files in subdirectories.
-* csvplayback - playback a stored CSV file, emit as JSON to a UDP endpoint.
-* out2kmlpoints - converts gpstool OUT files to KML 2.3 XML to visualize points.
 
-## Moving Map (Hazer)
+## Google Maps Moving Map (OBSOLETE)
 
 * client - runs Google Maps API in Firefox browser under MacOS.
 * consumer - consumes datagrams and reports on stdout.
 * producer - consumes data from serial port and forwards as datagrams.
 * provider - consumes datagrams and forwards to serial port.
+
+## Google Earth Keyhole Markup Language (KML)
+
+* csv2kml - converts gpstool CSV file to KML 2.3 XML to visualize a line.
+* csv2kmlchanges - converts gpstool CSV file to KML 2.3 XML to visualize fix changes.
+* csv2kmlpoints - converts gpstool CSV file to KML 2.3 XML to visualize points.
+* out2kmlpoints - converts gpstool OUT files to KML 2.3 XML to visualize points.
+
+## OpenStreetMap Moving Map (Tesoro)
+
+* csvfollow - follow a CSV file in real-time, forward as JSON to a UDP endpoint.
+* csvmeter - meters lines from a gpstool CSV file based on interarrival times.
+* csvplayback - playback a stored CSV file, forward JSON to a UDP endpoint.
+* tracker - run gpstool, capture CSV, forward JSON to a UDP endpoint.
 
 ## Differential GNSS (Tumbleweed)
 
@@ -1085,6 +1092,9 @@ the libraries and binaries in the system directories.)
 * sirfstar4 - exercises any SiRF Star 4 device.
 * source - send UDP packets to the sink.
 * talkers - processes a file of synthetic input.
+* tesorochoosefile - emit CSV output to an observation file for Tesoro.
+* tesorodraganddrop - emit CSV output to an observation file for Tesoro.
+* tesoroselectchannel - emit CSV output to a UDP endpoint for Tesoro.
 * tumbleweedkeepalives - serves as a Tumbleweed keepalive sink.
 * tumbleweedpi - Another Tumbleweed functional test.
 * tumbleweedremote - serves as a Tumbleweed RTCM sink.
