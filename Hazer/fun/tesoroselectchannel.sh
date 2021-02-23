@@ -3,6 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# Meter out a CSV file and forward it to a UDP endpoint.
 
 PROGRAM=$(basename ${0})
 OUTPUT=${1:-"localhost:tesoro"}

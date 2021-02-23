@@ -3,6 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# Meter out a CSV file and forward it to an observation file.
 
 PROGRAM=$(basename ${0})
 OUTPUT=${1:-${TMPDIR:="/tmp"}/${PROGRAM}/observation.json}
