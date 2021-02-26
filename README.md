@@ -948,6 +948,19 @@ the libraries and binaries in the system directories.)
     gpstool -?
     rtktool -?
 
+# Administration
+
+Most Linux distros will require the program accessing the GPS/GNSS
+device to either have root privileges or be in the "dialout" group.
+The latter is of course preferred.
+
+    sudo usermod -a -G dialout ${USER}
+
+${USER} will need to log out and back in for this to take effect.
+
+It is also possible to edit the udev rules to make the device
+readable and writeable by the ${USER} (okay) or anyone (nope).
+
 # Directories
 
 * app - application source files (utilities that can be daemons). 

@@ -3,7 +3,9 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the U-blox NEO-M8U.
+# Configure and run the U-blox NEO-M8U, collecting the
+# CSV dataset, and emitting just one line of output
+# per interval.
 
 ##
 ## SETUP
@@ -29,6 +31,9 @@ mkdir -p $(dirname ${CSVFIL})
 mkdir -p $(dirname ${PIDFIL})
 
 cp /dev/null ${ERRFIL}
+cp /dev/null ${OUTFIL}
+cp /dev/null ${CSVFIL}
+
 exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup

@@ -32,11 +32,20 @@ mkdir -p $(dirname ${CSVFIL})
 mkdir -p $(dirname ${PIDFIL})
 
 cp /dev/null ${ERRFIL}
+cp /dev/null ${OUTFIL}
+cp /dev/null ${CSVFIL}
+
 exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF} 2> /dev/null; exit 0" SIGINT SIGQUIT SIGTERM
+
+##
+## FORWARD JSON DATAGRAMS
+##
+
+tail -n 0 -f ${CSVFIL} | csv2dgm -U ${ENDPOINT} -j &
 
 ##
 ## CAPTURE CSV GEOLOCATION
@@ -45,14 +54,6 @@ trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF} 2> /dev/null; exit 
 gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${OUTFIL} -t 10 -T ${CSVFIL} -O ${PIDFIL} < /dev/null 1> /dev/null &
 
 sleep 5
-
-##
-## FORWARD JSON DATAGRAMS
-##
-
-tail -n 0 -f ${CSVFIL} | csv2dgm -U ${ENDPOINT} -j &
-
-sleep 2
 
 ##
 ## OUTPUT DISPLAY
