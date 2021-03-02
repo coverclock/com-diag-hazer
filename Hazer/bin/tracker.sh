@@ -5,8 +5,8 @@
 # https://github.com/coverclock/com-diag-hazer
 # Run a GNSS receiver, saving its data, and forwarding JSON datagrams.
 # The DEVICE and RATE default to those of the BU-353S4 USB device.
-# usage: witness [ ENDPOINT [ DEVICE [ RATE [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ]
-# example: witness tumbleweed:tesoro /dev/ttyUSB0 4800
+# usage: tracker [ ENDPOINT [ DEVICE [ RATE [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ]
+# example: tracker tumbleweed:tesoro /dev/ttyUSB0 4800
 
 ##
 ## SETUP
