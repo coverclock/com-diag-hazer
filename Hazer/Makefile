@@ -118,6 +118,8 @@ SO					:=	so
 
 A2SOARCH			:=	-shared -Wl,-soname,lib$(PROJECT).$(SO).$(MAJOR).$(MINOR)
 
+MODE				:= 755
+
 ########## Configuration Makefile
 
 TARGETMAKEFILE		:= $(CFG_DIR)/$(TARGET).mk
@@ -522,7 +524,7 @@ $(OUT)/$(BIN_DIR)/generate:	Makefile
 	echo 'echo export PATH=\\$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../$(APP_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(BIN_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(TST_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(FUN_DIR)' >> $@
 	echo 'echo export LD_LIBRARY_PATH=\\$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../$(LIB_DIR)' >> $@
 	echo 'echo . $(DIMINUTO_ROOT)/$(OUT)/$(BIN_DIR)/setup' >> $@
-	chmod 755 $@
+	chmod $(MODE) $@
 
 # For generating a setup script for a bash shell (for example, "bash generate > setup").
 # (Because the Android bash doesn't seem to implement BASH_ARGV.)
@@ -532,7 +534,7 @@ $(OUT)/$(SYM_DIR)/generate:	Makefile
 	echo 'echo export PATH=\\$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../$(APP_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(SYM_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(BIN_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(TST_DIR):$$COM_DIAG_$(SYMBOL)_ROOT/../$(FUN_DIR)' >> $@
 	echo 'echo export LD_LIBRARY_PATH=\\$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../$(LIB_DIR)' >> $@
 	echo 'echo . $(DIMINUTO_ROOT)/$(OUT)/$(SYM_DIR)/setup' >> $@
-	chmod 755 $@
+	chmod $(MODE) $@
 
 # For sourcing into a bash shell (for example, ". out/host/bin/setup").
 $(OUT)/$(BIN_DIR)/setup:	$(OUT)/$(BIN_DIR)/generate
@@ -631,12 +633,12 @@ $(OUT)/$(OBC_DIR)/%.o:	%.c $(TARGETSYNTHESIZED)
 $(OUT)/%:	%.sh
 	D=`dirname $@`; mkdir -p $$D
 	cp $< $@
-	chmod 755 $@
+	chmod $(MODE) $@
 
 $(OUT)/%.awk:	%.awk
 	D=`dirname $@`; mkdir -p $$D
 	cp $< $@
-	chmod 755 $@
+	chmod $(MODE) $@
 
 .SECONDARY:
 
