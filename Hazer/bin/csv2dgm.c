@@ -163,6 +163,11 @@ static const char FORMAT_DEFAULT[] =
  * HELPERS
  ******************************************************************************/
 
+/**
+ * Return true if the argument string is numeric.
+ * @param points to the argument string.
+ * @return true if numeric, false otherwise.
+ */
 static int numeric(const char * str)
 {
     char * end = (char *)0;
@@ -173,6 +178,25 @@ static int numeric(const char * str)
     return ((*str != '\0') && (errno == 0) && (end != (char *)0) && (*end == '\0'));
 }
 
+/**
+ * Change the coding of an empty CSV field from "0." to "0" for those
+ * output formats that have issues with "0.". I'm lookin' at you, JSON.
+ * @param str is a pointer to the input string.
+ * @return pointer to the output string which may be str or a constant.
+ */
+static char * empty(char * str)
+{
+    return ((strcmp(str, "0.") == 0) ? "0" : str);
+}
+
+/**
+ * Expand special characters into C=style escape sequences (for display).
+ * @param to points to the destination buffer.
+ * @param from points to the source buffer.
+ * @param tsize is the size of the destination buffer in bytes.
+ * @param fsize is the size of the source buffer in bytes.
+ * @return a pointer to the start of the destination buffer.
+ */
 static const char * expand(char * to, const char * from, size_t tsize, size_t fsize)
 {
     (void)diminuto_escape_expand(to, from, tsize, fsize, "\"");
@@ -192,6 +216,7 @@ int main(int argc, char * argv[])
     int opt = -1;
     int error = 0;
     int debug = 0;
+    int unempty = 0;
     int verbose = 0;
     int sock = -1;
     int rc = -1;
@@ -263,6 +288,7 @@ int main(int argc, char * argv[])
                 break;
             case 'j':
                 type = JSON;
+                unempty = !0;
                 break;
             case 'q':
                 type = QUERY;
@@ -568,6 +594,19 @@ int main(int argc, char * argv[])
                 errno = EINVAL;
                 diminuto_perror(token[TIM]);
                 continue;
+            }
+
+            /*
+             * If the chosen output format has issues with "0." (JSON!),
+             * change it to something that's more palatoble. "0." is a
+             * special coding in Hazer gpstool for numeric fields that
+             * are empty, versus fields that are legitimately zero.
+             */
+
+            if (unempty) {
+                token[LAT] = empty(token[LAT]);
+                token[LON] = empty(token[LON]);
+                token[MSL] = empty(token[MSL]);
             }
 
             /*
