@@ -658,6 +658,9 @@ Chip Overclock, "A Moving Map Display Using OpenStreetMap", 2021-02,
 Chip Overclock, "The OpenStreetMap Moving Map In Real-Time", 2021-02,
 <https://coverclock.blogspot.com/2021/02/the-openstreetmap-moving-map-in-real.html>
 
+Chip Overclock, "The OpenStreetMap Moving Map On Mobile Devices", 2021-03,
+<https://coverclock.blogspot.com/2021/03/the-openstreetmap-moving-map-on-mobile.html>
+
 # Media
 
 John Sloan, "Dead Reckoning", album, <https://flic.kr/s/aHsmPsGqjA>
