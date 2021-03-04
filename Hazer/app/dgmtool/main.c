@@ -29,9 +29,9 @@
  * EXAMPLES
  *
  * export COM_DIAG_DIMINUTO_LOG_MASK=0xff
- * dgmtool -U :22020 -T :22020 -F Observation.txt  &
- * csvmeter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -j -U localhost:22020 &
- * socat TCP:localhost:22020 -
+ * dgmtool -U :tesoro -T :tesoro -F Observation.txt  &
+ * csvmeter < ./dat/yodel/20200903/vehicle.csv | csv2dgm -j -U localhost:tesoro &
+ * socat TCP:localhost:tesoro -
  */
 
 #include "com/diag/diminuto/diminuto_assert.h"
