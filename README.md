@@ -379,7 +379,7 @@ used by GPS devices.
 
 Hazer has been successfully tested with the following GPS devices.
 
-* Adafruit Ultimate GPS (MediaTek/MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [12]    
+* Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [12]    
 * Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
 * Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [9]    
@@ -389,7 +389,6 @@ Hazer has been successfully tested with the following GPS devices.
 * GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]    
 * GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [1] [2] [4] [8]    
 * GlobalSat ND-105C (SiRF Star III+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
-* GlobalTop (Work In Progress)
 * Jackson Labs Technologies CSAC GPSDO (U-Blox 6/UBX-LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
 * MakerFocus USB-Port-GPS (Quectel L80-R+Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2] [6]    
 * NaviSys GR-701W (U-Blox 7+Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
