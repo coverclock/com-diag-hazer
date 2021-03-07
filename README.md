@@ -676,8 +676,7 @@ John Sloan, "GPS Receiver Gallery", album, <https://flic.kr/s/aHsmvoXqSH>
 
 John Sloan, "Hazer", album, <https://flic.kr/s/aHskRMLrx7>
 
-John Sloan, "Hazer Test 2017-02-15 15:45 UTC", video,
-<https://youtu.be/UluGfpqpiQw>
+John Sloan, "Hazer Test 2017-02-15 15:45 UTC", video, <https://youtu.be/UluGfpqpiQw>
 
 John Sloan, "NGS AA7126", album, <https://flic.kr/s/aHsmEnM8We>
 
@@ -698,6 +697,8 @@ John Sloan, "Yodel", album, <https://flic.kr/s/aHsmNDPmDN>
 John Sloan, "Tesoro", album, <https://flic.kr/s/aHsmTB3tme>
 
 John Sloan, "Screen Recording 2021 02 18 at 8 55 20 AM", video, <https://youtu.be/GjR7fPQRCZc>
+
+John Sloan, "Screen Recording 2021 02 24 at 10 06 20 AM", video, <https://youtu.be/-6p3w1SxW1A>
 
 # References
 
