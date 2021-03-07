@@ -288,6 +288,11 @@ Hazer recognizes the following received NMEA sentences.
 * TXT - Text Transmission (NMEA 0183 Version 4.10 p. 124)
 * VTG - Course Over Ground & Ground Speed (NMEA 0183 Version 4.10 p. 127)
 
+Hazer treats the following proprietary NMEA-format sentences as special cases.
+
+* PMTK - emitted and/or accepted by some GTop/MTK devices.
+* PUBX - emitted and/or accepted by some u-blox devices.
+
 Yodel recognizes the following received UBX messages.
 
 * UBX-ACK-ACK - Acknowledge UBX input and indicate success. (u-blox 9 p. 38)
@@ -718,8 +723,13 @@ Navigation, and Integration*, Wiley, 2013
 
 GIS Geography, "Geodetic Datums: NAD 27, NAD 83 and WGS 84", 2019-03-04
 
+GPS NAVSTAR, "Global Positioning System Standard Positioning Service Signal
+Specification", 2nd Edition, 1995-06-02
+
 John G. Grimes et al., *Global Position System Standard Positioning Service
 Performance Standard*, 4th edition, 2008-09
+
+GTop, "PMTK command packet", Revision A11, GlobalTop, 2012
 
 IGS et al., "RINEX - The Receiver Independent Exchange Format", Version 3.03,
 RTCM-SC104, 2015-07-14
@@ -729,9 +739,6 @@ House, 1996
 
 Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
 2013-01, 87.1, pp. 43..55
-
-GPS NAVSTAR, "Global Positioning System Standard Positioning Service Signal
-Specification", 2nd Edition, 1995-06-02
 
 Greg Milner, *Pinpoint: How GPS is Changing Technology, Culture, and Our Minds*,
 W. W. Norton, 2017-05-16
