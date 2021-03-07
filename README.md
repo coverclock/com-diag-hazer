@@ -358,7 +358,7 @@ never been exercised using actual GPS receivers.
 
 Hazer has been successfully tested with the following GPS chipsets.
 
-* MediaTek MTK3339    
+* MediaTek MTK3339 (with CR1220 3V)    
 * Quectel L80-R    
 * SiRF Star II    
 * SiRF Star III    
@@ -379,7 +379,7 @@ used by GPS devices.
 
 Hazer has been successfully tested with the following GPS devices.
 
-* Adafruit Ultimate GPS (MediaTek, MTK3339, 9600 8N1, v10c4pea60, ttyUSB, 1-10Hz)    
+* Adafruit Ultimate GPS (MediaTek, MTK3339, 9600 8N1, v10c4pea60, ttyUSB, 1/15Hz)    
 * Ardusimple SimpleRTK2B (U-Blox 9, UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
 * Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [9]    
