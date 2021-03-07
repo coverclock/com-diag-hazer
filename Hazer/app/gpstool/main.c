@@ -2018,6 +2018,8 @@ int main(int argc, char * argv[])
              * As a special case, if we receive an update on active satellites
              * or satellites in view from something we don't recognize, then
              * we have a new GNSS that isn't supported. That's worth noting.
+             * Two other special cases: PUBX (u-blox) and PMTK (Gtop/MTK)
+             * proprietary messages that are encoded like NMEA sentences.
              */
 
             if (count < 1) {
@@ -2029,7 +2031,16 @@ int main(int argc, char * argv[])
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
                     DIMINUTO_LOG_WARNING("Parse NMEA Talker Other \"%c%c\"", vector[0][1], vector[0][2]);
                 }
+                continue;
 
+            } else if (talker == HAZER_TALKER_PUBX) {
+
+                DIMINUTO_LOG_INFORMATION("Parse NMEA PUBX \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
+                continue;
+
+            } else if (talker == HAZER_TALKER_PMTK) {
+
+                DIMINUTO_LOG_INFORMATION("Parse NMEA PMTK \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
                 continue;
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
@@ -2037,7 +2048,6 @@ int main(int argc, char * argv[])
                 if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
                     DIMINUTO_LOG_WARNING("Parse NMEA System Other \"%c%c\"\n", vector[0][1], vector[0][2]);
                 }
-
                 continue;
 
             } else {

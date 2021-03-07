@@ -75,6 +75,8 @@
  *
  * "Dilution of Precision", Wikipedia,
  * https://en.wikipedia.org/wiki/Dilution_of_precision_(navigation), 2018-08-03
+ *
+ * Gtop, "PMTK command reference", GlobalTop Tech Inc., 2012
  */
 
 #include <stdio.h>
@@ -226,6 +228,7 @@ typedef enum HazerTalker {
     HAZER_TALKER_INSTRUMENTATION,
     HAZER_TALKER_NAVIGATION,
     HAZER_TALKER_LORANC,
+    HAZER_TALKER_PMTK,
     HAZER_TALKER_PUBX,
     HAZER_TALKER_QZSS,
     HAZER_TALKER_RADIO,
@@ -251,6 +254,7 @@ typedef enum HazerTalker {
         "II", \
         "IN", \
         "LC", \
+        "PMTK", \
         "PUBX", \
         "QZ", \
         "ZV", \
@@ -715,6 +719,12 @@ extern uint16_t hazer_parse_dop(const char * string);
  * ublox7 Protocol Reference, p. vi, PUBX
  */
 #define HAZER_PROPRIETARY_SENTENCE_PUBX "PUBX"
+
+/**
+ * @def HAZER_PROPRIETARY_SENTENCE_PMTK
+ * GTop PMTK command packet reference
+ */
+#define HAZER_PROPRIETARY_SENTENCE_PMTK "PMTK"
 
 /*******************************************************************************
  * DETERMINING TALKER
