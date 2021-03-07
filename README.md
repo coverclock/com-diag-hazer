@@ -288,7 +288,7 @@ Hazer recognizes the following received NMEA sentences.
 * TXT - Text Transmission (NMEA 0183 Version 4.10 p. 124)
 * VTG - Course Over Ground & Ground Speed (NMEA 0183 Version 4.10 p. 127)
 
-Hazer treats the following proprietary NMEA-format sentences as special cases.
+Hazer treats the following proprietary NMEA-style sentences as special cases.
 
 * PMTK - emitted and/or accepted by some GTop/MTK devices.
 * PUBX - emitted and/or accepted by some u-blox devices.
