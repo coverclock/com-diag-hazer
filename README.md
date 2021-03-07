@@ -420,8 +420,8 @@ Footnotes:
 [8] Supports UBX.    
 [9] A software defined radio (SDR).    
 [10] Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* COMPASS (China) concurrently.    
-[11] Has integrated Inertial Measurement Unit (IMU).
-[12] Equipped with a CR1220 3V button cell.
+[11] Has integrated Inertial Measurement Unit (IMU).    
+[12] Equipped with a CR1220 3V button cell.    
 
 Notes:
 
