@@ -1113,6 +1113,8 @@ readable and writeable by the ${USER} (okay) or anyone (nope).
 * makerfocus - exercises the MakerFocus GPS board.
 * makerfocuspps - exercises the MakerFocus GPS board and its 1PPS output.
 * neom8npps - exercises the SparkFun NEO-M8N board and its 1PPS output.
+* neom8u - exercises the SparkFun GPS Deadreckoning board.
+* pmtk - exercises the Adafruit Ultimate GPS board.
 * simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
 * simplertk2b - exercises the Ardusimple SimpleRTK2B board.
 * simplertk2bquery - queries the configuration of an Ardusimple SimpleRTK2B board.
