@@ -358,7 +358,7 @@ never been exercised using actual GPS receivers.
 
 Hazer has been successfully tested with the following GPS chipsets.
 
-* MediaTek MTK3339 (with CR1220 3V)    
+* MediaTek MTK3339    
 * Quectel L80-R    
 * SiRF Star II    
 * SiRF Star III    
@@ -374,35 +374,35 @@ used by GPS devices.
 * Cygnal Integrated Products    
 * FTDI    
 * Prolific    
-* Silicon Labs CP2104 (on the Adafruit Ultimate GPS)    
+* Silicon Labs CP2104    
 * U-Blox (apparently integrated into the GPS chip itself)    
 
 Hazer has been successfully tested with the following GPS devices.
 
-* Adafruit Ultimate GPS (MediaTek, MTK3339, 9600 8N1, v10c4pea60, ttyUSB, 1/15Hz)    
-* Ardusimple SimpleRTK2B (U-Blox 9, UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
+* Adafruit Ultimate GPS (MediaTek/MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [12]    
+* Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
 * Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [9]    
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
-* GlobalSat BU-353S4-5Hz (SiRF Star IV/Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
-* GlobalSat BU-353S4 (SiRF Star IV/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]    
-* GlobalSat BU-353W10 (U-Blox 8, UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [1] [2] [4] [8]    
-* GlobalSat ND-105C (SiRF Star III/Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
+* GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
+* GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]    
+* GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [1] [2] [4] [8]    
+* GlobalSat ND-105C (SiRF Star III+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * GlobalTop (Work In Progress)
-* Jackson Labs Technologies CSAC GPSDO (U-Blox UBX-LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
-* MakerFocus USB-Port-GPS (Quectel L80-R/Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2] [6]    
-* NaviSys GR-701W (U-Blox 7/Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
-* Pharos GPS-360 (SiRF Star II/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
-* Pharos GPS-500 (SiRF Star III/Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
+* Jackson Labs Technologies CSAC GPSDO (U-Blox 6/UBX-LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
+* MakerFocus USB-Port-GPS (Quectel L80-R+Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2] [6]    
+* NaviSys GR-701W (U-Blox 7+Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
+* Pharos GPS-360 (SiRF Star II+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
+* Pharos GPS-500 (SiRF Star III+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
 * Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]    
-* SparkFun GPS Dead Reckoning gen 8 (U-Blox 8, UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [11]
-* SparkFun GPS NEO-M8N (U-Blox 8, UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [8] [10]
-* SparkFun GPS-RTK2 (U-Blox 9, UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
-* SparkFun GPS Dead Reckoning gen 9 (U-Blox 9, UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]
+* SparkFun GPS Dead Reckoning gen 8 (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [11]
+* SparkFun GPS NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [8] [10]
+* SparkFun GPS-RTK2 (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
+* SparkFun GPS Dead Reckoning gen 9 (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]
 * Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
-* TOPGNSS GN-803G (U-Blox 8, UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
-* Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8, M8, 9600 8n1, N/A, ttyAMA, 1Hz) [4]    
+* TOPGNSS GN-803G (U-Blox 8/UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
+* Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8n1, N/A, ttyAMA, 1Hz) [4]    
 
 Footnotes:
 
@@ -417,6 +417,7 @@ Footnotes:
 [9] A software defined radio (SDR).    
 [10] Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* COMPASS (China) concurrently.    
 [11] Has integrated Inertial Measurement Unit (IMU).
+[12] Equipped with a CR1220 3V button cell.
 
 Notes:
 
