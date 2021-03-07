@@ -2033,14 +2033,9 @@ int main(int argc, char * argv[])
                 }
                 continue;
 
-            } else if (talker == HAZER_TALKER_PUBX) {
+            } else if ((talker == HAZER_TALKER_PUBX) || (talker == HAZER_TALKER_PMTK)) {
 
-                DIMINUTO_LOG_INFORMATION("Parse NMEA PUBX \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
-                continue;
-
-            } else if (talker == HAZER_TALKER_PMTK) {
-
-                DIMINUTO_LOG_INFORMATION("Parse NMEA PMTK \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
+                DIMINUTO_LOG_INFORMATION("Parse NMEA %s \"%.*s\"", HAZER_TALKER_NAME[talker], length - 2 /* Exclude CR and LF. */, buffer);
                 continue;
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
