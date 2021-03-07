@@ -717,6 +717,9 @@ Integration, 2013-09-24
 Dane E. Ericksen, "NAD 83: What Is It And Why You Should Care",
 *1994 SBE National Convention and World Media Expo*, 1994
 
+Amy Fox, "Precision Matters: The Critical Importance of Decimal Places",
+blis.com, 2017-07-09
+
 Geocaching.com, "Benchmark Hunting", 2019-09-16
 
 Mohinder S. Gerwal et al., *Global Navigation Satellite Systems, Inertial
@@ -2792,6 +2795,21 @@ I was surprised to find it called out a twelve byte memory leak in the
 C library's locale handling, which gpstool requires to correctly display
 Unicode symbols like the degree symbol. Perhaps this will be fixed in a
 future GNU update (or it's a bug in my code that I can't see).
+
+## Decimal Places
+
+* 0 - 1.0 - 111 km - country
+* 1 - 0.1 - 11.1 km - city
+* 2 - 0.01 - 1.11 km - village
+* 3 - 0.001 - 111 m - neighborhood
+* 4 - 0.0001 - 11.1 m - street
+* 5 - 0.00001 - 1.11 m - tree
+* 6 - 0.000001 - 11.1 cm - surveying
+* 7 - 0.0000001 - 1.11 cm - precision surveying
+* 8 - 0.00000001 - 1.11 mm - tectonic plate movement
+* 9 - 0.000000001 - 111 um - microscopy
+
+[A. Fox, blis.com, 2017-07-09]
 
 # Acknowledgements
 
