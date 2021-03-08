@@ -19,7 +19,7 @@
  *
  * USAGE
  * 
- * csv2dgm [ -d ] [ -v ]  [ -c | -j | -q | -s | -x | -y ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]
+ * csv2dgm [ -d ] [ -v ] [ -o ] [ -c | -j | -q | -s | -x | -y ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]
  *
  * EXAMPLE
  *
@@ -218,6 +218,7 @@ int main(int argc, char * argv[])
     int debug = 0;
     int unempty = 0;
     int verbose = 0;
+    int out = 0;
     int sock = -1;
     int rc = -1;
     int ii = -1;
@@ -261,7 +262,7 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "F:M:U:cdhjqsvxy")) >= 0) {
+        while ((opt = getopt(argc, argv, "F:M:U:cdhjoqsvxy")) >= 0) {
             switch (opt) {
             case 'F':
                 filename = optarg;
@@ -290,6 +291,9 @@ int main(int argc, char * argv[])
                 type = JSON;
                 unempty = !0;
                 break;
+            case 'o':
+                out = !0;
+                break;
             case 'q':
                 type = QUERY;
                 break;
@@ -312,6 +316,7 @@ int main(int argc, char * argv[])
                 fprintf(stderr, "       -d              Enable debug output.\n");
                 fprintf(stderr, "       -h              Emit HTML.\n");
                 fprintf(stderr, "       -j              Emit JSON.\n");
+                fprintf(stderr, "       -o              Write to standard output.\n");
                 fprintf(stderr, "       -q              Emit URL Query.\n");
                 fprintf(stderr, "       -s              Emit Shell commands.\n");
                 fprintf(stderr, "       -v              Enable verbose output.\n");
@@ -643,7 +648,7 @@ int main(int argc, char * argv[])
             }
 
             /*
-             * Write the output line to the file.
+             * Write the output line to the observation file.
              */
 
             if (fp != (FILE *)0) {
@@ -661,6 +666,14 @@ int main(int argc, char * argv[])
                 break;
             } else {
                 /* Do nothing. */
+            }
+
+            /*
+             * Write the output line to standard output.
+             */
+
+            if (out) {
+                fputs(output, stdout);
             }
 
         }
