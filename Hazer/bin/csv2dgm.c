@@ -648,7 +648,7 @@ int main(int argc, char * argv[])
             }
 
             /*
-             * Write the output line to the observation file.
+             * Write the output line to the observation file and commit it.
              */
 
             if (fp != (FILE *)0) {
@@ -674,6 +674,7 @@ int main(int argc, char * argv[])
 
             if (out) {
                 fputs(output, stdout);
+                fflush(stdout);
             }
 
         }
