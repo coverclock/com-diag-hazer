@@ -1071,6 +1071,7 @@ readable and writeable by the ${USER} (okay) or anyone (nope).
 
 ## OpenStreetMap Moving Map (Tesoro)
 
+* csvdataset - convert CSV file into a JSON object array for a static map.
 * csvfollow - follow a CSV file in real-time, forward as JSON to a UDP endpoint.
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvplayback - playback a stored CSV file, forward JSON to a UDP endpoint.
