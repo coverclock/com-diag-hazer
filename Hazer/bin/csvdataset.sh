@@ -25,10 +25,13 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 		continue
 	fi
 
+	# Skip retrograde.
+
 	NUM=${NUM%,}
 	if [[ ${NUM} -le ${PRIOR} ]]; then
 		continue
 	fi
+	PRIOR=${NUM}
 
 	# Skip stationary.
 
@@ -44,7 +47,7 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 	OLDLATITUDE=${LATITUDE}
 	OLDLONGITUDE=${LONGITUDE}
 
-	# Skip unless modulo.
+	# Skip non-modulo.
 
 	REMAINDER=$((${SEQUENCE} % ${MODULO}))
 	if [[ ${REMAINDER} -eq 0 ]]; then
@@ -62,8 +65,6 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 		LONGITUDE=""
 
 	fi
-
-	PRIOR=${NUM}
 	SEQUENCE=$((${SEQUENCE} + 1))
 
 done
