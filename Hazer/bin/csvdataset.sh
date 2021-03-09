@@ -4,7 +4,15 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Filter that reads CSV and outputs a JSON array to visualize a polyline.
+# Because the array has to be imported and stored entirely in memory,
+# a modulo value can be used to only select a sample of the incoming CSV.
+# The default is modulo 1 (every sample) but for example modulo 10 would
+# select every tenth sample. Regardless of the modulo, the first and last
+# sample are selected so that the starting and ending points are included.
+# To conserve memory, points that have no change in latitude and longitude
+# are skipped.
 # usage: csv2json [ MODULO ] < CSVFILE > JSONFILE
+# default: csv2json 1 < CSVFILE > JSONFILE
 
 PROGRAM=$(basename ${0})
 MODULO=${1:-1}
