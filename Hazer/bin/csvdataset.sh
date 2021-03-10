@@ -61,13 +61,15 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 	if [[ ${REMAINDER} -eq 0 ]]; then
 
 		if [[ -z "${INITIALIZED}" ]]; then
-			echo -n '{ "PATH": [ '
+			echo '{'
+			echo '  "PATH": [ '
+			echo -n '      '
 			INITIALIZED=Y
 		else
-			echo -n ', '
+			echo -n '    , '
 		fi
 
-		echo -n '[' "${LATITUDE}, ${LONGITUDE}" ']'
+		echo '[' "${LATITUDE}, ${LONGITUDE}" ']'
 
 		LATITUDE=""
 		LONGITUDE=""
@@ -82,11 +84,12 @@ if [[ -z "${LATITUDE}" ]]; then
 elif [[ -z "${LONGITUDE}" ]]; then
 	:
 else
-	echo -n ', [' "${LATITUDE}, ${LONGITUDE}" ']'
+	echo '    , [' "${LATITUDE}, ${LONGITUDE}" ']'
 fi
 
 if [[ ${SEQUENCE} -gt 0 ]]; then
-	echo ' ] }'
+	echo '  ]'
+	echo '}'
 fi
 
 exit 0
