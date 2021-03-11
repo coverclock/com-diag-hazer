@@ -9,7 +9,7 @@ Parse NMEA strings and other typical output from GNSS devices.
 
 # Copyright
 
-Copyright 2017-2020 by the Digital Aggregates Corporation, Colorado, USA.
+Copyright 2017-2021 by the Digital Aggregates Corporation, Colorado, USA.
 
 # License
 
@@ -1322,6 +1322,29 @@ uses csv2dgm to forward the corresponding JSON datagrams to (for example)
 a system that is using them to steer a moving map display.
 
     csvplayback 192.168.1.253:tesoro dat/yodel/20200917/vehicle.csv
+
+See the README in the Tesoro repository for more information.
+
+## csvdataset
+
+The csvdataset script is a filter that reads a CSV file and produces a JSON
+dataset suitable for importation into the Tesoro choosedataset feature to
+create a static route map. Multiple routes can be rendered on the same map,
+the the properties of the route line (color, weight, etc.) can be changed
+either globally or on a per route basis.
+
+    csvdataset < dat/yodel/20200917/vehicle.csv > 20200917.json
+
+The entire JSON dataset has to be processed and stored in memory by Tesoro.
+(This is a requirement of the underlying Leaflet third-party library.)
+For very large datasets this can be problematic. One way to handle this is
+to sample the CSV file. An optional value on the command line can cause
+csvdataset to sample the input file. The first and last data point is always
+included regardless of the sampling modulo value.
+
+    csvdataset 10 < dat/yodel/20200917/vehicle.csv > 20200917.json
+
+See the README in the Tesoro repository for more information.
 
 # Help
 
