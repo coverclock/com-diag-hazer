@@ -45,7 +45,7 @@ TARGET				:=	host# Build for the x86_64 running Ubuntu 14.04 LTS.
 # complaint string with the time specified in UTC with nanosecond resolution.
 
 # This stuff all gets embedded in the vintage application.
-COPYRIGHT			:=	2017-2020 Digital Aggregates Corporation
+COPYRIGHT			:=	2017-2021 Digital Aggregates Corporation
 LICENSE				:=	GNU Lesser General Public License 2.1
 CONTACT				:=	coverclock@diag.com
 HOMEPAGE			:=	https://github.com/coverclock/com-diag-hazer
