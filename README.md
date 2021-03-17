@@ -1127,7 +1127,7 @@ readable and writeable by the ${USER} (okay) or anyone (nope).
 * lowresolution - same as bin/base.sh but with much much lower standards.
 * makerfocus - exercises the MakerFocus GPS board.
 * makerfocuspps - exercises the MakerFocus GPS board and its 1PPS output.
-* neom8npps - exercises the SparkFun NEO-M8N board and its 1PPS output.
+* neom8n1pps - exercises the SparkFun NEO-M8N board and its 1PPS output.
 * neom8u - exercises the SparkFun GPS Deadreckoning board.
 * pmtk - exercises the Adafruit Ultimate GPS board.
 * simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
