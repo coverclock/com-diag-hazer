@@ -298,10 +298,10 @@ typedef enum YodelSystem {
  */
 #define YODEL_SYSTEM_NAME_INITIALIZER \
     { \
-        "GPS", \
+        "NAVSTAR", \
         "SBAS", \
         "GALILEO", \
-        "BEIDOU", \
+        "COMPASS", \
         "", \
         "QZSS", \
         "GLONASS", \
