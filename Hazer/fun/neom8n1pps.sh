@@ -51,4 +51,4 @@ FILENAME=$(basename ${OUTFIL})
 TASK=${FILENAME%%.*}
 FILE=${FILENAME#*.}
 
-peruse ${TASK} ${FILE} ${LIMIT} ${DIRECTORY} < /dev/null
+echo peruse ${TASK} ${FILE} ${LIMIT} ${DIRECTORY}
