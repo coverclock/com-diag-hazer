@@ -291,6 +291,7 @@ Hazer recognizes the following received NMEA sentences.
 Hazer recognizes the following proprietary NMEA-style sentences as special cases.
 
 * PMTK - emitted and/or accepted by some GTop/MTK devices.
+* PSRF - emitted and/or accepted by some SiRF devices.
 * PUBX - emitted and/or accepted by some u-blox devices.
 
 Yodel recognizes the following received UBX messages.
