@@ -229,6 +229,7 @@ typedef enum HazerTalker {
     HAZER_TALKER_NAVIGATION,
     HAZER_TALKER_LORANC,
     HAZER_TALKER_PMTK,
+    HAZER_TALKER_PSRF,
     HAZER_TALKER_PUBX,
     HAZER_TALKER_QZSS,
     HAZER_TALKER_RADIO,
@@ -255,6 +256,7 @@ typedef enum HazerTalker {
         "IN", \
         "LC", \
         "PMTK", \
+        "PSRF", \
         "PUBX", \
         "QZ", \
         "ZV", \
@@ -725,6 +727,12 @@ extern uint16_t hazer_parse_dop(const char * string);
  * GTop PMTK command packet reference
  */
 #define HAZER_PROPRIETARY_SENTENCE_PMTK "PMTK"
+
+/**
+ * @define HAZER_PROPRIETARY SENTENCE_PSRF
+ * SiRF NMEA Reference Manual, 2-1, Input Messages
+ */
+#define HAZER_PROPRIETARY_SENTENCE_PSRF "PSRF"
 
 /*******************************************************************************
  * DETERMINING TALKER

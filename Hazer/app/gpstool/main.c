@@ -2018,8 +2018,9 @@ int main(int argc, char * argv[])
              * As a special case, if we receive an update on active satellites
              * or satellites in view from something we don't recognize, then
              * we have a new GNSS that isn't supported. That's worth noting.
-             * Two other special cases: PUBX (u-blox) and PMTK (Gtop/MTK)
-             * proprietary messages that are encoded like NMEA sentences.
+             * Three other special cases: PUBX (u-blox), PMTK (Gtop/MTK),
+             * and PSRF (SiRF) proprietary messages that are encoded like
+             * NMEA sentences.
              */
 
             if (count < 1) {
@@ -2033,7 +2034,7 @@ int main(int argc, char * argv[])
                 }
                 continue;
 
-            } else if ((talker == HAZER_TALKER_PUBX) || (talker == HAZER_TALKER_PMTK)) {
+            } else if ((talker == HAZER_TALKER_PUBX) || (talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {
 
                 DIMINUTO_LOG_INFORMATION("Parse NMEA %s \"%.*s\"", HAZER_TALKER_NAME[talker], length - 2 /* Exclude CR and LF. */, buffer);
                 continue;
