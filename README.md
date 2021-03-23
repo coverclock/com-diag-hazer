@@ -670,6 +670,12 @@ Chip Overclock, "The OpenStreetMap Moving Map On Mobile Devices", 2021-03,
 Chip Overclock, "A Static Route Map Display Using OpenStreetMap", 2021-03,
 <https://coverclock.blogspot.com/2021/03/a-static-route-map-display-using.html>
 
+Chip Overclock, "Advanced Static Route Maps With OpenStreetMap", 2021-03,
+<https://coverclock.blogspot.com/2021/03/advanced-static-route-maps-with.html>
+
+Chip Overclock, "Where the RF Meets the Road", 2021-03,
+<https://coverclock.blogspot.com/2021/03/where-rf-meets-road.html>
+
 # Media
 
 John Sloan, "Dead Reckoning", album, <https://flic.kr/s/aHsmPsGqjA>
