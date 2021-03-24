@@ -1170,7 +1170,7 @@ or DGNSS parameters in files.  Setting this environmental variable
 changes the directory in which these files are stored. By default,
 stdout, stderr, and CSV files are stored in the out/${TARGET}/tmp
 subdirectory of the code base, where TARGET is set to the name of the
-Makefile configuration file (typically "host"). The DGNSS paramters are
+Makefile configuration file (typically "host"). The DGNSS parameters are
 saved in ${HOME}/fix, or if ${HOME} is not set, in /var/tmp/fix. All of
 these defaults are overridden if the environmental variable is set.
 
