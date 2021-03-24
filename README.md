@@ -55,10 +55,10 @@ degrees of precision down to centimeters. RTCM was developed by the Radio
 Technical Commision for Maritime services (RTCM). RTCM is supported by a
 parallel stack called Tumbleweed.
 
-> More broadly: Hazer used GNSS to do real-time moving map displays
-> using Google Earth; Yodel used GNSS with high precision GNSS and
+> More broadly: Hazer uses GNSS to do geolocation for applications like
+> moving map displays; Yodel uses GNSS with high precision geolocation and
 > integrated inertial measurement features of specific u-blox devices;
-> and Tumbleweed used Differental GNSS with specific u-blox devices.
+> and Tumbleweed uses Differental GNSS with specific u-blox devices.
 > All three projects reside in the Hazer repository.
 
 When I use the term "Hazer", I am not very good about distinguishing whether
