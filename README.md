@@ -416,8 +416,8 @@ Footnotes:
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
 [4] Receives GPS (U.S.) *and* GLONASS (Russia) constellations concurrently.    
 [5] Receives GPS (U.S.) *or* GLONASS (Russia) constellations via configuration.    
-[6] Supports One Pulse Per Second (1PPS) by toggling digital output pin.    
-[7] Supports One Pulse Per Second (1PPS) by toggling Data Carrier Detect (DCD).    
+[6] I have used the 1PPS indication exported via a digital output pin.    
+[7] I have used the 1PPS indication exported via Data Carrier Detect (DCD).    
 [8] Supports UBX.    
 [9] A software defined radio (SDR).    
 [10] Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* COMPASS (China) concurrently.    
