@@ -764,10 +764,9 @@ geographiclib, which is licensed under the MIT license.
 ## Latitude/Longitude Precision
 
 This is a useful way to interpret the precision implied by the number
-of decimal places presented in degrees of latitude and longitude. A
-big Thank You to Amy Fox of Blis, a company that provides geolocation
-assistance to advertising and marketing firms, who wrote about this in
-the Blis blog.
+of decimal places presented in degrees of latitude and longitude. A big
+Thank You to Amy Fox of Blis, a company that provides location-powered
+advertising abd analytics, who wrote about this in the Blis blog.
 
 * 0 - 1.0 - 111 km - country
 * 1 - 0.1 - 11.1 km - city
