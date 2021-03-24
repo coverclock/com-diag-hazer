@@ -761,7 +761,13 @@ geographiclib, which is licensed under the MIT license.
     $ geodesic 39.794212194, -105.153349928 39.794211944, -105.153350000
     0.0284344407
 
-## Decimal Places
+## Latitude/Longitude Precision
+
+This is a useful way to interpret the precision implied by the number
+of decimal places presented in degrees of latitude and longitude. A
+big Thank You to Amy Fox of Blis, a company that provides geolocation
+assistance to advertising and marketing firms, who wrote about this in
+the Blis blog.
 
 * 0 - 1.0 - 111 km - country
 * 1 - 0.1 - 11.1 km - city
@@ -774,4 +780,6 @@ geographiclib, which is licensed under the MIT license.
 * 8 - 0.00000001 - 1.11 mm - tectonic plate movement
 * 9 - 0.000000001 - 111 um - microscopy
 
-[A. Fox, blis.com, 2017-07-09]
+A. Fox, "Precision Matters: The Critical
+Importance of Decimal Places", blis.com, 2017-07-09,
+<https://blis.com/precision-matters-critical-importance-decimal-places-five-lowest-go/>
