@@ -402,7 +402,7 @@ Hazer has been successfully tested with the following GPS devices.
 * Pharos GPS-500 (SiRF Star III+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
 * Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]    
 * SparkFun GPS Dead Reckoning gen 8 (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [11]
-* SparkFun GPS NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [8] [10]
+* SparkFun GPS NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [6] [8] [10]
 * SparkFun GPS-RTK2 (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
 * SparkFun GPS Dead Reckoning gen 9 (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]
 * Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
