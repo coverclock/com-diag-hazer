@@ -411,7 +411,7 @@ Hazer has been successfully tested with the following GPS devices.
 
 Footnotes:
 
-[1] An good inexpensive introductory GPS device easily acquired from numerous sources.    
+[1] A good inexpensive introductory GPS device easily acquired from numerous sources.    
 [2] Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
 [3] Install udev rules in overlay to prevent ModemManager from toying with device.    
 [4] Receives GPS (U.S.) *and* GLONASS (Russia) constellations concurrently.    
