@@ -104,9 +104,10 @@ passle of other useful stuff. gpstool and rtktool are excellent examples
 of how to leverage Diminuto to get a lot done in not so much C code. I
 use Diminuto in virtually all of my C-based projects, and sometimes in
 other languages too that support C-linkage.  Portions of Diminuto have
-also shipped in products from several of my clients.
+also shipped in products from several of my clients. (Details of building
+Diminuto are shown below.)
 
-## Building
+## Tool Chain
 
 These days most Linux distributions do not include the basic tools
 to build C and C++ software (despite having themselves been developed
@@ -126,24 +127,6 @@ need to be installed.
     sudo apt-get install texlive-fonts-recommended
     sudo apt-get install texlive-fonts-extra
     sudo apt-get install texlive-science
-
-You can make HTML, man page, and PDF documentation based on the Doxygen
-comments embedded in the source code by using the following make targets.
-
-    make documentation
-    make manuals
-
-You can find the resulting documentation in the following directories.
-The variable TARGET will be replaced by "host" unless you are using some
-special Makefile configuration (for example, for cross-compilation).
-
-    out/${TARGET}/doc/html
-    out/${TARGET}/doc/man
-    out/${TARGET}/doc/pdf
-
-The gpstool application is a good example of how to use the Hazer,
-Tumbleweed, and Yodel features. (It is also a good example of how to
-use the features of the Diminuto library.)
 
 ## Utilities
 
@@ -930,6 +913,8 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 # Build
 
+## Diminuto
+
 Clone and build Diminuto, which is used by gpstool although not by libhazer.
 (Or follow the directions in the Diminuto README.)
 
@@ -941,6 +926,8 @@ Clone and build Diminuto, which is used by gpstool although not by libhazer.
     make pristine
     make depend
     make all
+
+## Hazer
 
 Clone and build Hazer. (If you don't build Diminuto where the Hazer Makefile
 expects it, some minor Makefile hacking might be required.)
@@ -954,6 +941,26 @@ expects it, some minor Makefile hacking might be required.)
     make depend
     make all
 
+## Documentation
+
+You can make HTML, man page, and PDF documentation based on the Doxygen
+comments embedded in the source code by using the following make targets.
+
+    make documentation
+    make manuals
+
+You can find the resulting documentation in the following directories.
+The variable TARGET will be replaced by "host" unless you are using some
+special Makefile configuration (for example, for cross-compilation).
+
+    out/${TARGET}/doc/html
+    out/${TARGET}/doc/man
+    out/${TARGET}/doc/pdf
+
+(Diminuto has a similer documentation build process.)
+
+## Administration
+
 The fs directory contains a file system overlay of files that I've found
 useful to carefully install in system directories like /etc and /lib.
 It is not installed automatically, because whether they are helpful, or
@@ -961,6 +968,17 @@ they reduce your target system to a smoking heap of silicon, depends on your
 exact circumstances: the target system, the version of Linux it runs, etc.
 Some of the files under fs are new files in their entirety, some just contain
 lines that need to be added to the indicated files.
+
+Most Linux distros will require the program accessing the GPS/GNSS
+device to either have root privileges or be in the "dialout" group.
+The latter is of course preferred.
+
+    sudo usermod -a -G dialout ${USER}
+
+${USER} will need to log out and back in for this to take effect.
+
+It is also possible to edit the udev rules to make the device
+readable and writeable by the ${USER} (okay) or anyone (nope).
 
 Depending on what features of Hazer you choose to use, you will need
 to define some services in the /etc/services file. The port numbers are
@@ -975,7 +993,7 @@ the /etc/services file.
     tesoro     33333/udp  # Tesoro JSON sink
     hazer      44444/udp  # Hazer NMEA source/sink
 
-# Unit Tests
+## Unit Tests
 
 Set up environment and run tests and utilities. (This establishes the paths
 for both the Hazer and the Diminuto executables so you don't have to install
@@ -986,19 +1004,6 @@ the libraries and binaries in the system directories.)
     make sanity
     gpstool -?
     rtktool -?
-
-# Administration
-
-Most Linux distros will require the program accessing the GPS/GNSS
-device to either have root privileges or be in the "dialout" group.
-The latter is of course preferred.
-
-    sudo usermod -a -G dialout ${USER}
-
-${USER} will need to log out and back in for this to take effect.
-
-It is also possible to edit the udev rules to make the device
-readable and writeable by the ${USER} (okay) or anyone (nope).
 
 # Directories
 
