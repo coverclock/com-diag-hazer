@@ -766,19 +766,22 @@ geographiclib, which is licensed under the MIT license.
 This is a useful way to interpret the precision implied by the number
 of decimal places presented in degrees of latitude and longitude. A big
 Thank You to Amy Fox of Blis, a company that provides location-powered
-advertising abd analytics, who wrote about this in the Blis blog.
+advertising abd analytics, who wrote about this in the Blis blog. Ms. Fox
+also referenced a similar table in Wikipedia.
 
-* 0 - 1.0 - 111 km - country
-* 1 - 0.1 - 11.1 km - city
-* 2 - 0.01 - 1.11 km - village
-* 3 - 0.001 - 111 m - neighborhood
-* 4 - 0.0001 - 11.1 m - street
-* 5 - 0.00001 - 1.11 m - tree
-* 6 - 0.000001 - 11.1 cm - surveying
-* 7 - 0.0000001 - 1.11 cm - precision surveying
-* 8 - 0.00000001 - 1.11 mm - tectonic plate movement
-* 9 - 0.000000001 - 111 um - microscopy
+* 0 - 1.0 - 111 km - country or large region
+* 1 - 0.1 - 11.1 km - large city or district
+* 2 - 0.01 - 1.11 km - town or village
+* 3 - 0.001 - 111 m - neighborhood, street
+* 4 - 0.0001 - 11.1 m - individual street, large buildings
+* 5 - 0.00001 - 1.11 m - individual tree, houses
+* 6 - 0.000001 - 11.1 cm - individual humans
+* 7 - 0.0000001 - 1.11 cm - practical limit of commercial surveying
+* 8 - 0.00000001 - 1.11 mm - specialized surveying, tectonic plate movement
+* 9 - 0.000000001 - 111 um - width of a strand of thread, microscopy
 
 A. Fox, "Precision Matters: The Critical
 Importance of Decimal Places", blis.com, 2017-07-09,
 <https://blis.com/precision-matters-critical-importance-decimal-places-five-lowest-go/>
+
+Wikipedia, "Wikipedia, "Decimal Degrees", 2020-11-14, <https://en.wikipedia.org/wiki/Decimal_degrees>
