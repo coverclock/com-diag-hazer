@@ -680,6 +680,8 @@ Chip Overclock, "Where the RF Meets the Road", 2021-03,
 
 John Sloan, "Dead Reckoning", album, <https://flic.kr/s/aHsmPsGqjA>
 
+John Sloan, "Decimal Degrees", album, <https://flic.kr/s/aHsmV3GnBe>
+
 John Sloan, "GN803G and Hazer 8.0.0", video, <https://youtu.be/ZXT_37PvmhE>
 
 John Sloan, "GPS Receiver Gallery", album, <https://flic.kr/s/aHsmvoXqSH>
@@ -696,19 +698,19 @@ John Sloan, "NGS KK1770", album, <https://flic.kr/s/aHskTG9K1h>
 
 John Sloan, "NTP Clock Gallery, album, <https://flic.kr/s/aHsmgrizkL>
 
+John Sloan, "Tesoro", album, <https://flic.kr/s/aHsmTB3tme>
+
 John Sloan, "Time and Space", album, <https://flic.kr/s/aHsm3ghwxP>
 
 John Sloan, "Time and Space", video, <https://youtu.be/szoT23ZBcVU>
 
 John Sloan, "Tumbleweed", album, <https://flic.kr/s/aHsmcdEgq6>
 
-John Sloan, "Yodel", album, <https://flic.kr/s/aHsmNDPmDN>
-
-John Sloan, "Tesoro", album, <https://flic.kr/s/aHsmTB3tme>
-
 John Sloan, "Screen Recording 2021 02 18 at 8 55 20 AM", video, <https://youtu.be/GjR7fPQRCZc>
 
 John Sloan, "Screen Recording 2021 02 24 at 10 06 20 AM", video, <https://youtu.be/-6p3w1SxW1A>
+
+John Sloan, "Yodel", album, <https://flic.kr/s/aHsmNDPmDN>
 
 # References
 
@@ -747,6 +749,13 @@ GTop, "PMTK command packet", Revision A11, GlobalTop, 2012
 
 IGS et al., "RINEX - The Receiver Independent Exchange Format", Version 3.03,
 RTCM-SC104, 2015-07-14
+
+ISO, "Standard representation of geographic point location by
+coordinates", Second edition, ISO 6709:2008(E), 2008-07-15
+
+ISO, "Data elements and interchange formats - Information interchange
+- Representation of dates and times", First edition, ISO8601:1988(E),
+1988-06-15
 
 Elliott D. Kaplan ed., *Understanding GPS principles and Applications*, Artech
 House, 1996
@@ -923,6 +932,8 @@ astronomers in the audience, but it wasn't to me.
 Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://www.gps.gov>
+
+<https://en.wikipedia.org/wiki/Decimal_degrees>
 
 # Soundtrack
 
