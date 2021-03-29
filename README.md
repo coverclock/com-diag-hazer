@@ -746,6 +746,9 @@ House, 1996
 Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
 2013-01, 87.1, pp. 43..55
 
+G. Klyne, C. Newman, "Date and Time on the Internet: Timestamps", RFC3339,
+IETF, July 2002
+
 Greg Milner, *Pinpoint: How GPS is Changing Technology, Culture, and Our Minds*,
 W. W. Norton, 2017-05-16
 
