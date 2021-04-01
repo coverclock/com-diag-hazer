@@ -7,7 +7,9 @@ line options, using the same version of gpstool. The gpstool display is
 event driven: each line is displayed if and only if the appropriate NMEA,
 UBX, or RTCM input was received from the device under test, within the
 timeout window, regardless of command line options or how the GNSS device
-was initialized.
+was initialized. This means for those lines containing data that the
+device is slow to update (the update interval is greater than the
+timeout interval), the lines may come and go.
 
 While NMEA (and UBX amd RTCM too for that matter) is good about updating
 the application with new information, it is not so good about letting the
@@ -21,24 +23,30 @@ new sentences or messages from the GPS device, it is no longer displayed.
 
 INP is the most recent data read from the device, either NMEA sentences or
 UBX packets, with binary data converted into standard C escape sequences.
+The number in the square brackets is the length of the input data.
 
     OUT [  7] \xb5b\x06>\0\0\0
 
 OUT is the most recent data written to the device, as specified on the
-command line using the -W (NMEA sentence) or -U (UBX message)  options.
+command line using the -W (NMEA sentence) or -U (UBX message)  options,
+minus the end matter like a checksum etc., which is added independently
+of when this line was emitted. The number in the square brackets is the
+length of the output data minus the end matter.
 
     LOC 2020-06-11T12:24:01.018-07:00+01T 00:00:00.871 34.2.0        11003 hacienda
 
 LOC is the current local time provided by the host system, the elapsed
 time to first fix, the software release number, the process id, and the
-local host name.
-The local time, with a fractional part in milliseconds, includes the time
-zone offset from UTC in hours and minutes, the current daylight saving
-time (DST) offset in hours, and the military time zone letter. If the
-time zone offset is an even number of hours (some aren't: Newfie Time,
-I'm looking at you), it will be a letter like "T" ("Tango") for Mountain
-Standard Time as found in Denver; otherwise it will be "J" ("Juliet")
-to indicate any local time zone.
+local host name.  The local time, with a fractional part in milliseconds,
+includes the time zone offset from UTC in hours and minutes, the current
+daylight saving time (DST) offset in hours, and the military time zone
+letter. If the time zone offset is an even number of hours (some aren't:
+Newfie Time, I'm looking at you), it will be a letter like "T" ("Tango")
+for Mountain Standard Time as found in Denver; otherwise it will be "J"
+("Juliet") to indicate any local time zone. This line also includes
+the duration before a fix was received by the application, the Hazer
+release string, the process identifier of the application, and the
+hostname of the host system truncated to eight characters.
 
     TIM 2020-06-11T18:24:00.000-00:00+00Z 0pps                             GNSS
 
@@ -135,13 +143,20 @@ no fix; '!' for a dead reckoning fix only; '2' for a 2D GNSS fix; '3' for a
 only fix; and '?' for an error.
 
     HPP   39.794267897, -105.153420946 ±     0.5237m                       GNSS
+
+HPP shows the high precision position available from some Ublox devices,
+along with its estimated accuracy. This may differ (slightly) from the
+position reported via POS and ALT due to the conversion of units done
+to conform to the NMEA format. When available, the HPP data is expected
+to be more precise.
+
     HPA   1709.4855m MSL   1687.9856m WGS84 ±     0.8001m                  GNSS
 
-HPP and HPA show the high precision position and altitude available from
-some Ublox devices, along with their estimated accuracy. This may differ
-(slightly) from the position and altitude reported via POS and ALT due
-to the conversion of units done to conform to the NMEA format. When
-available, the HPP and HPA is expected to be more precise.
+HPA shows the high precision altitude available from some Ublox devices,
+along with its estimated accuracy. This may differ (slightly) from
+the altitude reported via ALT due to the conversion of units done to
+conform to the NMEA format. When available, the HPA data is expected to
+be more precise.
 
     NGS  39 47 39.36442(N) 105 09 12.31540(W)                              GNSS
 
@@ -151,25 +166,30 @@ artifacts such as NGS and municipal survey markers. This makes it easier
 to compare the Hazer position against examples from the NGS database.
 
     BAS 1active 0valid      18019sec      18020obs       0.1675m           DGNSS
+
+BAS shows information about the Ublox device operating in base station. In
+base (stationary) mode, it shows if the device is actively surveying or
+if the survey has resolved to a valid location, how many seconds and
+observations have been consumed during the survey, and what the mean
+error is.
+
     ROV     0:  1094 (    0)                                               DGNSS
 
-BAS or ROV show information about the Ublox device operating in base
-station or in rover modes. In base (stationary) mode, it shows if the
-device is actively surveying or if the survey has resolved to a valid
-location, how many seconds and observations have been consumed during
-the survey, and what the mean error is. In rover (mobile) mode, it shows
-what RTCM message was last received and from whom.
+ROV shows information about the Ublox device operating in rover modes.
+In rover (mobile) mode, it shows what RTCM message was last received
+and from whom.
 
     RTK 1094 [ 129] rover    <ERNrCERN>                                    DGNSS
 
 RTK show the latest RTCM message received, when operating in base mode
-(in which case the message was received from the device), or in rover
-mode (the message was received from the base in a datagram via UDP).
-The lengths of the most recent message is shown, as is the mode of the
-system, base or rover. The character sequence between the angle brackets
-records the last eight RTCM messages that were received, the newest one
-indicated by the rightmost character in the sequence, as the sequence
-is progressively shifted left as new messages are received.
+(in which case the message was read from the device), or in rover mode
+(in which case the message was received from the base in a datagram via
+UDP and written to the device).  The lengths of the most recent message
+is shown, as is the mode of the system, base or rover. The character
+sequence between the angle brackets records the last eight RTCM messages
+that were received, the newest one indicated by the rightmost character
+in the sequence, as the sequence is progressively shifted left as new
+messages are received.
 
     ACT [1]  {    28     3    19    24     6     2 } [ 6] [ 8] [23] [32]   NAVSTAR
 
@@ -227,3 +247,4 @@ elevation were empty but display as zero (likely that the satellite is
 not in the transmitted almanac); and an '!' indicates that the signal
 strength was empty but displays as zero (some receivers use this to
 indicate the satellite is not being tracked).
+
