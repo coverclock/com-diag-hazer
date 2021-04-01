@@ -107,7 +107,7 @@ device from which gpstool is reading.
     MON -jamming  +history  50indicator  63maximum                         ttyACM1
 
 MON displays some of the results received in the UBX-MON-HW message if
-enabled.  Ublox 8 chips with firmware revision 18 and above can provide
+enabled.  u-blox 8 chips with firmware revision 18 and above can provide
 clues to jamming based on the received signal strength. (N.B. I don't
 have a way to test this.)  This requires that the jamming/interference
 monitor (ITFM) be calibrated using the UBX-CFG-ITFM message.
@@ -115,7 +115,7 @@ monitor (ITFM) be calibrated using the UBX-CFG-ITFM message.
     STA -spoofing -history       1985ms     303985ms     0epoch            ttyACM1
 
 STA displays some of the results received in the UBX-NAV-STATUS message
-if enabled. Ublox 8 chips with firmware revision 18 and above can provide
+if enabled. u-blox 8 chips with firmware revision 18 and above can provide
 clues to spoofing based on comparing navigation solutions from multiple
 GNSSes if available. (N.B. I don't have a way to test this.) Also shown
 are the milliseconds since first fix and milliseconds uptime provided
@@ -144,7 +144,7 @@ only fix; and '?' for an error.
 
     HPP   39.794267897, -105.153420946 ±     0.5237m                       GNSS
 
-HPP shows the high precision position available from some Ublox devices,
+HPP shows the high precision position available from some u-blox devices,
 along with its estimated accuracy. This may differ (slightly) from the
 position reported via POS and ALT due to the conversion of units done
 to conform to the NMEA format. When available, the HPP data is expected
@@ -152,7 +152,7 @@ to be more precise.
 
     HPA   1709.4855m MSL   1687.9856m WGS84 ±     0.8001m                  GNSS
 
-HPA shows the high precision altitude available from some Ublox devices,
+HPA shows the high precision altitude available from some u-blox devices,
 along with its estimated accuracy. This may differ (slightly) from
 the altitude reported via ALT due to the conversion of units done to
 conform to the NMEA format. When available, the HPA data is expected to
@@ -167,7 +167,7 @@ to compare the Hazer position against examples from the NGS database.
 
     BAS 1active 0valid      18019sec      18020obs       0.1675m           DGNSS
 
-BAS shows information about the Ublox device operating in base station. In
+BAS shows information about the u-blox device operating in base station. In
 base (stationary) mode, it shows if the device is actively surveying or
 if the survey has resolved to a valid location, how many seconds and
 observations have been consumed during the survey, and what the mean
@@ -175,7 +175,7 @@ error is.
 
     ROV     0:  1094 (    0)                                               DGNSS
 
-ROV shows information about the Ublox device operating in rover modes.
+ROV shows information about the u-blox device operating in rover modes.
 In rover (mobile) mode, it shows what RTCM message was last received
 and from whom.
 
