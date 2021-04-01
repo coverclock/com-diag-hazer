@@ -136,7 +136,7 @@ meters), along with the error estimate in meters.
     NED         -5mm/s north         -2mm/s east        -41mm/s down (3)   IMU
 
 NED indicates the North-East-Down vehicle frame reading available from the
-Intertial Measurement Unit (IMU) in some u-blox modules. The number in the
+Intertial Measurement Unit (IMU) in some u-blox modules. The character in the
 parenthesis indicates the nature of the ensemble GNSS and IMU fix: '-' for
 no fix; '!' for a dead reckoning fix only; '2' for a 2D GNSS fix; '3' for a
 3D GNSS fix; '+' for a combined GNSS + dead reckoning fix; '\*' for a time
