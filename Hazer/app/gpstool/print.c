@@ -253,7 +253,7 @@ void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
      * another reason to admin your embedded system to UTC.)
      */
 
-    offset = diminuto_time_timezone(Now);
+    offset = diminuto_time_timezone();
     zone = diminuto_time_zonename(offset);
 
     offset = diminuto_frequency_ticks2wholeseconds(offset);

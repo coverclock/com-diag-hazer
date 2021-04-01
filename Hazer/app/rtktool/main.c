@@ -235,7 +235,7 @@ int main(int argc, char * argv[])
     rc = diminuto_hangup_install(!0);
     diminuto_assert(rc >= 0);
 
-    (void)diminuto_time_timezone(diminuto_time_clock());
+    (void)diminuto_time_timezone();
 
     diminuto_mux_init(&mux);
 

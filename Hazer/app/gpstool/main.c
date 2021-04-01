@@ -1232,7 +1232,7 @@ int main(int argc, char * argv[])
     Now = diminuto_time_clock();
     diminuto_assert(Now >= 0);
 
-    (void)diminuto_time_timezone(Now);
+    (void)diminuto_time_timezone();
 
     /*
      * How much of each packet do we display? Depends on whether we're doing
