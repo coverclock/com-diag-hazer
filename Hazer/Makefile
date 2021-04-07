@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	37# API changes that may require that applications be modified.
 MINOR				:=	15# Only functionality or features added with no legacy API changes.
-BUILD				:=	3# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	4# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -547,13 +547,15 @@ $(OUT)/$(SYM_DIR)/setup:	$(OUT)/$(SYM_DIR)/generate
 	chmod 644 $@
 
 # For sourcing into a bash shell (for example, ". hazer").
-$(OUT)/$(BIN_DIR)/$(PROJECT):	$(OUT)/$(BIN_DIR)/vintage
-	$< > $@
+$(OUT)/$(BIN_DIR)/$(PROJECT):	$(OUT)/$(BIN_DIR)/vintage $(OUT)/$(BIN_DIR)/setup
+	. $(OUT)/$(BIN_DIR)/setup; \
+	$< > $@; \
 	chmod 664 $@
 
 # For sourcing into a bash shell (for example, ". hazer").
-$(OUT)/$(SYM_DIR)/$(PROJECT):	$(OUT)/$(SYM_DIR)/vintage
-	$< > $@
+$(OUT)/$(SYM_DIR)/$(PROJECT):	$(OUT)/$(SYM_DIR)/vintage $(OUT)/$(SYM_DIR)/setup
+	. $(OUT)/$(BIN_DIR)/setup; \
+	$< > $@; \
 	chmod 664 $@
 
 ########## User-Space Loadable Modules
