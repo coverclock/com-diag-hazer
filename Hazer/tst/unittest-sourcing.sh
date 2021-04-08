@@ -13,44 +13,30 @@
 # unittest-sourcing
 #
 
+PROJECT=hazer
+
 XC=1
 
 BINDIR=$(readlink -e $(dirname ${0})/../bin)
 SYMDIR=$(readlink -e $(dirname ${0})/../sym)
 
 for DD in ${BINDIR} ${SYMDIR}; do
-    FF=${DD}/hazer
+    FF=${DD}/${PROJECT}
     SS=${DD}/setup
     VV=${DD}/vintage
     if [ -r ${FF} -a -r ${SS} -a -x ${VV} ]; then
         (
-            . ${FF}
-            echo ${FF}: Arch=${Arch}
-            echo ${FF}: Branch=${Branch}
-            echo ${FF}: Cc=${Cc}
-            echo ${FF}: Contact=${Contact}
-            echo ${FF}: Copyright=${Copyright}
-            echo ${FF}: Distro=${Distro}
-            echo ${FF}: Homepage=${Homepage}
-            echo ${FF}: Host=${Host}
-            echo ${FF}: Kernel=${Kernel}
-            echo ${FF}: Libc=${Libc}
-            echo ${FF}: License=${License}
-            echo ${FF}: Make=${Make}
-            echo ${FF}: Modified=${Modified}
-            echo ${FF}: Os=${Os}
-            echo ${FF}: Platform=${Platform}
-            echo ${FF}: Release=${Release}
-            echo ${FF}: Repository=${Repository}
-            echo ${FF}: Revision=${Revision}
-            echo ${FF}: Root=${Root}
-            echo ${FF}: Target=${Target}
-            echo ${FF}: Title=${Title}
-            echo ${FF}: Toolchain=${Toolchain}
-            echo ${FF}: User=${User}
-            echo ${FF}: Vintage=${Vintage}
-            . ${SS}
-            ${VV} 2> /dev/null | (
+            cat ${FF} | (
+                while read LL; do
+                    echo ${FF}: ${LL}
+                done
+            )
+            source ${FF}
+            export PATH=
+            export LD_LIBRARY_PATH=
+            source ${SS}
+            PATH=${PATH}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            vintage 2> /dev/null | (
                 while read LL; do
                     echo ${VV}: ${LL}
                     eval LL_${LL}
@@ -86,3 +72,4 @@ for DD in ${BINDIR} ${SYMDIR}; do
 done
 
 exit ${XC}
+
