@@ -1051,10 +1051,10 @@ the libraries and binaries in the system directories.)
 * out/$(TARGET)/tmp - temporary files supporting headless operation.
 * out/$(TARGET)/tst - unit test binary executables and scripts.
 
-# Bash Sourcing Files
+# Bash Sourced Files
 
 * setup - defines and exports shell variables like PATH and LD_LIBRARY_PATH into the environment.
-* diminuto = defines shell variables like Arch, Release, Revision, and Vintage into the current shell.
+* diminuto - defines shell variables like Arch, Release, Revision, and Vintage into the current shell.
 
 # Applications
 
