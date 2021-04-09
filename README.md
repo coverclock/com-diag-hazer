@@ -921,6 +921,8 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://en.wikipedia.org/wiki/Decimal_degrees>
 
+<https://jsonlines.org>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
