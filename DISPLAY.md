@@ -237,8 +237,8 @@ multiple constellations.
 
 SAT is the list of satellites in view, including an index that is
 purely an artifact of Hazer, the Space Vehicle IDentifier (specific to
-the constellation), its elevation and azimuth in degrees based on its
-ephemeris, the signal strength (really, a carrier to noise density ratio)
+the constellation), its elevation and azimuth in degrees relative to
+the receiver, the signal strength (really, a carrier to noise density ratio)
 in deciBels Hertz of its transmission, a signal identifier indicating
 which signal or band (e.g.  L1 C/A, L2, etc.) is being used, and one
 or more flags. A flag of '<' indicates that the satellite is on the
