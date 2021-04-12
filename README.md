@@ -736,8 +736,8 @@ RTCM-SC104, 2015-07-14
 ISO, "Standard representation of geographic point location by
 coordinates", Second edition, ISO 6709:2008(E), 2008-07-15
 
-ISO, "Data elements and interchange formats - Information interchange
-- Representation of dates and times", First edition, ISO8601:1988(E),
+ISO, "Data elements and interchange formats - Information interchange -
+Representation of dates and times", First edition, ISO8601:1988(E),
 1988-06-15
 
 Elliott D. Kaplan ed., *Understanding GPS principles and Applications*, Artech
