@@ -19,7 +19,7 @@
  *
  * USAGE
  * 
- * csv2dgm [ -d ] [ -v ] [ -o ] [ -c | -j | -q | -s | -x | -y ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]
+ * csv2dgm [ -d ] [ -v ] [ -t ] [ -c | -j | -q | -s | -x | -y ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ] [ -D DEVICE [ -b BPS ] [ -
  *
  * EXAMPLE
  *
@@ -40,6 +40,7 @@
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_escape.h"
+#include "com/diag/diminuto/diminuto_fd.h"
 #include "com/diag/diminuto/diminuto_interrupter.h"
 #include "com/diag/diminuto/diminuto_ipc.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
@@ -47,6 +48,7 @@
 #include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_pipe.h"
+#include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_types.h"
@@ -55,7 +57,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 /*******************************************************************************
  * SYMBOLS
@@ -220,10 +224,12 @@ int main(int argc, char * argv[])
     int verbose = 0;
     int out = 0;
     int sock = -1;
+    int fd = -1;
     int rc = -1;
     int ii = -1;
     mode_t mode = COM_DIAG_DIMINUTO_OBSERVATION_MODE;
     diminuto_ipc_endpoint_t endpoint = { 0, };
+    char * device = (char *)0;
     char * endpointname = (char *)0;
     char * filename = (char *)0;
     char * token[23] = { 0, };
@@ -239,6 +245,11 @@ int main(int argc, char * argv[])
     char buffer[1024] = { '\0', };
     diminuto_ipv4_buffer_t ipv4buffer = { '\0', }; \
     diminuto_ipv6_buffer_t ipv6buffer = { '\0', }; \
+    int bps = 9600;
+    int databits = 8;
+    int stopbits = 1;
+    int paritybit = 0;
+    int modemcontrol = 0;
     diminuto_sticks_t ticks = 0;
     int year = 0;
     int month = 0;
@@ -262,8 +273,23 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "F:M:U:cdhjoqsvxy")) >= 0) {
+        while ((opt = getopt(argc, argv, "1278D:F:M:U:b:cedhjmnoqstvxy")) >= 0) {
             switch (opt) {
+            case '1':
+                stopbits = 1;
+                break;
+            case '2':
+                stopbits = 2;
+                break;
+            case '7':
+                databits = 7;
+                break;
+            case '8':
+                databits = 8;
+                break;
+            case 'D':
+                device = optarg;
+                break;
             case 'F':
                 filename = optarg;
                 break;
@@ -278,11 +304,22 @@ int main(int argc, char * argv[])
             case 'U':
                 endpointname = optarg;
                 break;
+            case 'b':
+                bps = strtoul(optarg, &end, 0);
+                if ((end == (char *)0) || (*end != '\0')) {
+                    errno = EINVAL;
+                    diminuto_perror(optarg);
+                    error = !0;
+                }
+                break;
             case 'c':
                 type = CSV;
                 break;
             case 'd':
                 debug = !0;
+                break;
+            case 'e':
+                paritybit = 2;
                 break;
             case 'h':
                 type = HTML;
@@ -291,14 +328,23 @@ int main(int argc, char * argv[])
                 type = JSON;
                 unempty = !0;
                 break;
+            case 'm':
+                modemcontrol = !0;
+                break;
             case 'o':
-                out = !0;
+                paritybit = 1;
+                break;
+            case 'n':
+                paritybit = 0;
                 break;
             case 'q':
                 type = QUERY;
                 break;
             case 's':
                 type = SHELL;
+                break;
+            case 't':
+                out = !0;
                 break;
             case 'v':
                 verbose = !0;
@@ -311,17 +357,27 @@ int main(int argc, char * argv[])
                 break;
             default:
             case '?':
-                fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -c | -h | -j | | -q | -s | -x | -y ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]\n", program);
+                fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -c | -h | -j | | -q | -s | -x | -y ] [ -t ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -1 | -2 ] [ -e | -o | -n ] [ -m ] ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]\n", program);
+                fprintf(stderr, "       -1              Set DEVICE to 1 stop bit.\n");
+                fprintf(stderr, "       -2              Set DEVICE to 2 stop bits.\n");
+                fprintf(stderr, "       -7              Set DEVICE to 7 data bits.\n");
+                fprintf(stderr, "       -8              Set DEVICE to 8 data bits.\n");
+                fprintf(stderr, "       -b BPS          Set DEVICE to BPS bits per second.\n");
                 fprintf(stderr, "       -c              Emit CSV.\n");
                 fprintf(stderr, "       -d              Enable debug output.\n");
+                fprintf(stderr, "       -e              Set DEVICE to even parity.\n");
                 fprintf(stderr, "       -h              Emit HTML.\n");
                 fprintf(stderr, "       -j              Emit JSON.\n");
-                fprintf(stderr, "       -o              Write to standard output.\n");
+                fprintf(stderr, "       -o              Set DEVICE to odd parity.\n");
+                fprintf(stderr, "       -m              Set DEVICE to use modem control.\n");
+                fprintf(stderr, "       -n              Set DEVICE to no parity.\n");
                 fprintf(stderr, "       -q              Emit URL Query.\n");
                 fprintf(stderr, "       -s              Emit Shell commands.\n");
+                fprintf(stderr, "       -t              Write to standard output.\n");
                 fprintf(stderr, "       -v              Enable verbose output.\n");
                 fprintf(stderr, "       -x              Emit XML.\n");
                 fprintf(stderr, "       -y              Emit YAML.\n");
+                fprintf(stderr, "       -D DEVICE       Write datagram to DEVICE.\n");
                 fprintf(stderr, "       -F FILE         Save latest datagram in observation FILE.\n");
                 fprintf(stderr, "       -M MODE         Set FILE mode to MODE.\n");
                 fprintf(stderr, "       -U HOST:PORT    Forward datagrams to HOST:PORT.\n");
@@ -380,6 +436,29 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else {
             fprintf(stderr, "%s: file=\"%s\" mode=0%03o fd=%d\n", program, filename, mode, fileno(fp));
+        }
+
+        if (device == (char *)0) {
+            /* Do nothing. */
+        } else if ((fd = open(device, O_WRONLY)) < 0) {
+            diminuto_perror(device);
+            break;
+        } else if (!diminuto_serial_valid(fd)) {
+            /* Do nothing. */
+        } else if (diminuto_serial_set(fd, bps, databits, paritybit, stopbits, modemcontrol, 0, 0) < 0) {
+            break;
+        } else if (diminuto_serial_raw(fd) < 0) {
+            break;
+        } else {
+            /* Do nothing. */
+        }
+
+        if (!debug) {
+            /* Do nothing. */
+        } else if (device == (char *)0) {
+            /* Do nothing. */
+        } else {
+            fprintf(stderr, "%s: device=\"%s\" bps=%d databits=%d paritybit=%d stopbits=%d modemcontrol=%d fd=%d\n", program, device, bps, databits, paritybit, stopbits, modemcontrol, fd);
         }
  
         /*
@@ -626,7 +705,7 @@ int main(int argc, char * argv[])
             if (verbose) { fprintf(stderr, "%s: output=\"%s\"\n", program, expand(buffer, output, sizeof(buffer), length)); }
 
             /*
-             * Send the output line as an IPv4 or IPv6 datagram.
+             * Send the output line as an IPv4 or IPv6 datagram on the socket.
              */
 
             if (sock < 0) {
@@ -643,6 +722,25 @@ int main(int argc, char * argv[])
                 /* Do nothing. */
             } else if (size > 0) {
                 /* Do nothing. */
+            } else if (size == 0) {
+                /* Should be impossible with UDP. */
+                fprintf(stderr, "diminuto_ipc_datagram_send: SHUTDOWN\n");
+                break;
+            } else {
+                break;
+            }
+
+            /*
+             * Write the output line to the device.
+             */
+
+            if (fd < 0) {
+                /* Do nothing. */
+            } else if ((size = diminuto_fd_write(fd, output, length)) == length) {
+                /* Do nothing. */
+            } else if (size >= 0) {
+                fprintf(stderr, "diminuto_fd_write: EOF\n");
+                break;
             } else {
                 break;
             }
@@ -692,6 +790,14 @@ int main(int argc, char * argv[])
         } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
             (void)diminuto_ipc6_datagram_send(sock, "", 0, endpoint.ipv6, endpoint.udp);
             (void)diminuto_ipc6_close(sock);
+        } else {
+            /* Do nothing. */
+        }
+
+        if (fd < 0) {
+            /* Do nothing. */
+        } else if (close(fd) < 0) {
+            diminuto_perror("close");
         } else {
             /* Do nothing. */
         }
