@@ -250,6 +250,7 @@ int main(int argc, char * argv[])
     int stopbits = 1;
     int paritybit = 0;
     int modemcontrol = 0;
+    int rtscts = 0;
     diminuto_sticks_t ticks = 0;
     int year = 0;
     int month = 0;
@@ -273,7 +274,7 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "1278D:F:M:U:b:cedhjmnoqstvxy")) >= 0) {
+        while ((opt = getopt(argc, argv, "1278D:F:M:U:b:cedhjmnoqrstvxy")) >= 0) {
             switch (opt) {
             case '1':
                 stopbits = 1;
@@ -340,6 +341,9 @@ int main(int argc, char * argv[])
             case 'q':
                 type = QUERY;
                 break;
+            case 'r':
+                rtscts = !0;
+                break;
             case 's':
                 type = SHELL;
                 break;
@@ -357,7 +361,7 @@ int main(int argc, char * argv[])
                 break;
             default:
             case '?':
-                fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -c | -h | -j | | -q | -s | -x | -y ] [ -t ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -1 | -2 ] [ -e | -o | -n ] [ -m ] ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]\n", program);
+                fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -c | -h | -j | | -q | -s | -x | -y ] [ -t ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -1 | -2 ] [ -e | -o | -n ] [ -m ] [ -r ] ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]\n", program);
                 fprintf(stderr, "       -1              Set DEVICE to 1 stop bit.\n");
                 fprintf(stderr, "       -2              Set DEVICE to 2 stop bits.\n");
                 fprintf(stderr, "       -7              Set DEVICE to 7 data bits.\n");
@@ -372,6 +376,7 @@ int main(int argc, char * argv[])
                 fprintf(stderr, "       -m              Set DEVICE to use modem control.\n");
                 fprintf(stderr, "       -n              Set DEVICE to no parity.\n");
                 fprintf(stderr, "       -q              Emit URL Query.\n");
+                fprintf(stderr, "       -r              Set DEVICE to use hardware flow control.\n");
                 fprintf(stderr, "       -s              Emit Shell commands.\n");
                 fprintf(stderr, "       -t              Write to standard output.\n");
                 fprintf(stderr, "       -v              Enable verbose output.\n");
@@ -445,7 +450,7 @@ int main(int argc, char * argv[])
             break;
         } else if (!diminuto_serial_valid(fd)) {
             /* Do nothing. */
-        } else if (diminuto_serial_set(fd, bps, databits, paritybit, stopbits, modemcontrol, 0, 0) < 0) {
+        } else if (diminuto_serial_set(fd, bps, databits, paritybit, stopbits, modemcontrol, 0, rtscts) < 0) {
             break;
         } else if (diminuto_serial_raw(fd) < 0) {
             break;
@@ -458,7 +463,7 @@ int main(int argc, char * argv[])
         } else if (device == (char *)0) {
             /* Do nothing. */
         } else {
-            fprintf(stderr, "%s: device=\"%s\" bps=%d databits=%d paritybit=%d stopbits=%d modemcontrol=%d fd=%d\n", program, device, bps, databits, paritybit, stopbits, modemcontrol, fd);
+            fprintf(stderr, "%s: device=\"%s\" bps=%d databits=%d paritybit=%d stopbits=%d modemcontrol=%d rtscts=%d fd=%d\n", program, device, bps, databits, paritybit, stopbits, modemcontrol, rtscts, fd);
         }
  
         /*
