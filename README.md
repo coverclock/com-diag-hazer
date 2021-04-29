@@ -1324,7 +1324,7 @@ I find this format more suitable for viewing the data during post-processing.
 Piping the CSV snippet into the script csv2dgm and providing an IP host
 address and port number like this
 
-    csv2dgm -j localhost:8080
+    csv2dgm -j -U localhost:8080
 
 sends a subset of the CSV line to an endpoint as a UDP datagram in JSON
 format. Receiving the datagrams using a command like this

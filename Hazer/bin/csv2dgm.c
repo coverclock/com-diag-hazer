@@ -417,9 +417,9 @@ int main(int argc, char * argv[])
         } else if (endpointname == (char *)0) {
             /* Do nothing. */
         } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
-            fprintf (stderr, "%s: endpoint=\"%s\"=%s:%u\n", program, endpointname, diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)), endpoint.udp);
+            fprintf (stderr, "%s: endpoint4=\"%s\"=%s:%u\n", program, endpointname, diminuto_ipc4_address2string(endpoint.ipv4, ipv4buffer, sizeof(ipv4buffer)), endpoint.udp);
         } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
-            fprintf (stderr, "%s: endpoint=\"%s\"=[%s]:%u\n", program, endpointname, diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)), endpoint.udp);
+            fprintf (stderr, "%s: endpoint6=\"%s\"=[%s]:%u\n", program, endpointname, diminuto_ipc6_address2string(endpoint.ipv6, ipv6buffer, sizeof(ipv6buffer)), endpoint.udp);
         } else {
             /* Do nothing. */
         }
@@ -587,7 +587,7 @@ int main(int argc, char * argv[])
                 if (token[ii] == (char *)0) {
                     break;
                 }
-                if (debug) {
+                if (verbose) {
                     fprintf(stderr, "%s: token[%d]=\"%s\"\n", program, ii, token[ii]);
                 }
             }
@@ -725,11 +725,15 @@ int main(int argc, char * argv[])
 
             if (sock < 0) {
                 /* Do nothing. */
-            } else if (size > 0) {
+            } else if (size == length) {
                 /* Do nothing. */
             } else if (size == 0) {
                 /* Should be impossible with UDP. */
                 fprintf(stderr, "diminuto_ipc_datagram_send: SHUTDOWN\n");
+                break;
+            } else if (size < length) {
+                /* Should be impossible with UDP. */
+                fprintf(stderr, "diminuto_ipc_datagram_send: SHORT\n");
                 break;
             } else {
                 break;
