@@ -1137,6 +1137,10 @@ the libraries and binaries in the system directories.)
 
 * vehicle - configures and runs a UBX-NEO-M8U with peruse and hups.
 
+## UDP over LTE-M (Wheatstone)
+
+* wheatstone - same as tracker but uses a serial-attached Digi XBEE 3 radio.
+
 ## Output Control
 
 * checkpoint - move the out/TARGET/tmp directory to a timestamped name.
