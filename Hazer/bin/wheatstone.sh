@@ -3,11 +3,12 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Run a GNSS receiver, saving its data, and forwarding JSON datagrams via a serial-connected radio.
-# The GPSDEVICE and GPSRATE default to those of the BU-353S4 USB device.
+# Run a GNSS receiver, saving its data, and forwarding JSON datagrams via a
+# serial-connected radio.
+# The GPSDEVICE and GPSRATE default to those of the BU-353W10 USB device.
 # The NETDEVICE and NETRATE default to those of the Digi XBEE3 LTE-M USB device.
 # usage: wheatstone [ GPSDEVICE [ NETDEVICE [ GPSRATE [ NETRATE [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ] ]
-# example: wheatstone /dev/ttyUSB0 /dev/ttyUSB1
+# example: wheatstone /dev/ttyACM0 /dev/ttyUSB0
 
 ##
 ## SETUP
@@ -19,9 +20,9 @@ CSVDIR=${COM_DIAG_HAZER_SAVDIR:-${HOME:-"/var/tmp"}/csv}
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
 PROGRAM=$(basename ${0})
-GPSDEVICE=${1:-"/dev/ttyUSB0"}
-NETDEVICE=${2:-"/dev/ttyUSB1"}
-GPSRATE=${3:-4800}
+GPSDEVICE=${1:-"/dev/ttyACM0"}
+NETDEVICE=${2:-"/dev/ttyUSB0"}
+GPSRATE=${3:-9600}
 NETRATE=${4:-9600}
 ERRFIL=${5-"${SAVDIR}/${PROGRAM}.err"}
 OUTFIL=${6-"${SAVDIR}/${PROGRAM}.out"}
