@@ -14,6 +14,7 @@
 
 #include <sys/types.h>
 #include <wchar.h>
+#include "types.h"
 
 /**
  * Encodings for fix type.

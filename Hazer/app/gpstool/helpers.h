@@ -13,16 +13,35 @@
  */
 
 #include "com/diag/diminuto/diminuto_time.h"
+#include "com/diag/diminuto/diminuto_frequency.h"
 #include "types.h"
 
 /**
  * Return monotonic time in seconds.
- * @param frequency is the underlying clock frequency.
  * @return monotonic time in seconds.
  */
-static inline long ticktock(diminuto_sticks_t frequency)
+static inline seconds_t ticktock(void)
 {
-    return diminuto_time_elapsed() / frequency;
+    return diminuto_time_elapsed() / diminuto_frequency();
+}
+
+/**
+ * Return true if specified number of seconds has elapsed, and if so
+ * update the previous elapsed seconds value-result variable.
+ * @param wasp points to the variable containing previous elapsed seconds.
+ * @param seconds is the number of seconds desired to elapse.
+ * @return true if the specified number of seconds has elapsed.
+ */
+static inline int dingdong(seconds_t * wasp, seconds_t seconds)
+{
+    int result;
+    seconds_t now;
+
+    if ((result = ((now = ticktock()) >= (*wasp + seconds)))) {
+        *wasp = now;
+    }
+
+    return result;
 }
 
 /**

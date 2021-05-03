@@ -174,8 +174,9 @@ int main(int argc, char * argv[])
     int unknown = 0;
     int serial = 0;
     int daemon = 0;
-    long timeout = HAZER_GNSS_SECONDS;
-    long keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
+    seconds_t timeout = HAZER_GNSS_SECONDS;
+    seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
+    seconds_t frequency = 1;
     /*
      * Configuration command variables.
      */
@@ -371,20 +372,16 @@ int main(int argc, char * argv[])
     /*
      * Time keeping variables.
      */
-    diminuto_sticks_t frequency = 0;
     diminuto_sticks_t delay = 0;
     diminuto_sticks_t elapsed = 0;
     diminuto_sticks_t epoch = 0;
     diminuto_sticks_t fix = -1;
     diminuto_sticks_t timetofirstfix = -1;
-    long expiration_was = 0;
-    long expiration_now = 0;
-    long display_was = 0;
-    long display_now = 0;
-    long keepalive_was = 0;
-    long keepalive_now = 0;
-    long trace_was = 0;
-    long trace_now = 0;
+    seconds_t expiration_was = 0;
+    seconds_t expiration_now = 0;
+    seconds_t display_last = 0;
+    seconds_t keepalive_last = 0;
+    seconds_t trace_last = 0;
     /*
      * I/O buffer variables.
      */
@@ -454,7 +451,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:O:PRS:T:U:VW:XY:b:cdeg:hk:lmnop:st:uvxy:?";
+    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:O:PRS:T:U:VW:XY:b:cdef:g:hk:lmnop:st:uvxy:?";
 
     /**
      ** PREINITIALIZATION
@@ -611,6 +608,10 @@ int main(int argc, char * argv[])
             paritybit = 2;
             serial = !0;
             break;
+        case 'f':
+            frequency = strtoul(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0') || (frequency < 1)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            break;
         case 'g':
             remote_mask = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
@@ -680,7 +681,7 @@ int main(int argc, char * argv[])
                            " [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ]"
                            " [ -K [ -k MASK ] ]"
                            " [ -N FILE ]"
-                           " [ -T FILE ]"
+                           " [ -T FILE [ -f SECONDS ] ]"
                           "\n", Program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
@@ -703,7 +704,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
-            fprintf(stderr, "       -T FILE     Save the PVT trace to FILE.\n");
+            fprintf(stderr, "       -T FILE     Save the PVT CSV Trace to FILE.\n");
             fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
             fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
@@ -716,6 +717,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
             fprintf(stderr, "       -e          Use Even parity for DEVICE.\n");
+            fprintf(stderr, "       -f SECONDS  Set trace Frequency to 1/SECONDS.\n");
             fprintf(stderr, "       -g MASK     Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
             fprintf(stderr, "       -h          Use RTS/CTS Hardware flow control for DEVICE.\n");
             fprintf(stderr, "       -k MASK     Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
@@ -1270,17 +1272,15 @@ int main(int argc, char * argv[])
 
     epoch = diminuto_time_elapsed();
 
-    frequency = diminuto_frequency();
+    expiration_now = expiration_was =
+        display_last =
+            keepalive_last =
+                trace_last =
+                    epoch / diminuto_frequency();
 
-    display_now = display_was =
-        expiration_now = expiration_was =
-            keepalive_now = keepalive_was =
-                trace_now = trace_was =
-                    epoch / frequency;
+    keepalive_last -= keepalive;
 
-    delay = frequency; /* May be mutatable some day. */
-
-    keepalive_was -= keepalive;
+    delay = diminuto_frequency();
 
     /*
      * Initialize all state machines to attempt synchronization with the
@@ -1740,14 +1740,13 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (!diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
-        } else if (((keepalive_now = ticktock(frequency)) - keepalive_was) < keepalive) {
+        } else if (!dingdong(&keepalive_last, keepalive)) {
             /* Do nothing. */
         } else {
 
             datagram_stamp(&keepalive_buffer.header, &keepalive_sequence);
             surveyor_total = send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             if (surveyor_total > 0) { network_total += surveyor_total; }
-            keepalive_was = keepalive_now;
 
             DIMINUTO_LOG_DEBUG("Surveyor RTCM keepalive sent");
 
@@ -1963,7 +1962,7 @@ int main(int argc, char * argv[])
          */
 
         expiration_was = expiration_now;
-        expiration_now = ticktock(frequency);
+        expiration_now = ticktock();
         elapsed = (expiration_now > expiration_was) ? expiration_now - expiration_was : 0;
 
         if (elapsed > 0) {
@@ -2477,19 +2476,18 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * If tracing is enabled and we have a high precision latitude,
-         * longitude, and height (LLH) solution, emit the trace.
+         * If tracing is enabled and we have a latitude, longitude
+         * and altitude solution, emit the trace.
          */
 
         if (trace_fp == (FILE *)0) {
             /* Do nothing. */
         } else if (!trace) {
             /* Do nothing. */
-        } else if (trace_was == (trace_now = ticktock(frequency))) {
+        } else if (!dingdong(&trace_last, frequency)) {
             /* Do nothing. */
         } else {
             emit_trace(trace_fp, position, &solution, &attitude, &posveltim, &base);
-            trace_was = trace_now;
             trace = 0;
         }
 
@@ -2582,7 +2580,7 @@ report:
 
         if (!refresh) {
             /* Do nothing. */
-        } else if (slow && (display_was == (display_now = ticktock(frequency)))) {
+        } else if (slow && (!dingdong(&display_last, 1))) {
             /* Do nothing. */
         } else {
 
@@ -2624,7 +2622,6 @@ report:
                 diminuto_assert(out_fp != (FILE *)0);
             }
 
-            display_was = display_now;
             refresh = 0;
         }
 
@@ -2706,7 +2703,7 @@ report:
         diminuto_perror("fclose(dev_fp)");
     }
 
-    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS peak=%lldB\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * frequency) / (diminuto_time_elapsed() - epoch)), (long long)io_peak);
+    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS peak=%lldB\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * diminuto_frequency()) / (diminuto_time_elapsed() - epoch)), (long long)io_peak);
 
     free(io_buffer);
 

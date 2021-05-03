@@ -22,13 +22,16 @@ SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 PROGRAM=$(basename ${0})
 GPSDEVICE=${1:-"/dev/ttyACM0"}
 NETDEVICE=${2:-"/dev/ttyUSB0"}
-GPSRATE=${3:-9600}
-NETRATE=${4:-9600}
-ERRFIL=${5-"${SAVDIR}/${PROGRAM}.err"}
-OUTFIL=${6-"${SAVDIR}/${PROGRAM}.out"}
-CSVFIL=${7-"${CSVDIR}/${PROGRAM}.csv"}
-PIDFIL=${8-"${SAVDIR}/${PROGRAM}.pid"}
-LIMIT=${9:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+UPDATE=${3:-5}
+GPSRATE=${4:-9600}
+NETRATE=${5:-9600}
+ERRFIL=${6-"${SAVDIR}/${PROGRAM}.err"}
+OUTFIL=${7-"${SAVDIR}/${PROGRAM}.out"}
+CSVFIL=${8-"${CSVDIR}/${PROGRAM}.csv"}
+PIDFIL=${9-"${SAVDIR}/${PROGRAM}.pid"}
+LIMIT=${10:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+
+TIMEOUT=10
 
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
@@ -55,7 +58,7 @@ tail -n 0 -f ${CSVFIL} | csv2dgm -D ${NETDEVICE} -b ${NETRATE} -8 -1 -n -j &
 ## CAPTURE CSV GEOLOCATION
 ##
 
-gpstool -D ${GPSDEVICE} -b ${GPSRATE} -8 -n -1 -H ${OUTFIL} -t 10 -T ${CSVFIL} -O ${PIDFIL} < /dev/null 1> /dev/null &
+gpstool -D ${GPSDEVICE} -b ${GPSRATE} -8 -n -1 -H ${OUTFIL} -f ${UPDATE} -t ${TIMEOUT} -T ${CSVFIL} -O ${PIDFIL} < /dev/null 1> /dev/null &
 
 sleep 5
 
