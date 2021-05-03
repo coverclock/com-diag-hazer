@@ -1116,7 +1116,6 @@ the libraries and binaries in the system directories.)
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvplayback - playback a stored CSV file, forward JSON to a UDP endpoint.
 * tracker - capture CSV with gpstool, forward JSON to an UDP endpoint, with peruse and hups.
-* wheatstone - like tracker, but uses a Digi XBEE 3 LTE-M radio over a serial port.
 
 ## Differential GNSS (Tumbleweed)
 
@@ -1140,7 +1139,7 @@ the libraries and binaries in the system directories.)
 
 ## UDP over LTE-M (Wheatstone)
 
-* wheatstone - same as tracker but uses a serial-attached Digi XBEE 3 radio.
+* wheatstone - like tracker, but uses LTE-M over a serial-attached Digi XBEE 3 radio.
 
 ## Output Control
 
