@@ -366,6 +366,10 @@ int main(int argc, char * argv[])
                 fprintf(stderr, "       -2              Set DEVICE to 2 stop bits.\n");
                 fprintf(stderr, "       -7              Set DEVICE to 7 data bits.\n");
                 fprintf(stderr, "       -8              Set DEVICE to 8 data bits.\n");
+                fprintf(stderr, "       -D DEVICE       Write datagram to DEVICE.\n");
+                fprintf(stderr, "       -F FILE         Save latest datagram in observation FILE.\n");
+                fprintf(stderr, "       -M MODE         Set FILE mode to MODE.\n");
+                fprintf(stderr, "       -U HOST:PORT    Forward datagrams to HOST:PORT.\n");
                 fprintf(stderr, "       -b BPS          Set DEVICE to BPS bits per second.\n");
                 fprintf(stderr, "       -c              Emit CSV.\n");
                 fprintf(stderr, "       -d              Enable debug output.\n");
@@ -382,10 +386,6 @@ int main(int argc, char * argv[])
                 fprintf(stderr, "       -v              Enable verbose output.\n");
                 fprintf(stderr, "       -x              Emit XML.\n");
                 fprintf(stderr, "       -y              Emit YAML.\n");
-                fprintf(stderr, "       -D DEVICE       Write datagram to DEVICE.\n");
-                fprintf(stderr, "       -F FILE         Save latest datagram in observation FILE.\n");
-                fprintf(stderr, "       -M MODE         Set FILE mode to MODE.\n");
-                fprintf(stderr, "       -U HOST:PORT    Forward datagrams to HOST:PORT.\n");
                 error = !0;
                 break;
             }

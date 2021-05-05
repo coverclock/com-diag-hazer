@@ -1139,7 +1139,7 @@ the libraries and binaries in the system directories.)
 
 ## UDP over LTE-M (Wheatstone)
 
-* wheatstone - like tracker, but uses LTE-M over a serial-attached Digi XBEE 3 radio.
+* wheatstone - like tracker but over a serial-attached Digi XBEE 3 LTE-M radio.
 
 ## Output Control
 
@@ -1454,7 +1454,36 @@ See the README in the Tesoro repository for more information.
            -t SECONDS  Set the client timeout to SECONDS seconds.
            -v          Display Verbose output on standard error.
 
-# Memory leaks
+## csv2dgm
+
+    > csv2dgm -?
+    usage: csv2dgm [ -d ] [ -v ] [ -c | -h | -j | | -q | -s | -x | -y ] [ -t ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -1 | -2 ] [ -e | -o | -n ] [ -m ] [ -r ] ] [ -F FILE ] [ -M MODE ] [ -U HOST:PORT ]
+           -1              Set DEVICE to 1 stop bit.
+           -2              Set DEVICE to 2 stop bits.
+           -7              Set DEVICE to 7 data bits.
+           -8              Set DEVICE to 8 data bits.
+           -D DEVICE       Write datagram to DEVICE.
+           -F FILE         Save latest datagram in observation FILE.
+           -M MODE         Set FILE mode to MODE.
+           -U HOST:PORT    Forward datagrams to HOST:PORT.
+           -b BPS          Set DEVICE to BPS bits per second.
+           -c              Emit CSV.
+           -d              Enable debug output.
+           -e              Set DEVICE to even parity.
+           -h              Emit HTML.
+           -j              Emit JSON.
+           -o              Set DEVICE to odd parity.
+           -m              Set DEVICE to use modem control.
+           -n              Set DEVICE to no parity.
+           -q              Emit URL Query.
+           -r              Set DEVICE to use hardware flow control.
+           -s              Emit Shell commands.
+           -t              Write to standard output.
+           -v              Enable verbose output.
+           -x              Emit XML.
+           -y              Emit YAML.
+
+# Memory Leaks
 
 When testing for memory leaks, I strongly recommend using valgrind,
 specfically with the full leak check option.
