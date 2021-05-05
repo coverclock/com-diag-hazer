@@ -1076,7 +1076,7 @@ the libraries and binaries in the system directories.)
 * bucketbrigade - read from a serial port and forward to another serial port.
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * compasstool - converts a bearing in decimal degrees to an 8, 16, or 32 compass point.
-* csv2dgm - forwards subset of gpstool CSV fields from stdin to a UDP port.
+* csv2dgm - forwards subset of gpstool CSV fields from stdin to a UDP endpoint, serial port, etc.
 * geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
@@ -1330,24 +1330,32 @@ I find this format more suitable for viewing the data during post-processing.
 Piping the CSV snippet into the script csv2dgm and providing an IP host
 address and port number like this
 
-    csv2dgm -j -U localhost:8080
+    csv2dgm -j -U hostname:5555
 
 sends a subset of the CSV line to an endpoint as a UDP datagram in JSON
 format. Receiving the datagrams using a command like this
 
-    socat -u UDP6-RECV:8080 -
+    socat -u UDP6-RECV:5555 -
 
 produces output that looks like this.
 
-    { "TIM": 1598455524, "LAT": 39.7943026, "LON": -105.1533253, "MSL": 1708.000, "LBL": "20200826T152524Z" }
-    { "TIM": 1598455525, "LAT": 39.7943030, "LON": -105.1533263, "MSL": 1708.100, "LBL": "20200826T152525Z" }
-    { "TIM": 1598455526, "LAT": 39.7943030, "LON": -105.1533276, "MSL": 1708.200, "LBL": "20200826T152526Z" }
-    { "TIM": 1598455527, "LAT": 39.7943031, "LON": -105.1533286, "MSL": 1708.300, "LBL": "20200826T152527Z" }
-    { "TIM": 1598455528, "LAT": 39.7943035, "LON": -105.1533300, "MSL": 1708.500, "LBL": "20200826T152528Z" }
+    { "NAM": "neon", "NUM": 116, "TIM": 1598455524, "LAT": 39.7943026, "LON": -105.1533253, "MSL": 1708.000, "LBL": "2020-08-26T15:25:24Z" }
+    { "NAM": "neon", "NUM": 117, "TIM": 1598455525, "LAT": 39.7943030, "LON": -105.1533263, "MSL": 1708.100, "LBL": "2020-08-26T15:25:25Z" }
+    { "NAM": "neon", "NUM": 118, "TIM": 1598455526, "LAT": 39.7943030, "LON": -105.1533276, "MSL": 1708.200, "LBL": "2020-08-26T15:25:26Z" }
+    { "NAM": "neon", "NUM": 119, "TIM": 1598455527, "LAT": 39.7943031, "LON": -105.1533286, "MSL": 1708.300, "LBL": "2020-08-26T15:25:27Z" }
+    { "NAM": "neon", "NUM": 120, "TIM": 1598455528, "LAT": 39.7943035, "LON": -105.1533300, "MSL": 1708.500, "LBL": "2020-08-26T15:25:28Z" }
 
 This output can be processed by the fun/channel script in another project,
 Tesoro, which uses this JSON and some JavaScript code to drive a moving map
 display using an OpenStreetMap tile server.
+
+The same utility can be used to send the same subset of the CSV output to
+a serial port. I use this to transmit the CSV data via an Digi XBEE 3
+LTE-M radio. If the XBEE is configured correctly, it can send the same
+datagram to the same endpoint via LTE-M, yielding the same result as
+above. I use LTE-M SIMs for AT&T's One Rate plan for this.
+
+    csv2dgm -j -D /dev/ttyUSB0 -b 9600 -8 -1 -n
 
 ## csvfollow and csvplayback
 
