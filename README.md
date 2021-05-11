@@ -370,6 +370,7 @@ Hazer has been successfully tested with the following GPS devices.
 
 * Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [12]    
 * Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
+* Digi XBIB-C-GPS (U-blox 8/UBX-CAM-M8Q, 9600 8n1, 1Hz)    
 * Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [9]    
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    

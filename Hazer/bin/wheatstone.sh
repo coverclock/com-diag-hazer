@@ -5,10 +5,14 @@
 # https://github.com/coverclock/com-diag-hazer
 # Run a GNSS receiver, saving its data, and forwarding JSON datagrams via a
 # serial-connected radio.
-# The GPSDEVICE and GPSRATE default to those of the BU-353W10 USB device.
-# The NETDEVICE and NETRATE default to those of the Digi XBEE3 LTE-M USB device.
+# The NETDEVICE and NETRATE default to the Digi XBIB-CU-TH board or the
+# Digi XBIB-U-DEV board, either with a Digi XBEE3 LTE-M radio module.
+# The GPSDEVICE and GPSRATE default to the Digi XBIB-C-GPS daughter board.
+# In the case of the XBIB-C-GPS daughter board, the defaults in the script
+# assume that the FTDI USB-to-serial cable is plugged in *second* so that it
+# enumerates as /dev/ttyUSB1 while the radio enumerates as /dev/ttyUSB0.
 # usage: wheatstone [ GPSDEVICE [ NETDEVICE [ GPSRATE [ NETRATE [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ] ]
-# example: wheatstone /dev/ttyACM0 /dev/ttyUSB0
+# example: wheatstone /dev/ttyUSB1 /dev/ttyUSB0
 
 ##
 ## SETUP
@@ -20,7 +24,7 @@ CSVDIR=${COM_DIAG_HAZER_SAVDIR:-${HOME:-"/var/tmp"}/csv}
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
 PROGRAM=$(basename ${0})
-GPSDEVICE=${1:-"/dev/ttyACM0"}
+GPSDEVICE=${1:-"/dev/ttyUSB1"}
 NETDEVICE=${2:-"/dev/ttyUSB0"}
 UPDATE=${3:-5}
 GPSRATE=${4:-9600}
