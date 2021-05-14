@@ -1145,6 +1145,7 @@ the libraries and binaries in the system directories.)
 ## UDP over LTE-M (Wheatstone)
 
 * wheatstone - like tracker but over a serial-attached Digi XBEE 3 LTE-M radio.
+* wheatstoneshutdown - shuts down Digi XBEE 3 LTE-M radio (recommended before powering off).
 
 ## OpenStreetMap Moving Map (Tesoro)
 
