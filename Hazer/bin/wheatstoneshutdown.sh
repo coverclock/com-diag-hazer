@@ -14,7 +14,7 @@ NETRATE=${5:-9600}
 
 echo ${PROGRAM}: DEVICE ${NETDEVICE} ${NETRATE} 1>&2
 
-#coproc serialtool -D ${NETDEVICE} -b ${NETRATE} -8 -1 -n
+#coproc serialtool -D ${NETDEVICE} -b ${NETRATE} -8 -1 -n -r
 #echo ${PROGRAM}: SERIALTOOL ${COPROC[0]} ${COPROC[1]} 1>&2
 #exec 0<&${COPROC[0]}-
 #exec 1>&${COPROC[1]}-
