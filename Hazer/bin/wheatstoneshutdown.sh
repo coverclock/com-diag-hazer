@@ -25,7 +25,14 @@ echo ${PROGRAM}: PLUSPLUSPLUS 1>&2
 echo -n -e '+++' > ${NETDEVICE}
 read -s -n 2 REPLY < ${NETDEVICE}
 echo ${PROGRAM}: PLUSPLUSPLUS \"${REPLY}\" 1>&2
+
+test "${REPLY}" = "OK" || exit 1
+
 echo ${PROGRAM}: SHUTDOWN 1>&2
 echo -n -e 'ATSD0\r' > ${NETDEVICE}
 read -s -n 2 REPLY < ${NETDEVICE}
 echo ${PROGRAM}: SHUTDOWN \"${REPLY}\" 1>&2
+
+test "${REPLY}" = "OK" || exit 1
+
+exit 0
