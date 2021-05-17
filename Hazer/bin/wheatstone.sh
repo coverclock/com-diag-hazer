@@ -5,14 +5,17 @@
 # https://github.com/coverclock/com-diag-hazer
 # Run a GNSS receiver, saving its data, and forwarding JSON datagrams via a
 # serial-connected radio.
+#
 # The NETDEVICE and NETRATE default to the parameters for the Digi XBIB-CU-TH
 # board with a Digi XBEE3 LTE-M radio module; the serial connection is via an
-# on-board FTDI chip. The GPSDEVICE and GPSRATE default to the parameters for
-# the Digi XBIB-C-GPS daughter board with a u-blox CAN-M8Q GNSS receiver with
-# the serial connection provided by a separate FTDI cable. For the XBEE3 radio
-# I use a SIM for AT&T's LTE-M "One Rate" plan. Note that the enumeration of the
-# ttyUSB devices will depend on the order that they are plugged in, even though
-# the GNSS receiver is powered from the same USB C connection as the radio.
+# on-board FTDI chip.
+#
+# The GPSDEVICE and GPSRATE default to the parameters for the Digi XBIB-C-GPS
+# daughter board with a u-blox CAN-M8Q GNSS receiver; the serial connection is
+# via direct connection to the Raspberry Pi serial port.
+#
+# For the XBEE3 radio, I use a SIM for AT&T's LTE-M "One Rate" plan.
+#
 # usage: wheatstone [ GPSDEVICE [ NETDEVICE [ GPSRATE [ NETRATE [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ] ]
 # example: wheatstone /dev/ttyUSB1 /dev/ttyUSB0
 
@@ -26,7 +29,7 @@ CSVDIR=${COM_DIAG_HAZER_SAVDIR:-${HOME:-"/var/tmp"}/csv}
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
 PROGRAM=$(basename ${0})
-GPSDEVICE=${1:-"/dev/ttyUSB1"}
+GPSDEVICE=${1:-"/dev/ttyS0"}
 NETDEVICE=${2:-"/dev/ttyUSB0"}
 UPDATE=${3:-10}
 GPSRATE=${4:-9600}
