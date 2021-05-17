@@ -785,3 +785,14 @@ Importance of Decimal Places", blis.com, 2017-07-09,
 <https://blis.com/precision-matters-critical-importance-decimal-places-five-lowest-go/>
 
 Wikipedia, "Wikipedia, "Decimal Degrees", 2020-11-14, <https://en.wikipedia.org/wiki/Decimal_degrees>
+
+## Geocode Examples
+
+Latitude/Longitude: 39°47'39.392"N, 105°09'12.293"W    
+
+Decimal Degrees: 39.7942756, -105.1534148    
+
+What3Words.com:	///beard.hobby.funds    
+
+maps.google.com plus.codes: QRVW+PJ    
+
