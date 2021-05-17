@@ -1153,6 +1153,7 @@ the libraries and binaries in the system directories.)
 * csvfollow - follow a CSV file in real-time, forward as JSON to a UDP endpoint.
 * csvmeter - meters lines from a gpstool CSV file based on interarrival times.
 * csvplayback - playback a stored CSV file, forward JSON to a UDP endpoint.
+* jsonmeter - meters lines from a JSON file based on interarrival times.
 * tracker - capture CSV with gpstool, forward JSON to an UDP endpoint, with peruse and hups.
 
 ## Output Control
