@@ -34,10 +34,10 @@ repository, it incorporates features in support of five different
 related projects described below:
 
 * Hazer (NMEA support),
-* Yodel (UBX support, including IMU),
+* Yodel (UBX support including IMU),
 * Tumbleweed (RTCM support),
 * Wheatstone (LTE-M support), and
-* Tesoro (Open Street Map support).
+* Tesoro (OSM support).
 
 The Hazer repo includes parsers for three different input formats - NMEA,
 UBX, and RTCM - and interprets many of the data records represented in
@@ -382,7 +382,7 @@ Hazer has been successfully tested with the following GPS devices.
 
 * Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [12]    
 * Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
-* Digi XBIB-C-GPS (U-blox 8/UBX-CAM-M8Q, 9600 8n1, 1Hz)    
+* Digi XBIB-C-GPS (U-blox 8/UBX-CAM-M8Q, 9600 8N1, 1Hz) [4]    
 * Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [9]    
 * Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
@@ -403,7 +403,7 @@ Hazer has been successfully tested with the following GPS devices.
 * SparkFun GPS Dead Reckoning gen 9 (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]
 * Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * TOPGNSS GN-803G (U-Blox 8/UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
-* Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8n1, N/A, ttyAMA, 1Hz) [4]    
+* Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8N1, N/A, ttyAMA, 1Hz) [4]    
 
 Footnotes:
 
