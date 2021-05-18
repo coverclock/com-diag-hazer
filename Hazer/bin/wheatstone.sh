@@ -9,12 +9,13 @@
 # The NETDEVICE and NETRATE default to the parameters for the Digi XBIB-CU-TH
 # board with a Digi XBEE3 LTE-M radio module; the serial connection is via an
 # on-board FTDI chip.
-#
 # The GPSDEVICE and GPSRATE default to the parameters for the Digi XBIB-C-GPS
 # daughter board with a u-blox CAN-M8Q GNSS receiver; the serial connection is
 # via direct connection to the Raspberry Pi serial port.
-#
 # For the XBEE3 radio, I use a SIM for AT&T's LTE-M "One Rate" plan.
+# Beware when running unshielded and untwisted jumper wires from the Digi board
+# to the RPi's serial port that you don't run them near the cellular antenna. I
+# suspect this can induct spurious signals into the serial bit stream.
 #
 # usage: wheatstone [ GPSDEVICE [ NETDEVICE [ GPSRATE [ NETRATE [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ] ]
 # example: wheatstone /dev/ttyUSB1 /dev/ttyUSB0
@@ -40,8 +41,8 @@ CSVFIL=${8-"${CSVDIR}/${PROGRAM}.csv"}
 PIDFIL=${9-"${SAVDIR}/${PROGRAM}.pid"}
 LIMIT=${10:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
-TIMEOUT=10
-REPORT=5
+TIMEOUT=60
+REPORT=1
 
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
