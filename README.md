@@ -824,9 +824,11 @@ ublox, 2018-12-20
 
 # Resources
 
-<http://www.catb.org/gpsd/NMEA.txt>
+<http://www.catb.org/gpsd/NMEA.txt> DEPRECATED
 
-<http://www.catb.org/gpsd/NMEA.html>
+<http://www.catb.org/gpsd/NMEA.html> DEPRECATED
+
+<https://gpsd.gitlab.io/gpsd/NMEA.html>
 
 <https://support.google.com/earth/answer/148095>
 
