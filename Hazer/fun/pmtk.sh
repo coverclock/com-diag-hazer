@@ -19,4 +19,4 @@ mkdir -p $(dirname ${ERRFIL})
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -W '$PMTK605' 2>> ${ERRFIL}
+gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -F 1 -W '$PMTK605' 2>> ${ERRFIL}

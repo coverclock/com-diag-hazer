@@ -42,7 +42,7 @@ coreable gpstool \
 	-B 1024 \
 	-C ${CATFIL} \
 	-D ${DEVICE} -b ${RATE} -8 -n -1 \
-	-F -H ${OUTFIL} -t 10 \
+	-H ${OUTFIL} -t 10 \
 	-L ${LOGFIL} \
 	-N ${FIXFIL} \
 	-S ${SRCFIL} \

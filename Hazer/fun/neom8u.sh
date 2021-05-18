@@ -3,7 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# I'm using this with a SparkFun board with the dead reckining
+# I'm using this with a SparkFun board with the dead reckoning
 # u-blox NEO-M8U module.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
@@ -25,4 +25,4 @@ for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} -W ${OPTION}"
 done
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F ${OPTIONS} 2>> ${ERRFIL}
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -F 1 ${OPTIONS} 2>> ${ERRFIL}

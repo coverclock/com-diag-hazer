@@ -41,6 +41,7 @@ PIDFIL=${9-"${SAVDIR}/${PROGRAM}.pid"}
 LIMIT=${10:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 TIMEOUT=10
+REPORT=5
 
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
@@ -67,7 +68,7 @@ tail -n 0 -f ${CSVFIL} | csv2dgm -D ${NETDEVICE} -b ${NETRATE} -8 -1 -n -j &
 ## CAPTURE CSV GEOLOCATION
 ##
 
-gpstool -D ${GPSDEVICE} -b ${GPSRATE} -8 -n -1 -H ${OUTFIL} -f ${UPDATE} -t ${TIMEOUT} -T ${CSVFIL} -O ${PIDFIL} < /dev/null 1> /dev/null &
+gpstool -D ${GPSDEVICE} -b ${GPSRATE} -8 -n -1 -H ${OUTFIL} -f ${UPDATE} -F ${REPORT} -t ${TIMEOUT} -T ${CSVFIL} -O ${PIDFIL} < /dev/null 1> /dev/null &
 
 sleep 5
 

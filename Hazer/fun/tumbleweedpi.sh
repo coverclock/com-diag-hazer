@@ -13,4 +13,4 @@ RATE=${2:-115200}
 DIR=$(readlink -e $(dirname ${0})/..)/log
 mkdir -p ${DIR}
 
-exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -F -H ${DIR}/${PROGRAM}.out -t 10 2> ${DIR}/${PROGRAM}.log
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${DIR}/${PROGRAM}.out -t 10 2> ${DIR}/${PROGRAM}.log

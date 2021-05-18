@@ -51,7 +51,7 @@
  *
  *  gpstool -D /dev/ttyACM0 -b 115200 -8 -n -1 \
  *      -G tumbleweed:21010 -g 4 \
- *      -F -H headless.out -t 10 \
+ *      -H headless.out -t 10 \
  *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01' \
  *      -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00' \
  *      -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40\x10\x27\x00\x00' \
@@ -169,11 +169,11 @@ int main(int argc, char * argv[])
     int process = 0;
     int strobepin = (((int)1)<<((sizeof(int)*8)-1));
     int ppspin = (((int)1)<<((sizeof(int)*8)-1));
-    int slow = 0;
     int expire = 0;
     int unknown = 0;
     int serial = 0;
     int daemon = 0;
+    seconds_t slow = 0;
     seconds_t timeout = HAZER_GNSS_SECONDS;
     seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
     seconds_t frequency = 1;
@@ -451,7 +451,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EFG:H:I:KL:MN:O:PRS:T:U:VW:XY:b:cdef:g:hk:lmnop:st:uvxy:?";
+    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:b:cdef:g:hk:lmnop:st:uvxy:?";
 
     /**
      ** PREINITIALIZATION
@@ -507,9 +507,9 @@ int main(int argc, char * argv[])
             process = !0;
             break;
         case 'F':
+            slow = strtoul(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0') || (slow < 1)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             report = !0;
-            slow = !0;
-            escape = !0;
             process = !0;
             break;
         case 'G':
@@ -520,7 +520,7 @@ int main(int argc, char * argv[])
             break;
         case 'H':
             report = !0;
-            slow = !0;
+            if (slow == 0) { slow = 1; }
             process = !0;
             headless = optarg;
             break;
@@ -675,7 +675,7 @@ int main(int argc, char * argv[])
                            " [ -t SECONDS ]"
                            " [ -I PIN | -c ] [ -p PIN ]"
                            " [ -U STRING ... ] [ -W STRING ... ]"
-                           " [ -R | -E | -F | -H HEADLESS | -P ]"
+                           " [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ]"
                            " [ -L LOG ]"
                            " [ -G [ IP:PORT | :PORT [ -g MASK ] ] ]"
                            " [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ]"
@@ -691,7 +691,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -C FILE     Catenate input to FILE or named pipe.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
-            fprintf(stderr, "       -F          Like -E but reFresh at 1Hz.\n");
+            fprintf(stderr, "       -F SECONDS  Set report Frequency to 1/SECONDS.\n");
             fprintf(stderr, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
             fprintf(stderr, "       -G :PORT    Use local PORT as dataGram source.\n");
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
@@ -2580,7 +2580,7 @@ report:
 
         if (!refresh) {
             /* Do nothing. */
-        } else if (slow && (!dingdong(&display_last, 1))) {
+        } else if ((slow > 0) && (!dingdong(&display_last, slow))) {
             /* Do nothing. */
         } else {
 
