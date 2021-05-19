@@ -796,3 +796,35 @@ What3Words.com:	///beard.hobby.funds
 
 maps.google.com plus.codes: QRVW+PJ    
 
+## Corruption of Serial Data Stream by RF
+
+For my Wheatstone project, I used a Digi XBee LTE-M radio in "transparent
+mode" to send JSON datagrams via UDP based on output from gpstool.
+My initial test setup had me reading the serial port of a U-Blox CAM-M8Q
+GNSS receiver using an FTDI-to-serial convertor. It ran flawlessly for
+days.
+
+In my second test setup, I was running gpstool on a Raspberry Pi and
+reading the output stream of the CAM-M8Q via the RPi's serial port. I
+used typical jumper wires to go from the CAM-M8Q (really, from the pins
+on the Digi XBIB-CU-TH development board that were connected to the
+CAM-M8Q on the Digi XBIB-C-GPS daughter board) to the RPi.
+
+This worked initially. But a couple of days later I started getting
+garbage characters - typically with a lot of bits set, like 0xf4 - in the
+middle of NMEA sentences, causing gpstool to reject the sentence (checksum
+failure) and resync with the stream. Eventually I could only run a test
+for a few minutes; the NMEA stream would desync and then fail to resync.
+If I restarted gpstool, it would run okay for a few minutes, then fail in
+the same way.
+
+It took me most of a morning to debug this. It turned out the jumper wires
+for the serial connection, which were unshielded and not twisted pair, had
+gotten right up against the cellular antenna for the LTE-M radio as I had
+moved stuff around on my lab bench. The transmit RF power was apparently
+enough to induce a signal on the serial connection, which could only
+occasionally be decoded by the UART in the RPi as a valid (but incorrrect)
+data frame.
+
+I switched to a different cellular antenna, rearranged my lab bench,
+and my test has run flawlessly for many hours since then.
