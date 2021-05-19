@@ -465,7 +465,7 @@ int main(int argc, char * argv[])
     DIMINUTO_LOG_INFORMATION("Begin");
 
     {
-        char commandline[4096] = "";
+        char commandline[4096] = { '\0', };
         sz = diminuto_command_line(argc, (const char **)argv, commandline, sizeof(commandline));
         DIMINUTO_LOG_INFORMATION("Command \"%s\"\n", commandline);
     }
