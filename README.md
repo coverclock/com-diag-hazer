@@ -706,6 +706,8 @@ John Sloan, "Screen Recording 2021 02 18 at 8 55 20 AM", video, <https://youtu.b
 
 John Sloan, "Screen Recording 2021 02 24 at 10 06 20 AM", video, <https://youtu.be/-6p3w1SxW1A>
 
+John Sloan, "Wheatstone", album, <https://flic.kr/s/aHsmVu1wkK>
+
 John Sloan, "Yodel", album, <https://flic.kr/s/aHsmNDPmDN>
 
 # References
