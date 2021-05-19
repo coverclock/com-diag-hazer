@@ -442,7 +442,6 @@ int main(int argc, char * argv[])
     int rc = 0;
     size_t sz = 0;
     char * locale = (char *)0;
-    char commandline[256] = "";
     /*
      * External symbols.
      */
@@ -465,8 +464,11 @@ int main(int argc, char * argv[])
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
     diminuto_log_setmask();
 
-    sz = diminuto_command_line(argc, (const char **)argv, commandline, sizeof(commandline));
-    DIMINUTO_LOG_INFORMATION("Command \"%s\"\n", commandline);
+    {
+        char commandline[4096] = "";
+        sz = diminuto_command_line(argc, (const char **)argv, commandline, sizeof(commandline));
+        DIMINUTO_LOG_INFORMATION("Command \"%s\"\n", commandline);
+    }
 
     (void)gethostname(Hostname, sizeof(Hostname));
     Hostname[sizeof(Hostname) - 1] = '\0';
