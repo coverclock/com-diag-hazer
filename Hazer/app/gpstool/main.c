@@ -454,8 +454,6 @@ int main(int argc, char * argv[])
      */
     static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:b:cdef:g:hk:lmnop:st:uvxy:?";
 
-    DIMINUTO_LOG_INFORMATION("Begin");
-
     /**
      ** PREINITIALIZATION
      **/
@@ -463,6 +461,8 @@ int main(int argc, char * argv[])
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
     diminuto_log_setmask();
+
+    DIMINUTO_LOG_INFORMATION("Begin");
 
     {
         char commandline[4096] = "";
