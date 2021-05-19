@@ -90,6 +90,7 @@
 #include "com/diag/diminuto/diminuto_absolute.h"
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_coherentsection.h"
+#include "com/diag/diminuto/diminuto_command.h"
 #include "com/diag/diminuto/diminuto_containerof.h"
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_criticalsection.h"
@@ -441,6 +442,7 @@ int main(int argc, char * argv[])
     int rc = 0;
     size_t sz = 0;
     char * locale = (char *)0;
+    char commandline[256] = "";
     /*
      * External symbols.
      */
@@ -453,21 +455,25 @@ int main(int argc, char * argv[])
      */
     static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:b:cdef:g:hk:lmnop:st:uvxy:?";
 
+    DIMINUTO_LOG_INFORMATION("Begin");
+
     /**
      ** PREINITIALIZATION
      **/
 
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
-
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
-
     diminuto_log_setmask();
+
+    sz = diminuto_command_line(argc, (const char **)argv, commandline, sizeof(commandline));
+    DIMINUTO_LOG_INFORMATION("Command \"%s\"\n", commandline);
 
     (void)gethostname(Hostname, sizeof(Hostname));
     Hostname[sizeof(Hostname) - 1] = '\0';
     if (Hostname[0] == '\0') {
         strncpy(Hostname, "hostname", sizeof(Hostname));
     }
+    DIMINUTO_LOG_INFORMATION("Hostname \"%s\"\n", Hostname);
 
     /*
      * OPTIONS
@@ -744,8 +750,6 @@ int main(int argc, char * argv[])
     /**
      ** INITIALIZATION
      **/
-
-    DIMINUTO_LOG_INFORMATION("Begin");
 
     /*
      * Necessary to get stuff like wchar_t and the "%lc" format to work,
