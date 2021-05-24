@@ -465,9 +465,18 @@ int main(int argc, char * argv[])
     DIMINUTO_LOG_INFORMATION("Begin");
 
     {
-        char commandline[4096] = { '\0', };
-        sz = diminuto_command_line(argc, (const char **)argv, commandline, sizeof(commandline));
+        size_t commandlength = 0;
+        char * commandline = (char *)0;
+        size_t commandresult = 0;
+
+        commandlength = diminuto_command_length(argc, (const char **)argv);
+        diminuto_assert(commandlength > 0);
+        commandline = (char *)malloc(commandlength);
+        diminuto_assert(commandline != (char *)0);
+        commandresult = diminuto_command_line(argc, (const char **)argv, commandline, commandlength);
+        diminuto_assert(commandresult == commandlength);
         DIMINUTO_LOG_INFORMATION("Command \"%s\"\n", commandline);
+        free(commandline);
     }
 
     (void)gethostname(Hostname, sizeof(Hostname));
