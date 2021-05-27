@@ -1048,7 +1048,7 @@ the libraries and binaries in the system directories.)
 
 # Directories
 
-* app - application source files (utilities that can be daemons). 
+* app - application source files (utilities with more than one source file).
 * bin - utility source files.
 * cfg - configuration makefiles.
 * dat - data captured from Hazer, Yodel, and Tumbleweed tests (some in LFS).
