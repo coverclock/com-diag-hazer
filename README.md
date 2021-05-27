@@ -187,17 +187,17 @@ use this repo.
 
 ## geodesic
 
-The geodesic utility is based on algorithms described in
+The geodesic application is based on algorithms described in
 
 > Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
 > 2013-01, 87.1, pp. 43..55
 
-and uses one .c file and one .h file, included in this repository, that was
-written by Mr. Karney and which can be found at
+and uses one .c file and one .h file, included in this repository, that were
+written by Mr. Karney. They can be found at
 
 > <https://geographiclib.sourceforge.io>
 
-and which is licensed under the MIT license.
+and are licensed under the MIT license.
 
 ## locale
 
@@ -1082,6 +1082,7 @@ the libraries and binaries in the system directories.)
 # Applications
 
 * dgmtool - multipoint-to-multipoint CSV UDP-to-TCP forwarder.
+* geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
 * gpstool - Hazer's multi-purpose GNSS tool.
 * rtktool - Tumbleweed's point-to-multipoint RTK UDP-to-UDP router.
 
@@ -1094,7 +1095,6 @@ the libraries and binaries in the system directories.)
 * checksum - takes arguments that are NMEA or UBX packets and adds end matter.
 * compasstool - converts a bearing in decimal degrees to an 8, 16, or 32 compass point.
 * csv2dgm - forwards subset of gpstool CSV fields from stdin to a UDP endpoint, serial port, etc.
-* geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
 * haversine - computes the great circle distance in meters between two coordinates.
 * hazer - consumes data from a serial port and reports on stdout.
 * iso8601 - converts seconds since the UNIX epoch into an ISO8601 timestamp.

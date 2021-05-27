@@ -70,7 +70,6 @@ CFG_DIR				:=	cfg# Build configuration files
 DEP_DIR				:=	dep# Generated dependencies and other make files
 DOC_DIR				:=	doc# Documentation
 ETC_DIR				:=	etc# Miscellaneous files
-EXT_DIR				:=	ext# Extra source files not part of Hazer
 FUN_DIR				:=	fun# Functional tests
 GEN_DIR				:=	gen# Generated source files
 INC_DIR				:=	inc# Header files
