@@ -1084,7 +1084,7 @@ the libraries and binaries in the system directories.)
 # Applications
 
 * dgmtool - multipoint-to-multipoint CSV UDP-to-TCP forwarder.
-* geodesic - computes the WGS84 geodesic distance in meters between two coordinates.
+* geodesic - computes the geodesic distance in meters between two WGS84 coordinates.
 * gpstool - Hazer's multi-purpose GNSS tool.
 * rtktool - Tumbleweed's point-to-multipoint RTK UDP-to-UDP router.
 
