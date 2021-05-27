@@ -743,6 +743,10 @@ Specification", 2nd Edition, 1995-06-02
 John G. Grimes et al., *Global Position System Standard Positioning Service
 Performance Standard*, 4th edition, 2008-09
 
+Grosse-Kunstleve RW, Terwilliger TC, Sauter NK, Adams PD, "Automatic
+Fortran to C++ conversion with FABLE", *Source Code for Biology and
+Medicine 2012*, 7:5
+
 GTop, "PMTK command packet", Revision A11, GlobalTop, 2012
 
 IGS et al., "RINEX - The Receiver Independent Exchange Format", Version 3.03,
@@ -1048,7 +1052,6 @@ the libraries and binaries in the system directories.)
 * bin - utility source files.
 * cfg - configuration makefiles.
 * dat - data captured from Hazer, Yodel, and Tumbleweed tests (some in LFS).
-* ext - sources for extra files not part of this library.
 * fun - functional test source files.
 * inc - public header files.
 * out - build artifacts.
@@ -1063,7 +1066,6 @@ the libraries and binaries in the system directories.)
 * out/$(TARGET)/arc - object file archives for static linking.
 * out/$(TARGET)/bin - utility stripped binary executables and scripts.
 * out/$(TARGET)/dep - make dependencies.
-* out/$(TARGET)/ext - executables of extra files if you choose to compile them.
 * out/$(TARGET)/fun - functional test binary executables and scripts.
 * out/$(TARGET)/gen - generated source files.
 * out/$(TARGET)/inc - include (header) files.
