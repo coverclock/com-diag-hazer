@@ -1534,6 +1534,15 @@ future GNU update (or it's a bug in my code that I can't see).
 
 Thanks to Charles F. F. Karney for his MIT licensed geographiclib.
 
+Thank you to Kathy Kadnuck of the Valley Water District, who, thanks to
+her collection of infrastructure survey maps, helped me to determine
+the location of an old NGS survey marker in my neighborhood which,
+apparently, had been buried under a sidewalk as part of a development
+in the past few decades. (Remarkably, it is not illegal to landscape
+over an NGS survey marker. It's merely illegal to remove or damage them.
+If a municipality needs to find the marker for official business, be
+prepared to have your landscaping back-hoe'ed up.)
+
 A big thank you to Brad Gabbard, a professional surveyor with
 Flatirons, Inc., a surveying, engineering, and geomatics firm located
 in Boulder Colorado. Mr. Gabbard generously shared some results off
