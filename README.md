@@ -1541,7 +1541,7 @@ apparently, had been buried under a sidewalk as part of a development
 in the past few decades. (Remarkably, it is not illegal to landscape
 over an NGS survey marker. It's merely illegal to remove or damage them.
 If a municipality needs to find the marker for official business, be
-prepared to have your landscaping back-hoe'ed up.)
+prepared to have your landscaping back-hoe'ed up. And be billed for it.)
 
 A big thank you to Brad Gabbard, a professional surveyor with
 Flatirons, Inc., a surveying, engineering, and geomatics firm located
