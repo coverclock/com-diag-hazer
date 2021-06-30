@@ -3,8 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the U-blox ZED-UBX-F9P as a uncorrected independent
-# mobile Rover.
+# Use a bunch of options.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
@@ -23,6 +22,7 @@ FD2FIL="${SAVDIR}/${PROGRAM}.fd2"
 FIXFIL="${SAVDIR}/${PROGRAM}.fix"
 LOGFIL="${SAVDIR}/${PROGRAM}.log"
 OUTFIL="${SAVDIR}/${PROGRAM}.out"
+PIDFIL="${SAVDIR}/${PROGRAM}.pid"
 SRCFIL="${SAVDIR}/${PROGRAM}.src"
 
 mkdir -p $(dirname ${CATFIL})
@@ -41,21 +41,35 @@ cp /dev/null ${SRCFIL}
 coreable gpstool \
 	-B 1024 \
 	-C ${CATFIL} \
-	-D ${DEVICE} -b ${RATE} -8 -n -1 \
-	-H ${OUTFIL} -t 10 \
+	-D ${DEVICE} -b ${RATE} -7 -8 -e -o -n -2 -1 \
+	-F 1 \
+	-R -E -P -H ${OUTFIL} -t 10 \
 	-L ${LOGFIL} \
 	-N ${FIXFIL} \
+	-O ${PIDFIL} \
+	-P ${PIDFIL} \
 	-S ${SRCFIL} \
 	-T ${CSVFIL} \
+	-V \
 	-d \
+	-f 1 \
 	-g 0x7 \
 	-k 0x7 \
 	-t 10 \
 	-u \
 	-v \
+	-x \
 	-y 10 \
 	< ${FD0FIL} \
 	> ${FD1FIL} \
 	2> ${FD2FIL}
 
 stty sane
+
+cat ${OUTFIL}
+
+cat ${FD2FIL}
+
+cat ${FD1FIL}
+
+exit 0
