@@ -464,8 +464,11 @@ int emit_solution(const char * arp, const yodel_base_t * bp, const yodel_solutio
 
         COM_DIAG_YODEL_HTOLE(acc);
         COM_DIAG_YODEL_HTOLE(lat);
+        COM_DIAG_YODEL_HTOLE(latHp);
         COM_DIAG_YODEL_HTOLE(lon);
+        COM_DIAG_YODEL_HTOLE(lonHp);
         COM_DIAG_YODEL_HTOLE(height);
+        COM_DIAG_YODEL_HTOLE(heightHp);
 
         dump_buffer(fp, &acc, sizeof(acc));
         dump_buffer(fp, &lat, sizeof(lat));

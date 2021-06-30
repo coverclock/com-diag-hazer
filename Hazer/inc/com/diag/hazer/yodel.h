@@ -1219,12 +1219,15 @@ extern int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t 
 /**
  * @def COM_DIAG_YODEL_LETOH
  * Convert in-place variable @a _FIELD_ from Little Endian byte order to Host
- * byte order. The field width, 16, 32, or 64 bits, in inferred automatically.
- * The field must be appropriately aligned.
+ * byte order. The field width 8, 16, 32, or 64 bits, is inferred automatically.
+ * The field must be appropriately aligned. Little endian (not network byte
+ * order) is used because the u-blox specification requires it.
  */
 #define COM_DIAG_YODEL_LETOH(_FIELD_) \
     do { \
         switch (sizeof(_FIELD_)) { \
+        case sizeof(uint8_t): \
+            break; \
         case sizeof(uint16_t): \
             _FIELD_ = le16toh(_FIELD_); \
             break; \
@@ -1242,12 +1245,15 @@ extern int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t 
 /**
  * @def COM_DIAG_YODEL_HTOLE
  * Convert in-place variable @a _FIELD_ from Host byte order to Little Endian
- * byte order. The field width, 16, 32, or 64 bits, in inferred automatically.
- * The field must be appropriately aligned.
+ * byte order. The field width 8, 16, 32, or 64 bits, is inferred automatically.
+ * The field must be appropriately aligned. Little endian (not network byte
+ * order) is used because the u-blox specification requires it.
  */
 #define COM_DIAG_YODEL_HTOLE(_FIELD_) \
     do { \
         switch (sizeof(_FIELD_)) { \
+        case sizeof(uint8_t): \
+            break; \
         case sizeof(uint16_t): \
             _FIELD_ = htole16(_FIELD_); \
             break; \
