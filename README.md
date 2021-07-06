@@ -193,7 +193,7 @@ The geodesic application is based on algorithms described in
 > 2013-01, 87.1, pp. 43..55
 
 and uses one .c file and one .h file, included in this repository, that were
-written by Mr. Karney. They can be found at
+written by Mr. Karney. The original source files can be found at
 
 > <https://geographiclib.sourceforge.io>
 
