@@ -1,0 +1,61 @@
+2021-06-30T18:49:30.470459Z "hacienda" <INFO> [789] {76fa8210} SVIN_MIN_DUR="\x2c\x01\x00\x00"
+2021-06-30T18:49:30.480559Z "hacienda" <INFO> [790] {76f6f210} SVIN_ACC_LIMIT="\xfa\x00\x00\x00"
+2021-06-30T18:49:30.501361Z "hacienda" <INFO> [759] {76f46530} Begin
+2021-06-30T18:49:30.502180Z "hacienda" <INFO> [759] {76f46530} Command "gpstool -H /home/pi/src/com-diag-hazer/Hazer/out/host/tmp/base.out -t 10 -T /home/pi/src/com-diag-hazer/Hazer/out/host/tmp/base.csv -D /dev/tumbleweed -b 230400 -8 -n -1 -G tumbleweed:tumbleweed -g 4 -N /home/pi/fix/base.fix -x -U \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01 -U \xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00 -U \xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40\xfa\x00\x00\x00 -U \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\xc0\x02\x91\x20\x01 -U \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x61\x03\x91\x20\x01 -U \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x66\x03\x91\x20\x01 -U \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x6b\x03\x91\x20\x01 -U \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x70\x03\x91\x20\x01 -U \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x06\x03\x91\x20\x01 -U \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x77\x10\x00 -U \xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x78\x1
+2021-06-30T18:49:30.502267Z "hacienda" <INFO> [759] {76f46530} Hostname "hacienda"
+2021-06-30T18:49:30.502323Z "hacienda" <INFO> [759] {76f46530} Option -H "/home/pi/src/com-diag-hazer/Hazer/out/host/tmp/base.out"
+2021-06-30T18:49:30.502371Z "hacienda" <INFO> [759] {76f46530} Option -t "10"
+2021-06-30T18:49:30.502422Z "hacienda" <INFO> [759] {76f46530} Option -T "/home/pi/src/com-diag-hazer/Hazer/out/host/tmp/base.csv"
+2021-06-30T18:49:30.502465Z "hacienda" <INFO> [759] {76f46530} Option -D "/dev/tumbleweed"
+2021-06-30T18:49:30.502510Z "hacienda" <INFO> [759] {76f46530} Option -b "230400"
+2021-06-30T18:49:30.502561Z "hacienda" <INFO> [759] {76f46530} Option -8
+2021-06-30T18:49:30.502602Z "hacienda" <INFO> [759] {76f46530} Option -n
+2021-06-30T18:49:30.502645Z "hacienda" <INFO> [759] {76f46530} Option -1
+2021-06-30T18:49:30.502687Z "hacienda" <INFO> [759] {76f46530} Option -G "tumbleweed:tumbleweed"
+2021-06-30T18:49:30.568426Z "hacienda" <INFO> [759] {76f46530} Option -g "4"
+2021-06-30T18:49:30.568551Z "hacienda" <INFO> [759] {76f46530} Option -N "/home/pi/fix/base.fix"
+2021-06-30T18:49:30.568597Z "hacienda" <INFO> [759] {76f46530} Option -x
+2021-06-30T18:49:30.568643Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01"
+2021-06-30T18:49:30.568700Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00"
+2021-06-30T18:49:30.568748Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40\xfa\x00\x00\x00"
+2021-06-30T18:49:30.568792Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\xc0\x02\x91\x20\x01"
+2021-06-30T18:49:30.568835Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x61\x03\x91\x20\x01"
+2021-06-30T18:49:30.568881Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x66\x03\x91\x20\x01"
+2021-06-30T18:49:30.568924Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x6b\x03\x91\x20\x01"
+2021-06-30T18:49:30.568967Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x70\x03\x91\x20\x01"
+2021-06-30T18:49:30.569012Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x06\x03\x91\x20\x01"
+2021-06-30T18:49:30.569055Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x77\x10\x00"
+2021-06-30T18:49:30.569098Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x78\x10\x01"
+2021-06-30T18:49:30.569144Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x8b\x00\x91\x20\x01"
+2021-06-30T18:49:30.569253Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x03\x00\x51\x10\x00"
+2021-06-30T18:49:30.569299Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x06\x00\x64\x10\x00"
+2021-06-30T18:49:30.569342Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x05\x00\x52\x10\x00"
+2021-06-30T18:49:30.569388Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x05\x00\x53\x10\x00"
+2021-06-30T18:49:30.569431Z "hacienda" <INFO> [759] {76f46530} Option -U "\xb5\x62\x06\x01\x03\x00\x01\x14\x01"
+2021-06-30T18:49:30.569809Z "hacienda" <INFO> [759] {76f46530} Locale "en_US.UTF-8"
+2021-06-30T18:49:30.569870Z "hacienda" <INFO> [759] {76f46530} Processing
+2021-06-30T18:49:30.570095Z "hacienda" <INFO> [759] {76f46530} Remote (3) "tumbleweed:tumbleweed" [::ffff:192.168.1.238]:21010
+2021-06-30T18:49:30.570810Z "hacienda" <INFO> [759] {76f46530} Device (4) "/dev/tumbleweed" rw "tumbleweed" 230400 8N1 local
+2021-06-30T18:49:30.571032Z "hacienda" <INFO> [759] {76f46530} Buffer (4) [8192] [8192]
+2021-06-30T18:49:30.571429Z "hacienda" <INFO> [759] {76f46530} Tracing enabled
+2021-06-30T18:49:30.571637Z "hacienda" <INFO> [759] {76f46530} Start
+2021-06-30T18:49:31.017537Z "hacienda" <NOTE> [759] {76f46530} Sync RTCM 0x00000000000000bb
+2021-06-30T18:49:31.020011Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:31.079715Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:32.017967Z "hacienda" <NOTE> [759] {76f46530} Time 2021-06-30 18:49:31Z
+2021-06-30T18:49:32.020806Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:32.075075Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:33.021773Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:33.066447Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:34.020775Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:34.075444Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:35.020500Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:35.078248Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:36.021950Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:36.077422Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:37.021733Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:37.076418Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:38.021818Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:38.076713Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x8a (1)
+2021-06-30T18:49:39.020347Z "hacienda" <INFO> [759] {76f46530} Parse UBX ACK 0x06 0x01 (1)
+2021-06-30T18:49:39.058476Z "hacienda" <NOTE> [759] {76f46530} Ready
