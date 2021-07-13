@@ -1529,6 +1529,7 @@ future GNU update (or it's a bug in my code that I can't see).
 * Differential GNSS (Tumbleweed) - <https://github.com/coverclock/com-diag-hazer/blob/master/DGNSS.md>
 * Display Format - <https://github.com/coverclock/com-diag-hazer/blob/master/DISPLAY.md>
 * Additional Remarks - <https://github.com/coverclock/com-diag-hazer/blob/master/REMARKS.md>
+* Interesting Locations - <https://github.com/coverclock/com-diag-hazer/blob/master/LOCATIONS.md>
 
 # Acknowledgements
 
