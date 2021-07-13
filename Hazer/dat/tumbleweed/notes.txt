@@ -10,3 +10,10 @@ GPS Meridian
 Prime Meridian
 (WGS84)
 51°28’40″N, 0°00’06″W
+
+Point Nemo
+(Latin for "no one", this is the location on Earth that is
+the furthest from land in all directions. It's been said that at
+this location the nearest humans are sometimes on the International
+Space Station as it passes overhead.)
+48°52.5′S 123°23.6′W
