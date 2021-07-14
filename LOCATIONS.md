@@ -25,4 +25,4 @@ from land in all directions. It's been said that at this location the
 nearest humans are sometimes on the International Space Station as it
 passes overhead. It is in the Pacific Ocean.
 
-48°52.5′S 123°23.6′W
+48°52.5′S, 123°23.6′W
