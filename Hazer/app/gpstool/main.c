@@ -1831,13 +1831,12 @@ int main(int argc, char * argv[])
 
         /*
          * If we have any initialization strings to send, and we have a device,
-         * do so one at a time. Because
-         * this queue of writes is checked every time we reiterate in the
-         * work loop, later code can enqueue new commands to be written
-         * to the device. Because this is a doubly-linked list, queued
-         * commands can be removed from the queue before they are processed.
-         * And the list header can be prepended onto a command string as
-         * part of a dynamically allocated structure, and this code will
+         * do so one at a time. Because this queue of writes is checked every
+         * time we reiterate in the work loop, later code can enqueue new
+         * commands to be written to the device. Because this is a doubly-linked
+         * list, queued commands can be removed from the queue before they are
+         * processed. And the list header can be prepended onto a command string
+         * as part of a dynamically allocated structure, and this code will
          * free it. If an post-collapse string is empty, that signals
          * the application to exit. This allows gpstool to be used to
          * initialize a GPS device then exit, perhaps for some other
@@ -2517,7 +2516,7 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_DEBUG("Ready file [%zu] [%zu]\n", io_available, io_peak);
             if (io_available >= io_size) { DIMINUTO_LOG_WARNING("Full file [%zd] [%zu]\n", io_available, io_size); }
             continue;
-        } else if ((io_available = diminuto_serial_available(in_fd)) > 0) {
+        } else if (serial && (io_available = diminuto_serial_available(in_fd)) > 0) {
             if (io_available > io_peak) { io_peak = io_available; }
             DIMINUTO_LOG_DEBUG("Ready device [%zu] [%zu]\n", io_available, io_peak);
             continue;
