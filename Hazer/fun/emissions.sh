@@ -8,10 +8,10 @@ PROGRAM=$(basename ${0})
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-eval coreable gpstool \
+coreable gpstool \
 	-D /dev/tty -b 38400 -8 -n -n \
+	-Z 'LYNQ012ARHM\x0d' \
+	-Z 'LYNQ012ARHM\x0d' \
 	-W '$PUBX,00' \
 	-U '\xb5\x62\x06\x01\x03\x00\x01\x14\x01' \
-	-Z 'LYNQ012ARHM' \
-	-Z 'LYNQ012ARHM' \
 	-u -v

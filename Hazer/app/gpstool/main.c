@@ -1871,6 +1871,8 @@ int main(int argc, char * argv[])
 
                 command_size = strlen(command_string) + 1;
                 command_length = diminuto_escape_collapse(command_string, command_string, command_size);
+                if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_string, command_length); }
+
                 switch (command->emission) {
                 case OPT_W:
                     rc = emit_sentence(dev_fp, command_string, command_length);
@@ -1890,7 +1892,6 @@ int main(int argc, char * argv[])
                 }
 
                 if (rc == 0) {
-                    if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_string, command_length); }
                     if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
                     if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }
                 }
