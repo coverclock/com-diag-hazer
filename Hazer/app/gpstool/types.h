@@ -120,6 +120,16 @@ typedef enum Update {
     RTCM_TYPE_9999  = '?',
 } update_t;
 
+/**
+ *  What kind of data is being emitted?
+ */
+typedef enum Emission {
+    EMISSION        = '?',
+    OPT_W           = 'W',
+    OPT_U           = 'U',
+    OPT_Z           = 'Z',
+} emission_t;
+
 /*******************************************************************************
  * HIGH PRECISION SOLUTION
  ******************************************************************************/
@@ -376,12 +386,12 @@ typedef struct Poller {
 
 /**
  * The Command structure contains a linked list node whose data pointer
- * points to the command we want to send, and the acknak field indicates
+ * points to the command we want to send, and the emission field indicates
  * whether this command expects an UBX CFG ACK or a NAK from the device.
  */
 typedef struct Command {
     diminuto_list_t link;
-    int acknak;
+    emission_t emission;
 } command_t;
 
 #endif

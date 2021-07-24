@@ -17,22 +17,33 @@
 
 /**
  * Emit an NMEA configuration sentence to the specified stream after adding the
- * ending matter consisting of the checksum delimiter, the two checksum
+ * end matter consisting of the checksum delimiter, the two checksum
  * characters, a carriage return, and a line feed.
  * @param fp points to the FILE stream.
- * @param string points to the NUL-terminated sentence minus the ending matter.
+ * @param sentence points to the sentence minus the ending matter.
  * @param size is the size of the NMEA sentence in bytes.
+ * @return 0 for success, <0 for error.
  */
-extern void emit_sentence(FILE * fp, const char * string, size_t size);
+extern int emit_sentence(FILE * fp, const char * sentence, size_t size);
 
 /**
  * Emit a UBX configuration packet to the specified stream after adding the
- * ending matter consisting of the two Fletcher checksum bytes.
+ * end matter consisting of the two Fletcher checksum bytes.
  * @param fp points to the FILE stream.
  * @param packet points to the packet minus the ending matter.
  * @param size is the size of the UBX packet in bytes.
+ * @return 0 for success, <0 for error.
  */
-extern void emit_packet(FILE * fp, const void * packet, size_t size);
+extern int emit_packet(FILE * fp, const void * packet, size_t size);
+
+/**
+ * Emit a configuration string to the specified stream exactly as is.
+ * @param fp points to the FILE stream.
+ * @param string points to the string.
+ * @param size is the size of the string in bytes.
+ * @return 0 for success, <0 for error.
+ */
+extern int emit_string(FILE * fp, const void * string, size_t size);
 
 /**
  * Save the current PVT solution to the trace file in CSV format.

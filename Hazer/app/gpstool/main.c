@@ -452,7 +452,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:b:cdef:g:hk:lmnop:st:uvxy:?";
+    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XYZ::b:cdef:g:hk:lmnop:st:uvxy:?";
 
     /**
      ** PREINITIALIZATION
@@ -602,7 +602,7 @@ int main(int argc, char * argv[])
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
             diminuto_assert(command != (command_t *)0);
-            command->acknak = !0;
+            command->emission = OPT_U;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
             diminuto_list_enqueue(&command_list, command_node);
@@ -616,7 +616,7 @@ int main(int argc, char * argv[])
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
             diminuto_assert(command != (command_t *)0);
-            command->acknak = 0;
+            command->emission = OPT_W;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
             diminuto_list_enqueue(&command_list, command_node);
@@ -632,6 +632,16 @@ int main(int argc, char * argv[])
             rc = diminuto_ipc_endpoint(surveyor_option, &surveyor_endpoint);
             if (surveyor_endpoint.udp <= 0) { rc = -1; errno = EINVAL; }
             if (rc < 0) { diminuto_perror(optarg); error = !0; }
+            break;
+        case 'Z':
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
+            readonly = 0;
+            command = (command_t *)malloc(sizeof(command_t));
+            diminuto_assert(command != (command_t *)0);
+            command->emission = OPT_Z;
+            command_node = &(command->link);
+            diminuto_list_datainit(command_node, optarg);
+            diminuto_list_enqueue(&command_list, command_node);
             break;
         case 'b':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
@@ -735,7 +745,7 @@ int main(int argc, char * argv[])
                            " [ -C FILE ]"
                            " [ -t SECONDS ]"
                            " [ -I PIN | -c ] [ -p PIN ]"
-                           " [ -U STRING ... ] [ -W STRING ... ]"
+                           " [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ]"
                            " [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ]"
                            " [ -L LOG ]"
                            " [ -G [ IP:PORT | :PORT [ -g MASK ] ] ]"
@@ -766,14 +776,17 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
             fprintf(stderr, "       -T FILE     Save the PVT CSV Trace to FILE.\n");
-            fprintf(stderr, "       -U STRING   Like -W except expect UBX ACK or NAK response.\n");
-            fprintf(stderr, "       -U ''       Exit when this empty UBX STRING is processed.\n");
+            fprintf(stderr, "       -U STRING   Collapse STRING, append Ubx end matter, write to DEVICE, expect response.\n");
+            fprintf(stderr, "       -U ''       Exit when this empty STRING is processed.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
-            fprintf(stderr, "       -W STRING   Collapse STRING, append checksum, Write to DEVICE.\n");
-            fprintf(stderr, "       -W ''       Exit when this empty Write STRING is processed.\n");
+            fprintf(stderr, "       -W STRING   Collapse STRING, append NMEA end matter, Write to DEVICE.\n");
+            fprintf(stderr, "       -W ''       Exit when this empty STRING is processed.\n");
             fprintf(stderr, "       -X          Enable message eXpiration test mode.\n");
             fprintf(stderr, "       -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.\n");
             fprintf(stderr, "       -Y :PORT    Use local PORT as surveYor source.\n");
+            fprintf(stderr, "       -Z STRING   Collapse STRING, write to DEVICE.\n");
+            fprintf(stderr, "       -Z ''       Exit when this empty STRING is processed.\n");
+            fprintf(stderr, "       -X          Enable message eXpiration test mode.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
@@ -1858,25 +1871,25 @@ int main(int argc, char * argv[])
 
                 command_size = strlen(command_string) + 1;
                 command_length = diminuto_escape_collapse(command_string, command_string, command_size);
-                if (command_string[0] == HAZER_STIMULUS_START) {
-
-                    emit_sentence(dev_fp, command_string, command_length);
-                    rc = 0;
-
-                } else if ((command_string[0] == YODEL_STIMULUS_SYNC_1) && (command_string[1] == YODEL_STIMULUS_SYNC_2)) {
-
-                    emit_packet(dev_fp, command_string, command_length);
-                    rc = 0;
-
-                } else {
-
-                    DIMINUTO_LOG_WARNING("Command Other 0x%02x%02x [%zd]", command_string[0], command_string[1], command_length);
+                switch (command->emission) {
+                case OPT_W:
+                    rc = emit_sentence(dev_fp, command_string, command_length);
+                    break;
+                case OPT_U:
+                    rc = emit_packet(dev_fp, command_string, command_length);
+                    if (rc == 0) { acknakpending += 1; }
+                    break;
+                case OPT_Z:
+                    rc = emit_string(dev_fp, command_string, command_length);
+                    break;
+                default:
                     rc = -1;
-
+                    errno = EINVAL;
+                    diminuto_perror("emission");
+                    break;
                 }
 
                 if (rc == 0) {
-                    if (command->acknak) { acknakpending += 1; }
                     if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_string, command_length); }
                     if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
                     if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }

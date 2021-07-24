@@ -24,42 +24,31 @@
 #include "buffer.h"
 #include "emit.h"
 
-/**
- * Emit an NMEA configuration sentence to the specified stream after adding the
- * ending matter consisting of the checksum delimiter, the two checksum
- * characters, a carriage return, and a line feed.
- * @param fp points to the FILE stream.
- * @param string points to the NUL-terminated sentence minus the ending matter.
- * @param size is the size of the NMEA sentence in bytes.
- */
-void emit_sentence(FILE * fp, const char * string, size_t size)
+int emit_sentence(FILE * fp, const char * sentence, size_t size)
 {
+    int rc = -1;
     uint8_t msn = '\0';
     uint8_t lsn = '\0';
 
-    if (hazer_checksum_buffer(string, size, &msn, &lsn) == (void *)0) {
+    if (hazer_checksum_buffer(sentence, size, &msn, &lsn) == (void *)0) {
         errno = EIO;
         diminuto_perror("emit_sentence: checksum");
-    } else if (fprintf(fp, "%s%c%c%c\r\n", string, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) {
+    } else if (fprintf(fp, "%s%c%c%c\r\n", sentence, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) {
         errno = EIO;
         diminuto_perror("emit_sentence: fprintf");
     } else if (fflush(fp) == EOF) {
         errno = EIO;
         diminuto_perror("emit_sentence: fflush");
    } else {
-        /* Do nothing. */
+        rc = 0;
    }
+
+    return rc;
 }
 
-/**
- * Emit a UBX configuration packet to the specified stream after adding the
- * ending matter consisting of the two Fletcher checksum bytes.
- * @param fp points to the FILE stream.
- * @param packet points to the packet minus the ending matter.
- * @param size is the size of the UBX packet in bytes.
- */
-void emit_packet(FILE * fp, const void * packet, size_t size)
+int emit_packet(FILE * fp, const void * packet, size_t size)
 {
+    int rc = -1;
     const void * bp = (const void *)0;
     uint8_t ck_a = 0;
     uint8_t ck_b = 0;
@@ -81,19 +70,29 @@ void emit_packet(FILE * fp, const void * packet, size_t size)
         errno = EIO;
         diminuto_perror("emit_packet: fflush");
     } else {
-        /* Do nothing. */
+        rc = 0;
     }
+
+    return rc;
 }
 
-/**
- * Save the current PVT solution to the trace file in CSV format.
- * @param fp points to the FILE stream.
- * @param pa is the positions (NMEA) array.
- * @param sp points to the solution (UBX HPPOSLLH) structure.
- * @param ap points to the attitude (UBX UBXNAVATT) structure.
- * @param pp points to the PVT (UBX UBXPOSVELTIM) structure
- * @param bp points the DGNSS base (UBX UBXNAVSVIN) structure.
- */
+int emit_string(FILE * fp, const void * string, size_t size)
+{
+    int rc = -1;
+
+    if (fwrite(string, size, 1, fp) < 1) {
+        errno = EIO;
+        diminuto_perror("emit_string: fwrite");
+    } else if (fflush(fp) == EOF) {
+        errno = EIO;
+        diminuto_perror("emit_string: fflush");
+    } else {
+        rc = 0;
+    }
+
+    return rc;
+}
+
 void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp, const yodel_attitude_t * ap, const yodel_posveltim_t * pp, const yodel_base_t * bp)
 {
     static uint64_t sn = 0;
@@ -405,15 +404,6 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
     fflush(fp);
 }
 
-/**
- * If the caller has passed a valid file name, and the solution is not active
- * yet valid, emit the appropriate UBX messages minus checksums for feeding
- * this solution into this programming running in fixed mode.
- * @param arp points to a Antenna Reference Point file name.
- * @param bp points to a base structure.
- * @param sp points to a solution structure.
- * @return true if the solution was emitted, false otherwise.
- */
 int emit_solution(const char * arp, const yodel_base_t * bp, const yodel_solution_t * sp)
 {
     int rc = 0;
