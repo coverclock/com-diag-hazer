@@ -452,7 +452,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XYZ::b:cdef:g:hk:lmnop:st:uvxy:?";
+    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XYZ:b:cdef:g:hk:lmnop:st:uvxy:?";
 
     /**
      ** PREINITIALIZATION
