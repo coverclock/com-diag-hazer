@@ -17,8 +17,8 @@ mkfifo -m 600 ${FIFO}
 
 coreable gpstool \
 	-D ${FIFO} \
-	-Z 'LYNQ012ARHM\x0d' \
-	-Z 'LYNQ012ARHM\x0d' \
+	-Z 'LYNQ012ARHM\r' \
+	-Z 'LYNQ012ARHM\r' \
 	-W '$PUBX,00' \
 	-U '\xb5b\x05\x01\x02\x00\x05\x01\x0e6' \
 	-u -v
