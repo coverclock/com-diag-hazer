@@ -273,33 +273,33 @@ const void * yodel_checksum_buffer(const void * buffer, size_t size, uint8_t * c
 
 ssize_t yodel_length(const void * buffer, size_t size)
 {
-       ssize_t result = -1;
-       uint16_t length = 0;
-       const unsigned char * packet = (const char *)0;
+   ssize_t result = -1;
+   uint16_t length = 0;
+   const unsigned char * packet = (const char *)0;
 
-       packet = (const char *)buffer;
+   packet = (const char *)buffer;
 
-       if (size < YODEL_UBX_SHORTEST) {
-           /* Do nothing. */
-       } else if (packet[YODEL_UBX_SYNC_1] != YODEL_STIMULUS_SYNC_1) {
-           /* Do nothing. */
-       } else if (packet[YODEL_UBX_SYNC_2] != YODEL_STIMULUS_SYNC_2) {
+   if (size < YODEL_UBX_SHORTEST) {
+       /* Do nothing. */
+   } else if (packet[YODEL_UBX_SYNC_1] != YODEL_STIMULUS_SYNC_1) {
+       /* Do nothing. */
+   } else if (packet[YODEL_UBX_SYNC_2] != YODEL_STIMULUS_SYNC_2) {
+       /* Do nothing. */
+   } else {
+       /*
+        * Ublox8, p. 134: "little endian"
+        */
+       length = packet[YODEL_UBX_LENGTH_MSB] << 8;
+       length |= packet[YODEL_UBX_LENGTH_LSB];
+       if (length > (size - YODEL_UBX_SHORTEST)) {
            /* Do nothing. */
        } else {
-           /*
-            * Ublox8, p. 134: "little endian"
-            */
-           length = packet[YODEL_UBX_LENGTH_MSB] << 8;
-           length |= packet[YODEL_UBX_LENGTH_LSB];
-           if (length > (size - YODEL_UBX_SHORTEST)) {
-               /* Do nothing. */
-           } else {
-               result = length;
-               result += YODEL_UBX_SHORTEST;
-           }
+           result = length;
+           result += YODEL_UBX_SHORTEST;
        }
+   }
 
-       return result;
+   return result;
 }
 
 ssize_t yodel_validate(const void * buffer, size_t size)

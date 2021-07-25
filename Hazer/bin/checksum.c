@@ -26,6 +26,7 @@
 #include "com/diag/hazer/tumbleweed.h"
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_phex.h"
+#include "com/diag/diminuto/diminuto_log.h"
 
 static const size_t UNLIMITED = ~(size_t)0;
 
@@ -69,20 +70,30 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
 
     do {
         bp = hazer_checksum_buffer(sentence, size, &msn, &lsn);
-        if (bp == (uint8_t *)0) { break; }
+        if (bp == (uint8_t *)0) {
+            DIMINUTO_LOG_ERROR("hazer_checksum_buffer: failed! size=%zu bp=null\n", size);
+            break;
+        }
         length = (const uint8_t *)bp - (const uint8_t *)sentence;
+        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
         buffer = malloc(length + 5);
-        if (buffer == (uint8_t *)0) { break; }
+        if (buffer == (uint8_t *)0) {
+            diminuto_perror("malloc");
+            break;
+        }
         strncpy(buffer, sentence, length);
         buffer[length++] = HAZER_STIMULUS_CHECKSUM;
         buffer[length++] = msn;
         buffer[length++] = lsn;
         buffer[length++] = HAZER_STIMULUS_CR;
         buffer[length++] = HAZER_STIMULUS_LF;
+        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
         print_buffer(stdout, buffer, length, 0);
         rc = 0;
     } while (0);
-    if (buffer != (uint8_t *)0) { free(buffer); }
+    if (buffer != (uint8_t *)0) {
+        free(buffer);
+    }
 
     return rc;
 }
@@ -98,7 +109,6 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
 static int print_packet(FILE * fp, const void * packet, size_t size)
 {
     int rc = -1;
-    ssize_t payload = 0;
     const void * bp = (const void *)0;
     uint8_t ck_a = 0;
     uint8_t ck_b = 0;
@@ -106,20 +116,28 @@ static int print_packet(FILE * fp, const void * packet, size_t size)
     uint8_t * buffer = (uint8_t *)0;
 
     do {
-        payload = yodel_length(packet, size);
-        if (payload == 0) { break; }
-        bp = yodel_checksum_buffer(packet, payload, &ck_a, &ck_b);
-        if (bp == (void *)0) { break; }
+        bp = yodel_checksum_buffer(packet, size, &ck_a, &ck_b);
+        if (bp == (void *)0) {
+            DIMINUTO_LOG_ERROR("yodel_checksum_buffer: failed! size=%zu bp=null\n", size);
+            break;
+        }
         length = (const uint8_t *)bp - (const uint8_t *)packet;
+        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
         buffer = malloc(length + 2);
-        if (buffer == (uint8_t *)0) { break; }
+        if (buffer == (uint8_t *)0) {
+            diminuto_perror("malloc");
+            break;
+        }
         memcpy(buffer, packet, length);
         buffer[length++] = ck_a;
         buffer[length++] = ck_b;
+        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
         print_buffer(stdout, buffer, length, !0);
         rc = 0;
     } while (0);
-    if (buffer != (uint8_t *)0) { free(buffer); }
+    if (buffer != (uint8_t *)0) {
+        free(buffer);
+    }
 
     return rc;
 }
@@ -135,7 +153,6 @@ static int print_packet(FILE * fp, const void * packet, size_t size)
 static int print_message(FILE * fp, const void * message, size_t size)
 {
     int rc = -1;
-    ssize_t payload = 0;
     const void * bp = (const void *)0;
     uint8_t crc1 = 0;
     uint8_t crc2 = 0;
@@ -144,21 +161,26 @@ static int print_message(FILE * fp, const void * message, size_t size)
     uint8_t * buffer = (char *)0;
 
     do {
-        payload = tumbleweed_length(message, size);
-        if (payload == 0) { break; }
-        bp = tumbleweed_checksum_buffer(message, payload, &crc1, &crc2, &crc3);
-        if (bp == (void *)0) { break; }
+        bp = tumbleweed_checksum_buffer(message, size, &crc1, &crc2, &crc3);
+        if (bp == (void *)0) {
+            DIMINUTO_LOG_ERROR("tumbleweed_checksum_buffer: failed! size=%zu bp=null\n", size);
+            break;
+        }
         length = (const uint8_t *)bp - (const uint8_t *)message;
+        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
         buffer = malloc(length + 3);
         if (buffer == (uint8_t *)0) { break; }
         memcpy(buffer, message, length);
         buffer[length++] = crc1;
         buffer[length++] = crc2;
         buffer[length++] = crc3;
+        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
         print_buffer(stdout, buffer, length, !0);
         rc = 0;
     } while (0);
-    if (buffer != (uint8_t *)0) { free(buffer); }
+    if (buffer != (uint8_t *)0) {
+        free(buffer);
+    }
 
     return rc;
 }
@@ -168,6 +190,7 @@ static int print_message(FILE * fp, const void * message, size_t size)
  */
 int main(int argc, char * argv[])
 {
+    int xc = 0;
     int index = 0;
     uint8_t * buffer = (char *)0;
     size_t length = 0;
@@ -178,12 +201,14 @@ int main(int argc, char * argv[])
         buffer = argv[index];
         if (buffer[0] == '\0') {
             fputc('\n', stdout);
+            DIMINUTO_LOG_WARNING("expanded: empty?");
             continue;
         }
         length = strlen(buffer) + 1;
         size = diminuto_escape_collapse(buffer, buffer, length);
         if (buffer[0] == '\0') {
             fputc('\n', stdout);
+            DIMINUTO_LOG_WARNING("collapsed: empty?");
             continue;
         }
         if (buffer[0] == HAZER_STIMULUS_START) {
@@ -193,14 +218,15 @@ int main(int argc, char * argv[])
         } else if (buffer[0] == TUMBLEWEED_STIMULUS_PREAMBLE) {
             rc = print_message(stdout, buffer, size - 1);
         } else {
-            fprintf(stderr, "OTHER! 0x%x 0x%x\n", buffer[0], buffer[1]);
+            DIMINUTO_LOG_ERROR("preamble: failed! [0]=0x%x [1]=0x%x\n", buffer[0], buffer[1]);
             rc = -2;
         }
         if (rc < 0) {
             fputc('\n', stdout);
+            xc = 1;
             continue;
         }
     }
 
-    return 0;
+    return xc;
 }
