@@ -37,13 +37,13 @@ extern int emit_sentence(FILE * fp, const char * sentence, size_t size);
 extern int emit_packet(FILE * fp, const void * packet, size_t size);
 
 /**
- * Emit a configuration string to the specified stream exactly as is.
+ * Emit a configuration datum to the specified stream exactly as is.
  * @param fp points to the FILE stream.
- * @param string points to the string.
- * @param size is the size of the string in bytes.
+ * @param datum points to the datum.
+ * @param size is the size of the datum in bytes.
  * @return 0 for success, <0 for error.
  */
-extern int emit_string(FILE * fp, const void * string, size_t size);
+extern int emit_datum(FILE * fp, const void * datum, size_t size);
 
 /**
  * Save the current PVT solution to the trace file in CSV format.

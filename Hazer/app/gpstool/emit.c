@@ -76,16 +76,18 @@ int emit_packet(FILE * fp, const void * packet, size_t size)
     return rc;
 }
 
-int emit_string(FILE * fp, const void * string, size_t size)
+int emit_datum(FILE * fp, const void * datum, size_t size)
 {
     int rc = -1;
 
-    if (fwrite(string, size, 1, fp) < 1) {
+    if (size == 0) {
+        rc = 0;
+    } else if (fwrite(datum, size - 1 /* Ignore terminating nul. */, 1, fp) < 1) {
         errno = EIO;
-        diminuto_perror("emit_string: fwrite");
+        diminuto_perror("emit_datum: fwrite");
     } else if (fflush(fp) == EOF) {
         errno = EIO;
-        diminuto_perror("emit_string: fflush");
+        diminuto_perror("emit_datum: fflush");
     } else {
         rc = 0;
     }

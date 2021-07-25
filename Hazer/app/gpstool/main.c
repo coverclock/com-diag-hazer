@@ -1870,29 +1870,40 @@ int main(int argc, char * argv[])
 
                 command_size = strlen(command_string) + 1;
                 command_length = diminuto_escape_collapse(command_string, command_string, command_size);
-                if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_string, command_length); }
 
-                switch (command->emission) {
-                case OPT_W:
-                    rc = emit_sentence(dev_fp, command_string, command_length);
-                    break;
-                case OPT_U:
-                    rc = emit_packet(dev_fp, command_string, command_length);
-                    if (rc == 0) { acknakpending += 1; }
-                    break;
-                case OPT_Z:
-                    rc = emit_string(dev_fp, command_string, command_length);
-                    break;
-                default:
-                    rc = -1;
-                    errno = EINVAL;
-                    diminuto_perror("emission");
-                    break;
-                }
+                /*
+                 * Since collapse() always includes a terminating NUL, the
+                 * length will always be at least one. But if it is zero,
+                 * wackiness ensues below, so we check it anyway.
+                 */
 
-                if (rc == 0) {
-                    if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
-                    if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }
+                if (command_length > 0) {
+
+                    if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_string, command_length - 1); }
+
+                    switch (command->emission) {
+                    case OPT_W:
+                        rc = emit_sentence(dev_fp, command_string, command_length);
+                        break;
+                    case OPT_U:
+                        rc = emit_packet(dev_fp, command_string, command_length);
+                        if (rc == 0) { acknakpending += 1; }
+                        break;
+                    case OPT_Z:
+                        rc = emit_datum(dev_fp, command_string, command_length);
+                        break;
+                    default:
+                        rc = -1;
+                        errno = EINVAL;
+                        diminuto_perror("emission");
+                        break;
+                    }
+
+                    if (rc == 0) {
+                        if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
+                        if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }
+                    }
+
                 }
 
                 free(command_node);
