@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/tumbleweed.h"
@@ -66,17 +67,18 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
     char msn = '\0';
     char lsn = '\0';
     size_t length = 0;
+    ssize_t validated = 0;
     uint8_t * buffer = (char *)0;
 
     do {
         bp = hazer_checksum_buffer(sentence, size, &msn, &lsn);
         if (bp == (uint8_t *)0) {
-            DIMINUTO_LOG_ERROR("hazer_checksum_buffer: failed! size=%zu bp=null\n", size);
+            errno = EINVAL;
+            diminuto_perror("hazer_checksum_buffer");
             break;
         }
         length = (const uint8_t *)bp - (const uint8_t *)sentence;
-        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
-        buffer = malloc(length + 5);
+        buffer = (uint8_t *)malloc(length + 5);
         if (buffer == (uint8_t *)0) {
             diminuto_perror("malloc");
             break;
@@ -87,7 +89,12 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
         buffer[length++] = lsn;
         buffer[length++] = HAZER_STIMULUS_CR;
         buffer[length++] = HAZER_STIMULUS_LF;
-        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
+        validated = hazer_validate(buffer, length);
+        if (validated < 0) {
+            errno = EINVAL;
+            diminuto_perror("hazer_validate");
+        }
+        DIMINUTO_LOG_DEBUG("NMEA: size=%zu length=%zu validated=%zd\n", size, length, validated);
         print_buffer(stdout, buffer, length, 0);
         rc = 0;
     } while (0);
@@ -113,17 +120,18 @@ static int print_packet(FILE * fp, const void * packet, size_t size)
     uint8_t ck_a = 0;
     uint8_t ck_b = 0;
     size_t length = 0;
+    ssize_t validated = 0;
     uint8_t * buffer = (uint8_t *)0;
 
     do {
         bp = yodel_checksum_buffer(packet, size, &ck_a, &ck_b);
         if (bp == (void *)0) {
-            DIMINUTO_LOG_ERROR("yodel_checksum_buffer: failed! size=%zu bp=null\n", size);
+            errno = EINVAL;
+            diminuto_perror("yodel_checksum_buffer");
             break;
         }
         length = (const uint8_t *)bp - (const uint8_t *)packet;
-        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
-        buffer = malloc(length + 2);
+        buffer = (uint8_t *)malloc(length + 2);
         if (buffer == (uint8_t *)0) {
             diminuto_perror("malloc");
             break;
@@ -131,7 +139,13 @@ static int print_packet(FILE * fp, const void * packet, size_t size)
         memcpy(buffer, packet, length);
         buffer[length++] = ck_a;
         buffer[length++] = ck_b;
-        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
+        validated = yodel_validate(buffer, length);
+        if (validated < 0) {
+            errno = EINVAL;
+            diminuto_perror("yodel_validate");
+            break;
+        }
+        DIMINUTO_LOG_DEBUG("UBX: size=%zu length=%zu validated=%zd\n", size, length, validated);
         print_buffer(stdout, buffer, length, !0);
         rc = 0;
     } while (0);
@@ -158,23 +172,32 @@ static int print_message(FILE * fp, const void * message, size_t size)
     uint8_t crc2 = 0;
     uint8_t crc3 = 0;
     size_t length = 0;
+    ssize_t validated = 0;
     uint8_t * buffer = (char *)0;
 
     do {
         bp = tumbleweed_checksum_buffer(message, size, &crc1, &crc2, &crc3);
         if (bp == (void *)0) {
-            DIMINUTO_LOG_ERROR("tumbleweed_checksum_buffer: failed! size=%zu bp=null\n", size);
+            errno = EINVAL;
+            diminuto_perror("tumbleweed_checksum_buffer");
             break;
         }
         length = (const uint8_t *)bp - (const uint8_t *)message;
-        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
-        buffer = malloc(length + 3);
-        if (buffer == (uint8_t *)0) { break; }
+        buffer = (uint8_t *)malloc(length + 3);
+        if (buffer == (uint8_t *)0) {
+            diminuto_perror("malloc");
+            break;
+        }
         memcpy(buffer, message, length);
         buffer[length++] = crc1;
         buffer[length++] = crc2;
         buffer[length++] = crc3;
-        DIMINUTO_LOG_DEBUG("size=%zu length=%zu\n", size, length);
+        validated = tumbleweed_validate(buffer, length);
+        if (validated < 0) {
+            errno = EINVAL;
+            diminuto_perror("tumblweed_validate");
+        }
+        DIMINUTO_LOG_DEBUG("RTCM: size=%zu length=%zu validated=%zd\n", size, length, validated);
         print_buffer(stdout, buffer, length, !0);
         rc = 0;
     } while (0);
@@ -196,6 +219,8 @@ int main(int argc, char * argv[])
     size_t length = 0;
     ssize_t size = 0;
     int rc = 0;
+
+    diminuto_log_setmask();
 
     for (index = 1; index < argc; index += 1) {
         buffer = argv[index];
