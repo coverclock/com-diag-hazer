@@ -60,6 +60,33 @@ echo "ACTUAL  " ${ACTUAL}
 if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
 echo
 
+ARGUMENT='\xd3\x00\x08\x4c\xe0\x00\x8a\x00\x00\x00\x00\xa8\xf7\x2a';
+echo "ARGUMENT" ${ARGUMENT}
+EXPECTED='\xd3\x00\x08L\xe0\x00\x8a\x00\x00\x00\x00\xa8\xf7*';
+echo "EXPECTED" ${EXPECTED}
+ACTUAL=$(checksum ${ARGUMENT})
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
+
+ARGUMENT='\xd3\x00\x08\x4c\xe0\x00\x8a\x00\x00\x00\x00\xff\xff\xff';
+echo "ARGUMENT" ${ARGUMENT}
+EXPECTED='\xd3\x00\x08L\xe0\x00\x8a\x00\x00\x00\x00\xa8\xf7*';
+echo "EXPECTED" ${EXPECTED}
+ACTUAL=$(checksum ${ARGUMENT})
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
+
+ARGUMENT='\xd3\x00\x08\x4c\xe0\x00\x8a\x00\x00\x00\x00';
+echo "ARGUMENT" ${ARGUMENT}
+EXPECTED='\xd3\x00\x08L\xe0\x00\x8a\x00\x00\x00\x00\xa8\xf7*';
+echo "EXPECTED" ${EXPECTED}
+ACTUAL=$(checksum ${ARGUMENT})
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
+
 ARGUMENT='P855w0rd!\n'
 echo "ARGUMENT" ${ARGUMENT}
 EXPECTED='P855w0rd!\n'

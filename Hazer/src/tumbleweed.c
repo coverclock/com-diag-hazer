@@ -304,11 +304,12 @@ const void * tumbleweed_checksum_buffer(const void * buffer, size_t size, uint8_
     uint32_t crc = 0;
     int ii = 0;
 
-    length = ((uint8_t)(bp[TUMBLEWEED_RTCM_LENGTH_MSB])) << 8;
-    length |= ((uint8_t)(bp[TUMBLEWEED_RTCM_LENGTH_LSB]));
+    length = ((uint16_t)(bp[TUMBLEWEED_RTCM_LENGTH_MSB])) << 8;
+    length |= ((uint16_t)(bp[TUMBLEWEED_RTCM_LENGTH_LSB]));
+    length &= TUMBLEWEED_RTCM_MASK_LENGTH;
     length += TUMBLEWEED_RTCM_SUMMED;
 
-    if ((length + TUMBLEWEED_RTCM_UNSUMMED) <= size) {
+    if (length <= size) {
 
         for (ii = 0; ii < length; ++ii) {
             tumbleweed_checksum(*(bp++), &crc);
