@@ -1901,7 +1901,7 @@ int main(int argc, char * argv[])
 
                     if (rc == 0) {
                         if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
-                        if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length); print_buffer(out_fp, command_string, command_length, limitation); fflush(out_fp); }
+                        if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length - 1); print_buffer(out_fp, command_string, command_length - 1, limitation); fflush(out_fp); }
                     }
 
                 }
@@ -2086,13 +2086,15 @@ int main(int argc, char * argv[])
              * We tokenize the a copy of the NMEA sentence so we can parse it.
              * We make a copy because the tokenization modifies the body
              * of the sentence in place and we may want to display the original
-             * sentence later.
+             * sentence later. Note that the count returned by the tokenizer
+             * includes a NULL pointer in the last used slot to terminate
+             * the array in an argv[][] manner.
              */
 
             strncpy(tokenized, buffer, sizeof(tokenized));
             tokenized[sizeof(tokenized) - 1] = '\0';
             count = hazer_tokenize(vector, diminuto_countof(vector), tokenized, length);
-            diminuto_assert(count >= 0);
+            diminuto_assert(count > 0);
             diminuto_assert(vector[count - 1] == (char *)0);
             diminuto_assert(count <= diminuto_countof(vector));
 
@@ -2106,7 +2108,7 @@ int main(int argc, char * argv[])
              * NMEA sentences.
              */
 
-            if (count < 1) {
+            if (count < 2) {
 
                 continue;
 

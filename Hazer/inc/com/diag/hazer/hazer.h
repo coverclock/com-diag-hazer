@@ -762,7 +762,7 @@ extern hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker);
 
 /**
  * THis structure maintains the time, position, altitude, speed, and bearing
- * derived from the NMEA stream. THIS OBJECT  SHOULD BE INITIALIZED TO ALL
+ * derived from the NMEA stream. THIS OBJECT SHOULD BE INITIALIZED TO ALL
  * ZEROS.
  */
 typedef struct HazerPosition {

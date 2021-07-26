@@ -368,28 +368,34 @@ ssize_t hazer_validate(const void * buffer, size_t size)
 
 ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size)
 {
+    ssize_t result = 0;
     char ** vv = vector;
-    char ** tt = (char **)0;
     char * bb = (char *)buffer;
-    ssize_t nn = 0;
+    char ** tt = (char **)0;
 
     if (count > 1) {
         tt = vv;
         *(vv++) = bb;
-        ++nn;
         --count;
         while ((size--) > 0) {
             if (*bb == ',') {
                 *(bb++) = '\0';
+                if (debug != (FILE *)0) {
+                    fprintf(debug, "TOKEN [%zd] \"%s\"\n", result, *tt);
+                }
+                ++result;
                 if (count <= 1) {
                     break;
                 }
                 tt = vv;
                 *(vv++) = bb;
-                ++nn;
                 --count;
             } else if (*bb == '*') {
                 *(bb++) = '\0';
+                if (debug != (FILE *)0) {
+                    fprintf(debug, "TOKEN [%zd] \"%s\"\n", result, *tt);
+                }
+                ++result;
                 break;
             } else {
                 ++bb;
@@ -398,13 +404,18 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     }
 
     if (count > 0) {
-        tt = vv;
         *(vv++) = (char *)0;
-        ++nn;
-        --count;
+        if (debug != (FILE *)0) {
+            fprintf(debug, "TOKEN [%zd] NULL\n", result);
+        }
+        ++result;
     }
 
-    return (vv - vector);
+    if (debug != (FILE *)0) {
+        fprintf(debug, "TOKENS [%zd]\n", result);
+    }
+
+    return result;
 }
 
 ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t count)
@@ -1005,7 +1016,7 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
     int rc = -1;
     static const char GGA[] = HAZER_NMEA_SENTENCE_GGA;
     
-    if (count < 1) { 
+    if (count < 2) { 
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
         /* Do nothing. */
@@ -1013,7 +1024,7 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, GGA, sizeof(GGA) - 1) != 0) {
         /* Do nothing. */
-    } else if (count < 11) { 
+    } else if (count < 14) { 
         /* Do nothing. */
     } else if (*vector[6] == '0') {
         /* Do nothing. */
@@ -1043,7 +1054,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     int satellites = 0;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
 
-    if (count < 1) {
+    if (count < 2) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
         /* Do nothing. */
@@ -1051,7 +1062,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, GSA, sizeof(GSA) - 1) != 0) {
         /* Do nothing. */
-    } else if (count < 18) {
+    } else if (count < 19) {
         /* Do nothing. */
     } else if (*vector[2] == '1') {
         /* Do nothing. */
@@ -1097,7 +1108,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     unsigned int id = 0;
     static const int SATELLITES = sizeof(viewp->sat) / sizeof(viewp->sat[0]);
     
-    if (count < 1) {
+    if (count < 2) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXGSV")) != (sizeof("$XXGSV") - 1)) {
         /* Do nothing. */
@@ -1221,7 +1232,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
     int rc = -1;
     static const char RMC[] = HAZER_NMEA_SENTENCE_RMC;
 
-    if (count < 1) {
+    if (count < 2) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXRMC")) != (sizeof("$XXRMC") - 1)) {
         /* Do nothing. */
@@ -1229,13 +1240,13 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, RMC, sizeof(RMC) - 1) != 0) {
         /* Do nothing. */
-    } else if (count < 12) {
+    } else if (count < 11) {
         /* Do nothing. */
     } else if (*vector[2] != 'A') {
         /* Do nothing. */
-    } else if (*vector[10] == 'N') {
+    } else if ((count > 13) && (*vector[12] == 'N')) { /* NMEA 2.3+ */
         /* Do nothing. */
-    } else if (*vector[11] == 'V') {
+    } else if ((count > 14) && (*vector[13] == 'V')) { /* NMEA 4.10+ */
         /* Do nothing. */
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
@@ -1258,7 +1269,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
     int rc = -1;
     static const char GLL[] = HAZER_NMEA_SENTENCE_GLL;
 
-    if (count < 1) {
+    if (count < 2) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
         /* Do nothing. */
@@ -1266,7 +1277,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, GLL, sizeof(GLL) - 1) != 0) {
         /* Do nothing. */
-    } else if (count < 8) {
+    } else if (count < 9) {
         /* Do nothing. */
     } else if (*vector[6] == 'V') {
         /* Do nothing. */
@@ -1290,7 +1301,7 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
     int rc = -1;
     static const char VTG[] = HAZER_NMEA_SENTENCE_VTG;
 
-    if (count < 1) {
+    if (count < 2) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXVTG")) != (sizeof("$XXVTG") - 1)) {
         /* Do nothing. */
@@ -1298,7 +1309,7 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, VTG, sizeof(VTG) - 1) != 0) {
         /* Do nothing. */
-    } else if (count < 10) {
+    } else if (count < 11) {
         /* Do nothing. */
     } else if (*vector[9] == 'N') {
         /* Do nothing. */
@@ -1319,7 +1330,7 @@ int hazer_parse_txt(char * vector[], size_t count)
     int rc = -1;
     static const char TXT[] = HAZER_NMEA_SENTENCE_TXT;
 
-    if (count < 1) {
+    if (count < 2) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXTXT")) != (sizeof("$XXTXT") - 1)) {
         /* Do nothing. */
