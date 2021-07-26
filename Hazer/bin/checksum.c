@@ -37,7 +37,7 @@ static const size_t UNLIMITED = ~(size_t)0;
  * @param fp points to the FILE stream.
  * @param buffer points to the sentence or packet.
  * @param size is the size of the sentence or packet.
- * @param canonical is true to print standard special characters in hex.
+ * @param canonical is false to print standard special characters in hex.
  * @return 0 for success, <0 if an error occurred.
  */
 static int print_buffer(FILE * fp, const void * buffer, size_t size, int canonical)
@@ -47,7 +47,7 @@ static int print_buffer(FILE * fp, const void * buffer, size_t size, int canonic
     int end = 0;
 
     for (bb = buffer; size > 0; --size) {
-        diminuto_phex_emit(fp, *(bb++), UNLIMITED, 0, 0, !!canonical, &current, &end, 0);
+        diminuto_phex_emit(fp, *(bb++), UNLIMITED, 0, 0, !canonical, &current, &end, 0);
     }
     fputc('\n', fp);
 
@@ -98,7 +98,7 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
             diminuto_perror("hazer_validate");
         }
         DIMINUTO_LOG_DEBUG("NMEA: size=%zu length=%zu validated=%zd\n", size, length, validated);
-        rc = print_buffer(stdout, buffer, length, 0);
+        rc = print_buffer(stdout, buffer, length, !0);
     } while (0);
     if (buffer != (uint8_t *)0) {
         free(buffer);
@@ -148,7 +148,7 @@ static int print_packet(FILE * fp, const void * packet, size_t size)
             break;
         }
         DIMINUTO_LOG_DEBUG("UBX: size=%zu length=%zu validated=%zd\n", size, length, validated);
-        rc = print_buffer(stdout, buffer, length, !0);
+        rc = print_buffer(stdout, buffer, length, 0);
     } while (0);
     if (buffer != (uint8_t *)0) {
         free(buffer);
@@ -199,7 +199,7 @@ static int print_message(FILE * fp, const void * message, size_t size)
             diminuto_perror("tumblweed_validate");
         }
         DIMINUTO_LOG_DEBUG("RTCM: size=%zu length=%zu validated=%zd\n", size, length, validated);
-        rc = print_buffer(stdout, buffer, length, !0);
+        rc = print_buffer(stdout, buffer, length, 0);
     } while (0);
     if (buffer != (uint8_t *)0) {
         free(buffer);
@@ -243,7 +243,7 @@ int main(int argc, char * argv[])
         } else if (buffer[0] == TUMBLEWEED_STIMULUS_PREAMBLE) {
             rc = print_message(stdout, buffer, size - 1);
         } else {
-            rc = print_buffer(stdout, buffer, size - 1, 0);
+            rc = print_buffer(stdout, buffer, size - 1, !0);
         }
         if (rc < 0) {
             fputc('\n', stdout);
