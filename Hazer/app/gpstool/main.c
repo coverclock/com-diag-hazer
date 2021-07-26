@@ -174,6 +174,7 @@ int main(int argc, char * argv[])
     int unknown = 0;
     int serial = 0;
     int daemon = 0;
+    int bypass = 0;
     seconds_t slow = 0;
     seconds_t timeout = HAZER_GNSS_SECONDS;
     seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
@@ -452,7 +453,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:Z:b:cdef:g:hk:lmnop:st:uvxy:?";
+    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:Z:b:cdef:g:hik:lmnop:st:uvxy:?";
 
     /**
      ** PREINITIALIZATION
@@ -679,6 +680,10 @@ int main(int argc, char * argv[])
             rtscts = !0;
             serial = !0;
             break;
+        case 'i':
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
+            bypass = !0;
+            break;
         case 'k':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             device_mask = strtol(optarg, &end, 0);
@@ -746,7 +751,7 @@ int main(int argc, char * argv[])
                            " [ -t SECONDS ]"
                            " [ -I PIN | -c ] [ -p PIN ]"
                            " [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ]"
-                           " [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ]"
+                           " [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i ]"
                            " [ -L LOG ]"
                            " [ -G [ IP:PORT | :PORT [ -g MASK ] ] ]"
                            " [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ]"
@@ -794,6 +799,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -f SECONDS  Set trace Frequency to 1/SECONDS.\n");
             fprintf(stderr, "       -g MASK     Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
             fprintf(stderr, "       -h          Use RTS/CTS Hardware flow control for DEVICE.\n");
+            fprintf(stderr, "       -i          Bypass Input data available check.\n");
             fprintf(stderr, "       -k MASK     Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
             fprintf(stderr, "       -l          Use Local control for DEVICE.\n");
             fprintf(stderr, "       -m          Use Modem control for DEVICE.\n");
@@ -2519,12 +2525,20 @@ int main(int argc, char * argv[])
          * all about). So if there is still data waiting to be read, we
          * short circuit the report code and instead try to assemble another
          * complete sentence, packet, or message that we can forward, write,
-         * log, or use to update our databases.
+         * log, or use to update our databases. OTOH, why might we choose
+         * not to do this, despite the risk of data loss? I have tested
+         * GNSS devices whose output was so evenly distributed throughout
+         * their cycle time (e.g. 1Hz) that there is never a time that there
+         * isn't data in the standard I/O buffer. In such devices, this
+         * code would continously loop back to read and process more data,
+         * and never render a report. (Perhaps a better approach would be
+         * to add a timeout interval, kind of the opposite of what the
+         * report frequency options achieves.)
          */
 
         if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
             /* Do nothing. */
-        } else if (slow == 0) {
+        } else if (bypass) {
             /* Do nothing. */
         } else if ((io_available = diminuto_file_ready(in_fp)) > 0) {
             if (io_available > io_peak) { io_peak = io_available; }
