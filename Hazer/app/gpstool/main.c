@@ -534,7 +534,7 @@ int main(int argc, char * argv[])
         case 'F':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             slow = strtoul(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (slow < 1)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             report = !0;
             process = !0;
             break;
@@ -762,7 +762,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -C FILE     Catenate input to FILE or named pipe.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
-            fprintf(stderr, "       -F SECONDS  Set report Frequency to 1/SECONDS.\n");
+            fprintf(stderr, "       -F SECONDS  Set report Frequency to 1/SECONDS, 0 for no delay.\n");
             fprintf(stderr, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
             fprintf(stderr, "       -G :PORT    Use local PORT as dataGram source.\n");
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
@@ -1771,7 +1771,7 @@ int main(int argc, char * argv[])
          * (This may be the only time I've found a legitimate use for a goto.)
          */
 
-        if (eof) { goto report; }
+        if (eof) { goto render; }
 
         /*
          * At this point, either we have a buffer with a complete and validated
@@ -2513,7 +2513,7 @@ int main(int argc, char * argv[])
         if (eof) { break; }
 
         /*
-         * We always give priority to reading input from the device or a
+         * We usually give priority to reading input from the device or a
          * socket. Generating the report can take a long time, particularly
          * with slow displays or serial consoles (partly what the -F flag is
          * all about). So if there is still data waiting to be read, we
@@ -2523,6 +2523,8 @@ int main(int argc, char * argv[])
          */
 
         if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
+            /* Do nothing. */
+        } else if (slow == 0) {
             /* Do nothing. */
         } else if ((io_available = diminuto_file_ready(in_fp)) > 0) {
             if (io_available > io_peak) { io_peak = io_available; }
@@ -2602,11 +2604,11 @@ int main(int argc, char * argv[])
             trace_fp = (FILE *)0;
         }
 
+render:
+
         /**
          ** REPORT
          **/
-
-report:
 
         /*
          * This code is just for testing the expiration feature.
