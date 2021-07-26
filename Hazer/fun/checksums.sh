@@ -60,6 +60,15 @@ echo "ACTUAL  " ${ACTUAL}
 if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
 echo
 
+ARGUMENT='P855w0rd!\n'
+echo "ARGUMENT" ${ARGUMENT}
+EXPECTED='P855w0rd!\n'
+echo "EXPECTED" ${EXPECTED}
+ACTUAL=$(checksum ${ARGUMENT})
+echo "ACTUAL  " ${ACTUAL}
+if [[ "${EXPECTED}" != "${ACTUAL}" ]]; then echo "ERROR   "; XC=1; fi
+echo
+
 if [[ ${XC} == 0 ]]; then echo "PASS    "; else echo "FAIL    "; fi
 
 exit ${XC}
