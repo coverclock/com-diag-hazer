@@ -392,6 +392,7 @@ Hazer has been successfully tested with the following GPS devices.
 * GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [1] [2] [4] [8]    
 * GlobalSat ND-105C (SiRF Star III+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * Jackson Labs Technologies CSAC GPSDO (U-Blox 6/UBX-LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
+* Lynq Technologies Smart Compass (U-Blox 8/UBX-CAM-M8Q, 115200 8n1, v1fc9p0194, ttyACM, 1Hz)    
 * MakerFocus USB-Port-GPS (Quectel L80-R+Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2] [6]    
 * NaviSys GR-701W (U-Blox 7+Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
 * Pharos GPS-360 (SiRF Star II+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
