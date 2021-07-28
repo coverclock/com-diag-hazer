@@ -599,38 +599,6 @@ snapshot this information before it is removed.
     D2=D2A
     F2=F2A
 
-## U-Blox UBX-ZED-F9P Bug: wrong number of satellites reported for GLONASS
-
-The Ardusimple SimpleRTK2B board uses the U-Blox ZED-F9P GPS receiver.
-I'm pretty sure the firmware in the ZED-F9P-00B-01 chip on my SimpleRTK2B
-board has a bug. I believe this GSV sentence that it emitted is incorrect.
-
-    $GLGSV,3,3,11,85,26,103,25,86,02,152,29,1*75\r\n
-
-This GSV sentence says it is the third of three GSV sentences for the
-GLONASS constellation, and there are eleven total satellites cited in
-the three GSV sentences.
-
-GSV is unusual amongst the typical NMEA sentences in that it is variable
-length. Each GSV sentence can contain at most four satellites, each
-represented by four numbers: the space vehicle ID (which is specific to
-the constellation), the SV's elevation in degrees, the SV's azimuth in
-degrees, and the signal strength in dB Hz.
-
-The two prior GSV sentences for this report of GLONASS satellites in
-view would have had at most four satellites, for a total of eight,
-leaving three satellites for this final sentence in the sequence. This
-sentence only has the metrics for two satellites. Note also that this
-messages has the optional signal identifier as its last field before
-the checksum.
-
-I think either there should be a third set of four fields for the eleventh
-satellite, or the total count should be ten instead of eleven. My software
-has been modified to account for this malformed message; it originally
-core dumped with a segmentation violation.
-
-(2019-06-06: U-Blox says this FW bug will be fixed in a subsequent release.)
-
 ## Ardusimple SimpleRTK2B
 
 The Ardusimple SimpleRTK2B board features a ZED-F9P "9th generation" U-Blox
@@ -676,36 +644,6 @@ use SimpleRTK2B boards interchangeably in the field.
 > LTE-M cellular radios which have the same form factor and are pin compatible,
 > met my needs, although I tried both, the latter using AT&T LTE-M SIMs. As
 > far as I can tell, however, both worked as advertised.
-
-## Lost /dev/ttyACM Characters
-
-I've been troubleshooting a weird issue with sequences of characters being
-lost on the modem-ish (ttyACM) USB connection on a U-blox UBX-ZED-F9P
-(generation 9) chip. This occurs when using the Ardusimple SimpleRTK2B and
-Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation 8)
-chip in a GlobalSat BU353W10 dongle. I've seen in on Intel (Dell) and
-ARM (Raspberry Pi 3B+ and 4B) systems. I've seen it using my software,
-using socat, and even just using cat, to collect data off the USB port.
-I've seen it at a variety of baud rates.
-
-I've described this at length in the article
-
-<https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
-
-## EOF on the Device
-
-Several times, while running this software under Ubunto 19.10 in a
-virtual machine on a Lenovo ThinkPad T430s running Windows 10 using a
-U-blox ZED-F9P receiver on a SparkFun GPS-RTK2 board - and only under
-those circumstances - I've seen gpstool receive an EOF from the input
-stream. The standard I/O function ferror() returned false and feof()
-returned true. The tool fired right back up with no problem. This happens
-very infrequently, and my suspicion is that VMware Workstation 15 Pro is
-disconnecting the USB interface from the VM for some reason, maybe as a
-result of Windows 10 power management on the laptop. This is something
-to especially worry about if you are running a long term survey which
-would be interrupted by this event. (I was doing this mostly to test
-VMware and my Ubuntu installation on my field laptop.)
 
 ## Google Maps
 
@@ -795,36 +733,3 @@ Decimal Degrees: 39.7942756, -105.1534148
 What3Words.com:	///beard.hobby.funds    
 
 maps.google.com plus.codes: QRVW+PJ    
-
-## Corruption of Serial Data Stream by RF
-
-For my Wheatstone project, I used a Digi XBee LTE-M radio in "transparent
-mode" to send JSON datagrams via UDP based on output from gpstool.
-My initial test setup had me reading the serial port of a U-Blox CAM-M8Q
-GNSS receiver using an FTDI-to-serial convertor. It ran flawlessly for
-days.
-
-In my second test setup, I was running gpstool on a Raspberry Pi and
-reading the output stream of the CAM-M8Q via the RPi's serial port. I
-used typical jumper wires to go from the CAM-M8Q (really, from the pins
-on the Digi XBIB-CU-TH development board that were connected to the
-CAM-M8Q on the Digi XBIB-C-GPS daughter board) to the RPi.
-
-This worked initially. But a couple of days later I started getting
-garbage characters - typically with a lot of bits set, like 0xf4 - in the
-middle of NMEA sentences, causing gpstool to reject the sentence (checksum
-failure) and resync with the stream. Eventually I could only run a test
-for a few minutes; the NMEA stream would desync and then fail to resync.
-If I restarted gpstool, it would run okay for a few minutes, then fail in
-the same way.
-
-It took me most of a morning to debug this. It turned out the jumper wires
-for the serial connection, which were unshielded and not twisted pair, had
-gotten right up against the cellular antenna for the LTE-M radio as I had
-moved stuff around on my lab bench. The transmit RF power was apparently
-enough to induce a signal on the serial connection, which could only
-occasionally be decoded by the UART in the RPi as a valid (but incorrrect)
-data frame.
-
-I switched to a different cellular antenna, rearranged my lab bench,
-and my test has run flawlessly for many hours since then.
