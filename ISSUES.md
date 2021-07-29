@@ -1,7 +1,9 @@
 # Issues
 
 Here is a list of weird things I've observed in my travels using
-various GNSS modules.
+various GNSS modules. U-blox may appear to be over represented
+here, but that's only because they're my favorite GNSS device
+manufacturer.
 
 ## Wrong number of satellites reported for GLONASS on U-Blox UBX-ZED-F9P
 
