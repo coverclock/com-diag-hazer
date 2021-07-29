@@ -1011,6 +1011,13 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
  *
  ******************************************************************************/
 
+/*
+ * I am frequently tempted to replace the numerical constants used as counts
+ * and indices below with symbolic constants, but I find they actually make
+ * the code a lot harder to read, to debug, and to compare against the NMEA
+ * spec.
+ */
+
 int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
@@ -1100,7 +1107,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int messages = 0;
     int message = 0;
     int start = 0;
-    int index = 4;
+    int index = 0;
     int slot = 0;
     int sequence = 0;
     int channel = 0;
@@ -1129,6 +1136,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             sequence = message - 1;
             channel = sequence * HAZER_GNSS_VIEWS;
             satellites = strtol(vector[3], (char **)0, 10);
+            index = 4;
             /*
              * "Null fields are not required for unused sets when less
              * than four sets are transmitted." [NMEA 0183 v4.10 2012 p. 96]
