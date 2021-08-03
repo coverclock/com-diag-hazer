@@ -2522,45 +2522,6 @@ int main(int argc, char * argv[])
         if (eof) { break; }
 
         /*
-         * We usually give priority to reading input from the device or a
-         * socket. Generating the report can take a long time, particularly
-         * with slow displays or serial consoles (partly what the -F flag is
-         * all about). So if there is still data waiting to be read, we
-         * short circuit the report code and instead try to assemble another
-         * complete sentence, packet, or message that we can forward, write,
-         * log, or use to update our databases. OTOH, why might we choose
-         * not to do this, despite the risk of data loss? I have tested
-         * GNSS devices whose output was so evenly distributed throughout
-         * their cycle time (e.g. 1Hz) that there is never a time that there
-         * isn't data in the standard I/O buffer. In such devices, this
-         * code would continously loop back to read and process more data,
-         * and never render a report. (Perhaps a better approach would be
-         * to add a timeout interval, kind of the opposite of what the
-         * report frequency options achieves.)
-         */
-
-        if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
-            /* Do nothing. */
-        } else if (bypass) {
-            /* Do nothing. */
-        } else if ((io_available = diminuto_file_ready(in_fp)) > 0) {
-            if (io_available > io_peak) { io_peak = io_available; }
-            DIMINUTO_LOG_DEBUG("Ready file [%zu] [%zu]\n", io_available, io_peak);
-            if (io_available >= io_size) { DIMINUTO_LOG_WARNING("Full file [%zd] [%zu]\n", io_available, io_size); }
-            continue;
-        } else if (serial && (io_available = diminuto_serial_available(in_fd)) > 0) {
-            if (io_available > io_peak) { io_peak = io_available; }
-            DIMINUTO_LOG_DEBUG("Ready device [%zu] [%zu]\n", io_available, io_peak);
-            continue;
-        } else if ((io_available = diminuto_mux_wait(&mux, 0 /* POLL */)) > 0) {
-            if (io_peak <= 0) { io_peak = 1; } /* Actual number of bytes unknown but greater than zero. */
-            DIMINUTO_LOG_DEBUG("Ready socket [%zu] [%zu]\n", io_available, io_peak);
-            continue;
-        } else {
-            DIMINUTO_LOG_DEBUG("Ready empty [0] [%zu]\n", io_peak);
-        }
-
-        /*
          * If we've generated a high precision solution in survey mode,
          * and have been asked to emit the solution to a file for later use
          * in fixed mode, do so now. We delay doing this until the device
@@ -2619,6 +2580,45 @@ int main(int argc, char * argv[])
         } else {
             diminuto_perror("fclose(trace_fp)");
             trace_fp = (FILE *)0;
+        }
+
+        /*
+         * We usually give priority to reading input from the device or a
+         * socket. Generating the report can take a long time, particularly
+         * with slow displays or serial consoles (partly what the -F flag is
+         * all about). So if there is still data waiting to be read, we
+         * short circuit the report code and instead try to assemble another
+         * complete sentence, packet, or message that we can forward, write,
+         * log, or use to update our databases. OTOH, why might we choose
+         * not to do this, despite the risk of data loss? I have tested
+         * GNSS devices whose output was so evenly distributed throughout
+         * their cycle time (e.g. 1Hz) that there is never a time that there
+         * isn't data in the standard I/O buffer. In such devices, this
+         * code would continously loop back to read and process more data,
+         * and never render a report. (Perhaps a better approach would be
+         * to add a timeout interval, kind of the opposite of what the
+         * report frequency options achieves.)
+         */
+
+        if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
+            /* Do nothing. */
+        } else if (bypass) {
+            /* Do nothing. */
+        } else if ((io_available = diminuto_file_ready(in_fp)) > 0) {
+            if (io_available > io_peak) { io_peak = io_available; }
+            DIMINUTO_LOG_DEBUG("Ready file [%zu] [%zu]\n", io_available, io_peak);
+            if (io_available >= io_size) { DIMINUTO_LOG_WARNING("Full file [%zd] [%zu]\n", io_available, io_size); }
+            continue;
+        } else if (serial && (io_available = diminuto_serial_available(in_fd)) > 0) {
+            if (io_available > io_peak) { io_peak = io_available; }
+            DIMINUTO_LOG_DEBUG("Ready device [%zu] [%zu]\n", io_available, io_peak);
+            continue;
+        } else if ((io_available = diminuto_mux_wait(&mux, 0 /* POLL */)) > 0) {
+            if (io_peak <= 0) { io_peak = 1; } /* Actual number of bytes unknown but greater than zero. */
+            DIMINUTO_LOG_DEBUG("Ready socket [%zu] [%zu]\n", io_available, io_peak);
+            continue;
+        } else {
+            DIMINUTO_LOG_DEBUG("Ready empty [0] [%zu]\n", io_peak);
         }
 
 render:
