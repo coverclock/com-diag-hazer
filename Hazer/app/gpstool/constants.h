@@ -85,4 +85,9 @@ static const wchar_t DEGREE = 0x00B0;
  */
 static const wchar_t PLUSMINUS = 0x00B1;
 
+/*
+ * This is the size of the temporary buffer we use to capture unknown stuff.
+ */
+static const size_t SYNCBUFFER = 4096;
+
 #endif

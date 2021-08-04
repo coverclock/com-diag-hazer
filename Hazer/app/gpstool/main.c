@@ -135,6 +135,7 @@
 #include "buffer.h"
 #include "datagram.h"
 #include "emit.h"
+#include "sync.h"
 #include "helpers.h"
 #include "print.h"
 #include "threads.h"
@@ -1530,7 +1531,7 @@ int main(int argc, char * argv[])
 
                 if (!sync) {
 
-                    /* Do nothing. */
+                    sync_out(ch);
 
                 } else if (!frame) {
 
@@ -1563,6 +1564,7 @@ int main(int argc, char * argv[])
                     }
 
                     sync = 0;
+                    sync_out(ch);
 
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_START;
@@ -1583,6 +1585,7 @@ int main(int argc, char * argv[])
                     if (!sync) {
                         DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
+                        sync_in();
                     }
 
                     frame = !0;
@@ -1604,6 +1607,7 @@ int main(int argc, char * argv[])
                     if (!sync) {
                         DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
+                        sync_in();
                     }
 
                     frame = !0;
@@ -1624,6 +1628,7 @@ int main(int argc, char * argv[])
                     if (!sync) {
                         DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
+                        sync_in();
                     }
 
                     frame = !0;
@@ -1650,6 +1655,7 @@ int main(int argc, char * argv[])
                     if (sync) {
                         DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
                         sync = 0;
+                        sync_out(ch);
                     }
 
                     frame = 0;
@@ -1894,38 +1900,34 @@ int main(int argc, char * argv[])
 
                 /*
                  * Since collapse() always includes a terminating NUL, the
-                 * length will always be at least one. But if it is zero,
+                 * length will always be at least one. But if it is short,
                  * wackiness ensues below, so we check it anyway.
                  */
 
-                if (command_length > 1) {
+                diminuto_assert(command_length > 1);
 
-                    switch (command->emission) {
-                    case OPT_W:
-                        command_total = emit_sentence(dev_fp, command_buffer, command_length);
-                        break;
-                    case OPT_U:
-                        command_total = emit_packet(dev_fp, command_buffer, command_length);
-                        if (command_total > 0) { acknakpending += 1; }
-                        break;
-                    case OPT_Z:
-                        command_total = emit_data(dev_fp, command_buffer, command_length);
-                        break;
-                    default:
-                        command_total = -1;
-                        errno = EINVAL;
-                        diminuto_perror("emission");
-                        break;
-                    }
-
-                    if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_buffer, ((command_total > command_length) ? command_total : command_length) - 1 /* Minus terminating nul. */); }
-
-                    if (command_total > 0) {
-                        if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
-                        if (report) { fprintf(out_fp, "OUT [%3zd] ", command_total - 1); print_buffer(out_fp, command_buffer, command_total - 1, limitation); fflush(out_fp); }
-                    }
-
+                switch (command->emission) {
+                case OPT_W:
+                    command_total = emit_sentence(dev_fp, command_buffer, command_length);
+                    break;
+                case OPT_U:
+                    command_total = emit_packet(dev_fp, command_buffer, command_length);
+                    if (command_total > 0) { acknakpending += 1; }
+                    break;
+                case OPT_Z:
+                    command_total = emit_data(dev_fp, command_buffer, command_length);
+                    break;
+                default:
+                    command_total = -1;
+                    break;
                 }
+
+                diminuto_assert(command_total > 1);
+
+                 if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_buffer, ((command_total > command_length) ? command_total : command_length) - 1 /* Minus terminating nul. */); }
+
+                if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
+                if (report) { fprintf(out_fp, "OUT [%3zd] ", command_total - 1); print_buffer(out_fp, command_buffer, command_total - 1 /* Minus terminating nul. */, limitation); fflush(out_fp); }
 
                 free(command_buffer);
                 free(command_node);
