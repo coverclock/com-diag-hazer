@@ -34,11 +34,17 @@ static inline seconds_t ticktock(void)
  */
 static inline int dingdong(seconds_t * wasp, seconds_t seconds)
 {
-    int result;
-    seconds_t now;
+    int result = !0;
+    seconds_t now = 0;
 
-    if ((result = ((now = ticktock()) >= (*wasp + seconds)))) {
+    if (seconds <= 0) {
+        /* Do nothing. */
+    } else if (*wasp == 0) {
+        *wasp = ticktock();
+    } else if ((result = ((now = ticktock()) >= (*wasp + seconds)))) {
         *wasp = now;
+    } else {
+        /* Do nothing. */
     }
 
     return result;

@@ -179,6 +179,7 @@ int main(int argc, char * argv[])
     seconds_t timeout = HAZER_GNSS_SECONDS;
     seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
     seconds_t frequency = 1;
+    seconds_t postpone = 0;
     /*
      * Configuration command variables.
      */
@@ -384,6 +385,7 @@ int main(int argc, char * argv[])
     seconds_t display_last = 0;
     seconds_t keepalive_last = 0;
     seconds_t trace_last = 0;
+    seconds_t write_last = 0;
     /*
      * I/O buffer variables.
      */
@@ -453,7 +455,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:Z:b:cdef:g:hik:lmnop:st:uvxy:?";
+    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:Z:b:cdef:g:hik:lmnop:st:uvxw:y:?";
 
     /**
      ** PREINITIALIZATION
@@ -709,6 +711,11 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             verbose = !0;
             break;
+        case 'w':
+            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            postpone = strtoul(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            break;
         case 'x':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             nakquit = !0;
@@ -721,20 +728,20 @@ int main(int argc, char * argv[])
         case '?':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             fprintf(stderr, "usage: %s"
-                           " [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ]"
-                           " [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
-                           " [ -O FILE ]"
-                           " [ -C FILE ]"
-                           " [ -t SECONDS ]"
-                           " [ -I PIN | -c ] [ -p PIN ]"
-                           " [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ]"
-                           " [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i ]"
-                           " [ -L LOG ]"
-                           " [ -G [ IP:PORT | :PORT [ -g MASK ] ] ]"
-                           " [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ]"
-                           " [ -K [ -k MASK ] ]"
-                           " [ -N FILE ]"
-                           " [ -T FILE [ -f SECONDS ] ]"
+                " [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ]"
+                " [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
+                " [ -O FILE ]"
+                " [ -C FILE ]"
+                " [ -t SECONDS ]"
+                " [ -I PIN | -c ] [ -p PIN ]"
+                " [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ]"
+                " [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i ]"
+                " [ -L LOG ]"
+                " [ -G [ IP:PORT | :PORT [ -g MASK ] ] ]"
+                " [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ]"
+                " [ -K [ -k MASK ] ]"
+                " [ -N FILE ]"
+                " [ -T FILE [ -f SECONDS ] ]"
                           "\n", Program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
@@ -787,6 +794,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
             fprintf(stderr, "       -u          Note Unprocessed input on standard error.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
+            fprintf(stderr, "       -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds.\n");
             fprintf(stderr, "       -x          EXit if a NAK is received.\n");
             fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds.\n");
             return 1;
@@ -1092,9 +1100,9 @@ int main(int argc, char * argv[])
      * N.B. For USB GPS devices, it takes a moment or three for the device to
      * enumerate and show up in the file system. If you, for example, plug in
      * the GPS device and start gpstool too quickly, the open(2) will fail, the
-     * diminuto_assert(3) will fire, and the application will dump core. I do this
-     * routinely, alas. Maybe in the future I'll add a check, a delay, and a
-     * retry.
+     * diminuto_assert(3) will fire, and the application will dump core. I do
+     * this routinely, alas. Maybe in the future I'll add a check, a delay, and
+     * a retry.
      */
 
     if (device == (const char *)0) {
@@ -1348,18 +1356,18 @@ int main(int argc, char * argv[])
     }
 
     /*
-     * Start the clock.
+     * Start the clock. For some time periods (e.g. display) we want to
+     * delay initially; for others (e.g. keepalive) we do not.
      */
 
     epoch = diminuto_time_elapsed();
 
     expiration_now = expiration_was =
         display_last =
-            keepalive_last =
-                trace_last =
-                    epoch / diminuto_frequency();
+            trace_last =
+                write_last = ticktock();
 
-    keepalive_last -= keepalive;
+    keepalive_last = 0;
 
     delay = diminuto_frequency();
 
@@ -1815,8 +1823,6 @@ int main(int argc, char * argv[])
 
         if (surveyor_fd < 0) {
             /* Do nothing. */
-        } else if (keepalive < 0) {
-            /* Do nothing. */
         } else if (acknakpending > 0) {
             /* Do nothing. */
         } else if (!diminuto_list_isempty(&command_list)) {
@@ -1858,6 +1864,8 @@ int main(int argc, char * argv[])
         } else if (acknakpending > 0) {
             /* Do nothing. */
         } else if (diminuto_list_isempty(&command_list)) {
+            /* Do nothing. */
+        } else if (!dingdong(&write_last, postpone)) {
             /* Do nothing. */
         } else {
 
@@ -2687,7 +2695,7 @@ render:
 
         if (!refresh) {
             /* Do nothing. */
-        } else if ((slow > 0) && (!dingdong(&display_last, slow))) {
+        } else if (!dingdong(&display_last, slow)) {
             /* Do nothing. */
         } else {
 
