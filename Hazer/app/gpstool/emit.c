@@ -24,13 +24,14 @@
 #include "buffer.h"
 #include "emit.h"
 
-int emit_sentence(FILE * fp, const char * sentence, size_t size)
+ssize_t emit_sentence(FILE * fp, char * sentence, size_t size)
 {
-    int rc = -1;
+    ssize_t rc = -1;
+    uint8_t * bp = (uint8_t *)0;
     uint8_t msn = '\0';
     uint8_t lsn = '\0';
 
-    if (hazer_checksum_buffer(sentence, size, &msn, &lsn) == (void *)0) {
+    if ((bp = (uint8_t *)hazer_checksum_buffer(sentence, size, &msn, &lsn)) == (uint8_t *)0) {
         errno = EIO;
         diminuto_perror("emit_sentence: checksum");
     } else if (fprintf(fp, "%s%c%c%c\r\n", sentence, HAZER_STIMULUS_CHECKSUM, msn, lsn) < 0) {
@@ -40,24 +41,29 @@ int emit_sentence(FILE * fp, const char * sentence, size_t size)
         errno = EIO;
         diminuto_perror("emit_sentence: fflush");
    } else {
-        rc = 0;
+        *(bp++) = HAZER_STIMULUS_CHECKSUM;
+        *(bp++) = msn;
+        *(bp++) = lsn;
+        *(bp++) = '\r';
+        *(bp++) = '\n';
+        *(bp++) = '\0';
+        rc = bp - (uint8_t *)sentence;
    }
 
     return rc;
 }
 
-int emit_packet(FILE * fp, const void * packet, size_t size)
+ssize_t emit_packet(FILE * fp, void * packet, size_t size)
 {
-    int rc = -1;
-    const void * bp = (const void *)0;
+    ssize_t rc = -1;
+    uint8_t * bp = (uint8_t *)0;
     uint8_t ck_a = 0;
     uint8_t ck_b = 0;
-    size_t length = 0;
 
-    if ((bp = yodel_checksum_buffer(packet, size, &ck_a, &ck_b)) == (void *)0) {
+    if ((bp = (uint8_t *)yodel_checksum_buffer(packet, size, &ck_a, &ck_b)) == (uint8_t *)0) {
         errno = EIO;
         diminuto_perror("emit_packet: checksum");
-    } else if (fwrite(packet, length = (const char *)bp - (const char *)packet, 1, fp) < 1) {
+    } else if (fwrite(packet, bp - (uint8_t *)packet, 1, fp) < 1) {
         errno = EIO;
         diminuto_perror("emit_packet: fwrite 1");
     } else if (fwrite(&ck_a, sizeof(ck_a), 1, fp) < 1) {
@@ -70,26 +76,29 @@ int emit_packet(FILE * fp, const void * packet, size_t size)
         errno = EIO;
         diminuto_perror("emit_packet: fflush");
     } else {
-        rc = 0;
+        *(bp++) = ck_a;
+        *(bp++) = ck_b;
+        *(bp++) = '\0';
+        rc = bp - (uint8_t *)packet;
     }
 
     return rc;
 }
 
-int emit_datum(FILE * fp, const void * datum, size_t size)
+ssize_t emit_data(FILE * fp, void * data, size_t size)
 {
-    int rc = -1;
+    ssize_t rc = -1;
 
-    if (size == 0) {
+    if (size < 2) {
         rc = 0;
-    } else if (fwrite(datum, size - 1 /* Ignore terminating nul. */, 1, fp) < 1) {
+    } else if (fwrite(data, size - 1 /* Ignore terminating nul. */, 1, fp) < 1) {
         errno = EIO;
-        diminuto_perror("emit_datum: fwrite");
+        diminuto_perror("emit_data: fwrite");
     } else if (fflush(fp) == EOF) {
         errno = EIO;
-        diminuto_perror("emit_datum: fflush");
+        diminuto_perror("emit_data: fflush");
     } else {
-        rc = 0;
+        rc = size;
     }
 
     return rc;

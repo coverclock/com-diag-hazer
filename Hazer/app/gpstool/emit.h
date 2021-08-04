@@ -20,30 +20,30 @@
  * end matter consisting of the checksum delimiter, the two checksum
  * characters, a carriage return, and a line feed.
  * @param fp points to the FILE stream.
- * @param sentence points to the sentence minus the ending matter.
- * @param size is the size of the NMEA sentence in bytes.
- * @return 0 for success, <0 for error.
+ * @param sentence points to the sentence minus the ending matter but including the terminating nul.
+ * @param size is the size of the NMEA sentence in bytes including the terminating nul.
+ * @return total length emitted for success, <0 for error.
  */
-extern int emit_sentence(FILE * fp, const char * sentence, size_t size);
+extern ssize_t emit_sentence(FILE * fp, char * sentence, size_t size);
 
 /**
  * Emit a UBX configuration packet to the specified stream after adding the
  * end matter consisting of the two Fletcher checksum bytes.
  * @param fp points to the FILE stream.
- * @param packet points to the packet minus the ending matter.
- * @param size is the size of the UBX packet in bytes.
- * @return 0 for success, <0 for error.
+ * @param packet points to the packet minus the ending matter but including the terminating nul.
+ * @param size is the size of the UBX packet in bytes including the terminating nul.
+ * @return total length emitted for success, <0 for error.
  */
-extern int emit_packet(FILE * fp, const void * packet, size_t size);
+extern ssize_t emit_packet(FILE * fp, void * packet, size_t size);
 
 /**
- * Emit a configuration datum to the specified stream exactly as is.
+ * Emit configuration data to the specified stream exactly as is.
  * @param fp points to the FILE stream.
- * @param datum points to the datum.
- * @param size is the size of the datum in bytes.
- * @return 0 for success, <0 for error.
+ * @param data points to the data including the terminating nul.
+ * @param size is the size of the datum in bytes including the terminating nul.
+ * @return total length emitted for success, <0 for error.
  */
-extern int emit_datum(FILE * fp, const void * datum, size_t size);
+extern ssize_t emit_data(FILE * fp, void * data, size_t size);
 
 /**
  * Save the current PVT solution to the trace file in CSV format.

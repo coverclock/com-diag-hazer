@@ -187,8 +187,10 @@ int main(int argc, char * argv[])
     diminuto_list_t * command_node = (diminuto_list_t *)0;
     diminuto_list_t command_list = DIMINUTO_LIST_NULLINIT(&command_list);
     uint8_t * command_string = (uint8_t *)0;
+    uint8_t * command_buffer = (uint8_t *)0;
     ssize_t command_size = 0;
     ssize_t command_length = 0;
+    ssize_t command_total = 0;
     /*
      * FILE pointer variables.
      */
@@ -1886,7 +1888,9 @@ int main(int argc, char * argv[])
 
                 command_size = strlen(command_string) + 1;
                 DIMINUTO_LOG_NOTICE("Out \'%s\'[%zd]", command_string, command_size);
-                command_length = diminuto_escape_collapse(command_string, command_string, command_size);
+                command_buffer = (uint8_t *)malloc(command_size + 8 /* e.g. *, CHECKSUMA, CHECKSUMB, CR, LF, NUL. */);
+                diminuto_assert(command_buffer != (uint8_t *)0);
+                command_length = diminuto_escape_collapse(command_buffer, command_string, command_size);
 
                 /*
                  * Since collapse() always includes a terminating NUL, the
@@ -1894,35 +1898,36 @@ int main(int argc, char * argv[])
                  * wackiness ensues below, so we check it anyway.
                  */
 
-                if (command_length > 0) {
-
-                    if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_string, command_length - 1); }
+                if (command_length > 1) {
 
                     switch (command->emission) {
                     case OPT_W:
-                        rc = emit_sentence(dev_fp, command_string, command_length);
+                        command_total = emit_sentence(dev_fp, command_buffer, command_length);
                         break;
                     case OPT_U:
-                        rc = emit_packet(dev_fp, command_string, command_length);
-                        if (rc == 0) { acknakpending += 1; }
+                        command_total = emit_packet(dev_fp, command_buffer, command_length);
+                        if (command_total > 0) { acknakpending += 1; }
                         break;
                     case OPT_Z:
-                        rc = emit_datum(dev_fp, command_string, command_length);
+                        command_total = emit_data(dev_fp, command_buffer, command_length);
                         break;
                     default:
-                        rc = -1;
+                        command_total = -1;
                         errno = EINVAL;
                         diminuto_perror("emission");
                         break;
                     }
 
-                    if (rc == 0) {
+                    if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_buffer, ((command_total > command_length) ? command_total : command_length) - 1 /* Minus terminating nul. */); }
+
+                    if (command_total > 0) {
                         if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
-                        if (report) { fprintf(out_fp, "OUT [%3zd] ", command_length - 1); print_buffer(out_fp, command_string, command_length - 1, limitation); fflush(out_fp); }
+                        if (report) { fprintf(out_fp, "OUT [%3zd] ", command_total - 1); print_buffer(out_fp, command_buffer, command_total - 1, limitation); fflush(out_fp); }
                     }
 
                 }
 
+                free(command_buffer);
                 free(command_node);
 
             }
