@@ -1422,7 +1422,7 @@ See the README in the Tesoro repository for more information.
 ## gpstool
 
     > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -O FILE ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE [ -f SECONDS ] ]
+    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -O FILE ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ] [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE [ -f SECONDS ] ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
@@ -1431,7 +1431,7 @@ See the README in the Tesoro repository for more information.
            -C FILE     Catenate input to FILE or named pipe.
            -D DEVICE   Use DEVICE for input or output.
            -E          Like -R but use ANSI Escape sequences.
-           -F SECONDS  Set report Frequency to 1/SECONDS.
+           -F SECONDS  Set report Frequency to 1/SECONDS, 0 for no delay.
            -G IP:PORT  Use remote IP and PORT as dataGram sink.
            -G :PORT    Use local PORT as dataGram source.
            -H HEADLESS Like -R but writes each iteration to HEADLESS file.
@@ -1445,14 +1445,17 @@ See the README in the Tesoro repository for more information.
            -R          Print a Report on standard output.
            -S FILE     Use source FILE or named pipe for input.
            -T FILE     Save the PVT CSV Trace to FILE.
-           -U STRING   Like -W except expect UBX ACK or NAK response.
-           -U ''       Exit when this empty UBX STRING is processed.
+           -U STRING   Collapse STRING, append Ubx end matter, write to DEVICE, expect response.
+           -U ''       Exit when this empty STRING is processed.
            -V          Log Version in the form of release, vintage, and revision.
-           -W STRING   Collapse STRING, append checksum, Write to DEVICE.
-           -W ''       Exit when this empty Write STRING is processed.
+           -W STRING   Collapse STRING, append NMEA end matter, Write to DEVICE.
+           -W ''       Exit when this empty STRING is processed.
            -X          Enable message eXpiration test mode.
            -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.
            -Y :PORT    Use local PORT as surveYor source.
+           -Z STRING   Collapse STRING, write to DEVICE.
+           -Z ''       Exit when this empty STRING is processed.
+           -X          Enable message eXpiration test mode.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
            -d          Display Debug output on standard error.
@@ -1460,6 +1463,7 @@ See the README in the Tesoro repository for more information.
            -f SECONDS  Set trace Frequency to 1/SECONDS.
            -g MASK     Set dataGram sink mask (NMEA=1, UBX=2, RTCM=4) default NMEA.
            -h          Use RTS/CTS Hardware flow control for DEVICE.
+           -i          Bypass Input data available check.
            -k MASK     Set device sinK mask (NMEA=1, UBX=2, RTCM=4) default NMEA.
            -l          Use Local control for DEVICE.
            -m          Use Modem control for DEVICE.
@@ -1470,6 +1474,7 @@ See the README in the Tesoro repository for more information.
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.
            -v          Display Verbose output on standard error.
+           -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds.
            -x          EXit if a NAK is received.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
 

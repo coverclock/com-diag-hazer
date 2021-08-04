@@ -2205,7 +2205,7 @@ int main(int argc, char * argv[])
             } else if (hazer_parse_gsa(&cache, vector, count) == 0) {
 
                 /*
-                 * This is a special case for the Ublox 8 used in devices like
+                 * Below is a special case for the Ublox 8 used in devices like
                  * the GN-803G. It emits multiple GSA sentences all under the
                  * GN (GNSS) talker, but the satellites are either GPS or
                  * GLONASS *plus* WAAS. We'd like to classify them as either
