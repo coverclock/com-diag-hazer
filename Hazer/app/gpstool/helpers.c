@@ -12,12 +12,39 @@
 #include "types.h"
 #include "helpers.h"
 
-/**
- * Track RTK updates by encoding each received RTCM message as a single
- * character in a shifting string.
- * @param number is the RTCM message number.
- * @param up points to the updates union.
- */
+int dingdong(seconds_t * wasp, timeout_t seconds)
+{
+    int result = !0;
+    seconds_t now = 0;
+
+    if (seconds < 0) {
+        result = 0;
+    } else if (seconds == 0) {
+        /* Do nothing. */
+    } else if (*wasp == 0) {
+        *wasp = ticktock();
+    } else if ((result = ((now = ticktock()) >= (*wasp + seconds)))) {
+        *wasp = now;
+    } else {
+        /* Do nothing. */
+    }
+
+    return result;
+}
+
+void countdown(hazer_expiry_t * ep, diminuto_sticks_t elapsed)
+{
+    if (*ep == 0) {
+        /* Do nothing. */
+    } else if (elapsed <= 0) {
+        /* Do nothing. */
+    } else if (*ep <= elapsed) {
+        *ep = 0;
+    } else {
+        *ep -= elapsed;
+    }
+}
+
 void collect(int number, tumbleweed_updates_t * up)
 {
     update_t update = UPDATE;

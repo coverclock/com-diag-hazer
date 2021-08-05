@@ -175,12 +175,12 @@ int main(int argc, char * argv[])
     int unknown = 0;
     int serial = 0;
     int daemon = 0;
-    int bypass = 0;
-    seconds_t slow = 0;
-    seconds_t timeout = HAZER_GNSS_SECONDS;
-    seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
-    seconds_t frequency = 1;
-    seconds_t postpone = 0;
+    timeout_t slow = 0;
+    timeout_t timeout = HAZER_GNSS_SECONDS;
+    timeout_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
+    timeout_t frequency = 1;
+    timeout_t postpone = 0;
+    timeout_t check = -1;
     /*
      * Configuration command variables.
      */
@@ -388,7 +388,8 @@ int main(int argc, char * argv[])
     seconds_t display_last = 0;
     seconds_t keepalive_last = 0;
     seconds_t trace_last = 0;
-    seconds_t write_last = 0;
+    seconds_t command_last = 0;
+    seconds_t check_last = 0;
     /*
      * I/O buffer variables.
      */
@@ -458,7 +459,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:Z:b:cdef:g:hik:lmnop:st:uvxw:y:?";
+    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:Z:b:cdef:g:hi:k:lmnop:st:uvxw:y:?";
 
     /**
      ** PREINITIALIZATION
@@ -515,7 +516,7 @@ int main(int argc, char * argv[])
             break;
         case 'F':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
-            slow = strtoul(optarg, &end, 0);
+            slow = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             report = !0;
             process = !0;
@@ -530,7 +531,6 @@ int main(int argc, char * argv[])
         case 'H':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             report = !0;
-            if (slow == 0) { slow = 1; }
             process = !0;
             headless = optarg;
             break;
@@ -648,7 +648,7 @@ int main(int argc, char * argv[])
             break;
         case 'f':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
-            frequency = strtoul(optarg, &end, 0);
+            frequency = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (frequency < 1)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case 'g':
@@ -662,8 +662,9 @@ int main(int argc, char * argv[])
             serial = !0;
             break;
         case 'i':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
-            bypass = !0;
+            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            check = strtol(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case 'k':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
@@ -716,8 +717,8 @@ int main(int argc, char * argv[])
             break;
         case 'w':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
-            postpone = strtoul(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            postpone = strtol(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0') || (postpone < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
             break;
         case 'x':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -738,7 +739,7 @@ int main(int argc, char * argv[])
                 " [ -t SECONDS ]"
                 " [ -I PIN | -c ] [ -p PIN ]"
                 " [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ]"
-                " [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i ]"
+                " [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ]"
                 " [ -L LOG ]"
                 " [ -G [ IP:PORT | :PORT [ -g MASK ] ] ]"
                 " [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ]"
@@ -786,7 +787,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -f SECONDS  Set trace Frequency to 1/SECONDS.\n");
             fprintf(stderr, "       -g MASK     Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
             fprintf(stderr, "       -h          Use RTS/CTS Hardware flow control for DEVICE.\n");
-            fprintf(stderr, "       -i          Bypass Input data available check.\n");
+            fprintf(stderr, "       -i SECONDS  Bypass input check every SECONDS seconds, 0 for always, -1 for never.\n");
             fprintf(stderr, "       -k MASK     Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
             fprintf(stderr, "       -l          Use Local control for DEVICE.\n");
             fprintf(stderr, "       -m          Use Modem control for DEVICE.\n");
@@ -1368,7 +1369,8 @@ int main(int argc, char * argv[])
     expiration_now = expiration_was =
         display_last =
             trace_last =
-                write_last = ticktock();
+                check_last =
+                    command_last = ticktock();
 
     keepalive_last = 0;
 
@@ -1873,7 +1875,7 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
-        } else if (!dingdong(&write_last, postpone)) {
+        } else if (!dingdong(&command_last, postpone)) {
             /* Do nothing. */
         } else {
 
@@ -2617,7 +2619,7 @@ int main(int argc, char * argv[])
 
         if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
             /* Do nothing. */
-        } else if (bypass) {
+        } else if (dingdong(&check_last, check)) {
             /* Do nothing. */
         } else if ((io_available = diminuto_file_ready(in_fp)) > 0) {
             if (io_available > io_peak) { io_peak = io_available; }
@@ -2629,8 +2631,7 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_DEBUG("Ready device [%zu] [%zu]\n", io_available, io_peak);
             continue;
         } else if ((io_available = diminuto_mux_wait(&mux, 0 /* POLL */)) > 0) {
-            if (io_peak <= 0) { io_peak = 1; } /* Actual number of bytes unknown but greater than zero. */
-            DIMINUTO_LOG_DEBUG("Ready socket [%zu] [%zu]\n", io_available, io_peak);
+            DIMINUTO_LOG_DEBUG("Ready socket\n");
             continue;
         } else {
             DIMINUTO_LOG_DEBUG("Ready empty [0] [%zu]\n", io_peak);

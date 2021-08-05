@@ -29,6 +29,11 @@
  */
 typedef uint64_t seconds_t;
 
+/**
+ * Timeout seconds, signed so <0 indicate special cases.
+ */
+typedef int64_t timeout_t;
+
 /*******************************************************************************
  * ENUMERATIONS
  ******************************************************************************/
