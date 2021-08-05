@@ -2277,7 +2277,11 @@ int main(int argc, char * argv[])
 
             /*
              * Calculate our time to first fix if the code above established
-             * a fix.
+             * a fix. "Fix" here means both location and time. This means for
+             * this code to accept a "first fix", it has to receive messages
+             * that establish both, even though a location fix is impossible
+             * without also having a time fix. (I mention this because I have
+             * tested this against devices that only emit location messages.)
              */
 
             if (position[system].ticks == 0) {
