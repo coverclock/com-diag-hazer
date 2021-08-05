@@ -1459,6 +1459,8 @@ int main(int argc, char * argv[])
 
         if ((available = diminuto_file_ready(in_fp)) > 0) {
             fd = in_fd;
+        } else if (serial && (diminuto_serial_available(in_fd) > 0)) {
+            fd = in_fd;
         } else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
             /* Do nothing. */
         } else if ((ready = diminuto_mux_wait(&mux, delay /* BLOCK */)) == 0) {
