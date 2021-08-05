@@ -1559,10 +1559,21 @@ int main(int argc, char * argv[])
 
                 } else {
 
+                    /*
+                     * Normally I'd log this at WARNING or NOTICE. But
+                     * some devices with USB interfaces flood the log
+                     * because of lost data every output cycle. (I'm
+                     * looking at you, u-blox, which exhibits lost data
+                     * on the USB interface.) I thought this was a bug in
+                     * my code, but it occurs even using socat, screen, etc.
+                     * Then I thought it was a bug in the Linux USB driver,
+                     * but it shows up using a USB hardware analyzer.
+                     */
+
                     if (isprint(ch)) {
-                        DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Lost 0x%016llx 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
                     } else {
-                        DIMINUTO_LOG_WARNING("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
                     }
 
                     sync = 0;
@@ -1585,7 +1596,7 @@ int main(int argc, char * argv[])
                     format = NMEA;
 
                     if (!sync) {
-                        DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync NMEA 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
                         if (verbose) { sync_in(length); }
                     }
@@ -1607,7 +1618,7 @@ int main(int argc, char * argv[])
                     format = UBX;
 
                     if (!sync) {
-                        DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync UBX 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
                         if (verbose) { sync_in(length); }
                     }
@@ -1628,7 +1639,7 @@ int main(int argc, char * argv[])
                     format = RTCM;
 
                     if (!sync) {
-                        DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync RTCM 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
                         if (verbose) { sync_in(length); }
                     }
@@ -1655,7 +1666,7 @@ int main(int argc, char * argv[])
                 } else {
 
                     if (sync) {
-                        DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
                         sync = 0;
                         if (verbose) { sync_out(ch); }
                     }
