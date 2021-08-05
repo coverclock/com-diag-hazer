@@ -12,10 +12,23 @@
  * @details
  */
 
+/**
+ * Add a character to the sync troubleshooting buffer when the input
+ * stream is out of syncronization.
+ * @param ch is a character from the input stream.
+ */
 extern void sync_out(int ch);
 
-extern void sync_in(void);
+/**
+ * Process the sync troubleshooting buffer when the input stream comes
+ * back into synchronization.
+ * @param length is the length of the data that brought the stream into sync.
+ */
+extern void sync_in(size_t length);
 
+/**
+ * Handle any final processing of the sync troubleshooting buffer at end of job.
+ */
 extern void sync_end(void);
 
 #endif

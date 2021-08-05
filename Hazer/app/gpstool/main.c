@@ -1531,7 +1531,7 @@ int main(int argc, char * argv[])
 
                 if (!sync) {
 
-                    sync_out(ch);
+                    if (verbose) { sync_out(ch); }
 
                 } else if (!frame) {
 
@@ -1564,7 +1564,7 @@ int main(int argc, char * argv[])
                     }
 
                     sync = 0;
-                    sync_out(ch);
+                    if (verbose) { sync_out(ch); }
 
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_START;
@@ -1585,7 +1585,7 @@ int main(int argc, char * argv[])
                     if (!sync) {
                         DIMINUTO_LOG_NOTICE("Sync NMEA 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
-                        sync_in();
+                        if (verbose) { sync_in(length); }
                     }
 
                     frame = !0;
@@ -1607,7 +1607,7 @@ int main(int argc, char * argv[])
                     if (!sync) {
                         DIMINUTO_LOG_NOTICE("Sync UBX 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
-                        sync_in();
+                        if (verbose) { sync_in(length); }
                     }
 
                     frame = !0;
@@ -1628,7 +1628,7 @@ int main(int argc, char * argv[])
                     if (!sync) {
                         DIMINUTO_LOG_NOTICE("Sync RTCM 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
-                        sync_in();
+                        if (verbose) { sync_in(length); }
                     }
 
                     frame = !0;
@@ -1655,7 +1655,7 @@ int main(int argc, char * argv[])
                     if (sync) {
                         DIMINUTO_LOG_WARNING("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
                         sync = 0;
-                        sync_out(ch);
+                        if (verbose) { sync_out(ch); }
                     }
 
                     frame = 0;
@@ -2756,6 +2756,8 @@ render:
      **/
 
     DIMINUTO_LOG_NOTICE("Stop");
+
+    if (verbose) { sync_end(); }
 
     DIMINUTO_LOG_INFORMATION("Counters Remote=%lu Surveyor=%lu Keepalive=%lu OutOfOrder=%u Missing=%u", (unsigned long)remote_sequence, (unsigned long)surveyor_sequence, (unsigned long)keepalive_sequence, outoforder_counter, missing_counter);
 

@@ -41,13 +41,17 @@ void sync_out(int ch)
     *(sync_here++) = ch;
 }
 
-void sync_in(void)
+void sync_in(size_t length)
 {
     size_t sync_length = 0;
 
     if (sync_buffer != (uint8_t *)0) {
 
         sync_length = sync_here - sync_buffer;
+
+        if (length < sync_length) {
+            sync_length -= length;
+        }
 
         if (sync_length > 0) {
             fputs("UNK:\n", stderr);
