@@ -1422,7 +1422,7 @@ See the README in the Tesoro repository for more information.
 ## gpstool
 
     > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -O FILE ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ] [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE [ -f SECONDS ] ]
+    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -O FILE ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ] [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE [ -f SECONDS ] ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
@@ -1463,7 +1463,7 @@ See the README in the Tesoro repository for more information.
            -f SECONDS  Set trace Frequency to 1/SECONDS.
            -g MASK     Set dataGram sink mask (NMEA=1, UBX=2, RTCM=4) default NMEA.
            -h          Use RTS/CTS Hardware flow control for DEVICE.
-           -i          Bypass Input data available check.
+           -i SECONDS  Bypass input check every SECONDS seconds, 0 for always, -1 for never.
            -k MASK     Set device sinK mask (NMEA=1, UBX=2, RTCM=4) default NMEA.
            -l          Use Local control for DEVICE.
            -m          Use Modem control for DEVICE.
