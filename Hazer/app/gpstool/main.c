@@ -498,7 +498,11 @@ int main(int argc, char * argv[])
         case 'B':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             io_size = strtoul(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (io_size < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0') || (io_size < 0)) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 'C':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
@@ -517,16 +521,25 @@ int main(int argc, char * argv[])
         case 'F':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             slow = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             report = !0;
             process = !0;
             break;
         case 'G':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
-            remote_option = optarg;
-            rc = diminuto_ipc_endpoint(optarg, &remote_endpoint);
-            if (remote_endpoint.udp <= 0) { rc = -1; errno = EINVAL; }
-            if (rc < 0) { diminuto_perror(optarg); error = !0; }
+            if (diminuto_ipc_endpoint(optarg, &remote_endpoint) < 0) {
+                error = !0;
+            } else if (remote_endpoint.udp <= 0) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            } else {
+                remote_option = optarg;
+            }
             break;
         case 'H':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
@@ -538,7 +551,11 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             pps = optarg;
             ppspin = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 'K':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -609,11 +626,17 @@ int main(int argc, char * argv[])
             break;
         case 'Y':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
-            readonly = 0;
-            surveyor_option = optarg;
-            rc = diminuto_ipc_endpoint(surveyor_option, &surveyor_endpoint);
-            if (surveyor_endpoint.udp <= 0) { rc = -1; errno = EINVAL; }
-            if (rc < 0) { diminuto_perror(optarg); error = !0; }
+            if (diminuto_ipc_endpoint(optarg, &surveyor_endpoint) < 0) {
+                error = !0;
+            } else if (surveyor_endpoint.udp <= 0) {
+                rc = -1;
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            } else {
+                readonly = 0;
+                surveyor_option = optarg;
+            }
             break;
         case 'Z':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
@@ -628,8 +651,13 @@ int main(int argc, char * argv[])
         case 'b':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             bitspersecond = strtoul(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (bitspersecond == 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
-            serial = !0;
+            if ((end == (char *)0) || (*end != '\0') || (bitspersecond == 0)) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            } else {
+                serial = !0;
+            }
             break;
         case 'c':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -649,12 +677,20 @@ int main(int argc, char * argv[])
         case 'f':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             frequency = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (frequency < 1)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0') || (frequency < 1)) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 'g':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             remote_mask = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 'h':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -664,12 +700,20 @@ int main(int argc, char * argv[])
         case 'i':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             check = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 'k':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             device_mask = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 'l':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -695,7 +739,11 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             strobe = optarg;
             strobepin = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 's':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -705,7 +753,11 @@ int main(int argc, char * argv[])
         case 't':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             timeout = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (timeout < 0) || (timeout > HAZER_GNSS_SECONDS)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0') || (timeout < 0) || (timeout > HAZER_GNSS_SECONDS)) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 'u':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -718,7 +770,11 @@ int main(int argc, char * argv[])
         case 'w':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             postpone = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (postpone < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 'x':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -727,7 +783,11 @@ int main(int argc, char * argv[])
         case 'y':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             keepalive = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (keepalive < 0)) { errno = EINVAL; diminuto_perror(optarg); error = !0; }
+            if ((end == (char *)0) || (*end != '\0') || (keepalive < 0)) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case '?':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -779,7 +839,6 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -Y :PORT    Use local PORT as surveYor source.\n");
             fprintf(stderr, "       -Z STRING   Collapse STRING, write to DEVICE.\n");
             fprintf(stderr, "       -Z ''       Exit when this empty STRING is processed.\n");
-            fprintf(stderr, "       -X          Enable message eXpiration test mode.\n");
             fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(stderr, "       -d          Display Debug output on standard error.\n");
@@ -791,9 +850,9 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -k MASK     Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
             fprintf(stderr, "       -l          Use Local control for DEVICE.\n");
             fprintf(stderr, "       -m          Use Modem control for DEVICE.\n");
+            fprintf(stderr, "       -n          Use No parity for DEVICE.\n");
             fprintf(stderr, "       -o          Use Odd parity for DEVICE.\n");
             fprintf(stderr, "       -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).\n");
-            fprintf(stderr, "       -n          Use No parity for DEVICE.\n");
             fprintf(stderr, "       -s          Use XON/XOFF (control-Q/control-S) for DEVICE.\n");
             fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
             fprintf(stderr, "       -u          Note Unprocessed input on standard error.\n");
@@ -943,7 +1002,9 @@ int main(int argc, char * argv[])
 
     }
 
-    if (remote_fd >= 0) { show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp); }
+    if (remote_fd >= 0) {
+        show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp);
+    }
 
     /*
      * Are we receiving RTK corrections in the form of RTCM messages from a
@@ -1009,7 +1070,9 @@ int main(int argc, char * argv[])
 
     }
 
-    if (surveyor_fd >= 0) { show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp); }
+    if (surveyor_fd >= 0) {
+        show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp);
+    }
 
     /*
      * Are we strobing a GPIO pin with the one pulse per second (1PPS)
@@ -1129,7 +1192,9 @@ int main(int argc, char * argv[])
         }
 
         dev_fd = open(device, readonly ? O_RDONLY : O_RDWR);
-        if (dev_fd < 0) { diminuto_perror(device); }
+        if (dev_fd < 0) {
+            diminuto_perror(device);
+        }
         diminuto_assert(dev_fd >= 0);
 
         if (serial) {
@@ -1151,7 +1216,9 @@ int main(int argc, char * argv[])
          */
 
         dev_fp = fdopen(dev_fd, readonly ? "r" : "a+");
-        if (dev_fp == (FILE *)0) { diminuto_perror(device); }
+        if (dev_fp == (FILE *)0) {
+            diminuto_perror(device);
+        }
         diminuto_assert(dev_fp != (FILE *)0);
 
         /*
@@ -1443,6 +1510,10 @@ int main(int argc, char * argv[])
          ** INPUT
          **/
 
+        available = 0;
+        fd = -1;
+        ready = 0;
+
         /*
          * We keep looking for input from one of our sources until one of them
          * tells us we have a buffer to process. It could be a NMEA sentence,
@@ -1450,15 +1521,14 @@ int main(int argc, char * argv[])
          * select(2) timed out, and no file descriptor will be returned, in
          * which case we have other work to do further below. Or it may be
          * that the select(2) was interrupted, so we need to interrogate our
-         * signal handlers.
+         * signal handlers. Note that the code below may block.
          */
-
-        available = 0;
-        fd = -1;
-        ready = 0;
 
         if ((available = diminuto_file_ready(in_fp)) > 0) {
             fd = in_fd;
+            if (available > io_maximum) {
+                io_maximum = available;
+            }
         } else if (serial && (diminuto_serial_available(in_fd) > 0)) {
             fd = in_fd;
         } else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
@@ -1492,8 +1562,6 @@ int main(int argc, char * argv[])
              */
 
         } else if (fd == in_fd) {
-
-            if (available > io_maximum) { io_maximum = available; }
 
             /*
              * Consume bytes of NMEA, UBX, or RTCM from the input stream until
@@ -1535,7 +1603,9 @@ int main(int argc, char * argv[])
 
                 if (!sync) {
 
-                    if (verbose) { sync_out(ch); }
+                    if (verbose) {
+                        sync_out(ch);
+                    }
 
                 } else if (!frame) {
 
@@ -1579,7 +1649,9 @@ int main(int argc, char * argv[])
                     }
 
                     sync = 0;
-                    if (verbose) { sync_out(ch); }
+                    if (verbose) {
+                        sync_out(ch);
+                    }
 
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_START;
@@ -1600,7 +1672,9 @@ int main(int argc, char * argv[])
                     if (!sync) {
                         DIMINUTO_LOG_INFORMATION("Sync NMEA 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
-                        if (verbose) { sync_in(length); }
+                        if (verbose) {
+                            sync_in(length);
+                        }
                     }
 
                     frame = !0;
@@ -1622,7 +1696,9 @@ int main(int argc, char * argv[])
                     if (!sync) {
                         DIMINUTO_LOG_INFORMATION("Sync UBX 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
-                        if (verbose) { sync_in(length); }
+                        if (verbose) {
+                            sync_in(length);
+                        }
                     }
 
                     frame = !0;
@@ -1643,7 +1719,9 @@ int main(int argc, char * argv[])
                     if (!sync) {
                         DIMINUTO_LOG_INFORMATION("Sync RTCM 0x%016llx\n", (unsigned long long)io_total);
                         sync = !0;
-                        if (verbose) { sync_in(length); }
+                        if (verbose) {
+                            sync_in(length);
+                        }
                     }
 
                     frame = !0;
@@ -1670,7 +1748,9 @@ int main(int argc, char * argv[])
                     if (sync) {
                         DIMINUTO_LOG_INFORMATION("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
                         sync = 0;
-                        if (verbose) { sync_out(ch); }
+                        if (verbose) {
+                            sync_out(ch);
+                        }
                     }
 
                     frame = 0;
@@ -1701,7 +1781,9 @@ int main(int argc, char * argv[])
              */
 
             remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer));
-            if (remote_total > 0) { network_total += remote_total; }
+            if (remote_total > 0) {
+                network_total += remote_total;
+            }
 
             if (remote_total < sizeof(remote_buffer.header)) {
 
@@ -1751,7 +1833,9 @@ int main(int argc, char * argv[])
              */
 
             surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer));
-            if (surveyor_total > 0) { network_total += surveyor_total; }
+            if (surveyor_total > 0) {
+                network_total += surveyor_total;
+            }
 
             if (surveyor_total < sizeof(surveyor_buffer.header)) {
 
@@ -1778,7 +1862,9 @@ int main(int argc, char * argv[])
                 kinematics.source = NETWORK;
 
                 kinematics.number = tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length);
-                if (kinematics.number < 0) { kinematics.number = 9999; }
+                if (kinematics.number < 0) {
+                    kinematics.number = 9999;
+                }
                 collect(kinematics.number, &updates);
 
                 kinematics.length = surveyor_length;
@@ -1788,7 +1874,10 @@ int main(int argc, char * argv[])
 
                 DIMINUTO_LOG_DEBUG("Surveyor RTCM [%zd] [%zd] [%zd] <%d>\n", surveyor_total, surveyor_size, surveyor_length, kinematics.number);
 
-                if (verbose) { fputs("NET:\n", stderr); diminuto_dump(stderr, &surveyor_buffer, surveyor_total); }
+                if (verbose) {
+                    fputs("NET:\n", stderr);
+                    diminuto_dump(stderr, &surveyor_buffer, surveyor_total);
+                }
                 write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
 
             }
@@ -1810,7 +1899,9 @@ int main(int argc, char * argv[])
          * (This may be the only time I've found a legitimate use for a goto.)
          */
 
-        if (eof) { goto render; }
+        if (eof) {
+            goto render;
+        }
 
         /*
          * At this point, either we have a buffer with a complete and validated
@@ -1856,7 +1947,9 @@ int main(int argc, char * argv[])
 
             datagram_stamp(&keepalive_buffer.header, &keepalive_sequence);
             surveyor_total = send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
-            if (surveyor_total > 0) { network_total += surveyor_total; }
+            if (surveyor_total > 0) {
+                network_total += surveyor_total;
+            }
 
             DIMINUTO_LOG_DEBUG("Surveyor RTCM keepalive sent");
 
@@ -1927,7 +2020,9 @@ int main(int argc, char * argv[])
                     break;
                 case OPT_U:
                     command_total = emit_packet(dev_fp, command_buffer, command_length);
-                    if (command_total > 0) { acknakpending += 1; }
+                    if (command_total > 0) {
+                        acknakpending += 1;
+                    }
                     break;
                 case OPT_Z:
                     command_total = emit_data(dev_fp, command_buffer, command_length);
@@ -1939,10 +2034,18 @@ int main(int argc, char * argv[])
 
                 diminuto_assert(command_total > 1);
 
-                 if (verbose) { fputs("OUT:\n", stderr); diminuto_dump(stderr, command_buffer, ((command_total > command_length) ? command_total : command_length) - 1 /* Minus terminating nul. */); }
+                 if (verbose) {
+                    fputs("OUT:\n", stderr);
+                    diminuto_dump(stderr, command_buffer, ((command_total > command_length) ? command_total : command_length) - 1 /* Minus terminating nul. */);
+                }
 
-                if (escape) { fputs("\033[2;1H\033[0K", out_fp); }
-                if (report) { fprintf(out_fp, "OUT [%3zd] ", command_total - 1); print_buffer(out_fp, command_buffer, command_total - 1 /* Minus terminating nul. */, limitation); fflush(out_fp); }
+                if (escape) {
+                    fputs("\033[2;1H\033[0K", out_fp);
+                }
+                if (report) {
+                    fprintf(out_fp, "OUT [%3zd] ", command_total - 1); print_buffer(out_fp, command_buffer, command_total - 1 /* Minus terminating nul. */, limitation);
+                    fflush(out_fp);
+                }
 
                 free(command_buffer);
                 free(command_node);
@@ -2021,7 +2124,9 @@ int main(int argc, char * argv[])
             dp = diminuto_containerof(datagram_buffer_t, payload, buffer);
             datagram_stamp(&(dp->header), &remote_sequence);
             remote_total = send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
-            if (remote_total > 0) { network_total += remote_total; }
+            if (remote_total > 0) {
+                network_total += remote_total;
+            }
         }
 
         /**
@@ -2055,10 +2160,21 @@ int main(int argc, char * argv[])
          ** LOG
          **/
 
-        if (log_fp != (FILE *)0) { print_buffer(log_fp, buffer, length, UNLIMITED); }
-        if (verbose) { fputs("INP:\n", stderr); diminuto_dump(stderr, buffer, length); }
-        if (escape) { fputs("\033[1;1H\033[0K", out_fp); }
-        if (report) { fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation); fflush(out_fp); }
+        if (log_fp != (FILE *)0) {
+            print_buffer(log_fp, buffer, length, UNLIMITED);
+        }
+
+        if (verbose) {
+            fputs("INP:\n", stderr); diminuto_dump(stderr, buffer, length);
+        }
+
+        if (escape) {
+            fputs("\033[1;1H\033[0K", out_fp);
+        }
+        if (report) {
+            fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation);
+            fflush(out_fp);
+        }
 
         /**
          ** ITERATE
@@ -2259,7 +2375,9 @@ int main(int argc, char * argv[])
                  */
 
                 view[system].ticks = timeout;
-                if (rc == 0) { refresh = !0; }
+                if (rc == 0) {
+                    refresh = !0;
+                }
 
             } else if (hazer_parse_txt(vector, count) == 0) {
 
@@ -2336,7 +2454,9 @@ int main(int argc, char * argv[])
                     eof = !0;
                 }
 
-                if (acknakpending > 0) { acknakpending -= 1; }
+                if (acknakpending > 0) {
+                    acknakpending -= 1;
+                }
 
             } else if (yodel_ubx_cfg_valget(buffer, length) == 0) {
 
@@ -2403,7 +2523,9 @@ int main(int argc, char * argv[])
                         break;
                     }
 
-                    if (ll == 0) { break; }
+                    if (ll == 0) {
+                        break;
+                    }
 
                     bb += sizeof(kk);
 
@@ -2443,11 +2565,15 @@ int main(int argc, char * argv[])
 
                 do {
 
-                    if (bb >= ee) { break; }
+                    if (bb >= ee) {
+                        break;
+                    }
                     DIMINUTO_LOG_INFORMATION("Parse UBX MON VER SW \"%s\"\n", bb);
                     bb += YODEL_UBX_MON_VER_swVersion_LENGTH;
 
-                    if (bb >= ee) { break; }
+                    if (bb >= ee) {
+                        break;
+                    }
                     DIMINUTO_LOG_INFORMATION("Parse UBX MON VER HW \"%s\"\n", bb);
                     bb += YODEL_UBX_MON_VER_hwVersion_LENGTH;
 
@@ -2535,7 +2661,9 @@ int main(int argc, char * argv[])
             kinematics.source = DEVICE;
 
             kinematics.number = tumbleweed_message(buffer, length);
-            if (kinematics.number < 0) { kinematics.number = 9999; }
+            if (kinematics.number < 0) {
+                kinematics.number = 9999;
+            }
             collect(kinematics.number, &updates);
 
             kinematics.length = length;
@@ -2553,7 +2681,9 @@ int main(int argc, char * argv[])
 
         }
 
-        if (eof) { break; }
+        if (eof) {
+            break;
+        }
 
         /*
          * If we've generated a high precision solution in survey mode,
@@ -2629,9 +2759,8 @@ int main(int argc, char * argv[])
          * their cycle time (e.g. 1Hz) that there is never a time that there
          * isn't data in the standard I/O buffer. In such devices, this
          * code would continously loop back to read and process more data,
-         * and never render a report. (Perhaps a better approach would be
-         * to add a timeout interval, kind of the opposite of what the
-         * report frequency options achieves.)
+         * and never render a report. That's what the check timeout below
+         * is all about. Note that the code below is non-blocking.
          */
 
         if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
@@ -2639,15 +2768,21 @@ int main(int argc, char * argv[])
         } else if (dingdong(&check_last, check)) {
             /* Do nothing. */
         } else if ((io_available = diminuto_file_ready(in_fp)) > 0) {
-            if (io_available > io_peak) { io_peak = io_available; }
+            if (io_available > io_peak) {
+                io_peak = io_available;
+            }
             DIMINUTO_LOG_DEBUG("Ready file [%zu] [%zu]\n", io_available, io_peak);
-            if (io_available >= io_size) { DIMINUTO_LOG_WARNING("Full file [%zd] [%zu]\n", io_available, io_size); }
+            if (io_available >= io_size) {
+                DIMINUTO_LOG_WARNING("Full file [%zd] [%zu]\n", io_available, io_size);
+            }
             continue;
         } else if (serial && (io_available = diminuto_serial_available(in_fd)) > 0) {
-            if (io_available > io_peak) { io_peak = io_available; }
+            if (io_available > io_peak) {
+                io_peak = io_available;
+            }
             DIMINUTO_LOG_DEBUG("Ready device [%zu] [%zu]\n", io_available, io_peak);
             continue;
-        } else if ((io_available = diminuto_mux_wait(&mux, 0 /* POLL */)) > 0) {
+        } else if (diminuto_mux_wait(&mux, 0 /* POLL */) > 0) {
             DIMINUTO_LOG_DEBUG("Ready socket\n");
             continue;
         } else {
@@ -2724,7 +2859,9 @@ render:
             /* Do nothing. */
         } else {
 
-            if (escape) { fputs("\033[3;1H", out_fp); }
+            if (escape) {
+                fputs("\033[3;1H", out_fp);
+            }
             if (report) {
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
                     onepps = poller.onepps;
@@ -2742,8 +2879,12 @@ render:
                 print_actives(out_fp, active);
                 print_views(out_fp, view, active);
             }
-            if (escape) { fputs("\033[0J", out_fp); }
-            if (report) { fflush(out_fp); }
+            if (escape) {
+                fputs("\033[0J", out_fp);
+            }
+            if (report) {
+                fflush(out_fp);
+            }
 
             /*
              * If we're running headless, commit this observation to the
@@ -2765,7 +2906,9 @@ render:
             refresh = 0;
         }
 
-        if (eof) { break; }
+        if (eof) {
+            break;
+        }
 
     }
 
@@ -2775,7 +2918,9 @@ render:
 
     DIMINUTO_LOG_NOTICE("Stop");
 
-    if (verbose) { sync_end(); }
+    if (verbose) {
+        sync_end();
+    }
 
     DIMINUTO_LOG_INFORMATION("Counters Remote=%lu Surveyor=%lu Keepalive=%lu OutOfOrder=%u Missing=%u", (unsigned long)remote_sequence, (unsigned long)surveyor_sequence, (unsigned long)keepalive_sequence, outoforder_counter, missing_counter);
 
