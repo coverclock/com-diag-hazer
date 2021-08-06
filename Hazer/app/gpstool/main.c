@@ -629,7 +629,6 @@ int main(int argc, char * argv[])
             if (diminuto_ipc_endpoint(optarg, &surveyor_endpoint) < 0) {
                 error = !0;
             } else if (surveyor_endpoint.udp <= 0) {
-                rc = -1;
                 errno = EINVAL;
                 diminuto_perror(optarg);
                 error = !0;
@@ -783,7 +782,7 @@ int main(int argc, char * argv[])
         case 'y':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
             keepalive = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0') || (keepalive < 0)) {
+            if ((end == (char *)0) || (*end != '\0')) {
                 errno = EINVAL;
                 diminuto_perror(optarg);
                 error = !0;
