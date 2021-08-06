@@ -150,8 +150,10 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
             /* Do nothing. */
         } else if (pa[ii].utc_nanoseconds == 0) {
             /* Do nothing. */
+#if 0
         } else if (pa[ii].dmy_nanoseconds == 0) {
             /* Do nothing. */
+#endif
         } else {
             system = ii;
             break;

@@ -449,6 +449,8 @@ int main(int argc, char * argv[])
     int rc = 0;
     size_t sz = 0;
     char * locale = (char *)0;
+    int ii = 0;
+    int jj = 0;
     /*
      * External symbols.
      */
@@ -2133,6 +2135,20 @@ int main(int argc, char * argv[])
          **/
 
         /*
+         * Determine if any constellation has the current time and date.
+         */
+
+        dmyokay = 0;
+        totokay = 0;
+
+        for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
+            if (position[ii].ticks > 0) {
+                dmyokay = dmyokay || (position[ii].dmy_nanoseconds > 0);
+                totokay = totokay || (position[ii].tot_nanoseconds >= position[ii].old_nanoseconds);
+            }
+        }
+
+        /*
          * We write the validated input to the device in the case in which
          * we received the original data via UDP or from standard input; in
          * other cases the device is our input source. Time must monotonically
@@ -2204,7 +2220,6 @@ int main(int argc, char * argv[])
         elapsed = (expiration_now > expiration_was) ? expiration_now - expiration_was : 0;
 
         if (elapsed > 0) {
-            int ii;
 
             for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
                 countdown(&position[ii].ticks, elapsed);
@@ -2306,8 +2321,6 @@ int main(int argc, char * argv[])
                 refresh = !0;
                 trace = !0;
                 fix = diminuto_time_elapsed();
-                dmyokay = (position[system].dmy_nanoseconds > 0);
-                totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
             } else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 
@@ -2315,8 +2328,6 @@ int main(int argc, char * argv[])
                 refresh = !0;
                 trace = !0;
                 fix = diminuto_time_elapsed();
-                dmyokay = (position[system].dmy_nanoseconds > 0);
-                totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
             } else if (hazer_parse_gll(&position[system], vector, count) == 0) {
 
@@ -2324,15 +2335,11 @@ int main(int argc, char * argv[])
                 refresh = !0;
                 trace = !0;
                 fix = diminuto_time_elapsed();
-                dmyokay = (position[system].dmy_nanoseconds > 0);
-                totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
             } else if (hazer_parse_vtg(&position[system], vector, count) == 0) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
-                dmyokay = (position[system].dmy_nanoseconds > 0);
-                totokay = (position[system].tot_nanoseconds >= position[system].old_nanoseconds);
 
             } else if (hazer_parse_gsa(&cache, vector, count) == 0) {
 
@@ -2405,6 +2412,10 @@ int main(int argc, char * argv[])
                 /* Do nothing. */
             } else if (position[system].utc_nanoseconds == 0) {
                 /* Do nothing. */
+#if 0
+            } else if (position[system].dmy_nanoseconds == 0) {
+                /* Do nothing. */
+#endif
             } else if (fix < 0) {
                 /* Do nothing. */
             } else if (ttff >= 0) {
@@ -2469,7 +2480,6 @@ int main(int argc, char * argv[])
                 const char * bb = (const char *)0;
                 const char * ee = &buffer[length - YODEL_UBX_CHECKSUM];
                 const char * layer = (const char *)0;
-                int ii = 0;
                 yodel_ubx_cfg_valget_key_t kk = 0;
                 size_t ss = 0;
                 size_t ll = 0;
@@ -2607,9 +2617,6 @@ int main(int argc, char * argv[])
                 refresh = !0;
 
             } else if ((rc = yodel_ubx_mon_comms(&ports, buffer, length)) >= 0) {
-                int ii = 0;
-                int jj = 0;
-
                 diminuto_assert(sizeof(ports.prefix) == 8);
                 diminuto_assert(sizeof(ports.port[0]) == 40);
                 diminuto_assert(sizeof(ports) == (8 + (5 * 40)));
@@ -2809,7 +2816,6 @@ render:
             /* Do nothing. */
         } else {
             static int crowbar = 1000;
-            int ii;
 
             if (crowbar <= 0) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
@@ -2864,6 +2870,7 @@ render:
                     onepps = poller.onepps;
                     poller.onepps = 0;
                 DIMINUTO_CRITICAL_SECTION_END;
+
                 print_local(out_fp, ttff);
                 print_positions(out_fp, position, onepps, dmyokay, totokay, network_total);
                 print_hardware(out_fp, &hardware);
@@ -2875,6 +2882,7 @@ render:
                 print_corrections(out_fp, &base, &rover, &kinematics, &updates);
                 print_actives(out_fp, active);
                 print_views(out_fp, view, active);
+
             }
             if (escape) {
                 fputs("\033[0J", out_fp);

@@ -1033,8 +1033,10 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (count < 14) { 
         /* Do nothing. */
+#if 0
     } else if (*vector[6] == '0') {
-        /* Do nothing. */
+        /* Probably some other value is really proper here, like 3 or 4. */
+#endif
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
@@ -1254,8 +1256,10 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if ((count > 13) && (*vector[12] == 'N')) { /* NMEA 2.3+ */
         /* Do nothing. */
+#if 0
     } else if ((count > 14) && (*vector[13] == 'V')) { /* NMEA 4.10+ */
-        /* Do nothing. */
+        /* Not clear what this means on the u-blox UBX-F9P. */
+#endif
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
         positionp->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
@@ -1287,8 +1291,10 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (count < 9) {
         /* Do nothing. */
+#if 0
     } else if (*vector[6] == 'V') {
-        /* Do nothing. */
+        /* Not clear what this means on the u-blox UBX-F9P. */
+#endif
     } else if (*vector[7] == 'N') {
         /* Do nothing. */
     } else {
