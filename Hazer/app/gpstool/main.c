@@ -382,7 +382,7 @@ int main(int argc, char * argv[])
     diminuto_sticks_t elapsed = 0;
     diminuto_sticks_t epoch = 0;
     diminuto_sticks_t fix = -1;
-    diminuto_sticks_t timetofirstfix = -1;
+    diminuto_sticks_t ttff = -1;
     seconds_t expiration_was = 0;
     seconds_t expiration_now = 0;
     seconds_t display_last = 0;
@@ -1465,7 +1465,7 @@ int main(int argc, char * argv[])
         if (report) {
             fprintf(out_fp, "INP [%3d]\n", 0);
             fprintf(out_fp, "OUT [%3d]\n", 0);
-            print_local(out_fp, timetofirstfix);
+            print_local(out_fp, ttff);
             fflush(out_fp);
         }
     }
@@ -2405,14 +2405,12 @@ int main(int argc, char * argv[])
                 /* Do nothing. */
             } else if (position[system].utc_nanoseconds == 0) {
                 /* Do nothing. */
-            } else if (position[system].dmy_nanoseconds == 0) {
-                /* Do nothing. */
             } else if (fix < 0) {
                 /* Do nothing. */
-            } else if (timetofirstfix >= 0) {
+            } else if (ttff >= 0) {
                 /* Do nothing. */
             } else {
-                timetofirstfix = fix - epoch;
+                ttff = fix - epoch;
             }
 
             break;
@@ -2866,7 +2864,7 @@ render:
                     onepps = poller.onepps;
                     poller.onepps = 0;
                 DIMINUTO_CRITICAL_SECTION_END;
-                print_local(out_fp, timetofirstfix);
+                print_local(out_fp, ttff);
                 print_positions(out_fp, position, onepps, dmyokay, totokay, network_total);
                 print_hardware(out_fp, &hardware);
                 print_status(out_fp, &status);

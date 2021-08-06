@@ -204,9 +204,9 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
 /**
  * Print the local (Juliet) time (and the release string).
  * @param fp points to the FILE stream.
- * @param timetofirstfix is the number of ticks until thr first fix.
+ * @param ttff is the number of ticks until thr first fix.
  */
-void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
+void print_local(FILE * fp, diminuto_sticks_t ttff)
 {
     int year = 0;
     int month = 0;
@@ -277,17 +277,17 @@ void print_local(FILE * fp, diminuto_sticks_t timetofirstfix)
 
     /*
      * This is where we calculate time to first fix. We display dashes
-     * if its negative, asterisks if it is a day or more, the actual
+     * if it is negative, asterisks if it is a day or more, the actual
      * values otherwise.
      */
 
-    if (timetofirstfix < 0) {
+    if (ttff < 0) {
 
         fprintf(fp, " %2s:%2s:%2s.%3s", "--", "--", "--", "---");
 
     } else {
 
-        rc = diminuto_time_duration(timetofirstfix, &day, &hour, &minute, &second, &fraction);
+        rc = diminuto_time_duration(ttff, &day, &hour, &minute, &second, &fraction);
         diminuto_assert(rc >= 0);
         diminuto_assert(day >= 0);
         diminuto_assert((0 <= hour) && (hour <= 23));
