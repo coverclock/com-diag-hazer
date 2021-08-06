@@ -44,25 +44,46 @@ lost on the modem-ish (ttyACM) USB connection on a U-blox UBX-ZED-F9P
 (generation 9) chip. This occurs when using the Ardusimple SimpleRTK2B and
 Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation 8)
 chip in a GlobalSat BU353W10 dongle. I've seen in on Intel (Dell) and
-ARM (Raspberry Pi 3B+ and 4B) systems. I've seen it using my software,
-using socat, and even just using cat, to collect data off the USB port.
-I've seen it at a variety of baud rates, and whether I had modem control
-enabled on the port or not. I've used the Linux usbmon USB debugging tool
-to establish that the characters are missing at a very low level in the
-USB driver. And finally I used a Total Phase USB Protocol Analyzer
-hardware tool to verify that the characters are already missing as
-the data comes out of the GPS module, before it ever reaches my Linux
-system. Although this insures that the data isn't being dropped by my
-software or my hardware, my hardware and the underlying USB hardware
-and OS drivers likely have something to do with it: I see it occur much
-more often on the Intel servers, and on those, more often on the faster
-processors.
+ARM (Raspberry Pi 3B+ and 4B) systems.
+
+I've seen it using my software,
+
+    gpstool -D /dev/ttyACM0 -b 115200 -8 -n -1 -m -v -R
+
+using screen
+
+    screen /dev/ttyACM0 115200 8n1
+
+using socat,
+
+    socat OPEN:/dev/ttyACM0,b115200 -
+
+and even just using cat (after configuring the baud rate of the port)
+
+    cat /dev/ttyACM0
+
+to collect data off the USB port.
+
+I've also seen it in the binary packet view (which is like using the -v
+verbose option with gpstool) when running the u-blox u-center tool on
+a Windows 10 laptop.
+
+I've used the Linux usbmon USB debugging tool to establish that the
+characters are missing at a very low level in the USB driver. And finally
+I used a Total Phase USB Protocol Analyzer hardware tool to verify that
+the characters are already missing as the data comes out of the GPS
+module, before it ever reaches my Linux system.
+
+Although this insures that the data isn't being dropped by my software or
+my hardware, my hardware and the underlying USB hardware and OS drivers
+likely have something to do with it: I see it occur much more often on
+the Intel servers, and on those, more often on the faster processors.
 
 I've described this at length in the article
 
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
-The u-blox support forum is full of people reporting this same thing.
+The u-blox support forum has other people reporting this same thing.
 
 ## End Of File (EOF) on U-blox UBX-ZED-F9P when using Ubuntu VM
 
