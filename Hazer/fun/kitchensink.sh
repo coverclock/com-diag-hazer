@@ -7,7 +7,13 @@
 
 PROGRAM=$(basename ${0})
 
-DEVICE="/dev/tty"
+if [[ "$1" != "" ]]; then
+	PREFIX="valgrind --leak-check=full --show-leak-kinds=all"
+else
+	PREFIX="coreable"
+fi
+
+DEVICE="/dev/null"
 RATE=115200
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
@@ -34,19 +40,23 @@ cp /dev/null ${SRCFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-coreable gpstool \
+# -I 0
+# -p 0
+
+export COM_DIAG_DIMINUTO_LOG_MASK=0xff
+
+${PREFIX} gpstool \
 	-1 \
 	-2 \
 	-7 \
 	-8 \
 	-B 1024 \
 	-C ${CATFIL} \
-	-D ${DEVICE} -b ${RATE} \
+	-D ${DEVICE} \
 	-E \
 	-F 1 \
 	-G 127.0.0.1:21000 \
 	-H ${OUTFIL} \
-	-I 0 \
 	-K \
 	-L ${LOGFIL} \
 	-M \
@@ -62,7 +72,7 @@ coreable gpstool \
 	-X \
 	-Y 127.0.0.1:21001 \
 	-Z '' \
-	-b 9600 \
+	-b ${RATE} \
 	-c \
 	-d \
 	-e \
@@ -75,7 +85,6 @@ coreable gpstool \
 	-m \
 	-n \
 	-o \
-	-p 0 \
 	-s \
 	-t 10 \
 	-u \

@@ -480,22 +480,18 @@ int main(int argc, char * argv[])
         case '1':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             stopbits = 1;
-            serial = !0;
             break;
         case '2':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             stopbits = 2;
-            serial = !0;
             break;
         case '7':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             databits = 7;
-            serial = !0;
             break;
         case '8':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             databits = 8;
-            serial = !0;
             break;
         case 'B':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
@@ -656,15 +652,12 @@ int main(int argc, char * argv[])
                 errno = EINVAL;
                 diminuto_perror(optarg);
                 error = !0;
-            } else {
-                serial = !0;
             }
             break;
         case 'c':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             modemcontrol = !0;
             carrierdetect = !0;
-            serial = !0;
             break;
         case 'd':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
@@ -673,7 +666,6 @@ int main(int argc, char * argv[])
         case 'e':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             paritybit = 2;
-            serial = !0;
             break;
         case 'f':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
@@ -696,7 +688,6 @@ int main(int argc, char * argv[])
         case 'h':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             rtscts = !0;
-            serial = !0;
             break;
         case 'i':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
@@ -719,22 +710,18 @@ int main(int argc, char * argv[])
         case 'l':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             modemcontrol = 0;
-            serial = !0;
             break;
         case 'm':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             modemcontrol = !0;
-            serial = !0;
             break;
         case 'n':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             paritybit = 0;
-            serial = !0;
             break;
         case 'o':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             paritybit = 1;
-            serial = !0;
             break;
         case 'p':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
@@ -749,7 +736,6 @@ int main(int argc, char * argv[])
         case 's':
             DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             xonxoff = !0;
-            serial = !0;
             break;
         case 't':
             DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
