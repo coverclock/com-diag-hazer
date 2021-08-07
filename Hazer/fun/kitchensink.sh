@@ -4,6 +4,9 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Use a bunch of options just to test the command line parsing.
+# Examples:
+# kitchensink
+# kitchensink disposal
 
 PROGRAM=$(basename ${0})
 
@@ -41,16 +44,17 @@ cp /dev/null ${SRCFIL}
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 # -I 0
+# -M
 # -p 0
 
 export COM_DIAG_DIMINUTO_LOG_MASK=0xff
 
-${PREFIX} gpstool \
+exec ${PREFIX} gpstool \
 	-1 \
 	-2 \
 	-7 \
 	-8 \
-	-B 1024 \
+	-B 1048576 \
 	-C ${CATFIL} \
 	-D ${DEVICE} \
 	-E \
@@ -59,7 +63,6 @@ ${PREFIX} gpstool \
 	-H ${OUTFIL} \
 	-K \
 	-L ${LOGFIL} \
-	-M \
 	-N ${FIXFIL} \
 	-O ${PIDFIL} \
 	-P \
@@ -93,7 +96,3 @@ ${PREFIX} gpstool \
 	-x \
 	-y 10 \
 	< /dev/null
-
-stty sane
-
-exit 0

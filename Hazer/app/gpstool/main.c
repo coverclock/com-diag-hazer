@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2021 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This implements the gpstool main program.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -606,6 +606,7 @@ int main(int argc, char * argv[])
             process = !0; /* Have to process ACK/NAKs. */
             break;
         case 'V':
+            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
             DIMINUTO_LOG_NOTICE("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
@@ -931,6 +932,10 @@ int main(int argc, char * argv[])
         diminuto_assert(log_fp != (FILE *)0);
     }
 
+    if (log_fp != (FILE *)0) {
+        DIMINUTO_LOG_INFORMATION("Log (%d) \"%s\"\n", fileno(log_fp), logging);
+    }
+
     /*
      * Initialize the multiplexer.
      */
@@ -1090,6 +1095,8 @@ int main(int argc, char * argv[])
         strobe_fp = diminuto_pin_open(strobepin, !0);
         diminuto_assert(strobe_fp != (FILE *)0);
 
+        DIMINUTO_LOG_INFORMATION("Strobe (%d) \"%s\" %d\n", fileno(strobe_fp), strobe, strobepin);
+
         rc = diminuto_pin_clear(strobe_fp);
         diminuto_assert(rc >= 0);
     }
@@ -1127,6 +1134,8 @@ int main(int argc, char * argv[])
 
         pps_fp = diminuto_pin_open(ppspin, 0);
         diminuto_assert(pps_fp != (FILE *)0);
+
+        DIMINUTO_LOG_INFORMATION("1pps (%d) \"%s\" %d\n", fileno(pps_fp), pps, ppspin);
 
         rc = diminuto_pin_get(pps_fp);
         diminuto_assert(rc >= 0);
@@ -1186,7 +1195,7 @@ int main(int argc, char * argv[])
 
         if (serial) {
 
-            DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\" %d %d%c%d%s%s%s\n", dev_fd, device, readonly ? "ro" : "rw", Device, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
+            DIMINUTO_LOG_INFORMATION("Serial (%d) \"%s\" %d %d%c%d%s%s%s\n", dev_fd, device, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
 
             rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
             diminuto_assert(rc == 0);
@@ -1207,6 +1216,8 @@ int main(int argc, char * argv[])
             diminuto_perror(device);
         }
         diminuto_assert(dev_fp != (FILE *)0);
+
+        DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\"\n", fileno(dev_fp), device, readonly ? "ro" : "rw", Device);
 
         /*
          * Note that we set our input file pointer provisionally; we may
@@ -1250,9 +1261,7 @@ int main(int argc, char * argv[])
 
     }
 
-    if (!serial) {
-            DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\"\n", dev_fd, device, readonly ? "ro" : "rw", Device);
-    }
+    DIMINUTO_LOG_INFORMATION("Source (%d) \"%s\" %s\n", fileno(in_fp), Device, readonly ? "ro" : "rw");
 
     /*
      * If we are using some other sink of output (e.g. a file, a FIFO, etc.),
@@ -1270,6 +1279,10 @@ int main(int argc, char * argv[])
         diminuto_assert(sink_fp != (FILE *)0);
     }
 
+    if (sink_fp != (FILE *)0) {
+        DIMINUTO_LOG_INFORMATION("Sink (%d) \"%s\"\n", fileno(sink_fp), sink);
+    }
+
     /*
      * Our input source is either standard input (either implicitly or
      * explicitly), a serial(ish) device, or a file or maybe a FIFO
@@ -1285,12 +1298,13 @@ int main(int argc, char * argv[])
     rc = diminuto_mux_register_read(&mux, in_fd);
     diminuto_assert(rc >= 0);
 
-    io_buffer = malloc(io_size);
-    diminuto_assert(io_buffer != (void *)0);
-    rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
-    diminuto_assert(rc == 0);
-
-    DIMINUTO_LOG_INFORMATION("Buffer (%d) [%zu] [%zu]\n", in_fd, io_size, (size_t)BUFSIZ);
+    if (io_size > BUFSIZ) {
+        io_buffer = malloc(io_size);
+        diminuto_assert(io_buffer != (void *)0);
+        rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
+        diminuto_assert(rc == 0);
+        DIMINUTO_LOG_INFORMATION("Buffer [%zu] [%zu]\n", io_size, (size_t)BUFSIZ);
+    }
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -1300,6 +1314,7 @@ int main(int argc, char * argv[])
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_create(headless, &temporary);
         diminuto_assert(out_fp != (FILE *)0);
+        DIMINUTO_LOG_INFORMATION("Observation (%d) \"%s\"\n", fileno(out_fp), headless);
     }
 
     /*
@@ -1313,6 +1328,8 @@ int main(int argc, char * argv[])
      */
 
     if (dev_fp == (FILE *)0) {
+        /* Do nothing. */
+    } else if (!serial) {
         /* Do nothing. */
     } else if (!modemcontrol) {
         /* Do nothing. */
@@ -1341,12 +1358,15 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (strcmp(tracing, "-") == 0) {
         trace_fp = stdout;
-        DIMINUTO_LOG_INFORMATION("Tracing enabled\n");
     } else if ((trace_fp = fopen(tracing, "a")) != (FILE *)0) {
-        DIMINUTO_LOG_INFORMATION("Tracing enabled\n");
+        /* Do nothing. */
     } else {
         diminuto_perror(tracing);
         diminuto_assert(trace_fp != (FILE *)0);
+    }
+
+    if (trace_fp != (FILE *)0) {
+        DIMINUTO_LOG_INFORMATION("Trace (%d) \"%s\"\n", fileno(trace_fp), tracing);
     }
 
     /*
@@ -1564,13 +1584,16 @@ int main(int argc, char * argv[])
                 } else if (ferror(in_fp)) {
                     DIMINUTO_LOG_WARNING("ERROR");
                     clearerr(in_fp);
-                    continue;
+                    xc = 1;
+                    eof = !0;
+                    break;
                 } else if (feof(in_fp)) {
                     DIMINUTO_LOG_NOTICE("EOF");
                     eof = !0;
                     break;
                 } else {
                     DIMINUTO_LOG_ERROR("FAILURE");
+                    xc = 1;
                     eof = !0;
                     break;
                 }
@@ -2672,7 +2695,7 @@ int main(int argc, char * argv[])
         }
 
         if (eof) {
-            break;
+            goto render;
         }
 
         /*
@@ -2848,15 +2871,26 @@ render:
             /* Do nothing. */
         } else {
 
-            if (escape) {
-                fputs("\033[3;1H", out_fp);
-            }
-            if (report) {
+            /*
+             * If we're monitoring a 1PPS pin, update our copy of its
+             * status now.
+             */
+
+            if (pps_fp != (FILE *)0) {
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
                     onepps = poller.onepps;
                     poller.onepps = 0;
                 DIMINUTO_CRITICAL_SECTION_END;
+            }
 
+            /*
+             * Update the display.
+             */
+
+            if (escape) {
+                fputs("\033[3;1H", out_fp);
+            }
+            if (report) {
                 print_local(out_fp, ttff);
                 print_positions(out_fp, position, onepps, dmyokay, totokay, network_total);
                 print_hardware(out_fp, &hardware);
@@ -2898,6 +2932,7 @@ render:
         }
 
         if (eof) {
+            DIMINUTO_LOG_NOTICE("Stop");
             break;
         }
 
@@ -2907,7 +2942,7 @@ render:
      ** FINIALIZATION
      **/
 
-    DIMINUTO_LOG_NOTICE("Stop");
+    DIMINUTO_LOG_NOTICE("Final");
 
     if (verbose) {
         sync_end();
