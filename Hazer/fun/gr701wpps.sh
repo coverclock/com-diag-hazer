@@ -18,7 +18,7 @@
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-9600}
-STROBE=${3:-"-20"}
+STROBE=${3:--16}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 

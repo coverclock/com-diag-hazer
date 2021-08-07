@@ -16,7 +16,7 @@
 # by virtue of being in group "gpio".
 
 PROGRAM=$(basename ${0})
-DEVICE=${1:-"/dev/ttyUSB0"}
+DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
 ONEPPS=${3:-18}
 STROBE=${4:-16}
