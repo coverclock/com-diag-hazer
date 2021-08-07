@@ -27,7 +27,6 @@ STROBE=${4:-16}
 ERRFIL=${5-"${SAVDIR}/${PROGRAM}.err"}
 OUTFIL=${6-"${SAVDIR}/${PROGRAM}.out"}
 PIDFIL=${7-"${SAVDIR}/${PROGRAM}.pid"}
-LIMIT=${8:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
@@ -40,15 +39,4 @@ exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -I ${ONEPPS} -p ${STROBE} -H ${OUTFIL} -t 10 -O ${PIDFIL} < /dev/null 1> /dev/null &
-
-sleep 5
-
-cat ${ERRFIL}
-
-DIRECTORY=$(dirname ${OUTFIL})
-FILENAME=$(basename ${OUTFIL})
-TASK=${FILENAME%%.*}
-FILE=${FILENAME#*.}
-
-echo peruse ${TASK} ${FILE} ${LIMIT} ${DIRECTORY}
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -I ${ONEPPS} -p ${STROBE} -H ${OUTFIL} -t 10 -O ${PIDFIL}
