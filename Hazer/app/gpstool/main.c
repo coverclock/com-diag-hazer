@@ -1193,6 +1193,7 @@ int main(int argc, char * argv[])
         }
         diminuto_assert(dev_fd >= 0);
 
+        serial = diminuto_serial_valid(dev_fd);
         if (serial) {
 
             DIMINUTO_LOG_INFORMATION("Serial (%d) \"%s\" %d %d%c%d%s%s%s\n", dev_fd, device, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
@@ -1292,8 +1293,6 @@ int main(int argc, char * argv[])
      */
 
     in_fd = fileno(in_fp);
-
-    serial = diminuto_serial_valid(in_fd);
 
     rc = diminuto_mux_register_read(&mux, in_fd);
     diminuto_assert(rc >= 0);
