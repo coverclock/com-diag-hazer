@@ -3,7 +3,6 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-
 # This script is for functionally testing the expiration feature.
 
 PROGRAM=$(basename ${0})
@@ -19,7 +18,7 @@ mkdir -p ${LOG}
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do
-    OPTIONS="${OPTIONS} -W ${OPTION}"
+    OPTIONS="${OPTIONS} ${OPTION}"
 done
 
 eval coreable gpstool -X -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 ${OPTIONS} 2> ${LOG}/${PROGRAM}.err

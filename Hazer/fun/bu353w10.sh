@@ -28,7 +28,7 @@ mkdir -p ${LOG}
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do
-    OPTIONS="${OPTIONS} -W ${OPTION}"
+    OPTIONS="${OPTIONS} ${OPTION}"
 done
 
 eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 ${OPTIONS} 2> ${LOG}/${PROGRAM}.err

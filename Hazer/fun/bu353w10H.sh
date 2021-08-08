@@ -3,6 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# Like the bu353w10 script except this one runs headless.
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
@@ -17,7 +18,7 @@ mkdir -p ${LOG}
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do
-    OPTIONS="${OPTIONS} -W ${OPTION}"
+    OPTIONS="${OPTIONS} ${OPTION}"
 done
 
 eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${LOG}/${PROGRAM}.out -t 10 ${OPTIONS} 2> ${LOG}/${PROGRAM}.err

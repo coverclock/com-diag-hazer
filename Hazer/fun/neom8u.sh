@@ -22,7 +22,7 @@ mkdir -p $(dirname ${ERRFIL})
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do
-    OPTIONS="${OPTIONS} -W ${OPTION}"
+    OPTIONS="${OPTIONS} ${OPTION}"
 done
 
 eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -F 1 ${OPTIONS} 2>> ${ERRFIL}

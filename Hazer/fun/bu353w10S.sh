@@ -10,7 +10,7 @@ PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
 FIFO=${3:-${TMPDIR:="/tmp"}"/"${PROGRAM}".fifo"}
-BYTES=${4:-"512"}
+BYTES=${4:-"8192"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -21,15 +21,15 @@ mkdir -p ${LOG}
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do
-    OPTIONS="${OPTIONS} -W ${OPTION}"
+    OPTIONS="${OPTIONS} ${OPTION}"
 done
 
-eval gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 ${OPTIONS} -W '' 2> >(log -S -N ${PROGRAM})
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 ${OPTIONS} -U '' 2> ${LOG}/${PROGRAM}-initialize.err
 
 mkfifo ${FIFO} 
 
-socat -u -b ${BYTES} OPEN:${DEVICE},b${RATE},cs8,rawer PIPE:${FIFO} & PID=$!
+socat -u -b ${BYTES} OPEN:${DEVICE},b${RATE},cs8,rawer PIPE:${FIFO} &
 
-trap "kill -0 ${PID} && kill ${PID}; rm -f ${FIFO}" INT TERM
+trap "rm -f ${FIFO}" SIGINT SIGQUIT SIGTERM EXIT
 
-exec coreable gpstool -S ${FIFO} -t 10 -E 2> ${LOG}/${PROGRAM}.err
+coreable gpstool -S ${FIFO} -E 2> ${LOG}/${PROGRAM}-source.err

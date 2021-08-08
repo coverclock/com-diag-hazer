@@ -22,9 +22,9 @@ mkdir -p ${LOG}
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do
-    OPTIONS="${OPTIONS} -W ${OPTION}"
+    OPTIONS="${OPTIONS} ${OPTION}"
 done
 
-coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 ${OPTIONS} -G ${HOST}:${PORT} 2> ${LOG}/${PROGRAM}-producer.err 1> /dev/null &
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 ${OPTIONS} -G ${HOST}:${PORT} 2> ${LOG}/${PROGRAM}-producer.err 1> /dev/null &
 
 coreable gpstool -G ${PORT} -E 2> ${LOG}/${PROGRAM}-consumer.err

@@ -19,7 +19,7 @@ RATE=${2:-9600}
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do
-    OPTIONS="${OPTIONS} -W ${OPTION}"
+    OPTIONS="${OPTIONS} ${OPTION}"
 done
 
 eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -R ${OPTIONS}
