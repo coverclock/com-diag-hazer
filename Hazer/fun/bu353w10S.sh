@@ -3,6 +3,8 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# Like the bu353w10 script but uses socat to read from the device
+# and send to gpstool over a FIFO as a source.
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}

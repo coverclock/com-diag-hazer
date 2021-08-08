@@ -414,6 +414,7 @@ int main(int argc, char * argv[])
     int ready = 0;
     int fd = -1;
     ssize_t available = 0;
+    int stage = 0;
     format_t format = FORMAT;
     FILE * fp = (FILE *)0;
     uint8_t * buffer = (uint8_t *)0;
@@ -1526,10 +1527,6 @@ int main(int argc, char * argv[])
          ** INPUT
          **/
 
-        available = 0;
-        fd = -1;
-        ready = 0;
-
         /*
          * We keep looking for input from one of our sources until one of them
          * tells us we have a buffer to process. It could be a NMEA sentence,
@@ -1539,6 +1536,11 @@ int main(int argc, char * argv[])
          * that the select(2) was interrupted, so we need to interrogate our
          * signal handlers. Note that the code below may block.
          */
+
+        stage = 1;
+        available = 0;
+        ready = 0;
+        fd = -1;
 
         if ((available = diminuto_file_ready(in_fp)) > 0) {
             fd = in_fd;
@@ -1564,6 +1566,8 @@ int main(int argc, char * argv[])
         }
 
 consume:
+
+        DIMINUTO_LOG_DEBUG("Consume #%d [%d] (%d) [%lld] [%llu]\n", stage, ready, fd, (long long signed int)available, (long long unsigned int)io_maximum);
 
         /*
          * At this point, either available > 0 (there is pending data in
@@ -2789,6 +2793,11 @@ consume:
          * and never render a report. That's what the check timeout below
          * is all about. Note that the code below is non-blocking.
          */
+
+        stage = 2;
+        available = 0;
+        ready = 0;
+        fd = -1;
 
         if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
             /* Do nothing. */
