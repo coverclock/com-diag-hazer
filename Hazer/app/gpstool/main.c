@@ -21,6 +21,15 @@
  * tracking of a moving vehicle by forwarding GPS output in UDP datagrams
  * using an IPv6 connection over an LTE modem.
  *
+ * gpstool started out as a functional test of the Hazer library, but it has
+ * since taken on a life of its own. I've been writing C code for decades, and
+ * usually take a more modular approach to design. But with gpstool, I used
+ * a "work loop" approach that has resulted in a far larger main program than
+ * I would perhaps have otherwise preferred. But I find it pretty easy to
+ * maintain, modify, and debug. This is the only C program (other than some
+ * Linux kernel hacking) that I've had reason to use gotos - in a very limited
+ * way - to actually simplify the code.
+ *
  * EXAMPLES
  *
  *  gpstool -?
@@ -397,8 +406,6 @@ int main(int argc, char * argv[])
     size_t io_size = BUFSIZ;
     size_t io_maximum = 0;
     size_t io_total = 0;
-    ssize_t io_available = 0;
-    ssize_t io_peak = 0;
     /*
      * Source variables.
      */
@@ -1302,8 +1309,8 @@ int main(int argc, char * argv[])
         diminuto_assert(io_buffer != (void *)0);
         rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
         diminuto_assert(rc == 0);
-        DIMINUTO_LOG_INFORMATION("Buffer [%zu] [%zu]\n", io_size, (size_t)BUFSIZ);
     }
+    DIMINUTO_LOG_INFORMATION("Buffer [%zu] [%zu]\n", io_size, (size_t)BUFSIZ);
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -1535,8 +1542,11 @@ int main(int argc, char * argv[])
             if (available > io_maximum) {
                 io_maximum = available;
             }
-        } else if (serial && (diminuto_serial_available(in_fd) > 0)) {
+        } else if (serial && ((available = diminuto_serial_available(in_fd)) > 0)) {
             fd = in_fd;
+            if (available > io_maximum) {
+                io_maximum = available;
+            }
         } else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
             /* Do nothing. */
         } else if ((ready = diminuto_mux_wait(&mux, delay /* BLOCK */)) == 0) {
@@ -1549,6 +1559,8 @@ int main(int argc, char * argv[])
         } else {
             diminuto_assert(0);
         }
+
+consume:
 
         /*
          * At this point, either available > 0 (there is pending data in
@@ -2779,26 +2791,30 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (dingdong(&check_last, check)) {
             /* Do nothing. */
-        } else if ((io_available = diminuto_file_ready(in_fp)) > 0) {
-            if (io_available > io_peak) {
-                io_peak = io_available;
+        } else if ((available = diminuto_file_ready(in_fp)) > 0) {
+            fd = in_fd;
+            if (available > io_maximum) {
+                io_maximum = available;
             }
-            DIMINUTO_LOG_DEBUG("Ready file [%zu] [%zu]\n", io_available, io_peak);
-            if (io_available >= io_size) {
-                DIMINUTO_LOG_WARNING("Full file [%zd] [%zu]\n", io_available, io_size);
+            goto consume;
+        } else if (serial && (available = diminuto_serial_available(in_fd)) > 0) {
+            fd = in_fd;
+            if (available > io_maximum) {
+                io_maximum = available;
             }
-            continue;
-        } else if (serial && (io_available = diminuto_serial_available(in_fd)) > 0) {
-            if (io_available > io_peak) {
-                io_peak = io_available;
-            }
-            DIMINUTO_LOG_DEBUG("Ready device [%zu] [%zu]\n", io_available, io_peak);
-            continue;
-        } else if (diminuto_mux_wait(&mux, 0 /* POLL */) > 0) {
-            DIMINUTO_LOG_DEBUG("Ready socket\n");
-            continue;
+            goto consume;
+        } else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
+            goto consume;
+        } else if ((ready = diminuto_mux_wait(&mux, 0 /* POLL */)) == 0) {
+            /* Do nothing. */
+        } else if (ready > 0) {
+            fd = diminuto_mux_ready_read(&mux);
+            diminuto_assert(fd >= 0);
+            goto consume;
+        } else if (errno == EINTR) {
+            continue; /* Interrupt. */
         } else {
-            DIMINUTO_LOG_DEBUG("Ready empty [0] [%zu]\n", io_peak);
+            diminuto_assert(0);
         }
 
 render:
@@ -3015,7 +3031,7 @@ render:
         diminuto_perror("fclose(dev_fp)");
     }
 
-    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB speed=%lluBPS peak=%lldB\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * diminuto_frequency()) / (diminuto_time_elapsed() - epoch)), (long long)io_peak);
+    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB sustained=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * diminuto_frequency()) / (diminuto_time_elapsed() - epoch)));
 
     free(io_buffer);
 
