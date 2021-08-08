@@ -475,8 +475,11 @@ int main(int argc, char * argv[])
      **/
 
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
+
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
     diminuto_log_setmask();
+
+    DIMINUTO_LOG_INFORMATION("Program %s\n", argv[0]);
 
     /*
      * OPTIONS
@@ -485,23 +488,23 @@ int main(int argc, char * argv[])
     while ((opt = getopt(argc, argv, OPTIONS)) >= 0) {
         switch (opt) {
         case '1':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             stopbits = 1;
             break;
         case '2':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             stopbits = 2;
             break;
         case '7':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             databits = 7;
             break;
         case '8':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             databits = 8;
             break;
         case 'B':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             io_size = strtoul(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (io_size < 0)) {
                 errno = EINVAL;
@@ -510,21 +513,21 @@ int main(int argc, char * argv[])
             }
             break;
         case 'C':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             sink = optarg;
             break;
         case 'D':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             device = optarg;
             break;
         case 'E':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             report = !0;
             escape = !0;
             process = !0;
             break;
         case 'F':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             slow = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) {
                 errno = EINVAL;
@@ -535,7 +538,7 @@ int main(int argc, char * argv[])
             process = !0;
             break;
         case 'G':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             if (diminuto_ipc_endpoint(optarg, &remote_endpoint) < 0) {
                 error = !0;
             } else if (remote_endpoint.udp <= 0) {
@@ -547,13 +550,13 @@ int main(int argc, char * argv[])
             }
             break;
         case 'H':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             report = !0;
             process = !0;
             headless = optarg;
             break;
         case 'I':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             pps = optarg;
             ppspin = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) {
@@ -563,46 +566,46 @@ int main(int argc, char * argv[])
             }
             break;
         case 'K':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             readonly = 0;
             direction = OUTPUT;
             break;
         case 'L':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             logging = optarg;
             break;
         case 'M':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             daemon = !0;
             break;
         case 'N':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             arp = optarg;
             break;
         case 'O':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             identity = optarg;
             break;
         case 'P':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             process = !0;
             break;
         case 'R':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             report = !0;
             process = !0;
             break;
         case 'S':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             source = optarg;
             break;
         case 'T':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             tracing = optarg;
             process = !0; /* Have to process trace. */
             break;
         case 'U':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
             diminuto_assert(command != (command_t *)0);
@@ -613,11 +616,11 @@ int main(int argc, char * argv[])
             process = !0; /* Have to process ACK/NAKs. */
             break;
         case 'V':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             DIMINUTO_LOG_NOTICE("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
             break;
         case 'W':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
             diminuto_assert(command != (command_t *)0);
@@ -627,11 +630,11 @@ int main(int argc, char * argv[])
             diminuto_list_enqueue(&command_list, command_node);
             break;
         case 'X':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             expire = !0;
             break;
         case 'Y':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             if (diminuto_ipc_endpoint(optarg, &surveyor_endpoint) < 0) {
                 error = !0;
             } else if (surveyor_endpoint.udp <= 0) {
@@ -644,7 +647,7 @@ int main(int argc, char * argv[])
             }
             break;
         case 'Z':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
             diminuto_assert(command != (command_t *)0);
@@ -654,7 +657,7 @@ int main(int argc, char * argv[])
             diminuto_list_enqueue(&command_list, command_node);
             break;
         case 'b':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             bitspersecond = strtoul(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (bitspersecond == 0)) {
                 errno = EINVAL;
@@ -663,20 +666,20 @@ int main(int argc, char * argv[])
             }
             break;
         case 'c':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             modemcontrol = !0;
             carrierdetect = !0;
             break;
         case 'd':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             debug = !0;
             break;
         case 'e':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             paritybit = 2;
             break;
         case 'f':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             frequency = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (frequency < 1)) {
                 errno = EINVAL;
@@ -685,7 +688,7 @@ int main(int argc, char * argv[])
             }
             break;
         case 'g':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             remote_mask = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) {
                 errno = EINVAL;
@@ -694,11 +697,11 @@ int main(int argc, char * argv[])
             }
             break;
         case 'h':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             rtscts = !0;
             break;
         case 'i':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             check = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) {
                 errno = EINVAL;
@@ -707,7 +710,7 @@ int main(int argc, char * argv[])
             }
             break;
         case 'k':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             device_mask = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) {
                 errno = EINVAL;
@@ -716,23 +719,23 @@ int main(int argc, char * argv[])
             }
             break;
         case 'l':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             modemcontrol = 0;
             break;
         case 'm':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             modemcontrol = !0;
             break;
         case 'n':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             paritybit = 0;
             break;
         case 'o':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             paritybit = 1;
             break;
         case 'p':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             strobe = optarg;
             strobepin = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) {
@@ -742,11 +745,11 @@ int main(int argc, char * argv[])
             }
             break;
         case 's':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             xonxoff = !0;
             break;
         case 't':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             timeout = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0') || (timeout < 0) || (timeout > HAZER_GNSS_SECONDS)) {
                 errno = EINVAL;
@@ -755,15 +758,15 @@ int main(int argc, char * argv[])
             }
             break;
         case 'u':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             unknown = !0;
             break;
         case 'v':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             verbose = !0;
             break;
         case 'w':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             postpone = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) {
                 errno = EINVAL;
@@ -772,11 +775,11 @@ int main(int argc, char * argv[])
             }
             break;
         case 'x':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             nakquit = !0;
             break;
         case 'y':
-            DIMINUTO_LOG_DEBUG("Option -%c \"%s\"\n", opt, optarg);
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             keepalive = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) {
                 errno = EINVAL;
@@ -785,7 +788,7 @@ int main(int argc, char * argv[])
             }
             break;
         case '?':
-            DIMINUTO_LOG_DEBUG("Option -%c\n", opt);
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             fprintf(stderr, "usage: %s"
                 " [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ]"
                 " [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
@@ -891,7 +894,7 @@ int main(int argc, char * argv[])
         diminuto_assert(commandline != (char *)0);
         commandresult = diminuto_command_line(argc, (const char **)argv, commandline, commandlength);
         diminuto_assert(commandresult == commandlength);
-        DIMINUTO_LOG_INFORMATION("Command \"%s\"\n", commandline);
+        DIMINUTO_LOG_NOTICE("Command \"%s\"\n", commandline);
         free(commandline);
     }
 
