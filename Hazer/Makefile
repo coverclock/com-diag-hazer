@@ -737,7 +737,7 @@ functional:
 	@echo "emissionsslow"
 	@echo "kitchensink"
 	@echo "bu353w10 with the GlobalSat BU-353W10"
-	@echo "bu353w10C (concatenate) with the GlobalSat BU-353W10"
+	@echo "bu353w10C (concatenate)"
 	@echo "bu353w10D (datagrams) with the GlobalSat BU-353W10"
 	@echo "bu353w10F (frequency) with the GlobalSat BU-353W10"
 	@echo "bu353w10S (source) with the GlobalSat BU-353W10"
