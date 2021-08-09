@@ -1174,6 +1174,8 @@ the libraries and binaries in the system directories.)
 
 * bu353s4 - exercises the GlobalSat BU-353S4 receiver.
 * bu353w10 - exercises the GlobalSat BU-353W10 receiver.
+* bu353w10C - uses cat to send stored data files to gpstool.
+* bu353w10D - uses socat to send data from GlobalSat BU-353W10 to gpstool over a UDP socket.
 * bu353w10F - exercises the GlobalSat BU-353W10 receiver with slow displays.
 * bu353w10H - exercises the GlobalSat BU-353W10 receiver in headless mode.
 * bu353w10M4 - exercises the GlobalSat BU-353W10 receiver logging PRN 4.
@@ -1186,7 +1188,7 @@ the libraries and binaries in the system directories.)
 * dgnss - a script used to test other DNSS scripts.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
 * gr701w - exercises the NaviSys GR701W receiver.    
-* gr701wpps - exercises the NaviSys GR701W receiver and its 1PPS output.    
+* gr701w1pps - exercises the NaviSys GR701W receiver and its 1PPS output.    
 * lowresolution - same as bin/base.sh but with much much lower standards.
 * makerfocus - exercises the MakerFocus GPS board.
 * makerfocuspps - exercises the MakerFocus GPS board and its 1PPS output.

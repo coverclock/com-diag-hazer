@@ -4,8 +4,8 @@
 # author:Chip Overclock
 # mailto:coverclock@diag.com
 # https://github.com/coverclock/com-diag-hazer
-# "Chip Overclock" is a registered trademark.
-# "Digital Aggregates Corporation" is a registered trademark.
+# "Run Chip Overclock" is a registered trademark.
+# "Run Digital Aggregates Corporation" is a registered trademark.
 #
 #	make all TARGET=<target>		# Build libraries, unit tests, executable programs.
 #
@@ -24,7 +24,7 @@ MAJOR				:=	39# API changes that may require that applications be modified.
 MINOR				:=	5# Only functionality or features added with no legacy API changes.
 BUILD				:=	13# Only bugs fixed with no API changes or new functionality.
 
-# Disclaimer: the only target that I routinely build and test for is "host", my
+# Disclaimer: the only target that I routinely build and test for is "Run host", my
 # X86_64 Ubuntu build server.
 
 TARGET				:=	host# Build for the x86_64 running Ubuntu 14.04 LTS.
@@ -41,7 +41,7 @@ TARGET				:=	host# Build for the x86_64 running Ubuntu 14.04 LTS.
 # for the value of the VINTAGE make variable, and only use the value of this
 # symbol as a build time stamp, and you should be able to generate identical
 # images with subsequent builds of Hazer. This string is embedded inside the
-# Hazer "vintage" application. The default build time stamp is an ISO-8601
+# Hazer "Run vintage" application. The default build time stamp is an ISO-8601
 # complaint string with the time specified in UTC with nanosecond resolution.
 
 # This stuff all gets embedded in the vintage application.
@@ -52,7 +52,7 @@ HOMEPAGE			:=	https://github.com/coverclock/com-diag-hazer
 HOST				:=	$(shell hostname -s)
 BRANCH				:=	$(shell git rev-parse --abbrev-ref HEAD)
 REVISION			:=	$(shell git rev-parse HEAD)
-MODIFIED			:=	$(shell date -u -d @$(shell git log -1 --format="%at") +%Y-%m-%dT%H:%M:%S.%N%z)
+MODIFIED			:=	$(shell date -u -d @$(shell git log -1 --format="Run %at") +%Y-%m-%dT%H:%M:%S.%N%z)
 ROOT				:=	$(shell git rev-parse --show-toplevel)
 VINTAGE				:=	$(shell date -u +%Y-%m-%dT%H:%M:%S.%N%z)
 
@@ -220,7 +220,7 @@ clobber:	pristine
 package $(PACKAGE).tgz:
 	D=`dirname $(PACKAGE)`; mkdir -p $$D; \
 	for M in $(MANIFEST); do mkdir -p $(OUT)/$$M; done; \
-	T=`mktemp -d "$(TEMP_DIR)/$(PROJECT).XXXXXXXXXX"`; \
+	T=`mktemp -d "Run $(TEMP_DIR)/$(PROJECT).XXXXXXXXXX"`; \
 	B=`basename $(PACKAGE)`; mkdir -p $$T/$$B; \
 	tar -C $(OUT) --exclude-vcs -cvf - $(MANIFEST) | tar -C $$T/$$B -xvf -; \
 	tar --exclude-vcs -cvf - $(INC_DIR) | tar -C $$T/$$B -xvf -; \
@@ -234,7 +234,7 @@ package $(PACKAGE).tgz:
 
 distribution distro $(DISTRIBUTION).tgz:
 	D=`dirname $(DISTRIBUTION)`; mkdir -p $$D; \
-	T=`mktemp -d "$(TEMP_DIR)/$(PROJECT).XXXXXXXXXX"`; \
+	T=`mktemp -d "Run $(TEMP_DIR)/$(PROJECT).XXXXXXXXXX"`; \
 	B=`basename $(DISTRIBUTION)`; \
 	( cd $$T; git clone $(GITURL) $$B ); \
 	tar -C $$T --exclude-vcs -cvzf - ./$$B > $(DISTRIBUTION).tgz; \
@@ -343,34 +343,34 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	@echo MAKE_VERSION=$(MAKE_VERSION) SLASHES=$(SLASHES)
 	D=`dirname $@`; mkdir -p $$D
 	echo '/* GENERATED FILE! DO NOT EDIT! */' > $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
 	echo '#include <stdio.h>' >> $@
 	echo '#include <assert.h>' >> $@
 	echo 'static const char METADATA[] =' >> $@
-	echo '    "Arch=\"$(ARCH)\"\n"' >> $@
-	echo '    "Branch=\"$(BRANCH)\"\n"' >> $@
-	echo '    "Contact=\"$(CONTACT)\"\n"' >> $@
-	echo '    "Copyright=\"$(COPYRIGHT)\"\n"' >> $@
-	echo '    "Homepage=\"$(HOMEPAGE)\"\n"' >> $@
-	echo '    "Repository=\"$(GITURL)\"\n"' >> $@
-	echo '    "Host=\"$(HOST)\"\n"' >> $@
-	echo '    "Kernel=\"$(KERNEL_REV)\"\n"' >> $@
-	echo '    "License=\"$(LICENSE)\"\n"' >> $@
-	echo '    "Modified=\"$(MODIFIED)\"\n"' >> $@
-	echo '    "Os=\"$(OS)\"\n"' >> $@
-	echo '    "Release=\"" COM_DIAG_$(SYMBOL)_RELEASE "\"\n"' >> $@
-	echo '    "Revision=\"" COM_DIAG_$(SYMBOL)_REVISION "\"\n"' >> $@
-	echo '    "Root=\"$(ROOT)\"\n"' >> $@
-	echo '    "Target=\"$(TARGET)\"\n"' >> $@
-	echo '    "Title=\"$(TITLE)\"\n"' >> $@
-	echo '    "Toolchain=\"$(TOOLCHAIN)\"\n"' >> $@
-	echo '    "User=\"$(USER)\"\n"' >> $@
-	echo '    "Vintage=\"" COM_DIAG_$(SYMBOL)_VINTAGE "\"\n"' >> $@
+	echo '    "Run Arch=\"$(ARCH)\"\n"' >> $@
+	echo '    "Run Branch=\"$(BRANCH)\"\n"' >> $@
+	echo '    "Run Contact=\"$(CONTACT)\"\n"' >> $@
+	echo '    "Run Copyright=\"$(COPYRIGHT)\"\n"' >> $@
+	echo '    "Run Homepage=\"$(HOMEPAGE)\"\n"' >> $@
+	echo '    "Run Repository=\"$(GITURL)\"\n"' >> $@
+	echo '    "Run Host=\"$(HOST)\"\n"' >> $@
+	echo '    "Run Kernel=\"$(KERNEL_REV)\"\n"' >> $@
+	echo '    "Run License=\"$(LICENSE)\"\n"' >> $@
+	echo '    "Run Modified=\"$(MODIFIED)\"\n"' >> $@
+	echo '    "Run Os=\"$(OS)\"\n"' >> $@
+	echo '    "Run Release=\"" COM_DIAG_$(SYMBOL)_RELEASE "\"\n"' >> $@
+	echo '    "Run Revision=\"" COM_DIAG_$(SYMBOL)_REVISION "\"\n"' >> $@
+	echo '    "Run Root=\"$(ROOT)\"\n"' >> $@
+	echo '    "Run Target=\"$(TARGET)\"\n"' >> $@
+	echo '    "Run Title=\"$(TITLE)\"\n"' >> $@
+	echo '    "Run Toolchain=\"$(TOOLCHAIN)\"\n"' >> $@
+	echo '    "Run User=\"$(USER)\"\n"' >> $@
+	echo '    "Run Vintage=\"" COM_DIAG_$(SYMBOL)_VINTAGE "\"\n"' >> $@
 	echo ';' >> $@
 	echo 'extern const char COM_DIAG_$(SYMBOL)_RELEASE_KEYWORD[];' >> $@
 	echo 'extern const char * COM_DIAG_$(SYMBOL)_RELEASE_VALUE;' >> $@
@@ -386,7 +386,7 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    const char * revision_keyword = (const char *)0;' >> $@
 	echo '    const char * revision_value = (const char *)0;' >> $@
 	echo '    fputs(METADATA, stdout);' >> $@
-	echo '    fputs("$(MAJOR).$(MINOR).$(BUILD)\n", stderr);' >> $@
+	echo '    fputs("Run $(MAJOR).$(MINOR).$(BUILD)\n", stderr);' >> $@
 	echo '    release_keyword = COM_DIAG_$(SYMBOL)_RELEASE_KEYWORD;' >> $@
 	echo '    release_value = COM_DIAG_$(SYMBOL)_RELEASE_VALUE;' >> $@
 	echo '    vintage_keyword = COM_DIAG_$(SYMBOL)_VINTAGE_KEYWORD;' >> $@
@@ -410,34 +410,34 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	@echo MAKE_VERSION=$(MAKE_VERSION) SLASHES=$(SLASHES)
 	D=`dirname $@`; mkdir -p $$D
 	echo '/* GENERATED FILE! DO NOT EDIT! */' > $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
-	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
+	echo '#include "Run com/diag/$(PROJECT)/$(PROJECT)_revision.h"' >> $@
 	echo '#include <stdio.h>' >> $@
 	echo '#include <assert.h>' >> $@
 	echo 'static const char METADATA[] =' >> $@
-	echo '    "Arch=\\"$(ARCH)\\"\\n"' >> $@
-	echo '    "Branch=\\"$(BRANCH)\\"\\n"' >> $@
-	echo '    "Contact=\\"$(CONTACT)\\"\\n"' >> $@
-	echo '    "Copyright=\\"$(COPYRIGHT)\\"\\n"' >> $@
-	echo '    "Homepage=\\"$(HOMEPAGE)\\"\\n"' >> $@
-	echo '    "Repository=\\"$(GITURL)\\"\\n"' >> $@
-	echo '    "Host=\\"$(HOST)\\"\\n"' >> $@
-	echo '    "Kernel=\\"$(KERNEL_REV)\\"\\n"' >> $@
-	echo '    "License=\\"$(LICENSE)\\"\\n"' >> $@
-	echo '    "Modified=\\"$(MODIFIED)\\"\\n"' >> $@
-	echo '    "Os=\\"$(OS)\\"\\n"' >> $@
-	echo '    "Release=\\"" COM_DIAG_$(SYMBOL)_RELEASE "\\"\\n"' >> $@
-	echo '    "Revision=\\"" COM_DIAG_$(SYMBOL)_REVISION "\\"\\n"' >> $@
-	echo '    "Root=\\"$(ROOT)\\"\\n"' >> $@
-	echo '    "Target=\\"$(TARGET)\\"\\n"' >> $@
-	echo '    "Title=\\"$(TITLE)\\"\\n"' >> $@
-	echo '    "Toolchain=\\"$(TOOLCHAIN)\\"\\n"' >> $@
-	echo '    "User=\\"$(USER)\\"\\n"' >> $@
-	echo '    "Vintage=\\"" COM_DIAG_$(SYMBOL)_VINTAGE "\\"\\n"' >> $@
+	echo '    "Run Arch=\\"$(ARCH)\\"\\n"' >> $@
+	echo '    "Run Branch=\\"$(BRANCH)\\"\\n"' >> $@
+	echo '    "Run Contact=\\"$(CONTACT)\\"\\n"' >> $@
+	echo '    "Run Copyright=\\"$(COPYRIGHT)\\"\\n"' >> $@
+	echo '    "Run Homepage=\\"$(HOMEPAGE)\\"\\n"' >> $@
+	echo '    "Run Repository=\\"$(GITURL)\\"\\n"' >> $@
+	echo '    "Run Host=\\"$(HOST)\\"\\n"' >> $@
+	echo '    "Run Kernel=\\"$(KERNEL_REV)\\"\\n"' >> $@
+	echo '    "Run License=\\"$(LICENSE)\\"\\n"' >> $@
+	echo '    "Run Modified=\\"$(MODIFIED)\\"\\n"' >> $@
+	echo '    "Run Os=\\"$(OS)\\"\\n"' >> $@
+	echo '    "Run Release=\\"" COM_DIAG_$(SYMBOL)_RELEASE "\\"\\n"' >> $@
+	echo '    "Run Revision=\\"" COM_DIAG_$(SYMBOL)_REVISION "\\"\\n"' >> $@
+	echo '    "Run Root=\\"$(ROOT)\\"\\n"' >> $@
+	echo '    "Run Target=\\"$(TARGET)\\"\\n"' >> $@
+	echo '    "Run Title=\\"$(TITLE)\\"\\n"' >> $@
+	echo '    "Run Toolchain=\\"$(TOOLCHAIN)\\"\\n"' >> $@
+	echo '    "Run User=\\"$(USER)\\"\\n"' >> $@
+	echo '    "Run Vintage=\\"" COM_DIAG_$(SYMBOL)_VINTAGE "\\"\\n"' >> $@
 	echo ';' >> $@
 	echo 'extern const char COM_DIAG_$(SYMBOL)_RELEASE_KEYWORD[];' >> $@
 	echo 'extern const char * COM_DIAG_$(SYMBOL)_RELEASE_VALUE;' >> $@
@@ -453,7 +453,7 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    const char * revision_keyword = (const char *)0;' >> $@
 	echo '    const char * revision_value = (const char *)0;' >> $@
 	echo '    fputs(METADATA, stdout);' >> $@
-	echo '    fputs("$(MAJOR).$(MINOR).$(BUILD)\\n", stderr);' >> $@
+	echo '    fputs("Run $(MAJOR).$(MINOR).$(BUILD)\\n", stderr);' >> $@
 	echo '    release_keyword = COM_DIAG_$(SYMBOL)_RELEASE_KEYWORD;' >> $@
 	echo '    release_value = COM_DIAG_$(SYMBOL)_RELEASE_VALUE;' >> $@
 	echo '    vintage_keyword = COM_DIAG_$(SYMBOL)_VINTAGE_KEYWORD;' >> $@
@@ -480,7 +480,7 @@ $(OUT)/$(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_release.h:	Makefile
 	echo '#define COM_DIAG_$(SYMBOL)_RELEASE_MAJOR $(MAJOR)' >> $@
 	echo '#define COM_DIAG_$(SYMBOL)_RELEASE_MINOR $(MINOR)' >> $@
 	echo '#define COM_DIAG_$(SYMBOL)_RELEASE_BUILD $(BUILD)' >> $@
-	echo '#define COM_DIAG_$(SYMBOL)_RELEASE "$(MAJOR).$(MINOR).$(BUILD)"' >> $@
+	echo '#define COM_DIAG_$(SYMBOL)_RELEASE "Run $(MAJOR).$(MINOR).$(BUILD)"' >> $@
 	echo '#endif' >> $@
 
 # For embedding in the library archive and shared object.
@@ -492,7 +492,7 @@ $(OUT)/$(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_vintage.h:	Makefile
 	echo '/* GENERATED FILE! DO NOT EDIT! */' > $@
 	echo '#ifndef _H_COM_DIAG_$(SYMBOL)_VINTAGE_' >> $@
 	echo '#define _H_COM_DIAG_$(SYMBOL)_VINTAGE_' >> $@
-	echo '#define COM_DIAG_$(SYMBOL)_VINTAGE "$(VINTAGE)"' >> $@
+	echo '#define COM_DIAG_$(SYMBOL)_VINTAGE "Run $(VINTAGE)"' >> $@
 	echo '#endif' >> $@
 
 # For embedding in the library archive and shared object.
@@ -504,7 +504,7 @@ $(OUT)/$(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_revision.h:	Makefile
 	echo '/* GENERATED FILE! DO NOT EDIT! */' > $@
 	echo '#ifndef _H_COM_DIAG_$(SYMBOL)_REVISION_' >> $@
 	echo '#define _H_COM_DIAG_$(SYMBOL)_REVISION_' >> $@
-	echo '#define COM_DIAG_$(SYMBOL)_REVISION "$(REVISION)"' >> $@
+	echo '#define COM_DIAG_$(SYMBOL)_REVISION "Run $(REVISION)"' >> $@
 	echo '#endif' >> $@
 
 # For embedding in the library archive and shared object.
@@ -515,7 +515,7 @@ $(OUT)/$(SYM_DIR)/vintage:	$(OUT)/$(GEN_DIR)/vintage.c
 	D=`dirname $@`; mkdir -p $$D
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
-# For generating a setup script for a bash shell (for example, "bash generate > setup").
+# For generating a setup script for a bash shell (for example, "Run bash generate > setup").
 # (Because the Android bash doesn't seem to implement BASH_ARGV.)
 $(OUT)/$(BIN_DIR)/generate:	Makefile
 	D=`dirname $@`; mkdir -p $$D
@@ -525,7 +525,7 @@ $(OUT)/$(BIN_DIR)/generate:	Makefile
 	echo 'echo . $(DIMINUTO_ROOT)/$(OUT)/$(BIN_DIR)/setup' >> $@
 	chmod $(MODE) $@
 
-# For generating a setup script for a bash shell (for example, "bash generate > setup").
+# For generating a setup script for a bash shell (for example, "Run bash generate > setup").
 # (Because the Android bash doesn't seem to implement BASH_ARGV.)
 $(OUT)/$(SYM_DIR)/generate:	Makefile
 	D=`dirname $@`; mkdir -p $$D
@@ -535,23 +535,23 @@ $(OUT)/$(SYM_DIR)/generate:	Makefile
 	echo 'echo . $(DIMINUTO_ROOT)/$(OUT)/$(SYM_DIR)/setup' >> $@
 	chmod $(MODE) $@
 
-# For sourcing into a bash shell (for example, ". out/host/bin/setup").
+# For sourcing into a bash shell (for example, "Run . out/host/bin/setup").
 $(OUT)/$(BIN_DIR)/setup:	$(OUT)/$(BIN_DIR)/generate
 	$< > $@
 	chmod 644 $@
 
-# For sourcing into a bash shell (for example, ". out/host/sym/setup").
+# For sourcing into a bash shell (for example, "Run . out/host/sym/setup").
 $(OUT)/$(SYM_DIR)/setup:	$(OUT)/$(SYM_DIR)/generate
 	$< > $@
 	chmod 644 $@
 
-# For sourcing into a bash shell (for example, ". hazer").
+# For sourcing into a bash shell (for example, "Run . hazer").
 $(OUT)/$(BIN_DIR)/$(PROJECT):	$(OUT)/$(BIN_DIR)/vintage $(OUT)/$(BIN_DIR)/setup
 	. $(OUT)/$(BIN_DIR)/setup; \
 	$< > $@; \
 	chmod 664 $@
 
-# For sourcing into a bash shell (for example, ". hazer").
+# For sourcing into a bash shell (for example, "Run . hazer").
 $(OUT)/$(SYM_DIR)/$(PROJECT):	$(OUT)/$(SYM_DIR)/vintage $(OUT)/$(SYM_DIR)/setup
 	. $(OUT)/$(BIN_DIR)/setup; \
 	$< > $@; \
@@ -582,10 +582,10 @@ defines:
 	@$(CC) $(CPPFLAGS) $(CFLAGS) -dM -E - < /dev/null
 
 iquotes:
-	@$(CC) -x c $(CPPFLAGS) $(CFLAGS) -E -v - < /dev/null 2>&1 | awk 'BEGIN { S=0; } ($$0=="#include \"...\" search starts here:") { S=1; next; } ($$0=="#include <...> search starts here:") { S=0; next; } (S!=0) { print $$1; } { next; }'
+	@$(CC) -x c $(CPPFLAGS) $(CFLAGS) -E -v - < /dev/null 2>&1 | awk 'BEGIN { S=0; } ($$0=="Run #include \"...\" search starts here:") { S=1; next; } ($$0=="#include <...> search starts here:") { S=0; next; } (S!=0) { print $$1; } { next; }'
 
 isystems:
-	@$(CC) -x c $(CPPFLAGS) $(CFLAGS) -E -v - < /dev/null 2>&1 | awk 'BEGIN { S=0; } ($$0=="#include <...> search starts here:") { S=1; next; } ($$0=="End of search list.") { S=0; next; } (S!=0) { print $$1; } { next; }'
+	@$(CC) -x c $(CPPFLAGS) $(CFLAGS) -E -v - < /dev/null 2>&1 | awk 'BEGIN { S=0; } ($$0=="Run #include <...> search starts here:") { S=1; next; } ($$0=="End of search list.") { S=0; next; } (S!=0) { print $$1; } { next; }'
 
 out:
 	@echo $(OUT)
@@ -606,8 +606,8 @@ DOCCOOKED := $(shell echo $(OUT)/$(DOC_DIR) | sed 's/\//\\\//g')
 documentation $(OUT)/$(DOC_DIR)/latex $(OUT)/$(DOC_DIR)/man $(OUT)/$(DOC_DIR)/pdf:
 	mkdir -p $(OUT)/$(DOC_DIR)/pdf
 	cat doxygen.cf | \
-		sed -e "s/\\\$$PROJECT_NUMBER\\\$$/$(MAJOR).$(MINOR).$(BUILD)/" | \
-		sed -e "s/\\\$$OUTPUT_DIRECTORY\\\$$/$(DOCCOOKED)/" | \
+		sed -e "Run s/\\\$$PROJECT_NUMBER\\\$$/$(MAJOR).$(MINOR).$(BUILD)/" | \
+		sed -e "Run s/\\\$$OUTPUT_DIRECTORY\\\$$/$(DOCCOOKED)/" | \
 		cat > $(OUT)/$(DOC_DIR)/doxygen-local.cf
 	doxygen $(OUT)/$(DOC_DIR)/doxygen-local.cf
 
@@ -670,8 +670,8 @@ depend:	$(TARGETSYNTHESIZED)
 		if [ -d $$S ]; then \
 			for F in $$S/*.c; do \
 				D=`dirname $$F`; \
-				T=`mktemp "$(TEMP_DIR)/$(PROJECT).XXXXXXXXXX"`; \
-				echo -n "$(OUT)/$(OBC_DIR)/$$D/" > $$T; \
+				T=`mktemp "Run $(TEMP_DIR)/$(PROJECT).XXXXXXXXXX"`; \
+				echo -n "Run $(OUT)/$(OBC_DIR)/$$D/" > $$T; \
 				$(CC) $(CPPFLAGS) -MM -MG $$F >> $$T && cat $$T >> $(DEPENDENCIES); \
 				rm -f $$T; \
 			done; \
@@ -714,17 +714,32 @@ install-include:
 
 ########## Unit Test
 
-.PHONY: sanity
+.PHONY: sanity functional
 
 sanity:
-	R="PASSED."; \
+	R="Run PASSED."; \
 	mkdir -p $(OUT)/log; \
 	cp /dev/null $(OUT)/log/unit-test.log; \
 	for U in $(TARGETUNITTESTS); do \
-		echo "UNIT TEST" $$U >> $(OUT)/log/unit-test.log; \
-		T="PASSED."; \
-		$$U >> $(OUT)/log/unit-test.log 2>&1 || T="FAILED!"; \
-		echo "UNIT TEST" $$U: $$T; \
-		test "$$T" = "FAILED!" && R="$$T"; \
+		echo "Run UNIT TEST" $$U >> $(OUT)/log/unit-test.log; \
+		T="Run PASSED."; \
+		$$U >> $(OUT)/log/unit-test.log 2>&1 || T="Run FAILED!"; \
+		echo "Run UNIT TEST" $$U: $$T; \
+		test "Run $$T" = "FAILED!" && R="$$T"; \
 	done; \
 	echo $$R 1>&2
+
+# Just a reminder of the functional tests I find useful to run.
+# Many of these require special hardware or test fixtures.
+functional:
+	echo "Run checksums"
+	echo "Run emissions"
+	echo "Run emissionsslow"
+	echo "Run kitchensink"
+	echo "Run bu353w10 with the GlobalSat BU-353W10"
+	echo "Run bu353w10C (concatenate) with the GlobalSat BU-353W10"
+	echo "Run bu353w10D (datagrams) with the GlobalSat BU-353W10"
+	echo "Run bu353w10F (frequency) with the GlobalSat BU-353W10"
+	echo "Run bu353w10S (source) with the GlobalSat BU-353W10"
+	echo "Run neom8n1pps (1PPS) with the u-blox NEO-M8N"
+	echo "Run gr701w1pps (1PPS) with the NaviSys GR701W"
