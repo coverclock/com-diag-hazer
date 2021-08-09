@@ -2799,9 +2799,7 @@ consume:
         ready = 0;
         fd = -1;
 
-        if ((dev_fp == (FILE *)0) && (remote_fd < 0)) {
-            /* Do nothing. */
-        } else if (dingdong(&check_last, check)) {
+        if (dingdong(&check_last, check)) {
             /* Do nothing. */
         } else if ((available = diminuto_file_ready(in_fp)) > 0) {
             fd = in_fd;
