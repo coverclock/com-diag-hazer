@@ -1180,6 +1180,7 @@ the libraries and binaries in the system directories.)
 * bu353w10H - exercises the GlobalSat BU-353W10 receiver in headless mode.
 * bu353w10M4 - exercises the GlobalSat BU-353W10 receiver logging PRN 4.
 * bu353w10S - uses socat to send data from GlobalSat BU-353W10 to gpstool over named pipe.
+* bu353w10V - exercises the GlobalSat BU-353W10 receiver using verbose mode.
 * bu353W10X - exercises the GlobalSat BU-353W10 receiver while testing data expiration.
 * checksums - exercises the checksum utility.
 * collect - collects output of a device into a file.

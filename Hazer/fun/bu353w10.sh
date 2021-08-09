@@ -12,8 +12,6 @@
 # sentence containing the course over ground (COG) and speed
 # over ground (SOG) values every second, something the GR-803G
 # does, but which the BU-353W10 does not right out of the box.
-# This script also redirects the standard error stream to the
-# system log.
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}

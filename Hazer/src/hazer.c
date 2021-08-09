@@ -1033,10 +1033,8 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (count < 14) { 
         /* Do nothing. */
-#if 0
     } else if (*vector[6] == '0') {
-        /* Probably some other value is really proper here, like 3 or 4. */
-#endif
+        /* Do nothing. */
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
