@@ -235,16 +235,20 @@ multiple constellations.
 
     SAT [  1]     2id  40°elv  205°azm    0dBHz  6sig <   !                NAVSTAR
 
-SAT is the list of satellites in view, including an index that is
-purely an artifact of Hazer, the Space Vehicle IDentifier (specific to
-the constellation), its elevation and azimuth in degrees relative to
-the receiver, the signal strength (really, a carrier to noise density ratio)
-in deciBels Hertz of its transmission, a signal identifier indicating
-which signal or band (e.g.  L1 C/A, L2, etc.) is being used, and one
-or more flags. A flag of '<' indicates that the satellite is on the
-active list (see ACT above); a '?' indicates that the azimuth and/or the
-elevation were empty but display as zero (likely that the satellite is
-not in the transmitted almanac); and an '!' indicates that the signal
-strength was empty but displays as zero (some receivers use this to
-indicate the satellite is not being tracked).
+SAT, generated from the NMEA GSV sentence, is the list of satellites in
+view. It includes an index that is purely an artifact of Hazer, the Space
+Vehicle IDentifier (specific to the constellation), its elevation and
+azimuth in degrees relative to the receiver, the signal strength (really,
+a carrier to noise density ratio) in deciBels Hertz of its transmission,
+a signal identifier indicating which signal or band (e.g.  L1 C/A, L2,
+etc.) is being used, and one or more flags. A flag of '<' indicates that
+the satellite is on the active list (see ACT above, provided by the NMEA
+GSA sentence); a '?' indicates that the azimuth and/or the elevation
+were empty (but display as zero; typically means that the almanac has not
+yet been received - a cold start - but occasionally indicates that the
+satellite is not in the received almanac, which I've seen when GPS ground
+control is testing a new satellite); and a '!' indicates that the
+signal strength was empty but displays as zero (some receivers use this
+to indicate the satellite is in the almanac but is not being received
+over an avaiable RF channel).
 
