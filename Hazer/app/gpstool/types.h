@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2021 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This defines the gpstool Types.
  * @author Chip Overclock <mailto:coverclock@diag.com>

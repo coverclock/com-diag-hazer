@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2021 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares and defines the gpstool Helpers.
  * @author Chip Overclock <mailto:coverclock@diag.com>
