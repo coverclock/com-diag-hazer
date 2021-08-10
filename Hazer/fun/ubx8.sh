@@ -30,6 +30,7 @@ COMMANDS='
     -W "\$PUBX,00"
     -W "\$PUBX,03"
     -W "\$PUBX,04"
+    -W "\$PUBX,40,GGA,0,0,0,1,0,0"
     -W "\$PUBX,40,GSA,0,0,0,1,0,0"
     -W "\$PUBX,40,GSV,0,0,0,1,0,0"
     -W "\$PUBX,40,RMC,0,0,0,1,0,0"
