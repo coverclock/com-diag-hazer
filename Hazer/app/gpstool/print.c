@@ -699,7 +699,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
 
         }
 
-        if (count == 0) {
+        if (count <= 0) {
 
             fputs("INT", fp);
 
