@@ -676,6 +676,8 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
     }
 
     {
+        int count = 0;
+
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (pa[system].ticks == 0) { continue; }
@@ -688,6 +690,26 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
             fprintf(fp, " %3s", totokay ? "TOT" : "tot");
             fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].sep_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
             fprintf(fp, " %20lluB", (unsigned long long)bytes); /* (2^64)-1 == 0xFFFFFFFFFFFFFFFF == 18,446,744,073,709,551,615. */
+
+            fprintf(fp, " %-8.8s", Device);
+
+            fputc('\n', fp);
+
+            count += 1;
+
+        }
+
+        if (count == 0) {
+
+            fputs("INT", fp);
+
+            fprintf(fp, " %s", "   ");
+            fprintf(fp, " [%2u]", 0);
+            fprintf(fp, " %3s", dmyokay ? "DMY" : "dmy");
+            fprintf(fp, " %3s", totokay ? "TOT" : "tot");
+            fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d %2d )", 0, 0, 0, 0, 0, 0, 0, 0);
+
+            fprintf(fp, " %20uB", 0);
 
             fprintf(fp, " %-8.8s", Device);
 
