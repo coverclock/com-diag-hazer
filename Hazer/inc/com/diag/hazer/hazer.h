@@ -761,9 +761,8 @@ extern hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker);
  ******************************************************************************/
 
 /**
- * THis structure maintains the time, position, altitude, speed, and bearing
- * derived from the NMEA stream. THIS OBJECT SHOULD BE INITIALIZED TO ALL
- * ZEROS.
+ * This structure maintains the time, position, altitude, speed, and bearing
+ * derived from the NMEA stream.
  */
 typedef struct HazerPosition {
     uint64_t old_nanoseconds;	/* Prior total nanoseconds. */
@@ -850,8 +849,7 @@ extern int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t
 
 /**
  * This structure maintains the information on the satellites in any
- * constellation that were used in the position solution. THIS OBJECT
- * SHOULD BE INITIALIZED TO ALL ZEROS.
+ * constellation that were used in the position solution.
  */
 typedef struct HazerActive {
     const char * label;			/* Label for sentence. */
@@ -861,8 +859,8 @@ typedef struct HazerActive {
     uint16_t vdop;				/* Vertical Dilution Of Precision * 100. */
     uint8_t system;				/* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
     uint8_t active;             /* Number of satellites active. */
+    uint8_t mode;               /* Navigation mode: 1(None), 2(D), 3(D). */
     hazer_expiry_t ticks;		/* Lifetime in application-defined ticks. */
-    uint8_t unused[1];          /* Unused. */
 } hazer_active_t;
 
 /**
@@ -877,7 +875,7 @@ typedef struct HazerActive {
         HAZER_SYSTEM_TOTAL, \
         0, \
         0, \
-        { 0, } \
+        0, \
     }
 
 /**
@@ -943,7 +941,7 @@ typedef struct HazerSatellite {
 
 /**fg
  * This structure maintains the information on as many satellites as we
- * have channels configured. THIS OBJECT SHOULD BE INITIALIZED TO ALL ZEROS.
+ * have channels configured.
  */
 typedef struct HazerView {
     const char * label;			/* Label for sentence. */

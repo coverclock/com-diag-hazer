@@ -54,7 +54,7 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
         if (aa[system].ticks == 0) { continue; }
         if (aa[system].active == 0) { continue; }
 
-        fprintf(fp, "%s {", "ACT [1] ");
+        fprintf(fp, "%s {", "ACT [1]");
 
         count = 0;
         for (satellite = 0; satellite < (IDENTIFIERS / 2); ++satellite) {
@@ -68,7 +68,7 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
         fprintf(fp, " } [%2u] [%2u] [%2u] [%2u]", count, aa[system].active, total, maximum);
 
-        fprintf(fp, "%2s", "");
+        fprintf(fp, " %1.1dD", aa[system].mode);
 
         fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
@@ -76,7 +76,7 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
         if (aa[system].active <= (IDENTIFIERS / 2)) { continue; }
 
-        fprintf(fp, "%s {", "ACT [2] ");
+        fprintf(fp, "%s {", "ACT [2]");
 
         count = 0;
         for (satellite = (IDENTIFIERS / 2); satellite < IDENTIFIERS; ++satellite) {
@@ -90,7 +90,7 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
         fprintf(fp, " } [%2u] [%2u] [%2u] [%2u]", count, aa[system].active, total, maximum);
 
-        fprintf(fp, "%2s", "");
+        fprintf(fp, " %1.1dD", aa[system].mode);
 
         fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 

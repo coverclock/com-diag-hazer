@@ -1071,8 +1071,10 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         /* Do nothing. */
     } else if (count < 19) {
         /* Do nothing. */
+#if 0
     } else if (*vector[2] == '1') {
         /* Do nothing. */
+#endif
     } else {
         for (slot = 0; slot < IDENTIFIERS; ++slot) {
             id = strtol(vector[index++], (char **)0, 10);
@@ -1088,6 +1090,10 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         activep->pdop = hazer_parse_dop(vector[15]);
         activep->hdop = hazer_parse_dop(vector[16]);
         activep->vdop = hazer_parse_dop(vector[17]);
+        /*
+         * 0 == initial, 1 == no fix, 2 == 2D, 3 == 3D.
+         */
+        activep->mode = atoi(vector[2]);
         /*
          * NMEA 0183 4.10 2012 has an additional 19th field containing
          * the GNSS System ID to identify GPS, GLONASS, GALILEO, etc.
@@ -1254,7 +1260,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if ((count > 13) && (*vector[12] == 'N')) { /* NMEA 2.3+ */
         /* Do nothing. */
-#if 0
+#if !0
     } else if ((count > 14) && (*vector[13] == 'V')) { /* NMEA 4.10+ */
         /* Not clear what this means on the u-blox UBX-F9P. */
 #endif
@@ -1289,7 +1295,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (count < 9) {
         /* Do nothing. */
-#if 0
+#if !0
     } else if (*vector[6] == 'V') {
         /* Not clear what this means on the u-blox UBX-F9P. */
 #endif
