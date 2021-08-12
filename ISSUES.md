@@ -35,7 +35,9 @@ satellite, or the total count should be ten instead of eleven. My software
 has been modified to account for this malformed message; it originally
 core dumped with a segmentation violation.
 
-(2019-06-06: U-Blox says this FW bug will be fixed in a subsequent release.)
+2019-06-06: U-Blox says this FW bug will be fixed in a subsequent release.
+
+<https://portal.u-blox.com/s/question/0D52p00008WRsgMCAT/ubxzedf9p-incorrect-number-of-satellites-in-view-for-nmea-gsv-for-glonass>
 
 ## Lost Characters on Gen 8 and Gen 9 U-blox Modules using USB ACM Port
 
@@ -83,7 +85,9 @@ I've described this at length in the article
 
 <https://coverclock.blogspot.com/2019/06/this-is-what-you-have-to-deal-with.html>
 
-The u-blox support forum has other people reporting this same thing.
+The u-blox support forum has another person reporting something similar.
+
+<https://portal.u-blox.com/s/question/0D52p00008vA2ElCAK/seeing-partial-nmea-sentences-on-usb-interface>
 
 ## End Of File (EOF) on U-blox UBX-ZED-F9P when using Ubuntu VM
 

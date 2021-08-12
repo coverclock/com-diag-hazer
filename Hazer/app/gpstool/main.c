@@ -189,7 +189,7 @@ int main(int argc, char * argv[])
     timeout_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
     timeout_t frequency = 1;
     timeout_t postpone = 0;
-    timeout_t check = -1;
+    timeout_t bypass = -1;
     /*
      * Configuration command variables.
      */
@@ -398,7 +398,7 @@ int main(int argc, char * argv[])
     seconds_t keepalive_last = 0;
     seconds_t trace_last = 0;
     seconds_t command_last = 0;
-    seconds_t check_last = 0;
+    seconds_t bypass_last = 0;
     /*
      * I/O buffer variables.
      */
@@ -703,7 +703,7 @@ int main(int argc, char * argv[])
             break;
         case 'i':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
-            check = strtol(optarg, &end, 0);
+            bypass = strtol(optarg, &end, 0);
             if ((end == (char *)0) || (*end != '\0')) {
                 errno = EINVAL;
                 diminuto_perror(optarg);
@@ -1453,7 +1453,7 @@ int main(int argc, char * argv[])
     expiration_now = expiration_was =
         display_last =
             trace_last =
-                check_last =
+                bypass_last =
                     command_last = ticktock();
 
     keepalive_last = 0;
@@ -2162,20 +2162,6 @@ consume:
          **/
 
         /*
-         * Determine if any constellation has the current time and date.
-         */
-
-        dmyokay = 0;
-        totokay = 0;
-
-        for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-            if (position[ii].ticks > 0) {
-                dmyokay = dmyokay || (position[ii].dmy_nanoseconds > 0);
-                totokay = totokay || (position[ii].tot_nanoseconds >= position[ii].old_nanoseconds);
-            }
-        }
-
-        /*
          * We write the validated input to the device in the case in which
          * we received the original data via UDP or from standard input; in
          * other cases the device is our input source. Time must monotonically
@@ -2712,8 +2698,31 @@ consume:
 
         }
 
+        /*
+         * If we received an EOF (or anything else that say we should
+         * quit), render the output screen one last time.
+         */
+
         if (eof) {
             goto render;
+        }
+
+        /*
+         * Determine if any constellation has the current time and date.
+         */
+
+        dmyokay = 0;
+        totokay = 0;
+
+        for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
+            if (position[ii].ticks > 0) {
+                if (position[ii].dmy_nanoseconds > 0) {
+                    dmyokay = !0;
+                }
+                if (position[ii].tot_nanoseconds >= position[ii].old_nanoseconds) {
+                    totokay = !0;
+                }
+            }
         }
 
         /*
@@ -2799,7 +2808,7 @@ consume:
         ready = 0;
         fd = -1;
 
-        if (dingdong(&check_last, check)) {
+        if (dingdong(&bypass, bypass)) {
             /* Do nothing. */
         } else if ((available = diminuto_file_ready(in_fp)) > 0) {
             fd = in_fd;

@@ -151,7 +151,11 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
             if (va[system].sat[satellite].id == 0) { continue; }
 
             ranged = INACTIVE;
-            if (aa[system].active > 0) {
+            if (aa[system].ticks == 0) {
+                /* Do nothing. */
+            } else if (aa[system].active == 0) {
+                /* Do nothing. */
+            } else {
                 for (active = 0; active < IDENTIFIERS; ++active) {
 
                     if (active >= aa[system].active) { break; }

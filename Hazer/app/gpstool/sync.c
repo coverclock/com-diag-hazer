@@ -21,7 +21,7 @@ static uint8_t * sync_here = (uint8_t *)0;
 
 void sync_out(int ch)
 {
-    size_t sync_length = 0;
+    ssize_t sync_length = 0;
 
     if (sync_buffer == (uint8_t *)0) {
         diminuto_assert(SYNCBUFFER > 0);
@@ -31,23 +31,28 @@ void sync_out(int ch)
     }
 
     sync_length = sync_here - sync_buffer;
+    diminuto_assert(sync_length >= 0);
+    diminuto_assert(sync_length < SYNCBUFFER);
+
+    *(sync_here++) = ch;
+    sync_length += 1;
 
     if (sync_length >= SYNCBUFFER) {
         fputs("UNK:\n", stderr);
         diminuto_dump(stderr, sync_buffer, sync_length);
         sync_here = sync_buffer;
     }
-
-    *(sync_here++) = ch;
 }
 
 void sync_in(size_t length)
 {
-    size_t sync_length = 0;
+    ssize_t sync_length = 0;
 
     if (sync_buffer != (uint8_t *)0) {
 
         sync_length = sync_here - sync_buffer;
+        diminuto_assert(sync_length >= 0);
+        diminuto_assert(sync_length < SYNCBUFFER);
 
         if (length < sync_length) {
             sync_length -= length;
@@ -64,11 +69,13 @@ void sync_in(size_t length)
 
 void sync_end(void)
 {
-    size_t sync_length = 0;
+    ssize_t sync_length = 0;
 
     if (sync_buffer != (uint8_t *)0) {
 
         sync_length = sync_here - sync_buffer;
+        diminuto_assert(sync_length >= 0);
+        diminuto_assert(sync_length < SYNCBUFFER);
 
         if (sync_length > 0) {
             fputs("UNK:\n", stderr);
