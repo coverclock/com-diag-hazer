@@ -949,6 +949,8 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://www.gpsworldbuyersguide.com>
 
+<https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
