@@ -2808,7 +2808,7 @@ consume:
         ready = 0;
         fd = -1;
 
-        if (dingdong(&bypass, bypass)) {
+        if (dingdong(&bypass_last, bypass)) {
             /* Do nothing. */
         } else if ((available = diminuto_file_ready(in_fp)) > 0) {
             fd = in_fd;
