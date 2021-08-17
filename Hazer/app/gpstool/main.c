@@ -1707,7 +1707,7 @@ consume:
 
                     frame = !0;
 
-                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd]", size, length);
+                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] %-5.5s", size, length, (buffer + 1));
 
                     break;
 
@@ -1731,7 +1731,7 @@ consume:
 
                     frame = !0;
 
-                    DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd]", size, length);
+                    DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
 
                     break;
                 }
@@ -1754,7 +1754,7 @@ consume:
 
                     frame = !0;
 
-                    DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd]", size, length);
+                    DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd] %d", size, length, tumbleweed_message(buffer, length));
 
                     break;
                 }
