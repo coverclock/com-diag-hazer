@@ -1427,11 +1427,27 @@ See the README in the Tesoro repository for more information.
 ## gpstool
 
     > gpstool -?
-    usage: gpstool [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ] [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ] [ -O FILE ] [ -C FILE ] [ -t SECONDS ] [ -I PIN | -c ] [ -p PIN ] [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ] [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -L LOG ] [ -G [ IP:PORT | :PORT [ -g MASK ] ] ] [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ] [ -K [ -k MASK ] ] [ -N FILE ] [ -T FILE [ -f SECONDS ] ]
+    usage: gpstool
+                   [ -d ] [ -v ] [ -u ]
+                   [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]
+                   [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ]
+                   [ -C FILE ]
+                   [ -O FILE ]
+                   [ -L FILE ]
+                   [ -T FILE [ -f SECONDS ] ]
+                   [ -N FILE ]
+                   [ -K [ -k MASK ] ]
+                   [ -A STRING ... ] [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ] [ -x ]
+                   [ -G :PORT | -G IP:PORT [ -g MASK ] ]
+                   [ -Y :PORT | -Y IP:PORT [ -y SECONDS ] ]
+                   [ -I PIN | -c ] [ -p PIN ]
+                   [ -M ] [ -X MASK ] [ -V ]
            -1          Use one stop bit for DEVICE.
            -2          Use two stop bits for DEVICE.
            -7          Use seven data bits for DEVICE.
            -8          Use eight data bits for DEVICE.
+           -A STRING   Collapse STRING, append Ubx end matter, write to DEVICE, expect ACK/NAK.
+           -A ''       Exit when this empty STRING is processed.
            -B BYTES    Set the input Buffer size to BYTES bytes.
            -C FILE     Catenate input to FILE or named pipe.
            -D DEVICE   Use DEVICE for input or output.
@@ -1442,7 +1458,7 @@ See the README in the Tesoro repository for more information.
            -H HEADLESS Like -R but writes each iteration to HEADLESS file.
            -I PIN      Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).
            -K          Write input to DEVICE sinK from datagram source.
-           -L LOG      Write pretty-printed input to LOG file.
+           -L FILE     Write pretty-printed input to FILE file.
            -M          Run in the background as a daeMon.
            -N FILE     Use fix FILE to save ARP LLH for subsequeNt fixed mode.
            -O FILE     Save process identifier in FILE.
@@ -1450,17 +1466,16 @@ See the README in the Tesoro repository for more information.
            -R          Print a Report on standard output.
            -S FILE     Use source FILE or named pipe for input.
            -T FILE     Save the PVT CSV Trace to FILE.
-           -U STRING   Collapse STRING, append Ubx end matter, write to DEVICE, expect response.
+           -U STRING   Collapse STRING, append Ubx end matter, write to DEVICE.
            -U ''       Exit when this empty STRING is processed.
            -V          Log Version in the form of release, vintage, and revision.
            -W STRING   Collapse STRING, append NMEA end matter, Write to DEVICE.
            -W ''       Exit when this empty STRING is processed.
-           -X          Enable message eXpiration test mode.
+           -X MASK     Enable special test modes via MASK.
            -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.
            -Y :PORT    Use local PORT as surveYor source.
            -Z STRING   Collapse STRING, write to DEVICE.
            -Z ''       Exit when this empty STRING is processed.
-           -X          Enable message eXpiration test mode.
            -b BPS      Use BPS bits per second for DEVICE.
            -c          Take 1PPS from DCD (requires -D and implies -m).
            -d          Display Debug output on standard error.
@@ -1472,9 +1487,9 @@ See the README in the Tesoro repository for more information.
            -k MASK     Set device sinK mask (NMEA=1, UBX=2, RTCM=4) default NMEA.
            -l          Use Local control for DEVICE.
            -m          Use Modem control for DEVICE.
+           -n          Use No parity for DEVICE.
            -o          Use Odd parity for DEVICE.
            -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).
-           -n          Use No parity for DEVICE.
            -s          Use XON/XOFF (control-Q/control-S) for DEVICE.
            -t SECONDS  Timeout GNSS data after SECONDS seconds.
            -u          Note Unprocessed input on standard error.
