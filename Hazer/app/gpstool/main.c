@@ -2491,9 +2491,9 @@ consume:
                 refresh = !0;
 
                 if (acknak.state) {
-                    DIMINUTO_LOG_INFORMATION("Parse UBX ACK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                    DIMINUTO_LOG_NOTICE("Parse UBX ACK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                 } else if (!nakquit) {
-                    DIMINUTO_LOG_INFORMATION("Parse UBX NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                    DIMINUTO_LOG_NOTICE("Parse UBX NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                 } else {
                     DIMINUTO_LOG_WARNING("Parse UBX NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                     xc = 1;
