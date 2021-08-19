@@ -15,14 +15,34 @@ FIFO=${TMPDIR:-"/tmp"}/${PROGRAM}.fifo
 trap "rm -f ${FIFO}" SIGINT SIGQUIT SIGTERM EXIT
 mkfifo -m 600 ${FIFO}
 
-coreable gpstool \
+eval coreable gpstool \
 	-D ${FIFO} \
 	-Z 'VERBATIM\r' \
 	-Z 'VERBATIM\r' \
 	-W '$PUBX,00' \
 	-W '$PUBX,01' \
-	-U '\xb5\x62\x05\x01\x02\x00\x05\x01' \
-	-U '\xb5\x62\x05\x00\x02\x00\x05\x00' \
-	-A '\xb5\x62\x05\x01\x02\x00\x05\x01' \
-	-A '\xb5\x62\x05\x00\x02\x00\x05\x00' \
+	-U '\
+\\xb5\\x62\
+\\x05\\x01\
+\\x02\\x00\
+\\x05\\x01\
+' \
+	-U '\
+\\xb5\\x62\
+\\x05\\x00\
+\\x02\\x00\
+\\x05\\x00\
+' \
+	-A '\
+\\xb5\\x62\
+\\x05\\x01\
+\\x02\\x00\
+\\x05\\x01\
+' \
+	-A '\
+\\xb5\\x62\
+\\x05\\x00\
+\\x02\\x00\
+\\x05\\x00\
+' \
 	-u -v -R
