@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2019 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2019-2021 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
@@ -16,7 +16,7 @@ RATE=${2:-9600}
 
 OPTIONS=""
 for OPTION in ${COMMANDS}; do
-    OPTIONS="${OPTIONS} -W ${OPTION}"
+    OPTIONS="${OPTIONS} ${OPTION}"
 done
 
 eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -R ${OPTIONS}
