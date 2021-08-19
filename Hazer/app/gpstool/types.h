@@ -130,10 +130,19 @@ typedef enum Update {
  */
 typedef enum Emission {
     EMISSION        = '?',
+    OPT_A           = 'A',
     OPT_W           = 'W',
     OPT_U           = 'U',
     OPT_Z           = 'Z',
 } emission_t;
+
+/**
+ * What kind of special test mode is being done?
+ */
+typedef enum Test {
+    TEST            = 0,
+    TEST_EXPIRATION = 1,
+} test_t;
 
 /*******************************************************************************
  * HIGH PRECISION SOLUTION

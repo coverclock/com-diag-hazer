@@ -180,7 +180,7 @@ int main(int argc, char * argv[])
     int process = 0;
     int strobepin = (((int)1)<<((sizeof(int)*8)-1));
     int ppspin = (((int)1)<<((sizeof(int)*8)-1));
-    int expire = 0;
+    int test = TEST;
     int unknown = 0;
     int serial = 0;
     int daemon = 0;
@@ -469,7 +469,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:XY:Z:b:cdef:g:hi:k:lmnop:st:uvxw:y:?";
+    static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:uvxw:y:?";
 
     /**
      ** PREINITIALIZATION
@@ -503,6 +503,17 @@ int main(int argc, char * argv[])
         case '8':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             databits = 8;
+            break;
+        case 'A':
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
+            readonly = 0;
+            command = (command_t *)malloc(sizeof(command_t));
+            diminuto_assert(command != (command_t *)0);
+            command->emission = OPT_A;
+            command_node = &(command->link);
+            diminuto_list_datainit(command_node, optarg);
+            diminuto_list_enqueue(&command_list, command_node);
+            process = !0; /* Have to process ACK/NAKs. */
             break;
         case 'B':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
@@ -614,7 +625,6 @@ int main(int argc, char * argv[])
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
             diminuto_list_enqueue(&command_list, command_node);
-            process = !0; /* Have to process ACK/NAKs. */
             break;
         case 'V':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
@@ -631,8 +641,13 @@ int main(int argc, char * argv[])
             diminuto_list_enqueue(&command_list, command_node);
             break;
         case 'X':
-            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
-            expire = !0;
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
+            test = strtoul(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
             break;
         case 'Y':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
@@ -790,26 +805,28 @@ int main(int argc, char * argv[])
             break;
         case '?':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
-            fprintf(stderr, "usage: %s"
-                " [ -d ] [ -v ] [ -M ] [ -u ] [ -V ] [ -X ] [ -x ]"
-                " [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]"
-                " [ -O FILE ]"
-                " [ -C FILE ]"
-                " [ -t SECONDS ]"
-                " [ -I PIN | -c ] [ -p PIN ]"
-                " [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ]"
-                " [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ]"
-                " [ -L LOG ]"
-                " [ -G [ IP:PORT | :PORT [ -g MASK ] ] ]"
-                " [ -Y [ IP:PORT [ -y SECONDS ] | :PORT ] ]"
-                " [ -K [ -k MASK ] ]"
-                " [ -N FILE ]"
-                " [ -T FILE [ -f SECONDS ] ]"
-                          "\n", Program);
+            fprintf(stderr, "usage: %s\n"
+                            "               [ -d ] [ -v ] [ -u ]\n"
+                            "               [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]\n"
+                            "               [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ]\n"
+                            "               [ -C FILE ]\n"
+                            "               [ -O FILE ]\n"
+                            "               [ -L FILE ]\n"
+                            "               [ -T FILE [ -f SECONDS ] ]\n"
+                            "               [ -N FILE ]\n"
+                            "               [ -K [ -k MASK ] ]\n"
+                            "               [ -A STRING ... ] [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ] [ -x ]\n"
+                            "               [ -G :PORT | -G IP:PORT [ -g MASK ] ]\n"
+                            "               [ -Y :PORT | -Y IP:PORT [ -y SECONDS ] ]\n"
+                            "               [ -I PIN | -c ] [ -p PIN ]\n"
+                            "               [ -M ] [ -X MASK ] [ -V ]\n"
+                            , Program);
             fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
             fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
             fprintf(stderr, "       -7          Use seven data bits for DEVICE.\n");
             fprintf(stderr, "       -8          Use eight data bits for DEVICE.\n");
+            fprintf(stderr, "       -A STRING   Collapse STRING, append Ubx end matter, write to DEVICE, expect ACK/NAK.\n");
+            fprintf(stderr, "       -A ''       Exit when this empty STRING is processed.\n");
             fprintf(stderr, "       -B BYTES    Set the input Buffer size to BYTES bytes.\n");
             fprintf(stderr, "       -C FILE     Catenate input to FILE or named pipe.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE for input or output.\n");
@@ -820,7 +837,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).\n");
             fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
-            fprintf(stderr, "       -L LOG      Write pretty-printed input to LOG file.\n");
+            fprintf(stderr, "       -L FILE     Write pretty-printed input to FILE file.\n");
             fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
             fprintf(stderr, "       -N FILE     Use fix FILE to save ARP LLH for subsequeNt fixed mode.\n");
             fprintf(stderr, "       -O FILE     Save process identifier in FILE.\n");
@@ -828,12 +845,12 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -R          Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
             fprintf(stderr, "       -T FILE     Save the PVT CSV Trace to FILE.\n");
-            fprintf(stderr, "       -U STRING   Collapse STRING, append Ubx end matter, write to DEVICE, expect response.\n");
+            fprintf(stderr, "       -U STRING   Collapse STRING, append Ubx end matter, write to DEVICE.\n");
             fprintf(stderr, "       -U ''       Exit when this empty STRING is processed.\n");
             fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
             fprintf(stderr, "       -W STRING   Collapse STRING, append NMEA end matter, Write to DEVICE.\n");
             fprintf(stderr, "       -W ''       Exit when this empty STRING is processed.\n");
-            fprintf(stderr, "       -X          Enable message eXpiration test mode.\n");
+            fprintf(stderr, "       -X MASK     Enable special test modes via MASK.\n");
             fprintf(stderr, "       -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.\n");
             fprintf(stderr, "       -Y :PORT    Use local PORT as surveYor source.\n");
             fprintf(stderr, "       -Z STRING   Collapse STRING, write to DEVICE.\n");
@@ -897,6 +914,10 @@ int main(int argc, char * argv[])
         diminuto_assert(commandresult == commandlength);
         DIMINUTO_LOG_NOTICE("Command \"%s\"\n", commandline);
         free(commandline);
+    }
+
+    if (test != 0) {
+        DIMINUTO_LOG_NOTICE("Testing 0x%x\n", test);
     }
 
     (void)gethostname(Hostname, sizeof(Hostname));
@@ -2043,14 +2064,18 @@ consume:
                 diminuto_assert(command_length > 1);
 
                 switch (command->emission) {
-                case OPT_W:
-                    command_total = emit_sentence(dev_fp, command_buffer, command_length);
-                    break;
-                case OPT_U:
+                case OPT_A:
                     command_total = emit_packet(dev_fp, command_buffer, command_length);
                     if (command_total > 0) {
                         acknakpending += 1;
+                        DIMINUTO_LOG_NOTICE("Pending %d", acknakpending);
                     }
+                    break;
+                case OPT_U:
+                    command_total = emit_packet(dev_fp, command_buffer, command_length);
+                    break;
+                case OPT_W:
+                    command_total = emit_sentence(dev_fp, command_buffer, command_length);
                     break;
                 case OPT_Z:
                     command_total = emit_data(dev_fp, command_buffer, command_length);
@@ -2853,7 +2878,7 @@ render:
          * high precision position fix problematic.
          */
 
-        if (!expire) {
+        if ((test & TEST_EXPIRATION) == 0) {
             /* Do nothing. */
         } else if (!refresh) {
             /* Do nothing. */

@@ -54,6 +54,7 @@ exec ${PREFIX} gpstool \
 	-2 \
 	-7 \
 	-8 \
+	-A '' \
 	-B 1048576 \
 	-C ${CATFIL} \
 	-D ${DEVICE} \
@@ -72,7 +73,7 @@ exec ${PREFIX} gpstool \
 	-U '' \
 	-V \
 	-W '' \
-	-X \
+	-X 1 \
 	-Y 127.0.0.1:21001 \
 	-Z '' \
 	-b ${RATE} \

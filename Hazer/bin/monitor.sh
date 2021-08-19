@@ -42,7 +42,6 @@ coreable gpstool \
 	-T ${CSVFIL} \
 	-O ${PIDFIL} \
 	-D ${DEVICE} -b ${RATE} -8 -n -1 \
-	-x \
 	< /dev/null 1> /dev/null &
 
 sleep 5
