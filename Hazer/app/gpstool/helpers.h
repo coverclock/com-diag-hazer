@@ -35,6 +35,19 @@ static inline seconds_t ticktock(void)
 extern int dingdong(seconds_t * wasp, timeout_t seconds);
 
 /**
+ * Return true if the NMEA sentence name following the talker matches
+ * three letter name. No length checks are done here, so the safeties are
+ * off.
+ * @param vector is the Hazer parsed vector (an array).
+ * @param name is the three letter name.
+ * @return true if the name matches the vector.
+ */
+static inline int precheck(const hazer_vector_t vector, const char * name)
+{
+    return ((vector[0][3] == name[0]) && (vector[0][4] == name[1]) && (vector[0][5] == name[2]));
+}
+
+/**
  * Common function to count down the expiration fields in the database.
  * @param ep points to the expiration field to count down.
  * @param elapsed is the number of ticks to count down.

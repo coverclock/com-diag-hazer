@@ -2353,33 +2353,33 @@ consume:
              * we got this sentence via a UDP datagram).
              */
 
-            if (hazer_parse_gga(&position[system], vector, count) == 0) {
+            if (precheck(vector, HAZER_NMEA_SENTENCE_GGA) && hazer_parse_gga(&position[system], vector, count) == 0) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
                 fix = diminuto_time_elapsed();
 
-            } else if (hazer_parse_rmc(&position[system], vector, count) == 0) {
+            } else if (precheck(vector, HAZER_NMEA_SENTENCE_RMC) && hazer_parse_rmc(&position[system], vector, count) == 0) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
                 fix = diminuto_time_elapsed();
 
-            } else if (hazer_parse_gll(&position[system], vector, count) == 0) {
+            } else if (precheck(vector, HAZER_NMEA_SENTENCE_GLL) && hazer_parse_gll(&position[system], vector, count) == 0) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
                 fix = diminuto_time_elapsed();
 
-            } else if (hazer_parse_vtg(&position[system], vector, count) == 0) {
+            } else if (precheck(vector, HAZER_NMEA_SENTENCE_VTG) && hazer_parse_vtg(&position[system], vector, count) == 0) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
 
-            } else if (hazer_parse_gsa(&cache, vector, count) == 0) {
+            } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSA) && hazer_parse_gsa(&cache, vector, count) == 0) {
 
                 /*
                  * Below is a special case for the Ublox 8 used in devices like
@@ -2408,7 +2408,7 @@ consume:
                 active[system].ticks = timeout;
                 refresh = !0;
 
-            } else if ((rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
+            } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSV) && (rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
 
                 /*
                  * I choose not to signal for a refresh unless we have
@@ -2423,7 +2423,7 @@ consume:
                     refresh = !0;
                 }
 
-            } else if (hazer_parse_txt(vector, count) == 0) {
+            } else if (precheck(vector, HAZER_NMEA_SENTENCE_TXT) && hazer_parse_txt(vector, count) == 0) {
 
                 DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
 
