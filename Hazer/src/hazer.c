@@ -1388,7 +1388,17 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, char * vector[], siz
     } else if (strncmp(&vector[1][0], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
     } else {
-        fprintf(stderr, "UBLOX %s,%s\n", PUBX, ID);
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
+        positionp->old_nanoseconds = positionp->tot_nanoseconds;
+        positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
+        positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
+        positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
+        positionp->sep_millimeters = hazer_parse_alt(vector[7], *(vector[12]), &positionp->sep_digits);
+        positionp->sog_microknots = hazer_parse_sog(vector[11], &positionp->sog_digits);
+        positionp->cog_nanodegrees = hazer_parse_cog(vector[12], &positionp->cog_digits);
+        positionp->sat_used = strtol(vector[18], (char **)0, 10);
+        positionp->label = PUBX;
+        rc = 0;
     }
 
     return rc;
@@ -1438,7 +1448,11 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
     } else if (strncmp(&vector[1][0], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
     } else {
-        fprintf(stderr, "UBLOX %s,%s\n", PUBX, ID);
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
+        positionp->dmy_nanoseconds = hazer_parse_dmy(vector[3]);
+        positionp->old_nanoseconds = positionp->tot_nanoseconds;
+        positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
+        rc = 0;
     }
 
     return rc;
