@@ -2321,9 +2321,24 @@ consume:
 
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
 
-                if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
+                if (precheck(vector, "GSA") || precheck(vector, "GSV")) {
                     DIMINUTO_LOG_INFORMATION("Parse NMEA Talker Other \"%c%c\"", vector[0][1], vector[0][2]);
                 }
+                continue;
+
+            } else if ((count >= 3) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
+
+                fprintf(stderr, "PUBX POSITION\n");
+                continue;
+
+            } else if ((count >= 3) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS)) {
+
+                fprintf(stderr, "PUBX SVSTATUS\n");
+                continue;
+
+            } else if ((count >= 3) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME)) {
+
+                fprintf(stderr, "PUBX TIME\n");
                 continue;
 
             } else if ((talker == HAZER_TALKER_PUBX) || (talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {
@@ -2333,7 +2348,7 @@ consume:
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 
-                if ((vector[0][3] == 'G') && (vector[0][4] == 'S') && ((vector[0][5] == 'A') || (vector[0][5] == 'V'))) {
+                if (precheck(vector, "GSA") || precheck(vector, "GSV")) {
                     DIMINUTO_LOG_INFORMATION("Parse NMEA System Other \"%c%c\"\n", vector[0][1], vector[0][2]);
                 }
                 continue;

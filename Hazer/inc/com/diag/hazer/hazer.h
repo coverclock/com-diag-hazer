@@ -723,6 +723,24 @@ extern uint16_t hazer_parse_dop(const char * string);
 #define HAZER_PROPRIETARY_SENTENCE_PUBX "PUBX"
 
 /**
+ * @def HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION
+ * ublox8 M8 Receiver description, p. 138, PUBX,00
+ */
+#define HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION "00"
+
+/**
+ * @def HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS
+ * ublox8 M8 Receiver description, p. 140, PUBX,03
+ */
+#define HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS "03"
+
+/**
+ * @def HAZER_PROPRIETARY_SENTENCE_PUBX_TIME
+ * ublox8 M8 Receiver description, p. 141, PUBX,04
+ */
+#define HAZER_PROPRIETARY_SENTENCE_PUBX_TIME "04"
+
+/**
  * @def HAZER_PROPRIETARY_SENTENCE_PMTK
  * GTop PMTK command packet reference
  */
