@@ -1371,18 +1371,75 @@ int hazer_parse_txt(char * vector[], size_t count)
 
 int hazer_parse_pubx_position(hazer_position_t * positionp, char * vector[], size_t count)
 {
-    fprintf(stderr, "UBLOX %s,%s\n", HAZER_PROPRIETARY_SENTENCE_PUBX, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION);
-    return -1;
-}
+    int rc = -1;
+    static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
+    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION;
 
-int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count)
-{
-    fprintf(stderr, "UBLOX %s,%s\n", HAZER_PROPRIETARY_SENTENCE_PUBX, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME);
-    return -1;
+    if (count < 22) {
+        /* Do nothing. */
+    } else if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
+        /* Do nothing. */
+    } else if (vector[0][0] != HAZER_STIMULUS_START) {
+        /* Do nothing. */
+    } else if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
+        /* Do nothing. */
+    } else if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
+        /* Do nothing. */
+    } else if (strncmp(&vector[1][0], ID, sizeof(ID)) != 0) {
+        /* Do nothing. */
+    } else {
+        fprintf(stderr, "UBLOX %s,%s\n", PUBX, ID);
+    }
+
+    return rc;
 }
 
 int hazer_parse_pubx_svstatus(hazer_view_t * positionp, char * vector[], size_t count)
 {
-    fprintf(stderr, "UBLOX %s,%s\n", HAZER_PROPRIETARY_SENTENCE_PUBX, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS);
-    return -1;
+    int rc = -1;
+    static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
+    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS;
+
+    if (count < 4) {
+        /* Do nothing. */
+    } else if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
+        /* Do nothing. */
+    } else if (vector[0][0] != HAZER_STIMULUS_START) {
+        /* Do nothing. */
+    } else if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
+        /* Do nothing. */
+    } else if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
+        /* Do nothing. */
+    } else if (strncmp(&vector[1][0], ID, sizeof(ID)) != 0) {
+        /* Do nothing. */
+    } else {
+        fprintf(stderr, "UBLOX %s,%s\n", PUBX, ID);
+    }
+
+    return rc;
+}
+
+int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count)
+{
+    int rc = -1;
+    static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
+    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_TIME;
+
+    if (count < 11) {
+        /* Do nothing. */
+    } else if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
+        /* Do nothing. */
+    } else if (vector[0][0] != HAZER_STIMULUS_START) {
+        /* Do nothing. */
+    } else if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
+        /* Do nothing. */
+    } else if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
+        /* Do nothing. */
+    } else if (strncmp(&vector[1][0], ID, sizeof(ID)) != 0) {
+        /* Do nothing. */
+    } else {
+        fprintf(stderr, "UBLOX %s,%s\n", PUBX, ID);
+    }
+
+    return rc;
 }
