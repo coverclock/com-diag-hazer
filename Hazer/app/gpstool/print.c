@@ -688,7 +688,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
 
             fputs("INT", fp);
 
-            fprintf(fp, " %s", pa[system].label);
+            fprintf(fp, " %3.3s", pa[system].label);
             fprintf(fp, " [%2u]", pa[system].sat_used);
             fprintf(fp, " %3s", dmyokay ? "DMY" : "dmy");
             fprintf(fp, " %3s", totokay ? "TOT" : "tot");

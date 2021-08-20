@@ -2326,29 +2326,11 @@ consume:
                 }
                 continue;
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION) && (hazer_parse_pubx_position(&position[HAZER_SYSTEM_GNSS], vector, count) == 0)) {
-    
-                position[system].ticks = timeout;
-                refresh = !0;
-                trace = !0;
-                fix = diminuto_time_elapsed();
-                continue;
+            } else if (talker == HAZER_TALKER_PUBX) {
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && (hazer_parse_pubx_svstatus(&view[HAZER_SYSTEM_GNSS], vector, count) == 0)) {
+                system = HAZER_SYSTEM_GNSS;
 
-                view[system].ticks = timeout;
-                refresh = !0;
-                continue;
-
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME) && (hazer_parse_pubx_time(&position[HAZER_SYSTEM_GNSS], vector, count) == 0)) {
-
-                position[system].ticks = timeout;
-                refresh = !0;
-                trace = !0;
-                fix = diminuto_time_elapsed();
-                continue;
-
-            } else if ((talker == HAZER_TALKER_PUBX) || (talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {
+            } else if ((talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {
 
                 DIMINUTO_LOG_INFORMATION("Parse NMEA %s \"%.*s\"", HAZER_TALKER_NAME[talker], length - 2 /* Exclude CR and LF. */, buffer);
                 continue;
@@ -2448,6 +2430,28 @@ consume:
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_TXT) && hazer_parse_txt(vector, count) == 0) {
 
                 DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
+
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION) && (hazer_parse_pubx_position(&position[system], vector, count) == 0)) {
+
+                position[system].ticks = timeout;
+                refresh = !0;
+                trace = !0;
+                fix = diminuto_time_elapsed();
+
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && (hazer_parse_pubx_svstatus(&view[system], vector, count) == 0)) {
+
+                view[system].ticks = timeout;
+                refresh = !0;
+
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME) && (hazer_parse_pubx_time(&position[system], vector, count) == 0)) {
+
+                /*
+                 * The CAM-M8Q can report time in this sentence without
+                 * having a valid fix, apparently based on a prior fix and
+                 * its internal clock. So we update the time, but we don't
+                 * reset the timer.
+                 */
+                refresh = !0;
 
             } else if (unknown) {
 

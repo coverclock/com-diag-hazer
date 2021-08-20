@@ -1385,8 +1385,14 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, char * vector[], siz
         /* Do nothing. */
     } else if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
         /* Do nothing. */
-    } else if (strncmp(&vector[1][0], ID, sizeof(ID)) != 0) {
+    } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
+#if !0
+    } else if (strncmp(vector[8], "NF", sizeof("NF")) == 0) {
+        /* Do nothing. */
+    } else if (strncmp(vector[18], "0", sizeof("0")) == 0) {
+        /* Do nothing. */
+#endif
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
@@ -1420,7 +1426,7 @@ int hazer_parse_pubx_svstatus(hazer_view_t * positionp, char * vector[], size_t 
         /* Do nothing. */
     } else if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
         /* Do nothing. */
-    } else if (strncmp(&vector[1][0], ID, sizeof(ID)) != 0) {
+    } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
     } else {
         fprintf(stderr, "UBLOX %s,%s\n", PUBX, ID);
@@ -1445,7 +1451,7 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
         /* Do nothing. */
     } else if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
         /* Do nothing. */
-    } else if (strncmp(&vector[1][0], ID, sizeof(ID)) != 0) {
+    } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
