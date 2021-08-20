@@ -2326,19 +2326,26 @@ consume:
                 }
                 continue;
 
-            } else if ((count >= 3) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
-
-                fprintf(stderr, "PUBX POSITION\n");
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION) && (hazer_parse_pubx_position(&position[HAZER_SYSTEM_GNSS], vector, count) == 0)) {
+    
+                position[system].ticks = timeout;
+                refresh = !0;
+                trace = !0;
+                fix = diminuto_time_elapsed();
                 continue;
 
-            } else if ((count >= 3) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS)) {
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && (hazer_parse_pubx_svstatus(&view[HAZER_SYSTEM_GNSS], vector, count) == 0)) {
 
-                fprintf(stderr, "PUBX SVSTATUS\n");
+                view[system].ticks = timeout;
+                refresh = !0;
                 continue;
 
-            } else if ((count >= 3) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME)) {
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME) && (hazer_parse_pubx_time(&position[HAZER_SYSTEM_GNSS], vector, count) == 0)) {
 
-                fprintf(stderr, "PUBX TIME\n");
+                position[system].ticks = timeout;
+                refresh = !0;
+                trace = !0;
+                fix = diminuto_time_elapsed();
                 continue;
 
             } else if ((talker == HAZER_TALKER_PUBX) || (talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {

@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2021 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Parse common NMEA strings from GNSS devices.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -43,6 +43,9 @@
  *
  * "u-blox 8 / u-blox M8 Receiver Description Including Protocol Specification",
  * UBX-13003221-R15, ublox AG, 2018-03-06
+ *
+ * "u-blox 8 / u-blox M8 Receiver Description Including Protocol Specification",
+ * UBX-13003221-R24, ublox AG, 2021-06-22
  *
  * "u-blox ZED-F9P Interface Description*, UBX-18010854-R05, ublox AG,
  * 2018-12-20
@@ -775,7 +778,7 @@ extern hazer_talker_t hazer_parse_talker(const void * buffer);
 extern hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker);
 
 /*******************************************************************************
- * PARSING POSITION, HEADING, AND VELOCITY SENTENCES
+ * PARSING POSITION, HEADING, VELOCITY, AND TIME SENTENCES
  ******************************************************************************/
 
 /**
@@ -860,6 +863,10 @@ extern int hazer_parse_gll(hazer_position_t *positionp, char * vector[], size_t 
  * @return 0 for success, <0 otherwise.
  */
 extern int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count);
+
+extern int hazer_parse_pubx_position(hazer_position_t * positionp, char * vector[], size_t count);
+
+extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count);
 
 /*******************************************************************************
  * PARSING SATELLITE ELEVATION, AZIMUTH, AND SIGNAL STRENGTH SENTENCES
@@ -1027,6 +1034,8 @@ typedef struct HazerView {
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.
  */
 extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
+
+extern int hazer_parse_pubx_svstatus(hazer_view_t * positionp, char * vector[], size_t count);
 
 /*******************************************************************************
  * PARSING TEXT SENTENCES

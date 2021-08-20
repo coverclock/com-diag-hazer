@@ -1364,3 +1364,25 @@ int hazer_parse_txt(char * vector[], size_t count)
 
     return rc;
 }
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
+int hazer_parse_pubx_position(hazer_position_t * positionp, char * vector[], size_t count)
+{
+    fprintf(stderr, "UBLOX %s,%s\n", HAZER_PROPRIETARY_SENTENCE_PUBX, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION);
+    return -1;
+}
+
+int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count)
+{
+    fprintf(stderr, "UBLOX %s,%s\n", HAZER_PROPRIETARY_SENTENCE_PUBX, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME);
+    return -1;
+}
+
+int hazer_parse_pubx_svstatus(hazer_view_t * positionp, char * vector[], size_t count)
+{
+    fprintf(stderr, "UBLOX %s,%s\n", HAZER_PROPRIETARY_SENTENCE_PUBX, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS);
+    return -1;
+}
