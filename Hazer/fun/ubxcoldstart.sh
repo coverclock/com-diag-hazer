@@ -4,14 +4,13 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 
-PROCESS=$$
 PROGRAM=$(basename -s .sh ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-115200}
 INTERVAL=${3:-1}
 WRITE=${4:-1}
 
-. $(readlink -e $(dirname ${0})/../../com-diag-hazer/Hazer/out/host/bin)/setup
+. $(readlink -e $(dirname ${0})/../bin)/setup
 
 exec coreable gpstool \
 	-D ${DEVICE} -b ${RATE} -8 -n -1 -m -i ${INTERVAL} \

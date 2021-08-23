@@ -4,14 +4,20 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 
-PROCESS=$$
 PROGRAM=$(basename -s .sh ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-115200}
 INTERVAL=${3:-1}
 WRITE=${4:-1}
 
-. $(readlink -e $(dirname ${0})/../../com-diag-hazer/Hazer/out/host/bin)/setup
+. $(readlink -e $(dirname ${0})/../bin)/setup
+
+# Note that reverse of most other scripts in this project,
+# this one saves STDOUT to the log file and emits
+# STDERR.
+
+LOG=$(readlink -e $(dirname ${0})/..)/log
+mkdir -p ${LOG}
 
 # UBX-MON-BATCH
 # UBX-MON-GNSS
@@ -43,4 +49,4 @@ exec coreable gpstool \
 	-U '\xb5\x62\x0a\x2f\x00\x00' \
 	-U '\xb5\x62\x0a\x08\x00\x00' \
 	-U '\xb5\x62\x0a\x04\x00\x00' \
-	-R -v
+	-R -v > ${LOG}/${PROGRAM}.out
