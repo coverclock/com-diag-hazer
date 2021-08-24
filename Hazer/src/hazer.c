@@ -1469,7 +1469,7 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
     return rc;
 }
 
-int hazer_parse_pubx_svstatus(hazer_view_t views[], hazer_active_t actives[], char * vector[], size_t count)
+int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char * vector[], size_t count)
 {
     int rc = 0;
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
@@ -1478,10 +1478,13 @@ int hazer_parse_pubx_svstatus(hazer_view_t views[], hazer_active_t actives[], ch
     int satellite = 0;
     int channel = 0;
     int channels[HAZER_SYSTEM_TOTAL] = { 0, };
+    int ranger = 0;
+    int rangers[HAZER_SYSTEM_TOTAL] = { 0, };
     int index = 0;
     int id = 0;
     int system = 0;
-    static const int SATELLITES = sizeof(views[0].sat) / sizeof(views[0].sat[0]);
+    static const int SATELLITES = sizeof(view[0].sat) / sizeof(view[0].sat[0]);
+    static const int RANGERS = sizeof(active[0].id) / sizeof(active[0].id[0]);
 
     if (count < 4) {
         /* Do nothing. */
@@ -1505,31 +1508,43 @@ int hazer_parse_pubx_svstatus(hazer_view_t views[], hazer_active_t actives[], ch
             if (system >= HAZER_SYSTEM_TOTAL) {
                 system = HAZER_SYSTEM_GNSS;
             }
-            if ((channel = channels[system]) >= SATELLITES) {
+            channel = channels[system];
+            if (channel >= SATELLITES) {
                 continue;
             }
-            views[system].sat[channel].id = id;
-            views[system].sat[channel].elv_degrees = strtol(vector[index + 2], (char **)0, 10);
-            views[system].sat[channel].azm_degrees = strtol(vector[index + 3], (char **)0, 10);
-            views[system].sat[channel].snr_dbhz = strtol(vector[index + 4], (char **)0, 10);
-            views[system].sat[channel].signal = 0;
+            view[system].sat[channel].id = id;
+            view[system].sat[channel].elv_degrees = strtol(vector[index + 2], (char **)0, 10);
+            view[system].sat[channel].azm_degrees = strtol(vector[index + 3], (char **)0, 10);
+            view[system].sat[channel].snr_dbhz = strtol(vector[index + 4], (char **)0, 10);
+            view[system].sat[channel].signal = 0;
             if (vector[index + 1][0] == 'U') {
-                views[system].sat[channel].phantom = 0;
-                views[system].sat[channel].untracked = 0;
+                view[system].sat[channel].phantom = 0;
+                view[system].sat[channel].untracked = 0;
+                ranger = rangers[system];
+                if (ranger < RANGERS) {
+                    active[system].id[ranger] = id;
+                    ranger += 1;
+                    rangers[system] = ranger;
+                    active[system].active = ranger;
+                }
+                active[system].system = system;
+                active[system].label = PUBX;
             } else if (vector[index + 1][0] == 'e') {
-                views[system].sat[channel].phantom = 0;
-                views[system].sat[channel].untracked = !0;
+                view[system].sat[channel].phantom = 0;
+                view[system].sat[channel].untracked = !0;
             } else if (vector[index + 1][0] == '-') {
-                views[system].sat[channel].phantom = !0;
-                views[system].sat[channel].untracked = 0;
+                view[system].sat[channel].phantom = !0;
+                view[system].sat[channel].untracked = 0;
             } else {
-                views[system].sat[channel].phantom = !0;
-                views[system].sat[channel].untracked = !0;
+                view[system].sat[channel].phantom = !0;
+                view[system].sat[channel].untracked = !0;
             }
-            views[system].channels = ++channels[system];
-            views[system].view = views[system].channels;
-            views[system].pending = 0;
-            views[system].label = PUBX;
+            channel += 1;
+            channels[system] = channel;
+            view[system].channels = channel;
+            view[system].view = satellites;
+            view[system].pending = 0;
+            view[system].label = PUBX;
             rc |= (1 << system);
             index += 6;
         }

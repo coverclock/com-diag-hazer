@@ -943,7 +943,7 @@ typedef struct HazerActive {
     uint16_t tdop;				        /* Time Dilution Of Precision * 100. */
     uint8_t system;				        /* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
     uint8_t active;                     /* Number of satellites active. */
-    uint8_t mode;                       /* Navigation mode: 1(None), 2(D), 3(D). */
+    uint8_t mode;                       /* Navigation mode: 0(Unknown), 1(D), 2(D), 3(D). */
     hazer_expiry_t ticks;		        /* Lifetime in application-defined ticks. */
 } hazer_active_t;
 
@@ -1122,7 +1122,7 @@ extern int hazer_parse_txt(char * vector[], size_t count);
 
 extern int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * activep, char * vector[], size_t count);
 
-extern int hazer_parse_pubx_svstatus(hazer_view_t views[], hazer_active_t actives[], char * vector[], size_t count);
+extern int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char * vector[], size_t count);
 
 extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count);
 
