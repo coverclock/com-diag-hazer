@@ -971,7 +971,8 @@ hazer_system_t hazer_map_id_to_system(uint16_t id)
  * NMEA 0183 4.10 p. 94-95.
  * UBLOX8 R15 p. 373.
  */
-hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
+hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep)
+{
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
     hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
     int slot = 0;
@@ -1005,6 +1006,40 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep) {
     }
 
     return system;
+}
+
+/*
+ * UBLOX8 R24 p. 446.
+ */
+hazer_system_t hazer_map_ubxid_to_system(uint16_t id)
+{
+    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+
+    if (id == 0) {
+        /* Do nothing. */
+    } else if ((HAZER_UBX_GPS_FIRST <= id) && (id <= HAZER_UBX_GPS_LAST)) {
+        candidate = HAZER_SYSTEM_GPS;
+    } else if ((HAZER_UBX_BEIDOU1_FIRST <= id) && (id <= HAZER_UBX_BEIDOU1_LAST)) {
+        candidate = HAZER_SYSTEM_BEIDOU;
+    } else if ((HAZER_UBX_GLONASS1_FIRST <= id) && (id <= HAZER_UBX_GLONASS1_LAST)) {
+        candidate = HAZER_SYSTEM_GLONASS;
+    } else if ((HAZER_UBX_SBAS_FIRST <= id) && (id <= HAZER_UBX_SBAS_LAST)) {
+        candidate = HAZER_SYSTEM_SBAS;
+    } else if ((HAZER_UBX_GALILEO_FIRST <= id) && (id <= HAZER_UBX_GALILEO_LAST)) {
+        candidate = HAZER_SYSTEM_GALILEO;
+    } else if ((HAZER_UBX_BEIDOU2_FIRST <= id) && (id <= HAZER_UBX_BEIDOU2_LAST)) {
+        candidate = HAZER_SYSTEM_BEIDOU;
+    } else if ((HAZER_UBX_IMES_FIRST <= id) && (id <= HAZER_UBX_IMES_LAST)) {
+        candidate = HAZER_SYSTEM_IMES;
+    } else if ((HAZER_UBX_QZSS_FIRST <= id) && (id <= HAZER_UBX_QZSS_LAST)) {
+        candidate = HAZER_SYSTEM_QZSS;
+    } else if ((HAZER_UBX_GLONASS2_FIRST <= id) && (id <= HAZER_UBX_GLONASS2_LAST)) {
+        candidate = HAZER_SYSTEM_GLONASS;
+    } else {
+        /* Do nothing. */
+    }
+
+    return candidate;
 }
 
 /******************************************************************************
@@ -1090,6 +1125,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         activep->pdop = hazer_parse_dop(vector[15]);
         activep->hdop = hazer_parse_dop(vector[16]);
         activep->vdop = hazer_parse_dop(vector[17]);
+        activep->tdop = HAZER_GNSS_DOP;
         /*
          * 0 == initial, 1 == no fix, 2 == 2D, 3 == 3D.
          */
@@ -1117,7 +1153,10 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int slot = 0;
     int sequence = 0;
     int channel = 0;
+    int first = 0;
+    int past = 0;
     int satellites = 0;
+    int signal = 0;
     unsigned int id = 0;
     static const int SATELLITES = sizeof(viewp->sat) / sizeof(viewp->sat[0]);
     
@@ -1141,6 +1180,8 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         } else {
             sequence = message - 1;
             channel = sequence * HAZER_GNSS_VIEWS;
+            first = channel;
+            past = channel;
             satellites = strtol(vector[3], (char **)0, 10);
             index = 4;
             /*
@@ -1202,27 +1243,37 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                 }
                 ++index;
                 ++channel;
+                past = channel;
                 rc = 1;
-            }
-            /*
-             * NMEA 0183 4.10 2012 has an additional field containing the
-             * signal identifier. This is constellation specific, but
-             * indicates what frequency band was used, e.g. for GPS: L1C/A,
-             * L2, etc.
-             */
-            if (index > (count - 2)) {
-                viewp->signal[sequence] = 0;
-            } else if (strlen(vector[count - 2]) > 0) {
-                viewp->signal[sequence] = strtol(vector[count - 2], (char **)0, 10);
-            } else if (sequence > 0) {
-                viewp->signal[sequence] =  viewp->signal[sequence - 1];
-            } else {
-                viewp->signal[sequence] = 0;
             }
             viewp->channels = channel;
             viewp->view = satellites;
             viewp->pending = messages - message;
             viewp->label = GSV;
+            /*
+             * NMEA 0183 4.10 2012 has an additional field containing the
+             * signal identifier. This is constellation specific, but
+             * indicates what frequency band was used, e.g. for GPS: L1C/A,
+             * L2, etc. It complicates things by applying to all of the
+             * satellites in this particular message, but we don't know
+             * if the field exists until we have processed all the
+             * satellites in this message. If it is present, it applies
+             * to all the satellites in this message.
+             */
+            if (index > (count - 2)) {
+                signal = 0;
+            } else if (strlen(vector[count - 2]) > 0) {
+                signal = strtol(vector[count - 2], (char **)0, 10);
+            } else if (first > 0) {
+                signal = viewp->sat[first - 1].signal;
+            } else {
+                signal = 0;
+            }
+            for (channel = first; channel < past; ++channel) {
+                if (channel >= satellites) { break; }
+                if (channel >= SATELLITES) { break; }
+                viewp->sat[channel].signal = signal;
+            }
             /*
              * Only if this is the last message in the GSV tuple do we
              * emit a zero return code. That lets the application decide
@@ -1335,7 +1386,7 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
         positionp->cog_nanodegrees = hazer_parse_cog(vector[1], &positionp->cog_digits);
         positionp->mag_nanodegrees = hazer_parse_cog(vector[3], &positionp->mag_digits);
         positionp->sog_microknots = hazer_parse_sog(vector[5], &positionp->sog_digits);
-        positionp->sog_millimeters = hazer_parse_smm(vector[7], &positionp->smm_digits);
+        positionp->sog_millimetersperhour = hazer_parse_smm(vector[7], &positionp->smm_digits);
         positionp->label = VTG;
         rc = 0;
    }
@@ -1369,11 +1420,12 @@ int hazer_parse_txt(char * vector[], size_t count)
  *
  ******************************************************************************/
 
-int hazer_parse_pubx_position(hazer_position_t * positionp, char * vector[], size_t count)
+int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * activep, char * vector[], size_t count)
 {
     int rc = -1;
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION;
+    int satellites = 0;
 
     if (count < 22) {
         /* Do nothing. */
@@ -1387,12 +1439,14 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, char * vector[], siz
         /* Do nothing. */
     } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
-#if !0
     } else if (strncmp(vector[8], "NF", sizeof("NF")) == 0) {
         /* Do nothing. */
     } else if (strncmp(vector[18], "0", sizeof("0")) == 0) {
         /* Do nothing. */
-#endif
+    } else if (strncmp(vector[8], "TT", sizeof("TT")) == 0) {
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
+        positionp->old_nanoseconds = positionp->tot_nanoseconds;
+        positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
@@ -1400,21 +1454,34 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, char * vector[], siz
         positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
         positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
         positionp->sep_millimeters = hazer_parse_alt(vector[7], *(vector[12]), &positionp->sep_digits);
-        positionp->sog_microknots = hazer_parse_sog(vector[11], &positionp->sog_digits);
+        positionp->sog_millimetersperhour = hazer_parse_smm(vector[11], &positionp->sog_digits);
         positionp->cog_nanodegrees = hazer_parse_cog(vector[12], &positionp->cog_digits);
-        positionp->sat_used = strtol(vector[18], (char **)0, 10);
+        satellites = strtol(vector[18], (char **)0, 10);
+        positionp->sat_used = satellites;
         positionp->label = PUBX;
+        activep->hdop = hazer_parse_dop(vector[15]);
+        activep->vdop = hazer_parse_dop(vector[16]);
+        activep->tdop = hazer_parse_dop(vector[17]);
+        activep->label = PUBX;
         rc = 0;
     }
 
     return rc;
 }
 
-int hazer_parse_pubx_svstatus(hazer_view_t * positionp, char * vector[], size_t count)
+int hazer_parse_pubx_svstatus(hazer_view_t views[], hazer_active_t actives[], char * vector[], size_t count)
 {
-    int rc = -1;
+    int rc = 0;
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS;
+    int satellites = 0;
+    int satellite = 0;
+    int channel = 0;
+    int channels[HAZER_SYSTEM_TOTAL] = { 0, };
+    int index = 0;
+    int id = 0;
+    int system = 0;
+    static const int SATELLITES = sizeof(views[0].sat) / sizeof(views[0].sat[0]);
 
     if (count < 4) {
         /* Do nothing. */
@@ -1428,8 +1495,44 @@ int hazer_parse_pubx_svstatus(hazer_view_t * positionp, char * vector[], size_t 
         /* Do nothing. */
     } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
+    } else if (count < (4 + ((satellites = strtol(vector[2], (char **)0, 10)) * 6))) {
+        /* Do nothing. */
     } else {
-        fprintf(stderr, "UBLOX %s,%s\n", PUBX, ID);
+        index = 3;
+        for (satellite = 0; satellite < satellites; ++satellite) {
+            id = strtol(vector[index + 0], (char **)0, 10);
+            system = hazer_map_ubxid_to_system(id);
+            if (system >= HAZER_SYSTEM_TOTAL) {
+                system = HAZER_SYSTEM_GNSS;
+            }
+            if ((channel = channels[system]) >= SATELLITES) {
+                continue;
+            }
+            views[system].sat[channel].id = id;
+            views[system].sat[channel].elv_degrees = strtol(vector[index + 2], (char **)0, 10);
+            views[system].sat[channel].azm_degrees = strtol(vector[index + 3], (char **)0, 10);
+            views[system].sat[channel].snr_dbhz = strtol(vector[index + 4], (char **)0, 10);
+            views[system].sat[channel].signal = 0;
+            if (vector[index + 1][0] == 'U') {
+                views[system].sat[channel].phantom = 0;
+                views[system].sat[channel].untracked = 0;
+            } else if (vector[index + 1][0] == 'e') {
+                views[system].sat[channel].phantom = 0;
+                views[system].sat[channel].untracked = !0;
+            } else if (vector[index + 1][0] == '-') {
+                views[system].sat[channel].phantom = !0;
+                views[system].sat[channel].untracked = 0;
+            } else {
+                views[system].sat[channel].phantom = !0;
+                views[system].sat[channel].untracked = !0;
+            }
+            views[system].channels = ++channels[system];
+            views[system].view = views[system].channels;
+            views[system].pending = 0;
+            views[system].label = PUBX;
+            rc |= (1 << system);
+            index += 6;
+        }
     }
 
     return rc;
@@ -1458,6 +1561,7 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
         positionp->dmy_nanoseconds = hazer_parse_dmy(vector[3]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
         positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
+        positionp->label = PUBX;
         rc = 0;
     }
 

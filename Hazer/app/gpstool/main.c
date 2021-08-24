@@ -443,7 +443,7 @@ int main(int argc, char * argv[])
      * Data processing variables.
      */
     ssize_t count = 0;
-    hazer_active_t cache = HAZER_ACTIVE_INITIALIZER;
+    hazer_active_t active_cache = HAZER_ACTIVE_INITIALIZER;
     int dmyokay = 0;
     int totokay = 0;
     /*
@@ -2383,7 +2383,7 @@ consume:
                 position[system].ticks = timeout;
                 refresh = !0;
 
-            } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSA) && hazer_parse_gsa(&cache, vector, count) == 0) {
+            } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSA) && hazer_parse_gsa(&active_cache, vector, count) == 0) {
 
                 /*
                  * Below is a special case for the Ublox 8 used in devices like
@@ -2402,13 +2402,13 @@ consume:
                  */
 
                 if (system == HAZER_SYSTEM_GNSS) {
-                    candidate = hazer_map_active_to_system(&cache);
+                    candidate = hazer_map_active_to_system(&active_cache);
                     if (candidate < HAZER_SYSTEM_TOTAL) {
                         system = candidate;
                     }
                 }
 
-                active[system] = cache;
+                active[system] = active_cache;
                 active[system].ticks = timeout;
                 refresh = !0;
 
@@ -2431,26 +2431,33 @@ consume:
 
                 DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION) && (hazer_parse_pubx_position(&position[system], vector, count) == 0)) {
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION) && ((rc = hazer_parse_pubx_position(&position[system], &active[system], vector, count)) == 0)) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
                 fix = diminuto_time_elapsed();
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && (hazer_parse_pubx_svstatus(&view[system], vector, count) == 0)) {
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && (hazer_parse_pubx_svstatus(view, active, vector, count) != 0)) {
 
-                view[system].ticks = timeout;
-                refresh = !0;
+                for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
+                    if ((rc & (1 << system)) != 0) {
+                        view[system].ticks = timeout;
+                        active[system].ticks = timeout;
+                        refresh = !0;
+                    }
+                }
 
             } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME) && (hazer_parse_pubx_time(&position[system], vector, count) == 0)) {
 
                 /*
                  * The CAM-M8Q can report time in this sentence without
                  * having a valid fix, apparently based on a prior fix and
-                 * its internal clock. So we update the time, but we don't
-                 * reset the timer.
+                 * its internal clock. This PUBX sentence also does not
+                 * indicate the constellation(s) that contributed to the
+                 * solution.
                  */
+                position[system].ticks = timeout;
                 refresh = !0;
 
             } else if (unknown) {
@@ -2472,15 +2479,7 @@ consume:
              * tested this against devices that only emit location messages.)
              */
 
-            if (position[system].ticks == 0) {
-                /* Do nothing. */
-            } else if (position[system].utc_nanoseconds == 0) {
-                /* Do nothing. */
-#if 0
-            } else if (position[system].dmy_nanoseconds == 0) {
-                /* Do nothing. */
-#endif
-            } else if (fix < 0) {
+            if (fix < 0) {
                 /* Do nothing. */
             } else if (ttff >= 0) {
                 /* Do nothing. */

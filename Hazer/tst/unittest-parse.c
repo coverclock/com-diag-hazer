@@ -34,14 +34,14 @@ int main(void)
     /**************************************************************************/
 
 #define UNITTEST_PARSE_TALKER_SYSTEM(_STRING_, _TALKER_, _SYSTEM_) \
-    { \
+    do { \
         string = "$" _STRING_; \
         talker = hazer_parse_talker(string); \
         assert(talker == _TALKER_); \
         system = hazer_map_talker_to_system(talker); \
         assert(system == _SYSTEM_); \
         assert((_TALKER_ == HAZER_TALKER_TOTAL) || (strcmp(_STRING_, HAZER_TALKER_NAME[_TALKER_]) == 0)); \
-    }
+    } while (0)
 
     UNITTEST_PARSE_TALKER_SYSTEM("GN", HAZER_TALKER_GNSS, HAZER_SYSTEM_GNSS);
     UNITTEST_PARSE_TALKER_SYSTEM("GP", HAZER_TALKER_GPS, HAZER_SYSTEM_GPS);
@@ -65,15 +65,33 @@ int main(void)
     if (((_MIN_) <= id) && (id <= (_MAX_))) { assert(hazer_map_id_to_system(id) == (_SYSTEM_)); continue; }
 
     for (id = 0, index = 0; index <= 0xffff; ++index, ++id) {
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GPS_FIRST, HAZER_ID_GPS_LAST, HAZER_SYSTEM_GPS)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBAS_FIRST, HAZER_ID_SBAS_LAST, HAZER_SYSTEM_SBAS)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GLONASS_FIRST, HAZER_ID_GLONASS_LAST, HAZER_SYSTEM_GLONASS)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_IMES_FIRST, HAZER_ID_IMES_LAST, HAZER_SYSTEM_IMES)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_QZSS_FIRST, HAZER_ID_QZSS_LAST, HAZER_SYSTEM_QZSS)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU1_FIRST, HAZER_ID_BEIDOU1_LAST, HAZER_SYSTEM_BEIDOU)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GALILEO_FIRST, HAZER_ID_GALILEO_LAST, HAZER_SYSTEM_GALILEO)
-        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU2_FIRST, HAZER_ID_BEIDOU2_LAST, HAZER_SYSTEM_BEIDOU)
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GPS_FIRST, HAZER_ID_GPS_LAST, HAZER_SYSTEM_GPS);
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_SBAS_FIRST, HAZER_ID_SBAS_LAST, HAZER_SYSTEM_SBAS);
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GLONASS_FIRST, HAZER_ID_GLONASS_LAST, HAZER_SYSTEM_GLONASS);
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_IMES_FIRST, HAZER_ID_IMES_LAST, HAZER_SYSTEM_IMES);
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_QZSS_FIRST, HAZER_ID_QZSS_LAST, HAZER_SYSTEM_QZSS);
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU1_FIRST, HAZER_ID_BEIDOU1_LAST, HAZER_SYSTEM_BEIDOU);
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_GALILEO_FIRST, HAZER_ID_GALILEO_LAST, HAZER_SYSTEM_GALILEO);
+        UNITTEST_PARSE_ID_SYSTEM(HAZER_ID_BEIDOU2_FIRST, HAZER_ID_BEIDOU2_LAST, HAZER_SYSTEM_BEIDOU);
         assert(hazer_map_id_to_system(id) == HAZER_SYSTEM_TOTAL);
+    }
+
+    /**************************************************************************/
+
+#define UNITTEST_PARSE_UBX_SYSTEM(_MIN_, _MAX_, _SYSTEM_) \
+    if (((_MIN_) <= id) && (id <= (_MAX_))) { assert(hazer_map_ubxid_to_system(id) == (_SYSTEM_)); continue; }
+
+    for (id = 0, index = 0; index <= 0xffff; ++index, ++id) {
+        UNITTEST_PARSE_UBX_SYSTEM(HAZER_UBX_GPS_FIRST, HAZER_UBX_GPS_LAST, HAZER_SYSTEM_GPS);
+        UNITTEST_PARSE_UBX_SYSTEM(HAZER_UBX_BEIDOU1_FIRST, HAZER_UBX_BEIDOU1_LAST, HAZER_SYSTEM_BEIDOU);
+        UNITTEST_PARSE_UBX_SYSTEM(HAZER_UBX_GLONASS1_FIRST, HAZER_UBX_GLONASS1_LAST, HAZER_SYSTEM_GLONASS);
+        UNITTEST_PARSE_UBX_SYSTEM(HAZER_UBX_SBAS_FIRST, HAZER_UBX_SBAS_LAST, HAZER_SYSTEM_SBAS);
+        UNITTEST_PARSE_UBX_SYSTEM(HAZER_UBX_GALILEO_FIRST, HAZER_UBX_GALILEO_LAST, HAZER_SYSTEM_GALILEO);
+        UNITTEST_PARSE_UBX_SYSTEM(HAZER_UBX_BEIDOU2_FIRST, HAZER_UBX_BEIDOU2_LAST, HAZER_SYSTEM_BEIDOU);
+        UNITTEST_PARSE_UBX_SYSTEM(HAZER_UBX_IMES_FIRST, HAZER_UBX_IMES_LAST, HAZER_SYSTEM_IMES);
+        UNITTEST_PARSE_UBX_SYSTEM(HAZER_UBX_QZSS_FIRST, HAZER_UBX_QZSS_LAST, HAZER_SYSTEM_QZSS);
+        UNITTEST_PARSE_UBX_SYSTEM(HAZER_UBX_GLONASS2_FIRST, HAZER_UBX_GLONASS2_LAST, HAZER_SYSTEM_GLONASS);
+        assert(hazer_map_ubxid_to_system(id) == HAZER_SYSTEM_TOTAL);
     }
 
     /**************************************************************************/
@@ -87,7 +105,7 @@ int main(void)
                         HAZER_ID_GPS_FIRST + 2,
                         HAZER_ID_GPS_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 4,
         };
@@ -103,7 +121,7 @@ int main(void)
                     HAZER_ID_SBAS_FIRST,
                     HAZER_ID_SBAS_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 2,
         };
@@ -120,7 +138,7 @@ int main(void)
                     HAZER_ID_GPS_FIRST,
                     HAZER_ID_SBAS_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 3,
         };
@@ -137,7 +155,7 @@ int main(void)
                     HAZER_ID_SBAS_FIRST,
                     HAZER_ID_SBAS_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 3,
         };
@@ -154,7 +172,7 @@ int main(void)
                     HAZER_ID_GLONASS_FIRST + 1,
                     HAZER_ID_GLONASS_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 3,
         };
@@ -171,7 +189,7 @@ int main(void)
                     HAZER_ID_BEIDOU1_FIRST + 1,
                     HAZER_ID_BEIDOU1_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 3,
         };
@@ -188,7 +206,7 @@ int main(void)
                     HAZER_ID_BEIDOU2_FIRST + 1,
                     HAZER_ID_BEIDOU2_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 3,
         };
@@ -205,7 +223,7 @@ int main(void)
                     HAZER_ID_QZSS_FIRST + 1,
                     HAZER_ID_QZSS_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 3,
         };
@@ -223,7 +241,7 @@ int main(void)
                     HAZER_ID_GLONASS_FIRST,
                     HAZER_ID_GLONASS_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 4,
         };
@@ -241,7 +259,7 @@ int main(void)
                     HAZER_ID_GPS_LAST,
                     HAZER_ID_GLONASS_LAST,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 4,
         };
@@ -260,7 +278,7 @@ int main(void)
                     4,
                     5,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_GALILEO,
                 5,
         };
@@ -278,7 +296,7 @@ int main(void)
                     99,
                     100,
                 },
-                0, 0, 0,
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
                 4,
         };

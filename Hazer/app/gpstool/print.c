@@ -105,9 +105,9 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
         fprintf(fp, "%s", "DOP");
 
-        fprintf(fp, " %6.2lfpdop %6.2lfhdop %6.2lfvdop", (double)aa[system].pdop / 100.0, (double)aa[system].hdop / 100.0, (double)aa[system].vdop / 100.0);
+        fprintf(fp, " %6.2lfpdop %6.2lfhdop %6.2lfvdop %6.2lftdop", (double)aa[system].pdop / 100.0, (double)aa[system].hdop / 100.0, (double)aa[system].vdop / 100.0, (double)aa[system].tdop / 100.0);
 
-        fprintf(fp, "%34s", "");
+        fprintf(fp, "%23s", "");
 
         fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
@@ -132,7 +132,6 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
     unsigned int satellite = 0;
     unsigned int active = 0;
     unsigned int limit = 0;
-    unsigned int sequence = 0;
     marker_t ranged = MARKER;
     marker_t phantom = MARKER;
     marker_t untracked = MARKER;
@@ -168,11 +167,9 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
             phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
             untracked = va[system].sat[satellite].untracked ? UNTRACKED : INACTIVE;
 
-            sequence = satellite / HAZER_GNSS_VIEWS;
-
             fputs("SAT", fp);
 
-            fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, (wint_t)DEGREE, va[system].sat[satellite].azm_degrees, (wint_t)DEGREE, va[system].sat[satellite].snr_dbhz, va[system].signal[sequence], ranged, phantom, untracked);
+            fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, (wint_t)DEGREE, va[system].sat[satellite].azm_degrees, (wint_t)DEGREE, va[system].sat[satellite].snr_dbhz, va[system].sat[satellite].signal, ranged, phantom, untracked);
 
             fprintf(fp, "%15s", "");
 
@@ -661,11 +658,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
             thousandths = (abs64(pa[system].sog_microknots) % 1000000LLU) / 1000LLU;
             fprintf(fp, " %7lld.%03lluknots", (long long signed int)knots, (long long unsigned int)thousandths);
 
-            kilometersperhour = pa[system].sog_millimeters / 1000000LL;
-            thousandths = (abs64(pa[system].sog_millimeters) % 1000000LLU) / 1000LLU;
+            kilometersperhour = pa[system].sog_millimetersperhour / 1000000LL;
+            thousandths = (abs64(pa[system].sog_millimetersperhour) % 1000000LLU) / 1000LLU;
             fprintf(fp, " %7lld.%03llukph", (long long signed int)kilometersperhour, (long long unsigned int)thousandths);
 
-            meterspersecond = pa[system].sog_millimeters;
+            meterspersecond = pa[system].sog_millimetersperhour;
             meterspersecond /= 1000.0;
             meterspersecond /= 3600.0;
             fprintf(fp, " %11.3lfm/s", meterspersecond);

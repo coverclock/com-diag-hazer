@@ -246,25 +246,25 @@ typedef enum HazerTalker {
  * be in collating sequence order.
  */
 #define HAZER_TALKER_NAME_INITIALIZER \
-    { \
-        "BD", \
-        "CD", \
-        "EC", \
-        "GA", \
-        "GB", \
-        "GL", \
-        "GN", \
-        "GP", \
-        "II", \
-        "IN", \
-        "LC", \
-        "PMTK", \
-        "PSRF", \
-        "PUBX", \
-        "QZ", \
-        "ZV", \
-        (const char *)0, \
-    }
+{ \
+    "BD", \
+    "CD", \
+    "EC", \
+    "GA", \
+    "GB", \
+    "GL", \
+    "GN", \
+    "GP", \
+    "II", \
+    "IN", \
+    "LC", \
+    "PMTK", \
+    "PSRF", \
+    "PUBX", \
+    "QZ", \
+    "ZV", \
+    (const char *)0, \
+}
 
 /**
  * Array of TALKER names indexed by talker enumeration.
@@ -275,8 +275,9 @@ extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
 /**
  * GNSS system identifiers.
  * NMEA 0183 4.10 table 20 p. 94-95.
- * Everything beyond Galileo is really just a guess on my part.
+ * Also based on actual values observed in the wild.
  * These must be in the same order as the corresponding strings below.
+ * UBLOX R24 Appendix A p. 446 has a different scheme.
  */
 typedef enum HazerSystem {
     HAZER_SYSTEM_GNSS				= 0,
@@ -284,10 +285,10 @@ typedef enum HazerSystem {
     HAZER_SYSTEM_GLONASS			= 2,
     HAZER_SYSTEM_GALILEO			= 3,
     HAZER_SYSTEM_BEIDOU             = 4,
-    HAZER_SYSTEM_SBAS,
-    HAZER_SYSTEM_IMES,
+    HAZER_SYSTEM_SBAS               = 5,
+    HAZER_SYSTEM_IMES               = 6,
     HAZER_SYSTEM_QZSS               = 15,
-    HAZER_SYSTEM_TOTAL,
+    HAZER_SYSTEM_TOTAL
 } hazer_system_t;
 
 /**
@@ -311,19 +312,36 @@ typedef enum HazerSystem {
         "7", \
         "8", \
         "9", \
-        "10", \
-        "11", \
-        "12", \
-        "13", \
-        "14", \
+        "A", \
+        "B", \
+        "C", \
+        "D", \
+        "E", \
         "QZSS", \
         (const char *)0, \
     }
 
 /**
+ * UBX proprietary GNSS system identifiers.
+ * UBLOX R24 Appendix A p. 446.
+ */
+typedef enum HazerUbx {
+    HAZER_UBX_GPS				= 0,
+    HAZER_UBX_SBAS              = 1,
+    HAZER_UBX_GALILEO			= 2,
+    HAZER_UBX_BEIDOU            = 3,
+    HAZER_UBX_IMES              = 4,
+    HAZER_UBX_QZSS              = 5,
+    HAZER_UBX_GLONASS			= 6,
+    HAZER_UBX_TOTAL             = 7,
+    HAZER_UBX_GNSS              = 8,
+} hazer_ubx_t;
+
+/**
  * GNSS satellite identifiers.
  * NMEA 0183 4.10 p. 94.
  * UBLOX8 R15 p. 373.
+ * UBLOX8 R19 Appendix A p. 402.
  * There are some conflicts between these documents, and my most recent
  * receiver, the U-blox 9, doesn't match these anyway. Despite the
  * documentation, I don't consider these reliable.
@@ -370,6 +388,50 @@ typedef enum HazerId {
     /*						   :     */
     /*						  65535, */
 } hazer_id_t;
+
+/**
+ * Proprietary UBX GNSS satellite identifiers used in NMEA-like PUBX sentences.
+ * UBLOX R24 Appendix A p. 446.
+ */
+typedef enum HazerUbxid {
+    /*                        0,    */
+    HAZER_UBX_GPS_FIRST     = 1,
+    HAZER_UBX_GPS_LAST      = 32,
+    HAZER_UBX_BEIDOU1_FIRST = 33,
+    HAZER_UBX_BEIDOU1_LAST  = 64,
+    HAZER_UBX_GLONASS1_FIRST= 65,
+    HAZER_UBX_GLONASS1_LAST = 96,
+    /*                        97,   */
+    /*                         :    */
+    /*                        119,  */
+    HAZER_UBX_SBAS_FIRST    = 120,
+    HAZER_UBX_SBAS_LAST     = 158,
+    /*                        159,  */
+    /*                         :    */
+    /*                        210,  */
+    HAZER_UBX_GALILEO_FIRST = 211,
+    HAZER_UBX_GALILEO_LAST  = 246,
+    /*                        247,  */
+    /*                         :    */
+    /*                        158,  */
+    HAZER_UBX_BEIDOU2_FIRST = 159,
+    HAZER_UBX_BEIDOU2_LAST  = 163,
+    /*                        164,  */
+    /*                         :    */
+    /*                        172,  */
+    HAZER_UBX_IMES_FIRST    = 173,
+    HAZER_UBX_IMES_LAST     = 182,
+    /*                        183,  */
+    /*                         :    */
+    /*                        192,  */
+    HAZER_UBX_QZSS_FIRST    = 193,
+    HAZER_UBX_QZSS_LAST     = 202,
+    /*                        203,  */
+    /*                         :    */
+    /*                        254,  */
+    HAZER_UBX_GLONASS2_FIRST= 255,
+    HAZER_UBX_GLONASS2_LAST = 255,
+} hazer_ubxid_t;
 
 /**
  * Array of SYSTEM names indexed by system enumeration.
@@ -786,30 +848,30 @@ extern hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker);
  * derived from the NMEA stream.
  */
 typedef struct HazerPosition {
-    uint64_t old_nanoseconds;	/* Prior total nanoseconds. */
-    uint64_t tot_nanoseconds;   /* Total nanoseconds. */
-    uint64_t utc_nanoseconds;   /* Time in nanoseconds since 00:00 UTC. */
-    uint64_t dmy_nanoseconds;   /* Date in nanoseconds since POSIX epoch. */
-    int64_t lat_nanominutes;    /* Latitude in nanominutes. */
-    int64_t lon_nanominutes;    /* Longitude in nanominutes. */
-    int64_t alt_millimeters;    /* Altitude above MSL in millimeters. */
-    int64_t sep_millimeters;    /* Geoid seperation in millimeters. */
-    int64_t sog_microknots;     /* Speed On Ground in microknots. */
-    int64_t sog_millimeters;    /* Speed On Ground in millimeters per hour. */
-    int64_t cog_nanodegrees;    /* Course On Ground true in nanodegrees. */
-    int64_t mag_nanodegrees;    /* Magnetic bearing in nanodegrees. */
-    const char * label;			/* Label for sentence. */
-    uint8_t sat_used;           /* Number of satellites used. */
-    uint8_t lat_digits;         /* Significant digits of latitude. */
-    uint8_t lon_digits;         /* Significant digits of longitude. */
-    uint8_t alt_digits;         /* Significant digits of altitude. */
-    uint8_t sep_digits;         /* Significant digits of seperation. */
-    uint8_t sog_digits;         /* Significant digits of Speed On Ground. */
-    uint8_t smm_digits;			/* Significant digits of SOG mm/h. */
-    uint8_t cog_digits;         /* Significant digits of Course On Ground. */
-    uint8_t mag_digits;         /* Significant digits of Magnetic bearing. */
-    hazer_expiry_t ticks;		/* Lifetime in application-defined ticks. */
-    uint8_t unused[1];          /* Unused. */
+    uint64_t old_nanoseconds;	    /* Prior total nanoseconds. */
+    uint64_t tot_nanoseconds;       /* Total nanoseconds. */
+    uint64_t utc_nanoseconds;       /* Time in nanoseconds since 00:00 UTC. */
+    uint64_t dmy_nanoseconds;       /* Date in nanoseconds since POSIX epoch. */
+    int64_t lat_nanominutes;        /* Latitude in nanominutes. */
+    int64_t lon_nanominutes;        /* Longitude in nanominutes. */
+    int64_t alt_millimeters;        /* Altitude above MSL in millimeters. */
+    int64_t sep_millimeters;        /* Geoid seperation in millimeters. */
+    int64_t sog_microknots;         /* Speed Over Ground in microknots. */
+    int64_t sog_millimetersperhour; /* Speed Over Ground in millimeters per hour. */
+    int64_t cog_nanodegrees;        /* Course Over Ground true in nanodegrees. */
+    int64_t mag_nanodegrees;        /* Magnetic bearing in nanodegrees. */
+    const char * label;			    /* Label for sentence. */
+    uint8_t sat_used;               /* Number of satellites used. */
+    uint8_t lat_digits;             /* Significant digits of latitude. */
+    uint8_t lon_digits;             /* Significant digits of longitude. */
+    uint8_t alt_digits;             /* Significant digits of altitude. */
+    uint8_t sep_digits;             /* Significant digits of seperation. */
+    uint8_t sog_digits;             /* Significant digits of Speed On Ground. */
+    uint8_t smm_digits;			    /* Significant digits of SOG mm/h. */
+    uint8_t cog_digits;             /* Significant digits of Course On Ground. */
+    uint8_t mag_digits;             /* Significant digits of Magnetic bearing. */
+    hazer_expiry_t ticks;		    /* Lifetime in application-defined ticks. */
+    uint8_t unused[1];              /* Unused. */
 } hazer_position_t;
 
 /**
@@ -864,10 +926,6 @@ extern int hazer_parse_gll(hazer_position_t *positionp, char * vector[], size_t 
  */
 extern int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count);
 
-extern int hazer_parse_pubx_position(hazer_position_t * positionp, char * vector[], size_t count);
-
-extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count);
-
 /*******************************************************************************
  * PARSING SATELLITE ELEVATION, AZIMUTH, AND SIGNAL STRENGTH SENTENCES
  ******************************************************************************/
@@ -877,16 +935,19 @@ extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], 
  * constellation that were used in the position solution.
  */
 typedef struct HazerActive {
-    const char * label;			/* Label for sentence. */
-    uint16_t id[HAZER_GNSS_ACTIVES];  /* Satellites active. */
-    uint16_t pdop;				/* Position Dilution Of Precision * 100. */
-    uint16_t hdop;				/* Horizontal Dilution Of Precision * 100. */
-    uint16_t vdop;				/* Vertical Dilution Of Precision * 100. */
-    uint8_t system;				/* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
-    uint8_t active;             /* Number of satellites active. */
-    uint8_t mode;               /* Navigation mode: 1(None), 2(D), 3(D). */
-    hazer_expiry_t ticks;		/* Lifetime in application-defined ticks. */
+    const char * label;			        /* Label for sentence. */
+    uint16_t id[HAZER_GNSS_ACTIVES];    /* Satellites active. */
+    uint16_t pdop;				        /* Position Dilution Of Precision * 100. */
+    uint16_t hdop;				        /* Horizontal Dilution Of Precision * 100. */
+    uint16_t vdop;				        /* Vertical Dilution Of Precision * 100. */
+    uint16_t tdop;				        /* Time Dilution Of Precision * 100. */
+    uint8_t system;				        /* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
+    uint8_t active;                     /* Number of satellites active. */
+    uint8_t mode;                       /* Navigation mode: 1(None), 2(D), 3(D). */
+    hazer_expiry_t ticks;		        /* Lifetime in application-defined ticks. */
 } hazer_active_t;
+
+#define HAZER_ACTIVE_
 
 /**
  * @def HAZER_ACTIVE_INITIALIZER
@@ -896,7 +957,7 @@ typedef struct HazerActive {
     { \
         (const char *)0, \
         { 0, }, \
-        0, 0, 0, \
+        HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, \
         HAZER_SYSTEM_TOTAL, \
         0, \
         0, \
@@ -916,8 +977,8 @@ extern int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t cou
  * Map a single satellite identifier to a system. Using this is really a last
  * resort, and will likely only work in old receivers, and then maybe not
  * reliably.
- * @param id is the satellite it.
- * @return an index of the system of SYSTEM TOTAL if N/A.
+ * @param id is the NMEA satellite identifier.
+ * @return an index of the system or SYSTEM TOTAL if N/A.
  */
 extern hazer_system_t hazer_map_id_to_system(uint16_t id);
 
@@ -933,6 +994,14 @@ extern hazer_system_t hazer_map_id_to_system(uint16_t id);
 extern hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep);
 
 /**
+ * Map a single satellite identifier to a system using the proprietary UBX
+ * identifiers.
+ * @param id is the UBX satellite identifier.
+ * @return an index of the system or SYSTEM TOTAL if N/A.
+ */
+extern hazer_system_t hazer_map_ubxid_to_system(uint16_t id);
+
+/**
  * This structure maintains the elevation, azimuth, and signal strength of a
  * single satellite. (The phantom field was introduced due to the Ublox 8
  * equipped BU353W10 reporting a GPS PRN 4 satellite within view, with an
@@ -945,6 +1014,7 @@ typedef struct HazerSatellite {
     int16_t elv_degrees;        /* Elevation in whole degrees. */
     int16_t azm_degrees;        /* Azimuth in whole degrees. */
     int8_t snr_dbhz;            /* Signal/Noise Ratio in dBHz. */
+    uint8_t signal;             /* Signal band identifier. */
     uint8_t phantom;			/* If true, elevation or azimuth were empty. */
     uint8_t untracked;          /* If true, signal strength was empty. */
     uint8_t unused;             /* Unused. */
@@ -961,17 +1031,17 @@ typedef struct HazerSatellite {
         0, \
         0, \
         0, \
+        0, \
         0 \
     }
 
-/**fg
+/**
  * This structure maintains the information on as many satellites as we
  * have channels configured.
  */
 typedef struct HazerView {
     const char * label;			/* Label for sentence. */
     hazer_satellite_t sat[HAZER_GNSS_SATELLITES]; /* Satellites viewed. */
-    uint8_t signal[HAZER_GNSS_VIEWS]; /* Signal identifier. */
     uint8_t view;               /* Number of satellites in view. */
     uint8_t channels;           /* Number of channels used in view. */
     uint8_t pending;			/* Number of updates pending. */
@@ -1023,7 +1093,6 @@ typedef struct HazerView {
         0, \
         0, \
         0, \
-        0, \
     }
 
 /**
@@ -1034,8 +1103,6 @@ typedef struct HazerView {
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.
  */
 extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
-
-extern int hazer_parse_pubx_svstatus(hazer_view_t * positionp, char * vector[], size_t count);
 
 /*******************************************************************************
  * PARSING TEXT SENTENCES
@@ -1048,6 +1115,16 @@ extern int hazer_parse_pubx_svstatus(hazer_view_t * positionp, char * vector[], 
  * @return 0 for success, <0 otherwise.
  */
 extern int hazer_parse_txt(char * vector[], size_t count);
+
+/*******************************************************************************
+ * PARSING PROPRIETARY U-BLOX PUBX SENTENCES
+ ******************************************************************************/
+
+extern int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * activep, char * vector[], size_t count);
+
+extern int hazer_parse_pubx_svstatus(hazer_view_t views[], hazer_active_t actives[], char * vector[], size_t count);
+
+extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count);
 
 /*******************************************************************************
  * FORMATTING DATA FOR OUTPUT
