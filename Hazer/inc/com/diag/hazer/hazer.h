@@ -1116,10 +1116,41 @@ extern int hazer_parse_txt(char * vector[], size_t count);
  * PARSING PROPRIETARY U-BLOX PUBX SENTENCES
  ******************************************************************************/
 
+/**
+ * Parse a U-blox PUBX,00 (POSITION) message. This message contains information
+ * both about position and the fix itself (e.g. the dilution of precision values
+ * and fix mode indicator).
+ * @param positionp points to the position structure.
+ * @param activep points to the active structure.
+ * @param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success on final update of group, 1 for success, <0 otherwise.
+ */
 extern int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * activep, char * vector[], size_t count);
 
+/**
+ * Parse a U-blox PUBX,03 (SVSTATUS) message. The arrays are used instead
+ * of pointers to a single element in the array because this PUBX message
+ * contains Space Vehicle (SV) statuses for satellites across all systems.
+ * @param view is the view ARRAY (not a pointer to a single element).
+ * @param active is the active ARRAY (not a pointer to a single element).
+ * @param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return a bit mask with (1<<system) bit set for every system reported.
+ */
 extern int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char * vector[], size_t count);
 
+/**
+ * Parse a U-blox PUBX,04 (TIME) message. Note that should the fix be lost,
+ * at least the U-blox generation 8 device will continue to issue this
+ * messgae with the time updated according (apparently) to its internal clock.
+ * This can be misleadning, IMO.
+ * @param positionp points to the position structure.
+ * @param activep points to the active structure.
+ * @param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success on final update of group, 1 for success, <0 otherwise.
+ */
 extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count);
 
 /*******************************************************************************
