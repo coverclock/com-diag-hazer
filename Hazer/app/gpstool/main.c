@@ -1704,7 +1704,7 @@ consume:
 
                     frame = !0;
 
-                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] %-5.5s", size, length, (buffer + 1));
+                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] %-7.7s", size, length, (buffer + 1));
 
                     break;
 
@@ -2308,7 +2308,7 @@ consume:
 
             } else if ((talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {
 
-                DIMINUTO_LOG_INFORMATION("Parse NMEA %s \"%.*s\"", HAZER_TALKER_NAME[talker], length - 2 /* Exclude CR and LF. */, buffer);
+                DIMINUTO_LOG_INFORMATION("Parse NMEA Sentence Other  %s \"%.*s\"", HAZER_TALKER_NAME[talker], length - 2 /* Exclude CR and LF. */, buffer);
                 continue;
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
@@ -2340,12 +2340,16 @@ consume:
                 trace = !0;
                 fix = diminuto_time_elapsed();
 
+                DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
+
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_RMC) && hazer_parse_rmc(&position[system], vector, count) == 0) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
                 fix = diminuto_time_elapsed();
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_GLL) && hazer_parse_gll(&position[system], vector, count) == 0) {
 
@@ -2354,10 +2358,14 @@ consume:
                 trace = !0;
                 fix = diminuto_time_elapsed();
 
+                DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
+
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_VTG) && hazer_parse_vtg(&position[system], vector, count) == 0) {
 
                 position[system].ticks = timeout;
                 refresh = !0;
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA VTG\n");
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSA) && hazer_parse_gsa(&active_cache, vector, count) == 0) {
 
@@ -2388,6 +2396,8 @@ consume:
                 active[system].ticks = timeout;
                 refresh = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse NMEA GSA\n");
+
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSV) && (rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
 
                 /*
@@ -2403,6 +2413,8 @@ consume:
                     refresh = !0;
                 }
 
+                DIMINUTO_LOG_DEBUG("Parse NMEA GSV\n");
+
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_TXT) && hazer_parse_txt(vector, count) == 0) {
 
                 DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
@@ -2414,7 +2426,9 @@ consume:
                 trace = !0;
                 fix = diminuto_time_elapsed();
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && (hazer_parse_pubx_svstatus(view, active, vector, count) != 0)) {
+                DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
+
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && ((rc = hazer_parse_pubx_svstatus(view, active, vector, count)) != 0)) {
 
                 for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
                     if ((rc & (1 << system)) != 0) {
@@ -2423,6 +2437,8 @@ consume:
                         refresh = !0;
                     }
                 }
+
+                DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS 0x%x\n", rc);
 
             } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME) && (hazer_parse_pubx_time(&position[system], vector, count) == 0)) {
 
@@ -2435,6 +2451,8 @@ consume:
                  */
                 position[system].ticks = timeout;
                 refresh = !0;
+
+                DIMINUTO_LOG_DEBUG("Parse PUBX TIME\n");
 
             } else if (unknown) {
 
@@ -2477,26 +2495,32 @@ consume:
                 refresh = !0;
                 trace = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse UBX-NAV-HPPOSLLH\n");
+
             } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 
                 hardware.ticks = timeout;
                 refresh = !0;
+
+                DIMINUTO_LOG_DEBUG("Parse UBX-MON-HW\n");
 
             } else if (yodel_ubx_nav_status(&(status.payload), buffer, length) == 0) {
 
                 status.ticks = timeout;
                 refresh = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse UBX-NAV-STATUS \n");
+
             } else if (yodel_ubx_ack(&acknak, buffer, length) == 0) {
 
                 refresh = !0;
 
                 if (acknak.state) {
-                    DIMINUTO_LOG_NOTICE("Parse UBX ACK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                    DIMINUTO_LOG_NOTICE("Parse UBX-ACK-ACK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                 } else if (!nakquit) {
-                    DIMINUTO_LOG_NOTICE("Parse UBX NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                    DIMINUTO_LOG_NOTICE("Parse UBX-ACK-NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                 } else {
-                    DIMINUTO_LOG_WARNING("Parse UBX NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                    DIMINUTO_LOG_WARNING("Parse UBX-ACK-NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                     xc = 1;
                     eof = !0;
                 }
@@ -2578,23 +2602,23 @@ consume:
                     switch (ss) {
                     case YODEL_UBX_CFG_VALGET_Size_BIT:
                         memcpy(&vv1, bb, sizeof(vv1));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%01x\n", pp->version, layer, ii, kk, vv1);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%01x\n", pp->version, layer, ii, kk, vv1);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_ONE:
                         memcpy(&vv1, bb, sizeof(vv1));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%02x\n", pp->version, layer, ii, kk, vv1);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%02x\n", pp->version, layer, ii, kk, vv1);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_TWO:
                         memcpy(&vv16, bb, sizeof(vv16));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%04x\n", pp->version, layer, ii, kk, vv16);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%04x\n", pp->version, layer, ii, kk, vv16);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_FOUR:
                         memcpy(&vv32, bb, sizeof(vv32));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%08x\n", pp->version,layer, ii, kk, vv32);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%08x\n", pp->version,layer, ii, kk, vv32);
                         break;
                     case YODEL_UBX_CFG_VALGET_Size_EIGHT:
                         memcpy(&vv64, bb, sizeof(vv64));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX CFG VALGET v%d %s [%d] 0x%08x 0x%016llx\n", pp->version, layer, ii, kk, (unsigned long long)vv64);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%016llx\n", pp->version, layer, ii, kk, (unsigned long long)vv64);
                         break;
                     }
 
@@ -2614,17 +2638,17 @@ consume:
                     if (bb >= ee) {
                         break;
                     }
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON VER SW \"%s\"\n", bb);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-VER SW \"%s\"\n", bb);
                     bb += YODEL_UBX_MON_VER_swVersion_LENGTH;
 
                     if (bb >= ee) {
                         break;
                     }
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON VER HW \"%s\"\n", bb);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-VER HW \"%s\"\n", bb);
                     bb += YODEL_UBX_MON_VER_hwVersion_LENGTH;
 
                     while (bb < ee) {
-                        DIMINUTO_LOG_INFORMATION("Parse UBX MON VER EX \"%s\"\n", bb);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX-MON-VER EX \"%s\"\n", bb);
                         bb += YODEL_UBX_MON_VER_extension_LENGTH;
                     }
 
@@ -2635,61 +2659,71 @@ consume:
                 base.ticks = timeout;
                 refresh = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse UBX-NAV-SVIN\n");
+
             } else if (yodel_ubx_nav_att(&(attitude.payload), buffer, length) == 0) {
 
                 attitude.ticks = timeout;
                 refresh = !0;
+
+                DIMINUTO_LOG_DEBUG("Parse UBX-NAV-ATT\n");
 
             } else if (yodel_ubx_nav_odo(&(odometer.payload), buffer, length) == 0) {
 
                 odometer.ticks = timeout;
                 refresh = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse UBX-NAV-ODO\n");
+
             } else if (yodel_ubx_nav_pvt(&(posveltim.payload), buffer, length) == 0) {
 
                 posveltim.ticks = timeout;
                 refresh = !0;
+
+                DIMINUTO_LOG_DEBUG("Parse UBX-NAV-PVT\n");
 
             } else if (yodel_ubx_rxm_rtcm(&rover.payload, buffer, length) == 0) {
 
                 rover.ticks = timeout;
                 refresh = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse UBX-RXM-RTCM\n");
+
             } else if ((rc = yodel_ubx_mon_comms(&ports, buffer, length)) >= 0) {
                 diminuto_assert(sizeof(ports.prefix) == 8);
                 diminuto_assert(sizeof(ports.port[0]) == 40);
                 diminuto_assert(sizeof(ports) == (8 + (5 * 40)));
 
-                DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS version = %u\n", ports.prefix.version);
-                DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS nPorts = %u\n", ports.prefix.nPorts);
-                DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS txErrors = 0x%02x\n", ports.prefix.txErrors);
+                DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS version = %u\n", ports.prefix.version);
+                DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS nPorts = %u\n", ports.prefix.nPorts);
+                DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS txErrors = 0x%02x\n", ports.prefix.txErrors);
                 for (ii = 0; ii < countof(ports.prefix.protIds); ++ii) {
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS protIds[%d] = %u\n", ii, ports.prefix.protIds[ii]);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS protIds[%d] = %u\n", ii, ports.prefix.protIds[ii]);
                 }
                 for (ii = 0; ii < rc; ++ii) {
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] portId = 0x%04x\n", ii, ports.port[ii].portId);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txPending = %u\n", ii, ports.port[ii].txPending);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txBytes = %u\n", ii, ports.port[ii].txBytes);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txUsage = %u\n", ii, ports.port[ii].txUsage);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] txPeakUsage = %u\n", ii, ports.port[ii].txPeakUsage);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxPending = %u\n", ii, ports.port[ii].rxPending);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxBytes = %u\n", ii, ports.port[ii].rxBytes);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxUsage = %u\n", ii, ports.port[ii].rxUsage);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] rxPeakUsage = %u\n", ii, ports.port[ii].rxPeakUsage);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] overrunErrs = %u\n", ii, ports.port[ii].overrunErrs);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] portId = 0x%04x\n", ii, ports.port[ii].portId);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] txPending = %u\n", ii, ports.port[ii].txPending);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] txBytes = %u\n", ii, ports.port[ii].txBytes);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] txUsage = %u\n", ii, ports.port[ii].txUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] txPeakUsage = %u\n", ii, ports.port[ii].txPeakUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] rxPending = %u\n", ii, ports.port[ii].rxPending);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] rxBytes = %u\n", ii, ports.port[ii].rxBytes);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] rxUsage = %u\n", ii, ports.port[ii].rxUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] rxPeakUsage = %u\n", ii, ports.port[ii].rxPeakUsage);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] overrunErrs = %u\n", ii, ports.port[ii].overrunErrs);
                     for (jj = 0; jj < countof(ports.port[ii].msgs); ++jj) {
-                        DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] msgs[%d] = %u\n", ii, jj, ports.port[ii].msgs[jj]);
+                        DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] msgs[%d] = %u\n", ii, jj, ports.port[ii].msgs[jj]);
                     }
-                    DIMINUTO_LOG_INFORMATION("Parse UBX MON COMMS port[%d] skipped = %u\n", ii, ports.port[ii].skipped);
+                    DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] skipped = %u\n", ii, ports.port[ii].skipped);
                 }
 
             } else if (unknown) {
 
-                DIMINUTO_LOG_WARNING("Parse UBX Other 0x%02x%02x%02x%02x\n", buffer[YODEL_UBX_SYNC_1], buffer[YODEL_UBX_SYNC_2], buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
+                DIMINUTO_LOG_WARNING("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             } else {
 
-                /* Do nothing. */
+                DIMINUTO_LOG_DEBUG("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             }
 
@@ -2713,6 +2747,8 @@ consume:
 
             kinematics.ticks = timeout;
             refresh = !0;
+
+            DIMINUTO_LOG_DEBUG("Parse RTCM %d %lld\n", kinematics.number, kinematics.length);
 
             break;
 

@@ -147,6 +147,9 @@ enum HazerGnssConstants {
  *
  * The NaviSys GR-701W with the uBlox-7 chipset emits proprietary
  * PUBX messages longer than the NMEA spec.
+ *
+ * U-blox devices with PUBX,03 (SVSTATUS) enabled can produce a
+ * sentence that is at least 474 characters with 148 fields.
  */
 enum HazerNmeaConstants {
     HAZER_NMEA_SHORTEST    = sizeof("$GGAXX\r\n") - 1,
