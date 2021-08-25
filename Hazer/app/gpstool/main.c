@@ -2411,9 +2411,11 @@ consume:
                 view[system].ticks = timeout;
                 if (rc == 0) {
                     refresh = !0;
+                    DIMINUTO_LOG_DEBUG("Parse NMEA GSV\n");
+                } else {
+                    DIMINUTO_LOG_DEBUG("Parse NMEA GSV (partial)\n");
                 }
 
-                DIMINUTO_LOG_DEBUG("Parse NMEA GSV\n");
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_TXT) && hazer_parse_txt(vector, count) == 0) {
 
@@ -2435,10 +2437,9 @@ consume:
                         view[system].ticks = timeout;
                         active[system].ticks = timeout;
                         refresh = !0;
+                        DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS (%s)\n", HAZER_SYSTEM_NAME[system]);
                     }
                 }
-
-                DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS 0x%x\n", rc);
 
             } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME) && (hazer_parse_pubx_time(&position[system], vector, count) == 0)) {
 
