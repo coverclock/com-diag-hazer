@@ -1564,20 +1564,24 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
                     rangers[system] = ranger;
                     active[system].active = ranger;
                 }
+                active[system].pdop = active[HAZER_SYSTEM_GNSS].pdop;
+                active[system].hdop = active[HAZER_SYSTEM_GNSS].hdop;
+                active[system].vdop = active[HAZER_SYSTEM_GNSS].vdop;
+                active[system].tdop = active[HAZER_SYSTEM_GNSS].tdop;
                 active[system].system = system;
                 active[system].label = PUBX;
             } else if (vector[index + 1][0] == 'e') {
                 view[system].sat[channel].phantom = 0;
-                view[system].sat[channel].untracked = !0;
+                view[system].sat[channel].untracked = 0;
             } else if (vector[index + 1][0] == '-') {
-                view[system].sat[channel].phantom = !0;
+                view[system].sat[channel].phantom = 0;
                 view[system].sat[channel].untracked = !0;
             } else {
                 /*
                  * Should never happen, and not clear what it means it if does.
                  */
                 view[system].sat[channel].phantom = !0;
-                view[system].sat[channel].untracked = 0;
+                view[system].sat[channel].untracked = !0;
             }
             view[system].sat[channel].azm_degrees = strtol(vector[index + 2], (char **)0, 10);
             view[system].sat[channel].elv_degrees = strtol(vector[index + 3], (char **)0, 10);

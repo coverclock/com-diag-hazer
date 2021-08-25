@@ -146,7 +146,7 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GPS].sat[0].elv_degrees == 34);
         assert(view[HAZER_SYSTEM_GPS].sat[0].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[0].signal == 0);
-        assert(view[HAZER_SYSTEM_GPS].sat[0].phantom == !0);
+        assert(view[HAZER_SYSTEM_GPS].sat[0].phantom == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[0].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GPS].sat[1].id == 10);
@@ -162,7 +162,7 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GPS].sat[2].elv_degrees == 38);
         assert(view[HAZER_SYSTEM_GPS].sat[2].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[2].signal == 0);
-        assert(view[HAZER_SYSTEM_GPS].sat[2].phantom == !0);
+        assert(view[HAZER_SYSTEM_GPS].sat[2].phantom == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[2].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GPS].sat[3].id == 15);
@@ -171,14 +171,14 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GPS].sat[3].snr_dbhz == 20);
         assert(view[HAZER_SYSTEM_GPS].sat[3].signal == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[3].phantom == 0);
-        assert(view[HAZER_SYSTEM_GPS].sat[3].untracked == !0);
+        assert(view[HAZER_SYSTEM_GPS].sat[3].untracked == 0);
 
         assert(view[HAZER_SYSTEM_GPS].sat[4].id == 16);
         assert(view[HAZER_SYSTEM_GPS].sat[4].azm_degrees == 309);
         assert(view[HAZER_SYSTEM_GPS].sat[4].elv_degrees == 15);
         assert(view[HAZER_SYSTEM_GPS].sat[4].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[4].signal == 0);
-        assert(view[HAZER_SYSTEM_GPS].sat[4].phantom == !0);
+        assert(view[HAZER_SYSTEM_GPS].sat[4].phantom == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[4].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GPS].sat[5].id == 18);
@@ -195,14 +195,14 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GPS].sat[6].snr_dbhz == 40);
         assert(view[HAZER_SYSTEM_GPS].sat[6].signal == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[6].phantom == 0);
-        assert(view[HAZER_SYSTEM_GPS].sat[6].untracked == !0);
+        assert(view[HAZER_SYSTEM_GPS].sat[6].untracked == 0);
 
         assert(view[HAZER_SYSTEM_GPS].sat[7].id == 23);
         assert(view[HAZER_SYSTEM_GPS].sat[7].azm_degrees == 248);
         assert(view[HAZER_SYSTEM_GPS].sat[7].elv_degrees == 48);
         assert(view[HAZER_SYSTEM_GPS].sat[7].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[7].signal == 0);
-        assert(view[HAZER_SYSTEM_GPS].sat[7].phantom == !0);
+        assert(view[HAZER_SYSTEM_GPS].sat[7].phantom == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[7].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GPS].sat[8].id == 25);
@@ -211,14 +211,14 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GPS].sat[8].snr_dbhz == 50);
         assert(view[HAZER_SYSTEM_GPS].sat[8].signal == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[8].phantom == 0);
-        assert(view[HAZER_SYSTEM_GPS].sat[8].untracked == !0);
+        assert(view[HAZER_SYSTEM_GPS].sat[8].untracked == 0);
 
         assert(view[HAZER_SYSTEM_GPS].sat[9].id == 26);
         assert(view[HAZER_SYSTEM_GPS].sat[9].azm_degrees == 276);
         assert(view[HAZER_SYSTEM_GPS].sat[9].elv_degrees == 17);
         assert(view[HAZER_SYSTEM_GPS].sat[9].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[9].signal == 0);
-        assert(view[HAZER_SYSTEM_GPS].sat[9].phantom == !0);
+        assert(view[HAZER_SYSTEM_GPS].sat[9].phantom == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[9].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GPS].sat[10].id == 29);
@@ -226,7 +226,7 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GPS].sat[10].elv_degrees == 58);
         assert(view[HAZER_SYSTEM_GPS].sat[10].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[10].signal == 0);
-        assert(view[HAZER_SYSTEM_GPS].sat[10].phantom == !0);
+        assert(view[HAZER_SYSTEM_GPS].sat[10].phantom == 0);
         assert(view[HAZER_SYSTEM_GPS].sat[10].untracked == !0);
 
 /*
@@ -251,7 +251,7 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GLONASS].sat[0].elv_degrees == 68);
         assert(view[HAZER_SYSTEM_GLONASS].sat[0].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[0].signal == 0);
-        assert(view[HAZER_SYSTEM_GLONASS].sat[0].phantom == !0);
+        assert(view[HAZER_SYSTEM_GLONASS].sat[0].phantom == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[0].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GLONASS].sat[1].id == 66);
@@ -267,7 +267,7 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GLONASS].sat[2].elv_degrees == 21);
         assert(view[HAZER_SYSTEM_GLONASS].sat[2].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[2].signal == 0);
-        assert(view[HAZER_SYSTEM_GLONASS].sat[2].phantom == !0);
+        assert(view[HAZER_SYSTEM_GLONASS].sat[2].phantom == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[2].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GLONASS].sat[3].id == 79);
@@ -275,7 +275,7 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GLONASS].sat[3].elv_degrees == 2);
         assert(view[HAZER_SYSTEM_GLONASS].sat[3].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[3].signal == 0);
-        assert(view[HAZER_SYSTEM_GLONASS].sat[3].phantom == !0);
+        assert(view[HAZER_SYSTEM_GLONASS].sat[3].phantom == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[3].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GLONASS].sat[4].id == 80);
@@ -283,7 +283,7 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GLONASS].sat[4].elv_degrees == 3);
         assert(view[HAZER_SYSTEM_GLONASS].sat[4].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[4].signal == 0);
-        assert(view[HAZER_SYSTEM_GLONASS].sat[4].phantom == !0);
+        assert(view[HAZER_SYSTEM_GLONASS].sat[4].phantom == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[4].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GLONASS].sat[5].id == 81);
@@ -291,7 +291,7 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GLONASS].sat[5].elv_degrees == 35);
         assert(view[HAZER_SYSTEM_GLONASS].sat[5].snr_dbhz == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[5].signal == 0);
-        assert(view[HAZER_SYSTEM_GLONASS].sat[5].phantom == !0);
+        assert(view[HAZER_SYSTEM_GLONASS].sat[5].phantom == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[5].untracked == !0);
 
         assert(view[HAZER_SYSTEM_GLONASS].sat[6].id == 87);
@@ -300,7 +300,7 @@ $PUBX,03,19,
         assert(view[HAZER_SYSTEM_GLONASS].sat[6].snr_dbhz == 70);
         assert(view[HAZER_SYSTEM_GLONASS].sat[6].signal == 0);
         assert(view[HAZER_SYSTEM_GLONASS].sat[6].phantom == 0);
-        assert(view[HAZER_SYSTEM_GLONASS].sat[6].untracked == !0);
+        assert(view[HAZER_SYSTEM_GLONASS].sat[6].untracked == 0);
 
         assert(view[HAZER_SYSTEM_GLONASS].sat[7].id == 88);
         assert(view[HAZER_SYSTEM_GLONASS].sat[7].azm_degrees == 56);
