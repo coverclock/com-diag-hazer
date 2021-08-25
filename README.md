@@ -273,7 +273,7 @@ built.
 
 # Sentences
 
-Hazer recognizes the following received NMEA sentences.
+Hazer processes the following standard NMEA sentences.
 
 * GGA - Global Positioning System Fix Data (NMEA 0183 Version 4.10 p. 68)
 * GLL - Geographic Position - Latitude/Longitude (NMEA 0183 Version 4.10 p. 87)
@@ -283,7 +283,13 @@ Hazer recognizes the following received NMEA sentences.
 * TXT - Text Transmission (NMEA 0183 Version 4.10 p. 124)
 * VTG - Course Over Ground & Ground Speed (NMEA 0183 Version 4.10 p. 127)
 
-Hazer recognizes the following proprietary NMEA-style sentences as special cases.
+Hazer processes the following proprietary NMEA sentences.
+
+* PUBX,00 - emitted by some u-blox devices for POSITION.
+* PUBX,03 - emitted by some u-blox devices for SVSTATUS.
+* PUBX,04 - emitted by some u-blox devices for TIME.
+
+Hazer recognizes the following proprietary NMEA sentences.
 
 * PMTK - emitted and/or accepted by some GTop/MTK devices.
 * PSRF - emitted and/or accepted by some SiRF devices.
