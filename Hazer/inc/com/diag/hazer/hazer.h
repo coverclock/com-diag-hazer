@@ -905,7 +905,7 @@ typedef struct HazerPosition {
 
 /**
  * Parse a GGA NMEA sentence, updating the position.
- * @param positionp points to the position structure (initialized to zeros).
+ * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
@@ -914,7 +914,7 @@ extern int hazer_parse_gga(hazer_position_t *positionp, char * vector[], size_t 
 
 /**
  * Parse a RMC NMEA sentence, updating the position.
- * @param positionp points to the position structure (initialized to zeros).
+ * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
@@ -923,7 +923,7 @@ extern int hazer_parse_rmc(hazer_position_t *positionp, char * vector[], size_t 
 
 /**
  * Parse a GLL NMEA sentence, updating the position.
- * @param positionp points to the position structure (initialized to zeros).
+ * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
@@ -932,7 +932,7 @@ extern int hazer_parse_gll(hazer_position_t *positionp, char * vector[], size_t 
 
 /**
  * Parse a VTG NMEA sentence, updating the position.
- * @param positionp points to the position structure (initialized to zeros).
+ * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
@@ -979,7 +979,7 @@ typedef struct HazerActive {
 
 /**
  * Parse a GSA NMEA sentence, updating the constellation.
- * @param activep points to the active structure (initialized to zeros).
+ * @param activep points to the active structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
@@ -1093,7 +1093,7 @@ typedef struct HazerView {
 
 /**
  * Parse a GSV NMEA sentence, updating the constellation.
- * @param viewp points to the view structure (initialized to zeros).
+ * @param viewp points to the view structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.
@@ -1146,7 +1146,6 @@ extern int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[
  * messgae with the time updated according (apparently) to its internal clock.
  * This can be misleadning, IMO.
  * @param positionp points to the position structure.
- * @param activep points to the active structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.

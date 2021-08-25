@@ -169,7 +169,7 @@ static const char FORMAT_DEFAULT[] =
 
 /**
  * Return true if the argument string is numeric.
- * @param points to the argument string.
+ * @param str points to the argument string.
  * @return true if numeric, false otherwise.
  */
 static int numeric(const char * str)
