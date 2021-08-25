@@ -712,9 +712,9 @@ install-include:
 	tar -C $(OUT)/$(INC_DIR) -cvf - . | tar -C $(INSTALL_INC) -xvf -
 	tar -C $(INC_DIR) -cvf - . | tar -C $(INSTALL_INC) -xvf -
 
-########## Unit Test
+########## Tests
 
-.PHONY: sanity functional
+.PHONY: sanity functional valgrind
 
 sanity:
 	R="PASSED."; \
@@ -743,3 +743,7 @@ functional:
 	@echo "bu353w10S (source) with the GlobalSat BU-353W10"
 	@echo "neom8n1pps (1PPS) with the u-blox NEO-M8N"
 	@echo "gr701w1pps (1PPS) with the NaviSys GR701W"
+
+valgrind:
+	cat dat/hazer/ubx-cam-m8q-dan-1.dat dat/hazer/ubx-cam-m8q-dan-2.dat | valgrind gpstool -R
+	cat dat/hazer/bu353w10-1.dat dat/hazer/bu353w10-2.dat dat/hazer/bu353w10-3.dat dat/hazer/bu353w10-4.dat | valgrind gpstool -R
