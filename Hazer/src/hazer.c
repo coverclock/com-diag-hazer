@@ -1275,11 +1275,11 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                     viewp->sat[channel].azm_degrees = strtol(vector[index], (char **)0, 10);
                 }
                 ++index;
-                viewp->sat[channel].untracked = 0;
                 if (strlen(vector[index]) == 0) {
                     viewp->sat[channel].untracked = !0;
                     viewp->sat[channel].snr_dbhz = 0;
                 } else {
+                    viewp->sat[channel].untracked = 0;
                     viewp->sat[channel].snr_dbhz = strtol(vector[index], (char **)0, 10);
                 }
                 ++index;
@@ -1554,10 +1554,6 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
                 continue;
             }
             view[system].sat[channel].id = id;
-            view[system].sat[channel].elv_degrees = strtol(vector[index + 2], (char **)0, 10);
-            view[system].sat[channel].azm_degrees = strtol(vector[index + 3], (char **)0, 10);
-            view[system].sat[channel].snr_dbhz = strtol(vector[index + 4], (char **)0, 10);
-            view[system].sat[channel].signal = 0;
             if (vector[index + 1][0] == 'U') {
                 view[system].sat[channel].phantom = 0;
                 view[system].sat[channel].untracked = 0;
@@ -1575,11 +1571,18 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
                 view[system].sat[channel].untracked = !0;
             } else if (vector[index + 1][0] == '-') {
                 view[system].sat[channel].phantom = !0;
-                view[system].sat[channel].untracked = 0;
-            } else {
-                view[system].sat[channel].phantom = !0;
                 view[system].sat[channel].untracked = !0;
+            } else {
+                /*
+                 * Should never happen, and not clear what it means it if does.
+                 */
+                view[system].sat[channel].phantom = !0;
+                view[system].sat[channel].untracked = 0;
             }
+            view[system].sat[channel].azm_degrees = strtol(vector[index + 2], (char **)0, 10);
+            view[system].sat[channel].elv_degrees = strtol(vector[index + 3], (char **)0, 10);
+            view[system].sat[channel].snr_dbhz = strtol(vector[index + 4], (char **)0, 10);
+            view[system].sat[channel].signal = 0;
             channel += 1;
             channels[system] = channel;
             view[system].channels = channel;
