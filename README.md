@@ -275,19 +275,19 @@ built.
 
 Hazer processes the following standard NMEA sentences.
 
-* GGA - Global Positioning System Fix Data (NMEA 0183 Version 4.10 p. 68)
-* GLL - Geographic Position - Latitude/Longitude (NMEA 0183 Version 4.10 p. 87)
-* GSA - GNSS DOP and Active Satellites (NMEA 0183 Version 4.10 p. 92)
-* GSV - GNSS Satellites In View (NMEA 0183 Version 4.10 p. 96)
-* RMC - Recommended Minimum Specific GNSS Data (NMEA 0183 Version 4.10 p. 113)
-* TXT - Text Transmission (NMEA 0183 Version 4.10 p. 124)
-* VTG - Course Over Ground & Ground Speed (NMEA 0183 Version 4.10 p. 127)
+* GGA - Global Positioning System Fix Data. (NMEA 0183 Version 4.10 p. 68)
+* GLL - Geographic Position - Latitude/Longitude. (NMEA 0183 Version 4.10 p. 87)
+* GSA - GNSS DOP and Active Satellites. (NMEA 0183 Version 4.10 p. 92)
+* GSV - GNSS Satellites In View. (NMEA 0183 Version 4.10 p. 96)
+* RMC - Recommended Minimum Specific GNSS Data. (NMEA 0183 Version 4.10 p. 113)
+* TXT - Text Transmission. (NMEA 0183 Version 4.10 p. 124)
+* VTG - Course Over Ground & Ground Speed. (NMEA 0183 Version 4.10 p. 127)
 
 Hazer processes the following proprietary NMEA sentences.
 
-* PUBX,00 - emitted by some u-blox devices for POSITION.
-* PUBX,03 - emitted by some u-blox devices for SVSTATUS.
-* PUBX,04 - emitted by some u-blox devices for TIME.
+* PUBX,00 - emitted by u-blox devices for POSITION. (u-blox 8 31.3 pp. 163-167)
+* PUBX,03 - emitted by u-blox devices for SVSTATUS. (u-blox 8 31.3 pp. 163-167)
+* PUBX,04 - emitted by u-blox devices for TIME. (u-blox 8 31.3 pp. 163-167)
 
 Hazer recognizes the following proprietary NMEA sentences.
 
