@@ -271,24 +271,20 @@ typedef enum HazerTalker {
  */
 extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
 
-
 /**
- * GNSS system identifiers.
- * NMEA 0183 4.10 table 20 p. 94-95.
- * Also based on actual values observed in the wild.
+ * Internal GNSS system identifiers.
  * These must be in the same order as the corresponding strings below.
- * UBLOX R24 Appendix A p. 446 has a different scheme.
  */
 typedef enum HazerSystem {
-    HAZER_SYSTEM_GNSS				= 0,
-    HAZER_SYSTEM_GPS				= 1,
-    HAZER_SYSTEM_GLONASS			= 2,
-    HAZER_SYSTEM_GALILEO			= 3,
-    HAZER_SYSTEM_BEIDOU             = 4,
-    HAZER_SYSTEM_SBAS               = 5,
-    HAZER_SYSTEM_IMES               = 6,
-    HAZER_SYSTEM_QZSS               = 15,
-    HAZER_SYSTEM_TOTAL
+    HAZER_SYSTEM_GNSS		    = 0,
+    HAZER_SYSTEM_GPS,
+    HAZER_SYSTEM_GLONASS,
+    HAZER_SYSTEM_GALILEO,
+    HAZER_SYSTEM_BEIDOU,
+    HAZER_SYSTEM_SBAS,
+    HAZER_SYSTEM_IMES,
+    HAZER_SYSTEM_QZSS,
+    HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 
 /**
@@ -309,33 +305,35 @@ typedef enum HazerSystem {
         "COMPASS", \
         "SBAS", \
         "IMES", \
-        "7", \
-        "8", \
-        "9", \
-        "A", \
-        "B", \
-        "C", \
-        "D", \
-        "E", \
         "QZSS", \
         (const char *)0, \
     }
 
 /**
- * UBX proprietary GNSS system identifiers.
- * UBLOX R24 Appendix A p. 446.
+ * Array of SYSTEM names indexed by system enumeration.
  */
-typedef enum HazerUbx {
-    HAZER_UBX_GPS				= 0,
-    HAZER_UBX_SBAS              = 1,
-    HAZER_UBX_GALILEO			= 2,
-    HAZER_UBX_BEIDOU            = 3,
-    HAZER_UBX_IMES              = 4,
-    HAZER_UBX_QZSS              = 5,
-    HAZER_UBX_GLONASS			= 6,
-    HAZER_UBX_TOTAL             = 7,
-    HAZER_UBX_GNSS              = 8,
-} hazer_ubx_t;
+extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
+
+/**
+ * NMEA GNSS system identifiers.
+ * NMEA 0183 4.10 table 20 p. 94-95.
+ */
+typedef enum HazerNmea {
+    HAZER_NMEA_GPS              = 1,
+    HAZER_NMEA_GLONASS          = 2,
+    HAZER_NMEA_GALILEO          = 3,
+    HAZER_NMEA_BEIDOU           = 4,
+    HAZER_NMEA_SBAS             = 5,
+    HAZER_NMEA_IMES             = 6,
+    HAZER_NMEA_QZSS             = 15,
+} hazer_nmea_t;
+
+/**
+ * Map the NMEA GNSS system id to the internal system id.
+ * @param constellation is the NMEA system identifier.
+ * @return an index of the system or SYSTEM TOTAL if N/A.
+ */
+extern hazer_system_t hazer_map_nmea_to_system(uint8_t constellation);
 
 /**
  * GNSS satellite identifiers.
@@ -346,97 +344,109 @@ typedef enum HazerUbx {
  * receiver, the U-blox 9, doesn't match these anyway. Despite the
  * documentation, I don't consider these reliable.
  */
-typedef enum HazerId {
+typedef enum HazerNmeaId {
     /*                        0,     */
-    HAZER_ID_GPS_FIRST		= 1,
-    HAZER_ID_GPS_LAST		= 32,
-    HAZER_ID_SBAS_FIRST		= 33,
-    HAZER_ID_SBAS_LAST		= 64,
-    HAZER_ID_GLONASS_FIRST	= 65,
-    HAZER_ID_GLONASS_LAST	= 96,
+    HAZER_NMEA_GPS_FIRST	= 1,
+    HAZER_NMEA_GPS_LAST		= 32,
+    HAZER_NMEA_SBAS_FIRST	= 33,
+    HAZER_NMEA_SBAS_LAST	= 64,
+    HAZER_NMEA_GLONASS_FIRST= 65,
+    HAZER_NMEA_GLONASS_LAST	= 96,
     /*						  97,    */
     /*						   :     */
     /*						  151,   */
-    HAZER_ID_SBASX_FIRST	= 152,
-    HAZER_ID_SBASX_LAST		= 158,
+    HAZER_NMEA_SBASX_FIRST	= 152,
+    HAZER_NMEA_SBASX_LAST	= 158,
     /*						  159,   */
     /*						   :     */
     /*						  172,   */
-    HAZER_ID_IMES_FIRST		= 173,
-    HAZER_ID_IMES_LAST		= 182,
+    HAZER_NMEA_IMES_FIRST	= 173,
+    HAZER_NMEA_IMES_LAST	= 182,
     /*						  183,   */
     /*						   :     */
     /*						  192,   */
-    HAZER_ID_QZSS_FIRST		= 193,
-    HAZER_ID_QZSS_LAST		= 197,
+    HAZER_NMEA_QZSS_FIRST	= 193,
+    HAZER_NMEA_QZSS_LAST	= 197,
     /*						  198,   */
     /*						   :     */
     /*						  200,   */
-    HAZER_ID_BEIDOU1_FIRST	= 201,
-    HAZER_ID_BEIDOU1_LAST	= 235,
+    HAZER_NMEA_BEIDOU1_FIRST= 201,
+    HAZER_NMEA_BEIDOU1_LAST	= 235,
     /*						  236,   */
     /*						   :     */
     /*						  300,   */
-    HAZER_ID_GALILEO_FIRST	= 301,
-    HAZER_ID_GALILEO_LAST	= 336,
+    HAZER_NMEA_GALILEO_FIRST= 301,
+    HAZER_NMEA_GALILEO_LAST	= 336,
     /*						  337,   */
     /*						   :     */
     /*						  400,   */
-    HAZER_ID_BEIDOU2_FIRST	= 401,
-    HAZER_ID_BEIDOU2_LAST	= 437,
+    HAZER_NMEA_BEIDOU2_FIRST= 401,
+    HAZER_NMEA_BEIDOU2_LAST	= 437,
     /*						  438,   */
     /*						   :     */
     /*						  65535, */
-} hazer_id_t;
+} hazer_nmeaid_t;
+
+/**
+ * Map a single satellite identifier to a system. Using this is really a last
+ * resort, and will likely only work in old receivers, and then maybe not
+ * reliably.
+ * @param id is the NMEA satellite identifier.
+ * @return an index of the system or SYSTEM TOTAL if N/A.
+ */
+extern hazer_system_t hazer_map_nmeaid_to_system(uint16_t id);
 
 /**
  * Proprietary UBX GNSS satellite identifiers used in NMEA-like PUBX sentences.
  * UBLOX R24 Appendix A p. 446.
  */
-typedef enum HazerUbxid {
-    /*                        0,    */
-    HAZER_UBX_GPS_FIRST     = 1,
-    HAZER_UBX_GPS_LAST      = 32,
-    HAZER_UBX_BEIDOU1_FIRST = 33,
-    HAZER_UBX_BEIDOU1_LAST  = 64,
-    HAZER_UBX_GLONASS1_FIRST= 65,
-    HAZER_UBX_GLONASS1_LAST = 96,
-    /*                        97,   */
-    /*                         :    */
-    /*                        119,  */
-    HAZER_UBX_SBAS_FIRST    = 120,
-    HAZER_UBX_SBAS_LAST     = 158,
-    /*                        159,  */
-    /*                         :    */
-    /*                        210,  */
-    HAZER_UBX_GALILEO_FIRST = 211,
-    HAZER_UBX_GALILEO_LAST  = 246,
-    /*                        247,  */
-    /*                         :    */
-    /*                        158,  */
-    HAZER_UBX_BEIDOU2_FIRST = 159,
-    HAZER_UBX_BEIDOU2_LAST  = 163,
-    /*                        164,  */
-    /*                         :    */
-    /*                        172,  */
-    HAZER_UBX_IMES_FIRST    = 173,
-    HAZER_UBX_IMES_LAST     = 182,
-    /*                        183,  */
-    /*                         :    */
-    /*                        192,  */
-    HAZER_UBX_QZSS_FIRST    = 193,
-    HAZER_UBX_QZSS_LAST     = 202,
-    /*                        203,  */
-    /*                         :    */
-    /*                        254,  */
-    HAZER_UBX_GLONASS2_FIRST= 255,
-    HAZER_UBX_GLONASS2_LAST = 255,
-} hazer_ubxid_t;
+typedef enum HazerPubxId {
+    /*                            0,    */
+    HAZER_PUBX_GPS_FIRST        = 1,
+    HAZER_PUBX_GPS_LAST         = 32,
+    HAZER_PUBX_BEIDOU1_FIRST    = 33,
+    HAZER_PUBX_BEIDOU1_LAST     = 64,
+    HAZER_PUBX_GLONASS1_FIRST   = 65,
+    HAZER_PUBX_GLONASS1_LAST    = 96,
+    /*                            97,   */
+    /*                             :    */
+    /*                            119,  */
+    HAZER_PUBX_SBAS_FIRST       = 120,
+    HAZER_PUBX_SBAS_LAST        = 158,
+    /*                            159,  */
+    /*                             :    */
+    /*                            210,  */
+    HAZER_PUBX_GALILEO_FIRST    = 211,
+    HAZER_PUBX_GALILEO_LAST     = 246,
+    /*                            247,  */
+    /*                             :    */
+    /*                            158,  */
+    HAZER_PUBX_BEIDOU2_FIRST    = 159,
+    HAZER_PUBX_BEIDOU2_LAST     = 163,
+    /*                            164,  */
+    /*                             :    */
+    /*                            172,  */
+    HAZER_PUBX_IMES_FIRST       = 173,
+    HAZER_PUBX_IMES_LAST        = 182,
+    /*                            183,  */
+    /*                             :    */
+    /*                            192,  */
+    HAZER_PUBX_QZSS_FIRST       = 193,
+    HAZER_PUBX_QZSS_LAST        = 202,
+    /*                            203,  */
+    /*                             :    */
+    /*                            254,  */
+    HAZER_PUBX_GLONASS2_FIRST   = 255,
+    HAZER_PUBX_GLONASS2_LAST    = 255,
+} hazer_pubxid_t;
 
 /**
- * Array of SYSTEM names indexed by system enumeration.
+ * Map a single satellite identifier to a system using the proprietary UBX
+ * identifiers.
+ * @param id is the UBX satellite identifier.
+ * @return an index of the system or SYSTEM TOTAL if N/A.
  */
-extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
+extern hazer_system_t hazer_map_pubxid_to_system(uint16_t id);
 
 /**
  * This buffer is large enough to contain the largest NMEA sentence,
@@ -974,15 +984,6 @@ typedef struct HazerActive {
 extern int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count);
 
 /**
- * Map a single satellite identifier to a system. Using this is really a last
- * resort, and will likely only work in old receivers, and then maybe not
- * reliably.
- * @param id is the NMEA satellite identifier.
- * @return an index of the system or SYSTEM TOTAL if N/A.
- */
-extern hazer_system_t hazer_map_id_to_system(uint16_t id);
-
-/**
  * Return a system given a list of active satellites. This is based on the
  * NMEA conventions for satellite numbering for GPS, GLONASS, and WAAS.
  * It is sometimes useful for GPS devices that emit multiple GSA sentences all
@@ -992,14 +993,6 @@ extern hazer_system_t hazer_map_id_to_system(uint16_t id);
  * @return the index of the system or SYSTEM TOTAL if N/A.
  */
 extern hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep);
-
-/**
- * Map a single satellite identifier to a system using the proprietary UBX
- * identifiers.
- * @param id is the UBX satellite identifier.
- * @return an index of the system or SYSTEM TOTAL if N/A.
- */
-extern hazer_system_t hazer_map_ubxid_to_system(uint16_t id);
 
 /**
  * This structure maintains the elevation, azimuth, and signal strength of a

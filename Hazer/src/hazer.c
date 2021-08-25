@@ -938,28 +938,103 @@ hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
     return system;
 }
 
-hazer_system_t hazer_map_id_to_system(uint16_t id)
+/*
+ * NMEA 0183 4.10 table 20 p. 94-95.
+ */
+hazer_system_t hazer_map_nmea_to_system(uint8_t constellation)
+{
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
+
+    switch (constellation) {
+    case HAZER_NMEA_GPS:
+        system = HAZER_SYSTEM_GPS;
+        break;
+    case HAZER_NMEA_GLONASS:
+        system = HAZER_SYSTEM_GLONASS;
+        break;
+    case HAZER_NMEA_GALILEO:
+        system = HAZER_SYSTEM_GALILEO;
+        break;
+    case HAZER_NMEA_BEIDOU:
+        system = HAZER_SYSTEM_BEIDOU;
+        break;
+    case HAZER_NMEA_SBAS:
+        system = HAZER_SYSTEM_SBAS;
+        break;
+    case HAZER_NMEA_IMES:
+        system = HAZER_SYSTEM_IMES;
+        break;
+    case HAZER_NMEA_QZSS:
+        system = HAZER_SYSTEM_QZSS;
+        break;
+    default:
+        break;
+    }
+
+    return system;
+}
+
+/*
+ * NMEA 0183 4.10 p. 94.
+ * UBLOX8 R15 p. 373.
+ * UBLOX8 R19 Appendix A p. 402.
+ */
+hazer_system_t hazer_map_nmeaid_to_system(uint16_t id)
 {
     hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
 
     if (id == 0) {
         /* Do nothing. */
-    } else if ((HAZER_ID_GPS_FIRST <= id) && (id <= HAZER_ID_GPS_LAST)) {
+    } else if ((HAZER_NMEA_GPS_FIRST <= id) && (id <= HAZER_NMEA_GPS_LAST)) {
         candidate = HAZER_SYSTEM_GPS;
-    } else if ((HAZER_ID_SBAS_FIRST <= id) && (id <= HAZER_ID_SBAS_LAST)) {
+    } else if ((HAZER_NMEA_SBAS_FIRST <= id) && (id <= HAZER_NMEA_SBAS_LAST)) {
         candidate = HAZER_SYSTEM_SBAS;
-    } else if ((HAZER_ID_GLONASS_FIRST <= id) && (id <= HAZER_ID_GLONASS_LAST)) {
+    } else if ((HAZER_NMEA_GLONASS_FIRST <= id) && (id <= HAZER_NMEA_GLONASS_LAST)) {
         candidate = HAZER_SYSTEM_GLONASS;
-    } else if ((HAZER_ID_BEIDOU1_FIRST <= id) && (id <= HAZER_ID_BEIDOU1_LAST)) {
+    } else if ((HAZER_NMEA_BEIDOU1_FIRST <= id) && (id <= HAZER_NMEA_BEIDOU1_LAST)) {
         candidate = HAZER_SYSTEM_BEIDOU;
-    } else if ((HAZER_ID_IMES_FIRST <= id) && (id <= HAZER_ID_IMES_LAST)) {
+    } else if ((HAZER_NMEA_IMES_FIRST <= id) && (id <= HAZER_NMEA_IMES_LAST)) {
         candidate = HAZER_SYSTEM_IMES;
-    } else if ((HAZER_ID_QZSS_FIRST <= id) && (id <= HAZER_ID_QZSS_LAST)) {
+    } else if ((HAZER_NMEA_QZSS_FIRST <= id) && (id <= HAZER_NMEA_QZSS_LAST)) {
         candidate = HAZER_SYSTEM_QZSS;
-    } else if ((HAZER_ID_GALILEO_FIRST <= id) && (id <= HAZER_ID_GALILEO_LAST)) {
+    } else if ((HAZER_NMEA_GALILEO_FIRST <= id) && (id <= HAZER_NMEA_GALILEO_LAST)) {
         candidate = HAZER_SYSTEM_GALILEO;
-    } else if ((HAZER_ID_BEIDOU2_FIRST <= id) && (id <= HAZER_ID_BEIDOU2_LAST)) {
+    } else if ((HAZER_NMEA_BEIDOU2_FIRST <= id) && (id <= HAZER_NMEA_BEIDOU2_LAST)) {
         candidate = HAZER_SYSTEM_BEIDOU;
+    } else {
+        /* Do nothing. */
+    }
+
+    return candidate;
+}
+
+/*
+ * UBLOX8 R24 p. 446.
+ */
+hazer_system_t hazer_map_pubxid_to_system(uint16_t id)
+{
+    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+
+    if (id == 0) {
+        /* Do nothing. */
+    } else if ((HAZER_PUBX_GPS_FIRST <= id) && (id <= HAZER_PUBX_GPS_LAST)) {
+        candidate = HAZER_SYSTEM_GPS;
+    } else if ((HAZER_PUBX_BEIDOU1_FIRST <= id) && (id <= HAZER_PUBX_BEIDOU1_LAST)) {
+        candidate = HAZER_SYSTEM_BEIDOU;
+    } else if ((HAZER_PUBX_GLONASS1_FIRST <= id) && (id <= HAZER_PUBX_GLONASS1_LAST)) {
+        candidate = HAZER_SYSTEM_GLONASS;
+    } else if ((HAZER_PUBX_SBAS_FIRST <= id) && (id <= HAZER_PUBX_SBAS_LAST)) {
+        candidate = HAZER_SYSTEM_SBAS;
+    } else if ((HAZER_PUBX_GALILEO_FIRST <= id) && (id <= HAZER_PUBX_GALILEO_LAST)) {
+        candidate = HAZER_SYSTEM_GALILEO;
+    } else if ((HAZER_PUBX_BEIDOU2_FIRST <= id) && (id <= HAZER_PUBX_BEIDOU2_LAST)) {
+        candidate = HAZER_SYSTEM_BEIDOU;
+    } else if ((HAZER_PUBX_IMES_FIRST <= id) && (id <= HAZER_PUBX_IMES_LAST)) {
+        candidate = HAZER_SYSTEM_IMES;
+    } else if ((HAZER_PUBX_QZSS_FIRST <= id) && (id <= HAZER_PUBX_QZSS_LAST)) {
+        candidate = HAZER_SYSTEM_QZSS;
+    } else if ((HAZER_PUBX_GLONASS2_FIRST <= id) && (id <= HAZER_PUBX_GLONASS2_LAST)) {
+        candidate = HAZER_SYSTEM_GLONASS;
     } else {
         /* Do nothing. */
     }
@@ -978,7 +1053,7 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep)
     int slot = 0;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
 
-    if ((0 <= activep->system) && (activep->system < HAZER_SYSTEM_TOTAL)) {
+    if ((HAZER_SYSTEM_GNSS <= activep->system) && (activep->system < HAZER_SYSTEM_TOTAL)) {
         system = (hazer_system_t)activep->system;
     } else {
         for (slot = 0; slot < IDENTIFIERS; ++slot) {
@@ -986,7 +1061,7 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep)
                 break;
             } else if (activep->id[slot] == 0) {
                 break;
-            } else if ((candidate = hazer_map_id_to_system(activep->id[slot])) == HAZER_SYSTEM_TOTAL) {
+            } else if ((candidate = hazer_map_nmeaid_to_system(activep->id[slot])) == HAZER_SYSTEM_TOTAL) {
                 continue;
             } else {
                 /* Do nothing. */
@@ -1006,40 +1081,6 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep)
     }
 
     return system;
-}
-
-/*
- * UBLOX8 R24 p. 446.
- */
-hazer_system_t hazer_map_ubxid_to_system(uint16_t id)
-{
-    hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
-
-    if (id == 0) {
-        /* Do nothing. */
-    } else if ((HAZER_UBX_GPS_FIRST <= id) && (id <= HAZER_UBX_GPS_LAST)) {
-        candidate = HAZER_SYSTEM_GPS;
-    } else if ((HAZER_UBX_BEIDOU1_FIRST <= id) && (id <= HAZER_UBX_BEIDOU1_LAST)) {
-        candidate = HAZER_SYSTEM_BEIDOU;
-    } else if ((HAZER_UBX_GLONASS1_FIRST <= id) && (id <= HAZER_UBX_GLONASS1_LAST)) {
-        candidate = HAZER_SYSTEM_GLONASS;
-    } else if ((HAZER_UBX_SBAS_FIRST <= id) && (id <= HAZER_UBX_SBAS_LAST)) {
-        candidate = HAZER_SYSTEM_SBAS;
-    } else if ((HAZER_UBX_GALILEO_FIRST <= id) && (id <= HAZER_UBX_GALILEO_LAST)) {
-        candidate = HAZER_SYSTEM_GALILEO;
-    } else if ((HAZER_UBX_BEIDOU2_FIRST <= id) && (id <= HAZER_UBX_BEIDOU2_LAST)) {
-        candidate = HAZER_SYSTEM_BEIDOU;
-    } else if ((HAZER_UBX_IMES_FIRST <= id) && (id <= HAZER_UBX_IMES_LAST)) {
-        candidate = HAZER_SYSTEM_IMES;
-    } else if ((HAZER_UBX_QZSS_FIRST <= id) && (id <= HAZER_UBX_QZSS_LAST)) {
-        candidate = HAZER_SYSTEM_QZSS;
-    } else if ((HAZER_UBX_GLONASS2_FIRST <= id) && (id <= HAZER_UBX_GLONASS2_LAST)) {
-        candidate = HAZER_SYSTEM_GLONASS;
-    } else {
-        /* Do nothing. */
-    }
-
-    return candidate;
 }
 
 /******************************************************************************
@@ -1134,7 +1175,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
          * NMEA 0183 4.10 2012 has an additional 19th field containing
          * the GNSS System ID to identify GPS, GLONASS, GALILEO, etc.
          */
-        activep->system = (count > 19) ? strtoul(vector[18], (char **)0, 10) : HAZER_SYSTEM_TOTAL;
+        activep->system = (count > 19) ? hazer_map_nmea_to_system(atoi(vector[18])) : HAZER_SYSTEM_TOTAL;
         activep->label = GSA;
         rc = 0;
     }
@@ -1504,7 +1545,7 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
         index = 3;
         for (satellite = 0; satellite < satellites; ++satellite) {
             id = strtol(vector[index + 0], (char **)0, 10);
-            system = hazer_map_ubxid_to_system(id);
+            system = hazer_map_pubxid_to_system(id);
             if (system >= HAZER_SYSTEM_TOTAL) {
                 system = HAZER_SYSTEM_GNSS;
             }

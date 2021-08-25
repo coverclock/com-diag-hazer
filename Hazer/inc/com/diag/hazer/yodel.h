@@ -271,7 +271,9 @@ extern ssize_t yodel_validate(const void * buffer, size_t size);
 
 /**
  * UBX system identifiers.
- * UBLOX9 R05, p. 242.
+ * UBLOX8 R24 Appendix A p. 446.
+ * UBLOX9 R04 p. 238.
+ * UBLOX9 R05 p. 242.
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum YodelSystem {
@@ -279,10 +281,9 @@ typedef enum YodelSystem {
     YODEL_SYSTEM_SBAS				= 1,
     YODEL_SYSTEM_GALILEO			= 2,
     YODEL_SYSTEM_BEIDOU				= 3,
-/*  UNUSED                            4, */
+    YODEL_SYSTEM_IMES               = 4,
     YODEL_SYSTEM_QZSS				= 5,
     YODEL_SYSTEM_GLONASS			= 6,
-    YODEL_SYSTEM_IMES,
     YODEL_SYSTEM_GNSS,
     YODEL_SYSTEM_TOTAL,
 } yodel_system_t;
@@ -302,10 +303,9 @@ typedef enum YodelSystem {
         "SBAS", \
         "GALILEO", \
         "COMPASS", \
-        "", \
+        "IMES", \
         "QZSS", \
         "GLONASS", \
-        "IMES", \
         "GNSS", \
         (const char *)0, \
     }
