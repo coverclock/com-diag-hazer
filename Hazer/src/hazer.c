@@ -1488,6 +1488,7 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
         positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
+        activep->mode = 0;
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
@@ -1500,6 +1501,21 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         satellites = strtol(vector[18], (char **)0, 10);
         positionp->sat_used = satellites;
         positionp->label = PUBX;
+        if (strncmp(vector[8], "DR", sizeof("DR")) == 0) {
+            activep->mode = 1;
+        } else if (strncmp(vector[8], "G2", sizeof("G2")) == 0) {
+            activep->mode = 2;
+        } else if (strncmp(vector[8], "G3", sizeof("G3")) == 0) {
+            activep->mode = 3;
+        } else if (strncmp(vector[8], "RK", sizeof("RK")) == 0) {
+            activep->mode = 4;
+        } else if (strncmp(vector[8], "D2", sizeof("D2")) == 0) {
+            activep->mode = 5;
+        } else if (strncmp(vector[8], "D3", sizeof("D3")) == 0) {
+            activep->mode = 6;
+        } else {
+            activep->mode = 0;
+        }
         activep->hdop = hazer_parse_dop(vector[15]);
         activep->vdop = hazer_parse_dop(vector[16]);
         activep->tdop = hazer_parse_dop(vector[17]);
@@ -1564,6 +1580,7 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
                     rangers[system] = ranger;
                     active[system].active = ranger;
                 }
+                active[system].mode = active[HAZER_SYSTEM_GNSS].mode;
                 active[system].pdop = active[HAZER_SYSTEM_GNSS].pdop;
                 active[system].hdop = active[HAZER_SYSTEM_GNSS].hdop;
                 active[system].vdop = active[HAZER_SYSTEM_GNSS].vdop;
