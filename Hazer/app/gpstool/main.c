@@ -1705,7 +1705,7 @@ consume:
 
                     frame = !0;
 
-                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] %-7.7s", size, length, (buffer + 1));
+                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] \"%-7.7s\"", size, length, (buffer + 1));
 
                     break;
 
@@ -2412,7 +2412,7 @@ consume:
                 view[system].ticks = timeout;
                 if (rc == 0) {
                     refresh = !0;
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GSV\n");
+                    DIMINUTO_LOG_DEBUG("Parse NMEA GSV (final)\n");
                 } else {
                     DIMINUTO_LOG_DEBUG("Parse NMEA GSV (partial)\n");
                 }
