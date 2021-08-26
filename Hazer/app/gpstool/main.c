@@ -120,6 +120,7 @@
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_phex.h"
 #include "com/diag/diminuto/diminuto_pin.h"
+#include "com/diag/diminuto/diminuto_pipe.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
@@ -1387,6 +1388,9 @@ int main(int argc, char * argv[])
     rc = diminuto_terminator_install(0);
     diminuto_assert(rc >= 0);
 
+    rc = diminuto_pipe_install(0);
+    diminuto_assert(rc >= 0);
+
     rc = diminuto_interrupter_install(!0);
     diminuto_assert(rc >= 0);
 
@@ -1502,6 +1506,11 @@ int main(int argc, char * argv[])
 
         if (diminuto_terminator_check()) {
             DIMINUTO_LOG_NOTICE("SIGTERM");
+            break;
+        }
+
+        if (diminuto_pipe_check()) {
+            DIMINUTO_LOG_NOTICE("SIGPIPE");
             break;
         }
 
