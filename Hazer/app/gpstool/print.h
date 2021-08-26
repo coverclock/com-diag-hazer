@@ -57,11 +57,9 @@ extern void print_status(FILE * fp, const yodel_status_t * sp);
  * @param fp points to the FILE stream.
  * @param pa points to an array of positions.
  * @param pps is the current value of the 1PPS strobe.
- * @param dmyokay is true if the DMY field has been set.
- * @param totokay is true if time is monotonically increasing.
  * @param bytes is the total number of bytes sent and received over the network.
  */
-extern void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyokay, int totokay, uint64_t bytes);
+extern void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t bytes);
 
 /**
  * Print information about the base and the rover that communicate via RTCM.

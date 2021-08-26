@@ -1489,6 +1489,8 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         positionp->old_nanoseconds = positionp->tot_nanoseconds;
         positionp->tot_nanoseconds = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
         activep->mode = 0;
+        activep->label = PUBX;
+        /* Do not return success. */
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
         positionp->old_nanoseconds = positionp->tot_nanoseconds;

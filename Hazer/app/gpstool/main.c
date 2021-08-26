@@ -2990,7 +2990,7 @@ render:
             }
             if (report) {
                 print_local(out_fp, ttff);
-                print_positions(out_fp, position, onepps, dmyokay, totokay, network_total);
+                print_positions(out_fp, position, onepps, network_total);
                 print_hardware(out_fp, &hardware);
                 print_status(out_fp, &status);
                 print_solution(out_fp, &solution);

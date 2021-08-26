@@ -202,11 +202,12 @@ void print_local(FILE * fp, diminuto_sticks_t ttff)
     int degrees = 0;
     int minutes = 0;
     int seconds = 0;
-    diminuto_sticks_t milliseconds = 0;
     diminuto_sticks_t offset = 0;
     diminuto_ticks_t fraction = 0;
+    diminuto_sticks_t milliseconds = 0;
     char zone = '\0';
     int rc = 0;
+    static int once = 0;
 
     fputs("LOC", fp);
 
@@ -224,6 +225,7 @@ void print_local(FILE * fp, diminuto_sticks_t ttff)
 
     milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
     diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
+
     fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.%03lu", year, month, day, hour, minute, second, (long unsigned int)milliseconds);
 
     /*
@@ -278,18 +280,18 @@ void print_local(FILE * fp, diminuto_sticks_t ttff)
         diminuto_assert((0 <= hour) && (hour <= 23));
         diminuto_assert((0 <= minute) && (minute <= 59));
         diminuto_assert((0 <= second) && (second <= 59));
+        milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
+        diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
 
         if (day > 0) {
-
             fprintf(fp, " %2s:%2s:%2s.%3s", "**", "**", "**", "***");
-
         } else {
-
-            milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-            diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
-
             fprintf(fp, " %02d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
+        }
 
+        if (!once) {
+            DIMINUTO_LOG_NOTICE("TTFF %d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
+            once = !0;
         }
 
     }
@@ -427,9 +429,12 @@ void print_status(FILE * fp, const yodel_status_t * sp)
     msss_prior = sp->payload.msss;
 }
 
-void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyokay, int totokay, uint64_t bytes)
+void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t bytes)
 {
     unsigned int system = 0;
+    int dmyokay = 0;
+    int totokay = 0;
+    static int once = 0;
 
     {
         int year = 0;
@@ -439,11 +444,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
         int minute = 0;
         int second = 0;
         uint64_t nanoseconds = 0;
-        int milliseconds = 0;
         char zone = '\0';
         int rc = 0;
         diminuto_sticks_t elapsed = 0;
-        static int once = 0;
+        diminuto_ticks_t fraction = 0;
+        diminuto_sticks_t milliseconds = 0;
 
         zone = diminuto_time_zonename(0);
 
@@ -452,6 +457,9 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
             if (pa[system].ticks == 0) { continue; }
             if (pa[system].utc_nanoseconds == 0) { continue; }
             if (pa[system].dmy_nanoseconds == 0) { continue; }
+
+            dmyokay = !0;
+            totokay = (pa[system].tot_nanoseconds >= pa[system].old_nanoseconds);
 
             fputs("TIM", fp);
 
@@ -464,17 +472,22 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
             diminuto_assert((0 <= nanoseconds) && (nanoseconds < 1000000000LLU));
             fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
 
+            if (!once) {
+                DIMINUTO_LOG_NOTICE("Time %04d-%02d-%02dT%02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
+                once = !0;
+            }
+
             elapsed = Now - Epoch;
-            rc = diminuto_time_duration(elapsed, &day, &hour, &minute, &second, &nanoseconds);
+            rc = diminuto_time_duration(elapsed, &day, &hour, &minute, &second, &fraction);
             diminuto_assert(rc >= 0);
             diminuto_assert(day >= 0);
             diminuto_assert((0 <= hour) && (hour <= 23));
             diminuto_assert((0 <= minute) && (minute <= 59));
             diminuto_assert((0 <= second) && (second <= 59));
-            diminuto_assert((0 <= nanoseconds) && (nanoseconds < 1000000000LLU));
-            milliseconds = nanoseconds / 1000000LLU;
+            milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
+            diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
 
-            fprintf(fp, " %3d/%02d:%02d:%02d.%03d", day, hour, minute, second, milliseconds);
+            fprintf(fp, " %3d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
 
             fprintf(fp, " %cpps", pps ? '1' : '0');
 
@@ -483,11 +496,6 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
             fputc('\n', fp);
-
-            if (!once) {
-                DIMINUTO_LOG_NOTICE("Time %04d-%02d-%02d %02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
-                once = !0;
-            }
 
         }
     }
