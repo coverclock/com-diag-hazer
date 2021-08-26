@@ -290,7 +290,7 @@ void print_local(FILE * fp, diminuto_sticks_t ttff)
         }
 
         if (!once) {
-            DIMINUTO_LOG_NOTICE("TTFF %d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
+            DIMINUTO_LOG_NOTICE("Fix %d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
             once = !0;
         }
 
