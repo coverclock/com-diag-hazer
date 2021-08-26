@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2021 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Globals.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -41,6 +41,11 @@ extern const char * Device;
  * This is our POSIX thread mutual exclusion semaphore.
  */
 extern pthread_mutex_t mutex;
+
+/**
+ * THis is the initial system (not GPS) time.
+ */
+extern diminuto_sticks_t Epoch;
 
 /**
  * THis is the current system (not GPS) time.

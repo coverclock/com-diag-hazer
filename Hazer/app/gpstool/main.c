@@ -453,6 +453,10 @@ int main(int argc, char * argv[])
 
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
 
+    Epoch = diminuto_time_clock();
+    diminuto_assert(Epoch >= 0);
+    Now = Epoch;
+
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
     diminuto_log_setmask();
 
@@ -1404,9 +1408,6 @@ int main(int argc, char * argv[])
      * time zone of your system to UTC. If nothing else, your field support
      * people may thank you.
      */
-
-    Now = diminuto_time_clock();
-    diminuto_assert(Now >= 0);
 
     (void)diminuto_time_timezone();
 

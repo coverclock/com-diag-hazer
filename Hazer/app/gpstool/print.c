@@ -438,8 +438,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
         int hour = 0;
         int minute = 0;
         int second = 0;
-        uint64_t billionths = 0;
+        uint64_t nanoseconds = 0;
+        int milliseconds = 0;
         char zone = '\0';
+        int rc = 0;
+        diminuto_sticks_t elapsed = 0;
         static int once = 0;
 
         zone = diminuto_time_zonename(0);
@@ -452,18 +455,30 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, int dmyoka
 
             fputs("TIM", fp);
 
-            hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &billionths);
+            hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
             diminuto_assert((1 <= month) && (month <= 12));
             diminuto_assert((1 <= day) && (day <= 31));
             diminuto_assert((0 <= hour) && (hour <= 23));
             diminuto_assert((0 <= minute) && (minute <= 59));
             diminuto_assert((0 <= second) && (second <= 59));
-            diminuto_assert((0 <= billionths) && (billionths < 1000000000LLU));
+            diminuto_assert((0 <= nanoseconds) && (nanoseconds < 1000000000LLU));
             fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
+
+            elapsed = Now - Epoch;
+            rc = diminuto_time_duration(elapsed, &day, &hour, &minute, &second, &nanoseconds);
+            diminuto_assert(rc >= 0);
+            diminuto_assert(day >= 0);
+            diminuto_assert((0 <= hour) && (hour <= 23));
+            diminuto_assert((0 <= minute) && (minute <= 59));
+            diminuto_assert((0 <= second) && (second <= 59));
+            diminuto_assert((0 <= nanoseconds) && (nanoseconds < 1000000000LLU));
+            milliseconds = nanoseconds / 1000000LLU;
+
+            fprintf(fp, " %3d/%02d:%02d:%02d.%03d", day, hour, minute, second, milliseconds);
 
             fprintf(fp, " %cpps", pps ? '1' : '0');
 
-            fprintf(fp, "%28s", "");
+            fprintf(fp, "%11s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
