@@ -24,6 +24,16 @@ Wheat Ridge CO 80033 USA
 <http://www.diag.com>    
 <mailto:coverclock@diag.com>    
 
+# Disclaimer
+
+I am a software developer. I have been working full time the field
+since 1976. I have an M.S. (1983) and B.S. (1980) in computer science
+from an accredited program at a university. What I am not is a
+hardware or radio engineer, nor am I an expert in global navigation
+satellite systems. Behind all the software work I present here is a
+vast collection of hardware, firmware, and radio frequency expertise
+contributed by the developers of the GNSS products I use.
+
 # Abstract
 
 This file is part of the Digital Aggregates Corporation Hazer
