@@ -395,7 +395,7 @@ Hazer has been successfully tested with the following GPS devices.
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
 * GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]    
-* GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [1] [2] [4] [8]    
+* GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [1] [2] [4] [8] [13]    
 * GlobalSat ND-105C (SiRF Star III+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * Jackson Labs Technologies CSAC GPSDO (U-Blox 6/UBX-LEA-6T, 115200 8n1, N/A, ttyACM, 1Hz)    
 * Lynq Technologies Smart Compass (U-Blox 8/UBX-CAM-M8Q, 115200 8n1, v1fc9p0194, ttyACM, 1Hz)    
@@ -426,6 +426,7 @@ Footnotes:
 [10] Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* COMPASS (China) concurrently.    
 [11] Has integrated Inertial Measurement Unit (IMU).    
 [12] Equipped with a CR1220 3V button cell.    
+[13] A tear down of the BU-353W10 reveals it has a button cell for its battery backed RAM.
 
 Notes:
 
@@ -680,6 +681,8 @@ Chip Overclock, "Where the RF Meets the Road", 2021-03,
 <https://coverclock.blogspot.com/2021/03/where-rf-meets-road.html>
 
 # Media
+
+John Sloan, "BU-353W10 Tear Down", album, <https://flic.kr/s/aHsmWxTpfs>
 
 John Sloan, "Dead Reckoning", album, <https://flic.kr/s/aHsmPsGqjA>
 
@@ -1187,7 +1190,9 @@ the libraries and binaries in the system directories.)
 * bu353w10F - exercises the GlobalSat BU-353W10 receiver with slow displays.
 * bu353w10H - exercises the GlobalSat BU-353W10 receiver in headless mode.
 * bu353w10M4 - exercises the GlobalSat BU-353W10 receiver logging PRN 4.
+* bu353w10P - exercises the GlobalSat BU-353W10 receiver configured for U-blox PUBX messages.
 * bu353w10S - uses socat to send data from GlobalSat BU-353W10 to gpstool over named pipe.
+* bu353w10T - exercises the GlobalSat BU-353W10 receiver with no additional configuration.
 * bu353w10V - exercises the GlobalSat BU-353W10 receiver using verbose mode.
 * bu353W10X - exercises the GlobalSat BU-353W10 receiver while testing data expiration.
 * checksums - exercises the checksum utility.
@@ -1225,6 +1230,9 @@ the libraries and binaries in the system directories.)
 * ublox8debug - exercises any Ublox 8 device with gpstool debug enabled.
 * ublox8 - exercises any Ublox 8 device.
 * ublox9 - exercises any Ublox 9 device.
+* ubxcoldstart - sends UBX message to cold start U-blox device.
+* ubxmonitor - sends UBX messages to query U-blox device for internal states.
+* ubxrestoredefaults - sends UBX message to restore defaults to U-blox battery backed RAM (BBRAM).
 * uputronics - exercises the Uputronics GPS board for the Rasperry Pi.
 * zedf9r - exercise UBX-ZED-F9R device.
 
