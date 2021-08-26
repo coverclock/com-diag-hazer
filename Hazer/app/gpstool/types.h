@@ -137,6 +137,15 @@ typedef enum Emission {
 } emission_t;
 
 /**
+ * What stage is the consumer in?
+ */
+typedef enum Stage {
+    STAGE           = '?',
+    STAGE_TOP       = 'A',
+    STAGE_BOTTOM    = 'B',
+} stage_t;
+
+/**
  * What kind of special test mode is being done?
  */
 typedef enum Test {

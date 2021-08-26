@@ -390,7 +390,7 @@ int main(int argc, char * argv[])
     int ready = 0;
     int fd = -1;
     ssize_t available = 0;
-    int stage = 0;
+    stage_t stage = STAGE;
     format_t format = FORMAT;
     FILE * fp = (FILE *)0;
     uint8_t * buffer = (uint8_t *)0;
@@ -1535,7 +1535,7 @@ int main(int argc, char * argv[])
          * signal handlers. Note that the code below may block.
          */
 
-        stage = 1;
+        stage = STAGE_TOP;
         available = 0;
         ready = 0;
         fd = -1;
@@ -1565,7 +1565,7 @@ int main(int argc, char * argv[])
 
 consume:
 
-        DIMINUTO_LOG_DEBUG("Consume #%d [%d] (%d) [%lld] [%llu]\n", stage, ready, fd, (long long signed int)available, (long long unsigned int)io_maximum);
+        DIMINUTO_LOG_DEBUG("Consume %c [%d] (%d) [%lld] [%llu]\n", stage, ready, fd, (long long signed int)available, (long long unsigned int)io_maximum);
 
         /*
          * At this point, either available > 0 (there is pending data in
@@ -2867,7 +2867,7 @@ consume:
          * is all about. Note that the code below is non-blocking.
          */
 
-        stage = 2;
+        stage = STAGE_BOTTOM;
         available = 0;
         ready = 0;
         fd = -1;
