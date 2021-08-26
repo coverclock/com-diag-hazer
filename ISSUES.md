@@ -138,3 +138,25 @@ data frame.
 
 I switched to a different cellular antenna, rearranged my lab bench,
 and my test has run flawlessly for many hours since then.
+
+## U-BLOX PUBX,04 TIME MESSAGE
+
+GNSS receivers manufactured by U-blox support two different kinds of
+proprietary messaging for both output and input: the UBX binary
+protocol, and the PUBX ("P UBX") proprietary NMEA extensions. The
+different PUBX messages are distinguished by the second field in the
+proprietary NMEA-format message which contains a two digit number.
+
+The PUBX,04 message provides the current time and date in UTC. This
+timestamp can be emitted even when the U-blox device does not have a
+current fix. It is apparently based on its internal battery-backed clock,
+and, I assume, depends on the reliability of the device's own clock
+oscillator, and how recently a prior fix was achieved before a warm or
+hot start.
+
+My reading of the UBLOX M8 R24 documentation doesn't suggest that there
+is anything in the message to indicate that this time is, when the device
+clock is in holdover, synthesized and not disciplined by a current 3D
+position fix.
+
+I can see where this might be useful, but I find it misleading.
