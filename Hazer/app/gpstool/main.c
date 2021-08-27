@@ -2291,6 +2291,8 @@ consume:
             diminuto_assert(vector[count - 1] == (char *)0);
             diminuto_assert(count <= diminuto_countof(vector));
 
+            DIMINUTO_LOG_DEBUG("Tokenize NMEA [%zd]", count);
+
             /*
              * Make sure it's a talker and a GNSS that we care about.
              * As a special case, if we receive an update on active satellites
