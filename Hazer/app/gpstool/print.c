@@ -676,6 +676,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
         int atleastone = 0;
         int dmyokay = 0;
         int totokay = 0;
+        static int totokay_prior = 0;
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -683,6 +684,10 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             dmyokay = (pa[system].dmy_nanoseconds > 0); 
             totokay = (pa[system].tot_nanoseconds > pa[system].old_nanoseconds);
+            if (totokay != totokay_prior) {
+                DIMINUTO_LOG_NOTICE(totokay ? "Monotonic" : "Retrograde");
+                totokay_prior = totokay;
+            }
 
             fputs("INT", fp);
 
