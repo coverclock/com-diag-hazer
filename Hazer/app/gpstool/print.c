@@ -682,7 +682,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             if (pa[system].ticks == 0) { continue; }
 
             dmyokay = (pa[system].dmy_nanoseconds > 0); 
-            totokay = (pa[system].tot_nanoseconds >= pa[system].old_nanoseconds);
+            totokay = (pa[system].tot_nanoseconds > pa[system].old_nanoseconds);
 
             fputs("INT", fp);
 
