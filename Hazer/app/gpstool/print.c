@@ -497,9 +497,9 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             }
 
-            fprintf(fp, " %cPPS", pps ? '1' : '0');
+            fprintf(fp, " %c PPS", pps ? '1' : '0');
 
-            fprintf(fp, "%16s", "");
+            fprintf(fp, "%15s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
