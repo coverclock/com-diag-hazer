@@ -366,9 +366,6 @@ int main(int argc, char * argv[])
      */
     diminuto_sticks_t delay = 0;
     diminuto_sticks_t elapsed = 0;
-    diminuto_sticks_t epoch = 0;
-    diminuto_sticks_t fix = -1;
-    diminuto_sticks_t ttff = -1;
     seconds_t expiration_was = 0;
     seconds_t expiration_now = 0;
     seconds_t display_last = 0;
@@ -453,10 +450,6 @@ int main(int argc, char * argv[])
      **/
 
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
-
-    Epoch = diminuto_time_clock();
-    diminuto_assert(Epoch >= 0);
-    Now = Epoch;
 
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
     diminuto_log_setmask();
@@ -1398,24 +1391,6 @@ int main(int argc, char * argv[])
     diminuto_assert(rc >= 0);
 
     /*
-     * Initialize our time zone. The underlying tzset(3) call is relatively
-     * expensive (it accesses the file system). But at least some
-     * implementations memoize (a.k.a. cache) the information gleaned from
-     * the file system and from the environment. So we'll call it here to
-     * do that so when print_local() calls it, it doesn't introduce a bunch
-     * of latency while we're processing the NMEA stream. IMPORTANT TIP: if
-     * your Hazer application is in a system that routinely crosses (perhaps
-     * many) time zones - as at least four of the aircraft-based products I've
-     * worked on do - or if your application is stationary but distributed
-     * (perhaps internationally) across time zones - as one of the enterprise
-     * telecommunications sytems I've worked on can be - consider setting the
-     * time zone of your system to UTC. If nothing else, your field support
-     * people may thank you.
-     */
-
-    (void)diminuto_time_timezone();
-
-    /*
      * How much of each packet do we display? Depends on whether we're doing
      * cursor control or not.
      */
@@ -1446,21 +1421,52 @@ int main(int argc, char * argv[])
     }
 
     /*
-     * Start the clock. For some time periods (e.g. display) we want to
-     * delay initially; for others (e.g. keepalive) we do not.
+     * Initialize our time zone. The underlying tzset(3) call is relatively
+     * expensive (it accesses the file system). But at least some
+     * implementations memoize (a.k.a. cache) the information gleaned from
+     * the file system and from the environment. So we'll call it here to
+     * do that so when print_local() calls it, it doesn't introduce a bunch
+     * of latency while we're processing the NMEA stream. IMPORTANT TIP: if
+     * your Hazer application is in a system that routinely crosses (perhaps
+     * many) time zones - as at least four of the aircraft-based products I've
+     * worked on do - or if your application is stationary but distributed
+     * (perhaps internationally) across time zones - as one of the enterprise
+     * telecommunications sytems I've worked on can be - consider setting the
+     * time zone of your system to UTC. If nothing else, your field support
+     * people may thank you.
      */
 
-    epoch = diminuto_time_elapsed();
+    (void)diminuto_time_timezone();
+
+    /*
+     * Start the clock.
+     */
+
+    Frequency = diminuto_frequency();
+    diminuto_assert(Frequency > 0);
+
+    Clock = diminuto_time_clock();
+    diminuto_assert(Clock >= 0);
+
+    Epoch = diminuto_time_elapsed();
+    diminuto_assert(Epoch >= 0);
+
+    Now = Epoch;
+
+    delay = Frequency;
+
+    /*
+     * For some time intervals (e.g. display) we want to
+     * delay initially; for others (e.g. keepalive) we do not.
+     */
 
     expiration_now = expiration_was =
         display_last =
             trace_last =
                 bypass_last =
-                    command_last = ticktock();
+                    command_last = (Now / Frequency);
 
     keepalive_last = 0;
-
-    delay = diminuto_frequency();
 
     /*
      * Initialize all state machines to attempt synchronization with the
@@ -1485,7 +1491,7 @@ int main(int argc, char * argv[])
         if (report) {
             fprintf(out_fp, "INP [%3d]\n", 0);
             fprintf(out_fp, "OUT [%3d]\n", 0);
-            print_local(out_fp, ttff);
+            print_local(out_fp);
             fflush(out_fp);
         }
     }
@@ -1943,10 +1949,13 @@ consume:
          * NMEA sentence, UBX packet, or RTCM message ready to process, acquired
          * either from a state machine or a socket, or there is no input pending
          * and maybe this is a good time to update the display. It is also a
-         * good time to make a note of the current system (not GPS) time.
+         * good time to make a note of the current system time.
          */
 
-        Now = diminuto_time_clock();
+        Clock = diminuto_time_clock();
+        diminuto_assert(Clock >= 0);
+
+        Now = diminuto_time_elapsed();
         diminuto_assert(Now >= 0);
 
         /**
@@ -1976,7 +1985,7 @@ consume:
             /* Do nothing. */
         } else if (!diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
-        } else if (!dingdong(&keepalive_last, keepalive)) {
+        } else if (!expired(&keepalive_last, keepalive)) {
             /* Do nothing. */
         } else {
 
@@ -2016,7 +2025,7 @@ consume:
             /* Do nothing. */
         } else if (diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
-        } else if (!dingdong(&command_last, postpone)) {
+        } else if (!expired(&command_last, postpone)) {
             /* Do nothing. */
         } else {
 
@@ -2240,7 +2249,7 @@ consume:
          */
 
         expiration_was = expiration_now;
-        expiration_now = ticktock();
+        expiration_now = Now / Frequency;
         elapsed = (expiration_now > expiration_was) ? expiration_now - expiration_was : 0;
 
         if (elapsed > 0) {
@@ -2350,7 +2359,10 @@ consume:
                 position[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
-                fix = diminuto_time_elapsed();
+
+                if (Fix < 0) {
+                    Fix = Now;
+                }
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
 
@@ -2359,7 +2371,10 @@ consume:
                 position[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
-                fix = diminuto_time_elapsed();
+
+                if (Fix < 0) {
+                    Fix = Now;
+                }
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
 
@@ -2368,7 +2383,10 @@ consume:
                 position[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
-                fix = diminuto_time_elapsed();
+
+                if (Fix < 0) {
+                    Fix = Now;
+                }
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
 
@@ -2438,7 +2456,10 @@ consume:
                 position[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
-                fix = diminuto_time_elapsed();
+
+                if (Fix < 0) {
+                    Fix = Now;
+                }
 
                 DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
 
@@ -2456,14 +2477,16 @@ consume:
             } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME) && (hazer_parse_pubx_time(&position[system], vector, count) == 0)) {
 
                 /*
-                 * The CAM-M8Q can report time in this sentence without
+                 * The CAM-M8Q can report time in the PUBX,04 sentence without
                  * having a valid fix, apparently based on a prior fix and
-                 * its internal clock. This PUBX sentence also does not
+                 * its own internal clock. This PUBX sentence also does not
                  * indicate the constellation(s) that contributed to the
-                 * solution.
+                 * solution. Because this time may be purely a value
+                 * synthesized by the CAM-M8Q (or any generation 8 U-blox
+                 * receiver), we don't reset the position timer or indicate
+                 * a refresh. We'll depend on a valid position fix (perhaps
+                 * from the PUBX,00 sentence) to indicate a position refresh.
                  */
-                position[system].ticks = timeout;
-                refresh = !0;
 
                 DIMINUTO_LOG_DEBUG("Parse PUBX TIME\n");
 
@@ -2475,23 +2498,6 @@ consume:
 
                 /* Do nothing. */
 
-            }
-
-            /*
-             * Calculate our time to first fix if the code above established
-             * a fix. "Fix" here means both location and time. This means for
-             * this code to accept a "first fix", it has to receive messages
-             * that establish both, even though a location fix is impossible
-             * without also having a time fix. (I mention this because I have
-             * tested this against devices that only emit location messages.)
-             */
-
-            if (fix < 0) {
-                /* Do nothing. */
-            } else if (ttff >= 0) {
-                /* Do nothing. */
-            } else {
-                ttff = fix - epoch;
             }
 
             break;
@@ -2829,7 +2835,7 @@ consume:
             /* Do nothing. */
         } else if (!trace) {
             /* Do nothing. */
-        } else if (!dingdong(&trace_last, frequency)) {
+        } else if (!expired(&trace_last, frequency)) {
             /* Do nothing. */
         } else {
             emit_trace(trace_fp, position, &solution, &attitude, &posveltim, &base);
@@ -2883,7 +2889,7 @@ consume:
         ready = 0;
         fd = -1;
 
-        if (dingdong(&bypass_last, bypass)) {
+        if (expired(&bypass_last, bypass)) {
             /* Do nothing. */
         } else if ((available = diminuto_file_ready(in_fp)) > 0) {
             fd = in_fd;
@@ -2976,7 +2982,7 @@ render:
 
         if (!refresh) {
             /* Do nothing. */
-        } else if (!dingdong(&display_last, slow)) {
+        } else if (!expired(&display_last, slow)) {
             /* Do nothing. */
         } else {
 
@@ -2986,7 +2992,7 @@ render:
              */
 
             if (pps_fp != (FILE *)0) {
-                DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+                DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
                     onepps = poller.onepps;
                     poller.onepps = 0;
                 DIMINUTO_CRITICAL_SECTION_END;
@@ -3000,7 +3006,7 @@ render:
                 fputs("\033[3;1H", out_fp);
             }
             if (report) {
-                print_local(out_fp, ttff);
+                print_local(out_fp);
                 print_positions(out_fp, position, onepps, network_total);
                 print_hardware(out_fp, &hardware);
                 print_status(out_fp, &status);
@@ -3125,7 +3131,7 @@ render:
         diminuto_perror("fclose(dev_fp)");
     }
 
-    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB sustained=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * diminuto_frequency()) / (diminuto_time_elapsed() - epoch)));
+    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB sustained=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * Frequency) / (Now - Epoch)));
 
     free(io_buffer);
 

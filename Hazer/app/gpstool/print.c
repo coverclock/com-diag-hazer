@@ -191,7 +191,7 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
 
 }
 
-void print_local(FILE * fp, diminuto_sticks_t ttff)
+void print_local(FILE * fp)
 {
     int year = 0;
     int month = 0;
@@ -205,13 +205,15 @@ void print_local(FILE * fp, diminuto_sticks_t ttff)
     diminuto_sticks_t offset = 0;
     diminuto_ticks_t fraction = 0;
     diminuto_sticks_t milliseconds = 0;
-    char zone = '\0';
     int rc = 0;
-    static int once = 0;
 
     fputs("LOC", fp);
 
-    rc = diminuto_time_juliet(Now, &year, &month, &day, &hour, &minute, &second, &fraction);
+    /*
+     * LOCAL CLOCK TIME
+     */
+
+    rc = diminuto_time_juliet(Clock, &year, &month, &day, &hour, &minute, &second, &fraction);
     diminuto_assert(rc == 0);
     diminuto_assert((1 <= month) && (month <= 12));
     diminuto_assert((1 <= day) && (day <= 31));
@@ -241,7 +243,6 @@ void print_local(FILE * fp, diminuto_sticks_t ttff)
      */
 
     offset = diminuto_time_timezone();
-    zone = diminuto_time_zonename(offset);
 
     offset = diminuto_frequency_ticks2wholeseconds(offset);
     hour = offset / 3600;
@@ -257,44 +258,26 @@ void print_local(FILE * fp, diminuto_sticks_t ttff)
      * typically, fixed).
      */
 
-    offset = diminuto_time_daylightsaving(Now);
+    offset = diminuto_time_daylightsaving(Clock);
     offset = diminuto_frequency_ticks2wholeseconds(offset);
     hour = offset / 3600;
-    fprintf(fp, "%+2.2d%c", hour, zone);
+    fprintf(fp, "%+2.2d", hour);
 
     /*
-     * This is where we calculate time to first fix. We display dashes
-     * if it is negative, asterisks if it is a day or more, the actual
-     * values otherwise.
+     * ELAPSED MONOTONIC TIME
      */
 
-    if (ttff < 0) {
+    rc = diminuto_time_duration(Now - Epoch, &day, &hour, &minute, &second, &fraction);
+    diminuto_assert(rc >= 0);
+    diminuto_assert(day >= 0);
+    diminuto_assert((0 <= hour) && (hour <= 23));
+    diminuto_assert((0 <= minute) && (minute <= 59));
+    diminuto_assert((0 <= second) && (second <= 59));
+    milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
+    diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
+    hour += day * 24;
 
-        fprintf(fp, " %2s:%2s:%2s.%3s", "--", "--", "--", "---");
-
-    } else {
-
-        rc = diminuto_time_duration(ttff, &day, &hour, &minute, &second, &fraction);
-        diminuto_assert(rc >= 0);
-        diminuto_assert(day >= 0);
-        diminuto_assert((0 <= hour) && (hour <= 23));
-        diminuto_assert((0 <= minute) && (minute <= 59));
-        diminuto_assert((0 <= second) && (second <= 59));
-        milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-        diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
-
-        if (day > 0) {
-            fprintf(fp, " %2s:%2s:%2s.%3s", "**", "**", "**", "***");
-        } else {
-            fprintf(fp, " %02d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
-        }
-
-        if (!once) {
-            DIMINUTO_LOG_NOTICE("Fix %d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
-            once = !0;
-        }
-
-    }
+    fprintf(fp, " %3d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
 
@@ -432,9 +415,6 @@ void print_status(FILE * fp, const yodel_status_t * sp)
 void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t bytes)
 {
     unsigned int system = 0;
-    int dmyokay = 0;
-    int totokay = 0;
-    static int once = 0;
 
     {
         int year = 0;
@@ -444,13 +424,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
         int minute = 0;
         int second = 0;
         uint64_t nanoseconds = 0;
-        char zone = '\0';
         int rc = 0;
-        diminuto_sticks_t elapsed = 0;
         diminuto_ticks_t fraction = 0;
         diminuto_sticks_t milliseconds = 0;
-
-        zone = diminuto_time_zonename(0);
+        static int timeonce = 0;
+        static int fixonce = 0;
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
@@ -458,10 +436,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             if (pa[system].utc_nanoseconds == 0) { continue; }
             if (pa[system].dmy_nanoseconds == 0) { continue; }
 
-            dmyokay = !0;
-            totokay = (pa[system].tot_nanoseconds >= pa[system].old_nanoseconds);
-
             fputs("TIM", fp);
+
+            /*
+             * GPS TIME
+             */
 
             hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
             diminuto_assert((1 <= month) && (month <= 12));
@@ -470,28 +449,55 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             diminuto_assert((0 <= minute) && (minute <= 59));
             diminuto_assert((0 <= second) && (second <= 59));
             diminuto_assert((0 <= nanoseconds) && (nanoseconds < 1000000000LLU));
-            fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00%c", year, month, day, hour, minute, second, zone);
+            fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00", year, month, day, hour, minute, second);
 
-            if (!once) {
-                DIMINUTO_LOG_NOTICE("Time %04d-%02d-%02dT%02d:%02d:%02d%c", year, month, day, hour, minute, second, zone);
-                once = !0;
+            if (!timeonce) {
+                DIMINUTO_LOG_NOTICE("Time %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
+                timeonce = !0;
             }
 
-            elapsed = Now - Epoch;
-            rc = diminuto_time_duration(elapsed, &day, &hour, &minute, &second, &fraction);
-            diminuto_assert(rc >= 0);
-            diminuto_assert(day >= 0);
-            diminuto_assert((0 <= hour) && (hour <= 23));
-            diminuto_assert((0 <= minute) && (minute <= 59));
-            diminuto_assert((0 <= second) && (second <= 59));
-            milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-            diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
+            /*
+             * TIME TO FIRST FIX (TTFF)
+             */
 
-            fprintf(fp, " %3d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
+            /*
+             * This is where we calculate time to first fix. We display dashes
+             * if it is negative, asterisks if it is a day or more, the actual
+             * values otherwise. Note that although the TTFF is displayed for
+             * each GNSS there is only one global TTFF.
+             */
 
-            fprintf(fp, " %cpps", pps ? '1' : '0');
+            if (Fix < 0) {
 
-            fprintf(fp, "%11s", "");
+                fprintf(fp, " %2s:%2s:%2s.%3s", "--", "--", "--", "---");
+
+            } else {
+
+                rc = diminuto_time_duration(Fix - Epoch, &day, &hour, &minute, &second, &fraction);
+                diminuto_assert(rc >= 0);
+                diminuto_assert(day >= 0);
+                diminuto_assert((0 <= hour) && (hour <= 23));
+                diminuto_assert((0 <= minute) && (minute <= 59));
+                diminuto_assert((0 <= second) && (second <= 59));
+                milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
+                diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
+
+                if (day > 0) {
+                    fprintf(fp, " %2s:%2s:%2s.%3s", "**", "**", "**", "***");
+                } else {
+                    fprintf(fp, " %02d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
+                }
+
+                if (!fixonce) {
+                    DIMINUTO_LOG_NOTICE("Fix %d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
+                    fixonce = !0;
+                }
+
+            }
+
+            fprintf(fp, " %cPPS", pps ? '1' : '0');
+
+            fprintf(fp, "%16s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
@@ -665,11 +671,16 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
     }
 
     {
-        int count = 0;
+        int atleastone = 0;
+        int dmyokay = 0;
+        int totokay = 0;
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (pa[system].ticks == 0) { continue; }
+
+            dmyokay = (pa[system].dmy_nanoseconds > 0); 
+            totokay = (pa[system].tot_nanoseconds >= pa[system].old_nanoseconds);
 
             fputs("INT", fp);
 
@@ -684,22 +695,20 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             fputc('\n', fp);
 
-            count += 1;
+            atleastone = !0;
 
         }
 
-        if (count <= 0) {
+        if (!atleastone) {
 
             fputs("INT", fp);
 
-            fprintf(fp, " %s", "---");
-            fprintf(fp, " [%2u]", 0);
-            fprintf(fp, " %3s", dmyokay ? "DMY" : "dmy");
-            fprintf(fp, " %3s", totokay ? "TOT" : "tot");
-            fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d %2d )", 0, 0, 0, 0, 0, 0, 0, 0);
-
-            fprintf(fp, " %20uB", 0);
-
+            fputs(" ---", fp);
+            fputs(" [ 0]", fp);
+            fputs(" dmy", fp);
+            fputs(" tot", fp);
+            fputs(" (  0  0  0  0  0  0  0  0 )", fp);
+            fputs("                    0B", fp);
             fprintf(fp, " %-8.8s", Device);
 
             fputc('\n', fp);

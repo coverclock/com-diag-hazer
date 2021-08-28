@@ -10,9 +10,10 @@
  */
 
 #include "types.h"
+#include "globals.h"
 #include "helpers.h"
 
-int dingdong(seconds_t * wasp, timeout_t seconds)
+int expired(seconds_t * wasp, timeout_t seconds)
 {
     int result = !0;
     seconds_t now = 0;
@@ -22,8 +23,8 @@ int dingdong(seconds_t * wasp, timeout_t seconds)
     } else if (seconds == 0) {
         /* Do nothing. */
     } else if (*wasp == 0) {
-        *wasp = ticktock();
-    } else if ((result = ((now = ticktock()) >= (*wasp + seconds)))) {
+        *wasp = (Epoch - Now) / Frequency;
+    } else if ((result = ((now = (Epoch - Now) / Frequency) >= (*wasp + seconds)))) {
         *wasp = now;
     } else {
         /* Do nothing. */

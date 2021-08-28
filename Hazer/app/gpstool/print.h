@@ -34,9 +34,8 @@ extern void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t 
 /**
  * Print the local (Juliet) time (and the release string).
  * @param fp points to the FILE stream.
- * @param timetofirstfix is the number of ticks until thr first fix.
  */
-extern void print_local(FILE * fp, diminuto_sticks_t timetofirstfix);
+extern void print_local(FILE * fp);
 
 /**
  * Print the hardware monitor details.

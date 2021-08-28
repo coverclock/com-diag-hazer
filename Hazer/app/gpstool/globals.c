@@ -19,8 +19,14 @@ pid_t Process = 0;
 
 const char * Device = "stdin";
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t Mutex = PTHREAD_MUTEX_INITIALIZER;
 
-diminuto_sticks_t Epoch = 0;
+diminuto_sticks_t Frequency = -1;
 
-diminuto_sticks_t Now = 0;
+diminuto_sticks_t Clock = -1;
+
+diminuto_sticks_t Epoch = -1;
+
+diminuto_sticks_t Fix = -1;
+
+diminuto_sticks_t Now = -1;

@@ -40,15 +40,33 @@ extern const char * Device;
 /**
  * This is our POSIX thread mutual exclusion semaphore.
  */
-extern pthread_mutex_t mutex;
+extern pthread_mutex_t Mutex;
 
 /**
- * THis is the initial system (not GPS) time.
+ * This is the Hazer time base frequency (typically one gigahertz).
+ */
+extern diminuto_sticks_t Frequency;
+
+/**
+ * This is the current system clock time. Unlike monotonic clock
+ * time, this can change dynamicall via administrative action, by the
+ * Network Time Protocol (NTP), or even by the insertion or deletion
+ * of leap seconds.
+ */
+extern diminuto_sticks_t Clock;
+
+/**
+ * This is the initial monotonic clock time.
  */
 extern diminuto_sticks_t Epoch;
 
 /**
- * THis is the current system (not GPS) time.
+ * This is the monotonic clock time of the first fix.
+ */
+extern diminuto_sticks_t Fix;
+
+/**
+ * This is the current monotonic time.
  */
 extern diminuto_sticks_t Now;
 

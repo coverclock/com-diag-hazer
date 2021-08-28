@@ -56,7 +56,7 @@ void * dcdpoller(void * argp)
                 rc = diminuto_pin_set(ctxp->strobefp);
                 if (rc < 0) { break; }
             }
-            DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+            DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
                 ctxp->onepps = !0;
             DIMINUTO_CRITICAL_SECTION_END;
         } else {
@@ -120,7 +120,7 @@ void * gpiopoller(void * argp)
                     rc = diminuto_pin_set(pollerp->strobefp);
                     if (rc < 0) { break; }
                 }
-                DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+                DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
                     pollerp->onepps = !0;
                 DIMINUTO_CRITICAL_SECTION_END;
             } else {
