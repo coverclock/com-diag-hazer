@@ -2514,6 +2514,10 @@ consume:
                 refresh = !0;
                 trace = !0;
 
+                if (Fix < 0) {
+                    Fix = Now;
+                }
+
                 DIMINUTO_LOG_DEBUG("Parse UBX-NAV-HPPOSLLH\n");
 
             } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
@@ -2980,10 +2984,20 @@ render:
          * Generate the display if necessary and sufficient reasons exist.
          */
 
-        if (!refresh) {
+        if (!expired(&display_last, slow)) {
+
             /* Do nothing. */
-        } else if (!expired(&display_last, slow)) {
-            /* Do nothing. */
+
+        } else if (!refresh) {
+
+            if (escape) {
+                fputs("\033[3;1H", out_fp);
+            }
+
+            if (report) {
+                print_local(out_fp);
+            }
+
         } else {
 
             /*
