@@ -277,11 +277,13 @@ void print_local(FILE * fp)
     diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
     hour += day * 24;
 
-    fprintf(fp, " %3d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
+    fprintf(fp, " %02d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
 
     fprintf(fp, " %10d", Process);
+
+    fputs(" ", fp);
 
     fprintf(fp, " %-8.8s", Hostname);
 
