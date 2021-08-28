@@ -33,27 +33,27 @@ minus the end matter like a checksum etc., which is added independently
 of when this line was emitted. The number in the square brackets is the
 length of the output data minus the end matter.
 
-    LOC 2020-06-11T12:24:01.018-07:00+01T 00:00:00.871 34.2.0        11003 hacienda
+    LOC 2021-08-28T15:13:50.053-07:00+01 00:00:08.299 44.0.0      3002494  cadmium
 
 LOC is the current local time provided by the host system, the elapsed
 time to first fix, the software release number, the process id, and the
 local host name.  The local time, with a fractional part in milliseconds,
 includes the time zone offset from UTC in hours and minutes, the current
-daylight saving time (DST) offset in hours, and the military time zone
-letter. If the time zone offset is an even number of hours (some aren't:
-Newfie Time, I'm looking at you), it will be a letter like "T" ("Tango")
-for Mountain Standard Time as found in Denver; otherwise it will be "J"
-("Juliet") to indicate any local time zone. This line also includes
-the duration before a fix was received by the application, the Hazer
-release string, the process identifier of the application, and the
-hostname of the host system truncated to eight characters.
+daylight saving time (DST) offset in hours. The next field is the elapsed
+time since the application began running, also in milliseconds. The
+following fields are the Hazer release string, the process identifier
+of the application, is the Hazer release string, and the first eight
+characters of the name of the host system.
 
-    TIM 2020-06-11T18:24:00.000-00:00+00Z 0pps                             GNSS
+    TIM 2021-08-28T21:13:50.000-00:00+00 00:00:00.297 pps                  GNSS
 
-TIM is the most recent time solution, in UTC (or 'Z' for "Zulu"), and
-the current value of the One Pulse Per Second (1PPS) signal if the device
-provides it and it was enabled on the command line using -c (using data
-carrier detect or DCD) or -I (using general purpose input/output or GPIO).
+TIM is the most recent time solution in UTC, the elapsed time of the
+initial position fix (or dashes if no position fix has occurred yet, or
+asterisks if it is more than a day), and the current value of the One
+Pulse Per Second (1PPS) signal ("PPS" if true, "pps" if false) if the
+device provides it and it was enabled on the command line using -c (using
+data carrier detect or DCD) or -I (using general purpose input/output
+or GPIO).
 
     POS 39°47'39.364"N, 105°09'12.315"W    39.7942678, -105.1534210        GNSS
 
