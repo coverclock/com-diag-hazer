@@ -471,7 +471,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             if (Fix < 0) {
 
-                fprintf(fp, " %2s:%2s:%2s.%3s", "--", "--", "--", "---");
+                fputs(" --:--:--.---", fp);
 
             } else {
 
@@ -485,7 +485,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
                 diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
 
                 if (day > 0) {
-                    fprintf(fp, " %2s:%2s:%2s.%3s", "**", "**", "**", "***");
+                    fputs(" **:**:**.***", fp);
                 } else {
                     fprintf(fp, " %02d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
                 }
@@ -497,9 +497,9 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             }
 
-            fprintf(fp, " %c PPS", pps ? '1' : '0');
+            fprintf(fp, " %s", pps ? "PPS" : "pps");
 
-            fprintf(fp, "%15s", "");
+            fprintf(fp, "%17s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
