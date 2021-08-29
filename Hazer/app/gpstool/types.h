@@ -25,14 +25,9 @@
  ******************************************************************************/
 
 /**
- * Monotonic elapsed seconds, unsigned so it wraps around.
+ * Monotonic elapsed seconds.
  */
-typedef uint64_t seconds_t;
-
-/**
- * Timeout seconds, signed so <0 indicate special cases.
- */
-typedef int64_t timeout_t;
+typedef int64_t seconds_t;
 
 /*******************************************************************************
  * ENUMERATIONS

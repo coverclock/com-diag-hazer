@@ -13,16 +13,16 @@
 #include "globals.h"
 #include "helpers.h"
 
-int expired(seconds_t * wasp, timeout_t seconds)
+int expired(seconds_t * wasp, seconds_t seconds)
 {
-    int result = !0;
+    int result = 0;
     seconds_t now = 0;
 
     if (seconds < 0) {
-        result = 0;
-    } else if (seconds == 0) {
         /* Do nothing. */
-    } else if ((result = ((now = (Now - Epoch) / Frequency) >= (*wasp + seconds)))) {
+    } else if (seconds == 0) {
+        result = !0;
+    } else if ((result = ((now = Now / Frequency) >= (*wasp + seconds)))) {
         *wasp = now;
     } else {
         /* Do nothing. */

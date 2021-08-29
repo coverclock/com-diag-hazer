@@ -23,7 +23,7 @@
  * @param seconds is the number of seconds desired to elapse, <0 for never, 0 for always.
  * @return true if the specified number of seconds has elapsed.
  */
-extern int expired(seconds_t * wasp, timeout_t seconds);
+extern int expired(seconds_t * wasp, seconds_t seconds);
 
 /**
  * Common function to count down the expiration fields in the database.

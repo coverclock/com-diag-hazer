@@ -185,12 +185,12 @@ int main(int argc, char * argv[])
     int unknown = 0;
     int serial = 0;
     int daemon = 0;
-    timeout_t slow = 0;
-    timeout_t timeout = HAZER_GNSS_SECONDS;
-    timeout_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
-    timeout_t frequency = 1;
-    timeout_t postpone = 0;
-    timeout_t bypass = -1;
+    seconds_t slow = 0;
+    seconds_t timeout = HAZER_GNSS_SECONDS;
+    seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
+    seconds_t frequency = 1;
+    seconds_t postpone = 0;
+    seconds_t bypass = -1;
     /*
      * Configuration command variables.
      */
@@ -1464,9 +1464,9 @@ int main(int argc, char * argv[])
         display_last =
             trace_last =
                 bypass_last =
-                    command_last = (Epoch / Frequency);
+                    command_last = Now / Frequency;
 
-    keepalive_last = (Epoch / Frequency) - keepalive;
+    keepalive_last = (Now / Frequency) - keepalive;
 
     /*
      * Initialize all state machines to attempt synchronization with the
