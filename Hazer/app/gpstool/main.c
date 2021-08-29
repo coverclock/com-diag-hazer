@@ -1464,9 +1464,9 @@ int main(int argc, char * argv[])
         display_last =
             trace_last =
                 bypass_last =
-                    command_last = (Now / Frequency);
+                    command_last = (Epoch / Frequency);
 
-    keepalive_last = 0;
+    keepalive_last = (Epoch / Frequency) - keepalive;
 
     /*
      * Initialize all state machines to attempt synchronization with the

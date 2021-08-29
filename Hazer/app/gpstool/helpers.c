@@ -22,9 +22,7 @@ int expired(seconds_t * wasp, timeout_t seconds)
         result = 0;
     } else if (seconds == 0) {
         /* Do nothing. */
-    } else if (*wasp == 0) {
-        *wasp = (Epoch - Now) / Frequency;
-    } else if ((result = ((now = (Epoch - Now) / Frequency) >= (*wasp + seconds)))) {
+    } else if ((result = ((now = (Now - Epoch) / Frequency) >= (*wasp + seconds)))) {
         *wasp = now;
     } else {
         /* Do nothing. */
