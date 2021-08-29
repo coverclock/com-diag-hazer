@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	44# API changes that may require that applications be modified.
 MINOR				:=	0# Only functionality or features added with no legacy API changes.
-BUILD				:=	3# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	4# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -734,17 +734,19 @@ sanity:
 # Just a reminder of the functional tests I find useful to run.
 # Many of these require special hardware or test fixtures.
 functional:
-	@echo "checksums"
-	@echo "emissions"
-	@echo "emissionsslow"
-	@echo "kitchensink"
-	@echo "bu353w10 with the GlobalSat BU-353W10"
-	@echo "bu353w10C (concatenate)"
-	@echo "bu353w10D (datagrams) with the GlobalSat BU-353W10"
-	@echo "bu353w10F (frequency) with the GlobalSat BU-353W10"
-	@echo "bu353w10S (source) with the GlobalSat BU-353W10"
-	@echo "neom8n1pps (1PPS) with the u-blox NEO-M8N"
-	@echo "gr701w1pps (1PPS) with the NaviSys GR701W"
+	@echo 'The following functional tests do not require special hardware:'
+	@echo '    checksums'
+	@echo '    emissions'
+	@echo '    emissionsslow'
+	@echo '    kitchensink'
+	@echo '    bu353w10C  # (Concatenate)'
+	@echo 'The following functional tests require special hardware:'
+	@echo '    bu353w10   # with the GlobalSat BU-353W10'
+	@echo '    bu353w10D  # (Datagrams) with the GlobalSat BU-353W10'
+	@echo '    bu353w10F  # (Frequency) with the GlobalSat BU-353W10'
+	@echo '    bu353w10S  # (Source) with the GlobalSat BU-353W10'
+	@echo '    neom8n1pps # (1 Pulse Per Second) with the u-blox NEO-M8N'
+	@echo '    gr701w1pps # (1 Pulse Per Second) with the NaviSys GR701W'
 
 valgrind:
 	cat dat/hazer/ubx-cam-m8q-dan-1.dat dat/hazer/ubx-cam-m8q-dan-2.dat | valgrind gpstool -R

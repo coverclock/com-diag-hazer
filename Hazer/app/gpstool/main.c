@@ -3145,7 +3145,11 @@ render:
         diminuto_perror("fclose(dev_fp)");
     }
 
-    DIMINUTO_LOG_INFORMATION("Buffer size=%lluB maximum=%lluB total=%lluB sustained=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * Frequency) / (Now - Epoch)));
+    Now = diminuto_time_elapsed();
+    diminuto_assert(Now >= 0);
+    if (Now > Epoch) {
+        DIMINUTO_LOG_INFORMATION("Bandwidth size=%lluB maximum=%lluB total=%lluB sustained=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * Frequency) / (Now - Epoch)));
+    }
 
     free(io_buffer);
 
