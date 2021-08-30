@@ -685,7 +685,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             dmyokay = (pa[system].dmy_nanoseconds > 0); 
             totokay = (pa[system].tot_nanoseconds > pa[system].old_nanoseconds);
             if (totokay != totokay_prior) {
-                DIMINUTO_LOG_NOTICE(totokay ? "Monotonic" : "Retrograde");
+                DIMINUTO_LOG_NOTICE("Clock %s\n", totokay ? "Monotonic" : "Retrograde");
                 totokay_prior = totokay;
             }
 
