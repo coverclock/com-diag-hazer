@@ -160,3 +160,12 @@ clock is in holdover, synthesized and not disciplined by a current 3D
 position fix.
 
 I can see where this might be useful, but I find it misleading.
+
+## RMC FAILING TO REPORT TIME AFTER 3D LOCK
+
+While testing the PUBX,04 feature mentioned above, I encountered a
+case where the U-blox CAM-M8Q reported a 3D lock with seven satellites
+active, was reporting the correct UTC time in the PUBX,04 TIME message,
+but the NMEA RMC message did not report the time (indicated via a 'V'
+that it had no lock). I power cycled the device, and it worked correctly
+on the subsequent identical test sequence.

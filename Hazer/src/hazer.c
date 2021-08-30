@@ -1479,7 +1479,6 @@ int hazer_parse_txt(char * vector[], size_t count)
 int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * activep, char * vector[], size_t count)
 {
     int rc = -1;
-    int satellites = 0;
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION;
 
@@ -1508,7 +1507,12 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
             positionp->old_nanoseconds = positionp->tot_nanoseconds;
             positionp->tot_nanoseconds = total;
         }
+        positionp->sat_used = strtol(vector[18], (char **)0, 10);
+        positionp->label = PUBX;
         activep->mode = 0;
+        activep->hdop = hazer_parse_dop(vector[15]);
+        activep->vdop = hazer_parse_dop(vector[16]);
+        activep->tdop = hazer_parse_dop(vector[17]);
         activep->label = PUBX;
         /* Do not return success. */
     } else {
@@ -1525,8 +1529,7 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         positionp->sep_millimeters = hazer_parse_alt(vector[7], *(vector[12]), &positionp->sep_digits);
         positionp->sog_millimetersperhour = hazer_parse_smm(vector[11], &positionp->sog_digits);
         positionp->cog_nanodegrees = hazer_parse_cog(vector[12], &positionp->cog_digits);
-        satellites = strtol(vector[18], (char **)0, 10);
-        positionp->sat_used = satellites;
+        positionp->sat_used = strtol(vector[18], (char **)0, 10);
         positionp->label = PUBX;
         if (strncmp(vector[8], "DR", sizeof("DR")) == 0) {
             activep->mode = 1;
@@ -1607,11 +1610,6 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
                     rangers[system] = ranger;
                     active[system].active = ranger;
                 }
-                active[system].mode = active[HAZER_SYSTEM_GNSS].mode;
-                active[system].pdop = active[HAZER_SYSTEM_GNSS].pdop;
-                active[system].hdop = active[HAZER_SYSTEM_GNSS].hdop;
-                active[system].vdop = active[HAZER_SYSTEM_GNSS].vdop;
-                active[system].tdop = active[HAZER_SYSTEM_GNSS].tdop;
                 active[system].system = system;
                 active[system].label = PUBX;
             } else if (vector[index + 1][0] == 'e') {

@@ -2454,6 +2454,7 @@ consume:
             } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION) && ((rc = hazer_parse_pubx_position(&position[system], &active[system], vector, count)) == 0)) {
 
                 position[system].ticks = timeout;
+                active[system].ticks = timeout;
                 refresh = !0;
                 trace = !0;
 
@@ -2468,6 +2469,17 @@ consume:
                 for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
                     if ((rc & (1 << system)) != 0) {
                         view[system].ticks = timeout;
+                        if (system == HAZER_SYSTEM_GNSS) {
+                            /* Do nothing. */
+                        } else if (active[HAZER_SYSTEM_GNSS].ticks == 0) {
+                            /* Do nothing. */
+                        } else {
+                            active[system].mode = active[HAZER_SYSTEM_GNSS].mode;
+                            active[system].pdop = active[HAZER_SYSTEM_GNSS].pdop;
+                            active[system].hdop = active[HAZER_SYSTEM_GNSS].hdop;
+                            active[system].vdop = active[HAZER_SYSTEM_GNSS].vdop;
+                            active[system].tdop = active[HAZER_SYSTEM_GNSS].tdop;
+                        }
                         active[system].ticks = timeout;
                         refresh = !0;
                         DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS (%s)\n", HAZER_SYSTEM_NAME[system]);
