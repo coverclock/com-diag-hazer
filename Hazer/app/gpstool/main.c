@@ -1981,7 +1981,7 @@ consume:
 
         if (surveyor_fd < 0) {
             /* Do nothing. */
-        } else if (acknakpending > 0) {
+        } else if (acknakpending) {
             /* Do nothing. */
         } else if (!diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
@@ -2021,7 +2021,7 @@ consume:
 
         if (dev_fp == (FILE *)0) {
             /* Do nothing. */
-        } else if (acknakpending > 0) {
+        } else if (acknakpending) {
             /* Do nothing. */
         } else if (diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
@@ -2062,8 +2062,8 @@ consume:
                 case OPT_A:
                     command_total = emit_packet(dev_fp, command_buffer, command_length);
                     if (command_total > 0) {
-                        acknakpending += 1;
-                        DIMINUTO_LOG_NOTICE("Pending %d", acknakpending);
+                        acknakpending = !0;
+                        DIMINUTO_LOG_NOTICE("Pending");
                     }
                     break;
                 case OPT_U:
@@ -2104,7 +2104,7 @@ consume:
 
         if (!diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
-        } else if (acknakpending > 0) {
+        } else if (acknakpending) {
             /* Do nothing. */
         } else if (nominal) {
             /* Do nothing. */
@@ -2560,9 +2560,7 @@ consume:
                     eof = !0;
                 }
 
-                if (acknakpending > 0) {
-                    acknakpending -= 1;
-                }
+                acknakpending = 0;
 
             } else if (yodel_ubx_cfg_valget(buffer, length) == 0) {
 
@@ -2834,7 +2832,7 @@ consume:
             /* Do nothing. */
         } else if (!diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
-        } else if (acknakpending > 0) {
+        } else if (acknakpending) {
             /* Do nothing. */
         } else if (!emit_solution(arp, &base, &solution)) {
             /* Do nothing. */
