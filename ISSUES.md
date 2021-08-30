@@ -159,7 +159,11 @@ is anything in the message to indicate that this time is, when the device
 clock is in holdover, synthesized and not disciplined by a current 3D
 position fix.
 
-I can see where this might be useful, but I find it misleading.
+I have seen the NMEA sentences GGA, GLL, and RMC also contain a
+synthesized time, but they contain indicators that there is no active fix,
+so the application can know to discount these times.
+
+I find it misleading.
 
 ## RMC FAILING TO REPORT TIME AFTER 3D LOCK
 
