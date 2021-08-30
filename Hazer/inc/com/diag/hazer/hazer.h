@@ -944,6 +944,26 @@ extern int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t
  ******************************************************************************/
 
 /**
+ * Various encodings for the fix mode. Note that larger numbers do not necessarily
+ * indicate a better fix. The values were chosen mostly to preserve the encoding
+ * specified by NMEA while capturing other possibilities of UBX PUBX.
+ * NMEA 0183 4.10 p. 94.
+ * UBX M8 R24 p. 164.
+ */
+typedef enum HazerMode {
+    HAZER_MODE          = 0,
+    HAZER_MODE_NOFIX    = 1,
+    HAZER_MODE_2D       = 2,
+    HAZER_MODE_3D       = 3,
+    HAZER_MODE_COMBINED = 4,
+    HAZER_MODE_DGNSS2D  = 5,
+    HAZER_MODE_DGNSS3D  = 6,
+    HAZER_MODE_TIME     = 7,
+    HAZER_MODE_IMU      = 8,
+    HAZER_MODE_UNKNOWN  = 9,
+} hazer_mode_t;
+
+/**
  * This structure maintains the information on the satellites in any
  * constellation that were used in the position solution.
  */
@@ -956,7 +976,7 @@ typedef struct HazerActive {
     uint16_t tdop;				        /* Time Dilution Of Precision * 100. */
     uint8_t system;				        /* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
     uint8_t active;                     /* Number of satellites active. */
-    uint8_t mode;                       /* Navigation mode: 0(Unknown), 1(D), 2(D), 3(D). */
+    uint8_t mode;                       /* Navigation mode: see HazerMode. */
     hazer_expiry_t ticks;		        /* Lifetime in application-defined ticks. */
 } hazer_active_t;
 
@@ -973,7 +993,7 @@ typedef struct HazerActive {
         HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, \
         HAZER_SYSTEM_TOTAL, \
         0, \
-        0, \
+        HAZER_MODE, \
         0, \
     }
 

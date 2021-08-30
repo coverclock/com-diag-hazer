@@ -1509,7 +1509,7 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         }
         positionp->sat_used = strtol(vector[18], (char **)0, 10);
         positionp->label = PUBX;
-        activep->mode = 0;
+        activep->mode = HAZER_MODE_TIME;
         activep->hdop = hazer_parse_dop(vector[15]);
         activep->vdop = hazer_parse_dop(vector[16]);
         activep->tdop = hazer_parse_dop(vector[17]);
@@ -1532,19 +1532,19 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         positionp->sat_used = strtol(vector[18], (char **)0, 10);
         positionp->label = PUBX;
         if (strncmp(vector[8], "DR", sizeof("DR")) == 0) {
-            activep->mode = 1;
+            activep->mode = HAZER_MODE_IMU;
         } else if (strncmp(vector[8], "G2", sizeof("G2")) == 0) {
-            activep->mode = 2;
+            activep->mode = HAZER_MODE_2D;
         } else if (strncmp(vector[8], "G3", sizeof("G3")) == 0) {
-            activep->mode = 3;
+            activep->mode = HAZER_MODE_3D;
         } else if (strncmp(vector[8], "RK", sizeof("RK")) == 0) {
-            activep->mode = 4;
+            activep->mode = HAZER_MODE_COMBINED;
         } else if (strncmp(vector[8], "D2", sizeof("D2")) == 0) {
-            activep->mode = 5;
+            activep->mode = HAZER_MODE_DGNSS2D;
         } else if (strncmp(vector[8], "D3", sizeof("D3")) == 0) {
-            activep->mode = 6;
+            activep->mode = HAZER_MODE_DGNSS3D;
         } else {
-            activep->mode = 0;
+            activep->mode = HAZER_MODE_UNKNOWN;
         }
         activep->hdop = hazer_parse_dop(vector[15]);
         activep->vdop = hazer_parse_dop(vector[16]);

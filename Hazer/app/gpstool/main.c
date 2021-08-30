@@ -2360,11 +2360,12 @@ consume:
                 refresh = !0;
                 trace = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
+
                 if (Fix < 0) {
                     Fix = Now;
+                    DIMINUTO_LOG_NOTICE("First NMEA GGA\n");
                 }
-
-                DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_RMC) && hazer_parse_rmc(&position[system], vector, count) == 0) {
 
@@ -2372,11 +2373,12 @@ consume:
                 refresh = !0;
                 trace = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
+
                 if (Fix < 0) {
                     Fix = Now;
+                    DIMINUTO_LOG_NOTICE("First NMEA RMC\n");
                 }
-
-                DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_GLL) && hazer_parse_gll(&position[system], vector, count) == 0) {
 
@@ -2384,11 +2386,12 @@ consume:
                 refresh = !0;
                 trace = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
+
                 if (Fix < 0) {
                     Fix = Now;
+                    DIMINUTO_LOG_NOTICE("First NMEA GLL\n");
                 }
-
-                DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_VTG) && hazer_parse_vtg(&position[system], vector, count) == 0) {
 
@@ -2428,6 +2431,22 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GSA\n");
 
+                /*
+                 * If the GSA sentences indicates a 3D fix and we haven't seen a fix from any
+                 * sentence prior to this, we log that. That allows us to figure out when the
+                 * fix occurred even though we might be losing other sentences due to sync
+                 * errors etc. and the like.
+                 */
+
+                if (Fix >= 0) {
+                    /* Do nothing. */
+                } else if (active[system].mode <= 1) {
+                    /* Do nothing. */
+                } else {
+                    Fix = Now;
+                    DIMINUTO_LOG_NOTICE("First NMEA GSA\n");
+                }
+
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSV) && (rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
 
                 /*
@@ -2458,11 +2477,12 @@ consume:
                 refresh = !0;
                 trace = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
+
                 if (Fix < 0) {
                     Fix = Now;
+                    DIMINUTO_LOG_NOTICE("First PUBX POSITION\n");
                 }
-
-                DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
 
             } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && ((rc = hazer_parse_pubx_svstatus(view, active, vector, count)) != 0)) {
 
@@ -2526,11 +2546,12 @@ consume:
                 refresh = !0;
                 trace = !0;
 
+                DIMINUTO_LOG_DEBUG("Parse UBX-NAV-HPPOSLLH\n");
+
                 if (Fix < 0) {
                     Fix = Now;
+                    DIMINUTO_LOG_NOTICE("First UBX-NAV-HPPOSLLH\n");
                 }
-
-                DIMINUTO_LOG_DEBUG("Parse UBX-NAV-HPPOSLLH\n");
 
             } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 
