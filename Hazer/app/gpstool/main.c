@@ -2432,15 +2432,15 @@ consume:
                 DIMINUTO_LOG_DEBUG("Parse NMEA GSA\n");
 
                 /*
-                 * If the GSA sentences indicates a 3D fix and we haven't seen a fix from any
+                 * If the GSA sentences indicates a fix and we haven't seen a fix from any
                  * sentence prior to this, we log that. That allows us to figure out when the
                  * fix occurred even though we might be losing other sentences due to sync
-                 * errors etc. and the like.
+                 * errors and the like.
                  */
 
                 if (Fix >= 0) {
                     /* Do nothing. */
-                } else if (active[system].mode <= 1) {
+                } else if (active[system].mode <= HAZER_MODE_NOFIX) {
                     /* Do nothing. */
                 } else {
                     Fix = Now;
