@@ -104,6 +104,7 @@ typedef enum Marker {
     ACTIVE      = '<',
     PHANTOM     = '?',
     UNTRACKED   = '!',
+    UNUSED      = '-',
 } marker_t;
 
 /**

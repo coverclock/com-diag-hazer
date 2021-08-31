@@ -1059,7 +1059,7 @@ typedef struct HazerSatellite {
     uint8_t signal;             /* Signal band identifier. */
     uint8_t phantom;			/* If true, elevation or azimuth were empty. */
     uint8_t untracked;          /* If true, signal strength was empty. */
-    uint8_t unused;             /* Unused. */
+    uint8_t unused;             /* If true, unused. */
 } hazer_satellite_t;
 
 /**
