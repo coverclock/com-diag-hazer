@@ -63,7 +63,7 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
         fprintf(fp, " } [%2u] [%2u] [%2u] [%2u]", count, aa[system].active, total, maximum);
 
-        fprintf(fp, " %1.1dD", aa[system].mode);
+        fprintf(fp, " %2.2s", HAZER_MODE_NAME[aa[system].mode]);
 
         fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
@@ -85,7 +85,7 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
         fprintf(fp, " } [%2u] [%2u] [%2u] [%2u]", count, aa[system].active, total, maximum);
 
-        fprintf(fp, " %1.1dD", aa[system].mode);
+        fprintf(fp, " %2.2s", HAZER_MODE_NAME[aa[system].mode]);
 
         fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 

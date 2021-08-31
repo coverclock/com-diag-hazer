@@ -29,6 +29,8 @@ const char * HAZER_TALKER_NAME[] = HAZER_TALKER_NAME_INITIALIZER;
 
 const char * HAZER_SYSTEM_NAME[] = HAZER_SYSTEM_NAME_INITIALIZER;
 
+const char * HAZER_MODE_NAME[] = HAZER_MODE_NAME_INITIALIZER;
+
 /******************************************************************************
  *
  ******************************************************************************/
@@ -1154,7 +1156,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         /* Do nothing. */
 #if 0
     } else if (*vector[2] == '1') {
-        /* Do nothing. */
+        activep->mode = HAZER_MODE_NOFIX;
 #endif
     } else {
         for (slot = 0; slot < IDENTIFIERS; ++slot) {
@@ -1176,6 +1178,9 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
          * 0 == initial, 1 == no fix, 2 == 2D, 3 == 3D.
          */
         activep->mode = atoi(vector[2]);
+        if (!((HAZER_MODE_NOFIX <= activep->mode) && (activep->mode <= HAZER_MODE_3D))) {
+            activep->mode = HAZER_MODE_TOTAL;
+        }
         /*
          * NMEA 0183 4.10 2012 has an additional 19th field containing
          * the GNSS System ID to identify GPS, GLONASS, GALILEO, etc.
@@ -1495,9 +1500,9 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
     } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
     } else if (strncmp(vector[8], "NF", sizeof("NF")) == 0) {
-        /* Do nothing. */
+        activep->mode = HAZER_MODE_NOFIX;
     } else if (strncmp(vector[18], "0", sizeof("0")) == 0) {
-        /* Do nothing. */
+        activep->mode = HAZER_MODE_ZERO;
     } else if (strncmp(vector[8], "TT", sizeof("TT")) == 0) {
         uint64_t total = 0;
 
@@ -1544,7 +1549,7 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         } else if (strncmp(vector[8], "D3", sizeof("D3")) == 0) {
             activep->mode = HAZER_MODE_DGNSS3D;
         } else {
-            activep->mode = HAZER_MODE_UNKNOWN;
+            activep->mode = HAZER_MODE_TOTAL;
         }
         activep->hdop = hazer_parse_dop(vector[15]);
         activep->vdop = hazer_parse_dop(vector[16]);

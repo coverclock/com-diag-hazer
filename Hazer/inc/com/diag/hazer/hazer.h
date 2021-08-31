@@ -960,8 +960,34 @@ typedef enum HazerMode {
     HAZER_MODE_DGNSS3D  = 6,
     HAZER_MODE_TIME     = 7,
     HAZER_MODE_IMU      = 8,
-    HAZER_MODE_UNKNOWN  = 9,
+    HAZER_MODE_ZERO     = 9,
+    HAZER_MODE_TOTAL    = 10,
 } hazer_mode_t;
+
+/**
+ * @def HAZER_MODE_NAME_INITIALIZER
+ * Initialize the array of character strings that map from a Hazer mode
+ * enumerated value to the printable name of the mode.
+ */
+#define HAZER_MODE_NAME_INITIALIZER \
+{ \
+    "--", \
+    "NF", \
+    "2D", \
+    "3D", \
+    "RK", \
+    "D2", \
+    "D3", \
+    "TT", \
+    "DR", \
+    "NS", \
+    "??", \
+}
+
+/**
+ * Array of MODE names indexed by mode enumeration.
+ */
+extern const char * HAZER_MODE_NAME[/* hazer_mode_t */];
 
 /**
  * This structure maintains the information on the satellites in any
