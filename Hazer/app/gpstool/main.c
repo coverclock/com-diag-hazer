@@ -2362,10 +2362,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
 
-                if (Fix < 0) {
-                    Fix = Now;
-                    DIMINUTO_LOG_NOTICE("First NMEA GGA\n");
-                }
+                firstfix("NMEA GGA");
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_RMC) && hazer_parse_rmc(&position[system], vector, count) == 0) {
 
@@ -2375,10 +2372,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
 
-                if (Fix < 0) {
-                    Fix = Now;
-                    DIMINUTO_LOG_NOTICE("First NMEA RMC\n");
-                }
+                firstfix("NMEA RMC");
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_GLL) && hazer_parse_gll(&position[system], vector, count) == 0) {
 
@@ -2388,10 +2382,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
 
-                if (Fix < 0) {
-                    Fix = Now;
-                    DIMINUTO_LOG_NOTICE("First NMEA GLL\n");
-                }
+                firstfix("NMEA GLL");
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_VTG) && hazer_parse_vtg(&position[system], vector, count) == 0) {
 
@@ -2438,13 +2429,8 @@ consume:
                  * errors and the like.
                  */
 
-                if (Fix >= 0) {
-                    /* Do nothing. */
-                } else if (active[system].mode <= HAZER_MODE_NOFIX) {
-                    /* Do nothing. */
-                } else {
-                    Fix = Now;
-                    DIMINUTO_LOG_NOTICE("First NMEA GSA\n");
+                if (active[system].mode > HAZER_MODE_NOFIX) {
+                    firstfix("NMEA GSA");
                 }
 
             } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSV) && (rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
@@ -2479,10 +2465,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
 
-                if (Fix < 0) {
-                    Fix = Now;
-                    DIMINUTO_LOG_NOTICE("First PUBX POSITION\n");
-                }
+                firstfix("PUBX POSITION");
 
             } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && ((rc = hazer_parse_pubx_svstatus(view, active, vector, count)) != 0)) {
 
@@ -2548,10 +2531,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse UBX-NAV-HPPOSLLH\n");
 
-                if (Fix < 0) {
-                    Fix = Now;
-                    DIMINUTO_LOG_NOTICE("First UBX-NAV-HPPOSLLH\n");
-                }
+                firstfix("UBX-NAV-HPPOSLLH");
 
             } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 

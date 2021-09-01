@@ -12,9 +12,11 @@
  * @details
  */
 
-#include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_frequency.h"
+#include "com/diag/diminuto/diminuto_log.h"
+#include "com/diag/diminuto/diminuto_time.h"
 #include "types.h"
+#include "globals.h"
 
 /**
  * Return true if specified number of seconds has elapsed, and if so
@@ -63,6 +65,18 @@ static inline int pubx(const hazer_vector_t vector, const char * id)
 static inline int precheck(const hazer_vector_t vector, const char * name)
 {
     return ((vector[0][3] == name[0]) && (vector[0][4] == name[1]) && (vector[0][5] == name[2]) && (vector[0][6] == '\0'));
+}
+
+/**
+ * Do the busywork necessary to mark the event of a First Fix.
+ * @param string is the string to log at level NOTICE.
+ */
+static inline void firstfix(const char * string)
+{
+    if (Fix < 0) {
+        Fix = Now;
+        DIMINUTO_LOG_NOTICE("First %s\n", string);
+    }
 }
 
 #endif
