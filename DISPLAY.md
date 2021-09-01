@@ -244,11 +244,14 @@ a signal identifier indicating which signal or band (e.g.  L1 C/A, L2,
 etc.) is being used, and one or more flags. A flag of '<' indicates that
 the satellite is on the active list (see ACT above, provided by the NMEA
 GSA sentence); a '?' indicates that the azimuth and/or the elevation
-were empty (but display as zero; typically means that the almanac has not
+were empty but displays as zero (typically means that the almanac has not
 yet been received - a cold start - but occasionally indicates that the
 satellite is not in the received almanac, which I've seen when GPS ground
-control is testing a new satellite); and a '!' indicates that the
+control is testing a new satellite); a '!' indicates that the
 signal strength was empty but displays as zero (some receivers use this
 to indicate the satellite is in the almanac but is not being received
-over an avaiable RF channel).
+over an avaiable RF channel); a '-' indicates that a PUBX,04 message
+has indicated that the satellite was excluded in the solution (this is
+apparently different from having the satellite's ephemeris but not
+using it in the solution).
 
