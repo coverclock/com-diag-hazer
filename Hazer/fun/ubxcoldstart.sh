@@ -12,7 +12,7 @@ WRITE=${4:-5}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-# UBX-CFG-RST COLDSTART
+# UBX-CFG-RST COLDSTART SHUTDOWN HARDWARERESET
 
 exec coreable gpstool \
 	-D ${DEVICE} -b ${RATE} -8 -n -1 -m -i ${INTERVAL} \
