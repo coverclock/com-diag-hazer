@@ -769,6 +769,8 @@ Medicine 2012*, 7:5
 
 GTop, "PMTK command packet", Revision A11, GlobalTop, 2012
 
+Tony Haddrell, Marino Phocas, Nico Ricquier, "Mobile Phone GPS Antennas - Can They Be Better?", *GPS World*, 2010-02
+
 IGS et al., "RINEX - The Receiver Independent Exchange Format", Version 3.03,
 RTCM-SC104, 2015-07-14
 
