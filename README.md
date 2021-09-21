@@ -790,6 +790,8 @@ Charles F. F. Karney, "Algorithms for geodesics", *Journal for Geodesy*,
 G. Klyne, C. Newman, "Date and Time on the Internet: Timestamps", RFC3339,
 IETF, July 2002
 
+H. Lyons, "Atomic Clocks", *Scientific American*, 1957-02
+
 Greg Milner, *Pinpoint: How GPS is Changing Technology, Culture, and Our Minds*,
 W. W. Norton, 2017-05-16
 
@@ -973,6 +975,9 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 <https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797>
 
 <https://youtu.be/NvpbW7JRu0Q> "Philomena Cunk's Moments of Wonder Ep. 1: Time", *Charlie Brooker's Weekly Wipe*, BBC, video
+
+<https://tf.nist.gov/general/pdf/1568.pdf> Harold Lyons,
+"Atomic Clocks", *Scientific American*, 1957-02 (archived on a NIST website)
 
 # Soundtrack
 
