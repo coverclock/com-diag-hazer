@@ -49,7 +49,7 @@ extern void collect(int number, tumbleweed_updates_t * up);
  * @param id is the two letter message identifier.
  * @return true if the id matches the field.
  */
-static inline int pubx(const hazer_vector_t vector, const char * id)
+static inline int is_pubx(const hazer_vector_t vector, const char * id)
 {
     return ((vector[1][0] == id[0]) && (vector[1][1] == id[1]) && (vector[1][2] == '\0'));
 }
@@ -62,20 +62,34 @@ static inline int pubx(const hazer_vector_t vector, const char * id)
  * @param name is the three letter name.
  * @return true if the name matches the field.
  */
-static inline int precheck(const hazer_vector_t vector, const char * name)
+static inline int is_nmea(const hazer_vector_t vector, const char * name)
 {
     return ((vector[0][3] == name[0]) && (vector[0][4] == name[1]) && (vector[0][5] == name[2]) && (vector[0][6] == '\0'));
 }
 
 /**
- * Do the busywork necessary to mark the event of a First Fix.
+ * Do the busywork necessary to mark the acquisition of a Fix.
  * @param string is the string to log at level NOTICE.
  */
-static inline void firstfix(const char * string)
+static inline void acquire_fix(const char * string)
 {
     if (Fix < 0) {
         Fix = Now;
-        DIMINUTO_LOG_NOTICE("First %s\n", string);
+        DIMINUTO_LOG_NOTICE("Fix Acquired %llds %s\n", (long long signed int)((Now - Event) / Frequency), string);
+        Event = Now;
+    }
+}
+
+/**
+ * Do the busywork necessary to mark the relinquishment of a Fix.
+ * @param string is the string to log at level NOTICE.
+ */
+static inline void relinquish_fix(const char * string)
+{
+    if (Fix >= 0) {
+        Fix = -1;
+        DIMINUTO_LOG_NOTICE("Fix Lost %llds %s\n", (long long signed int)((Now - Event) / Frequency), string);
+        Event = Now;
     }
 }
 

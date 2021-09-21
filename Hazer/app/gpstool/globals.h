@@ -70,4 +70,9 @@ extern diminuto_sticks_t Fix;
  */
 extern diminuto_sticks_t Now;
 
+/**
+ * This is the monotonic clock time of the last event.
+ */
+extern diminuto_sticks_t Event;
+
 #endif

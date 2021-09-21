@@ -1453,6 +1453,8 @@ int main(int argc, char * argv[])
 
     Now = Epoch;
 
+    Event = Epoch;
+
     delay = Frequency;
 
     /*
@@ -2318,7 +2320,7 @@ consume:
 
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
 
-                if (precheck(vector, "GSA") || precheck(vector, "GSV")) {
+                if (is_nmea(vector, "GSA") || is_nmea(vector, "GSV")) {
                     DIMINUTO_LOG_INFORMATION("Parse NMEA Talker Other \"%c%c\"", vector[0][1], vector[0][2]);
                 }
                 continue;
@@ -2334,7 +2336,7 @@ consume:
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 
-                if (precheck(vector, "GSA") || precheck(vector, "GSV")) {
+                if (is_nmea(vector, "GSA") || is_nmea(vector, "GSV")) {
                     DIMINUTO_LOG_INFORMATION("Parse NMEA System Other \"%c%c\"\n", vector[0][1], vector[0][2]);
                 }
                 continue;
@@ -2354,156 +2356,217 @@ consume:
              * we got this sentence via a UDP datagram).
              */
 
-            if (precheck(vector, HAZER_NMEA_SENTENCE_GGA) && hazer_parse_gga(&position[system], vector, count) == 0) {
+            if (is_nmea(vector, HAZER_NMEA_SENTENCE_GGA)) {
 
-                position[system].ticks = timeout;
-                refresh = !0;
-                trace = !0;
+                if (hazer_parse_gga(&position[system], vector, count) == 0) {
 
-                DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
-
-                firstfix("NMEA GGA");
-
-            } else if (precheck(vector, HAZER_NMEA_SENTENCE_RMC) && hazer_parse_rmc(&position[system], vector, count) == 0) {
-
-                position[system].ticks = timeout;
-                refresh = !0;
-                trace = !0;
-
-                DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
-
-                firstfix("NMEA RMC");
-
-            } else if (precheck(vector, HAZER_NMEA_SENTENCE_GLL) && hazer_parse_gll(&position[system], vector, count) == 0) {
-
-                position[system].ticks = timeout;
-                refresh = !0;
-                trace = !0;
-
-                DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
-
-                firstfix("NMEA GLL");
-
-            } else if (precheck(vector, HAZER_NMEA_SENTENCE_VTG) && hazer_parse_vtg(&position[system], vector, count) == 0) {
-
-                position[system].ticks = timeout;
-                refresh = !0;
-
-                DIMINUTO_LOG_DEBUG("Parse NMEA VTG\n");
-
-            } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSA) && hazer_parse_gsa(&active_cache, vector, count) == 0) {
-
-                /*
-                 * Below is a special case for the Ublox 8 used in devices like
-                 * the GN-803G. It emits multiple GSA sentences all under the
-                 * GN (GNSS) talker, but the satellites are either GPS or
-                 * GLONASS *plus* WAAS. We'd like to classify them as either
-                 * GPS or GLONASS. Sadly, later NMEA standards actually have
-                 * a field in the GSA sentence that contains a GNSS System ID,
-                 * but I have yet to see a device that supports it. However,
-                 * the GSA parser function has untested code to extract this ID
-                 * if it exists, and the map function below will use it. Also
-                 * note that apparently the DOP values are computed across all
-                 * the satellites in whatever constellations were used for a
-                 * navigation solution; this means the DOP values for GPS
-                 * and GLONASS will be identical in the Ublox 8.
-                 */
-
-                if (system == HAZER_SYSTEM_GNSS) {
-                    candidate = hazer_map_active_to_system(&active_cache);
-                    if (candidate < HAZER_SYSTEM_TOTAL) {
-                        system = candidate;
-                    }
-                }
-
-                active[system] = active_cache;
-                active[system].ticks = timeout;
-                refresh = !0;
-
-                DIMINUTO_LOG_DEBUG("Parse NMEA GSA\n");
-
-                /*
-                 * If the GSA sentences indicates a fix and we haven't seen a fix from any
-                 * sentence prior to this, we log that. That allows us to figure out when the
-                 * fix occurred even though we might be losing other sentences due to sync
-                 * errors and the like.
-                 */
-
-                if (active[system].mode > HAZER_MODE_NOFIX) {
-                    firstfix("NMEA GSA");
-                }
-
-            } else if (precheck(vector, HAZER_NMEA_SENTENCE_GSV) && (rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
-
-                /*
-                 * I choose not to signal for a refresh unless we have
-                 * processed the last GSV sentence of a tuple for a
-                 * particular constellation. But I do set the timer
-                 * in case the remaining GSV sentences in the tuple
-                 * never arrive.
-                 */
-
-                view[system].ticks = timeout;
-                if (rc == 0) {
+                    position[system].ticks = timeout;
                     refresh = !0;
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GSV (final)\n");
+                    trace = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
+
+                    acquire_fix("NMEA GGA");
+
                 } else {
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GSV (partial)\n");
+
+                    relinquish_fix("NMEA GGA");
+
                 }
 
+            } else if (is_nmea(vector, HAZER_NMEA_SENTENCE_RMC)) {
 
-            } else if (precheck(vector, HAZER_NMEA_SENTENCE_TXT) && hazer_parse_txt(vector, count) == 0) {
+                if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 
-                DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
+                    position[system].ticks = timeout;
+                    refresh = !0;
+                    trace = !0;
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION) && ((rc = hazer_parse_pubx_position(&position[system], &active[system], vector, count)) == 0)) {
+                    DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
 
-                position[system].ticks = timeout;
-                active[system].ticks = timeout;
-                refresh = !0;
-                trace = !0;
+                    acquire_fix("NMEA RMC");
 
-                DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
+                } else {
 
-                firstfix("PUBX POSITION");
+                    relinquish_fix("NMEA RMC");
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS) && ((rc = hazer_parse_pubx_svstatus(view, active, vector, count)) != 0)) {
+                }
 
-                for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
-                    if ((rc & (1 << system)) != 0) {
-                        view[system].ticks = timeout;
-                        if (system == HAZER_SYSTEM_GNSS) {
-                            /* Do nothing. */
-                        } else if (active[HAZER_SYSTEM_GNSS].ticks == 0) {
-                            /* Do nothing. */
-                        } else {
-                            active[system].mode = active[HAZER_SYSTEM_GNSS].mode;
-                            active[system].pdop = active[HAZER_SYSTEM_GNSS].pdop;
-                            active[system].hdop = active[HAZER_SYSTEM_GNSS].hdop;
-                            active[system].vdop = active[HAZER_SYSTEM_GNSS].vdop;
-                            active[system].tdop = active[HAZER_SYSTEM_GNSS].tdop;
+            } else if (is_nmea(vector, HAZER_NMEA_SENTENCE_GLL)) {
+
+                if (hazer_parse_gll(&position[system], vector, count) == 0) {
+
+                    position[system].ticks = timeout;
+                    refresh = !0;
+                    trace = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
+
+                    acquire_fix("NMEA GLL");
+
+                } else {
+
+                    relinquish_fix("NMEA GLL");
+
+                }
+
+            } else if (is_nmea(vector, HAZER_NMEA_SENTENCE_VTG)) {
+
+                if (hazer_parse_vtg(&position[system], vector, count) == 0) {
+
+                    position[system].ticks = timeout;
+                    refresh = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse NMEA VTG\n");
+
+                }
+
+            } else if (is_nmea(vector, HAZER_NMEA_SENTENCE_GSA)) {
+
+                if (hazer_parse_gsa(&active_cache, vector, count) == 0) {
+
+                    /*
+                     * Below is a special case for the Ublox 8 used in
+                     * devices like the GN-803G. It emits multiple GSA
+                     * sentences all under the GN (GNSS) talker, but the
+                     * satellites are either GPS or GLONASS *plus* WAAS.
+                     * We'd like to classify them as either GPS or GLONASS.
+                     * Sadly, later NMEA standards actually have a field in
+                     * the GSA sentence that contains a GNSS System ID,
+                     * but I have yet to see a device that supports it.
+                     * However, the GSA parser function has untested code
+                     * to extract this ID if it exists, and the map function
+                     * below will use it. Also note that apparently the DOP
+                     * values are computed across all the satellites in
+                     * whatever constellations were used for a navigation
+                     * solution; this means the DOP values for GPS and
+                     * GLONASS will be identical in the Ublox 8.
+                     */
+
+                    if (system == HAZER_SYSTEM_GNSS) {
+                        candidate = hazer_map_active_to_system(&active_cache);
+                        if (candidate < HAZER_SYSTEM_TOTAL) {
+                            system = candidate;
                         }
-                        active[system].ticks = timeout;
-                        refresh = !0;
-                        DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS (%s)\n", HAZER_SYSTEM_NAME[system]);
                     }
+
+                    active[system] = active_cache;
+                    active[system].ticks = timeout;
+                    refresh = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse NMEA GSA\n");
+
+                    /*
+                     * If the GSA sentences indicates a fix and we haven't
+                     * seen a fix from any sentence prior to this, we log
+                     * that. That allows us to figure out when the fix
+                     * occurred even though we might be losing other
+                     * sentences due to sync errors and the like.
+                     */
+
+                    if (active[system].mode > HAZER_MODE_NOFIX) {
+                        acquire_fix("NMEA GSA");
+                    } else {
+                        relinquish_fix("NMEA GSA");
+                    }
+
                 }
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME) && (hazer_parse_pubx_time(&position[system], vector, count) == 0)) {
+            } else if (is_nmea(vector, HAZER_NMEA_SENTENCE_GSV)) {
 
-                /*
-                 * The CAM-M8Q can report time in the PUBX,04 sentence without
-                 * having a valid fix, apparently based on a prior fix and
-                 * its own internal clock. This PUBX sentence also does not
-                 * indicate the constellation(s) that contributed to the
-                 * solution. Because this time may be purely a value
-                 * synthesized by the CAM-M8Q (or any generation 8 U-blox
-                 * receiver), we don't reset the position timer or indicate
-                 * a refresh. We'll depend on a valid position fix (perhaps
-                 * from the PUBX,00 sentence) to indicate a position refresh.
-                 */
+                if  ((rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
 
-                DIMINUTO_LOG_DEBUG("Parse PUBX TIME\n");
+                    /*
+                     * I choose not to signal for a refresh unless we have
+                     * processed the last GSV sentence of a tuple for a
+                     * particular constellation. But I do set the timer
+                     * in case the remaining GSV sentences in the tuple
+                     * never arrive.
+                     */
+
+                    view[system].ticks = timeout;
+                    if (rc == 0) {
+                        refresh = !0;
+                        DIMINUTO_LOG_DEBUG("Parse NMEA GSV (final)\n");
+                    } else {
+                        DIMINUTO_LOG_DEBUG("Parse NMEA GSV (partial)\n");
+                    }
+
+                }
+
+            } else if (is_nmea(vector, HAZER_NMEA_SENTENCE_TXT)) {
+
+                if  (hazer_parse_txt(vector, count) == 0) {
+
+                    DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
+
+                }
+
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && is_pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
+
+                if  (hazer_parse_pubx_position(&position[system], &active[system], vector, count) == 0) {
+
+                    position[system].ticks = timeout;
+                    active[system].ticks = timeout;
+                    refresh = !0;
+                    trace = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
+
+                    acquire_fix("PUBX POSITION");
+
+                } else {
+
+                    relinquish_fix("PUBX POSITION");
+
+                }
+
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && is_pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS)) {
+
+                if ((rc = hazer_parse_pubx_svstatus(view, active, vector, count)) != 0x00) {
+
+                    for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
+                        if ((rc & (1 << system)) != 0) {
+                            view[system].ticks = timeout;
+                            if (system == HAZER_SYSTEM_GNSS) {
+                                /* Do nothing. */
+                            } else if (active[HAZER_SYSTEM_GNSS].ticks == 0) {
+                                /* Do nothing. */
+                            } else {
+                                active[system].mode = active[HAZER_SYSTEM_GNSS].mode;
+                                active[system].pdop = active[HAZER_SYSTEM_GNSS].pdop;
+                                active[system].hdop = active[HAZER_SYSTEM_GNSS].hdop;
+                                active[system].vdop = active[HAZER_SYSTEM_GNSS].vdop;
+                                active[system].tdop = active[HAZER_SYSTEM_GNSS].tdop;
+                            }
+                            active[system].ticks = timeout;
+                            refresh = !0;
+                            DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS (%s)\n", HAZER_SYSTEM_NAME[system]);
+                        }
+                    }
+
+                }
+
+            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && is_pubx(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME)) {
+
+                if (hazer_parse_pubx_time(&position[system], vector, count) == 0) {
+
+                    /*
+                     * The CAM-M8Q can report time in the PUBX,04 sentence
+                     * without having a valid fix, apparently based on a prior
+                     * fix and its own internal clock. This PUBX sentence also
+                     * does not indicate the constellation(s) that contributed
+                     * to the solution. Because this time may be purely a value
+                     * synthesized by the CAM-M8Q (or any generation 8 U-blox
+                     * receiver), we don't reset the position timer or indicate
+                     * a refresh. We'll depend on a valid position fix (perhaps
+                     * from the PUBX,00 sentence) to indicate a position
+                     * refresh.
+                     */
+
+                    DIMINUTO_LOG_DEBUG("Parse PUBX TIME\n");
+
+                }
 
             } else if (unknown) {
 
@@ -2531,7 +2594,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse UBX-NAV-HPPOSLLH\n");
 
-                firstfix("UBX-NAV-HPPOSLLH");
+                acquire_fix("UBX-NAV-HPPOSLLH");
 
             } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 

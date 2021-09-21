@@ -3,7 +3,6 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-
 # Like bu353w10 but does no additional configuration.
 
 PROGRAM=$(basename ${0})

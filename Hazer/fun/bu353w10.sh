@@ -3,7 +3,6 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-
 # This script is specific to the GlobalSat BU-353W10. It is mostly
 # the same as the script for the Navlocate GR-803G (with which it
 # shares the use of the U-blox 8 chipset). But it sends two

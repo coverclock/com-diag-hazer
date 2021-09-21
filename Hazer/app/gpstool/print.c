@@ -493,7 +493,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
                 }
 
                 if (!fixonce) {
-                    DIMINUTO_LOG_NOTICE("Fix %d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
+                    DIMINUTO_LOG_NOTICE("Fix First %d/%02d:%02d:%02d.%03lu", day, hour, minute, second, (long unsigned int)milliseconds);
                     fixonce = !0;
                 }
 
