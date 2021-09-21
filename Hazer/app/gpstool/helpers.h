@@ -75,8 +75,8 @@ static inline void acquire_fix(const char * string)
 {
     if (Fix < 0) {
         Fix = Now;
-        DIMINUTO_LOG_NOTICE("Fix Acquired %llds %s\n", (long long signed int)((Now - Event) / Frequency), string);
-        Event = Now;
+        DIMINUTO_LOG_NOTICE("Fix Acquired %llds %s\n", (long long signed int)((Fix - Event) / Frequency), string);
+        Event = Fix;
     }
 }
 
@@ -87,9 +87,9 @@ static inline void acquire_fix(const char * string)
 static inline void relinquish_fix(const char * string)
 {
     if (Fix >= 0) {
-        Fix = -1;
-        DIMINUTO_LOG_NOTICE("Fix Lost %llds %s\n", (long long signed int)((Now - Event) / Frequency), string);
         Event = Now;
+        DIMINUTO_LOG_NOTICE("Fix Lost %llds %s\n", (long long signed int)((Event - Fix) / Frequency), string);
+        Fix = -1;
     }
 }
 
