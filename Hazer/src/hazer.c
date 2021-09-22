@@ -1362,7 +1362,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if ((count > 13) && (*vector[12] == 'N')) { /* NMEA 2.3+ */
         /* Do nothing. */
-#if !0
+#if 0
     } else if ((count > 14) && (*vector[13] == 'V')) { /* NMEA 4.10+ */
         /* Not clear what this means on the u-blox UBX-F9P. */
 #endif
@@ -1402,7 +1402,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (count < 9) {
         /* Do nothing. */
-#if !0
+#if 0
     } else if (*vector[6] == 'V') {
         /* Not clear what this means on the u-blox UBX-F9P. */
 #endif
