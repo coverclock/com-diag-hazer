@@ -27,8 +27,10 @@ diminuto_sticks_t Clock = -1;
 
 diminuto_sticks_t Epoch = -1;
 
+diminuto_sticks_t Now = -1;
+
 diminuto_sticks_t Fix = -1;
 
-diminuto_sticks_t Now = -1;
+diminuto_sticks_t First = -1;
 
 diminuto_sticks_t Event = -1;

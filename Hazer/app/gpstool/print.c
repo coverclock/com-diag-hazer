@@ -472,12 +472,20 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
              */
 
             if (Fix < 0) {
+                /* Do nothing. */
+            } else if (First >= 0) {
+                /* Do nothing. */
+            } else {
+                First = Fix;
+            }
+
+            if (First < 0) {
 
                 fputs(" --:--:--.---", fp);
 
             } else {
 
-                rc = diminuto_time_duration(Fix - Epoch, &day, &hour, &minute, &second, &fraction);
+                rc = diminuto_time_duration(First - Epoch, &day, &hour, &minute, &second, &fraction);
                 diminuto_assert(rc >= 0);
                 diminuto_assert(day >= 0);
                 diminuto_assert((0 <= hour) && (hour <= 23));

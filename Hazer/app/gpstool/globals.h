@@ -61,18 +61,28 @@ extern diminuto_sticks_t Clock;
 extern diminuto_sticks_t Epoch;
 
 /**
- * This is the monotonic clock time of the first fix.
- */
-extern diminuto_sticks_t Fix;
-
-/**
  * This is the current monotonic time.
  */
 extern diminuto_sticks_t Now;
 
 /**
- * This is the monotonic clock time of the last event.
+ * This is the monotonic clock time of the latest fix.
+ */
+extern diminuto_sticks_t Fix;
+
+/**
+ * This is the monotonic clock time of the first fix.
+ */
+extern diminuto_sticks_t First;
+
+/**
+ * This is the monotonic clock time of the prior event.
  */
 extern diminuto_sticks_t Event;
+
+/**
+ * This is the monotonic clock time of the latest fix.
+ */
+extern diminuto_sticks_t Fix;
 
 #endif
