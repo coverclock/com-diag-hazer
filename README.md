@@ -437,8 +437,8 @@ Footnotes:
 [10] Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* COMPASS (China) concurrently.    
 [11] Has integrated Inertial Measurement Unit (IMU).    
 [12] Equipped with a CR1220 3V button cell.    
-[13] A tear down of the BU-353W10 reveals it has a button cell for its battery backed RAM.
-[14] Make sure you mount this component side down, patch antenna side up.
+[13] A tear down of the BU-353W10 reveals it has a button cell for its battery backed RAM.    
+[14] Make sure you mount this component side down, patch antenna side up.    
 
 Notes:
 
