@@ -413,7 +413,7 @@ Hazer has been successfully tested with the following GPS devices.
 * NaviSys GR-701W (U-Blox 7+Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
 * Pharos GPS-360 (SiRF Star II+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
 * Pharos GPS-500 (SiRF Star III+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
-* RaceDayQuads RDQ Micro M8N (U-Blox 8/UBX-NEO-M8N, 9600 8n1, N/A, ttyAMA, 1Hz) [4] [8]    
+* RaceDayQuads RDQ Micro M8N (U-Blox 8/UBX-NEO-M8N, 9600 8n1, N/A, ttyAMA, 1Hz) [4] [8] [14]    
 * Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]    
 * SparkFun GPS Dead Reckoning gen 8 (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [11]
 * SparkFun GPS NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [6] [8] [10]
@@ -438,6 +438,7 @@ Footnotes:
 [11] Has integrated Inertial Measurement Unit (IMU).    
 [12] Equipped with a CR1220 3V button cell.    
 [13] A tear down of the BU-353W10 reveals it has a button cell for its battery backed RAM.
+[14] Make sure you mount this component side down, patch antenna side up.
 
 Notes:
 
