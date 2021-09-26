@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2019-2021 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
@@ -32,7 +32,8 @@ FILE=${2:-"out"}
 LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 DIRECTORY=${4:-${SAVDIR}}
 
-mkdir -p ${SAVDIR}
+mkdir -p ${DIRECTORY}
+touch ${DIRECTORY}/${TASK}.${FILE}
 
 . ${ROOT}/bin/setup
 

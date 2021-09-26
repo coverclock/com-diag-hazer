@@ -3060,7 +3060,7 @@ render:
 
         if ((!refresh) || (print_views_pending(view) > 0)) {
 
-            if (expired(&display_last, slow)) {
+            if (expiring(&display_last, slow)) {
 
                 if (escape) {
                     fputs("\033[3;1H", out_fp);
