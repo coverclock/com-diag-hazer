@@ -3058,21 +3058,21 @@ render:
          * Generate the display if necessary and sufficient reasons exist.
          */
 
-        if (!expired(&display_last, slow)) {
+        if ((!refresh) || (print_views_pending(view) > 0)) {
 
-            /* Do nothing. */
+            if (expired(&display_last, slow)) {
 
-        } else if (!refresh) {
+                if (escape) {
+                    fputs("\033[3;1H", out_fp);
+                }
 
-            if (escape) {
-                fputs("\033[3;1H", out_fp);
+                if (report) {
+                    print_local(out_fp);
+                }
+
             }
 
-            if (report) {
-                print_local(out_fp);
-            }
-
-        } else {
+        } else if (expired(&display_last, slow)) {
 
             /*
              * If we're monitoring a 1PPS pin, update our copy of its
@@ -3132,6 +3132,11 @@ render:
             }
 
             refresh = 0;
+
+        } else {
+
+            /* Do nothing. */
+
         }
 
         if (eof) {

@@ -3,7 +3,6 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-
 # This script tests the u-blox NEO-M8N GPS module, in my case on
 # a SparkFun NEO-M8N board. The SparkFun board has a USB
 # interface and the NEO-M8N provides 1PPS via a GPIO pin, which
