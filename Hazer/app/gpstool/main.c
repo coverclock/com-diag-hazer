@@ -2969,6 +2969,9 @@ consume:
 
         if (expired(&bypass_last, bypass)) {
             /* Do nothing. */
+        } else if (has_pending(view)) {
+            fd = in_fd;
+            goto consume;
         } else if ((available = diminuto_file_ready(in_fp)) > 0) {
             fd = in_fd;
             if (available > io_maximum) {
@@ -3058,21 +3061,21 @@ render:
          * Generate the display if necessary and sufficient reasons exist.
          */
 
-        if ((!refresh) || (print_views_pending(view) > 0)) {
+        if (!expired(&display_last, slow)) {
 
-            if (expiring(&display_last, slow)) {
+            /* Do nothing. */
 
-                if (escape) {
-                    fputs("\033[3;1H", out_fp);
-                }
+        } else if (!refresh) {
 
-                if (report) {
-                    print_local(out_fp);
-                }
-
+            if (escape) {
+                fputs("\033[3;1H", out_fp);
             }
 
-        } else if (expired(&display_last, slow)) {
+            if (report) {
+                print_local(out_fp);
+            }
+
+        } else {
 
             /*
              * If we're monitoring a 1PPS pin, update our copy of its
@@ -3132,10 +3135,6 @@ render:
             }
 
             refresh = 0;
-
-        } else {
-
-            /* Do nothing. */
 
         }
 

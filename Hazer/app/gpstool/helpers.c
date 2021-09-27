@@ -31,22 +31,6 @@ int expired(seconds_t * wasp, seconds_t seconds)
     return result;
 }
 
-int expiring(const seconds_t * wasp, seconds_t seconds)
-{
-    int result = 0;
-    seconds_t now = 0;
-
-    if (seconds < 0) {
-        /* Do nothing. */
-    } else if (seconds == 0) {
-        result = !0;
-    } else {
-        result = ((now = Now / Frequency) >= (*wasp + seconds));
-    }
-
-    return result;
-}
-
 void countdown(hazer_expiry_t * ep, diminuto_sticks_t elapsed)
 {
     if (*ep == 0) {
@@ -102,4 +86,18 @@ void collect(int number, tumbleweed_updates_t * up)
 
     up->word = (up->word << 8) | update;
 
+}
+
+int has_pending(const hazer_view_t va[])
+{
+    unsigned int system = 0;
+    unsigned int pending = 0;
+
+    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        if (va[system].ticks > 0) {
+            pending += va[system].pending;
+        }
+    }
+
+    return (pending > 0);
 }

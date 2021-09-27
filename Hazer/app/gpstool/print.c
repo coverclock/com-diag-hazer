@@ -112,20 +112,6 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
 }
 
-int print_views_pending(const hazer_view_t va[])
-{
-    unsigned int system = 0;
-    unsigned int pending = 0;
-
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
-        if (va[system].ticks > 0) {
-            pending += va[system].pending;
-        }
-    }
-
-    return (pending > 0);
-}
-
 void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
 {
     static const unsigned int SATELLITES = diminuto_countof(va[0].sat);

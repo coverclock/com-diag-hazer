@@ -28,15 +28,6 @@
 extern int expired(seconds_t * wasp, seconds_t seconds);
 
 /**
- * Return true if specified number of seconds has elapsed, but do not
- * update the previous elapsed seconds value-result variable.
- * @param wasp points to the variable containing elapsed seconds.
- * @param seconds is the number of seconds desired to elapse, <0 for never, 0 for always.
- * @return true if the specified number of seconds has elapsed.
- */
-extern int expiring(const seconds_t * wasp, seconds_t seconds);
-
-/**
  * Common function to count down the expiration fields in the database.
  * @param ep points to the expiration field to count down.
  * @param elapsed is the number of ticks to count down.
@@ -101,5 +92,12 @@ static inline void relinquish_fix(const char * string)
         Fix = -1;
     }
 }
+
+/**
+ * Returns true if there are GSV views pending for any constellation.
+ * @param va points to the array of all satellites being viewed.
+ * @return true if there are GSV views pending for any constellation.
+ */
+extern int has_pending(const hazer_view_t va[]);
 
 #endif

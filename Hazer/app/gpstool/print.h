@@ -24,13 +24,6 @@
 extern void print_actives(FILE * fp, const hazer_active_t aa[]);
 
 /**
- * Returns true if there are GSV views pending for any constellation.
- * @param va points to the array of all satellites being viewed.
- * @return true if there are GSV views pending for any constellation.
- */
-extern int print_views_pending(const hazer_view_t va[]);
-
-/**
  * Print all of the satellites currently being viewed by the receiver.
  * @param fp points to the FILE stream.
  * @param va points to the array of all satellite being viewed.
