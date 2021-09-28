@@ -421,7 +421,7 @@ Hazer has been successfully tested with the following GPS devices.
 * SparkFun GPS Dead Reckoning gen 9 (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]
 * Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * TOPGNSS GN-803G (U-Blox 8/UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
-* Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8N1, N/A, ttyAMA, 1Hz) [4]    
+* Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8N1, N/A, ttyS, 1Hz) [4]    
 
 Footnotes:
 
