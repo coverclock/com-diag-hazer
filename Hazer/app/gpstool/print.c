@@ -455,7 +455,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00", year, month, day, hour, minute, second);
 
             if (!timeonce) {
-                DIMINUTO_LOG_NOTICE("Time %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
+                DIMINUTO_LOG_NOTICE("Stamp %04d-%02d-%02dT%02d:%02d:%02dZ", year, month, day, hour, minute, second);
                 timeonce = !0;
             }
 
