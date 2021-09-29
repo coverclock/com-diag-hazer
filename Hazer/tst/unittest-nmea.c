@@ -423,6 +423,14 @@ int main(void)
             assert(strcmp(view.label, "GSV") == 0);
             assert(view.view == 15);
 
+            view.ticks = 0;
+            rc = hazer_has_pending_gsv(&view, 1);
+            assert(rc == 0);
+
+            view.ticks = 1;
+            rc = hazer_has_pending_gsv(&view, 1);
+            assert(rc == (ii < (((sizeof(DATA) / sizeof(DATA[0]))) - 1)));
+
         }
 
         assert(strcmp(view.label, "GSV") == 0);
@@ -577,6 +585,14 @@ int main(void)
             assert(((ii == 3) && (rc == 0)) || (rc > 0));
             assert(strcmp(view.label, "GSV") == 0);
             assert(view.view == 15);
+
+            view.ticks = 0;
+            rc = hazer_has_pending_gsv(&view, 1);
+            assert(rc == 0);
+
+            view.ticks = 1;
+            rc = hazer_has_pending_gsv(&view, 1);
+            assert(rc == (ii < (((sizeof(DATA) / sizeof(DATA[0]))) - 1)));
 
         }
 

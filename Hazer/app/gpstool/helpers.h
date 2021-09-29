@@ -68,11 +68,4 @@ static inline void relinquish_fix(const char * string)
     }
 }
 
-/**
- * Returns true if there are GSV views pending for any constellation.
- * @param va points to the array of all satellites being viewed.
- * @return true if there are GSV views pending for any constellation.
- */
-extern int has_pending(const hazer_view_t va[]);
-
 #endif

@@ -2969,7 +2969,7 @@ consume:
 
         if (expired(&bypass_last, bypass)) {
             /* Do nothing. */
-        } else if (has_pending(view)) {
+        } else if (hazer_has_pending_gsv(view, HAZER_SYSTEM_TOTAL)) {
             fd = in_fd;
             goto consume;
         } else if ((available = diminuto_file_ready(in_fp)) > 0) {

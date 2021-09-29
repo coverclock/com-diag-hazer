@@ -1227,6 +1227,16 @@ static inline int hazer_is_pubx_id(const hazer_vector_t vector, const char id[3]
     return ((vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][1]), "PUBX") == 0) && (strcmp(vector[1], id) == 0));
 }
 
+/**
+ * Returns true if there are GSV views pending for any constellation. Can be
+ * applied by a single constellation by passing pointer to single view and
+ * using a count of one.
+ * @param va points to the array of all satellites being viewed.
+ * @param count is the number of entries in the view array.
+ * @return true if there are GSV views pending for any constellation.
+ */
+extern int hazer_has_pending_gsv(const hazer_view_t va[], size_t count);
+
 /*******************************************************************************
  * FORMATTING DATA FOR OUTPUT
  ******************************************************************************/

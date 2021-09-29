@@ -1695,3 +1695,21 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
 
     return rc;
 }
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
+int hazer_has_pending_gsv(const hazer_view_t va[], size_t count)
+{
+    unsigned int system = 0;
+    unsigned int pending = 0;
+
+    for (system = 0; system < count; ++system) {
+        if (va[system].ticks > 0) {
+            pending += va[system].pending;
+        }
+    }
+
+    return (pending > 0);
+}

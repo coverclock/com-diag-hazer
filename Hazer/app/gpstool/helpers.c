@@ -87,17 +87,3 @@ void collect(int number, tumbleweed_updates_t * up)
     up->word = (up->word << 8) | update;
 
 }
-
-int has_pending(const hazer_view_t va[])
-{
-    unsigned int system = 0;
-    unsigned int pending = 0;
-
-    for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
-        if (va[system].ticks > 0) {
-            pending += va[system].pending;
-        }
-    }
-
-    return (pending > 0);
-}
