@@ -9,8 +9,4 @@ PROGRAM=$(basename ${0})
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-LOG=$(readlink -e $(dirname ${0})/..)/log
-mkdir -p ${LOG}
-
-cat $(readlink -e $(dirname ${0})/../../../dat)/hazer/bu353w10-*.dat |
-	coreable gpstool -E 2> ${LOG}/${PROGRAM}.err
+cat $(readlink -e $(dirname ${0})/../../../dat)/hazer/bu353w10-*.dat | coreable gpstool -R

@@ -910,7 +910,7 @@ typedef struct HazerPosition {
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
  */
-extern int hazer_parse_gga(hazer_position_t *positionp, char * vector[], size_t count);
+extern int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count);
 
 /**
  * Parse a RMC NMEA sentence, updating the position.
@@ -919,7 +919,7 @@ extern int hazer_parse_gga(hazer_position_t *positionp, char * vector[], size_t 
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
  */
-extern int hazer_parse_rmc(hazer_position_t *positionp, char * vector[], size_t count);
+extern int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count);
 
 /**
  * Parse a GLL NMEA sentence, updating the position.
@@ -928,7 +928,7 @@ extern int hazer_parse_rmc(hazer_position_t *positionp, char * vector[], size_t 
  * @param count is size of the vector in slots including the null pointer.
  * @return 0 for success, <0 otherwise.
  */
-extern int hazer_parse_gll(hazer_position_t *positionp, char * vector[], size_t count);
+extern int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count);
 
 /**
  * Parse a VTG NMEA sentence, updating the position.
