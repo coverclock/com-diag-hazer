@@ -1686,9 +1686,9 @@ consume:
                      */
 
                     if (isprint(ch)) {
-                        DIMINUTO_LOG_INFORMATION("Sync Lost 0x%016llx 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Lost %llu 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
                     } else {
-                        DIMINUTO_LOG_INFORMATION("Sync Lost 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Lost %llu 0x%02x\n", (unsigned long long)io_total, ch);
                     }
 
                     sync = 0;
@@ -1713,7 +1713,7 @@ consume:
                     format = NMEA;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync NMEA 0x%016llx\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync NMEA %llu\n", (unsigned long long)io_total);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1737,7 +1737,7 @@ consume:
                     format = UBX;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync UBX 0x%016llx\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync UBX %llu\n", (unsigned long long)io_total);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1760,7 +1760,7 @@ consume:
                     format = RTCM;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync RTCM 0x%016llx\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync RTCM %llu\n", (unsigned long long)io_total);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1789,7 +1789,7 @@ consume:
                 } else {
 
                     if (sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync Stop 0x%016llx 0x%02x\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Stop %llu 0x%02x\n", (unsigned long long)io_total, ch);
                         sync = 0;
                         if (verbose) {
                             sync_out(ch);
