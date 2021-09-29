@@ -418,8 +418,8 @@ int main(int argc, char * argv[])
      */
     ssize_t count = 0;
     hazer_active_t active_cache = HAZER_ACTIVE_INITIALIZER;
-    int dmyokay = 0;
-    int totokay = 0;
+    int time_valid = 0;
+    int time_valid_prior = 0;
     /*
      * Counters.
      */
@@ -2198,9 +2198,7 @@ consume:
             /* Do nothing. */
         } else if ((device_mask & format) == 0) {
             /* Do nothing. */
-        } else if (!dmyokay) {
-            /* Do nothing. */
-        } else if (!totokay) {
+        } else if (!time_valid) {
             /* Do nothing. */
         } else {
             write_buffer(dev_fp, buffer, length);
@@ -2867,21 +2865,21 @@ consume:
         }
 
         /*
-         * Determine if any constellation has the current time and date.
+         * Determine if any constellation has a valid time, date, and clock.
+         * We check this after parsing the input, but use it on the next
+         * iteration to decide whether to forward subsequent sentences etc.
          */
 
-        dmyokay = 0;
-        totokay = 0;
-
-        for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-            if (position[ii].ticks > 0) {
-                if (position[ii].dmy_nanoseconds > 0) {
-                    dmyokay = !0;
-                }
-                if (position[ii].tot_nanoseconds >= position[ii].old_nanoseconds) {
-                    totokay = !0;
-                }
+        time_valid = hazer_has_valid_time(position, countof(position));
+        if (time_valid == time_valid_prior) {
+            /* Do nothing. */
+        } else {
+            if (time_valid) {
+                DIMINUTO_LOG_NOTICE("Time Valid\n");
+            } else {
+                DIMINUTO_LOG_NOTICE("Time Invalid\n");
             }
+            time_valid_prior = time_valid;
         }
 
         /*
@@ -2969,7 +2967,7 @@ consume:
 
         if (expired(&bypass_last, bypass)) {
             /* Do nothing. */
-        } else if (hazer_has_pending_gsv(view, HAZER_SYSTEM_TOTAL)) {
+        } else if (hazer_has_pending_gsv(view, countof(view))) {
             fd = in_fd;
             goto consume;
         } else if ((available = diminuto_file_ready(in_fp)) > 0) {

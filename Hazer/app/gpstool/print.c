@@ -331,7 +331,7 @@ void print_hardware(FILE * fp, const yodel_hardware_t * hp)
         }
 
         if (jamming != jamming_prior) {
-            DIMINUTO_LOG_INFORMATION("Signal UBX MON jamming %u indicator %u\n", value, hp->payload.jamInd);
+            DIMINUTO_LOG_INFORMATION("Indicate UBX MON jamming %u indicator %u\n", value, hp->payload.jamInd);
             jamming_prior = jamming;
         }
 
@@ -393,7 +393,7 @@ void print_status(FILE * fp, const yodel_status_t * sp)
         }
 
         if (spoofing != spoofing_prior) {
-            DIMINUTO_LOG_NOTICE("Signal UBX NAV spoofing %u\n", value);
+            DIMINUTO_LOG_NOTICE("Indicate UBX NAV spoofing %u\n", value);
             spoofing_prior = spoofing;
         }
 

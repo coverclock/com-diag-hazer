@@ -1702,14 +1702,38 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
 
 int hazer_has_pending_gsv(const hazer_view_t va[], size_t count)
 {
-    unsigned int system = 0;
-    unsigned int pending = 0;
+    size_t ii = 0;
 
-    for (system = 0; system < count; ++system) {
-        if (va[system].ticks > 0) {
-            pending += va[system].pending;
+    for (ii = 0; ii < count; ++ii) {
+        if (va[ii].ticks == 0) {
+            /* Do nothing. */
+        } else if (va[ii].pending == 0) {
+            /* Do nothing. */
+        } else {
+            return !0;
         }
     }
 
-    return (pending > 0);
+    return 0;
+}
+
+int hazer_has_valid_time(const hazer_position_t pa[], size_t count)
+{
+    size_t ii = 0;
+
+    for (ii = 0; ii < count; ++ii) {
+        if (pa[ii].ticks == 0) {
+            /* Do nothing. */
+        } else if (pa[ii].utc_nanoseconds == 0) {
+            /* Do nothing. */
+        } else if (pa[ii].dmy_nanoseconds == 0) {
+            /* Do nothing. */
+        } else if (pa[ii].tot_nanoseconds <= pa[ii].old_nanoseconds) {
+            /* Do nothing. */
+        } else {
+            return !0;
+        }
+    }
+
+    return 0;
 }

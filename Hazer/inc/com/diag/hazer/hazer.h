@@ -1237,6 +1237,16 @@ static inline int hazer_is_pubx_id(const hazer_vector_t vector, const char id[3]
  */
 extern int hazer_has_pending_gsv(const hazer_view_t va[], size_t count);
 
+/**
+ * Returns true if there is any position that has a valid clock, which
+ * requires that at least one constellation has both the time and date and
+ * a monotonically increasing clock.
+ * @param pa points to the array of all positions being computed.
+ * @param count is the number of entries in the position array.
+ * @return true if time, date, and monotonic clock are true for some position.
+ */
+extern int hazer_has_valid_time(const hazer_position_t pa[], size_t count);
+
 /*******************************************************************************
  * FORMATTING DATA FOR OUTPUT
  ******************************************************************************/

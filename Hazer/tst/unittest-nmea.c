@@ -71,6 +71,12 @@ int main(void)
         assert(position.lon_nanominutes == -6309202160000LL);
         assert(position.alt_millimeters == 1708600LL);
         assert(position.sep_millimeters == -21500LL);
+
+        position.ticks = 0;
+        assert(!hazer_has_valid_time(&position, 1));
+
+        position.ticks = 1;
+        assert(!hazer_has_valid_time(&position, 1));
     }
 
     {
@@ -122,11 +128,17 @@ int main(void)
         assert(position.utc_nanoseconds == 50188000000000ULL);
         assert(position.dmy_nanoseconds == 1533600000000000000ULL); /* date -u -d "August 7 2018" +"%s.%N" */
         assert(position.tot_nanoseconds == (1533600000000000000ULL + 50188000000000ULL));
+        assert(position.old_nanoseconds == 0);
         assert(position.lat_nanominutes == 2387653370000LL);
         assert(position.lon_nanominutes == -6309202230000LL);
         assert(position.sog_microknots == 10000ULL);
         assert(position.cog_nanodegrees == 0LL);
 
+        position.ticks = 0;
+        assert(!hazer_has_valid_time(&position, 1));
+
+        position.ticks = 1;
+        assert(hazer_has_valid_time(&position, 1));
     }
 
     {
@@ -179,6 +191,12 @@ int main(void)
         assert(position.tot_nanoseconds == 50188000000000ULL);
         assert(position.lat_nanominutes == 2387653370000LL);
         assert(position.lon_nanominutes == -6309202230000LL);
+
+        position.ticks = 0;
+        assert(!hazer_has_valid_time(&position, 1));
+
+        position.ticks = 1;
+        assert(!hazer_has_valid_time(&position, 1));
     }
 
     {
@@ -231,6 +249,12 @@ int main(void)
         assert(position.mag_nanodegrees == 0LL);
         assert(position.sog_microknots == 21000LL);
         assert(position.sog_millimetersperhour == 40000LL);
+
+        position.ticks = 0;
+        assert(!hazer_has_valid_time(&position, 1));
+
+        position.ticks = 1;
+        assert(!hazer_has_valid_time(&position, 1));
     }
 
     {
