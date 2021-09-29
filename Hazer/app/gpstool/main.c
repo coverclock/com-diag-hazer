@@ -910,7 +910,7 @@ int main(int argc, char * argv[])
     if ((locale = setlocale(LC_ALL, "")) != (char *)0) {
         DIMINUTO_LOG_INFORMATION("Locale \"%s\"", locale);
     } else {
-        DIMINUTO_LOG_WARNING("Locale %p", locale);
+        DIMINUTO_LOG_WARNING("Locale Null");
     }
 
     if (identity != (const char *)0) {
@@ -1371,7 +1371,7 @@ int main(int argc, char * argv[])
     }
 
     if (trace_fp != (FILE *)0) {
-        DIMINUTO_LOG_INFORMATION("Trace (%d) \"%s\"\n", fileno(trace_fp), tracing);
+        DIMINUTO_LOG_INFORMATION("Trace Enabled (%d) \"%s\"\n", fileno(trace_fp), tracing);
     }
 
     /*
@@ -2934,10 +2934,10 @@ consume:
             /* Do nothing. */
         } else if (trace_fp == stdout) {
             trace_fp = (FILE *)0;
-            DIMINUTO_LOG_NOTICE("Tracing disabled\n");
+            DIMINUTO_LOG_NOTICE("Trace disabled\n");
         } else if ((rc = fclose(trace_fp)) != EOF) {
             trace_fp = (FILE *)0;
-            DIMINUTO_LOG_NOTICE("Tracing disabled\n");
+            DIMINUTO_LOG_NOTICE("Trace disabled\n");
         } else {
             diminuto_perror("fclose(trace_fp)");
             trace_fp = (FILE *)0;
