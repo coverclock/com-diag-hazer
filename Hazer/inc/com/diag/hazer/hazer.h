@@ -85,6 +85,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 /*******************************************************************************
  * TYPES
@@ -1197,6 +1198,34 @@ extern int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[
  * @return 0 for success on final update of group, 1 for success, <0 otherwise.
  */
 extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count);
+
+/*******************************************************************************
+ * PARSING HELPERS
+ ******************************************************************************/
+
+/**
+ * Return true if the NMEA sentence name following the talker matches
+ * the specified three letter name.
+ * @param vector is the Hazer parsed vector (a 2D array).
+ * @param name is the nul-terminated three letter name.
+ * @return true if the name matches the field.
+ */
+static inline int hazer_is_nmea_name(const hazer_vector_t vector, const char name[4])
+{
+    return ((vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][3]), name) == 0));
+}
+
+/**
+ * Return true if the second field in the vector matches the specified
+ * PUBX message id.
+ * @param vector is the Hazer parsed vector (a 2D array).
+ * @param id is the nul-terminated two letter message identifier.
+ * @return true if the id matches the field.
+ */
+static inline int hazer_is_pubx_id(const hazer_vector_t vector, const char id[3])
+{
+    return ((vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][1]), "PUBX") == 0) && (strcmp(vector[1], id) == 0));
+}
 
 /*******************************************************************************
  * FORMATTING DATA FOR OUTPUT

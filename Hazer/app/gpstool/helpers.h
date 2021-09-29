@@ -43,31 +43,6 @@ extern void countdown(hazer_expiry_t * ep, diminuto_sticks_t elapsed);
 extern void collect(int number, tumbleweed_updates_t * up);
 
 /**
- * Return true if the second field in the vector matches the PUBX message
- * id. No length checks are done here, so the safeties are off.
- * @param vector is the Hazer parsed vector (a 2D array).
- * @param id is the nul-terminated two letter message identifier.
- * @return true if the id matches the field.
- */
-static inline int is_pubx(const hazer_vector_t vector, const char id[3])
-{
-    return ((vector[1][0] == id[0]) && (vector[1][1] == id[1]) && (vector[1][2] == '\0'));
-}
-
-/**
- * Return true if the NMEA sentence name following the talker matches
- * three letter name. No length checks are done here, so the safeties are
- * off.
- * @param vector is the Hazer parsed vector (a 2D array).
- * @param name is the nul-terminated three letter name.
- * @return true if the name matches the field.
- */
-static inline int is_nmea(const hazer_vector_t vector, const char name[4])
-{
-    return ((vector[0][3] == name[0]) && (vector[0][4] == name[1]) && (vector[0][5] == name[2]) && (vector[0][6] == '\0'));
-}
-
-/**
  * Do the busywork necessary to mark the acquisition of a Fix.
  * @param string is the string to log at level NOTICE.
  */

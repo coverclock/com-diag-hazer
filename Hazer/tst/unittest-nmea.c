@@ -58,6 +58,9 @@ int main(void)
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
 
+        rc = hazer_is_nmea_name(vector, "GGA");
+        assert(rc == !0);
+
         rc = hazer_parse_gga(&position, vector, count);
         assert(rc == 0);
         assert(strcmp(position.label, "GGA") == 0);
@@ -109,6 +112,9 @@ int main(void)
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
+
+        rc = hazer_is_nmea_name(vector, "RMC");
+        assert(rc == !0);
 
         rc = hazer_parse_rmc(&position, vector, count);
         assert(rc == 0);
@@ -163,6 +169,9 @@ int main(void)
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
 
+        rc = hazer_is_nmea_name(vector, "GLL");
+        assert(rc == !0);
+
         rc = hazer_parse_gll(&position, vector, count);
         assert(rc == 0);
         assert(strcmp(position.label, "GLL") == 0);
@@ -212,6 +221,9 @@ int main(void)
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
 
+        rc = hazer_is_nmea_name(vector, "VTG");
+        assert(rc == !0);
+
         rc = hazer_parse_vtg(&position, vector, count);
         assert(rc == 0);
         assert(strcmp(position.label, "VTG") == 0);
@@ -260,6 +272,9 @@ int main(void)
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
+
+        rc = hazer_is_nmea_name(vector, "GSA");
+        assert(rc == !0);
 
         rc = hazer_parse_gsa(&active, vector, count);
         assert(rc == 0);
@@ -324,6 +339,9 @@ int main(void)
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
+
+        rc = hazer_is_nmea_name(vector, "GSA");
+        assert(rc == !0);
 
         rc = hazer_parse_gsa(&active, vector, count);
         assert(rc == 0);
@@ -396,6 +414,9 @@ int main(void)
             temporary[length + 2] = '\n';
             temporary[length + 3] = '\0';
             assert(strcmp(DATA[ii], temporary) == 0);
+
+            rc = hazer_is_nmea_name(vector, "GSV");
+            assert(rc == !0);
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(((ii == 3) && (rc == 0)) || (rc > 0));
@@ -548,6 +569,9 @@ int main(void)
             temporary[length + 2] = '\n';
             temporary[length + 3] = '\0';
             assert(strcmp(DATA[ii], temporary) == 0);
+
+            rc = hazer_is_nmea_name(vector, "GSV");
+            assert(rc == !0);
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(((ii == 3) && (rc == 0)) || (rc > 0));
