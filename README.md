@@ -1240,6 +1240,8 @@ the libraries and binaries in the system directories.)
 * sink - received UDP packets from the source.
 * sirfstar4 - exercises any SiRF Star 4 device.
 * source - send UDP packets to the sink.
+* streamdump - socat to phex.
+* streamprint - socat to gpstool with a lot of debug output.
 * talkers - processes a file of synthetic input.
 * tesorochoosefile - emit CSV output to an observation file for Tesoro.
 * tesorodraganddrop - emit CSV output to an observation file for Tesoro.
