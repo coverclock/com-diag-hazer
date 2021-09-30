@@ -1613,7 +1613,13 @@ consume:
 
                 ch = fgetc(in_fp);
                 if (ch != EOF) {
-                    /* Do nothing. */
+                    /*
+                     * Note that this counter is the number if bytes
+                     * consumed (one-based), not the displacement into
+                     * the input stream, dump file, etc. (zero-based).
+                     * Subtract one for the those values.
+                     */
+                    io_total += 1;
                 } else if (ferror(in_fp)) {
                     DIMINUTO_LOG_WARNING("ERROR");
                     clearerr(in_fp);
@@ -1631,7 +1637,24 @@ consume:
                     break;
                 }
 
-                io_total += 1;
+                if (!debug) {
+                    /* Do nothing. */
+                } else if (isprint(ch)) {
+                    fprintf(stderr, "DATUM [%llu] 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
+                } else {
+                    fprintf(stderr, "DATUM [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+                }
+
+                /*
+                 * We the single byte to the Catenate file sink to insure we
+                 * capture even invalid characters from the input source before
+                 * we check for frame synchronization.
+                 */
+
+                if (sink_fp != (FILE *)0) {
+                    rc = fputc(ch, sink_fp);
+                    diminuto_assert(rc != EOF);
+                }
 
                 /*
                  * We just received a character from the input stream.
@@ -1686,14 +1709,19 @@ consume:
                      */
 
                     if (isprint(ch)) {
-                        DIMINUTO_LOG_INFORMATION("Sync Lost %llu 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Lost [%llu] [0x%llx] 0x%02x '%c'\n", (unsigned long long)io_total, (unsigned long long)io_total, ch, ch);
                     } else {
-                        DIMINUTO_LOG_INFORMATION("Sync Lost %llu 0x%02x\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Lost [%llu] [0x%llx] 0x%02x\n", (unsigned long long)io_total, (unsigned long long)io_total, ch);
                     }
 
                     sync = 0;
                     if (verbose) {
                         sync_out(ch);
+                    }
+
+                    if (debug) {
+                        sync_end();
+                        goto stop;
                     }
 
                     nmea_state = HAZER_STATE_START;
@@ -1713,7 +1741,7 @@ consume:
                     format = NMEA;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync NMEA %llu\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync NMEA [%llu] [0x%llx]\n", (unsigned long long)io_total, (unsigned long long)io_total);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1737,7 +1765,7 @@ consume:
                     format = UBX;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync UBX %llu\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync UBX [%llu] [0x%llx]\n", (unsigned long long)io_total, (unsigned long long)io_total);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1760,7 +1788,7 @@ consume:
                     format = RTCM;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync RTCM %llu\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync RTCM [%llu] [0x%llx]\n", (unsigned long long)io_total, (unsigned long long)io_total);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1789,7 +1817,7 @@ consume:
                 } else {
 
                     if (sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync Stop %llu 0x%02x\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Stop [%llu] [0x%llx] 0x%02x\n", (unsigned long long)io_total, (unsigned long long)io_total, ch);
                         sync = 0;
                         if (verbose) {
                             sync_out(ch);
@@ -2140,15 +2168,6 @@ consume:
          * extracted from the data in the buffer. Unless the format requires
          * it (none currently do), it does not include the trailing NUL.
          */
-
-        /**
-         ** CATENATE
-         **/
-
-        if (sink_fp != (FILE *)0) {
-            sz = fwrite(buffer, 1, length, sink_fp);
-            diminuto_assert(sz == length);
-        }
 
         /**
          ** FORWARD
@@ -3146,6 +3165,8 @@ render:
     /**
      ** FINIALIZATION
      **/
+
+stop:
 
     DIMINUTO_LOG_NOTICE("Final");
 
