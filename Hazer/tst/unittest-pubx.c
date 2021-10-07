@@ -20,10 +20,10 @@ int main(void)
 
     {
         static const char * DATA = "$PUBX,00,180730.00,3948.04788,N,10510.62820,W,1703.346,G3,6528077,4616048,1.234,290.12,2.345,,1.23,4.56,7.89,4,0,0*4C\r\n";
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_position_t position = { 0 };
-        hazer_active_t active = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -31,6 +31,8 @@ int main(void)
         char msn = 0;
         char lsn = 0;
         hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
 
         strncpy(buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
@@ -68,7 +70,7 @@ int main(void)
         assert(position.sat_used == 4);
 
         assert(position.utc_nanoseconds == 65250000000000ULL);
-        assert(position.tot_nanoseconds == 65250000000000ULL);
+        assert(position.tot_nanoseconds == HAZER_NANOSECONDS_UNSET);
         assert(position.lat_nanominutes == 2388047880000LL);
         assert(position.lon_nanominutes == -6310628200000LL);
         assert(position.sep_millimeters == 1703346LL);
@@ -78,14 +80,34 @@ int main(void)
         assert(active.hdop == 123);
         assert(active.vdop == 456);
         assert(active.tdop == 789);
+
+        assert(!hazer_is_valid_time(&position));
     }
 
     {
         static const char * DATA = "$PUBX,03,19,5,-,051,34,,000,10,U,240,16,10,000,13,-,072,38,,000,15,e,113,56,20,000,16,-,309,15,,000,18,U,321,61,30,000,20,e,061,04,40,000,23,-,248,48,,000,25,e,193,-2,50,000,26,-,276,17,,000,29,-,167,58,,000,65,-,047,68,,000,66,U,201,43,60,000,72,-,033,21,,000,79,-,284,02,,000,80,-,335,03,,000,81,-,326,35,,000,87,e,115,37,70,000,88,U,056,72,80,000*1E\r\n";
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_view_t view[HAZER_SYSTEM_TOTAL] = { { 0, } };
-        hazer_active_t active[HAZER_SYSTEM_TOTAL] = { { 0, } };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_view_t view[HAZER_SYSTEM_TOTAL] = {
+            HAZER_VIEW_INITIALIZER,
+            HAZER_VIEW_INITIALIZER,
+            HAZER_VIEW_INITIALIZER,
+            HAZER_VIEW_INITIALIZER,
+            HAZER_VIEW_INITIALIZER,
+            HAZER_VIEW_INITIALIZER,
+            HAZER_VIEW_INITIALIZER,
+            HAZER_VIEW_INITIALIZER,
+        };
+        hazer_active_t active[HAZER_SYSTEM_TOTAL] = {
+            HAZER_ACTIVE_INITIALIZER,
+            HAZER_ACTIVE_INITIALIZER,
+            HAZER_ACTIVE_INITIALIZER,
+            HAZER_ACTIVE_INITIALIZER,
+            HAZER_ACTIVE_INITIALIZER,
+            HAZER_ACTIVE_INITIALIZER,
+            HAZER_ACTIVE_INITIALIZER,
+            HAZER_ACTIVE_INITIALIZER,
+        };
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -319,9 +341,9 @@ $PUBX,03,19,
 
     {
         static const char * DATA = "$PUBX,04,180729.00,200821,497248.99,2171,18,-21669119,376.950,21*3E\r\n";
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_position_t position = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -329,6 +351,8 @@ $PUBX,03,19,
         char msn = 0;
         char lsn = 0;
         hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
 
         strncpy(buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
@@ -366,6 +390,13 @@ $PUBX,03,19,
         assert(position.utc_nanoseconds == 65249000000000ULL);
         assert(position.dmy_nanoseconds == 1629417600000000000ULL); /* date -u -d "August 20 2021" +"%s.%N" */
         assert(position.tot_nanoseconds == (65249000000000ULL + 1629417600000000000ULL));
+
+        position.ticks = 0;
+        assert(!hazer_is_valid_time(&position));
+        assert(!hazer_has_valid_time(&position, 1));
+        position.ticks = 1;
+        assert(hazer_is_valid_time(&position));
+        assert(hazer_has_valid_time(&position, 1));
     }
 
     return 0;

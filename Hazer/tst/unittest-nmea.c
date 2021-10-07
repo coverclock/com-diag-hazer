@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2018-2021 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the NMEA unit test.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -20,9 +20,9 @@ int main(void)
 
     {
         static const char * DATA = "$GNGGA,135627.00,3947.65338,N,10509.20216,W,2,12,0.67,1708.6,M,-21.5,M,,0000*4E\r\n";
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_position_t position = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -30,6 +30,8 @@ int main(void)
         char msn = 0;
         char lsn = 0;
         hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
 
         strncpy(buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
@@ -66,24 +68,27 @@ int main(void)
         assert(strcmp(position.label, "GGA") == 0);
         assert(position.sat_used == 12);
         assert(position.utc_nanoseconds == 50187000000000ULL);
-        assert(position.tot_nanoseconds == 50187000000000ULL);
+        assert(position.dmy_nanoseconds == HAZER_NANOSECONDS_UNSET);
+        assert(position.tot_nanoseconds == HAZER_NANOSECONDS_UNSET);
+        assert(position.old_nanoseconds == HAZER_NANOSECONDS_UNSET);
         assert(position.lat_nanominutes == 2387653380000LL);
         assert(position.lon_nanominutes == -6309202160000LL);
         assert(position.alt_millimeters == 1708600LL);
         assert(position.sep_millimeters == -21500LL);
 
         position.ticks = 0;
+        assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, 1));
-
         position.ticks = 1;
+        assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, 1));
     }
 
     {
         static const char * DATA = "$GNRMC,135628.00,A,3947.65337,N,10509.20223,W,0.010,,070818,,,D*74\r\n";
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_position_t position = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -91,6 +96,8 @@ int main(void)
         char msn = 0;
         char lsn = 0;
         hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
 
         strncpy(buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
@@ -127,25 +134,27 @@ int main(void)
         assert(strcmp(position.label, "RMC") == 0);
         assert(position.utc_nanoseconds == 50188000000000ULL);
         assert(position.dmy_nanoseconds == 1533600000000000000ULL); /* date -u -d "August 7 2018" +"%s.%N" */
-        assert(position.tot_nanoseconds == (1533600000000000000ULL + 50188000000000ULL));
-        assert(position.old_nanoseconds == 0);
+        assert(position.tot_nanoseconds == (position.utc_nanoseconds + position.dmy_nanoseconds));
+        assert(position.old_nanoseconds == position.tot_nanoseconds);
         assert(position.lat_nanominutes == 2387653370000LL);
         assert(position.lon_nanominutes == -6309202230000LL);
         assert(position.sog_microknots == 10000ULL);
         assert(position.cog_nanodegrees == 0LL);
 
         position.ticks = 0;
+        assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, 1));
-
         position.ticks = 1;
+        assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(&position, 1));
+
     }
 
     {
         static const char * DATA = "$GNGLL,3947.65337,N,10509.20223,W,135628.00,A,D*6A\r\n";
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_position_t position = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -153,6 +162,8 @@ int main(void)
         char msn = 0;
         char lsn = 0;
         hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
 
         strncpy(buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
@@ -188,22 +199,25 @@ int main(void)
         assert(rc == 0);
         assert(strcmp(position.label, "GLL") == 0);
         assert(position.utc_nanoseconds == 50188000000000ULL);
-        assert(position.tot_nanoseconds == 50188000000000ULL);
+        assert(position.dmy_nanoseconds == HAZER_NANOSECONDS_UNSET);
+        assert(position.tot_nanoseconds == HAZER_NANOSECONDS_UNSET);
+        assert(position.old_nanoseconds == HAZER_NANOSECONDS_UNSET);
         assert(position.lat_nanominutes == 2387653370000LL);
         assert(position.lon_nanominutes == -6309202230000LL);
 
         position.ticks = 0;
+        assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, 1));
-
         position.ticks = 1;
+        assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, 1));
     }
 
     {
         static const char * DATA = "$GNVTG,,T,,M,0.021,N,0.040,K,D*3F\r\n";
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_position_t position = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -211,6 +225,8 @@ int main(void)
         char msn = 0;
         char lsn = 0;
         hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
 
         strncpy(buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
@@ -245,23 +261,28 @@ int main(void)
         rc = hazer_parse_vtg(&position, vector, count);
         assert(rc == 0);
         assert(strcmp(position.label, "VTG") == 0);
+        assert(position.utc_nanoseconds == HAZER_NANOSECONDS_UNSET);
+        assert(position.dmy_nanoseconds == HAZER_NANOSECONDS_UNSET);
+        assert(position.tot_nanoseconds == HAZER_NANOSECONDS_UNSET);
+        assert(position.old_nanoseconds == HAZER_NANOSECONDS_UNSET);
         assert(position.cog_nanodegrees == 0LL);
         assert(position.mag_nanodegrees == 0LL);
         assert(position.sog_microknots == 21000LL);
         assert(position.sog_millimetersperhour == 40000LL);
 
         position.ticks = 0;
+        assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, 1));
-
         position.ticks = 1;
+        assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, 1));
     }
 
     {
         static const char * DATA = "$GNGSA,A,3,07,11,15,18,19,13,30,28,51,01,48,17,1.27,0.64,1.10*1C\r\n";
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_active_t active = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -326,9 +347,9 @@ int main(void)
 
     {
         static const char * DATA = "$GNGSA,A,3,07,11,15,18,19,13,30,28,51,01,48,17,1.27,0.64,1.10,15*34\r\n";
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_active_t active = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -398,9 +419,9 @@ int main(void)
             "$GPGSV,4,3,15,18,24,052,32,19,32,223,36,28,67,020,28,30,59,149,38*77\r\n",
             "$GPGSV,4,4,15,46,38,215,40,48,36,220,34,51,44,183,45*47\r\n",
         };
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_view_t view = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_view_t view = HAZER_VIEW_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -561,9 +582,9 @@ int main(void)
             "$GPGSV,4,3,15,18,24,052,32,19,32,223,36,28,67,020,28,30,59,149,38,*5B\r\n",
             "$GPGSV,4,4,15,46,38,215,40,48,36,220,34,51,44,183,45,3*58\r\n",
         };
-        hazer_buffer_t buffer = { 0 };
-        hazer_vector_t vector = { 0 };
-        hazer_view_t view = { 0 };
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_view_t view = HAZER_VIEW_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -714,7 +735,6 @@ int main(void)
         assert(view.sat[14].azm_degrees == 183);
         assert(view.sat[14].snr_dbhz == 45);
         assert(view.sat[14].signal == 3);
-
     }
 
     return 0;

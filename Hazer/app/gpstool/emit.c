@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2021 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the implemention of the gpstool Emit API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -148,10 +148,10 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
     for (ii = HAZER_SYSTEM_GNSS; ii <= HAZER_SYSTEM_BEIDOU; ++ii) {
         if (pa[ii].ticks == 0) {
             /* Do nothing. */
-        } else if (pa[ii].utc_nanoseconds == 0) {
+        } else if (pa[ii].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) {
             /* Do nothing. */
 #if 0
-        } else if (pa[ii].dmy_nanoseconds == 0) {
+        } else if (pa[ii].dmy_nanoseconds == HAZER_NANOSECONDS_UNSET) {
             /* Do nothing. */
 #endif
         } else {
@@ -208,7 +208,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
     /* TIM */
 
-    if ((pa[system].ticks > 0) && (pa[system].utc_nanoseconds > 0) && (pa[system].dmy_nanoseconds > 0)) {
+    if ((pa[system].ticks > 0) && (hazer_is_valid_time(&(pa[system])))) {
 
         seconds = pa[system].tot_nanoseconds / NANO;
         nanoseconds = pa[system].tot_nanoseconds % NANO;

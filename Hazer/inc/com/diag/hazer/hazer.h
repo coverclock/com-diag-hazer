@@ -858,6 +858,17 @@ extern hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker);
  ******************************************************************************/
 
 /**
+ * @def HAZER_NANOSECONDS_INITIALIZER
+ * Nanosecond fields are initialized to this value (because 0 is a value value).
+ */
+#define HAZER_NANOSECONDS_INITIALIZER ((uint64_t)-1)
+
+/**
+ * Nanosecond fields with this value are unset.
+ */
+static const uint64_t HAZER_NANOSECONDS_UNSET = HAZER_NANOSECONDS_INITIALIZER;
+
+/**
  * This structure maintains the time, position, altitude, speed, and bearing
  * derived from the NMEA stream.
  */
@@ -894,7 +905,7 @@ typedef struct HazerPosition {
  */
 #define HAZER_POSITION_INITIALIZER \
     { \
-        0, 0, 0, 0, \
+        HAZER_NANOSECONDS_INITIALIZER, HAZER_NANOSECONDS_INITIALIZER, HAZER_NANOSECONDS_INITIALIZER, HAZER_NANOSECONDS_INITIALIZER, \
         0, 0, 0, 0, \
         0, 0, 0, 0, \
         (const char *)0, \
@@ -1006,8 +1017,6 @@ typedef struct HazerActive {
     uint8_t mode;                       /* Navigation mode: see HazerMode. */
     hazer_expiry_t ticks;		        /* Lifetime in application-defined ticks. */
 } hazer_active_t;
-
-#define HAZER_ACTIVE_
 
 /**
  * @def HAZER_ACTIVE_INITIALIZER
@@ -1236,6 +1245,22 @@ static inline int hazer_is_pubx_id(const hazer_vector_t vector, const char id[3]
  * @return true if there are GSV views pending for any constellation.
  */
 extern int hazer_has_pending_gsv(const hazer_view_t va[], size_t count);
+
+/**
+ * Returns true if the position has a valid clock, which requires both the
+ * the time and date and a monotonically increasing clock.
+ * @param positionp points to the position.
+ * @return true if time, date, and monotonic clock are true for the position.
+ */
+static int hazer_is_valid_time(const hazer_position_t * positionp)
+{
+    return ((positionp->ticks > 0) &&
+            (positionp->utc_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
+            (positionp->dmy_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
+            (positionp->tot_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
+            (positionp->old_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
+            (positionp->tot_nanoseconds <= positionp->old_nanoseconds));
+}
 
 /**
  * Returns true if there is any position that has a valid clock, which

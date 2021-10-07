@@ -1089,6 +1089,28 @@ hazer_system_t hazer_map_active_to_system(const hazer_active_t * activep)
  *
  ******************************************************************************/
 
+static void update_time(hazer_position_t * positionp)
+{
+    uint64_t total = 0;
+
+    if (positionp->dmy_nanoseconds != HAZER_NANOSECONDS_UNSET) {
+        total = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
+        if (positionp->tot_nanoseconds == HAZER_NANOSECONDS_UNSET) {
+            positionp->old_nanoseconds = total;
+            positionp->tot_nanoseconds = total;
+        } else if (total != positionp->tot_nanoseconds) {
+            positionp->old_nanoseconds = positionp->tot_nanoseconds;
+            positionp->tot_nanoseconds = total;
+        } else {
+            /* Do nothing. */
+        }
+    }
+}
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
 /*
  * I am frequently tempted to replace the numerical constants used as counts
  * and indices below with symbolic constants, but I find they actually make
@@ -1114,14 +1136,8 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
     } else if (*vector[6] == '0') {
         positionp->sat_used = 0;
     } else {
-        uint64_t total = 0;
-
         positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
-        total = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-        if (total != positionp->tot_nanoseconds) {
-            positionp->old_nanoseconds = positionp->tot_nanoseconds;
-            positionp->tot_nanoseconds = total;
-        }
+        update_time(positionp);
         positionp->lat_nanominutes = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits);
         positionp->lon_nanominutes = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
         positionp->sat_used = strtol(vector[7], (char **)0, 10);
@@ -1367,15 +1383,9 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         /* Not clear what this means on the u-blox UBX-F9P. */
 #endif
     } else {
-        uint64_t total = 0;
-
         positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
         positionp->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
-        total = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-        if (total != positionp->tot_nanoseconds) {
-            positionp->old_nanoseconds = positionp->tot_nanoseconds;
-            positionp->tot_nanoseconds = total;
-        }
+        update_time(positionp);
         positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
         positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
         positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits);
@@ -1409,14 +1419,8 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
     } else if (*vector[7] == 'N') {
         /* Do nothing. */
     } else {
-        uint64_t total = 0;
-
         positionp->utc_nanoseconds = hazer_parse_utc(vector[5]);
-        total = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-        if (total != positionp->tot_nanoseconds) {
-            positionp->old_nanoseconds = positionp->tot_nanoseconds;
-            positionp->tot_nanoseconds = total;
-        }
+        update_time(positionp);
         positionp->lat_nanominutes = hazer_parse_latlon(vector[1], *(vector[2]), &positionp->lat_digits);
         positionp->lon_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lon_digits);
         positionp->label = GLL;
@@ -1504,14 +1508,8 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
     } else if (strncmp(vector[18], "0", sizeof("0")) == 0) {
         activep->mode = HAZER_MODE_ZERO;
     } else if (strncmp(vector[8], "TT", sizeof("TT")) == 0) {
-        uint64_t total = 0;
-
         positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
-        total = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-        if (total != positionp->tot_nanoseconds) {
-            positionp->old_nanoseconds = positionp->tot_nanoseconds;
-            positionp->tot_nanoseconds = total;
-        }
+        update_time(positionp);
         positionp->sat_used = strtol(vector[18], (char **)0, 10);
         positionp->label = PUBX;
         activep->mode = HAZER_MODE_TIME;
@@ -1521,14 +1519,8 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         activep->label = PUBX;
         /* Do not return success. */
     } else {
-        uint64_t total = 0;
-
         positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
-        total = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-        if (total != positionp->tot_nanoseconds) {
-            positionp->old_nanoseconds = positionp->tot_nanoseconds;
-            positionp->tot_nanoseconds = total;
-        }
+        update_time(positionp);
         positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
         positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
         positionp->sep_millimeters = hazer_parse_alt(vector[7], *(vector[12]), &positionp->sep_digits);
@@ -1680,15 +1672,9 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
     } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
     } else {
-        uint64_t total = 0;
-
         positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
         positionp->dmy_nanoseconds = hazer_parse_dmy(vector[3]);
-        total = positionp->utc_nanoseconds + positionp->dmy_nanoseconds;
-        if (total != positionp->tot_nanoseconds) {
-            positionp->old_nanoseconds = positionp->tot_nanoseconds;
-            positionp->tot_nanoseconds = total;
-        }
+        update_time(positionp);
         positionp->label = PUBX;
         rc = 0;
     }
@@ -1722,15 +1708,7 @@ int hazer_has_valid_time(const hazer_position_t pa[], size_t count)
     size_t ii = 0;
 
     for (ii = 0; ii < count; ++ii) {
-        if (pa[ii].ticks == 0) {
-            /* Do nothing. */
-        } else if (pa[ii].utc_nanoseconds == 0) {
-            /* Do nothing. */
-        } else if (pa[ii].dmy_nanoseconds == 0) {
-            /* Do nothing. */
-        } else if (pa[ii].tot_nanoseconds <= pa[ii].old_nanoseconds) {
-            /* Do nothing. */
-        } else {
+        if (hazer_is_valid_time(&(pa[ii]))) {
             return !0;
         }
     }

@@ -20,8 +20,8 @@ default:	all
 
 TITLE				:=	Hazer
 
-MAJOR				:=	44# API changes that may require that applications be modified.
-MINOR				:=	6# Only functionality or features added with no legacy API changes.
+MAJOR				:=	45# API changes that may require that applications be modified.
+MINOR				:=	0# Only functionality or features added with no legacy API changes.
 BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
@@ -745,6 +745,7 @@ functional:
 	@echo '    bu353w10F  # (Frequency) with the GlobalSat BU-353W10' 1>&2
 	@echo '    bu353w10S  # (Source) with the GlobalSat BU-353W10' 1>&2
 	@echo '    neom8n1pps # (1 Pulse Per Second) with the u-blox NEO-M8N' 1>&2
+	@echo '    samm8q1pps # (1 Pulse Per Second) with the u-blox SAM-M8Q' 1>&2
 	@echo '    gr701w1pps # (1 Pulse Per Second) with the NaviSys GR701W' 1>&2
 
 valgrind:

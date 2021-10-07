@@ -436,8 +436,8 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (pa[system].ticks == 0) { continue; }
-            if (pa[system].utc_nanoseconds == 0) { continue; }
-            if (pa[system].dmy_nanoseconds == 0) { continue; }
+            if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
+            if (pa[system].dmy_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
             fputs("TIM", fp);
 
@@ -528,7 +528,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (pa[system].ticks == 0) { continue; }
-            if (pa[system].utc_nanoseconds == 0) { continue; }
+            if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
             fputs("POS", fp);
 
@@ -575,7 +575,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (pa[system].ticks == 0) { continue; }
-            if (pa[system].utc_nanoseconds == 0) { continue; }
+            if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
             fputs("ALT", fp);
 
@@ -612,7 +612,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (pa[system].ticks == 0) { continue; }
-            if (pa[system].utc_nanoseconds == 0) { continue; }
+            if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
             fputs("COG", fp);
 
@@ -650,7 +650,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (pa[system].ticks == 0) { continue; }
-            if (pa[system].utc_nanoseconds == 0) { continue; }
+            if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
             fputs("SOG", fp);
 
@@ -691,7 +691,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             if (pa[system].ticks == 0) { continue; }
 
-            dmyokay = (pa[system].dmy_nanoseconds > 0); 
+            dmyokay = (pa[system].dmy_nanoseconds != HAZER_NANOSECONDS_UNSET);
             totokay = (pa[system].tot_nanoseconds > pa[system].old_nanoseconds);
             if (totokay != totokay_prior) {
                 DIMINUTO_LOG_NOTICE("Clock %s\n", totokay ? "Monotonic" : "Retrograde");
