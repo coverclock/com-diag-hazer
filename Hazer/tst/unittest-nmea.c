@@ -19,6 +19,11 @@ int main(void)
     hazer_debug(stderr);
 
     {
+        assert(HAZER_NANOSECONDS_INITIALIZER == 0xffffffffffffffffULL);
+        assert(HAZER_NANOSECONDS_UNSET == 0xffffffffffffffffULL);
+    }
+
+    {
         static const char * DATA = "$GNGGA,135627.00,3947.65338,N,10509.20216,W,2,12,0.67,1708.6,M,-21.5,M,,0000*4E\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
