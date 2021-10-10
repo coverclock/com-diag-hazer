@@ -398,10 +398,11 @@ Hazer has been successfully tested with the following GPS devices.
 
 * Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [12]    
 * Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
+* Bad Elf GPS Pro + (STMicroelectronics/MediaTek MTK, 9600 8n1, v0483p5740, ttyACM, 1Hz) [4] [16]    
 * Digi XBIB-C-GPS (U-blox 8/UBX-CAM-M8Q, 9600 8N1, N/A, ttyS, 1Hz) [4]    
 * Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [9]    
-* Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4]    
+* Garmin GLO (unknown, Bluetooth, N/A, rfcomm, 10Hz) [4] [15]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
 * GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]    
@@ -440,6 +441,8 @@ Footnotes:
 [12] Equipped with a CR1220 3V button cell.    
 [13] A tear down of the BU-353W10 reveals it has a button cell for its battery backed RAM.    
 [14] Make sure you mount this component side down, patch antenna side up.    
+[15] Uses Bluetooth (see procedure for pairing in <https://github.com/coverclock/com-diag-hazer/blob/master/REMARKS.md>).    
+[16] Uses Bluetooth but refuses to pair with Raspberry Pi.    
 
 Notes:
 
@@ -454,7 +457,7 @@ SiRF is part of Qualcomm.
 # Platforms
 
 Various releases of Hazer have been tested on one or more the following targets
-and platforms.
+and platforms. (This list is not exhaustive.)
 
 Dell OptiPlex 7040    
 Intel Core i7-6700T x86_64 @ 2.8GHz x 4 x 2    
