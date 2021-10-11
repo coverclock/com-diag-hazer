@@ -894,11 +894,11 @@ int main(int argc, char * argv[])
         DIMINUTO_LOG_NOTICE("Testing 0x%x\n", test);
     }
 
-    (void)gethostname(Hostname, sizeof(Hostname));
-    Hostname[sizeof(Hostname) - 1] = '\0';
-    if (Hostname[0] == '\0') {
-        strncpy(Hostname, "hostname", sizeof(Hostname));
+    if (gethostname(Hostname, sizeof(Hostname)) < 0) {
+        diminuto_perror("gethostbyname");
+        strncpy(Hostname, "localhost", sizeof(Hostname));
     }
+    Hostname[sizeof(Hostname) - 1] = '\0';
     DIMINUTO_LOG_INFORMATION("Hostname \"%s\"\n", Hostname);
 
     /*

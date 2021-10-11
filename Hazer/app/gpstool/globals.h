@@ -14,6 +14,7 @@
 
 #include <sys/types.h>
 #include <pthread.h>
+#include "limits.h"
 #include "com/diag/diminuto/diminuto_types.h"
 
 /**
@@ -24,7 +25,7 @@ extern const char * Program;
 /**
  * This is our host name as provided by the run-time system.
  */
-extern char Hostname[9];
+extern char Hostname[HOST_NAME_MAX];
 
 /**
  * This is our process identifier.
