@@ -46,6 +46,7 @@ void sync_out(int ch)
 
 void sync_in(size_t length)
 {
+    static int synced = 0;
     ssize_t sync_length = 0;
 
     if (sync_buffer != (uint8_t *)0) {
@@ -59,7 +60,12 @@ void sync_in(size_t length)
         }
 
         if (sync_length > 0) {
-            fputs("UNK:\n", stderr);
+            if (synced) {
+                fputs("UNK:\n", stderr);
+            } else {
+                fputs("INI:\n", stderr);
+                synced = !0;
+            }
             diminuto_dump(stderr, sync_buffer, sync_length);
             sync_here = sync_buffer;
         }
