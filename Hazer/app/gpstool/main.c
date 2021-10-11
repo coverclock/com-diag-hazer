@@ -185,6 +185,8 @@ int main(int argc, char * argv[])
     int unknown = 0;
     int serial = 0;
     int daemon = 0;
+    int nakquit = 0;
+    int syncquit = 0;
     seconds_t slow = 0;
     seconds_t timeout = HAZER_GNSS_SECONDS;
     seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
@@ -354,7 +356,6 @@ int main(int argc, char * argv[])
     yodel_odometer_t odometer = YODEL_ODOMETER_INITIALIZER;
     yodel_posveltim_t posveltim = YODEL_POSVELTIM_INITIALIZER;
     int acknakpending = 0;
-    int nakquit = 0;
     int nominal = 0;
     /*
      * RTCM state databases.
@@ -443,7 +444,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:uvxw:y:?";
+    static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:uvxw:y:z?";
 
     /**
      ** PREINITIALIZATION
@@ -777,10 +778,14 @@ int main(int argc, char * argv[])
                 error = !0;
             }
             break;
+        case 'z':
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
+            syncquit = !0;
+            break;
         case '?':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             fprintf(stderr, "usage: %s\n"
-                            "               [ -d ] [ -v ] [ -u ]\n"
+                            "               [ -d ] [ -v ] [ -u ] [ -z ]\n"
                             "               [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]\n"
                             "               [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ]\n"
                             "               [ -C FILE ]\n"
@@ -850,6 +855,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds.\n");
             fprintf(stderr, "       -x          EXit if a NAK is received.\n");
             fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds.\n");
+            fprintf(stderr, "       -z          Exit if all state machines stop.\n");
             return 1;
             break;
         }
@@ -1696,6 +1702,8 @@ consume:
 
                 } else {
 
+                    sync = 0;
+
                     /*
                      * Normally I'd log this at WARNING or NOTICE. But
                      * some devices with USB interfaces flood the log
@@ -1707,18 +1715,13 @@ consume:
                      * but it shows up using a USB hardware analyzer.
                      */
 
-                    if (isprint(ch)) {
-                        DIMINUTO_LOG_INFORMATION("Sync Lost [%llu] 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
-                    } else {
-                        DIMINUTO_LOG_INFORMATION("Sync Lost [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
-                    }
+                    DIMINUTO_LOG_INFORMATION("Sync Lost [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
 
-                    sync = 0;
                     if (verbose) {
                         sync_out(ch);
                     }
 
-                    if (debug) {
+                    if (syncquit) {
                         sync_end();
                         goto stop;
                     }
@@ -1816,13 +1819,21 @@ consume:
                 } else {
 
                     if (sync) {
+
                         DIMINUTO_LOG_INFORMATION("Sync Stop [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
-                        sync = 0;
+
                         if (verbose) {
                             sync_out(ch);
                         }
+
+                        if (syncquit) {
+                            sync_end();
+                            goto stop;
+                        }
+
                     }
 
+                    sync = 0;
                     frame = 0;
 
                     nmea_state = HAZER_STATE_START;

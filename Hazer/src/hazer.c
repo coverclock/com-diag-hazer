@@ -90,16 +90,16 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             pp->sz = size;
             pp->tot = 0;
             pp->cs = 0;
-            pp->msn = '\0';
-            pp->lsn = '\0';
+            pp->msn = HAZER_NMEA_UNSET;
+            pp->lsn = HAZER_NMEA_UNSET;
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
         } else if (ch == HAZER_STIMULUS_ENCAPSULATION) {
             pp->bp = (uint8_t *)buffer;
             pp->sz = size;
             pp->cs = 0;
-            pp->msn = '\0';
-            pp->lsn = '\0';
+            pp->msn = HAZER_NMEA_UNSET;
+            pp->lsn = HAZER_NMEA_UNSET;
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
         } else {
@@ -218,9 +218,9 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     } else if (old == HAZER_STATE_STOP) {
         /* Do nothing. */
     } else if ((' ' <= ch) && (ch <= '~')) {
-        fprintf(debug, "NMEA %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
+        fprintf(debug, "NMEA %c %c %c *%c%c 0x%02x '%c'\n", old, state, action, pp->msn, pp->lsn, ch, ch);
     } else {
-        fprintf(debug, "NMEA %c %c %c 0x%02x\n", old, state, action, ch);
+        fprintf(debug, "NMEA %c %c %c *%c%c 0x%02x\n", old, state, action, pp->msn, pp->lsn, ch);
     }
 
     return state;
@@ -348,8 +348,8 @@ ssize_t hazer_validate(const void * buffer, size_t size)
     ssize_t result = -1;
     ssize_t length = 0;
     const uint8_t * bp = (uint8_t *)0;
-    uint8_t msn = 0;
-    uint8_t lsn = 0;
+    uint8_t msn = HAZER_NMEA_UNSET;
+    uint8_t lsn = HAZER_NMEA_UNSET;
 
     if ((length = hazer_length(buffer, size)) <= 0) {
         /* Do nothing. */
