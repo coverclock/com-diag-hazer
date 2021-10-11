@@ -2892,14 +2892,12 @@ consume:
         time_valid = hazer_has_valid_time(position, countof(position));
         if (time_valid == time_valid_prior) {
             /* Do nothing. */
+        } else if (time_valid) {
+            DIMINUTO_LOG_NOTICE("Time Valid\n");
         } else {
-            if (time_valid) {
-                DIMINUTO_LOG_NOTICE("Time Valid\n");
-            } else {
-                DIMINUTO_LOG_NOTICE("Time Invalid\n");
-            }
-            time_valid_prior = time_valid;
+            DIMINUTO_LOG_NOTICE("Time Invalid\n");
         }
+        time_valid_prior = time_valid;
 
         /*
          * If we've generated a high precision solution in survey mode,

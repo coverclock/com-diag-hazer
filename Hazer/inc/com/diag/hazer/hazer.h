@@ -1259,7 +1259,7 @@ static int hazer_is_valid_time(const hazer_position_t * positionp)
             (positionp->dmy_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
             (positionp->tot_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
             (positionp->old_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
-            (positionp->tot_nanoseconds <= positionp->old_nanoseconds));
+            (positionp->tot_nanoseconds >= positionp->old_nanoseconds));
 }
 
 /**
