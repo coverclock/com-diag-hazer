@@ -1318,6 +1318,7 @@ int main(int argc, char * argv[])
     DIMINUTO_LOG_INFORMATION("Buffer Default [%zu]\n", (size_t)BUFSIZ);
     DIMINUTO_LOG_INFORMATION("Buffer Read [%zu]\n", io_size);
     DIMINUTO_LOG_INFORMATION("Buffer Sync [%zu]\n", (size_t)SYNCBUFFER);
+    DIMINUTO_LOG_INFORMATION("Buffer Datagram [%zu]\n", (size_t)DATAGRAM_SIZE);
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -1676,7 +1677,7 @@ consume:
 
                 if (!sync) {
 
-                    if ((io_total % io_size) == 0) {
+                    if ((io_total % DATAGRAM_SIZE) == 0) {
                         DIMINUTO_LOG_INFORMATION("Sync Waiting [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
                     }
 
