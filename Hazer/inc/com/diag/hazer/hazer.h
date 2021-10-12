@@ -476,6 +476,7 @@ typedef struct HazerContext {
     uint8_t cs;			/* Running checksum. */
     uint8_t msn;		/* Most significant checksum nibble character. */
     uint8_t lsn;		/* Least significant checksum nibble character. */
+    uint8_t error;      /* Checksum error indication. */
 } hazer_context_t;
 
 /**

@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <wchar.h>
 #include "types.h"
+#include "hazer.h"
 
 /**
  * Encodings for fix type.
@@ -88,6 +89,6 @@ static const wchar_t PLUSMINUS = 0x00B1;
 /*
  * This is the size of the temporary buffer we use to capture unknown stuff.
  */
-static const size_t SYNCBUFFER = 4096;
+static const size_t SYNCBUFFER = HAZER_NMEA_LONGEST;
 
 #endif

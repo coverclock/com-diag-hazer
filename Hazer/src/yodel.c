@@ -80,6 +80,7 @@ yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size
             pp->ln = 0;
             pp->csa = 0;
             pp->csb = 0;
+            pp->error = 0;
             state = YODEL_STATE_SYNC_2;
             action = YODEL_ACTION_SAVE;
         }
@@ -145,6 +146,7 @@ yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size
             state = YODEL_STATE_CK_B;
             action = YODEL_ACTION_SAVE;
         } else {
+            pp->error = !0;
             state = YODEL_STATE_STOP;
         }
         break;
@@ -154,6 +156,7 @@ yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size
             state = YODEL_STATE_END;
             action = YODEL_ACTION_TERMINATE;
         } else {
+            pp->error = !0;
             state = YODEL_STATE_STOP;
         }
         break;

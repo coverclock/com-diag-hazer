@@ -1315,7 +1315,9 @@ int main(int argc, char * argv[])
         rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
         diminuto_assert(rc == 0);
     }
-    DIMINUTO_LOG_INFORMATION("Buffer [%zu] [%zu]\n", io_size, (size_t)BUFSIZ);
+    DIMINUTO_LOG_INFORMATION("Buffer Default [%zu]\n", (size_t)BUFSIZ);
+    DIMINUTO_LOG_INFORMATION("Buffer Read [%zu]\n", io_size);
+    DIMINUTO_LOG_INFORMATION("Buffer Sync [%zu]\n", (size_t)SYNCBUFFER);
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -1674,6 +1676,10 @@ consume:
 
                 if (!sync) {
 
+                    if ((io_total % io_size) == 0) {
+                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+                    }
+
                     if (verbose) {
                         sync_out(ch);
                     }
@@ -1743,7 +1749,7 @@ consume:
                     format = NMEA;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync NMEA [%llu]\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x NMEA\n", (unsigned long long)io_total, ch);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1767,7 +1773,7 @@ consume:
                     format = UBX;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync UBX [%llu]\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x UBX\n", (unsigned long long)io_total, ch);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1790,7 +1796,7 @@ consume:
                     format = RTCM;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync RTCM [%llu]\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x RTCM\n", (unsigned long long)io_total, ch);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1820,7 +1826,7 @@ consume:
 
                     if (sync) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Stop [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Stop [%llu] 0x%02x%s%s%s\n", (unsigned long long)io_total, ch, nmea_context.error ? " NMEA": "", ubx_context.error ? " UBX" : "", rtcm_context.error ? " RTCM" : "");
 
                         if (verbose) {
                             sync_out(ch);
@@ -2601,8 +2607,7 @@ consume:
 
             } else {
 
-                /* Do nothing. */
-
+                DIMINUTO_LOG_DEBUG("Parse NMEA Other \"%s\"\n", vector[0]);
             }
 
             break;
@@ -2843,7 +2848,7 @@ consume:
 
             } else if (unknown) {
 
-                DIMINUTO_LOG_WARNING("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
+                DIMINUTO_LOG_INFORMATION("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             } else {
 
@@ -2899,6 +2904,7 @@ consume:
          * iteration to decide whether to forward subsequent sentences etc.
          */
 
+        time_valid_prior = time_valid;
         time_valid = hazer_has_valid_time(position, countof(position));
         if (time_valid == time_valid_prior) {
             /* Do nothing. */
@@ -2907,7 +2913,6 @@ consume:
         } else {
             DIMINUTO_LOG_NOTICE("Time Invalid\n");
         }
-        time_valid_prior = time_valid;
 
         /*
          * If we've generated a high precision solution in survey mode,

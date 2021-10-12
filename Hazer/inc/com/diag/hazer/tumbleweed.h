@@ -168,6 +168,7 @@ typedef struct TumbleweedContext {
     uint8_t crc1;		/* CRC most significant byte. */
     uint8_t crc2;		/* CRC middle significant byte. */
     uint8_t crc3;		/* CRC lest significant byte. */
+    uint8_t error;      /* Checksum error indication. */
 } tumbleweed_context_t;
 
 /**

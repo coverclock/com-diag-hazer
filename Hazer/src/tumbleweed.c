@@ -80,6 +80,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
             pp->crc1 = 0;
             pp->crc2 = 0;
             pp->crc3 = 0;
+            pp->error = 0;
             tumbleweed_checksum(ch, &(pp->crc));
             state = TUMBLEWEED_STATE_LENGTH_1;
             action = TUMBLEWEED_ACTION_SAVE;
@@ -129,6 +130,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
             state = TUMBLEWEED_STATE_CRC_2;
             action = TUMBLEWEED_ACTION_SAVE;
         } else {
+            pp->error = !0;
             state = TUMBLEWEED_STATE_STOP;
         }
         break;
@@ -138,6 +140,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
             state = TUMBLEWEED_STATE_CRC_3;
             action = TUMBLEWEED_ACTION_SAVE;
         } else {
+            pp->error = !0;
             state = TUMBLEWEED_STATE_STOP;
         }
         break;
@@ -147,6 +150,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
             state = TUMBLEWEED_STATE_END;
             action = TUMBLEWEED_ACTION_TERMINATE;
         } else {
+            pp->error = !0;
             state = TUMBLEWEED_STATE_STOP;
         }
         break;
