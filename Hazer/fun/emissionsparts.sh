@@ -45,4 +45,4 @@ eval coreable gpstool \
 \\x02\\x00\
 \\x05\\x00\
 ' \
-	-u -v -R
+	-v -R
