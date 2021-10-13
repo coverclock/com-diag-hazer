@@ -183,6 +183,7 @@ typedef struct YodelContext {
     uint16_t ln;		/* Payload length in bytes. */
     uint8_t csa;		/* Running Fletcher checksum A. */
     uint8_t csb;		/* Running Fletcher checksum B. */
+    uint8_t error;      /* Checksum error indication. */
 } yodel_context_t;
 
 /**

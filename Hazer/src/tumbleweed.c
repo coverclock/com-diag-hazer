@@ -80,6 +80,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
             pp->crc1 = 0;
             pp->crc2 = 0;
             pp->crc3 = 0;
+            pp->error = 0;
             tumbleweed_checksum(ch, &(pp->crc));
             state = TUMBLEWEED_STATE_LENGTH_1;
             action = TUMBLEWEED_ACTION_SAVE;
@@ -129,6 +130,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
             state = TUMBLEWEED_STATE_CRC_2;
             action = TUMBLEWEED_ACTION_SAVE;
         } else {
+            pp->error = !0;
             state = TUMBLEWEED_STATE_STOP;
         }
         break;
@@ -138,6 +140,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
             state = TUMBLEWEED_STATE_CRC_3;
             action = TUMBLEWEED_ACTION_SAVE;
         } else {
+            pp->error = !0;
             state = TUMBLEWEED_STATE_STOP;
         }
         break;
@@ -147,6 +150,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
             state = TUMBLEWEED_STATE_END;
             action = TUMBLEWEED_ACTION_TERMINATE;
         } else {
+            pp->error = !0;
             state = TUMBLEWEED_STATE_STOP;
         }
         break;
@@ -211,9 +215,9 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     } else if (old == TUMBLEWEED_STATE_STOP) {
         /* Do nothing. */
     } else if ((' ' <= ch) && (ch <= '~')) {
-        fprintf(debug, "RTCM %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
+        fprintf(debug, "RTCM %c %c %c 0x%02x%02x%02x 0x%02x '%c'\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch, ch);
     } else {
-        fprintf(debug, "RTCM %c %c %c 0x%02x\n", old, state, action, ch);
+        fprintf(debug, "RTCM %c %c %c 0x%02x%02x%02x 0x%02x\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch);
     }
 
     return state;

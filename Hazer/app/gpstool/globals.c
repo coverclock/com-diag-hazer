@@ -13,7 +13,7 @@
 
 const char * Program = (const char *)0;
 
-char Hostname[9] = { '\0' };
+char Hostname[HOST_NAME_MAX] = { '\0' };
 
 pid_t Process = 0;
 

@@ -185,6 +185,8 @@ int main(int argc, char * argv[])
     int unknown = 0;
     int serial = 0;
     int daemon = 0;
+    int nakquit = 0;
+    int syncquit = 0;
     seconds_t slow = 0;
     seconds_t timeout = HAZER_GNSS_SECONDS;
     seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
@@ -354,7 +356,6 @@ int main(int argc, char * argv[])
     yodel_odometer_t odometer = YODEL_ODOMETER_INITIALIZER;
     yodel_posveltim_t posveltim = YODEL_POSVELTIM_INITIALIZER;
     int acknakpending = 0;
-    int nakquit = 0;
     int nominal = 0;
     /*
      * RTCM state databases.
@@ -443,7 +444,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:uvxw:y:?";
+    static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:uvxw:y:z?";
 
     /**
      ** PREINITIALIZATION
@@ -777,10 +778,14 @@ int main(int argc, char * argv[])
                 error = !0;
             }
             break;
+        case 'z':
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
+            syncquit = !0;
+            break;
         case '?':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             fprintf(stderr, "usage: %s\n"
-                            "               [ -d ] [ -v ] [ -u ]\n"
+                            "               [ -d ] [ -v ] [ -u ] [ -z ]\n"
                             "               [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]\n"
                             "               [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ]\n"
                             "               [ -C FILE ]\n"
@@ -850,6 +855,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds.\n");
             fprintf(stderr, "       -x          EXit if a NAK is received.\n");
             fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds.\n");
+            fprintf(stderr, "       -z          Exit if all state machines stop.\n");
             return 1;
             break;
         }
@@ -894,11 +900,11 @@ int main(int argc, char * argv[])
         DIMINUTO_LOG_NOTICE("Testing 0x%x\n", test);
     }
 
-    (void)gethostname(Hostname, sizeof(Hostname));
-    Hostname[sizeof(Hostname) - 1] = '\0';
-    if (Hostname[0] == '\0') {
-        strncpy(Hostname, "hostname", sizeof(Hostname));
+    if (gethostname(Hostname, sizeof(Hostname)) < 0) {
+        diminuto_perror("gethostbyname");
+        strncpy(Hostname, "localhost", sizeof(Hostname));
     }
+    Hostname[sizeof(Hostname) - 1] = '\0';
     DIMINUTO_LOG_INFORMATION("Hostname \"%s\"\n", Hostname);
 
     /*
@@ -1309,7 +1315,10 @@ int main(int argc, char * argv[])
         rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
         diminuto_assert(rc == 0);
     }
-    DIMINUTO_LOG_INFORMATION("Buffer [%zu] [%zu]\n", io_size, (size_t)BUFSIZ);
+    DIMINUTO_LOG_INFORMATION("Buffer Default [%zu]\n", (size_t)BUFSIZ);
+    DIMINUTO_LOG_INFORMATION("Buffer Read [%zu]\n", io_size);
+    DIMINUTO_LOG_INFORMATION("Buffer Sync [%zu]\n", (size_t)SYNCBUFFER);
+    DIMINUTO_LOG_INFORMATION("Buffer Datagram [%zu]\n", (size_t)DATAGRAM_SIZE);
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -1668,6 +1677,10 @@ consume:
 
                 if (!sync) {
 
+                    if ((io_total % DATAGRAM_SIZE) == 0) {
+                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+                    }
+
                     if (verbose) {
                         sync_out(ch);
                     }
@@ -1696,6 +1709,8 @@ consume:
 
                 } else {
 
+                    sync = 0;
+
                     /*
                      * Normally I'd log this at WARNING or NOTICE. But
                      * some devices with USB interfaces flood the log
@@ -1707,18 +1722,13 @@ consume:
                      * but it shows up using a USB hardware analyzer.
                      */
 
-                    if (isprint(ch)) {
-                        DIMINUTO_LOG_INFORMATION("Sync Lost [%llu] 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
-                    } else {
-                        DIMINUTO_LOG_INFORMATION("Sync Lost [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
-                    }
+                    DIMINUTO_LOG_INFORMATION("Sync Lost [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
 
-                    sync = 0;
                     if (verbose) {
                         sync_out(ch);
                     }
 
-                    if (debug) {
+                    if (syncquit) {
                         sync_end();
                         goto stop;
                     }
@@ -1740,7 +1750,7 @@ consume:
                     format = NMEA;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync NMEA [%llu]\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x NMEA\n", (unsigned long long)io_total, ch);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1764,7 +1774,7 @@ consume:
                     format = UBX;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync UBX [%llu]\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x UBX\n", (unsigned long long)io_total, ch);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1787,7 +1797,7 @@ consume:
                     format = RTCM;
 
                     if (!sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync RTCM [%llu]\n", (unsigned long long)io_total);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x RTCM\n", (unsigned long long)io_total, ch);
                         sync = !0;
                         if (verbose) {
                             sync_in(length);
@@ -1816,13 +1826,21 @@ consume:
                 } else {
 
                     if (sync) {
-                        DIMINUTO_LOG_INFORMATION("Sync Stop [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
-                        sync = 0;
+
+                        DIMINUTO_LOG_INFORMATION("Sync Stop [%llu] 0x%02x%s%s%s\n", (unsigned long long)io_total, ch, nmea_context.error ? " NMEA": "", ubx_context.error ? " UBX" : "", rtcm_context.error ? " RTCM" : "");
+
                         if (verbose) {
                             sync_out(ch);
                         }
+
+                        if (syncquit) {
+                            sync_end();
+                            goto stop;
+                        }
+
                     }
 
+                    sync = 0;
                     frame = 0;
 
                     nmea_state = HAZER_STATE_START;
@@ -2590,8 +2608,7 @@ consume:
 
             } else {
 
-                /* Do nothing. */
-
+                DIMINUTO_LOG_DEBUG("Parse NMEA Other \"%s\"\n", vector[0]);
             }
 
             break;
@@ -2832,7 +2849,7 @@ consume:
 
             } else if (unknown) {
 
-                DIMINUTO_LOG_WARNING("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
+                DIMINUTO_LOG_INFORMATION("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             } else {
 
@@ -2888,6 +2905,7 @@ consume:
          * iteration to decide whether to forward subsequent sentences etc.
          */
 
+        time_valid_prior = time_valid;
         time_valid = hazer_has_valid_time(position, countof(position));
         if (time_valid == time_valid_prior) {
             /* Do nothing. */
@@ -2896,7 +2914,6 @@ consume:
         } else {
             DIMINUTO_LOG_NOTICE("Time Invalid\n");
         }
-        time_valid_prior = time_valid;
 
         /*
          * If we've generated a high precision solution in survey mode,

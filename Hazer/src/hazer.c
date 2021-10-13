@@ -90,16 +90,18 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             pp->sz = size;
             pp->tot = 0;
             pp->cs = 0;
-            pp->msn = '\0';
-            pp->lsn = '\0';
+            pp->msn = HAZER_NMEA_UNSET;
+            pp->lsn = HAZER_NMEA_UNSET;
+            pp->error = 0;
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
         } else if (ch == HAZER_STIMULUS_ENCAPSULATION) {
             pp->bp = (uint8_t *)buffer;
             pp->sz = size;
             pp->cs = 0;
-            pp->msn = '\0';
-            pp->lsn = '\0';
+            pp->msn = HAZER_NMEA_UNSET;
+            pp->lsn = HAZER_NMEA_UNSET;
+            pp->error = 0;
             state = HAZER_STATE_BODY;
             action = HAZER_ACTION_SAVE;
         } else {
@@ -133,6 +135,7 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             state = HAZER_STATE_LSN;
             action = HAZER_ACTION_SAVE;
         } else {
+            pp->error = !0;
             state = HAZER_STATE_STOP;
         }
         break;
@@ -142,6 +145,7 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             state = HAZER_STATE_CR;
             action = HAZER_ACTION_SAVE;
         } else {
+            pp->error = !0;
             state = HAZER_STATE_STOP;
         }
         break;
@@ -218,9 +222,9 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     } else if (old == HAZER_STATE_STOP) {
         /* Do nothing. */
     } else if ((' ' <= ch) && (ch <= '~')) {
-        fprintf(debug, "NMEA %c %c %c 0x%02x '%c'\n", old, state, action, ch, ch);
+        fprintf(debug, "NMEA %c %c %c *%c%c 0x%02x '%c'\n", old, state, action, pp->msn, pp->lsn, ch, ch);
     } else {
-        fprintf(debug, "NMEA %c %c %c 0x%02x\n", old, state, action, ch);
+        fprintf(debug, "NMEA %c %c %c *%c%c 0x%02x\n", old, state, action, pp->msn, pp->lsn, ch);
     }
 
     return state;
@@ -348,8 +352,8 @@ ssize_t hazer_validate(const void * buffer, size_t size)
     ssize_t result = -1;
     ssize_t length = 0;
     const uint8_t * bp = (uint8_t *)0;
-    uint8_t msn = 0;
-    uint8_t lsn = 0;
+    uint8_t msn = HAZER_NMEA_UNSET;
+    uint8_t lsn = HAZER_NMEA_UNSET;
 
     if ((length = hazer_length(buffer, size)) <= 0) {
         /* Do nothing. */
@@ -508,7 +512,7 @@ uint64_t hazer_parse_dmy(const char * string)
 {
     uint64_t nanoseconds = 0;
     unsigned long ddmmyy = 0;
-    struct tm datetime = { 0 };
+    struct tm datetime = { 0, };
     extern long timezone;
 
     ddmmyy = strtoul(string, (char **)0, 10);
@@ -519,9 +523,7 @@ uint64_t hazer_parse_dmy(const char * string)
     datetime.tm_mday = ddmmyy / 10000;
 
     nanoseconds = mktime(&datetime); 
-
     nanoseconds -= timezone;
-
     nanoseconds *= 1000000000ULL;
 
     return nanoseconds;
@@ -749,7 +751,7 @@ uint16_t hazer_parse_dop(const char * string)
 
 void hazer_format_nanoseconds2timestamp(uint64_t nanoseconds, int * yearp, int * monthp, int * dayp, int * hourp, int * minutep, int * secondp, uint64_t * nanosecondsp)
 {
-    struct tm datetime = { 0 };
+    struct tm datetime = { 0, };
     struct tm * dtp = (struct tm *)0;
     time_t zulu = 0;
 
