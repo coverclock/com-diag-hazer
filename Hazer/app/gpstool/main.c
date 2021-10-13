@@ -2377,7 +2377,7 @@ consume:
 
             } else if ((talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {
 
-                DIMINUTO_LOG_INFORMATION("Parse NMEA Sentence Other  %s \"%.*s\"", HAZER_TALKER_NAME[talker], length - 2 /* Exclude CR and LF. */, buffer);
+                DIMINUTO_LOG_INFORMATION("Parse NMEA Sentence Other  %s \"%.*s\"", HAZER_TALKER_NAME[talker], (int)(length - 2) /* Exclude CR and LF. */, buffer);
                 continue;
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
@@ -2544,7 +2544,7 @@ consume:
 
                 if  (hazer_parse_txt(vector, count) == 0) {
 
-                    DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", length - 2 /* Exclude CR and LF. */, buffer);
+                    DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", (int)(length - 2) /* Exclude CR and LF. */, buffer);
 
                 }
 
@@ -2890,7 +2890,7 @@ consume:
             kinematics.ticks = timeout;
             refresh = !0;
 
-            DIMINUTO_LOG_DEBUG("Parse RTCM %d %lld\n", kinematics.number, kinematics.length);
+            DIMINUTO_LOG_DEBUG("Parse RTCM %d %lld\n", kinematics.number, (long long int)kinematics.length);
 
             break;
 
