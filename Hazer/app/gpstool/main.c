@@ -1678,7 +1678,7 @@ consume:
                 if (!sync) {
 
                     if ((io_total % DATAGRAM_SIZE) == 0) {
-                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%llu] 0x%02x %c %c %c\n", (unsigned long long)io_total, ch, nmea_state, ubx_state, rtcm_state);
                     }
 
                     if (verbose) {
@@ -1750,11 +1750,15 @@ consume:
                     format = NMEA;
 
                     if (!sync) {
+
                         DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x NMEA\n", (unsigned long long)io_total, ch);
+
                         sync = !0;
+
                         if (verbose) {
                             sync_in(length);
                         }
+
                     }
 
                     frame = !0;
@@ -1774,11 +1778,15 @@ consume:
                     format = UBX;
 
                     if (!sync) {
+
                         DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x UBX\n", (unsigned long long)io_total, ch);
+
                         sync = !0;
+
                         if (verbose) {
                             sync_in(length);
                         }
+
                     }
 
                     frame = !0;
@@ -1797,11 +1805,15 @@ consume:
                     format = RTCM;
 
                     if (!sync) {
+
                         DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x RTCM\n", (unsigned long long)io_total, ch);
+
                         sync = !0;
+
                         if (verbose) {
                             sync_in(length);
                         }
+
                     }
 
                     frame = !0;
