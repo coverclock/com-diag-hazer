@@ -93,7 +93,7 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             pp->msn = HAZER_NMEA_UNSET;
             pp->lsn = HAZER_NMEA_UNSET;
             pp->error = 0;
-            state = HAZER_STATE_BODY;
+            state = HAZER_STATE_PAYLOAD;
             action = HAZER_ACTION_SAVE;
         } else if (ch == HAZER_STIMULUS_ENCAPSULATION) {
             pp->bp = (uint8_t *)buffer;
@@ -102,14 +102,14 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             pp->msn = HAZER_NMEA_UNSET;
             pp->lsn = HAZER_NMEA_UNSET;
             pp->error = 0;
-            state = HAZER_STATE_BODY;
+            state = HAZER_STATE_PAYLOAD;
             action = HAZER_ACTION_SAVE;
         } else {
             /* Do nothing. */
         }
         break;
 
-    case HAZER_STATE_BODY:
+    case HAZER_STATE_PAYLOAD:
         /*
          * According to [NMEA 0183, 4.10, 2012] the checksum field is "required
          * on all sentences". According to [Wikipedia, "NMEA 0183", 2019-05-27]

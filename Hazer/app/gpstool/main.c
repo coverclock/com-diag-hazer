@@ -182,7 +182,6 @@ int main(int argc, char * argv[])
     int strobepin = (((int)1)<<((sizeof(int)*8)-1));
     int ppspin = (((int)1)<<((sizeof(int)*8)-1));
     int test = TEST;
-    int unknown = 0;
     int serial = 0;
     int daemon = 0;
     int nakquit = 0;
@@ -444,7 +443,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:uvxw:y:z?";
+    static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:vxw:y:z?";
 
     /**
      ** PREINITIALIZATION
@@ -455,7 +454,8 @@ int main(int argc, char * argv[])
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
     diminuto_log_setmask();
 
-    DIMINUTO_LOG_INFORMATION("Program %s\n", argv[0]);
+    DIMINUTO_LOG_NOTICE("Program %s\n", argv[0]);
+    DIMINUTO_LOG_INFORMATION("Release %s\n", COM_DIAG_HAZER_RELEASE);
 
     /*
      * OPTIONS
@@ -748,10 +748,6 @@ int main(int argc, char * argv[])
                 error = !0;
             }
             break;
-        case 'u':
-            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
-            unknown = !0;
-            break;
         case 'v':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             verbose = !0;
@@ -785,7 +781,7 @@ int main(int argc, char * argv[])
         case '?':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             fprintf(stderr, "usage: %s\n"
-                            "               [ -d ] [ -v ] [ -u ] [ -z ]\n"
+                            "               [ -d ] [ -v ] [ -z ]\n"
                             "               [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]\n"
                             "               [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ]\n"
                             "               [ -C FILE ]\n"
@@ -850,7 +846,6 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).\n");
             fprintf(stderr, "       -s          Use XON/XOFF (control-Q/control-S) for DEVICE.\n");
             fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
-            fprintf(stderr, "       -u          Note Unprocessed input on standard error.\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
             fprintf(stderr, "       -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds.\n");
             fprintf(stderr, "       -x          EXit if a NAK is received.\n");
@@ -1824,17 +1819,20 @@ consume:
                 }
 
                 /*
-                 * If all the state machines have stopped, then either we have
-                 * never had synchronization, or we lost synchronization.
-                 * Restart all of them.
+                 * If all the state machines have stopped, or at least one has
+                 * stopped while the rest are still in their state state, then
+                 * either we have never had synchronization, or we lost
+                 * synchronization. Restart all of them.
                  */
 
-                if (nmea_state != HAZER_STATE_STOP) {
-                    /* Do nothing. */
-                } else if (ubx_state != YODEL_STATE_STOP) {
-                    /* Do nothing. */
-                } else if (rtcm_state != TUMBLEWEED_STATE_STOP) {
-                    /* Do nothing. */
+                if ((nmea_state == HAZER_STATE_START) && (ubx_state == YODEL_STATE_START) && (rtcm_state == TUMBLEWEED_STATE_START)) {
+                    /* Do nothing: all are scanning for beginning of frame. */
+                } else if ((nmea_state != HAZER_STATE_START) && (nmea_state != HAZER_STATE_STOP)) {
+                    /* Do nothing: NMEA is processing. */
+                } else if ((ubx_state != YODEL_STATE_START) && (ubx_state != YODEL_STATE_STOP)) {
+                    /* Do nothing: UBX is processing. */
+                } else if ((rtcm_state != TUMBLEWEED_STATE_START) && (rtcm_state != TUMBLEWEED_STATE_STOP)) {
+                    /* Do nothing: RTCM is processing. */
                 } else {
 
                     if (sync) {
@@ -2614,13 +2612,10 @@ consume:
 
                 }
 
-            } else if (unknown) {
-
-                DIMINUTO_LOG_INFORMATION("Parse NMEA Other \"%s\"\n", vector[0]);
-
             } else {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA Other \"%s\"\n", vector[0]);
+
             }
 
             break;
@@ -2858,10 +2853,6 @@ consume:
                     }
                     DIMINUTO_LOG_INFORMATION("Parse UBX-MON-COMMS port[%d] skipped = %u\n", ii, ports.port[ii].skipped);
                 }
-
-            } else if (unknown) {
-
-                DIMINUTO_LOG_INFORMATION("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             } else {
 

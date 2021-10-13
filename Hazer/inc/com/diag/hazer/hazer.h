@@ -171,7 +171,7 @@ enum HazerNmeaConstants {
 typedef enum HazerState {
     HAZER_STATE_STOP		= 'X',
     HAZER_STATE_START		= 'S',
-    HAZER_STATE_BODY		= 'P',
+    HAZER_STATE_PAYLOAD		= 'P',
     HAZER_STATE_MSN			= 'M',
     HAZER_STATE_LSN			= 'L',
     HAZER_STATE_CR			= 'R',
