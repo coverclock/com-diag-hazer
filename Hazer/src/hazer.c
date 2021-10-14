@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <ctype.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/common.h"
 #include "../src/hazer.h"
@@ -221,7 +222,7 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         /* Do nothing. */
     } else if (old == HAZER_STATE_STOP) {
         /* Do nothing. */
-    } else if ((' ' <= ch) && (ch <= '~')) {
+    } else if (isprint(ch)) {
         fprintf(debug, "NMEA %c %c %c *%c%c 0x%02x '%c'\n", old, state, action, pp->msn, pp->lsn, ch, ch);
     } else {
         fprintf(debug, "NMEA %c %c %c *%c%c 0x%02x\n", old, state, action, pp->msn, pp->lsn, ch);
@@ -1135,7 +1136,7 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (count < 14) { 
         /* Do nothing. */
-    } else if (*vector[6] == '0') {
+    } else if (strcmp(vector[6], "0") == 0) {
         positionp->sat_used = 0;
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
@@ -1173,7 +1174,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     } else if (count < 19) {
         /* Do nothing. */
 #if 0
-    } else if (*vector[2] == '1') {
+    } else if (strcmp(vector[2], "1") == 0) {
         activep->mode = HAZER_MODE_NOFIX;
 #endif
     } else {
@@ -1376,12 +1377,12 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (count < 11) {
         /* Do nothing. */
-    } else if (*vector[2] != 'A') {
+    } else if (strcmp(vector[2], "A") != 0) {
         /* Do nothing. */
-    } else if ((count > 13) && (*vector[12] == 'N')) { /* NMEA 2.3+ */
+    } else if ((count > 13) && (strcmp(vector[12], "N") == 0)) { /* NMEA 2.3+ */
         /* Do nothing. */
 #if 0
-    } else if ((count > 14) && (*vector[13] == 'V')) { /* NMEA 4.10+ */
+    } else if ((count > 14) && (strcmp(vector[13], "V") == 0)) { /* NMEA 4.10+ */
         /* Not clear what this means on the u-blox UBX-F9P. */
 #endif
     } else {
@@ -1415,10 +1416,10 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
     } else if (count < 9) {
         /* Do nothing. */
 #if 0
-    } else if (*vector[6] == 'V') {
+    } else if (strcmp(vector[6], "V") == 0) {
         /* Not clear what this means on the u-blox UBX-F9P. */
 #endif
-    } else if (*vector[7] == 'N') {
+    } else if (strcmp(vector[7], "N") == 0) {
         /* Do nothing. */
     } else {
         positionp->utc_nanoseconds = hazer_parse_utc(vector[5]);
@@ -1447,7 +1448,7 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
         /* Do nothing. */
     } else if (count < 11) {
         /* Do nothing. */
-    } else if (*vector[9] == 'N') {
+    } else if (strcmp(vector[9], "N") == 0) {
         /* Do nothing. */
     } else {
         positionp->cog_nanodegrees = hazer_parse_cog(vector[1], &positionp->cog_digits);
@@ -1602,9 +1603,9 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
             view[system].sat[channel].phantom = 0;
             view[system].sat[channel].untracked = 0;
             view[system].sat[channel].unused = 0;
-            if (vector[index + 1][0] == 'e') {
+            if (strcmp(vector[index + 1], "e") == 0) {
                 /* Do nothing. */
-            } else if (vector[index + 1][0] == 'U') {
+            } else if (strcmp(vector[index + 1], "U") == 0) {
                 ranger = rangers[system];
                 if (ranger < RANGERS) {
                     active[system].id[ranger] = id;
@@ -1614,7 +1615,7 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
                 }
                 active[system].system = system;
                 active[system].label = PUBX;
-            } else if (vector[index + 1][0] == '-') {
+            } else if (strcmp(vector[index + 1], "-") == 0) {
                 view[system].sat[channel].unused = !0;
             } else {
                 /* Should never happen, and not clear what it means if it does. */

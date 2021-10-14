@@ -1181,7 +1181,7 @@ int main(int argc, char * argv[])
 
     } else if (strcmp(device, "-") == 0) {
 
-        Device = device;
+        Device = "stdin";
 
         in_fp = stdin;
 
@@ -1247,7 +1247,7 @@ int main(int argc, char * argv[])
 
     } else if (strcmp(source, "-") == 0) {
 
-        Device = source;
+        Device = "stdin";
 
         in_fp = stdin;
 

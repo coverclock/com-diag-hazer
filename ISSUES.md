@@ -178,14 +178,15 @@ on the subsequent identical test sequence.
 
 The Bad Elf GPS Pro+ device is documented to use the MediaTek (MTK)
 chipset.  Hazser 46.0.4 received the following RMC sentence from the
-device, as documented in a "contenate" (-C) file.
+device (BE-GPS-2300, SN 020661, FW 2.1.60, HW 8.0.0), as documented in a
+"contenate" (-C) file.
 
     $GPRMC,203410.000,A3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*68
 
 This is a malformed sentence that should be as follows (note the addition
 of a comma after the "A").
 
-    $GPRMC,203410.000,A,3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*68
+    $GPRMC,203410.000,A,3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*44
 
 I initially assumed that this was an error in my software, perhaps in its
 ability to keep up with the serial data stream. However, the checksum "68"
@@ -200,5 +201,14 @@ Checksumming the correct sentence yields a checksum of "44".
     checksum '$GPRMC,203410.000,A,3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*'
     $GPRMC,203410.000,A,3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*44\r\n
 
+This can be checked by running just the correct sentence with the new checksum
+through gpstool.
+
+    echo -n -e '$GPRMC,203410.000,A,3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*44\r\n' | gpstool -S - -R
+
 I have tested other GNSS devices with the MTK chipset and haven't run into
-this issue. I have to run the GPS Pro+ for several hours to recreate it.
+this issue. I have to run the GPS Pro+ for several hours to recreate it. The
+fact that the checksum is correct for the invalid sentence as transmitted
+suggests this is not an issue in the serial-to-USB conversion.
+
+Bad Elf support ticket 43008 submitted 2021-10-14 08:14MDT.

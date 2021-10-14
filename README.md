@@ -1140,6 +1140,7 @@ the libraries and binaries in the system directories.)
 * mapstool - convert gpstool coordinate strings to formats accepted by Google Maps.
 * monitor - uses gpstool to monitor device without any configuration.
 * pps - uses Diminuto pintool to multiplex on a 1PPS GPIO pin.
+* replay - replay a gpstool catenate (-C) file in non-real-time.
 
 ## Data Analysis
 
@@ -1151,7 +1152,7 @@ the libraries and binaries in the system directories.)
 * csvlimits - determines boundary of solutions in a gpstool CSV file.
 * csvparts - splits gpstool CSV file into smaller files in subdirectories.
 
-## Google Maps Moving Map (OBSOLETE)
+## Google Maps Moving Map (DEPRECATED)
 
 * client - runs Google Maps API in Firefox browser under MacOS.
 * consumer - consumes datagrams and reports on stdout.
@@ -1226,6 +1227,7 @@ the libraries and binaries in the system directories.)
 * datagramsource - exercises a datagram sink.
 * dgnss - a script used to test other DNSS scripts.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
+* gpsproplus - exercises the Bad Elf GPS Pro+ receiver.
 * gr701w - exercises the NaviSys GR701W receiver.    
 * gr701w1pps - exercises the NaviSys GR701W receiver and its 1PPS output.    
 * lowresolution - same as bin/base.sh but with much much lower standards.
