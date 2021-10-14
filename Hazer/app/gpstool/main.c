@@ -139,6 +139,7 @@
 #include <locale.h>
 #include <wchar.h>
 #include <ctype.h>
+#include "com/diag/hazer/common.h"
 #include "com/diag/hazer/hazer_release.h"
 #include "com/diag/hazer/hazer_revision.h"
 #include "com/diag/hazer/hazer_vintage.h"
@@ -1684,19 +1685,19 @@ consume:
 
                     /* Do nothing. */
 
-                } else if ((ch == HAZER_STIMULUS_START) || (ch == HAZER_STIMULUS_ENCAPSULATION)) {
+                } else if (common_machine_is_nmea(ch)) {
 
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
 
-                } else if (ch == YODEL_STIMULUS_SYNC_1) {
+                } else if (common_machine_is_ubx(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
 
-                } else if (ch == TUMBLEWEED_STIMULUS_PREAMBLE) {
+                } else if (common_machine_is_rtcm(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_STOP;
@@ -1825,15 +1826,7 @@ consume:
                  * synchronization. Restart all of them.
                  */
 
-                if ((nmea_state == HAZER_STATE_START) && (ubx_state == YODEL_STATE_START) && (rtcm_state == TUMBLEWEED_STATE_START)) {
-                    /* Do nothing: all are scanning for beginning of frame. */
-                } else if ((nmea_state != HAZER_STATE_START) && (nmea_state != HAZER_STATE_STOP)) {
-                    /* Do nothing: NMEA is processing. */
-                } else if ((ubx_state != YODEL_STATE_START) && (ubx_state != YODEL_STATE_STOP)) {
-                    /* Do nothing: UBX is processing. */
-                } else if ((rtcm_state != TUMBLEWEED_STATE_START) && (rtcm_state != TUMBLEWEED_STATE_STOP)) {
-                    /* Do nothing: RTCM is processing. */
-                } else {
+                if (common_machine_is_stalled(nmea_state, ubx_state, rtcm_state)) {
 
                     if (sync) {
 
