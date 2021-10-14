@@ -139,7 +139,7 @@ data frame.
 I switched to a different cellular antenna, rearranged my lab bench,
 and my test has run flawlessly for many hours since then.
 
-## U-BLOX PUBX,04 TIME MESSAGE
+## U-Blox CAM-M8Q PUBX,04 Time Message
 
 GNSS receivers manufactured by U-blox support two different kinds of
 proprietary messaging for both output and input: the UBX binary
@@ -165,7 +165,7 @@ so the application can know to discount these times.
 
 I find it misleading.
 
-## RMC FAILING TO REPORT TIME AFTER 3D LOCK
+## U-blox CAM-M8Q RMC failing to report time after 3D lock
 
 While testing the PUBX,04 feature mentioned above, I encountered a
 case where the U-blox CAM-M8Q reported a 3D lock with seven satellites
@@ -173,3 +173,32 @@ active, was reporting the correct UTC time in the PUBX,04 TIME message,
 but the NMEA RMC message did not report the time (indicated via a 'V'
 that it had no lock). I power cycled the device, and it worked correctly
 on the subsequent identical test sequence.
+
+## Bad Elf GPS Pro+ Invalid Message
+
+The Bad Elf GPS Pro+ device is documented to use the MediaTek (MTK)
+chipset.  Hazser 46.0.4 received the following RMC sentence from the
+device, as documented in a "contenate" (-C) file.
+
+    $GPRMC,203410.000,A3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*68
+
+This is a malformed sentence that should be as follows (note the addition
+of a comma after the "A").
+
+    $GPRMC,203410.000,A,3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*68
+
+I initially assumed that this was an error in my software, perhaps in its
+ability to keep up with the serial data stream. However, the checksum "68"
+in the received packet is correct given the missing comma. Which means the
+sentence was checksummed and transmitted by the MTK as it was received.
+
+    checksum '$GPRMC,203410.000,A3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*'
+    $GPRMC,203410.000,A3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*68\r\n
+
+Checksumming the correct sentence yields a checksum of "44".
+
+    checksum '$GPRMC,203410.000,A,3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*'
+    $GPRMC,203410.000,A,3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*44\r\n
+
+I have tested other GNSS devices with the MTK chipset and haven't run into
+this issue. I have to run the GPS Pro+ for several hours to recreate it.
