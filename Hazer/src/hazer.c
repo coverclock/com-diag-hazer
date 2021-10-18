@@ -16,6 +16,7 @@
 #include <time.h>
 #include <math.h>
 #include <ctype.h>
+#include <errno.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/common.h"
 #include "../src/hazer.h"
@@ -1129,35 +1130,114 @@ static void update_time(hazer_position_t * positionp)
  * spec.
  */
 
+/*
+ * Do not be tempted to do a struture assignment (copy) in the code below.
+ * That would update ALL of the fields, and that is not necessarily what is
+ * intended.
+ */
+
 int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     char * end = (char *)0;
+    hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char GGA[] = HAZER_NMEA_SENTENCE_GGA;
+
+    do {
+
+        /*
+         * VALIDATE
+         */
     
-    if (count < 2) { 
-        /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
-        /* Do nothing. */
-    } else if (*vector[0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
-    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GGA, sizeof(GGA) - 1) != 0) {
-        /* Do nothing. */
-    } else if (count < 14) { 
-        /* Do nothing. */
-    } else if (strcmp(vector[6], "0") == 0) {
-        positionp->sat_used = 0;
-    } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[1], &end);
+        if (count < 14) {
+            break;
+        }
+
+        if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
+            break;
+        }
+
+        if (*vector[0] != HAZER_STIMULUS_START) {
+            break;
+        }
+
+        if (strncmp(vector[0] + sizeof("$XX") - 1, GGA, sizeof(GGA) - 1) != 0) {
+            break;
+        }
+
+        position.sat_used = strtol(vector[7], &end, 10);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[7]);
+            break;
+        }
+
+        if (position.sat_used == 0) {
+            positionp->sat_used = 0;
+            break;
+        }
+
+        position.utc_nanoseconds = hazer_parse_utc(vector[1], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[1]);
+            break;
+        }
+
+        position.lat_nanominutes = hazer_parse_latlon(vector[2], *(vector[3]), &position.lat_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[2]);
+            break;
+        }
+
+        position.lon_nanominutes = hazer_parse_latlon(vector[4], *(vector[5]), &position.lon_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[4]);
+            break;
+        }
+
+        position.alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &position.alt_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[9]);
+            break;
+        }
+
+        position.sep_millimeters = hazer_parse_alt(vector[11], *(vector[12]), &position.sep_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[11]);
+            break;
+        }
+
+        /*
+         * APPLY
+         */
+
+        positionp->utc_nanoseconds = position.utc_nanoseconds;
         update_time(positionp);
-        positionp->lat_nanominutes = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits, &end);
-        positionp->lon_nanominutes = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits, &end);
-        positionp->sat_used = strtol(vector[7], (char **)0, 10);
-        positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits, &end);
-        positionp->sep_millimeters = hazer_parse_alt(vector[11], *(vector[12]), &positionp->sep_digits, &end);
+
+        positionp->lat_nanominutes = position.lat_nanominutes;
+        positionp->lat_digits = position.lat_digits;
+
+        positionp->lon_nanominutes = position.lon_nanominutes;
+        positionp->lon_digits = position.lon_digits;
+
+        positionp->sat_used = position.sat_used;
+
+        positionp->alt_millimeters = position.alt_millimeters;
+        positionp->alt_digits = position.alt_digits;
+
+        positionp->sep_millimeters = position.sep_millimeters;
+        positionp->sep_digits = position.sep_digits;
+
         positionp->label = GGA;
+
         rc = 0;
-    }
+
+    } while (0);
 
     return rc;
 }
@@ -1169,55 +1249,144 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     int slot = 0;
     int id = 0;
     int satellites = 0;
+    int system = 0;
     char * end = (char *)0;
+    hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
     static const char GSA[] = HAZER_NMEA_SENTENCE_GSA;
 
-    if (count < 2) {
-        /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
-        /* Do nothing. */
-    } else if (*vector[0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
-    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GSA, sizeof(GSA) - 1) != 0) {
-        /* Do nothing. */
-    } else if (count < 19) {
-        /* Do nothing. */
-#if 0
-    } else if (strcmp(vector[2], "1") == 0) {
-        activep->mode = HAZER_MODE_NOFIX;
-#endif
-    } else {
-        for (slot = 0; slot < IDENTIFIERS; ++slot) {
-            id = strtol(vector[index++], (char **)0, 10);
-            if (id <= 0) { break; }
-            activep->id[slot] = id;
-            ++satellites;
+    do {
+
+        /*
+         * VALIDATE
+         */
+
+        if (count < 19) {
+            break;
         }
+
+        if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
+            break;
+        }
+
+        if (*vector[0] != HAZER_STIMULUS_START) {
+            break;
+        }
+
+        if (strncmp(vector[0] + sizeof("$XX") - 1, GSA, sizeof(GSA) - 1) != 0) {
+            break;
+        }
+
+        active.mode = strtoul(vector[2], &end, 10);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[2]);
+            break;
+        }
+#if 0
+        if (active.mode == HAZER_MODE_NOFIX) {
+            activep->mode = HAZER_MODE_NOFIX;
+            break;
+        }
+#endif
+        if (!((HAZER_MODE <= active.mode) && (active.mode < HAZER_MODE_TOTAL))) {
+            active.mode = HAZER_MODE_TOTAL;
+        }
+
+        for (slot = 0; slot < IDENTIFIERS; ++slot) {
+            id = strtol(vector[index], &end, 10);
+            if (*end != '\0') {
+                errno = EINVAL;
+                perror(vector[index]);
+                break;
+            }
+            if (id <= 0) {
+                break;
+            }
+            active.id[slot] = id;
+            ++satellites;
+            ++index;
+        }
+        if (*end != '\0') {
+            break;
+        }
+
         /*
          * Unlike the GSV sentence, the GSA sentence isn't variable length.
          * Unused slots in the active list are denoted by empty fields.
          */
-        activep->active = satellites;
-        activep->pdop = hazer_parse_dop(vector[15], &end);
-        activep->hdop = hazer_parse_dop(vector[16], &end);
-        activep->vdop = hazer_parse_dop(vector[17], &end);
-        activep->tdop = HAZER_GNSS_DOP;
-        /*
-         * 0 == initial, 1 == no fix, 2 == 2D, 3 == 3D.
-         */
-        activep->mode = atoi(vector[2]);
-        if (!((HAZER_MODE_NOFIX <= activep->mode) && (activep->mode <= HAZER_MODE_3D))) {
-            activep->mode = HAZER_MODE_TOTAL;
+
+        active.active = satellites;
+
+        active.pdop = hazer_parse_dop(vector[15], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[15]);
+            break;
         }
+
+        active.hdop = hazer_parse_dop(vector[16], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[16]);
+            break;
+        }
+
+        active.vdop = hazer_parse_dop(vector[17], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[17]);
+            break;
+        }
+
+        active.tdop = HAZER_GNSS_DOP;
+
         /*
          * NMEA 0183 4.10 2012 has an additional 19th field containing
          * the GNSS System ID to identify GPS, GLONASS, GALILEO, etc.
          */
-        activep->system = (count > 19) ? hazer_map_nmea_to_system(atoi(vector[18])) : HAZER_SYSTEM_TOTAL;
+
+        if (count > 19) {
+
+            system = strtol(vector[18], &end, 10);
+            if (*end != '\0') {
+                errno = EINVAL;
+                perror(vector[18]);
+                break;
+            }
+
+            active.system = hazer_map_nmea_to_system(system);
+
+        } else {
+
+            active.system = HAZER_SYSTEM_TOTAL;
+
+        }
+
+        /*
+         * APPLY
+         */
+
+        activep->mode = active.mode;
+
+        for (index = 0; index < slot; ++index) {
+            activep->id[index] = active.id[index];
+        }
+
+        activep->active = active.active;
+
+        activep->pdop = active.pdop;
+        activep->hdop = active.hdop;
+        activep->vdop = active.vdop;
+        activep->tdop = active.tdop;
+
+        activep->system = active.system;
+
         activep->label = GSA;
+
         rc = 0;
-    }
+
+    } while (0);
 
     return rc;
 }
@@ -1228,7 +1397,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int messages = 0;
     int message = 0;
     int start = 0;
-    int index = 0;
+    int index = 4;
     int slot = 0;
     int sequence = 0;
     int channel = 0;
@@ -1238,137 +1407,256 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int signal = 0;
     unsigned int id = 0;
     char * end = (char *)0;
+    hazer_view_t view = HAZER_VIEW_INITIALIZER;
     static const int SATELLITES = sizeof(viewp->sat) / sizeof(viewp->sat[0]);
     static const char GSV[] = HAZER_NMEA_SENTENCE_GSV;
+
+    do {
+
+        /*
+         * VALIDATE
+         */
     
-    if (count < 2) {
-        /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XXGSV")) != (sizeof("$XXGSV") - 1)) {
-        /* Do nothing. */
-    } else if (*vector[0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
-    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GSV, sizeof(GSV) - 1) != 0) {
-        /* Do nothing. */
-    } else if (count < 5) {
-        /* Do nothing. */
-    } else {
-        messages = strtol(vector[1], &end, 10);
-        message = strtol(vector[2], &end, 10);
-        if (message <= 0) {
-            /* Do nothing. */
-        } else if (message > messages) {
-            /* Do nothing. */
-        } else {
-            sequence = message - 1;
-            channel = sequence * HAZER_GNSS_VIEWS;
-            first = channel;
-            past = channel;
-            satellites = strtol(vector[3], &end, 10);
-            index = 4;
-            /*
-             * "Null fields are not required for unused sets when less
-             * than four sets are transmitted." [NMEA 0183 v4.10 2012 p. 96]
-             * Unlike the GSA sentence, the GSV sentence can have a variable
-             * number of fields. So from here on all indices are effectively
-             * relative.
-             */
-            for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
-                if (channel >= satellites) { break; }
-                if (channel >= SATELLITES) { break; }
-                /*
-                 * I'm pretty sure my U-Blox ZED-F9P-00B-01 chip has a
-                 * firmware bug.  I believe this GSV sentence that it
-                 * sent is incorrect.
-                 *
-                 * $GLGSV,3,3,11,85,26,103,25,86,02,152,29,1*75\r\n.
-                 *
-                 * I think either there should be a third set of four
-                 * fields for the eleventh satellite, or the total count
-                 * should be ten instead of eleven. So we check for that
-                 * here.
-                 */
-                if ((index + 4) >= count) { break; }
-                id = strtol(vector[index], &end, 10);
-                ++index;
-                if (id <= 0) { break; }
-                viewp->sat[channel].id = id;
-                /*
-                 * "For efficiency it is recommended that null fields be used
-                 * in the additional sentences when the data is unchanged from
-                 * the first sentence." [NMEA 0183 v4.10 2012 p. 96]
-                 * Does this mean that the same satellite ID can appear more
-                 * than once in the same tuple of GSV sentences? Or does this
-                 * just apply to the (newish) signal ID in the last field?
-                 */
-                viewp->sat[channel].phantom = 0;
-                if (strlen(vector[index]) == 0) {
-                    viewp->sat[channel].phantom = !0;
-                    viewp->sat[channel].elv_degrees = 0;
-                } else {
-                    viewp->sat[channel].elv_degrees = strtol(vector[index], &end, 10);
-                }
-                ++index;
-                if (strlen(vector[index]) == 0) {
-                    viewp->sat[channel].phantom = !0;
-                    viewp->sat[channel].azm_degrees = 0;
-                } else {
-                    viewp->sat[channel].azm_degrees = strtol(vector[index], &end, 10);
-                }
-                ++index;
-                if (strlen(vector[index]) == 0) {
-                    viewp->sat[channel].untracked = !0;
-                    viewp->sat[channel].snr_dbhz = 0;
-                } else {
-                    viewp->sat[channel].untracked = 0;
-                    viewp->sat[channel].snr_dbhz = strtol(vector[index], &end, 10);
-                }
-                ++index;
-                ++channel;
-                past = channel;
-                rc = 1;
-            }
-            viewp->channels = channel;
-            viewp->view = satellites;
-            viewp->pending = messages - message;
-            viewp->label = GSV;
-            /*
-             * NMEA 0183 4.10 2012 has an additional field containing the
-             * signal identifier. This is constellation specific, but
-             * indicates what frequency band was used, e.g. for GPS: L1C/A,
-             * L2, etc. It complicates things by applying to all of the
-             * satellites in this particular message, but we don't know
-             * if the field exists until we have processed all the
-             * satellites in this message. If it is present, it applies
-             * to all the satellites in this message.
-             */
-            if (index > (count - 2)) {
-                signal = 0;
-            } else if (strlen(vector[count - 2]) > 0) {
-                signal = strtol(vector[count - 2], &end, 10);
-            } else if (first > 0) {
-                signal = viewp->sat[first - 1].signal;
-            } else {
-                signal = 0;
-            }
-            for (channel = first; channel < past; ++channel) {
-                if (channel >= satellites) { break; }
-                if (channel >= SATELLITES) { break; }
-                viewp->sat[channel].signal = signal;
-            }
-            /*
-             * Only if this is the last message in the GSV tuple do we
-             * emit a zero return code. That lets the application decide
-             * when it wants to peruse its view database.
-             */
-            if (rc < 0) {
-                /* Do nothing. */
-            } else if (viewp->pending > 0) {
-                /* Do nothing. */
-            } else {
-                rc = 0;
-            }
+        if (count < 5) {
+            break;
         }
-    }
+
+        if (strnlen(vector[0], sizeof("$XXGSV")) != (sizeof("$XXGSV") - 1)) {
+            break;
+        }
+
+        if (*vector[0] != HAZER_STIMULUS_START) {
+            break;
+        }
+
+        if (strncmp(vector[0] + sizeof("$XX") - 1, GSV, sizeof(GSV) - 1) != 0) {
+            break;
+        }
+
+        messages = strtol(vector[1], &end, 10);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[1]);
+            break;
+        }
+
+        message = strtol(vector[2], &end, 10);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[2]);
+            break;
+        }
+
+        if (message <= 0) {
+            break;
+        }
+
+        if (message > messages) {
+            break;
+        }
+
+        sequence = message - 1;
+        channel = sequence * HAZER_GNSS_VIEWS;
+        first = channel;
+        past = channel;
+        satellites = strtol(vector[3], &end, 10);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[3]);
+            break;
+        }
+
+        /*
+         * "Null fields are not required for unused sets when less
+         * than four sets are transmitted." [NMEA 0183 v4.10 2012 p. 96]
+         * Unlike the GSA sentence, the GSV sentence can have a variable
+         * number of fields. So from here on all indices are effectively
+         * relative.
+         */
+
+        for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
+
+            if (channel >= satellites) {
+                break;
+            }
+
+            if (channel >= SATELLITES) {
+                break;
+            }
+
+            /*
+             * I'm pretty sure my U-Blox ZED-F9P-00B-01 chip has a
+             * firmware bug.  I believe this GSV sentence that it
+             * sent is incorrect.
+             *
+             * $GLGSV,3,3,11,85,26,103,25,86,02,152,29,1*75\r\n.
+             *
+             * I think either there should be a third set of four
+             * fields for the eleventh satellite, or the total count
+             * should be ten instead of eleven. So we check for that
+             * here.
+             */
+
+            if ((index + 4) >= count) {
+                break;
+            }
+
+            id = strtol(vector[index], &end, 10);
+            if (*end != '\0') {
+                errno = EINVAL;
+                perror(vector[index]);
+                break;
+            }
+
+            ++index;
+
+            if (id <= 0) {
+                break;
+            }
+            view.sat[channel].id = id;
+
+            /*
+             * "For efficiency it is recommended that null fields be used
+             * in the additional sentences when the data is unchanged from
+             * the first sentence." [NMEA 0183 v4.10 2012 p. 96]
+             * Does this mean that the same satellite ID can appear more
+             * than once in the same tuple of GSV sentences? Or does this
+             * just apply to the (newish) signal ID in the last field?
+             */
+
+            view.sat[channel].phantom = 0;
+
+            if (strlen(vector[index]) == 0) {
+                view.sat[channel].phantom = !0;
+                view.sat[channel].elv_degrees = 0;
+            } else {
+                view.sat[channel].elv_degrees = strtol(vector[index], &end, 10);
+                if (*end != '\0') {
+                    errno = EINVAL;
+                    perror(vector[index]);
+                    break;
+                }
+            }
+
+            ++index;
+
+            if (strlen(vector[index]) == 0) {
+                view.sat[channel].phantom = !0;
+                view.sat[channel].azm_degrees = 0;
+            } else {
+                view.sat[channel].azm_degrees = strtol(vector[index], &end, 10);
+                if (*end != '\0') {
+                    errno = EINVAL;
+                    perror(vector[index]);
+                    break;
+                }
+            }
+
+            ++index;
+
+            if (strlen(vector[index]) == 0) {
+                view.sat[channel].untracked = !0;
+                view.sat[channel].snr_dbhz = 0;
+            } else {
+                view.sat[channel].untracked = 0;
+                view.sat[channel].snr_dbhz = strtol(vector[index], &end, 10);
+                if (*end != '\0') {
+                    errno = EINVAL;
+                    perror(vector[index]);
+                    break;
+                }
+            }
+
+            ++index;
+
+            past = ++channel;
+
+        }
+        if (*end != '\0') {
+            break;
+        }
+
+        view.channels = channel;
+        view.view = satellites;
+        view.pending = messages - message;
+        view.label = GSV;
+
+        /*
+         * NMEA 0183 4.10 2012 has an additional field containing the
+         * signal identifier. This is constellation specific, but
+         * indicates what frequency band was used, e.g. for GPS: L1C/A,
+         * L2, etc. It complicates things by applying to all of the
+         * satellites in this particular message, but we don't know
+         * if the field exists until we have processed all the
+         * satellites in this message. If it is present, it applies
+         * to all the satellites in this message.
+         */
+
+        if (index > (count - 2)) {
+            signal = 0;
+        } else if (strlen(vector[count - 2]) > 0) {
+            signal = strtol(vector[count - 2], &end, 10);
+            if (*end != '\0') {
+                errno = EINVAL;
+                perror(vector[count - 2]);
+                break;
+            }
+        } else if (first > 0) {
+            /*
+             * We have to reference the actual structure, not the
+             * working structure.
+             */
+            signal = viewp->sat[first - 1].signal;
+        } else {
+            signal = 0;
+        }
+
+        for (channel = first; channel < past; ++channel) {
+            if (channel >= satellites) {
+                break;
+            }
+            if (channel >= SATELLITES) {
+                break;
+            }
+            view.sat[channel].signal = signal;
+        }
+
+        /*
+         * APPLY
+         */
+
+        for (channel = first; channel < past; ++channel) {
+            if (channel >= satellites) {
+                break;
+            }
+            if (channel >= SATELLITES) {
+                break;
+            }
+            viewp->sat[channel].id = view.sat[channel].id;
+            viewp->sat[channel].phantom = view.sat[channel].phantom;
+            viewp->sat[channel].elv_degrees = view.sat[channel].elv_degrees;
+            viewp->sat[channel].azm_degrees = view.sat[channel].azm_degrees;
+            viewp->sat[channel].untracked = view.sat[channel].untracked;
+            viewp->sat[channel].snr_dbhz = view.sat[channel].snr_dbhz;
+            viewp->sat[channel].signal = view.sat[channel].signal;
+        }
+
+        viewp->channels = view.channels;
+        viewp->view = view.view;
+        viewp->pending = view.pending;
+        viewp->label = GSV;
+
+        /*
+         * Only if this is the last message in the GSV tuple do we
+         * emit a zero return code. That lets the application decide
+         * when it wants to peruse its view database. (We could have
+         * treated this expression like a boolean, but the return code
+         * is genuinely tri-state).
+         */
+
+        rc = (viewp->pending > 0) ? 1 : 0;
+
+    } while (0);
 
     return rc;
 }
@@ -1377,37 +1665,113 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     char * end = (char *)0;
+    hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char RMC[] = HAZER_NMEA_SENTENCE_RMC;
 
-    if (count < 2) {
-        /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XXRMC")) != (sizeof("$XXRMC") - 1)) {
-        /* Do nothing. */
-    } else if (*vector[0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
-    } else if (strncmp(vector[0] + sizeof("$XX") - 1, RMC, sizeof(RMC) - 1) != 0) {
-        /* Do nothing. */
-    } else if (count < 11) {
-        /* Do nothing. */
-    } else if (strcmp(vector[2], "A") != 0) {
-        /* Do nothing. */
-    } else if ((count > 13) && (strcmp(vector[12], "N") == 0)) { /* NMEA 2.3+ */
-        /* Do nothing. */
+    do {
+
+        /*
+         * VALIDATE
+         */
+
+        if (count < 11) {
+            break;
+        }
+
+        if (strnlen(vector[0], sizeof("$XXRMC")) != (sizeof("$XXRMC") - 1)) {
+            break;
+        }
+
+        if (*vector[0] != HAZER_STIMULUS_START) {
+            break;
+        }
+
+        if (strncmp(vector[0] + sizeof("$XX") - 1, RMC, sizeof(RMC) - 1) != 0) {
+            break;
+        }
+
+        if (strcmp(vector[2], "A") != 0) {
+            break;
+        }
+
+        if ((count > 13) && (strcmp(vector[12], "N") == 0)) { /* NMEA 2.3+ */
+            break;
+        }
+
 #if 0
-    } else if ((count > 14) && (strcmp(vector[13], "V") == 0)) { /* NMEA 4.10+ */
-        /* Not clear what this means on the u-blox UBX-F9P. */
+        if ((count > 14) && (strcmp(vector[13], "V") == 0)) { /* NMEA 4.10+ */
+            /* Not clear what this means on the u-blox UBX-F9P. */
+            break;
+        }
 #endif
-    } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[1], &end);
-        positionp->dmy_nanoseconds = hazer_parse_dmy(vector[9], &end);
+
+        position.utc_nanoseconds = hazer_parse_utc(vector[1], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[1]);
+            break;
+        }
+        position.lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &position.lat_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[3]);
+            break;
+        }
+
+        position.lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &position.lon_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[5]);
+            break;
+        }
+
+        position.sog_microknots = hazer_parse_sog(vector[7], &position.sog_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[7]);
+            break;
+        }
+
+        position.cog_nanodegrees = hazer_parse_cog(vector[8], &position.cog_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[8]);
+            break;
+        }
+
+        position.dmy_nanoseconds = hazer_parse_dmy(vector[9], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[9]);
+            break;
+        }
+
+        /*
+         * APPLY
+         */
+
+        positionp->utc_nanoseconds = position.utc_nanoseconds;
+
+        positionp->lat_nanominutes = position.lat_nanominutes;
+        positionp->lat_digits = position.lat_digits;
+
+        positionp->lon_nanominutes = position.lon_nanominutes;
+        positionp->lon_digits = position.lon_digits;
+
+        positionp->sog_microknots = position.sog_microknots;
+        positionp->sog_digits = position.sog_digits;
+
+        positionp->cog_nanodegrees = position.cog_nanodegrees;
+        positionp->cog_digits = position.cog_digits;
+
+        positionp->dmy_nanoseconds = position.dmy_nanoseconds;
         update_time(positionp);
-        positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits, &end);
-        positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits, &end);
-        positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits, &end);
-        positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits, &end);
+
         positionp->label = RMC;
+
         rc = 0;
-    }
+
+    } while (0);
 
     return rc;
 }
@@ -1416,32 +1780,81 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     char * end = (char *)0;
+    hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char GLL[] = HAZER_NMEA_SENTENCE_GLL;
 
-    if (count < 2) {
-        /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
-        /* Do nothing. */
-    } else if (*vector[0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
-    } else if (strncmp(vector[0] + sizeof("$XX") - 1, GLL, sizeof(GLL) - 1) != 0) {
-        /* Do nothing. */
-    } else if (count < 9) {
-        /* Do nothing. */
+    do {
+
+        /*
+         * VALIDATE
+         */
+
+        if (count < 9) {
+            break;
+        }
+
+        if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
+            break;
+        }
+
+        if (*vector[0] != HAZER_STIMULUS_START) {
+            break;
+        }
+
+        if (strncmp(vector[0] + sizeof("$XX") - 1, GLL, sizeof(GLL) - 1) != 0) {
+            break;
+        }
+
 #if 0
-    } else if (strcmp(vector[6], "V") == 0) {
-        /* Not clear what this means on the u-blox UBX-F9P. */
+        if (strcmp(vector[6], "V") == 0) {
+            /* Not clear what this means on the u-blox UBX-F9P. */
+            break;
+        }
 #endif
-    } else if (strcmp(vector[7], "N") == 0) {
-        /* Do nothing. */
-    } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[5], &end);
+
+        if (strcmp(vector[7], "N") == 0) {
+            break;
+        }
+
+        position.lat_nanominutes = hazer_parse_latlon(vector[1], *(vector[2]), &position.lat_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[1]);
+            break;
+        }
+
+        position.lon_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &position.lon_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[3]);
+            break;
+        }
+
+        position.utc_nanoseconds = hazer_parse_utc(vector[5], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[5]);
+            break;
+        }
+
+        /*
+         * APPLY
+         */
+
+        positionp->lat_nanominutes = position.lat_nanominutes;
+        positionp->lat_digits = position.lat_digits;
+
+        positionp->lon_nanominutes = position.lon_nanominutes;
+        positionp->lon_digits = position.lon_digits;
+
+        positionp->utc_nanoseconds = position.utc_nanoseconds;
         update_time(positionp);
-        positionp->lat_nanominutes = hazer_parse_latlon(vector[1], *(vector[2]), &positionp->lat_digits, &end);
-        positionp->lon_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lon_digits, &end);
+
         positionp->label = GLL;
+
         rc = 0;
-    }
+
+    } while (0);
 
     return rc;
 }
@@ -1450,28 +1863,84 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     char * end = (char *)0;
+    hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char VTG[] = HAZER_NMEA_SENTENCE_VTG;
 
-    if (count < 2) {
-        /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof("$XXVTG")) != (sizeof("$XXVTG") - 1)) {
-        /* Do nothing. */
-    } else if (*vector[0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
-    } else if (strncmp(vector[0] + sizeof("$XX") - 1, VTG, sizeof(VTG) - 1) != 0) {
-        /* Do nothing. */
-    } else if (count < 11) {
-        /* Do nothing. */
-    } else if (strcmp(vector[9], "N") == 0) {
-        /* Do nothing. */
-    } else {
-        positionp->cog_nanodegrees = hazer_parse_cog(vector[1], &positionp->cog_digits, &end);
-        positionp->mag_nanodegrees = hazer_parse_cog(vector[3], &positionp->mag_digits, &end);
-        positionp->sog_microknots = hazer_parse_sog(vector[5], &positionp->sog_digits, &end);
-        positionp->sog_millimetersperhour = hazer_parse_smm(vector[7], &positionp->smm_digits, &end);
+    do {
+
+        /*
+         * VALIDATE
+         */
+
+        if (count < 11) {
+            break;
+        }
+
+        if (strnlen(vector[0], sizeof("$XXVTG")) != (sizeof("$XXVTG") - 1)) {
+            break;
+        }
+
+        if (*vector[0] != HAZER_STIMULUS_START) {
+            break;
+        }
+
+        if (strncmp(vector[0] + sizeof("$XX") - 1, VTG, sizeof(VTG) - 1) != 0) {
+            break;
+        }
+
+        if (strcmp(vector[9], "N") == 0) {
+            break;
+        }
+
+        position.cog_nanodegrees = hazer_parse_cog(vector[1], &position.cog_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[1]);
+            break;
+        }
+
+        position.mag_nanodegrees = hazer_parse_cog(vector[3], &position.mag_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[3]);
+            break;
+        }
+
+        position.sog_microknots = hazer_parse_sog(vector[5], &position.sog_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[5]);
+            break;
+        }
+
+        position.sog_millimetersperhour = hazer_parse_smm(vector[7], &position.smm_digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            perror(vector[7]);
+            break;
+        }
+
+        /*
+         * APPLY
+         */
+
+        positionp->cog_nanodegrees = position.cog_nanodegrees;
+        positionp->cog_digits = position.cog_digits;
+
+        positionp->mag_nanodegrees = position.mag_nanodegrees;
+        positionp->mag_digits = position.mag_digits;
+
+        positionp->sog_microknots = position.sog_microknots;
+        positionp->sog_digits = position.sog_digits;
+
+        positionp->sog_millimetersperhour = position.sog_millimetersperhour;
+        positionp->smm_digits = position.smm_digits;
+
         positionp->label = VTG;
+
         rc = 0;
-   }
+
+   } while (0);
 
     return rc;
 }
@@ -1481,15 +1950,13 @@ int hazer_parse_txt(char * vector[], size_t count)
     int rc = -1;
     static const char TXT[] = HAZER_NMEA_SENTENCE_TXT;
 
-    if (count < 2) {
+    if (count < 5) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXTXT")) != (sizeof("$XXTXT") - 1)) {
         /* Do nothing. */
     } else if (*vector[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
     } else if (strncmp(vector[0] + sizeof("$XX") - 1, TXT, sizeof(TXT) - 1) != 0) {
-        /* Do nothing. */
-    } else if (count < 5) {
         /* Do nothing. */
     } else {
         rc = 0;
