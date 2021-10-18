@@ -29,4 +29,6 @@ exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -t 10 -F 1 -E -C ${CATFIL}
+export COM_DIAG_DIMINUTO_LOG_MASK=0xff
+
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -t 10 -F 1 -E -C ${CATFIL} -v -d

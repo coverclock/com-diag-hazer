@@ -212,3 +212,16 @@ fact that the checksum is correct for the invalid sentence as transmitted
 suggests this is not an issue in the serial-to-USB conversion.
 
 Bad Elf support ticket 43008 submitted 2021-10-14 08:14MDT.
+
+Addendum: Here's another example: there is a missing comma before the "N"
+direction indication, yet the checksum is correct. It took almost five hours
+for this to show up (although a similar error might have occurred earlier
+and not been in a field checked by an assert).
+
+    checksum '$GPRMC,002525.000,A,3947.6529N,10509.2015,W,0.01,68.88,161021,,,D*65'
+    $GPRMC,002525.000,A,3947.6529N,10509.2015,W,0.01,68.88,161021,,,D*65\r\n
+
+Compare with the correct sentence:
+
+    checksum '$GPRMC,002525.000,A,3947.6529,N,10509.2015,W,0.01,68.88,161021,,,D*65'
+    $GPRMC,002525.000,A,3947.6529,N,10509.2015,W,0.01,68.88,161021,,,D*49\r\n

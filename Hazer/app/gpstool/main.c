@@ -1644,9 +1644,9 @@ consume:
                 if (!debug) {
                     /* Do nothing. */
                 } else if (isprint(ch)) {
-                    fprintf(stderr, "DATUM [%llu] 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
+                    fprintf(stderr, "Datum [%llu] 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
                 } else {
-                    fprintf(stderr, "DATUM [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+                    fprintf(stderr, "Datum [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
                 }
 
                 /*
@@ -1759,7 +1759,7 @@ consume:
 
                     frame = !0;
 
-                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] \"%-7.7s\"", size, length, (buffer + 1));
+                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] \"%-5.5s\"", size, length, (buffer + 1));
 
                     break;
 
@@ -1884,7 +1884,7 @@ consume:
 
                 DIMINUTO_LOG_NOTICE("Remote Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
-            } else if ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0) {
+            } else if (common_machine_is_nmea(remote_buffer.payload.nmea[0]) && ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.nmea;
                 size = remote_size;
@@ -1893,7 +1893,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Remote NMEA [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0) {
+            } else if (common_machine_is_ubx(remote_buffer.payload.ubx[0]) && ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.ubx;
                 size = remote_size;
@@ -1902,7 +1902,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Remote UBX [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0) {
+            } else if (common_machine_is_rtcm(remote_buffer.payload.rtcm[0]) && ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.rtcm;
                 size = remote_size;
@@ -1984,6 +1984,8 @@ consume:
             diminuto_assert(0);
 
         }
+
+        fflush(sink_fp);
 
         /*
          * If one of the input sources indicated end of file, we're done.
@@ -2133,7 +2135,7 @@ consume:
                 diminuto_assert(command_total > 1);
 
                  if (verbose) {
-                    fputs("OUT:\n", stderr);
+                    fputs("Output:\n", stderr);
                     diminuto_dump(stderr, command_buffer, ((command_total > command_length) ? command_total : command_length) - 1 /* Minus terminating nul. */);
                 }
 
@@ -2252,7 +2254,7 @@ consume:
         }
 
         if (verbose) {
-            fputs("INP:\n", stderr); diminuto_dump(stderr, buffer, length);
+            fputs("Input:\n", stderr); diminuto_dump(stderr, buffer, length);
         }
 
         if (escape) {
@@ -2607,7 +2609,7 @@ consume:
 
             } else {
 
-                DIMINUTO_LOG_DEBUG("Parse NMEA Other \"%s\"\n", vector[0]);
+                DIMINUTO_LOG_INFORMATION("Parse NMEA Other \"%s\"\n", vector[0]);
 
             }
 
@@ -2849,7 +2851,7 @@ consume:
 
             } else {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
+                DIMINUTO_LOG_INFORMATION("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             }
 

@@ -625,85 +625,102 @@ extern ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size
  * Parse a string containing an integer representing the fractional portion of
  * a floating point value into a numerator representing the magnitude and a
  * denominator that will be a power of ten. This is done to defer the floating
- * point conversion.
+ * point conversion. The address of the terminating character in the string
+ * is returned.
  * @param string points to the string (just past the decimal point).
  * @param denominatorp points to where the denominator is stored.
+ * @param endp points to where the terminating address is stored.
  * @return the numerator.
  */
-extern uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp);
+extern uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp, char ** endp);
 
 /**
  * Parse a string containing the time in UTC in NMEA format into an integer
- * number of nanoseconds since the start of the day.
+ * number of nanoseconds since the start of the day. The address of the
+ * terminating character in the string is returned.
  * @param string points to the string.
+ * @param endp points to where the terminating address is stored.
  * @return an integer number of nanoseconds.
  */
-extern uint64_t hazer_parse_utc(const char * string);
+extern uint64_t hazer_parse_utc(const char * string, char ** endp);
 
 /**
  * Parse a string containing the date in NMEA format into an integer
- * number of nanoseconds since the start of the POSIX epoch.
+ * number of nanoseconds since the start of the POSIX epoch. The address
+ * of the terminating character in the string is returned.
  * @param string points to the string.
+ * @param endp points to where the terminating address is stored.
  * @return an integer number of microseconds.
  */
-extern uint64_t hazer_parse_dmy(const char * string);
+extern uint64_t hazer_parse_dmy(const char * string, char ** endp);
 
 /**
  * Parse a string containing the latitude or longitude in NMEA format into
- * a signed integer number of nanominutes.
+ * a signed integer number of nanominutes. The address of the terminating
+ * character in the string is returned.
  * @param string points to the string.
  * @param direction is the NMEA direction: 'N', 'S', 'E', or 'W'.
  * @param digitsp points to where the number of digits is stored.
+ * @param endp points to where the terminating address is stored.
  * @return nanominutes.
  */
-extern int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp);
+extern int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp, char ** endp);
 
 /**
  * Parse a string containing a heading (bearing) in degrees in NMEA format
- * into a signed integer number of nanodegrees.
+ * into a signed integer number of nanodegrees. The address of the terminating
+ * character in the string is returned.
  * @param string points to the string.
  * @param digitsp points to where the number of digits is stored.
+ * @param endp points to where the terminating address is stored.
  * @return nanodegrees.
  */
-extern int64_t hazer_parse_cog(const char * string, uint8_t * digitsp);
+extern int64_t hazer_parse_cog(const char * string, uint8_t * digitsp, char ** endp);
 
 /**
  * Parse a string containing a speed in knots in NMEA format into a
- * signed integer number of microknots.
+ * signed integer number of microknots. The address of the terminating
+ * character in the string is returned.
  * @param string points to the string.
  * @param digitsp points to where the number of digits is stored.
+ * @param endp points to where the terminating address is stored.
  * @return microknots.
  */
-extern int64_t hazer_parse_sog(const char * string, uint8_t * digitsp);
+extern int64_t hazer_parse_sog(const char * string, uint8_t * digitsp, char ** endp);
 
 /**
  * Parse a string containing a speed in kilometers/h in NMEA format into a
- * signed integer number of millimeters/hour.
+ * signed integer number of millimeters/hour. The address of the terminating
+ * character in the string is returned.
  * @param string points to the string.
  * @param digitsp points to where the number of digits is stored.
+ * @param endp points to where the terminating address is stored.
  * @return millimeters/hour.
  */
-extern int64_t hazer_parse_smm(const char * string, uint8_t * digitsp);
+extern int64_t hazer_parse_smm(const char * string, uint8_t * digitsp, char ** endp);
 
 /**
  * Parse a decimal number representing altitude above Mean Sea Level (MSL)
  * into integer millimeters. (Currently the units field is ignored and the
- * units are assumed to be meters.)
+ * units are assumed to be meters.) The address of the terminating character
+ * in the string is returned.
  * @param string points to the string.
  * @param units is the units ('M' for meters).
  * @param digitsp points to where the number of digits is stored.
+ * @param endp points to where the terminating address is stored.
  * @return millimeters.
  */
-extern int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp);
+extern int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp, char ** endp);
 
 /**
  * Parse a dilution of precision into a value that is the DOP scaled by
  * multiplying it by 100. The result will be in the range of 0 to 9999 (DOP of
- * 99.99).
+ * 99.99). The address of the terminating character in the string is returned.
  * @param string points the string.
+ * @param endp points to where the terminating address is stored.
  * @return a DOP scaled by 100.
  */
-extern uint16_t hazer_parse_dop(const char * string);
+extern uint16_t hazer_parse_dop(const char * string, char ** endp);
 
 /*******************************************************************************
  * IDENTIFYING STANDARD SENTENCES

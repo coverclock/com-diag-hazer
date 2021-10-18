@@ -616,6 +616,16 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             fputs("COG", fp);
 
+#if !0
+if (!((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL))) {
+fprintf(stderr, "DEBUG system=%u cog_nanodegrees=%lld=%llu=%llx\n",
+system,
+(long long int)pa[system].cog_nanodegrees,
+(long long unsigned int)pa[system].cog_nanodegrees,
+(long long int)pa[system].cog_nanodegrees);
+}
+#endif
+
             diminuto_assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
 
             compass = hazer_format_nanodegrees2compass16(pa[system].cog_nanodegrees);

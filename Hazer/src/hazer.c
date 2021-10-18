@@ -223,9 +223,9 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     } else if (old == HAZER_STATE_STOP) {
         /* Do nothing. */
     } else if (isprint(ch)) {
-        fprintf(debug, "NMEA %c %c %c *%c%c 0x%02x '%c'\n", old, state, action, pp->msn, pp->lsn, ch, ch);
+        fprintf(debug, "Machine NMEA %c %c %c *%c%c 0x%02x '%c'\n", old, state, action, pp->msn, pp->lsn, ch, ch);
     } else {
-        fprintf(debug, "NMEA %c %c %c *%c%c 0x%02x\n", old, state, action, pp->msn, pp->lsn, ch);
+        fprintf(debug, "Machine NMEA %c %c %c *%c%c 0x%02x\n", old, state, action, pp->msn, pp->lsn, ch);
     }
 
     return state;
@@ -388,7 +388,7 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
             if (*bb == ',') {
                 *(bb++) = '\0';
                 if (debug != (FILE *)0) {
-                    fprintf(debug, "TOKEN [%zd] \"%s\"\n", result, *tt);
+                    fprintf(debug, "Token [%zd] \"%s\"\n", result, *tt);
                 }
                 ++result;
                 if (count <= 1) {
@@ -400,7 +400,7 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
             } else if (*bb == '*') {
                 *(bb++) = '\0';
                 if (debug != (FILE *)0) {
-                    fprintf(debug, "TOKEN [%zd] \"%s\"\n", result, *tt);
+                    fprintf(debug, "Token [%zd] \"%s\"\n", result, *tt);
                 }
                 ++result;
                 break;
@@ -413,13 +413,13 @@ ssize_t hazer_tokenize(char * vector[], size_t count, void * buffer, size_t size
     if (count > 0) {
         *(vv++) = (char *)0;
         if (debug != (FILE *)0) {
-            fprintf(debug, "TOKEN [%zd] NULL\n", result);
+            fprintf(debug, "Token [%zd] NULL\n", result);
         }
         ++result;
     }
 
     if (debug != (FILE *)0) {
-        fprintf(debug, "TOKENS [%zd]\n", result);
+        fprintf(debug, "Tokens [%zd]\n", result);
     }
 
     return result;
@@ -464,15 +464,14 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
  *
  ******************************************************************************/
 
-uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp)
+uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp, char ** endp)
 {
     unsigned long long numerator = 0;
     unsigned long long denominator = 1;
-    char * end = (char *)0;
     size_t length = 0;
 
-    numerator = strtoull(string, &end, 10);
-    length = end - string;
+    numerator = strtoull(string, endp, 10);
+    length = *endp - string;
     while ((length--) > 0) {
         denominator = denominator * 10;
     }
@@ -481,15 +480,14 @@ uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp)
     return numerator;
 }
 
-uint64_t hazer_parse_utc(const char * string)
+uint64_t hazer_parse_utc(const char * string, char ** endp)
 {
     uint64_t nanoseconds = 0;
     uint64_t numerator = 0;
     uint64_t denominator = 1;
     unsigned long hhmmss = 0;
-    char * end = (char *)0;
 
-    hhmmss = strtoul(string, &end, 10);
+    hhmmss = strtoul(string, endp, 10);
     nanoseconds = hhmmss / 10000;
     nanoseconds *= 60;
     hhmmss %= 10000;
@@ -499,8 +497,8 @@ uint64_t hazer_parse_utc(const char * string)
     nanoseconds += hhmmss;
     nanoseconds *= 1000000000ULL;
 
-    if (*end == HAZER_STIMULUS_DECIMAL) {
-        numerator = hazer_parse_fraction(end + 1, &denominator);
+    if (**endp == HAZER_STIMULUS_DECIMAL) {
+        numerator = hazer_parse_fraction(*endp + 1, &denominator, endp);
         numerator *= 1000000000ULL;
         numerator /= denominator;
         nanoseconds += numerator;
@@ -509,14 +507,14 @@ uint64_t hazer_parse_utc(const char * string)
     return nanoseconds;
 }
 
-uint64_t hazer_parse_dmy(const char * string)
+uint64_t hazer_parse_dmy(const char * string, char ** endp)
 {
     uint64_t nanoseconds = 0;
     unsigned long ddmmyy = 0;
     struct tm datetime = { 0, };
     extern long timezone;
 
-    ddmmyy = strtoul(string, (char **)0, 10);
+    ddmmyy = strtoul(string, endp, 10);
 
     datetime.tm_year = ddmmyy % 100;
     if (datetime.tm_year < 93) {  datetime.tm_year += 100; }
@@ -530,42 +528,52 @@ uint64_t hazer_parse_dmy(const char * string)
     return nanoseconds;
 }
 
-int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp)
+int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digitsp, char ** endp)
 {
     int64_t nanominutes = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
     unsigned long dddmm = 0;
-    char * end = (char *)0;
     uint8_t digits = 0;
+    static char error = '?';
 
     digits = strlen(string);
 
-    dddmm = strtoul(string, &end, 10);
+    dddmm = strtoul(string, endp, 10);
     nanominutes = dddmm / 100;
     nanominutes *= 60000000000LL;
     fraction = dddmm % 100;
     fraction *= 1000000000LL;
     nanominutes += fraction;
-   
-    if (*end == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(end + 1, &denominator);
+
+    if (**endp == HAZER_STIMULUS_DECIMAL) {
+        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
         fraction *= 1000000000LL;
         fraction /= denominator;
         nanominutes += fraction;
         --digits;
     }
 
-    switch (direction) {
-    case HAZER_STIMULUS_NORTH:
-    case HAZER_STIMULUS_EAST:
-        break;
-    case HAZER_STIMULUS_SOUTH:
-    case HAZER_STIMULUS_WEST:
-        nanominutes = -nanominutes;
-        break;
-    default:
-        break;
+    if (**endp == '\0') {
+        switch (direction) {
+        case HAZER_STIMULUS_NORTH:
+        case HAZER_STIMULUS_EAST:
+            break;
+        case HAZER_STIMULUS_SOUTH:
+        case HAZER_STIMULUS_WEST:
+            nanominutes = -nanominutes;
+            break;
+        default:
+            /*
+             * NOTE: not thread safe but we need to indicate an error.
+             * In the event of a race condition, the error will still
+             * be indicated, but the indicated character may not
+             * be correct.
+             */
+            error = direction;
+            *endp = &error;
+            break;
+        }
     }
 
     *digitsp = digits;
@@ -573,25 +581,24 @@ int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digits
     return nanominutes;
 }
 
-int64_t hazer_parse_cog(const char * string, uint8_t * digitsp)
+int64_t hazer_parse_cog(const char * string, uint8_t * digitsp, char ** endp)
 {
     int64_t nanodegrees = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
-    char * end = (char *)0;
     uint8_t digits = 0;
 
     digits = strlen(string);
 
-    nanodegrees = strtol(string, &end, 10);
+    nanodegrees = strtol(string, endp, 10);
     nanodegrees *= 1000000000LL;
 
     if (nanodegrees < 0) {
         --digits;
     }
 
-    if (*end == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(end + 1, &denominator);
+    if (**endp == HAZER_STIMULUS_DECIMAL) {
+        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
         fraction *= 1000000000LL;
         fraction /= denominator;
         if (nanodegrees < 0) {
@@ -607,25 +614,24 @@ int64_t hazer_parse_cog(const char * string, uint8_t * digitsp)
     return nanodegrees;
 }
 
-int64_t hazer_parse_sog(const char * string, uint8_t * digitsp)
+int64_t hazer_parse_sog(const char * string, uint8_t * digitsp, char ** endp)
 {
     int64_t microknots = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
-    char * end = (char *)0;
     uint8_t digits = 0;
 
     digits = strlen(string);
 
-    microknots = strtol(string, &end, 10);
+    microknots = strtol(string, endp, 10);
     microknots *= 1000000LL;
 
     if (microknots < 0) {
         --digits;
     }
 
-    if (*end == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(end + 1, &denominator);
+    if (**endp == HAZER_STIMULUS_DECIMAL) {
+        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
         fraction *= 1000000;
         fraction /= denominator;
         if (microknots < 0) {
@@ -641,25 +647,24 @@ int64_t hazer_parse_sog(const char * string, uint8_t * digitsp)
     return microknots;
 }
 
-int64_t hazer_parse_smm(const char * string, uint8_t * digitsp)
+int64_t hazer_parse_smm(const char * string, uint8_t * digitsp, char ** endp)
 {
     int64_t millimetersperhour = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
-    char * end = (char *)0;
     uint8_t digits = 0;
 
     digits = strlen(string);
 
-    millimetersperhour = strtol(string, &end, 10);
+    millimetersperhour = strtol(string, endp, 10);
     millimetersperhour *= 1000000LL;
 
     if (millimetersperhour < 0) {
         --digits;
     }
 
-    if (*end == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(end + 1, &denominator);
+    if (**endp == HAZER_STIMULUS_DECIMAL) {
+        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
         fraction *= 1000000;
         fraction /= denominator;
         if (millimetersperhour < 0) {
@@ -675,25 +680,24 @@ int64_t hazer_parse_smm(const char * string, uint8_t * digitsp)
     return millimetersperhour;
 }
 
-int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp)
+int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp, char ** endp)
 {
     int64_t millimeters = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
-    char * end = (char *)0;
     uint8_t digits = 0;
 
     digits = strlen(string);
 
-    millimeters = strtol(string, &end, 10);
+    millimeters = strtol(string, endp, 10);
     millimeters *= 1000LL;
 
     if (millimeters < 0) {
         --digits;
     }
 
-    if (*end == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(end + 1, &denominator);
+    if (**endp == HAZER_STIMULUS_DECIMAL) {
+        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
         fraction *= 1000;
         fraction /= denominator;
         if (millimeters < 0) {
@@ -709,28 +713,23 @@ int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp)
     return millimeters;
 }
 
-uint16_t hazer_parse_dop(const char * string)
+uint16_t hazer_parse_dop(const char * string, char ** endp)
 {
     uint16_t dop = HAZER_GNSS_DOP;
     unsigned long number = 0;
     int64_t fraction = 0;
     uint64_t denominator = 0;
-    char * end = (char *)0;
 
     if (*string != '\0') {
 
-        number = strtoul(string, &end, 10);
-        if (end == (char *)0) {
-            /* Do nothing. */
-        } else if (number > (HAZER_GNSS_DOP / 100)) {
-            /* Do nothing. */
-        } else {
+        number = strtoul(string, endp, 10);
+        if (number <= (HAZER_GNSS_DOP / 100)) {
 
             number *= 100;
 
-            if (*end == HAZER_STIMULUS_DECIMAL) {
+            if (**endp == HAZER_STIMULUS_DECIMAL) {
 
-                fraction = hazer_parse_fraction(end + 1, &denominator);
+                fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
                 fraction *= 100;
                 fraction /= denominator;
 
@@ -741,6 +740,15 @@ uint16_t hazer_parse_dop(const char * string)
             dop = number;
 
         }
+
+    } else  {
+
+        /*
+         * NOTE: dropping const qualifier. Dangerous, but consistent
+         * with strtoul(3) et al. API which does the same.
+         */
+        *endp = (char *)string;
+
     }
 
     return dop;
@@ -1124,6 +1132,7 @@ static void update_time(hazer_position_t * positionp)
 int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
+    char * end = (char *)0;
     static const char GGA[] = HAZER_NMEA_SENTENCE_GGA;
     
     if (count < 2) { 
@@ -1139,13 +1148,13 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
     } else if (strcmp(vector[6], "0") == 0) {
         positionp->sat_used = 0;
     } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[1], &end);
         update_time(positionp);
-        positionp->lat_nanominutes = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits);
-        positionp->lon_nanominutes = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits);
+        positionp->lat_nanominutes = hazer_parse_latlon(vector[2], *(vector[3]), &positionp->lat_digits, &end);
+        positionp->lon_nanominutes = hazer_parse_latlon(vector[4], *(vector[5]), &positionp->lon_digits, &end);
         positionp->sat_used = strtol(vector[7], (char **)0, 10);
-        positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits);
-        positionp->sep_millimeters = hazer_parse_alt(vector[11], *(vector[12]), &positionp->sep_digits);
+        positionp->alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &positionp->alt_digits, &end);
+        positionp->sep_millimeters = hazer_parse_alt(vector[11], *(vector[12]), &positionp->sep_digits, &end);
         positionp->label = GGA;
         rc = 0;
     }
@@ -1156,12 +1165,13 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char GSA[] = HAZER_NMEA_SENTENCE_GSA;
     int index = 3;
     int slot = 0;
     int id = 0;
     int satellites = 0;
+    char * end = (char *)0;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
+    static const char GSA[] = HAZER_NMEA_SENTENCE_GSA;
 
     if (count < 2) {
         /* Do nothing. */
@@ -1189,9 +1199,9 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
          * Unused slots in the active list are denoted by empty fields.
          */
         activep->active = satellites;
-        activep->pdop = hazer_parse_dop(vector[15]);
-        activep->hdop = hazer_parse_dop(vector[16]);
-        activep->vdop = hazer_parse_dop(vector[17]);
+        activep->pdop = hazer_parse_dop(vector[15], &end);
+        activep->hdop = hazer_parse_dop(vector[16], &end);
+        activep->vdop = hazer_parse_dop(vector[17], &end);
         activep->tdop = HAZER_GNSS_DOP;
         /*
          * 0 == initial, 1 == no fix, 2 == 2D, 3 == 3D.
@@ -1215,7 +1225,6 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char GSV[] = HAZER_NMEA_SENTENCE_GSV;
     int messages = 0;
     int message = 0;
     int start = 0;
@@ -1228,7 +1237,9 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int satellites = 0;
     int signal = 0;
     unsigned int id = 0;
+    char * end = (char *)0;
     static const int SATELLITES = sizeof(viewp->sat) / sizeof(viewp->sat[0]);
+    static const char GSV[] = HAZER_NMEA_SENTENCE_GSV;
     
     if (count < 2) {
         /* Do nothing. */
@@ -1241,8 +1252,8 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     } else if (count < 5) {
         /* Do nothing. */
     } else {
-        messages = strtol(vector[1], (char **)0, 10);
-        message = strtol(vector[2], (char **)0, 10);
+        messages = strtol(vector[1], &end, 10);
+        message = strtol(vector[2], &end, 10);
         if (message <= 0) {
             /* Do nothing. */
         } else if (message > messages) {
@@ -1252,7 +1263,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             channel = sequence * HAZER_GNSS_VIEWS;
             first = channel;
             past = channel;
-            satellites = strtol(vector[3], (char **)0, 10);
+            satellites = strtol(vector[3], &end, 10);
             index = 4;
             /*
              * "Null fields are not required for unused sets when less
@@ -1277,7 +1288,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                  * here.
                  */
                 if ((index + 4) >= count) { break; }
-                id = strtol(vector[index], (char **)0, 10);
+                id = strtol(vector[index], &end, 10);
                 ++index;
                 if (id <= 0) { break; }
                 viewp->sat[channel].id = id;
@@ -1294,14 +1305,14 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                     viewp->sat[channel].phantom = !0;
                     viewp->sat[channel].elv_degrees = 0;
                 } else {
-                    viewp->sat[channel].elv_degrees = strtol(vector[index], (char **)0, 10);
+                    viewp->sat[channel].elv_degrees = strtol(vector[index], &end, 10);
                 }
                 ++index;
                 if (strlen(vector[index]) == 0) {
                     viewp->sat[channel].phantom = !0;
                     viewp->sat[channel].azm_degrees = 0;
                 } else {
-                    viewp->sat[channel].azm_degrees = strtol(vector[index], (char **)0, 10);
+                    viewp->sat[channel].azm_degrees = strtol(vector[index], &end, 10);
                 }
                 ++index;
                 if (strlen(vector[index]) == 0) {
@@ -1309,7 +1320,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                     viewp->sat[channel].snr_dbhz = 0;
                 } else {
                     viewp->sat[channel].untracked = 0;
-                    viewp->sat[channel].snr_dbhz = strtol(vector[index], (char **)0, 10);
+                    viewp->sat[channel].snr_dbhz = strtol(vector[index], &end, 10);
                 }
                 ++index;
                 ++channel;
@@ -1333,7 +1344,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             if (index > (count - 2)) {
                 signal = 0;
             } else if (strlen(vector[count - 2]) > 0) {
-                signal = strtol(vector[count - 2], (char **)0, 10);
+                signal = strtol(vector[count - 2], &end, 10);
             } else if (first > 0) {
                 signal = viewp->sat[first - 1].signal;
             } else {
@@ -1365,6 +1376,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
+    char * end = (char *)0;
     static const char RMC[] = HAZER_NMEA_SENTENCE_RMC;
 
     if (count < 2) {
@@ -1386,13 +1398,13 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         /* Not clear what this means on the u-blox UBX-F9P. */
 #endif
     } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[1]);
-        positionp->dmy_nanoseconds = hazer_parse_dmy(vector[9]);
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[1], &end);
+        positionp->dmy_nanoseconds = hazer_parse_dmy(vector[9], &end);
         update_time(positionp);
-        positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
-        positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
-        positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits);
-        positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits);
+        positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits, &end);
+        positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits, &end);
+        positionp->sog_microknots = hazer_parse_sog(vector[7], &positionp->sog_digits, &end);
+        positionp->cog_nanodegrees = hazer_parse_cog(vector[8], &positionp->cog_digits, &end);
         positionp->label = RMC;
         rc = 0;
     }
@@ -1403,6 +1415,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
+    char * end = (char *)0;
     static const char GLL[] = HAZER_NMEA_SENTENCE_GLL;
 
     if (count < 2) {
@@ -1422,10 +1435,10 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
     } else if (strcmp(vector[7], "N") == 0) {
         /* Do nothing. */
     } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[5]);
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[5], &end);
         update_time(positionp);
-        positionp->lat_nanominutes = hazer_parse_latlon(vector[1], *(vector[2]), &positionp->lat_digits);
-        positionp->lon_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lon_digits);
+        positionp->lat_nanominutes = hazer_parse_latlon(vector[1], *(vector[2]), &positionp->lat_digits, &end);
+        positionp->lon_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lon_digits, &end);
         positionp->label = GLL;
         rc = 0;
     }
@@ -1436,6 +1449,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
 int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
+    char * end = (char *)0;
     static const char VTG[] = HAZER_NMEA_SENTENCE_VTG;
 
     if (count < 2) {
@@ -1451,10 +1465,10 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
     } else if (strcmp(vector[9], "N") == 0) {
         /* Do nothing. */
     } else {
-        positionp->cog_nanodegrees = hazer_parse_cog(vector[1], &positionp->cog_digits);
-        positionp->mag_nanodegrees = hazer_parse_cog(vector[3], &positionp->mag_digits);
-        positionp->sog_microknots = hazer_parse_sog(vector[5], &positionp->sog_digits);
-        positionp->sog_millimetersperhour = hazer_parse_smm(vector[7], &positionp->smm_digits);
+        positionp->cog_nanodegrees = hazer_parse_cog(vector[1], &positionp->cog_digits, &end);
+        positionp->mag_nanodegrees = hazer_parse_cog(vector[3], &positionp->mag_digits, &end);
+        positionp->sog_microknots = hazer_parse_sog(vector[5], &positionp->sog_digits, &end);
+        positionp->sog_millimetersperhour = hazer_parse_smm(vector[7], &positionp->smm_digits, &end);
         positionp->label = VTG;
         rc = 0;
    }
@@ -1491,8 +1505,9 @@ int hazer_parse_txt(char * vector[], size_t count)
 int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * activep, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
+    char * end = (char *)0;
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION;
+    static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
 
     if (count < 22) {
         /* Do nothing. */
@@ -1511,25 +1526,25 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
     } else if (strncmp(vector[18], "0", sizeof("0")) == 0) {
         activep->mode = HAZER_MODE_ZERO;
     } else if (strncmp(vector[8], "TT", sizeof("TT")) == 0) {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[2], &end);
         update_time(positionp);
-        positionp->sat_used = strtol(vector[18], (char **)0, 10);
+        positionp->sat_used = strtol(vector[18], &end, 10);
         positionp->label = PUBX;
         activep->mode = HAZER_MODE_TIME;
-        activep->hdop = hazer_parse_dop(vector[15]);
-        activep->vdop = hazer_parse_dop(vector[16]);
-        activep->tdop = hazer_parse_dop(vector[17]);
+        activep->hdop = hazer_parse_dop(vector[15], &end);
+        activep->vdop = hazer_parse_dop(vector[16], &end);
+        activep->tdop = hazer_parse_dop(vector[17], &end);
         activep->label = PUBX;
         /* Do not return success. */
     } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[2], &end);
         update_time(positionp);
-        positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits);
-        positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits);
-        positionp->sep_millimeters = hazer_parse_alt(vector[7], *(vector[12]), &positionp->sep_digits);
-        positionp->sog_millimetersperhour = hazer_parse_smm(vector[11], &positionp->sog_digits);
-        positionp->cog_nanodegrees = hazer_parse_cog(vector[12], &positionp->cog_digits);
-        positionp->sat_used = strtol(vector[18], (char **)0, 10);
+        positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits, &end);
+        positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits, &end);
+        positionp->sep_millimeters = hazer_parse_alt(vector[7], *(vector[12]), &positionp->sep_digits, &end);
+        positionp->sog_millimetersperhour = hazer_parse_smm(vector[11], &positionp->sog_digits, &end);
+        positionp->cog_nanodegrees = hazer_parse_cog(vector[12], &positionp->cog_digits, &end);
+        positionp->sat_used = strtol(vector[18], &end, 10);
         positionp->label = PUBX;
         if (strncmp(vector[8], "DR", sizeof("DR")) == 0) {
             activep->mode = HAZER_MODE_IMU;
@@ -1546,9 +1561,9 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         } else {
             activep->mode = HAZER_MODE_TOTAL;
         }
-        activep->hdop = hazer_parse_dop(vector[15]);
-        activep->vdop = hazer_parse_dop(vector[16]);
-        activep->tdop = hazer_parse_dop(vector[17]);
+        activep->hdop = hazer_parse_dop(vector[15], &end);
+        activep->vdop = hazer_parse_dop(vector[16], &end);
+        activep->tdop = hazer_parse_dop(vector[17], &end);
         activep->label = PUBX;
         rc = 0;
     }
@@ -1559,8 +1574,6 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
 int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char * vector[], size_t count)
 {
     int rc = 0;
-    static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
-    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS;
     int satellites = 0;
     int satellite = 0;
     int channel = 0;
@@ -1570,8 +1583,11 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
     int index = 0;
     int id = 0;
     int system = 0;
+    char * end = (char *)0;
+    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS;
     static const int SATELLITES = sizeof(view[0].sat) / sizeof(view[0].sat[0]);
     static const int RANGERS = sizeof(active[0].id) / sizeof(active[0].id[0]);
+    static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
 
     if (count < 4) {
         /* Do nothing. */
@@ -1590,7 +1606,7 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
     } else {
         index = 3;
         for (satellite = 0; satellite < satellites; ++satellite) {
-            id = strtol(vector[index + 0], (char **)0, 10);
+            id = strtol(vector[index + 0], &end, 10);
             system = hazer_map_pubxid_to_system(id);
             if (system >= HAZER_SYSTEM_TOTAL) {
                 system = HAZER_SYSTEM_GNSS;
@@ -1627,19 +1643,19 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
                 view[system].sat[channel].phantom = !0;
                 view[system].sat[channel].azm_degrees = 0;
             } else {
-                view[system].sat[channel].azm_degrees = strtol(vector[index + 2], (char **)0, 10);
+                view[system].sat[channel].azm_degrees = strtol(vector[index + 2], &end, 10);
             }
             if (strlen(vector[index + 3]) == 0) {
                 view[system].sat[channel].phantom = !0;
                 view[system].sat[channel].elv_degrees = 0;
             } else {
-                view[system].sat[channel].elv_degrees = strtol(vector[index + 3], (char **)0, 10);
+                view[system].sat[channel].elv_degrees = strtol(vector[index + 3], &end, 10);
             }
             if (strlen(vector[index + 4]) == 0) {
                 view[system].sat[channel].untracked = !0;
                 view[system].sat[channel].snr_dbhz = 0;
             } else {
-                view[system].sat[channel].snr_dbhz = strtol(vector[index + 4], (char **)0, 10);
+                view[system].sat[channel].snr_dbhz = strtol(vector[index + 4], &end, 10);
             }
             view[system].sat[channel].signal = 0;
             channel += 1;
@@ -1659,8 +1675,9 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
 int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
-    static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
+    char * end = (char *)0;
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_TIME;
+    static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
 
     if (count < 11) {
         /* Do nothing. */
@@ -1675,8 +1692,8 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
     } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
         /* Do nothing. */
     } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[2]);
-        positionp->dmy_nanoseconds = hazer_parse_dmy(vector[3]);
+        positionp->utc_nanoseconds = hazer_parse_utc(vector[2], &end);
+        positionp->dmy_nanoseconds = hazer_parse_dmy(vector[3], &end);
         update_time(positionp);
         positionp->label = PUBX;
         rc = 0;

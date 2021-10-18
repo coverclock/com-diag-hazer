@@ -215,9 +215,9 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
     } else if (old == TUMBLEWEED_STATE_STOP) {
         /* Do nothing. */
     } else if ((' ' <= ch) && (ch <= '~')) {
-        fprintf(debug, "RTCM %c %c %c 0x%02x%02x%02x 0x%02x '%c'\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch, ch);
+        fprintf(debug, "Machine RTCM %c %c %c 0x%02x%02x%02x 0x%02x '%c'\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch, ch);
     } else {
-        fprintf(debug, "RTCM %c %c %c 0x%02x%02x%02x 0x%02x\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch);
+        fprintf(debug, "Machine RTCM %c %c %c 0x%02x%02x%02x 0x%02x\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch);
     }
 
     return state;
