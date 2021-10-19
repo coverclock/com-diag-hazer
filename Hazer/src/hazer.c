@@ -2530,10 +2530,10 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
     do {
 
         /*
-         * VALIDATE
+         * IDENTIFY
          */
 
-        if (count < 11) {
+        if (count < 3) {
             break;
         }
 
@@ -2550,6 +2550,15 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
         }
 
         if (strcmp(vector[1], ID) != 0) {
+            break;
+        }
+
+        /*
+         * VALIDATE
+         */
+
+        if (count < 11) {
+            enodata = vector[1];
             break;
         }
 
