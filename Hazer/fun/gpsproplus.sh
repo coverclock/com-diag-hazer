@@ -8,8 +8,6 @@
 # application, but alas the device refuses to pair with the
 # Raspberry Pi.
 
-SELF=$$
-
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
 

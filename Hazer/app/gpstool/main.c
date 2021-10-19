@@ -2409,6 +2409,8 @@ consume:
 
                 } else {
 
+                    DIMINUTO_LOG_DEBUG("Reject NMEA GGA\n");
+
                     relinquish_fix("NMEA GGA");
 
                 }
@@ -2426,6 +2428,8 @@ consume:
                     acquire_fix("NMEA RMC");
 
                 } else {
+
+                    DIMINUTO_LOG_DEBUG("Reject NMEA RMC\n");
 
                     relinquish_fix("NMEA RMC");
 
@@ -2445,6 +2449,8 @@ consume:
 
                 } else {
 
+                    DIMINUTO_LOG_DEBUG("Reject NMEA GLL\n");
+
                     relinquish_fix("NMEA GLL");
 
                 }
@@ -2457,6 +2463,10 @@ consume:
                     refresh = !0;
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA VTG\n");
+
+                } else {
+
+                    DIMINUTO_LOG_DEBUG("Reject NMEA VTG\n");
 
                 }
 
@@ -2509,6 +2519,10 @@ consume:
                         relinquish_fix("NMEA GSA");
                     }
 
+                } else {
+
+                    DIMINUTO_LOG_DEBUG("Reject NMEA GSA\n");
+
                 }
 
             } else if (hazer_is_nmea_name(vector, HAZER_NMEA_SENTENCE_GSV)) {
@@ -2531,6 +2545,10 @@ consume:
                         DIMINUTO_LOG_DEBUG("Parse NMEA GSV (partial)\n");
                     }
 
+                } else {
+
+                    DIMINUTO_LOG_DEBUG("Reject NMEA GSV\n");
+
                 }
 
             } else if (hazer_is_nmea_name(vector, HAZER_NMEA_SENTENCE_TXT)) {
@@ -2538,6 +2556,10 @@ consume:
                 if  (hazer_parse_txt(vector, count) == 0) {
 
                     DIMINUTO_LOG_INFORMATION("Parse NMEA TXT \"%.*s\"", (int)(length - 2) /* Exclude CR and LF. */, buffer);
+
+                } else {
+
+                    DIMINUTO_LOG_DEBUG("Reject NMEA TXT\n");
 
                 }
 
@@ -2555,6 +2577,8 @@ consume:
                     acquire_fix("PUBX POSITION");
 
                 } else {
+
+                    DIMINUTO_LOG_DEBUG("Reject PUBX POSITION\n");
 
                     relinquish_fix("PUBX POSITION");
 
@@ -2584,6 +2608,10 @@ consume:
                         }
                     }
 
+                } else {
+
+                    DIMINUTO_LOG_DEBUG("Reject PUBX SVSTATUS\n");
+
                 }
 
             } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && hazer_is_pubx_id(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME)) {
@@ -2604,6 +2632,10 @@ consume:
                      */
 
                     DIMINUTO_LOG_DEBUG("Parse PUBX TIME\n");
+
+                } else {
+
+                    DIMINUTO_LOG_DEBUG("Reject PUBX TIME\n");
 
                 }
 

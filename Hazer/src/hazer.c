@@ -2083,64 +2083,226 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION;
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
 
-    if (count < 22) {
-        /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
-        /* Do nothing. */
-    } else if (vector[0][0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
-    } else if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
-        /* Do nothing. */
-    } else if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
-        /* Do nothing. */
-    } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
-        /* Do nothing. */
-    } else if (strncmp(vector[8], "NF", sizeof("NF")) == 0) {
-        activep->mode = HAZER_MODE_NOFIX;
-    } else if (strncmp(vector[18], "0", sizeof("0")) == 0) {
-        activep->mode = HAZER_MODE_ZERO;
-    } else if (strncmp(vector[8], "TT", sizeof("TT")) == 0) {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[2], &end);
-        update_time(positionp);
-        positionp->sat_used = strtol(vector[18], &end, 10);
-        positionp->label = PUBX;
-        activep->mode = HAZER_MODE_TIME;
-        activep->hdop = hazer_parse_dop(vector[15], &end);
-        activep->vdop = hazer_parse_dop(vector[16], &end);
-        activep->tdop = hazer_parse_dop(vector[17], &end);
-        activep->label = PUBX;
-        /* Do not return success. */
-    } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[2], &end);
-        update_time(positionp);
-        positionp->lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &positionp->lat_digits, &end);
-        positionp->lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &positionp->lon_digits, &end);
-        positionp->sep_millimeters = hazer_parse_alt(vector[7], *(vector[12]), &positionp->sep_digits, &end);
-        positionp->sog_millimetersperhour = hazer_parse_smm(vector[11], &positionp->sog_digits, &end);
-        positionp->cog_nanodegrees = hazer_parse_cog(vector[12], &positionp->cog_digits, &end);
-        positionp->sat_used = strtol(vector[18], &end, 10);
-        positionp->label = PUBX;
-        if (strncmp(vector[8], "DR", sizeof("DR")) == 0) {
-            activep->mode = HAZER_MODE_IMU;
-        } else if (strncmp(vector[8], "G2", sizeof("G2")) == 0) {
-            activep->mode = HAZER_MODE_2D;
-        } else if (strncmp(vector[8], "G3", sizeof("G3")) == 0) {
-            activep->mode = HAZER_MODE_3D;
-        } else if (strncmp(vector[8], "RK", sizeof("RK")) == 0) {
-            activep->mode = HAZER_MODE_COMBINED;
-        } else if (strncmp(vector[8], "D2", sizeof("D2")) == 0) {
-            activep->mode = HAZER_MODE_DGNSS2D;
-        } else if (strncmp(vector[8], "D3", sizeof("D3")) == 0) {
-            activep->mode = HAZER_MODE_DGNSS3D;
-        } else {
-            activep->mode = HAZER_MODE_TOTAL;
+    do {
+
+        /*
+         * IDENTIFY
+         */
+
+        if (count < 3) {
+            break;
         }
-        activep->hdop = hazer_parse_dop(vector[15], &end);
-        activep->vdop = hazer_parse_dop(vector[16], &end);
-        activep->tdop = hazer_parse_dop(vector[17], &end);
+
+        if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
+            break;
+        }
+
+        if (vector[0][0] != HAZER_STIMULUS_START) {
+            break;
+        }
+
+        if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
+            break;
+        }
+
+        if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
+            break;
+        }
+
+        if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
+            break;
+        }
+
+        /*
+         * VALIDATE
+         */
+
+        if (count < 22) {
+            enodata = vector[1];
+            break;
+        }
+
+        if (strncmp(vector[8], "NF", sizeof("NF")) == 0) {
+            activep->mode = HAZER_MODE_NOFIX;
+            break;
+        }
+
+        if (strncmp(vector[18], "0", sizeof("0")) == 0) {
+            activep->mode = HAZER_MODE_ZERO;
+            break;
+        }
+
+        if (strncmp(vector[8], "TT", sizeof("TT")) == 0) {
+
+            position.utc_nanoseconds = hazer_parse_utc(vector[2], &end);
+            if (*end != '\0') {
+                einval = vector[2];
+                break;
+            }
+
+            position.sat_used = strtol(vector[18], &end, 10);
+            if (*end != '\0') {
+                einval = vector[18];
+                break;
+            }
+
+            active.mode = HAZER_MODE_TIME;
+
+            active.hdop = hazer_parse_dop(vector[15], &end);
+            if (*end != '\0') {
+                einval = vector[15];
+                break;
+            }
+
+            active.vdop = hazer_parse_dop(vector[16], &end);
+            if (*end != '\0') {
+                einval = vector[16];
+                break;
+            }
+
+            active.tdop = hazer_parse_dop(vector[17], &end);
+            if (*end != '\0') {
+                einval = vector[17];
+                break;
+            }
+
+            /*
+             * APPLY
+             */
+
+            positionp->utc_nanoseconds = position.utc_nanoseconds;
+            update_time(positionp);
+
+            positionp->sat_used = position.sat_used;
+
+            positionp->label = PUBX;
+
+            activep->mode = active.mode;
+
+            activep->hdop = active.hdop;
+            activep->vdop = active.vdop;
+            activep->tdop = active.tdop;
+
+            activep->label = PUBX;
+
+            rc = 0;
+
+            break;
+        }
+
+        position.utc_nanoseconds = hazer_parse_utc(vector[2], &end);
+        if (*end != '\0') {
+            einval = vector[2];
+            break;
+        }
+
+        position.lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &position.lat_digits, &end);
+        if (*end != '\0') {
+            einval = vector[3];
+            break;
+        }
+
+        position.lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &position.lon_digits, &end);
+        if (*end != '\0') {
+            einval = vector[5];
+            break;
+        }
+
+        position.sep_millimeters = hazer_parse_alt(vector[7], *(vector[12]), &position.sep_digits, &end);
+        if (*end != '\0') {
+            einval = vector[7];
+            break;
+        }
+
+        if (strncmp(vector[8], "DR", sizeof("DR")) == 0) {
+            active.mode = HAZER_MODE_IMU;
+        } else if (strncmp(vector[8], "G2", sizeof("G2")) == 0) {
+            active.mode = HAZER_MODE_2D;
+        } else if (strncmp(vector[8], "G3", sizeof("G3")) == 0) {
+            active.mode = HAZER_MODE_3D;
+        } else if (strncmp(vector[8], "RK", sizeof("RK")) == 0) {
+            active.mode = HAZER_MODE_COMBINED;
+        } else if (strncmp(vector[8], "D2", sizeof("D2")) == 0) {
+            active.mode = HAZER_MODE_DGNSS2D;
+        } else if (strncmp(vector[8], "D3", sizeof("D3")) == 0) {
+            active.mode = HAZER_MODE_DGNSS3D;
+        } else {
+            active.mode = HAZER_MODE_TOTAL;
+        }
+
+        position.sog_millimetersperhour = hazer_parse_smm(vector[11], &position.sog_digits, &end);
+        if (*end != '\0') {
+            einval = vector[11];
+            break;
+        }
+
+        position.cog_nanodegrees = hazer_parse_cog(vector[12], &position.cog_digits, &end);
+        if (*end != '\0') {
+            einval = vector[12];
+            break;
+        }
+
+        position.sat_used = strtol(vector[18], &end, 10);
+        if (*end != '\0') {
+            einval = vector[18];
+            break;
+        }
+
+        active.hdop = hazer_parse_dop(vector[15], &end);
+        if (*end != '\0') {
+            einval = vector[15];
+            break;
+        }
+
+        active.vdop = hazer_parse_dop(vector[16], &end);
+        if (*end != '\0') {
+            einval = vector[16];
+            break;
+        }
+
+        active.tdop = hazer_parse_dop(vector[17], &end);
+        if (*end != '\0') {
+            einval = vector[3];
+            break;
+        }
+
+        /*
+         * APPLY
+         */
+
+        positionp->utc_nanoseconds = position.utc_nanoseconds;
+        update_time(positionp);
+
+        positionp->lat_nanominutes = position.lat_nanominutes;
+        positionp->lat_digits = position.lat_digits;
+
+        positionp->lon_nanominutes = position.lon_nanominutes;
+        positionp->lon_digits = position.lon_digits;
+
+        positionp->sep_millimeters = position.sep_millimeters;
+        positionp->sep_digits = position.sep_digits;
+
+        positionp->sog_millimetersperhour = position.sog_millimetersperhour;
+        positionp->sog_digits = position.sog_digits;
+
+        positionp->cog_nanodegrees = position.cog_nanodegrees;
+        positionp->cog_digits = position.cog_digits;
+
+        positionp->sat_used = position.sat_used;
+
+        positionp->label = PUBX;
+
+        activep->mode = active.mode;
+
+        activep->hdop = active.hdop;
+        activep->vdop = active.vdop;
+        activep->tdop = active.tdop;
+
         activep->label = PUBX;
+
         rc = 0;
-    }
+
+    } while (0);
 
     if (enodata != (char *)0) {
         errno = ENODATA;
