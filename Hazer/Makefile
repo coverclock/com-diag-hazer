@@ -20,7 +20,7 @@ default:	all
 
 TITLE				:=	Hazer
 
-MAJOR				:=	47# API changes that may require that applications be modified.
+MAJOR				:=	48# API changes that may require that applications be modified.
 MINOR				:=	0# Only functionality or features added with no legacy API changes.
 BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
 

@@ -985,6 +985,10 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 <https://tf.nist.gov/general/pdf/1568.pdf> Harold Lyons,
 "Atomic Clocks", *Scientific American*, 1957-02 (archived on a NIST website)
 
+<http://freenmea.net/docs>
+
+<https://www.sparkfun.com/datasheets/GPS/NMEA%20Reference%20Manual-Rev2.1-Dec07.pdf>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>

@@ -213,7 +213,13 @@ suggests this is not an issue in the serial-to-USB conversion.
 
 Bad Elf support ticket 43008 submitted 2021-10-14 08:14MDT.
 
-Addendum: Here's another example: there is a missing comma before the "N"
+Update 2021-10-18: an engineer at Bad Elf has explained that the GPS
+Pro Plus+ must alter and regenerate the NMEA sentences produced by the
+MTK GPS device to make them palatable to the native parser in the Apple
+iPhone and iPad products. This explains the correct checksums on the
+incorrect sentences.
+
+Addendum 1: Here's another example: there is a missing comma before the "N"
 direction indication, yet the checksum is correct. It took almost five hours
 for this to show up (although a similar error might have occurred earlier
 and not been in a field checked by an assert).
@@ -225,3 +231,9 @@ Compare with the correct sentence:
 
     checksum '$GPRMC,002525.000,A,3947.6529,N,10509.2015,W,0.01,68.88,161021,,,D*65'
     $GPRMC,002525.000,A,3947.6529,N,10509.2015,W,0.01,68.88,161021,,,D*49\r\n
+
+Addennum 2: Yet another: note the missing comma after the "W".
+
+    checksum '$GPRMC,012859.000,A,3947.6540,N,10509.2019,W0.01,125.17,191021,,,D*50'
+    $GPRMC,012859.000,A,3947.6540,N,10509.2019,W0.01,125.17,191021,,,D*50\r\n
+

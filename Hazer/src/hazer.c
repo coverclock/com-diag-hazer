@@ -536,7 +536,7 @@ int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digits
     uint64_t denominator = 1;
     unsigned long dddmm = 0;
     uint8_t digits = 0;
-    static char error = '?';
+    static char invalid = '?';
 
     digits = strlen(string);
 
@@ -571,8 +571,8 @@ int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digits
              * be indicated, but the indicated character may not
              * be correct.
              */
-            error = direction;
-            *endp = &error;
+            invalid = direction;
+            *endp = &invalid;
             break;
         }
     }
@@ -1124,6 +1124,12 @@ static void update_time(hazer_position_t * positionp)
  ******************************************************************************/
 
 /*
+ * Note that the count passed to the terminating parsers include the
+ * terminating null pointer in the token vector. So a token vector
+ * containing a single token would have a count of two: [ "token", NULL ].
+ */
+
+/*
  * I am frequently tempted to replace the numerical constants used as counts
  * and indices below with symbolic constants, but I find they actually make
  * the code a lot harder to read, to debug, and to compare against the NMEA
@@ -1136,20 +1142,31 @@ static void update_time(hazer_position_t * positionp)
  * intended.
  */
 
+/*
+ * The most recent copy of the NMEA 0183 standard I have is 4.10. There is a
+ * 4.11 version now, but NMEA wants an (IMO) astronomical $2000 for a copy of
+ * it. It's time for GPS receiver manufacturers to form an industry association
+ * to fork the NMEA standard and produces a non-proprietary (or at least
+ * reasonably priced) standard. Or maybe ISO to do so (although that wouldn't
+ * be cheap either.)
+ */
+
 int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     char * end = (char *)0;
+    char * enodata = (char *)0;
+    char * einval = (char *)0;
     hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char GGA[] = HAZER_NMEA_SENTENCE_GGA;
 
     do {
 
         /*
-         * VALIDATE
+         * IDENTIFY
          */
     
-        if (count < 14) {
+        if (count < 2) {
             break;
         }
 
@@ -1165,10 +1182,18 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
+        /*
+         * VALIDATE
+         */
+    
+        if (count < 16) {
+            enodata = vector[0];
+            break;
+        }
+
         position.sat_used = strtol(vector[7], &end, 10);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[7]);
+            einval = vector[7];
             break;
         }
 
@@ -1179,36 +1204,31 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 
         position.utc_nanoseconds = hazer_parse_utc(vector[1], &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[1]);
+            einval = vector[1];
             break;
         }
 
         position.lat_nanominutes = hazer_parse_latlon(vector[2], *(vector[3]), &position.lat_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[2]);
+            einval = vector[2];
             break;
         }
 
         position.lon_nanominutes = hazer_parse_latlon(vector[4], *(vector[5]), &position.lon_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[4]);
+            einval = vector[4];
             break;
         }
 
         position.alt_millimeters = hazer_parse_alt(vector[9], *(vector[10]), &position.alt_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[9]);
+            einval = vector[9];
             break;
         }
 
         position.sep_millimeters = hazer_parse_alt(vector[11], *(vector[12]), &position.sep_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[11]);
+            einval = vector[11];
             break;
         }
 
@@ -1239,6 +1259,16 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 
     } while (0);
 
+    if (enodata != (char *)0) {
+        errno = ENODATA;
+        perror(enodata);
+    }
+
+    if (einval != (char *)0) {
+        errno = EINVAL;
+        perror(einval);
+    }
+
     return rc;
 }
 
@@ -1251,6 +1281,8 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     int satellites = 0;
     int system = 0;
     char * end = (char *)0;
+    char * enodata = (char *)0;
+    char * einval = (char *)0;
     hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
     static const int IDENTIFIERS = sizeof(activep->id) / sizeof(activep->id[0]);
     static const char GSA[] = HAZER_NMEA_SENTENCE_GSA;
@@ -1258,10 +1290,10 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
     do {
 
         /*
-         * VALIDATE
+         * IDENTIFY
          */
 
-        if (count < 19) {
+        if (count < 2) {
             break;
         }
 
@@ -1277,18 +1309,20 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
             break;
         }
 
+        /*
+         * VALIDATE
+         */
+
+        if (count < 19) {
+            enodata = vector[0];
+            break;
+        }
+
         active.mode = strtoul(vector[2], &end, 10);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[2]);
+            einval = vector[2];
             break;
         }
-#if 0
-        if (active.mode == HAZER_MODE_NOFIX) {
-            activep->mode = HAZER_MODE_NOFIX;
-            break;
-        }
-#endif
         if (!((HAZER_MODE <= active.mode) && (active.mode < HAZER_MODE_TOTAL))) {
             active.mode = HAZER_MODE_TOTAL;
         }
@@ -1296,8 +1330,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         for (slot = 0; slot < IDENTIFIERS; ++slot) {
             id = strtol(vector[index], &end, 10);
             if (*end != '\0') {
-                errno = EINVAL;
-                perror(vector[index]);
+                einval = vector[index];
                 break;
             }
             if (id <= 0) {
@@ -1320,22 +1353,19 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 
         active.pdop = hazer_parse_dop(vector[15], &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[15]);
+            einval = vector[15];
             break;
         }
 
         active.hdop = hazer_parse_dop(vector[16], &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[16]);
+            einval = vector[16];
             break;
         }
 
         active.vdop = hazer_parse_dop(vector[17], &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[17]);
+            einval = vector[17];
             break;
         }
 
@@ -1350,8 +1380,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 
             system = strtol(vector[18], &end, 10);
             if (*end != '\0') {
-                errno = EINVAL;
-                perror(vector[18]);
+                einval = vector[18];
                 break;
             }
 
@@ -1388,6 +1417,16 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
 
     } while (0);
 
+    if (enodata != (char *)0) {
+        errno = ENODATA;
+        perror(enodata);
+    }
+
+    if (einval != (char *)0) {
+        errno = EINVAL;
+        perror(einval);
+    }
+
     return rc;
 }
 
@@ -1407,6 +1446,8 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int signal = 0;
     unsigned int id = 0;
     char * end = (char *)0;
+    char * enodata = (char *)0;
+    char * einval = (char *)0;
     hazer_view_t view = HAZER_VIEW_INITIALIZER;
     static const int SATELLITES = sizeof(viewp->sat) / sizeof(viewp->sat[0]);
     static const char GSV[] = HAZER_NMEA_SENTENCE_GSV;
@@ -1414,10 +1455,10 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     do {
 
         /*
-         * VALIDATE
+         * IDENTIFY
          */
     
-        if (count < 5) {
+        if (count < 2) {
             break;
         }
 
@@ -1433,17 +1474,24 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             break;
         }
 
+        /*
+         * VALIDATE
+         */
+    
+        if (count < 5) {
+            enodata = vector[0];
+            break;
+        }
+
         messages = strtol(vector[1], &end, 10);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[1]);
+            einval = vector[1];
             break;
         }
 
         message = strtol(vector[2], &end, 10);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[2]);
+            einval = vector[2];
             break;
         }
 
@@ -1461,8 +1509,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         past = channel;
         satellites = strtol(vector[3], &end, 10);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[3]);
+            einval = vector[3];
             break;
         }
 
@@ -1503,8 +1550,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 
             id = strtol(vector[index], &end, 10);
             if (*end != '\0') {
-                errno = EINVAL;
-                perror(vector[index]);
+                einval = vector[index];
                 break;
             }
 
@@ -1532,8 +1578,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             } else {
                 view.sat[channel].elv_degrees = strtol(vector[index], &end, 10);
                 if (*end != '\0') {
-                    errno = EINVAL;
-                    perror(vector[index]);
+                    einval = vector[index];
                     break;
                 }
             }
@@ -1546,8 +1591,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             } else {
                 view.sat[channel].azm_degrees = strtol(vector[index], &end, 10);
                 if (*end != '\0') {
-                    errno = EINVAL;
-                    perror(vector[index]);
+                    einval = vector[index];
                     break;
                 }
             }
@@ -1561,8 +1605,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                 view.sat[channel].untracked = 0;
                 view.sat[channel].snr_dbhz = strtol(vector[index], &end, 10);
                 if (*end != '\0') {
-                    errno = EINVAL;
-                    perror(vector[index]);
+                    einval = vector[index];
                     break;
                 }
             }
@@ -1597,8 +1640,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         } else if (strlen(vector[count - 2]) > 0) {
             signal = strtol(vector[count - 2], &end, 10);
             if (*end != '\0') {
-                errno = EINVAL;
-                perror(vector[count - 2]);
+                einval = vector[count - 2];
                 break;
             }
         } else if (first > 0) {
@@ -1658,6 +1700,16 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 
     } while (0);
 
+    if (enodata != (char *)0) {
+        errno = ENODATA;
+        perror(enodata);
+    }
+
+    if (einval != (char *)0) {
+        errno = EINVAL;
+        perror(einval);
+    }
+
     return rc;
 }
 
@@ -1665,16 +1717,18 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     char * end = (char *)0;
+    char * enodata = (char *)0;
+    char * einval = (char *)0;
     hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char RMC[] = HAZER_NMEA_SENTENCE_RMC;
 
     do {
 
         /*
-         * VALIDATE
+         * IDENTIFY
          */
 
-        if (count < 11) {
+        if (count < 2) {
             break;
         }
 
@@ -1690,13 +1744,24 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
+        /*
+         * VALIDATE
+         */
+
+        if (count < 13) {
+            enodata = vector[0];
+            break;
+        }
+
         if (strcmp(vector[2], "A") != 0) {
             break;
         }
 
-        if ((count > 13) && (strcmp(vector[12], "N") == 0)) { /* NMEA 2.3+ */
+#if 0
+        if ((count > 13) && (strcmp(vector[12], "N") == 0)) { /* NMEA 2.30+ */
             break;
         }
+#endif
 
 #if 0
         if ((count > 14) && (strcmp(vector[13], "V") == 0)) { /* NMEA 4.10+ */
@@ -1707,42 +1772,36 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 
         position.utc_nanoseconds = hazer_parse_utc(vector[1], &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[1]);
+            einval = vector[1];
             break;
         }
         position.lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &position.lat_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[3]);
+            einval = vector[3];
             break;
         }
 
         position.lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &position.lon_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[5]);
+            einval = vector[5];
             break;
         }
 
         position.sog_microknots = hazer_parse_sog(vector[7], &position.sog_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[7]);
+            einval = vector[7];
             break;
         }
 
         position.cog_nanodegrees = hazer_parse_cog(vector[8], &position.cog_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[8]);
+            einval = vector[8];
             break;
         }
 
         position.dmy_nanoseconds = hazer_parse_dmy(vector[9], &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[9]);
+            einval = vector[9];
             break;
         }
 
@@ -1773,6 +1832,16 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 
     } while (0);
 
+    if (enodata != (char *)0) {
+        errno = ENODATA;
+        perror(enodata);
+    }
+
+    if (einval != (char *)0) {
+        errno = EINVAL;
+        perror(einval);
+    }
+
     return rc;
 }
 
@@ -1780,16 +1849,18 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     char * end = (char *)0;
+    char * enodata = (char *)0;
+    char * einval = (char *)0;
     hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char GLL[] = HAZER_NMEA_SENTENCE_GLL;
 
     do {
 
         /*
-         * VALIDATE
+         * IDENTIFY
          */
 
-        if (count < 9) {
+        if (count < 2) {
             break;
         }
 
@@ -1805,35 +1876,40 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
+        /*
+         * VALIDATE
+         */
+
+        if (count < 8) {
+            enodata = vector[0];
+            break;
+        }
+
+        if (strcmp(vector[6], "A") != 0) {
+            break;
+        }
+
 #if 0
-        if (strcmp(vector[6], "V") == 0) {
-            /* Not clear what this means on the u-blox UBX-F9P. */
+        if ((count >= 9) && (strcmp(vector[7], "N") == 0)) {
             break;
         }
 #endif
 
-        if (strcmp(vector[7], "N") == 0) {
-            break;
-        }
-
         position.lat_nanominutes = hazer_parse_latlon(vector[1], *(vector[2]), &position.lat_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[1]);
+            einval = vector[1];
             break;
         }
 
         position.lon_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &position.lon_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[3]);
+            einval = vector[3];
             break;
         }
 
         position.utc_nanoseconds = hazer_parse_utc(vector[5], &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[5]);
+            einval = vector[5];
             break;
         }
 
@@ -1856,6 +1932,16 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
 
     } while (0);
 
+    if (enodata != (char *)0) {
+        errno = ENODATA;
+        perror(enodata);
+    }
+
+    if (einval != (char *)0) {
+        errno = EINVAL;
+        perror(einval);
+    }
+
     return rc;
 }
 
@@ -1863,16 +1949,18 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     char * end = (char *)0;
+    char * enodata = (char *)0;
+    char * einval = (char *)0;
     hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char VTG[] = HAZER_NMEA_SENTENCE_VTG;
 
     do {
 
         /*
-         * VALIDATE
+         * IDENTIFY
          */
 
-        if (count < 11) {
+        if (count < 2) {
             break;
         }
 
@@ -1888,35 +1976,40 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
+        /*
+         * VALIDATE
+         */
+
+        if (count < 10) {
+            enodata = vector[0];
+            break;
+        }
+
         if (strcmp(vector[9], "N") == 0) {
             break;
         }
 
         position.cog_nanodegrees = hazer_parse_cog(vector[1], &position.cog_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[1]);
+            einval = vector[1];
             break;
         }
 
         position.mag_nanodegrees = hazer_parse_cog(vector[3], &position.mag_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[3]);
+            einval = vector[3];
             break;
         }
 
         position.sog_microknots = hazer_parse_sog(vector[5], &position.sog_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[5]);
+            einval = vector[5];
             break;
         }
 
         position.sog_millimetersperhour = hazer_parse_smm(vector[7], &position.smm_digits, &end);
         if (*end != '\0') {
-            errno = EINVAL;
-            perror(vector[7]);
+            einval = vector[7];
             break;
         }
 
@@ -1942,6 +2035,16 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
 
    } while (0);
 
+    if (enodata != (char *)0) {
+        errno = ENODATA;
+        perror(enodata);
+    }
+
+    if (einval != (char *)0) {
+        errno = EINVAL;
+        perror(einval);
+    }
+
     return rc;
 }
 
@@ -1950,7 +2053,7 @@ int hazer_parse_txt(char * vector[], size_t count)
     int rc = -1;
     static const char TXT[] = HAZER_NMEA_SENTENCE_TXT;
 
-    if (count < 5) {
+    if (count < 2) {
         /* Do nothing. */
     } else if (strnlen(vector[0], sizeof("$XXTXT")) != (sizeof("$XXTXT") - 1)) {
         /* Do nothing. */
@@ -1960,7 +2063,7 @@ int hazer_parse_txt(char * vector[], size_t count)
         /* Do nothing. */
     } else {
         rc = 0;
-   }
+    }
 
     return rc;
 }
@@ -1973,6 +2076,10 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
 {
     int rc = -1;
     char * end = (char *)0;
+    char * enodata = (char *)0;
+    char * einval = (char *)0;
+    hazer_position_t position = HAZER_POSITION_INITIALIZER;
+    hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION;
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
 
@@ -2035,6 +2142,16 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         rc = 0;
     }
 
+    if (enodata != (char *)0) {
+        errno = ENODATA;
+        perror(enodata);
+    }
+
+    if (einval != (char *)0) {
+        errno = EINVAL;
+        perror(einval);
+    }
+
     return rc;
 }
 
@@ -2051,6 +2168,10 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
     int id = 0;
     int system = 0;
     char * end = (char *)0;
+    char * enodata = (char *)0;
+    char * einval = (char *)0;
+    hazer_position_t positions = HAZER_POSITION_INITIALIZER;
+    hazer_active_t actives = HAZER_ACTIVE_INITIALIZER;
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS;
     static const int SATELLITES = sizeof(view[0].sat) / sizeof(view[0].sat[0]);
     static const int RANGERS = sizeof(active[0].id) / sizeof(active[0].id[0]);
@@ -2136,6 +2257,16 @@ int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char
         }
     }
 
+    if (enodata != (char *)0) {
+        errno = ENODATA;
+        perror(enodata);
+    }
+
+    if (einval != (char *)0) {
+        errno = EINVAL;
+        perror(einval);
+    }
+
     return rc;
 }
 
@@ -2143,27 +2274,76 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
 {
     int rc = -1;
     char * end = (char *)0;
+    char * enodata = (char *)0;
+    char * einval = (char *)0;
+    hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_TIME;
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
 
-    if (count < 11) {
-        /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
-        /* Do nothing. */
-    } else if (vector[0][0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
-    } else if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
-        /* Do nothing. */
-    } else if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
-        /* Do nothing. */
-    } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
-        /* Do nothing. */
-    } else {
-        positionp->utc_nanoseconds = hazer_parse_utc(vector[2], &end);
-        positionp->dmy_nanoseconds = hazer_parse_dmy(vector[3], &end);
+    do {
+
+        /*
+         * VALIDATE
+         */
+
+        if (count < 11) {
+            break;
+        }
+
+        if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
+            break;
+        }
+
+        if (vector[0][0] != HAZER_STIMULUS_START) {
+            break;
+        }
+
+        if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
+            break;
+        }
+
+        if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
+            break;
+        }
+
+        if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
+            break;
+        }
+
+        position.utc_nanoseconds = hazer_parse_utc(vector[2], &end);
+        if (*end != '\0') {
+            einval = vector[2];
+            break;
+        }
+
+        position.dmy_nanoseconds = hazer_parse_dmy(vector[3], &end);
+        if (*end != '\0') {
+            einval = vector[3];
+            break;
+        }
+
+        /*
+         * APPLY
+         */
+
+        positionp->utc_nanoseconds = position.utc_nanoseconds;
+        positionp->dmy_nanoseconds = position.dmy_nanoseconds;
         update_time(positionp);
+
         positionp->label = PUBX;
+
         rc = 0;
+
+    } while (0);
+
+    if (enodata != (char *)0) {
+        errno = ENODATA;
+        perror(enodata);
+    }
+
+    if (einval != (char *)0) {
+        errno = EINVAL;
+        perror(einval);
     }
 
     return rc;
