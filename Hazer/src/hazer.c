@@ -882,7 +882,7 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
     } else {
         for (ii = 0; ii < HAZER_TALKER_TOTAL; ++ii) {
             name = HAZER_TALKER_NAME[ii];
-            rc = strncmp(id, name, strlen(name));
+            rc = strncmp(id, name, strlen(name)); /* Compare just the prefix. */
             if (rc < 0) {
                 break;
             } else if (rc == 0) {
@@ -1178,7 +1178,7 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
-        if (strncmp(vector[0] + sizeof("$XX") - 1, GGA, sizeof(GGA) - 1) != 0) {
+        if (strcmp(vector[0] + sizeof("$XX") - 1, GGA) != 0) {
             break;
         }
 
@@ -1305,7 +1305,7 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
             break;
         }
 
-        if (strncmp(vector[0] + sizeof("$XX") - 1, GSA, sizeof(GSA) - 1) != 0) {
+        if (strcmp(vector[0] + sizeof("$XX") - 1, GSA) != 0) {
             break;
         }
 
@@ -1470,7 +1470,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             break;
         }
 
-        if (strncmp(vector[0] + sizeof("$XX") - 1, GSV, sizeof(GSV) - 1) != 0) {
+        if (strcmp(vector[0] + sizeof("$XX") - 1, GSV) != 0) {
             break;
         }
 
@@ -1740,7 +1740,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
-        if (strncmp(vector[0] + sizeof("$XX") - 1, RMC, sizeof(RMC) - 1) != 0) {
+        if (strcmp(vector[0] + sizeof("$XX") - 1, RMC) != 0) {
             break;
         }
 
@@ -1872,7 +1872,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
-        if (strncmp(vector[0] + sizeof("$XX") - 1, GLL, sizeof(GLL) - 1) != 0) {
+        if (strcmp(vector[0] + sizeof("$XX") - 1, GLL) != 0) {
             break;
         }
 
@@ -1972,7 +1972,7 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
-        if (strncmp(vector[0] + sizeof("$XX") - 1, VTG, sizeof(VTG) - 1) != 0) {
+        if (strcmp(vector[0] + sizeof("$XX") - 1, VTG) != 0) {
             break;
         }
 
@@ -2059,7 +2059,7 @@ int hazer_parse_txt(char * vector[], size_t count)
         /* Do nothing. */
     } else if (*vector[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
-    } else if (strncmp(vector[0] + sizeof("$XX") - 1, TXT, sizeof(TXT) - 1) != 0) {
+    } else if (strcmp(vector[0] + sizeof("$XX") - 1, TXT) != 0) {
         /* Do nothing. */
     } else {
         rc = 0;
