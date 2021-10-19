@@ -2080,8 +2080,8 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
     char * einval = (char *)0;
     hazer_position_t position = HAZER_POSITION_INITIALIZER;
     hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
-    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION;
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
+    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION;
 
     do {
 
@@ -2101,15 +2101,11 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
             break;
         }
 
-        if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
+        if (strcmp(&vector[0][1], PUBX) != 0) {
             break;
         }
 
-        if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
-            break;
-        }
-
-        if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
+        if (strcmp(vector[1], ID) != 0) {
             break;
         }
 
@@ -2122,17 +2118,17 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
             break;
         }
 
-        if (strncmp(vector[8], "NF", sizeof("NF")) == 0) {
+        if (strcmp(vector[8], "NF") == 0) {
             activep->mode = HAZER_MODE_NOFIX;
             break;
         }
 
-        if (strncmp(vector[18], "0", sizeof("0")) == 0) {
+        if (strcmp(vector[18], "0") == 0) {
             activep->mode = HAZER_MODE_ZERO;
             break;
         }
 
-        if (strncmp(vector[8], "TT", sizeof("TT")) == 0) {
+        if (strcmp(vector[8], "TT") == 0) {
 
             position.utc_nanoseconds = hazer_parse_utc(vector[2], &end);
             if (*end != '\0') {
@@ -2214,17 +2210,17 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
             break;
         }
 
-        if (strncmp(vector[8], "DR", sizeof("DR")) == 0) {
+        if (strcmp(vector[8], "DR") == 0) {
             active.mode = HAZER_MODE_IMU;
-        } else if (strncmp(vector[8], "G2", sizeof("G2")) == 0) {
+        } else if (strcmp(vector[8], "G2") == 0) {
             active.mode = HAZER_MODE_2D;
-        } else if (strncmp(vector[8], "G3", sizeof("G3")) == 0) {
+        } else if (strcmp(vector[8], "G3") == 0) {
             active.mode = HAZER_MODE_3D;
-        } else if (strncmp(vector[8], "RK", sizeof("RK")) == 0) {
+        } else if (strcmp(vector[8], "RK") == 0) {
             active.mode = HAZER_MODE_COMBINED;
-        } else if (strncmp(vector[8], "D2", sizeof("D2")) == 0) {
+        } else if (strcmp(vector[8], "D2") == 0) {
             active.mode = HAZER_MODE_DGNSS2D;
-        } else if (strncmp(vector[8], "D3", sizeof("D3")) == 0) {
+        } else if (strcmp(vector[8], "D3") == 0) {
             active.mode = HAZER_MODE_DGNSS3D;
         } else {
             active.mode = HAZER_MODE_TOTAL;
@@ -2317,107 +2313,196 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
     return rc;
 }
 
-int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char * vector[], size_t count)
+int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], char * vector[], size_t count)
 {
-    int rc = 0;
+    int rc = -1;
+    int result = 0;
     int satellites = 0;
     int satellite = 0;
     int channel = 0;
     int channels[HAZER_SYSTEM_TOTAL] = { 0, };
     int ranger = 0;
     int rangers[HAZER_SYSTEM_TOTAL] = { 0, };
-    int index = 0;
+    int index = 3;
     int id = 0;
     int system = 0;
     char * end = (char *)0;
     char * enodata = (char *)0;
     char * einval = (char *)0;
-    hazer_position_t positions = HAZER_POSITION_INITIALIZER;
-    hazer_active_t actives = HAZER_ACTIVE_INITIALIZER;
-    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS;
-    static const int SATELLITES = sizeof(view[0].sat) / sizeof(view[0].sat[0]);
-    static const int RANGERS = sizeof(active[0].id) / sizeof(active[0].id[0]);
+    hazer_view_t views[HAZER_SYSTEM_TOTAL] = HAZER_VIEWS_INITIALIZER;
+    hazer_active_t actives[HAZER_SYSTEM_TOTAL] = HAZER_ACTIVES_INITIALIZER;
+    static const int SATELLITES = sizeof(views[0].sat) / sizeof(views[0].sat[0]);
+    static const int RANGERS = sizeof(actives[0].id) / sizeof(actives[0].id[0]);
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
+    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS;
 
-    if (count < 4) {
-        /* Do nothing. */
-    } else if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
-        /* Do nothing. */
-    } else if (vector[0][0] != HAZER_STIMULUS_START) {
-        /* Do nothing. */
-    } else if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
-        /* Do nothing. */
-    } else if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
-        /* Do nothing. */
-    } else if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
-        /* Do nothing. */
-    } else if (count < (4 + ((satellites = strtol(vector[2], (char **)0, 10)) * 6))) {
-        /* Do nothing. */
-    } else {
-        index = 3;
+    do {
+
+        /* IDENTIFY */
+
+        if (count < 4) {
+            break;
+        }
+
+        if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
+            break;
+        }
+
+        if (vector[0][0] != HAZER_STIMULUS_START) {
+            break;
+        }
+
+        if (strcmp(&vector[0][1], PUBX) != 0) {
+            break;
+        }
+
+        if (strcmp(vector[1], ID) != 0) {
+            break;
+        }
+
+        /*
+         * VALIDATE
+         */
+
+        satellites = strtol(vector[2], &end, 10);
+        if (*end != '\0') {
+            einval = vector[2];
+            break;
+        }
+
+        if (count < (4 + (satellites * 6))) {
+            enodata = vector[1];
+            break;
+        }
+
         for (satellite = 0; satellite < satellites; ++satellite) {
+
             id = strtol(vector[index + 0], &end, 10);
+            if (*end != '\0') {
+                einval = vector[2];
+                break;
+            }
+
             system = hazer_map_pubxid_to_system(id);
             if (system >= HAZER_SYSTEM_TOTAL) {
                 system = HAZER_SYSTEM_GNSS;
             }
+
             channel = channels[system];
             if (channel >= SATELLITES) {
                 continue;
             }
-            view[system].sat[channel].id = id;
-            view[system].sat[channel].phantom = 0;
-            view[system].sat[channel].untracked = 0;
-            view[system].sat[channel].unused = 0;
+
+            views[system].sat[channel].id = id;
+            views[system].sat[channel].phantom = 0;
+            views[system].sat[channel].untracked = 0;
+            views[system].sat[channel].unused = 0;
+
             if (strcmp(vector[index + 1], "e") == 0) {
                 /* Do nothing. */
             } else if (strcmp(vector[index + 1], "U") == 0) {
                 ranger = rangers[system];
                 if (ranger < RANGERS) {
-                    active[system].id[ranger] = id;
+                    actives[system].id[ranger] = id;
                     ranger += 1;
                     rangers[system] = ranger;
-                    active[system].active = ranger;
+                    actives[system].active = ranger;
                 }
-                active[system].system = system;
-                active[system].label = PUBX;
+                actives[system].system = system;
+                actives[system].label = PUBX;
             } else if (strcmp(vector[index + 1], "-") == 0) {
-                view[system].sat[channel].unused = !0;
+                views[system].sat[channel].unused = !0;
             } else {
                 /* Should never happen, and not clear what it means if it does. */
-                view[system].sat[channel].phantom = !0;
-                view[system].sat[channel].untracked = !0;
-                view[system].sat[channel].unused = !0;
+                views[system].sat[channel].phantom = !0;
+                views[system].sat[channel].untracked = !0;
+                views[system].sat[channel].unused = !0;
             }
+
             if (strlen(vector[index + 2]) == 0) {
-                view[system].sat[channel].phantom = !0;
-                view[system].sat[channel].azm_degrees = 0;
+                views[system].sat[channel].phantom = !0;
+                views[system].sat[channel].azm_degrees = 0;
             } else {
-                view[system].sat[channel].azm_degrees = strtol(vector[index + 2], &end, 10);
+                views[system].sat[channel].azm_degrees = strtol(vector[index + 2], &end, 10);
+                if (*end != '\0') {
+                    einval = vector[index + 2];
+                    break;
+                }
             }
+
             if (strlen(vector[index + 3]) == 0) {
-                view[system].sat[channel].phantom = !0;
-                view[system].sat[channel].elv_degrees = 0;
+                views[system].sat[channel].phantom = !0;
+                views[system].sat[channel].elv_degrees = 0;
             } else {
-                view[system].sat[channel].elv_degrees = strtol(vector[index + 3], &end, 10);
+                views[system].sat[channel].elv_degrees = strtol(vector[index + 3], &end, 10);
+                if (*end != '\0') {
+                    einval = vector[index + 3];
+                    break;
+                }
             }
+
             if (strlen(vector[index + 4]) == 0) {
-                view[system].sat[channel].untracked = !0;
-                view[system].sat[channel].snr_dbhz = 0;
+                views[system].sat[channel].untracked = !0;
+                views[system].sat[channel].snr_dbhz = 0;
             } else {
-                view[system].sat[channel].snr_dbhz = strtol(vector[index + 4], &end, 10);
+                views[system].sat[channel].snr_dbhz = strtol(vector[index + 4], &end, 10);
+                if (*end != '\0') {
+                    einval = vector[index + 4];
+                    break;
+                }
             }
-            view[system].sat[channel].signal = 0;
+
+            views[system].sat[channel].signal = 0;
+
             channel += 1;
+
             channels[system] = channel;
-            view[system].channels = channel;
-            view[system].view = satellites;
-            view[system].pending = 0;
-            view[system].label = PUBX;
-            rc |= (1 << system);
+
+            views[system].channels = channel;
+            views[system].view = satellites;
+
+            result |= (1 << system);
+
             index += 6;
+
         }
-    }
+        if (*end != '\0') {
+            break;
+        }
+
+        /*
+         * APPLY
+         */
+
+        for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
+            if ((result & (1 << system)) != 0) {
+
+                viewa[system].label = PUBX;
+
+                for (channel = 0; channel < views[system].channels; ++channel) {
+                    viewa[system].sat[channel] = views[system].sat[channel]; /* Structure copy. */
+                }
+
+                viewa[system].view = views[system].view;
+                viewa[system].channels = views[system].channels;
+                viewa[system].pending = 0;
+
+                activea[system].label = PUBX;
+
+                for (ranger = 0; ranger < actives[system].active; ++ranger) {
+                    activea[system].id[ranger] = actives[system].id[ranger];
+                }
+
+                activea[system].system = actives[system].system;
+                activea[system].active = actives[system].active;
+                activea[system].mode = actives[system].mode;
+
+            }
+        }
+
+        rc = result;
+
+    } while (0);
 
     if (enodata != (char *)0) {
         errno = ENODATA;
@@ -2439,8 +2524,8 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
     char * enodata = (char *)0;
     char * einval = (char *)0;
     hazer_position_t position = HAZER_POSITION_INITIALIZER;
-    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_TIME;
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
+    static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_TIME;
 
     do {
 
@@ -2460,15 +2545,11 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
             break;
         }
 
-        if (strncmp(&vector[0][1], PUBX, sizeof(PUBX)) != 0) {
+        if (strcmp(&vector[0][1], PUBX) != 0) {
             break;
         }
 
-        if (strnlen(vector[1], sizeof(ID)) != (sizeof(ID) - 1)) {
-            break;
-        }
-
-        if (strncmp(vector[1], ID, sizeof(ID)) != 0) {
+        if (strcmp(vector[1], ID) != 0) {
             break;
         }
 

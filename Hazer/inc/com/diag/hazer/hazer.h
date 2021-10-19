@@ -935,6 +935,22 @@ typedef struct HazerPosition {
     }
 
 /**
+ * @define HAZER_POSITIONS_INITIALIZER
+ * Initialize an array of HazerPosition structures.
+ */
+#define HAZER_POSITIONS_INITIALIZER \
+    { \
+        HAZER_POSITION_INITIALIZER, \
+        HAZER_POSITION_INITIALIZER, \
+        HAZER_POSITION_INITIALIZER, \
+        HAZER_POSITION_INITIALIZER, \
+        HAZER_POSITION_INITIALIZER, \
+        HAZER_POSITION_INITIALIZER, \
+        HAZER_POSITION_INITIALIZER, \
+        HAZER_POSITION_INITIALIZER, \
+    }
+
+/**
  * Parse a GGA NMEA sentence, updating the position.
  * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
@@ -1053,6 +1069,22 @@ typedef struct HazerActive {
     }
 
 /**
+ * @define HAZER_ACTIVES_INITIALIZER
+ * Initialize an array of HazerActive structures.
+ */
+#define HAZER_ACTIVES_INITIALIZER \
+    { \
+        HAZER_ACTIVE_INITIALIZER, \
+        HAZER_ACTIVE_INITIALIZER, \
+        HAZER_ACTIVE_INITIALIZER, \
+        HAZER_ACTIVE_INITIALIZER, \
+        HAZER_ACTIVE_INITIALIZER, \
+        HAZER_ACTIVE_INITIALIZER, \
+        HAZER_ACTIVE_INITIALIZER, \
+        HAZER_ACTIVE_INITIALIZER, \
+    }
+
+/**
  * Parse a GSA NMEA sentence, updating the constellation.
  * @param activep points to the active structure.
  * @param vector contains the words in the NMEA sentence.
@@ -1167,6 +1199,22 @@ typedef struct HazerView {
     }
 
 /**
+ * @define HAZER_VIEWS_INITIALIZER
+ * Initialize an array of HazerView structures.
+ */
+#define HAZER_VIEWS_INITIALIZER \
+    { \
+        HAZER_VIEW_INITIALIZER, \
+        HAZER_VIEW_INITIALIZER, \
+        HAZER_VIEW_INITIALIZER, \
+        HAZER_VIEW_INITIALIZER, \
+        HAZER_VIEW_INITIALIZER, \
+        HAZER_VIEW_INITIALIZER, \
+        HAZER_VIEW_INITIALIZER, \
+        HAZER_VIEW_INITIALIZER, \
+    }
+
+/**
  * Parse a GSV NMEA sentence, updating the constellation.
  * @param viewp points to the view structure.
  * @param vector contains the words in the NMEA sentence.
@@ -1207,13 +1255,13 @@ extern int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_
  * Parse a U-blox PUBX,03 (SVSTATUS) message. The arrays are used instead
  * of pointers to a single element in the array because this PUBX message
  * contains Space Vehicle (SV) statuses for satellites across all systems.
- * @param view is the view ARRAY (not a pointer to a single element).
- * @param active is the active ARRAY (not a pointer to a single element).
+ * @param viewa is the view ARRAY (not a pointer to a single element).
+ * @param activea is the active ARRAY (not a pointer to a single element).
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
  * @return a bit mask with (1<<system) bit set for every system reported.
  */
-extern int hazer_parse_pubx_svstatus(hazer_view_t view[], hazer_active_t active[], char * vector[], size_t count);
+extern int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], char * vector[], size_t count);
 
 /**
  * Parse a U-blox PUBX,04 (TIME) message. Note that should the fix be lost,

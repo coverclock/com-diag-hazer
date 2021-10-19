@@ -88,26 +88,8 @@ int main(void)
         static const char * DATA = "$PUBX,03,19,5,-,051,34,,000,10,U,240,16,10,000,13,-,072,38,,000,15,e,113,56,20,000,16,-,309,15,,000,18,U,321,61,30,000,20,e,061,04,40,000,23,-,248,48,,000,25,e,193,-2,50,000,26,-,276,17,,000,29,-,167,58,,000,65,-,047,68,,000,66,U,201,43,60,000,72,-,033,21,,000,79,-,284,02,,000,80,-,335,03,,000,81,-,326,35,,000,87,e,115,37,70,000,88,U,056,72,80,000*1E\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_view_t view[HAZER_SYSTEM_TOTAL] = {
-            HAZER_VIEW_INITIALIZER,
-            HAZER_VIEW_INITIALIZER,
-            HAZER_VIEW_INITIALIZER,
-            HAZER_VIEW_INITIALIZER,
-            HAZER_VIEW_INITIALIZER,
-            HAZER_VIEW_INITIALIZER,
-            HAZER_VIEW_INITIALIZER,
-            HAZER_VIEW_INITIALIZER,
-        };
-        hazer_active_t active[HAZER_SYSTEM_TOTAL] = {
-            HAZER_ACTIVE_INITIALIZER,
-            HAZER_ACTIVE_INITIALIZER,
-            HAZER_ACTIVE_INITIALIZER,
-            HAZER_ACTIVE_INITIALIZER,
-            HAZER_ACTIVE_INITIALIZER,
-            HAZER_ACTIVE_INITIALIZER,
-            HAZER_ACTIVE_INITIALIZER,
-            HAZER_ACTIVE_INITIALIZER,
-        };
+        hazer_view_t view[HAZER_SYSTEM_TOTAL] = HAZER_VIEWS_INITIALIZER;
+        hazer_active_t active[HAZER_SYSTEM_TOTAL] = HAZER_ACTIVES_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
