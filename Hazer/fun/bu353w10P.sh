@@ -13,7 +13,7 @@ PROGRAM=$(basename -s .sh ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
 INTERVAL=${3:-1}
-WRITE=${4:-1}
+WRITE=${4:-5}
 ERRFIL=${5-"${SAVDIR}/${PROGRAM}.err"}
 CATFIL=${6-"${SAVDIR}/${PROGRAM}.cat"}
 
