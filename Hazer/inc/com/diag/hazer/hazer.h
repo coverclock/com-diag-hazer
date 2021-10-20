@@ -952,6 +952,7 @@ typedef struct HazerPosition {
 
 /**
  * Parse a GGA NMEA sentence, updating the position.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
@@ -961,6 +962,7 @@ extern int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t
 
 /**
  * Parse a RMC NMEA sentence, updating the position.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
@@ -970,6 +972,7 @@ extern int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t
 
 /**
  * Parse a GLL NMEA sentence, updating the position.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
@@ -979,6 +982,7 @@ extern int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t
 
 /**
  * Parse a VTG NMEA sentence, updating the position.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
@@ -1086,6 +1090,7 @@ typedef struct HazerActive {
 
 /**
  * Parse a GSA NMEA sentence, updating the constellation.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param activep points to the active structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
@@ -1216,6 +1221,7 @@ typedef struct HazerView {
 
 /**
  * Parse a GSV NMEA sentence, updating the constellation.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param viewp points to the view structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
@@ -1243,6 +1249,7 @@ extern int hazer_parse_txt(char * vector[], size_t count);
  * Parse a U-blox PUBX,00 (POSITION) message. This message contains information
  * both about position and the fix itself (e.g. the dilution of precision values
  * and fix mode indicator).
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param positionp points to the position structure.
  * @param activep points to the active structure.
  * @param vector contains the words in the NMEA sentence.
@@ -1255,6 +1262,7 @@ extern int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_
  * Parse a U-blox PUBX,03 (SVSTATUS) message. The arrays are used instead
  * of pointers to a single element in the array because this PUBX message
  * contains Space Vehicle (SV) statuses for satellites across all systems.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param viewa is the view ARRAY (not a pointer to a single element).
  * @param activea is the active ARRAY (not a pointer to a single element).
  * @param vector contains the words in the NMEA sentence.
@@ -1268,6 +1276,7 @@ extern int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t active
  * at least the U-blox generation 8 device will continue to issue this
  * messgae with the time updated according (apparently) to its internal clock.
  * This can be misleadning, IMO.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param positionp points to the position structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.

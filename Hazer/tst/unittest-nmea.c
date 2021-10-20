@@ -10,6 +10,7 @@
  */
 
 #include <stdio.h>
+#include <errno.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "./unittest.h"
@@ -70,6 +71,7 @@ int main(void)
 
         rc = hazer_parse_gga(&position, vector, count);
         assert(rc == 0);
+        assert(errno == 0);
         assert(strcmp(position.label, "GGA") == 0);
         assert(position.sat_used == 12);
         assert(position.utc_nanoseconds == 50187000000000ULL);
@@ -136,6 +138,7 @@ int main(void)
 
         rc = hazer_parse_rmc(&position, vector, count);
         assert(rc == 0);
+        assert(errno == 0);
         assert(strcmp(position.label, "RMC") == 0);
         assert(position.utc_nanoseconds == 50188000000000ULL);
         assert(position.dmy_nanoseconds == 1533600000000000000ULL); /* date -u -d "August 7 2018" +"%s.%N" */
@@ -202,6 +205,7 @@ int main(void)
 
         rc = hazer_parse_gll(&position, vector, count);
         assert(rc == 0);
+        assert(errno == 0);
         assert(strcmp(position.label, "GLL") == 0);
         assert(position.utc_nanoseconds == 50188000000000ULL);
         assert(position.dmy_nanoseconds == HAZER_NANOSECONDS_UNSET);
@@ -265,6 +269,7 @@ int main(void)
 
         rc = hazer_parse_vtg(&position, vector, count);
         assert(rc == 0);
+        assert(errno == 0);
         assert(strcmp(position.label, "VTG") == 0);
         assert(position.utc_nanoseconds == HAZER_NANOSECONDS_UNSET);
         assert(position.dmy_nanoseconds == HAZER_NANOSECONDS_UNSET);
@@ -328,6 +333,7 @@ int main(void)
 
         rc = hazer_parse_gsa(&active, vector, count);
         assert(rc == 0);
+        assert(errno == 0);
         assert(strcmp(active.label, "GSA") == 0);
         assert(active.active == 12);
         assert(active.pdop == 127);
@@ -395,6 +401,7 @@ int main(void)
 
         rc = hazer_parse_gsa(&active, vector, count);
         assert(rc == 0);
+        assert(errno == 0);
         assert(strcmp(active.label, "GSA") == 0);
         assert(active.active == 12);
         assert(active.pdop == 127);
@@ -470,6 +477,7 @@ int main(void)
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(((ii == 3) && (rc == 0)) || (rc > 0));
+            assert(errno == 0);
             assert(strcmp(view.label, "GSV") == 0);
             assert(view.view == 15);
 
@@ -633,6 +641,7 @@ int main(void)
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(((ii == 3) && (rc == 0)) || (rc > 0));
+            assert(errno == 0);
             assert(strcmp(view.label, "GSV") == 0);
             assert(view.view == 15);
 

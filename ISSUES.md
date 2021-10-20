@@ -232,8 +232,13 @@ Compare with the correct sentence:
     checksum '$GPRMC,002525.000,A,3947.6529,N,10509.2015,W,0.01,68.88,161021,,,D*65'
     $GPRMC,002525.000,A,3947.6529,N,10509.2015,W,0.01,68.88,161021,,,D*49\r\n
 
-Addennum 2: Yet another: note the missing comma after the "W".
+Addendum 2: Yet another: note the missing comma after the "W".
 
     checksum '$GPRMC,012859.000,A,3947.6540,N,10509.2019,W0.01,125.17,191021,,,D*50'
     $GPRMC,012859.000,A,3947.6540,N,10509.2019,W0.01,125.17,191021,,,D*50\r\n
 
+Addendum 3: A more insidius example in which the decimal point in the course
+on ground was lost, "12517" instead of "125.17".
+
+    checksum '$GPRMC,000411.000,A,3947.6531,N,10509.2017,W,0.04,12517,201021,,,D*56'
+    $GPRMC,000411.000,A,3947.6531,N,10509.2017,W,0.04,12517,201021,,,D*56\r\n

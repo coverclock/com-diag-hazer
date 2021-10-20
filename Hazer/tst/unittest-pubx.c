@@ -10,6 +10,7 @@
  */
 
 #include <stdio.h>
+#include <errno.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "./unittest.h"
@@ -66,6 +67,7 @@ int main(void)
 
         rc = hazer_parse_pubx_position(&position, &active, vector, count);
         assert(rc == 0);
+        assert(errno == 0);
         assert(strcmp(position.label, "PUBX") == 0);
         assert(position.sat_used == 4);
 
@@ -130,6 +132,7 @@ int main(void)
 
         rc = hazer_parse_pubx_svstatus(view, active, vector, count);
         assert(rc != 0);
+        assert(errno == 0);
 
 /*
 $PUBX,03,19,
@@ -368,6 +371,7 @@ $PUBX,03,19,
 
         rc = hazer_parse_pubx_time(&position, vector, count);
         assert(rc == 0);
+        assert(errno == 0);
         assert(strcmp(position.label, "PUBX") == 0);
         assert(position.utc_nanoseconds == 65249000000000ULL);
         assert(position.dmy_nanoseconds == 1629417600000000000ULL); /* date -u -d "August 20 2021" +"%s.%N" */
