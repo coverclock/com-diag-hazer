@@ -28,6 +28,7 @@ int main(void)
     int64_t nanodegrees = 0;
     int64_t millimeters = 0;
     int64_t microknots = 0;
+    int64_t millimetersperhour = 0;
     uint16_t dop = 0;
     uint64_t number = 0;
     uint8_t digits = 0;
@@ -396,6 +397,46 @@ int main(void)
 
     /**************************************************************************/
 
+    assert(!hazer_is_valid_latitude(-5400000000001LL));
+    assert(hazer_is_valid_latitude(-5400000000000LL));
+    assert(hazer_is_valid_latitude(0));
+    assert(hazer_is_valid_latitude(5400000000000LL));
+    assert(!hazer_is_valid_latitude(5400000000001LL));
+
+    assert(!hazer_is_valid_longitude(-10800000000001LL));
+    assert(hazer_is_valid_longitude(-10800000000000LL));
+    assert(hazer_is_valid_longitude(0));
+    assert(hazer_is_valid_longitude(10800000000000LL));
+    assert(!hazer_is_valid_longitude(10800000000001LL));
+
+    assert(!hazer_is_valid_courseoverground(-360000000001LL));
+    assert(hazer_is_valid_courseoverground(-360000000000LL));
+    assert(hazer_is_valid_courseoverground(0));
+    assert(hazer_is_valid_courseoverground(360000000000LL));
+    assert(!hazer_is_valid_courseoverground(360000000001LL));
+
+    assert(hazer_is_valid_dilutionofprecision(0));
+    assert(hazer_is_valid_dilutionofprecision(9999));
+    assert(!hazer_is_valid_dilutionofprecision(10000));
+
+    assert(!hazer_is_valid_elevation(-91));
+    assert(hazer_is_valid_elevation(-90));
+    assert(hazer_is_valid_elevation(0));
+    assert(hazer_is_valid_elevation(90));
+    assert(!hazer_is_valid_elevation(91));
+
+    assert(!hazer_is_valid_azimuth(-361));
+    assert(hazer_is_valid_azimuth(-360));
+    assert(hazer_is_valid_azimuth(0));
+    assert(hazer_is_valid_azimuth(360));
+    assert(!hazer_is_valid_azimuth(361));
+
+    assert(hazer_is_valid_signaltonoiseratio(0));
+    assert(hazer_is_valid_signaltonoiseratio(99));
+    assert(!hazer_is_valid_signaltonoiseratio(100));
+
+    /**************************************************************************/
+
     end = (char *)0;
     numerator = hazer_parse_fraction("", &denominator, &end);
     assert(numerator == 0);
@@ -444,6 +485,14 @@ int main(void)
     assert(denominator == 10000);
     assert((end != (char *)0) && (*end == '\0'));
 
+    end = (char *)0;
+    numerator = hazer_parse_fraction("1.5", &denominator, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    numerator = hazer_parse_fraction("1a5", &denominator, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
     /**************************************************************************/
 
     end = (char *)0;
@@ -471,12 +520,28 @@ int main(void)
     assert(number == 86399125000000ULL);
     assert((end != (char *)0) && (*end == '\0'));
 
+    end = (char *)0;
+    number = hazer_parse_utc("235959c125", &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    number = hazer_parse_utc("235959.125d", &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
     /**************************************************************************/
 
     end = (char *)0;
     number = hazer_parse_dmy("310117", &end);
     assert(number == 1485820800000000000ULL);
     assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    number = hazer_parse_dmy("310117.", &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    number = hazer_parse_dmy("310117d", &end);
+    assert((end != (char *)0) && (*end != '\0'));
 
     /**************************************************************************/
 
@@ -564,6 +629,18 @@ int main(void)
     assert((end != (char *)0) && (*end == '\0'));
     assert(hazer_is_valid_latitude(nanominutes));
 
+    end = (char *)0;
+    nanominutes = hazer_parse_latlon("8959;99999", 'S', &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    nanominutes = hazer_parse_latlon("8959.99999,", 'S', &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    nanominutes = hazer_parse_latlon("8959.99999", 'X', &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
     /**************************************************************************/
 
     end = (char *)0;
@@ -629,6 +706,14 @@ int main(void)
     assert((end != (char *)0) && (*end == '\0'));
     assert(hazer_is_valid_courseoverground(nanodegrees));
 
+    end = (char *)0;
+    nanodegrees = hazer_parse_cog("-90,125", &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    nanodegrees = hazer_parse_cog("-90.12;", &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
     /**************************************************************************/
 
     end = (char *)0;
@@ -642,6 +727,36 @@ int main(void)
     assert(microknots == -15500000LL);
     assert(digits == 3);
     assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    microknots = hazer_parse_sog("-15;5", &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    microknots = hazer_parse_sog("-15.5?", &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    /**************************************************************************/
+
+    end = (char *)0;
+    millimetersperhour = hazer_parse_smm("15.5", &digits, &end);
+    assert(millimetersperhour == 15500000LL);
+    assert(digits == 3);
+    assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    millimetersperhour = hazer_parse_smm("-15.5", &digits, &end);
+    assert(millimetersperhour == -15500000LL);
+    assert(digits == 3);
+    assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    millimetersperhour = hazer_parse_smm("-15;5", &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    millimetersperhour = hazer_parse_smm("-15.5?", &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
 
     /**************************************************************************/
 
@@ -680,6 +795,14 @@ int main(void)
     assert(millimeters == -521125ULL);
     assert(digits == 6);
     assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    millimeters = hazer_parse_alt("-521/125", 'M', &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    millimeters = hazer_parse_alt("-521.125;", 'M', &digits, &end);
+    assert((end != (char *)0) && (*end != '\0'));
 
     /**************************************************************************/
 
@@ -723,6 +846,14 @@ int main(void)
     assert(dop == 9999);
     assert((end != (char *)0) && (*end == '\0'));
     assert(hazer_is_valid_dilutionofprecision(dop));
+
+    end = (char *)0;
+    dop = hazer_parse_dop("99:99", &end);
+    assert((end != (char *)0) && (*end != '\0'));
+
+    end = (char *)0;
+    dop = hazer_parse_dop("99.9!9", &end);
+    assert((end != (char *)0) && (*end != '\0'));
 
     /**************************************************************************/
 
