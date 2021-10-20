@@ -1375,10 +1375,18 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
             errno = EINVAL;
             break;
         }
+        if (!hazer_is_valid_latitude(position.lat_nanominutes)) {
+            errno = ERANGE;
+            break;
+        }
 
         position.lon_nanominutes = hazer_parse_latlon(vector[4], *(vector[5]), &position.lon_digits, &end);
         if (*end != '\0') {
             errno = EINVAL;
+            break;
+        }
+        if (!hazer_is_valid_longitude(position.lon_nanominutes)) {
+            errno = ERANGE;
             break;
         }
 
@@ -1729,6 +1737,10 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                     errno = EINVAL;
                     break;
                 }
+                if (!hazer_is_valid_elevation(view.sat[channel].elv_degrees)) {
+                    errno = ERANGE;
+                    break;
+                }
             }
 
             ++index;
@@ -1740,6 +1752,10 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                 view.sat[channel].azm_degrees = strtol(vector[index], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
+                    break;
+                }
+                if (!hazer_is_valid_azimuth(view.sat[channel].azm_degrees)) {
+                    errno = ERANGE;
                     break;
                 }
             }
@@ -1754,6 +1770,10 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                 view.sat[channel].snr_dbhz = strtol(vector[index], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
+                    break;
+                }
+                if (!hazer_is_valid_signaltonoiseratio(view.sat[channel].snr_dbhz)) {
+                    errno = ERANGE;
                     break;
                 }
             }
@@ -1922,10 +1942,18 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
             errno = EINVAL;
             break;
         }
+        if (!hazer_is_valid_latitude(position.lat_nanominutes)) {
+            errno = ERANGE;
+            break;
+        }
 
         position.lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &position.lon_digits, &end);
         if (*end != '\0') {
             errno = EINVAL;
+            break;
+        }
+        if (!hazer_is_valid_longitude(position.lon_nanominutes)) {
+            errno = ERANGE;
             break;
         }
 
@@ -1938,6 +1966,10 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         position.cog_nanodegrees = hazer_parse_cog(vector[8], &position.cog_digits, &end);
         if (*end != '\0') {
             errno = EINVAL;
+            break;
+        }
+        if (!hazer_is_valid_courseoverground(position.cog_nanodegrees)) {
+            errno = ERANGE;
             break;
         }
 
@@ -2035,10 +2067,18 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
             errno = EINVAL;
             break;
         }
+        if (!hazer_is_valid_latitude(position.lat_nanominutes)) {
+            errno = ERANGE;
+            break;
+        }
 
         position.lon_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &position.lon_digits, &end);
         if (*end != '\0') {
             errno = EINVAL;
+            break;
+        }
+        if (!hazer_is_valid_longitude(position.lon_nanominutes)) {
+            errno = ERANGE;
             break;
         }
 
@@ -2120,6 +2160,10 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
         position.cog_nanodegrees = hazer_parse_cog(vector[1], &position.cog_digits, &end);
         if (*end != '\0') {
             errno = EINVAL;
+            break;
+        }
+        if (!hazer_is_valid_courseoverground(position.cog_nanodegrees)) {
+            errno = ERANGE;
             break;
         }
 
@@ -2320,10 +2364,18 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
             errno = EINVAL;
             break;
         }
+        if (!hazer_is_valid_latitude(position.lat_nanominutes)) {
+            errno = ERANGE;
+            break;
+        }
 
         position.lon_nanominutes = hazer_parse_latlon(vector[5], *(vector[6]), &position.lon_digits, &end);
         if (*end != '\0') {
             errno = EINVAL;
+            break;
+        }
+        if (!hazer_is_valid_longitude(position.lon_nanominutes)) {
+            errno = ERANGE;
             break;
         }
 
@@ -2358,6 +2410,10 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         position.cog_nanodegrees = hazer_parse_cog(vector[12], &position.cog_digits, &end);
         if (*end != '\0') {
             errno = EINVAL;
+            break;
+        }
+        if (!hazer_is_valid_courseoverground(position.cog_nanodegrees)) {
+            errno = ERANGE;
             break;
         }
 
@@ -2544,6 +2600,10 @@ int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], ch
                     errno = EINVAL;
                     break;
                 }
+                if (!hazer_is_valid_azimuth(views[system].sat[channel].azm_degrees)) {
+                    errno = ERANGE;
+                    break;
+                }
             }
 
             if (strlen(vector[index + 3]) == 0) {
@@ -2555,6 +2615,10 @@ int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], ch
                     errno = EINVAL;
                     break;
                 }
+                if (!hazer_is_valid_elevation(views[system].sat[channel].elv_degrees)) {
+                    errno = ERANGE;
+                    break;
+                }
             }
 
             if (strlen(vector[index + 4]) == 0) {
@@ -2564,6 +2628,10 @@ int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], ch
                 views[system].sat[channel].snr_dbhz = strtol(vector[index + 4], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
+                    break;
+                }
+                if (!hazer_is_valid_signaltonoiseratio(views[system].sat[channel].snr_dbhz)) {
+                    errno = ERANGE;
                     break;
                 }
             }
