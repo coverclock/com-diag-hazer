@@ -1322,6 +1322,10 @@ static inline int hazer_is_pubx_id(const hazer_vector_t vector, const char id[3]
  */
 extern int hazer_has_pending_gsv(const hazer_view_t va[], size_t count);
 
+/*******************************************************************************
+ * PARSING VALIDATORS
+ ******************************************************************************/
+
 /**
  * Returns true if the position has a valid clock, which requires both the
  * the time and date and a monotonically increasing clock.
@@ -1347,6 +1351,76 @@ static int hazer_is_valid_time(const hazer_position_t * positionp)
  * @return true if time, date, and monotonic clock are true for some position.
  */
 extern int hazer_has_valid_time(const hazer_position_t pa[], size_t count);
+
+/*
+ * The validators below are a little more liberal and forgiving than the
+ * NMEA specification requires. Many accept negative values where they
+ * might not make sense (e.g. as an elevation). And wrapping values are
+ * accepted to accomodate rounding (e.g. both 0 and 360 degrees).
+ */
+
+/**
+ * Returns true if a latitude in nanominutes has a valid value.
+ * @param nanominutes is the latitude [-90..90].
+ * @return true if valid, false otherwise.
+ */
+static inline int hazer_is_valid_latitude(int64_t nanominutes) {
+    return ((-5400000000000LL <= nanominutes) && (nanominutes <= 5400000000000LL));
+}
+
+/**
+ * Returns true if a longitude in nanominutes has a valid value.
+ * @param nanominutes is the longitude [-180..180].
+ * @return true if valid, false otherwise.
+ */
+static inline int hazer_is_valid_longitude(int64_t nanominutes) {
+    return ((-10800000000000LL <= nanominutes) && (nanominutes <= 10800000000000LL));
+}
+
+/**
+ * Returns true if a course over ground in nanodegrees has a valid value.
+ * @param nanodegrees is the COG [-360..360].
+ * @return true if valid, false otherwise.
+ */
+static inline int hazer_is_valid_courseoverground(int64_t nanodegrees) {
+    return ((-360000000000LL <= nanodegrees) && (nanodegrees <= 360000000000LL));
+}
+
+/**
+ * Returns true if a dilution of precision has a valid value.
+ * @param score is the DOP [0..99.99].
+ * @return true if valid, false otherwise.
+ */
+static inline int hazer_is_valid_dilutionofprecision(uint16_t score) {
+    return ((0 <= score) && (score <= 9999));
+}
+
+/**
+ * Returns true if a elevation in degrees has a valid value.
+ * @param degrees is the elevation [-90..90].
+ * @return true if valid, false otherwise.
+ */
+static inline int hazer_is_valid_elevation(int16_t degrees) {
+    return ((-90 <= degrees) && (degrees <= 90));
+}
+
+/**
+ * Returns true if a azimuth in degrees has a valid value.
+ * @param degrees is the azimuth [-360..360].
+ * @return true if valid, false otherwise.
+ */
+static inline int hazer_is_valid_azimuth(int16_t degrees) {
+    return ((-360 <= degrees) && (degrees <= 360));
+}
+
+/**
+ * Returns true if a Signal/Noise Ratio in dBHz has a valid value.
+ * @param dbhz is the SNR [0..99].
+ * @return true if valid, false otherwise.
+ */
+static inline int hazer_is_valid_signaltonoiseratio(int8_t dbhz) {
+    return ((0 <= dbhz) && (dbhz <= 99));
+}
 
 /*******************************************************************************
  * FORMATTING DATA FOR OUTPUT

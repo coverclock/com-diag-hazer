@@ -2662,7 +2662,7 @@ consume:
 
             } else {
 
-                DIMINUTO_LOG_INFORMATION("Parse NMEA Other accept \"%s\"\n", vector[0]);
+                DIMINUTO_LOG_INFORMATION("Parse NMEA Other reject \"%s\"\n", vector[0]);
 
             }
 

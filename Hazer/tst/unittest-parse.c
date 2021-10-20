@@ -485,138 +485,56 @@ int main(void)
     assert(nanominutes == 0LL);
     assert(digits == 5);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_longitude(nanominutes));
 
     end = (char *)0;
-    nanominutes = hazer_parse_latlon("00000", 'S', &digits, &end);
+    nanominutes = hazer_parse_latlon("00000", 'W', &digits, &end);
     assert(nanominutes == 0LL);
     assert(digits == 5);
     assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("18000", 'E', &digits, &end);
-    assert(nanominutes == 10800000000000LL);
-    assert(digits == 5);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("18000", 'S', &digits, &end);
-    assert(nanominutes == -10800000000000LL);
-    assert(digits == 5);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("18030", 'E', &digits, &end);
-    assert(nanominutes == 10830000000000LL);
-    assert(digits == 5);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("18030", 'S', &digits, &end);
-    assert(nanominutes == -10830000000000LL);
-    assert(digits == 5);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("18030.", 'E', &digits, &end);
-    assert(nanominutes == 10830000000000LL);
-    assert(digits == 5);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("18030.", 'W', &digits, &end);
-    assert(nanominutes == -10830000000000LL);
-    assert(digits == 5);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("18030.60", 'E', &digits, &end);
-    assert(nanominutes == 10830600000000LL);
-    assert(digits == 7);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("18030.60", 'W', &digits, &end);
-    assert(nanominutes == -10830600000000LL);
-    assert(digits == 7);
-    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_longitude(nanominutes));
 
     end = (char *)0;
     nanominutes = hazer_parse_latlon("0000", 'N', &digits, &end);
     assert(nanominutes == 0LL);
     assert(digits == 4);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_latitude(nanominutes));
 
     end = (char *)0;
     nanominutes = hazer_parse_latlon("0000", 'S', &digits, &end);
     assert(nanominutes == 0LL);
     assert(digits == 4);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_latitude(nanominutes));
+
+    end = (char *)0;
+    nanominutes = hazer_parse_latlon("18000", 'E', &digits, &end);
+    assert(nanominutes == 10800000000000LL);
+    assert(digits == 5);
+    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_longitude(nanominutes));
+
+    end = (char *)0;
+    nanominutes = hazer_parse_latlon("18000", 'W', &digits, &end);
+    assert(nanominutes == -10800000000000LL);
+    assert(digits == 5);
+    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_longitude(nanominutes));
 
     end = (char *)0;
     nanominutes = hazer_parse_latlon("9000", 'N', &digits, &end);
     assert(nanominutes == 5400000000000LL);
     assert(digits == 4);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_latitude(nanominutes));
 
     end = (char *)0;
     nanominutes = hazer_parse_latlon("9000", 'S', &digits, &end);
     assert(nanominutes == -5400000000000LL);
     assert(digits == 4);
     assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("9030", 'N', &digits, &end);
-    assert(nanominutes == 5430000000000LL);
-    assert(digits == 4);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("9030", 'S', &digits, &end);
-    assert(nanominutes == -5430000000000LL);
-    assert(digits == 4);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("9030.", 'N', &digits, &end);
-    assert(nanominutes == 5430000000000LL);
-    assert(digits == 4);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("9030.", 'S', &digits, &end);
-    assert(nanominutes == -5430000000000LL);
-    assert(digits == 4);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("9030.0", 'N', &digits, &end);
-    assert(nanominutes == 5430000000000LL);
-    assert(digits == 5);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("9030.0", 'S', &digits, &end);
-    assert(nanominutes == -5430000000000LL);
-    assert(digits == 5);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("9030.60", 'N', &digits, &end);
-    assert(nanominutes == 5430600000000LL);
-    assert(digits == 6);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("9030.60", 'S', &digits, &end);
-    assert(nanominutes == -5430600000000LL);
-    assert(digits == 6);
-    assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    nanominutes = hazer_parse_latlon("9030.66", 'N', &digits, &end);
-    assert(nanominutes == 5430660000000LL);
-    assert(digits == 6);
-    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_latitude(nanominutes));
 
     /**************************************************************************/
 
@@ -625,54 +543,63 @@ int main(void)
     assert(nanodegrees == 0LL);
     assert(digits == 1);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
 
     end = (char *)0;
     nanodegrees = hazer_parse_cog("360", &digits, &end);
     assert(nanodegrees == 360000000000LL);
     assert(digits == 3);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
 
     end = (char *)0;
     nanodegrees = hazer_parse_cog("360.", &digits, &end);
     assert(nanodegrees == 360000000000LL);
     assert(digits == 3);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
 
     end = (char *)0;
     nanodegrees = hazer_parse_cog("360.0", &digits, &end);
     assert(nanodegrees == 360000000000LL);
     assert(digits == 4);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
 
     end = (char *)0;
     nanodegrees = hazer_parse_cog("360.00", &digits, &end);
     assert(nanodegrees == 360000000000LL);
     assert(digits == 5);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
 
     end = (char *)0;
     nanodegrees = hazer_parse_cog("90.5", &digits, &end);
     assert(nanodegrees == 90500000000LL);
     assert(digits == 3);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
 
     end = (char *)0;
     nanodegrees = hazer_parse_cog("90.25", &digits, &end);
     assert(nanodegrees == 90250000000LL);
     assert(digits == 4);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
 
     end = (char *)0;
     nanodegrees = hazer_parse_cog("90.125", &digits, &end);
     assert(nanodegrees == 90125000000LL);
     assert(digits == 5);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
 
     end = (char *)0;
     nanodegrees = hazer_parse_cog("-90.125", &digits, &end);
     assert(nanodegrees == -90125000000LL);
     assert(digits == 5);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
 
     /**************************************************************************/
 
@@ -732,41 +659,42 @@ int main(void)
     dop = hazer_parse_dop("", &end);
     assert(dop == 9999);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_dilutionofprecision(dop));
 
-    end = (char *)0;
-    dop = hazer_parse_dop("-1", &end);
-    assert(dop == 9999);
+    dop = hazer_parse_dop("0", &end);
+    assert(dop == 0);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_dilutionofprecision(dop));
 
     end = (char *)0;
     dop = hazer_parse_dop("1", &end);
     assert(dop == 100);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_dilutionofprecision(dop));
 
     end = (char *)0;
     dop = hazer_parse_dop("2.", &end);
     assert(dop == 200);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_dilutionofprecision(dop));
 
     end = (char *)0;
     dop = hazer_parse_dop("3.4", &end);
     assert(dop == 340);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_dilutionofprecision(dop));
 
     end = (char *)0;
     dop = hazer_parse_dop("56.78", &end);
     assert(dop == 5678);
     assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_dilutionofprecision(dop));
 
     end = (char *)0;
     dop = hazer_parse_dop("99.99", &end);
     assert(dop == 9999);
     assert((end != (char *)0) && (*end == '\0'));
-
-    end = (char *)0;
-    dop = hazer_parse_dop("100", &end);
-    assert(dop == 9999);
-    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_dilutionofprecision(dop));
 
     /**************************************************************************/
 

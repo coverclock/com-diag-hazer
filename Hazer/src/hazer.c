@@ -483,27 +483,62 @@ uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp, char
 
 uint64_t hazer_parse_utc(const char * string, char ** endp)
 {
+    uint64_t field = 0;
     uint64_t nanoseconds = 0;
     uint64_t numerator = 0;
     uint64_t denominator = 1;
     unsigned long hhmmss = 0;
 
-    hhmmss = strtoul(string, endp, 10);
-    nanoseconds = hhmmss / 10000;
-    nanoseconds *= 60;
-    hhmmss %= 10000;
-    nanoseconds += hhmmss / 100;
-    nanoseconds *= 60;
-    hhmmss %= 100;
-    nanoseconds += hhmmss;
-    nanoseconds *= 1000000000ULL;
+    do {
 
-    if (**endp == HAZER_STIMULUS_DECIMAL) {
-        numerator = hazer_parse_fraction(*endp + 1, &denominator, endp);
-        numerator *= 1000000000ULL;
-        numerator /= denominator;
-        nanoseconds += numerator;
-    }
+        hhmmss = strtoul(string, endp, 10);
+        if (!((**endp == '\0') || (**endp == HAZER_STIMULUS_DECIMAL))) {
+            break;
+        }
+
+        field = hhmmss / 10000;
+        if(!((0 <= field) && (field < 24))) {
+            *endp = (char *)string; /* Questionable. */
+            break;
+        }
+        hhmmss %= 10000;
+
+        nanoseconds = field;
+        nanoseconds *= 60;
+
+        field = hhmmss / 100;
+        if(!((0 <= field) && (field < 60))) {
+            *endp = (char *)string; /* Dangerous. */
+            break;
+        }
+        hhmmss %= 100;
+
+        nanoseconds += field;
+        nanoseconds *= 60;
+
+        field = hhmmss;
+        if(!((0 <= field) && (field < 60))) {
+            *endp = (char *)string; /* Really? */
+            break;
+        }
+
+        nanoseconds += field;
+        nanoseconds *= 1000000000ULL;
+
+        if (**endp == HAZER_STIMULUS_DECIMAL) {
+
+            numerator = hazer_parse_fraction(*endp + 1, &denominator, endp);
+            if (!(**endp == '\0')) {
+                break;
+            }
+
+            numerator *= 1000000000ULL;
+            numerator /= denominator;
+            nanoseconds += numerator;
+
+        }
+
+    } while (0);
 
     return nanoseconds;
 }
@@ -511,20 +546,40 @@ uint64_t hazer_parse_utc(const char * string, char ** endp)
 uint64_t hazer_parse_dmy(const char * string, char ** endp)
 {
     uint64_t nanoseconds = 0;
+    time_t seconds = 0;
     unsigned long ddmmyy = 0;
     struct tm datetime = { 0, };
     extern long timezone;
 
-    ddmmyy = strtoul(string, endp, 10);
+    do {
 
-    datetime.tm_year = ddmmyy % 100;
-    if (datetime.tm_year < 93) {  datetime.tm_year += 100; }
-    datetime.tm_mon = ((ddmmyy % 10000) / 100) - 1;
-    datetime.tm_mday = ddmmyy / 10000;
+        ddmmyy = strtoul(string, endp, 10);
+        if (**endp != '\0') {
+            break;
+        }
 
-    nanoseconds = mktime(&datetime); 
-    nanoseconds -= timezone;
-    nanoseconds *= 1000000000ULL;
+        /*
+         * We let mktime check the fields since it is
+         * more complicated with a variable number of
+         * days per months and depending on the year.
+         */
+
+        datetime.tm_year = ddmmyy % 100;
+        if (datetime.tm_year < 93) {  datetime.tm_year += 100; }
+        datetime.tm_mon = ((ddmmyy % 10000) / 100) - 1;
+        datetime.tm_mday = ddmmyy / 10000;
+
+        seconds = mktime(&datetime); 
+        if (seconds == (time_t)-1) {
+            *endp = (char *)string; /* No, I really mean it. */
+            break;
+        }
+
+        nanoseconds = seconds;
+        nanoseconds -= timezone;
+        nanoseconds *= 1000000000ULL;
+
+    } while (0);
 
     return nanoseconds;
 }
@@ -535,49 +590,65 @@ int64_t hazer_parse_latlon(const char * string, char direction, uint8_t * digits
     int64_t fraction = 0;
     uint64_t denominator = 1;
     unsigned long dddmm = 0;
-    uint8_t digits = 0;
-    static char invalid = '?';
+    size_t digits = 0;
 
-    digits = strlen(string);
+    do {
 
-    dddmm = strtoul(string, endp, 10);
-    nanominutes = dddmm / 100;
-    nanominutes *= 60000000000LL;
-    fraction = dddmm % 100;
-    fraction *= 1000000000LL;
-    nanominutes += fraction;
-
-    if (**endp == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
-        fraction *= 1000000000LL;
-        fraction /= denominator;
-        nanominutes += fraction;
-        --digits;
-    }
-
-    if (**endp == '\0') {
-        switch (direction) {
-        case HAZER_STIMULUS_NORTH:
-        case HAZER_STIMULUS_EAST:
-            break;
-        case HAZER_STIMULUS_SOUTH:
-        case HAZER_STIMULUS_WEST:
-            nanominutes = -nanominutes;
-            break;
-        default:
-            /*
-             * NOTE: not thread safe but we need to indicate an error.
-             * In the event of a race condition, the error will still
-             * be indicated, but the indicated character may not
-             * be correct.
-             */
-            invalid = direction;
-            *endp = &invalid;
+        digits = strlen(string);
+        if (digits == 0) {
+            *digitsp = 0;
+            *endp = (char *)string; /* Again? */
             break;
         }
-    }
 
-    *digitsp = digits;
+        dddmm = strtoul(string, endp, 10);
+        if (!((**endp == '\0') || (**endp == HAZER_STIMULUS_DECIMAL))) {
+            break;
+        }
+
+        nanominutes = dddmm / 100;
+
+        nanominutes *= 60000000000LL;
+        fraction = dddmm % 100;
+        fraction *= 1000000000LL;
+        nanominutes += fraction;
+
+        if (**endp == HAZER_STIMULUS_DECIMAL) {
+
+            fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
+            if (**endp != '\0') {
+                break;
+            }
+
+            fraction *= 1000000000LL;
+            fraction /= denominator;
+            nanominutes += fraction;
+
+            --digits;
+
+        }
+
+        if (**endp == '\0') {
+            switch (direction) {
+            case HAZER_STIMULUS_NORTH:
+            case HAZER_STIMULUS_EAST:
+                break;
+            case HAZER_STIMULUS_SOUTH:
+            case HAZER_STIMULUS_WEST:
+                nanominutes = -nanominutes;
+                break;
+            default:
+                *endp = (char *)string; /* Oh, fer pete's sake! */
+                break;
+            }
+        }
+        if (**endp != '\0') {
+            break;
+        }
+
+        *digitsp = digits;
+
+    } while (0);
 
     return nanominutes;
 }
@@ -587,30 +658,49 @@ int64_t hazer_parse_cog(const char * string, uint8_t * digitsp, char ** endp)
     int64_t nanodegrees = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
-    uint8_t digits = 0;
+    size_t digits = 0;
 
-    digits = strlen(string);
+    do {
 
-    nanodegrees = strtol(string, endp, 10);
-    nanodegrees *= 1000000000LL;
-
-    if (nanodegrees < 0) {
-        --digits;
-    }
-
-    if (**endp == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
-        fraction *= 1000000000LL;
-        fraction /= denominator;
-        if (nanodegrees < 0) {
-            nanodegrees -= fraction;
-        } else {
-            nanodegrees += fraction;
+        digits = strlen(string);
+        if (digits == 0) {
+            *digitsp = 0;
+            *endp = (char *)string; /* Here we are again. */
+            break;
         }
-        --digits;
-    }
 
-    *digitsp = digits;
+        nanodegrees = strtol(string, endp, 10);
+        if (!((**endp == '\0') || (**endp == HAZER_STIMULUS_DECIMAL))) {
+            break;
+        }
+
+        nanodegrees *= 1000000000LL;
+
+        if (nanodegrees < 0) {
+            --digits;
+        }
+
+        if (**endp == HAZER_STIMULUS_DECIMAL) {
+
+            fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
+            if (**endp != '\0') {
+                break;
+            }
+
+            fraction *= 1000000000LL;
+            fraction /= denominator;
+            if (nanodegrees < 0) {
+                nanodegrees -= fraction;
+            } else {
+                nanodegrees += fraction;
+            }
+
+            --digits;
+        }
+
+        *digitsp = digits;
+
+    } while (0);
 
     return nanodegrees;
 }
@@ -620,30 +710,50 @@ int64_t hazer_parse_sog(const char * string, uint8_t * digitsp, char ** endp)
     int64_t microknots = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
-    uint8_t digits = 0;
+    size_t digits = 0;
 
-    digits = strlen(string);
+    do {
 
-    microknots = strtol(string, endp, 10);
-    microknots *= 1000000LL;
-
-    if (microknots < 0) {
-        --digits;
-    }
-
-    if (**endp == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
-        fraction *= 1000000;
-        fraction /= denominator;
-        if (microknots < 0) {
-            microknots -= fraction;
-        } else {
-            microknots += fraction;
+        digits = strlen(string);
+        if (digits == 0) {
+            *digitsp = 0;
+            *endp = (char *)string; /* Have we learning nothing? */
+            break;
         }
-        --digits;
-    }
 
-    *digitsp = digits;
+        microknots = strtol(string, endp, 10);
+        if (!((**endp == '\0') || (**endp == HAZER_STIMULUS_DECIMAL))) {
+            break;
+        }
+
+        microknots *= 1000000LL;
+
+        if (microknots < 0) {
+            --digits;
+        }
+
+        if (**endp == HAZER_STIMULUS_DECIMAL) {
+
+            fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
+            if (**endp != '\0') {
+                break;
+            }
+
+            fraction *= 1000000;
+            fraction /= denominator;
+            if (microknots < 0) {
+                microknots -= fraction;
+            } else {
+                microknots += fraction;
+            }
+
+            --digits;
+
+        }
+
+        *digitsp = digits;
+
+    } while (0);
 
     return microknots;
 }
@@ -653,30 +763,49 @@ int64_t hazer_parse_smm(const char * string, uint8_t * digitsp, char ** endp)
     int64_t millimetersperhour = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
-    uint8_t digits = 0;
+    size_t digits = 0;
 
-    digits = strlen(string);
+    do {
 
-    millimetersperhour = strtol(string, endp, 10);
-    millimetersperhour *= 1000000LL;
-
-    if (millimetersperhour < 0) {
-        --digits;
-    }
-
-    if (**endp == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
-        fraction *= 1000000;
-        fraction /= denominator;
-        if (millimetersperhour < 0) {
-            millimetersperhour -= fraction;
-        } else {
-            millimetersperhour += fraction;
+        digits = strlen(string);
+        if (digits == 0) {
+            *digitsp = 0;
+            *endp = (char *)string; /* Apparently not. */
+            break;
         }
-        --digits;
-    }
 
-    *digitsp = digits;
+        millimetersperhour = strtol(string, endp, 10);
+        if (!((**endp == '\0') || (**endp == HAZER_STIMULUS_DECIMAL))) {
+            break;
+        }
+
+        millimetersperhour *= 1000000LL;
+
+        if (millimetersperhour < 0) {
+            --digits;
+        }
+
+        if (**endp == HAZER_STIMULUS_DECIMAL) {
+
+            fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
+            if (**endp != '\0') {
+                break;
+            }
+
+            fraction *= 1000000;
+            fraction /= denominator;
+            if (millimetersperhour < 0) {
+                millimetersperhour -= fraction;
+            } else {
+                millimetersperhour += fraction;
+            }
+
+            --digits;
+        }
+
+        *digitsp = digits;
+
+    } while (0);
 
     return millimetersperhour;
 }
@@ -686,30 +815,50 @@ int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp, char
     int64_t millimeters = 0;
     int64_t fraction = 0;
     uint64_t denominator = 1;
-    uint8_t digits = 0;
+    size_t digits = 0;
 
-    digits = strlen(string);
+    do {
 
-    millimeters = strtol(string, endp, 10);
-    millimeters *= 1000LL;
-
-    if (millimeters < 0) {
-        --digits;
-    }
-
-    if (**endp == HAZER_STIMULUS_DECIMAL) {
-        fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
-        fraction *= 1000;
-        fraction /= denominator;
-        if (millimeters < 0) {
-            millimeters -= fraction;
-        } else {
-            millimeters += fraction;
+        digits = strlen(string);
+        if (digits == 0) {
+            *digitsp = 0;
+            *endp = (char *)string; /* Don't make me come back there! */
+            break;
         }
-        --digits;
-    }
 
-    *digitsp = digits;
+        millimeters = strtol(string, endp, 10);
+        if (!((**endp == '\0') || (**endp == HAZER_STIMULUS_DECIMAL))) {
+            break;
+        }
+
+        millimeters *= 1000LL;
+
+        if (millimeters < 0) {
+            --digits;
+        }
+
+        if (**endp == HAZER_STIMULUS_DECIMAL) {
+
+            fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
+            if (**endp != '\0') {
+                break;
+            }
+
+            fraction *= 1000;
+            fraction /= denominator;
+            if (millimeters < 0) {
+                millimeters -= fraction;
+            } else {
+                millimeters += fraction;
+            }
+
+            --digits;
+
+        }
+
+        *digitsp = digits;
+
+    } while (0);
 
     return millimeters;
 }
@@ -721,36 +870,36 @@ uint16_t hazer_parse_dop(const char * string, char ** endp)
     int64_t fraction = 0;
     uint64_t denominator = 0;
 
-    if (*string != '\0') {
+    do {
+
+        if (*string == '\0') {
+            *endp = (char *)string; /* The strtoul(3) API does this too! */
+            break;
+        }
 
         number = strtoul(string, endp, 10);
-        if (number <= (HAZER_GNSS_DOP / 100)) {
+        if (!((**endp == '\0') || (**endp == HAZER_STIMULUS_DECIMAL))) {
+            break;
+        }
 
-            number *= 100;
+        number *= 100;
 
-            if (**endp == HAZER_STIMULUS_DECIMAL) {
+        if (**endp == HAZER_STIMULUS_DECIMAL) {
 
-                fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
-                fraction *= 100;
-                fraction /= denominator;
-
-                number += fraction;
-
+            fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
+            if (**endp != '\0') {
+                break;
             }
 
-            dop = number;
+            fraction *= 100;
+            fraction /= denominator;
+            number += fraction;
 
         }
 
-    } else  {
+        dop = number;
 
-        /*
-         * NOTE: dropping const qualifier. Dangerous, but consistent
-         * with strtoul(3) et al. API which does the same.
-         */
-        *endp = (char *)string;
-
-    }
+    } while (0);
 
     return dop;
 }
@@ -1925,8 +2074,6 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
 {
     int rc = -1;
     char * end = (char *)0;
-    char * enodata = (char *)0;
-    char * einval = (char *)0;
     hazer_position_t position = HAZER_POSITION_INITIALIZER;
     static const char VTG[] = HAZER_NMEA_SENTENCE_VTG;
 

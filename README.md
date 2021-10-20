@@ -989,6 +989,8 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://www.sparkfun.com/datasheets/GPS/NMEA%20Reference%20Manual-Rev2.1-Dec07.pdf>
 
+<https://www.celestis.com/resources/faq/what-are-the-azimuth-and-elevation-of-a-satellite/>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
