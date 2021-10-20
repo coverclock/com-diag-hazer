@@ -536,6 +536,34 @@ int main(void)
     assert((end != (char *)0) && (*end == '\0'));
     assert(hazer_is_valid_latitude(nanominutes));
 
+    end = (char *)0;
+    nanominutes = hazer_parse_latlon("17959.99999", 'E', &digits, &end);
+    assert(nanominutes == 10799999990000LL);
+    assert(digits == 10);
+    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_longitude(nanominutes));
+
+    end = (char *)0;
+    nanominutes = hazer_parse_latlon("17959.99999", 'W', &digits, &end);
+    assert(nanominutes == -10799999990000LL);
+    assert(digits == 10);
+    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_longitude(nanominutes));
+
+    end = (char *)0;
+    nanominutes = hazer_parse_latlon("8959.99999", 'N', &digits, &end);
+    assert(nanominutes == 5399999990000LL);
+    assert(digits == 9);
+    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_latitude(nanominutes));
+
+    end = (char *)0;
+    nanominutes = hazer_parse_latlon("8959.99999", 'S', &digits, &end);
+    assert(nanominutes == -5399999990000LL);
+    assert(digits == 9);
+    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_latitude(nanominutes));
+
     /**************************************************************************/
 
     end = (char *)0;
