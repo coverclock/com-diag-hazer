@@ -150,6 +150,7 @@
 #include "globals.h"
 #include "helpers.h"
 #include "print.h"
+#include "process.h"
 #include "sync.h"
 #include "threads.h"
 #include "types.h"
@@ -2700,8 +2701,6 @@ consume:
 
             } else if (yodel_ubx_ack(&acknak, buffer, length) == 0) {
 
-                refresh = !0;
-
                 if (acknak.state) {
                     DIMINUTO_LOG_NOTICE("Parse UBX UBX-ACK-ACK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                 } else if (!nakquit) {
@@ -2716,128 +2715,15 @@ consume:
 
             } else if (yodel_ubx_cfg_valget(buffer, length) == 0) {
 
-                /*
-                 * All of the validity checking and byte swapping is done in
-                 * yodel_ubx_cfg_valget(). The parse function doesn't accept
-                 * the message unless it checks out. This is also why the
-                 * buffer is passed as non-const; the variable length payload
-                 * is byteswapped in-place.
-                 */
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-CFG-VALGET accept\n");
 
-                yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)&(buffer[YODEL_UBX_PAYLOAD]);
-                const char * bb = (const char *)0;
-                const char * ee = &buffer[length - YODEL_UBX_CHECKSUM];
-                const char * layer = (const char *)0;
-                yodel_ubx_cfg_valget_key_t kk = 0;
-                size_t ss = 0;
-                size_t ll = 0;
-                uint8_t vv1 = 0;
-                uint16_t vv16 = 0;
-                uint32_t vv32 = 0;
-                uint64_t vv64 = 0;
-
-                refresh = !0;
-
-                switch (pp->layer) {
-                case YODEL_UBX_CFG_VALGET_Layer_RAM:
-                    layer = "RAM";
-                    break;
-                case YODEL_UBX_CFG_VALGET_Layer_BBR:
-                    layer = "BBR";
-                    break;
-                case YODEL_UBX_CFG_VALGET_Layer_NVM:
-                    layer = "NVM";
-                    break;
-                case YODEL_UBX_CFG_VALGET_Layer_ROM:
-                    layer = "ROM";
-                    break;
-                default:
-                    layer = "INV";
-                    break;
-                }
-
-                for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
-
-                    memcpy(&kk, bb, sizeof(kk));
-
-                    ss = (kk >> YODEL_UBX_CFG_VALGET_Key_Size_SHIFT) & YODEL_UBX_CFG_VALGET_Key_Size_MASK;
-
-                    switch (ss) {
-                    case YODEL_UBX_CFG_VALGET_Size_BIT:
-                    case YODEL_UBX_CFG_VALGET_Size_ONE:
-                        ll = 1;
-                        break;
-                    case YODEL_UBX_CFG_VALGET_Size_TWO:
-                        ll = 2;
-                        break;
-                    case YODEL_UBX_CFG_VALGET_Size_FOUR:
-                        ll = 4;
-                        break;
-                    case YODEL_UBX_CFG_VALGET_Size_EIGHT:
-                        ll = 8;
-                        break;
-                    }
-
-                    if (ll == 0) {
-                        break;
-                    }
-
-                    bb += sizeof(kk);
-
-                    switch (ss) {
-                    case YODEL_UBX_CFG_VALGET_Size_BIT:
-                        memcpy(&vv1, bb, sizeof(vv1));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX UBX-CFG-VALGET accept v%d %s [%d] 0x%08x 0x%01x\n", pp->version, layer, ii, kk, vv1);
-                        break;
-                    case YODEL_UBX_CFG_VALGET_Size_ONE:
-                        memcpy(&vv1, bb, sizeof(vv1));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX UBX-CFG-VALGET accept v%d %s [%d] 0x%08x 0x%02x\n", pp->version, layer, ii, kk, vv1);
-                        break;
-                    case YODEL_UBX_CFG_VALGET_Size_TWO:
-                        memcpy(&vv16, bb, sizeof(vv16));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX UBX-CFG-VALGET accept v%d %s [%d] 0x%08x 0x%04x\n", pp->version, layer, ii, kk, vv16);
-                        break;
-                    case YODEL_UBX_CFG_VALGET_Size_FOUR:
-                        memcpy(&vv32, bb, sizeof(vv32));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX UBX-CFG-VALGET accept v%d %s [%d] 0x%08x 0x%08x\n", pp->version,layer, ii, kk, vv32);
-                        break;
-                    case YODEL_UBX_CFG_VALGET_Size_EIGHT:
-                        memcpy(&vv64, bb, sizeof(vv64));
-                        DIMINUTO_LOG_INFORMATION("Parse UBX UBX-CFG-VALGET accept v%d %s [%d] 0x%08x 0x%016llx\n", pp->version, layer, ii, kk, (unsigned long long)vv64);
-                        break;
-                    }
-
-                    ++ii;
-
-                }
+                process_ubx_cfg_valget(buffer, length);
 
             } else if (yodel_ubx_mon_ver(buffer, length) == 0) {
 
-                const char * bb = &buffer[YODEL_UBX_PAYLOAD];
-                const char * ee = &buffer[length - YODEL_UBX_CHECKSUM];
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VALGET accept\n");
 
-                refresh = !0;
-
-                do {
-
-                    if (bb >= ee) {
-                        break;
-                    }
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-VER accept SW \"%s\"\n", bb);
-                    bb += YODEL_UBX_MON_VER_swVersion_LENGTH;
-
-                    if (bb >= ee) {
-                        break;
-                    }
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-VER accept HW \"%s\"\n", bb);
-                    bb += YODEL_UBX_MON_VER_hwVersion_LENGTH;
-
-                    while (bb < ee) {
-                        DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-VER accept EX \"%s\"\n", bb);
-                        bb += YODEL_UBX_MON_VER_extension_LENGTH;
-                    }
-
-                } while (0);
+                process_ubx_mon_ver(buffer, length);
 
             } else if (yodel_ubx_nav_svin(&base.payload, buffer, length) == 0) {
 
@@ -2875,32 +2761,10 @@ consume:
                 DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RTCM accept\n");
 
             } else if ((rc = yodel_ubx_mon_comms(&ports, buffer, length)) >= 0) {
-                diminuto_assert(sizeof(ports.prefix) == 8);
-                diminuto_assert(sizeof(ports.port[0]) == 40);
-                diminuto_assert(sizeof(ports) == (8 + (5 * 40)));
 
-                DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept version = %u\n", ports.prefix.version);
-                DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept nPorts = %u\n", ports.prefix.nPorts);
-                DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept txErrors = 0x%02x\n", ports.prefix.txErrors);
-                for (ii = 0; ii < countof(ports.prefix.protIds); ++ii) {
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept protIds[%d] = %u\n", ii, ports.prefix.protIds[ii]);
-                }
-                for (ii = 0; ii < rc; ++ii) {
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] portId = 0x%04x\n", ii, ports.port[ii].portId);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] txPending = %u\n", ii, ports.port[ii].txPending);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] txBytes = %u\n", ii, ports.port[ii].txBytes);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] txUsage = %u\n", ii, ports.port[ii].txUsage);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] txPeakUsage = %u\n", ii, ports.port[ii].txPeakUsage);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] rxPending = %u\n", ii, ports.port[ii].rxPending);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] rxBytes = %u\n", ii, ports.port[ii].rxBytes);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] rxUsage = %u\n", ii, ports.port[ii].rxUsage);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] rxPeakUsage = %u\n", ii, ports.port[ii].rxPeakUsage);
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] overrunErrs = %u\n", ii, ports.port[ii].overrunErrs);
-                    for (jj = 0; jj < countof(ports.port[ii].msgs); ++jj) {
-                        DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] msgs[%d] = %u\n", ii, jj, ports.port[ii].msgs[jj]);
-                    }
-                    DIMINUTO_LOG_INFORMATION("Parse UBX UBX-MON-COMMS accept port[%d] skipped = %u\n", ii, ports.port[ii].skipped);
-                }
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS accept\n");
+
+                process_ubx_mon_comms(&ports, rc);
 
             } else {
 
