@@ -1273,34 +1273,39 @@ static void update_time(hazer_position_t * positionp)
  ******************************************************************************/
 
 /*
- * Note that the count passed to the terminating parsers include the
- * terminating null pointer in the token vector. So a token vector
- * containing a single token would have a count of two: [ "token", NULL ].
- */
-
-/*
- * I am frequently tempted to replace the numerical constants used as counts
- * and indices below with symbolic constants, but I find they actually make
- * the code a lot harder to read, to debug, and to compare against the NMEA
- * spec.
- */
-
-/*
- * Do not be tempted to do a struture assignment (copy) in the code below.
- * That would update ALL of the fields, and that is not necessarily what is
- * intended.
- */
-
-/*
  * The most recent copy of the NMEA 0183 standard I have is 4.10. There is a
  * 4.11 version now, but NMEA wants an (IMO) astronomical $2000 for a copy of
  * it. It's time for GPS receiver manufacturers to form an industry association
  * to fork the NMEA standard and produces a non-proprietary (or at least
- * reasonably priced) standard. Or maybe ISO to do so (although that wouldn't
- * be cheap either.)
- */
-
-/*
+ * reasonably priced) standard. Or maybe ISO or ANSI should do so (although
+ * that wouldn't be cheap either.)
+ *
+ * Why all the syntax and validity checking of NMEA(-ish) sentences? Because
+ * after five years I finally tested a GPS device - a Bad Elf GPS Pro+ that I
+ * bought used off eBay - that required it. The device reads NMEA output from a
+ * MediaTek (MTK) GPS receiver, makes changes to it to make it palatable to the
+ * iPhone/iPad/iEtc, regenerates the checksum, and then emits it. I found that
+ * it was dropping characters in the NMEA sentences - typically the comma field
+ * separator - and then recomputeing the checksum of the malformed sentence.
+ * Wackiness ensued. (See the ISSUES.md file for more detail.)
+ *
+ * I am frequently tempted to replace the numerical constants used as counts
+ * and indices below with symbolic constants, but I find in this particular
+ * case they actually make the code a lot harder to read, to debug, and to
+ * compare against the NMEA spec. The constants are not part of the Hazer
+ * public API.
+ *
+ * Note that the count passed to the terminating parsers include the
+ * terminating null pointer in the token vector. So a token vector
+ * containing a single token would have a count of two: [ "token", NULL ].
+ *
+ * Do not be tempted to do a struture assignment (copy) in the code below.
+ * That would update ALL of the fields, and that is not necessarily what is
+ * intended. Parsing functions only update the fields for which they have
+ * new data from the sentence that they are parsing. The provinence of
+ * the fields in the structures may originate from several different NMEA
+ * sentences.
+ *
  * The semantics of errno are more complex than they might appear. For one, the
  * variable is actually thread safe: if you include the pthread header, it uses
  * a macro to redefine errno to be a function that uses a per-thread variable.
@@ -1308,7 +1313,8 @@ static void update_time(hazer_position_t * positionp)
  * have something to communicate. That's why I don't, for example, initialize
  * errno to zero and only change it if parse function actually returns <0. To
  * do otherwise is to possibly introduce bugs in the calling application that
- * can be very difficult to find.
+ * can be very difficult to find, particularly those applications that do a
+ * good job checking for and reporting errors.
  */
 
 int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)

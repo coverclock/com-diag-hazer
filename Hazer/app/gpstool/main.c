@@ -2662,7 +2662,7 @@ consume:
 
             } else {
 
-                DIMINUTO_LOG_INFORMATION("Parse NMEA Other reject \"%s\"\n", vector[0]);
+                DIMINUTO_LOG_DEBUG("Parse NMEA Other reject \"%s\"\n", vector[0]);
 
             }
 
@@ -2904,7 +2904,7 @@ consume:
 
             } else {
 
-                DIMINUTO_LOG_INFORMATION("Parse UBX Other reject 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
+                DIMINUTO_LOG_DEBUG("Parse UBX Other reject 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             }
 

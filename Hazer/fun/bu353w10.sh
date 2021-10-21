@@ -20,7 +20,7 @@ RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../fun)/ubx8
 
-LOG=$(readlink -e $(dirname ${0})/..)/log
+LOG=$(readlink -e $(dirname ${0})/..)/tmp
 mkdir -p ${LOG}
 
 OPTIONS=""

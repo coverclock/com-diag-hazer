@@ -6,7 +6,7 @@
 # This script script mimics the messaging that is emitted by the
 # U-blox CAM-M8Q in the Lynq Technologies Smart Compass.
 
-SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/log}
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
 
 PROGRAM=$(basename -s .sh ${0})
