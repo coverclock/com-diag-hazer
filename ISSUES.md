@@ -219,9 +219,11 @@ MTK GPS device to make them palatable to the native parser in the Apple
 iPhone and iPad products. This explains the correct checksums on the
 incorrect sentences.
 
-Addendum 1: Here's another example: there is a missing comma before the "N"
-direction indication, yet the checksum is correct. It took almost five hours
-for this to show up (although a similar error might have occurred earlier
+### Addendum 1
+
+Here's another example: there is a missing comma before the "N" direction
+indication, yet the checksum is correct. It took almost five hours for
+this to show up (although a similar error might have occurred earlier
 and not been in a field checked by an assert).
 
     checksum '$GPRMC,002525.000,A,3947.6529N,10509.2015,W,0.01,68.88,161021,,,D*65'
@@ -232,29 +234,47 @@ Compare with the correct sentence:
     checksum '$GPRMC,002525.000,A,3947.6529,N,10509.2015,W,0.01,68.88,161021,,,D*65'
     $GPRMC,002525.000,A,3947.6529,N,10509.2015,W,0.01,68.88,161021,,,D*49\r\n
 
-Addendum 2: Yet another: note the missing comma after the "W".
+### Addendum 2
+
+Yet another: note the missing comma after the "W".
 
     checksum '$GPRMC,012859.000,A,3947.6540,N,10509.2019,W0.01,125.17,191021,,,D*50'
     $GPRMC,012859.000,A,3947.6540,N,10509.2019,W0.01,125.17,191021,,,D*50\r\n
 
-Addendum 3: A more insidius example in which the decimal point in the course
-on ground was lost, "12517" instead of "125.17".
+### Addendum 3
+
+A more insidius example in which the decimal point in the course on
+ground was lost, "12517" instead of "125.17".
 
     checksum '$GPRMC,000411.000,A,3947.6531,N,10509.2017,W,0.04,12517,201021,,,D*56'
     $GPRMC,000411.000,A,3947.6531,N,10509.2017,W,0.04,12517,201021,,,D*56\r\n
 
-Addendum 4: I'm not sure what to make of this: this is a malformed sentence
-from a BU353W10 GPS USB dongle that has a u-blox M8 chip. It reflects a
-dropped decimal point in the latitude field, "39476540" instead of "3947.6540",
-yet the checksum emitted by the device is correct for the malformed sentence.
+### Addendum 4
+
+I'm not sure what to make of this: this is a malformed sentence from a
+BU353W10 GPS USB dongle that has a u-blox M8 chip. It reflects a dropped
+decimal point in the latitude field, "39476540" instead of "3947.6540",
+yet the checksum emitted by the device is correct for the malformed
+sentence.
 
     checksum '$GPRMC,140422.000,A,39476540,N,10509.2006,W,0.00,125.17,211021,,,D*50'
     $GPRMC,140422.000,A,39476540,N,10509.2006,W,0.00,125.17,211021,,,D*50\r\n
 
 My latest version of Hazer, which includes a lot more code to validate the
-NMEA sentences, detected this.
+NMEA sentences (thanks to the GPS Pro+), detected this.
 
     2021-10-21T14:04:22.573436Z "wheatstone" <EROR> [27067] {b6f80530} app/gpstool/main.c@2418: $GPRMC,140422.000,A,39476540,N,10509.2006,W,0.00,125.17,211021,,,D*50: "Numerical result out of range" (34)
 
-I'm not sure what to think about this. I wish I could blame my own code
-for this (because then I could fix it), but I don't see how.
+I wish I could blame my own code for this (because then I could fix it),
+but I don't see how. gpstool does *not* regenerate the checksum in any way
+before processing the sentence (but it does compute the checksum to verify
+it).
+
+    checksum '$GPRMC,140422.000,A,39476540,N,10509.2006,W,0.00,125.17,211021,,,D*50'
+    $GPRMC,140422.000,A,39476540,N,10509.2006,W,0.00,125.17,211021,,,D*50\r\n
+
+Compare this against the checksum of the corrected sentence.
+
+    checksum '$GPRMC,140422.000,A,3947.6540,N,10509.2006,W,0.00,125.17,211021,,,D*50'
+    $GPRMC,140422.000,A,3947.6540,N,10509.2006,W,0.00,125.17,211021,,,D*7E\r\n
+
