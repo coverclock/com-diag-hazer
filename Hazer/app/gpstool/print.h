@@ -81,21 +81,40 @@ extern void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_ro
 extern void print_solution(FILE * fp, const yodel_solution_t * sp);
 
 /**
+ * Print information about the attitude from the IMU.
  * @param fp points to the FILE stream.
  * @param sp points to the attitude structure.
  */
 extern void print_attitude(FILE * fp, const yodel_attitude_t * sp);
 
 /**
+ * Print information about the odometer from the IMU.
  * @param fp points to the FILE stream.
  * @param sp points to the odometer structure.
  */
 extern void print_odometer(FILE * fp, const yodel_odometer_t * sp);
 
 /**
+ * Print information about the orientation from the IMU.
  * @param fp points to the FILE stream.
  * @param sp points to the position/velocity/time structure.
  */
 extern void print_posveltim(FILE * fp, const yodel_posveltim_t * sp);
+
+/**
+ * Print (really: log) an errno error message using the NMEA sentence
+ * minus the CR and LF end matter.
+ * @param file is the file name (typically __FILE__).
+ * @param line is the line number (typically __LINE__).
+ * @param buffer points to the NMEA sentence.
+ * @param length is the sentence length in bytes (not including the NUL).
+ */
+extern void print_error_f(const char * file, int line, const char * buffer, size_t length);
+
+/**
+ * @def print_error
+ * Calls print_error_f with __FILE__ and __LINE__ if errno != 0.
+ */
+#define print_error(_BUFFER_, _LENGTH_) ((errno != 0) ? print_error_f(__FILE__, __LINE__, _BUFFER_, _LENGTH_) : (void)0)
 
 #endif

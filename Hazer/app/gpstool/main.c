@@ -2318,14 +2318,6 @@ consume:
             DIMINUTO_LOG_DEBUG("Tokenize NMEA [%zd]", count);
 
             /*
-             * We lop off the carriage return and new line from the end of the NMEA
-             * sentence so we can more easily use the buffer in error messages. The
-             * NMEA parsers only use the tokenized vector after this point.
-             */
-
-            buffer[length - sizeof("\r\n") + 1] = '\0';
-
-            /*
              * Make sure it's a talker and a GNSS that we care about.
              * As a special case, if we receive an update on active satellites
              * or satellites in view from something we don't recognize, then
@@ -2391,9 +2383,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA GGA reject\n");
 
@@ -2415,9 +2405,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA RMC reject\n");
 
@@ -2439,9 +2427,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA GLL reject\n");
 
@@ -2460,9 +2446,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA VTG reject\n");
 
@@ -2519,9 +2503,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA GSA reject\n");
 
@@ -2549,9 +2531,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA GSV reject\n");
 
@@ -2565,9 +2545,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA TXT reject\n");
 
@@ -2588,9 +2566,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse PUBX POSITION reject\n");
 
@@ -2624,9 +2600,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS reject\n");
 
@@ -2653,9 +2627,7 @@ consume:
 
                 } else {
 
-                    if (errno != 0) {
-                        diminuto_perror(buffer);
-                    }
+                    print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse PUBX TIME reject\n");
 

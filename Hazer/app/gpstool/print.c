@@ -942,3 +942,14 @@ void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
 
     }
 }
+
+void print_error_f(const char * file, int line, const char * buffer, size_t length)
+{
+    int save = 0;
+    static const size_t MINIMUM = sizeof("\r\n") - 1;
+
+    save = errno;
+    length = (length > MINIMUM) ? (length - MINIMUM) : 0;
+    diminuto_log_log(DIMINUTO_LOG_PRIORITY_WARNING, "%s@%d: %*.*s: \"%s\" (%d)\n", file, line, length, length, buffer, strerror(save), save);
+    errno = save;
+}
