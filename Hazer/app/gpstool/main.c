@@ -2693,7 +2693,7 @@ consume:
 
             } else if (yodel_ubx_mon_ver(buffer, length) == 0) {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VALGET accept\n");
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VER accept\n");
 
                 process_ubx_mon_ver(buffer, length);
 
