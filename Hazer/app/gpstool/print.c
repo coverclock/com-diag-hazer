@@ -950,6 +950,6 @@ void print_error_f(const char * file, int line, const char * buffer, size_t leng
 
     save = errno;
     length = (length > MINIMUM) ? (length - MINIMUM) : 0;
-    diminuto_log_log(DIMINUTO_LOG_PRIORITY_WARNING, "%s@%d: %*.*s: \"%s\" (%d)\n", file, line, length, length, buffer, strerror(save), save);
+    diminuto_log_log(DIMINUTO_LOG_PRIORITY_WARNING, "%s@%d: \"%*.*s\": \"%s\" (%d)\n", file, line, length, length, buffer, strerror(save), save);
     errno = save;
 }
