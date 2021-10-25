@@ -22,7 +22,13 @@
  */
 extern void process_ubx_cfg_valget(const void * buffer, ssize_t length);
 
-extern void process_ubx_mon_comms(const yodel_ubx_mon_comms_t * pp, int count);
+/**
+ * Process a UBX-MON-COMMS message from a buffer that has been converted
+ * to host byte order in place.
+ * @param buffer points to the buffer.
+ * @param length is the number of payload bytes in the buffer.
+ */
+extern void process_ubx_mon_comms(const void * buffer, ssize_t length);
 
 /**
  * Process a UBX-MON-VER message from a buffer that has been converted

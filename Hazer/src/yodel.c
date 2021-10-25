@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <errno.h>
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/common.h"
 #include "../src/yodel.h"
@@ -336,11 +337,11 @@ int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * bp, ssize
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_HPPOSLLH_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_HPPOSLLH_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_HPPOSLLH_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
         COM_DIAG_YODEL_LETOH(mp->iTOW);
@@ -362,11 +363,11 @@ int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_HW_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_MON_HW_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_MON_HW_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
         COM_DIAG_YODEL_LETOH(mp->pinSel);
@@ -391,11 +392,11 @@ int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ssize_t l
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_STATUS_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_STATUS_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_STATUS_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
         COM_DIAG_YODEL_LETOH(mp->iTOW);
@@ -413,11 +414,11 @@ int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_ACK_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if ((hp[YODEL_UBX_ID] != YODEL_UBX_ACK_ACK_Id) && (hp[YODEL_UBX_ID] != YODEL_UBX_ACK_NAK_Id)) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_ACK_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), YODEL_UBX_ACK_Length);
         mp->state = (hp[YODEL_UBX_ID] == YODEL_UBX_ACK_ACK_Id);
@@ -433,11 +434,11 @@ int yodel_ubx_cfg_valget(void * bp, ssize_t length)
     unsigned char * hp = (unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_CFG_VALGET_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_CFG_VALGET_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length < (YODEL_UBX_SHORTEST + YODEL_UBX_CFG_VALGET_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)0;
         char * bb = (char *)0;
@@ -458,6 +459,7 @@ int yodel_ubx_cfg_valget(void * bp, ssize_t length)
         for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
 
             if ((bb + sizeof(kk)) > ee) {
+                errno = EINVAL;
                 rc = -1;
                 break;
             }
@@ -490,11 +492,13 @@ int yodel_ubx_cfg_valget(void * bp, ssize_t length)
             }
 
             if (ll == 0) {
+                errno = EINVAL;
                 rc = -1;
                 break;
             }
 
             if ((bb + ll) > ee) {
+                errno = EINVAL;
                 rc = -1;
                 break;
             }
@@ -531,11 +535,11 @@ int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_t lengt
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_RXM_RTCM_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_RXM_RTCM_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_RXM_RTCM_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
         COM_DIAG_YODEL_LETOH(mp->subType);
@@ -553,11 +557,11 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t lengt
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_SVIN_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_SVIN_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_SVIN_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
         COM_DIAG_YODEL_LETOH(mp->iTOW);
@@ -573,42 +577,44 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t lengt
     return rc;
 }
 
-int yodel_ubx_mon_comms(yodel_ubx_mon_comms_t * mp, const void * bp, ssize_t length)
+int yodel_ubx_mon_comms(void * bp, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)bp;
+    unsigned char * hp = (unsigned char *)bp;
     int ii = 0;
     int jj = 0;
+    yodel_ubx_mon_comms_t comms = YODEL_UBX_MON_COMMS_INITIALIZER;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_COMMS_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_MON_COMMS_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length < (YODEL_UBX_SHORTEST + YODEL_UBX_MON_COMMS_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         hp += YODEL_UBX_PAYLOAD;
         length -= YODEL_UBX_PAYLOAD;
-        memcpy(&(mp->prefix), hp, sizeof(mp->prefix));
-        hp += sizeof(mp->prefix);
-        length -= sizeof(mp->prefix);
-        while ((ii < mp->prefix.nPorts) && (ii < (sizeof(mp->port)/sizeof(mp->port[0]))) && (length >= sizeof(mp->port[ii]))) {
-            memcpy(&(mp->port[ii]), hp, sizeof(mp->port[ii]));
-            COM_DIAG_YODEL_LETOH(mp->port[ii].portId); /* Does not appear to be little-endian in practice. */
-            COM_DIAG_YODEL_LETOH(mp->port[ii].txPending);
-            COM_DIAG_YODEL_LETOH(mp->port[ii].txBytes);
-            COM_DIAG_YODEL_LETOH(mp->port[ii].rxPending);
-            COM_DIAG_YODEL_LETOH(mp->port[ii].rxBytes);
-            COM_DIAG_YODEL_LETOH(mp->port[ii].overrunErrs);
-            for (jj = 0; jj < (sizeof(mp->port[ii].msgs)/sizeof(mp->port[ii].msgs[jj])); ++jj) {
-                COM_DIAG_YODEL_LETOH(mp->port[ii].msgs[jj]);
+        memcpy(&comms.prefix, hp, sizeof(comms.prefix));
+        hp += sizeof(comms.prefix);
+        length -= sizeof(comms.prefix);
+        while ((ii < comms.prefix.nPorts) && (ii < (sizeof(comms.port)/sizeof(comms.port[0]))) && (length >= sizeof(comms.port[ii]))) {
+            memcpy(&(comms.port[ii]), hp, sizeof(comms.port[ii]));
+            COM_DIAG_YODEL_LETOH(comms.port[ii].portId); /* Does not appear to be little-endian in practice. */
+            COM_DIAG_YODEL_LETOH(comms.port[ii].txPending);
+            COM_DIAG_YODEL_LETOH(comms.port[ii].txBytes);
+            COM_DIAG_YODEL_LETOH(comms.port[ii].rxPending);
+            COM_DIAG_YODEL_LETOH(comms.port[ii].rxBytes);
+            COM_DIAG_YODEL_LETOH(comms.port[ii].overrunErrs);
+            for (jj = 0; jj < (sizeof(comms.port[ii].msgs)/sizeof(comms.port[ii].msgs[jj])); ++jj) {
+                COM_DIAG_YODEL_LETOH(comms.port[ii].msgs[jj]);
             }
-            COM_DIAG_YODEL_LETOH(mp->port[ii].skipped);
-            hp += sizeof(mp->port[ii]);
-            length -= sizeof(mp->port[ii]);
+            COM_DIAG_YODEL_LETOH(comms.port[ii].skipped);
+            memcpy(hp, &(comms.port[ii]), sizeof(comms.port[ii]));
+            hp += sizeof(comms.port[ii]);
+            length -= sizeof(comms.port[ii]);
             ii += 1;
         }
-        rc = ii;
+        rc = 0;
     }
 
     return rc;
@@ -620,11 +626,11 @@ int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_ATT_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_ATT_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_ATT_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
         COM_DIAG_YODEL_LETOH(mp->iTOW);
@@ -646,11 +652,11 @@ int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_ODO_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_ODO_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_ODO_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
         COM_DIAG_YODEL_LETOH(mp->iTOW);
@@ -669,11 +675,11 @@ int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_PVT_Class) {
-        /* Do nothing. */
+        errno = 0;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_PVT_Id) {
-        /* Do nothing. */
+        errno = 0;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_PVT_Length)) {
-        /* Do nothing. */
+        errno = ENODATA;
     } else {
         memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
         COM_DIAG_YODEL_LETOH(mp->iTOW);

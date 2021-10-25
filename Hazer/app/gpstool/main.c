@@ -325,7 +325,6 @@ int main(int argc, char * argv[])
     yodel_base_t base = YODEL_BASE_INITIALIZER;
     yodel_rover_t rover = YODEL_ROVER_INITIALIZER;
     yodel_ubx_ack_t acknak = YODEL_UBX_ACK_INITIALIZER;
-    yodel_ubx_mon_comms_t ports = YODEL_UBX_MON_COMMS_INITIALIZER;
     yodel_attitude_t attitude = YODEL_ATTITUDE_INITIALIZER;
     yodel_odometer_t odometer = YODEL_ODOMETER_INITIALIZER;
     yodel_posveltim_t posveltim = YODEL_POSVELTIM_INITIALIZER;
@@ -2844,11 +2843,11 @@ consume:
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_COMMS_Class, YODEL_UBX_MON_COMMS_Id)) {
 
-                if ((rc = yodel_ubx_mon_comms(&ports, buffer, length)) >= 0) {
+                if (yodel_ubx_mon_comms(buffer, length) == 0) {
 
                     DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS accept\n");
 
-                    process_ubx_mon_comms(&ports, rc);
+                    process_ubx_mon_comms(buffer, length);
 
                 } else {
 

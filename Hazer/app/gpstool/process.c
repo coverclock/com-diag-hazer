@@ -46,7 +46,7 @@ void process_ubx_cfg_valget(const void * buffer, ssize_t length)
         layer = "ROM";
         break;
     default:
-        layer = "INV";
+        layer = "UNK";
         break;
     }
 
@@ -107,39 +107,49 @@ void process_ubx_cfg_valget(const void * buffer, ssize_t length)
 
 }
 
-void process_ubx_mon_comms(const yodel_ubx_mon_comms_t * pp, int count)
+void process_ubx_mon_comms(const void * buffer, ssize_t length)
 {
     int ii = 0;
     int jj = 0;
+    yodel_ubx_mon_comms_t comms = YODEL_UBX_MON_COMMS_INITIALIZER;
+    const uint8_t * bp = &(((const uint8_t *)buffer)[YODEL_UBX_PAYLOAD]);
 
-    DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS version = %u\n", pp->prefix.version);
-    DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS nPorts = %u\n", pp->prefix.nPorts);
-    DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS txErrors = 0x%02x\n", pp->prefix.txErrors);
+    memcpy(&comms.prefix, bp, sizeof(comms.prefix));
 
-    for (ii = 0; ii < diminuto_countof(pp->prefix.protIds); ++ii) {
+    DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS version               %u\n", comms.prefix.version);
+    DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS nPorts                %u\n", comms.prefix.nPorts);
+    DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS txErrors              0x%02x\n", comms.prefix.txErrors);
 
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS protIds[%d] = %u\n", ii, pp->prefix.protIds[ii]);
+    for (ii = 0; ii < diminuto_countof(comms.prefix.protIds); ++ii) {
+
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS protIds[%d]            %u\n", ii, comms.prefix.protIds[ii]);
 
     }
 
-    for (ii = 0; ii < count; ++ii) {
+    bp += sizeof(comms.prefix);
 
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] portId = 0x%04x\n", ii, pp->port[ii].portId);
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] txPending = %u\n", ii, pp->port[ii].txPending);
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] txBytes = %u\n", ii, pp->port[ii].txBytes);
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] txUsage = %u\n", ii, pp->port[ii].txUsage);
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] txPeakUsage = %u\n", ii, pp->port[ii].txPeakUsage);
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] rxPending = %u\n", ii, pp->port[ii].rxPending);
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] rxBytes = %u\n", ii, pp->port[ii].rxBytes);
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] rxUsage = %u\n", ii, pp->port[ii].rxUsage);
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] rxPeakUsage = %u\n", ii, pp->port[ii].rxPeakUsage);
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] overrunErrs = %u\n", ii, pp->port[ii].overrunErrs);
+    for (ii = 0; ii < comms.prefix.nPorts; ++ii) {
 
-        for (jj = 0; jj < countof(pp->port[ii].msgs); ++jj) {
-            DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] msgs[%d] = %u\n", ii, jj, pp->port[ii].msgs[jj]);
+        memcpy(&comms.port[ii], bp, sizeof(comms.port[ii]));
+
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] portId        0x%04x\n", ii, comms.port[ii].portId);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   txPending   %u\n", ii, comms.port[ii].txPending);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   txBytes     %u\n", ii, comms.port[ii].txBytes);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   txUsage     %u\n", ii, comms.port[ii].txUsage);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   txPeakUsage %u\n", ii, comms.port[ii].txPeakUsage);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   rxPending   %u\n", ii, comms.port[ii].rxPending);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   rxBytes     %u\n", ii, comms.port[ii].rxBytes);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   rxUsage     %u\n", ii, comms.port[ii].rxUsage);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   rxPeakUsage %u\n", ii, comms.port[ii].rxPeakUsage);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   overrunErrs %u\n", ii, comms.port[ii].overrunErrs);
+
+        for (jj = 0; jj < countof(comms.port[ii].msgs); ++jj) {
+            DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   msgs[%d]     %u\n", ii, jj, comms.port[ii].msgs[jj]);
         }
 
-        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d] skipped = %u\n", ii, pp->port[ii].skipped);
+        DIMINUTO_LOG_INFORMATION("Process UBX-MON-COMMS port[%d]   skipped     %u\n", ii,  comms.port[ii].skipped);
+
+        bp += sizeof(comms.port[ii]);
     }
 
 }

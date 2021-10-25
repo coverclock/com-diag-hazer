@@ -1015,13 +1015,13 @@ enum YodelUbxMonCommsConstants {
 };
 
 /**
- * Process a possible UBX-MON-COMMS message.
- * @param mp points to a UBX-MON-COMMS structure in which to save the payload.
+ * Process a possible UBX-MON-COMMST message. The buffer is passed as non-const
+ * because the byte-swapping of the payload is performed in-place.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
- * @return the number of ports processed, <0 otherwise.
+ * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_mon_comms(yodel_ubx_mon_comms_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_mon_comms(void * bp, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-NAV-ATT MESSAGES
