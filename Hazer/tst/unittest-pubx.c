@@ -62,7 +62,7 @@ int main(void)
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
 
-        rc = hazer_is_pubx_id(vector, "00");
+        rc = hazer_is_pubx_id(vector, count, "00");
         assert(rc == !0);
 
         rc = hazer_parse_pubx_position(&position, &active, vector, count);
@@ -127,7 +127,7 @@ int main(void)
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
 
-        rc = hazer_is_pubx_id(vector, "03");
+        rc = hazer_is_pubx_id(vector, count, "03");
         assert(rc == !0);
 
         rc = hazer_parse_pubx_svstatus(view, active, vector, count);
@@ -366,7 +366,7 @@ $PUBX,03,19,
         temporary[length + 3] = '\0';
         assert(strcmp(DATA, temporary) == 0);
 
-        rc = hazer_is_pubx_id(vector, "04");
+        rc = hazer_is_pubx_id(vector, count, "04");
         assert(rc == !0);
 
         rc = hazer_parse_pubx_time(&position, vector, count);

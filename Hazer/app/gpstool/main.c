@@ -2333,7 +2333,7 @@ consume:
 
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
 
-                if (hazer_is_nmea_name(vector, "GSA") || hazer_is_nmea_name(vector, "GSV")) {
+                if (hazer_is_nmea_name(vector, count, "GSA") || hazer_is_nmea_name(vector, count, "GSV")) {
                     DIMINUTO_LOG_INFORMATION("Parse NMEA Talker Other \"%c%c\"", vector[0][1], vector[0][2]);
                 }
                 continue;
@@ -2349,7 +2349,7 @@ consume:
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 
-                if (hazer_is_nmea_name(vector, "GSA") || hazer_is_nmea_name(vector, "GSV")) {
+                if (hazer_is_nmea_name(vector, count, "GSA") || hazer_is_nmea_name(vector, count, "GSV")) {
                     DIMINUTO_LOG_INFORMATION("Parse NMEA System Other \"%c%c\"\n", vector[0][1], vector[0][2]);
                 }
                 continue;
@@ -2369,7 +2369,7 @@ consume:
              * we got this sentence via a UDP datagram).
              */
 
-            if (hazer_is_nmea_name(vector, HAZER_NMEA_SENTENCE_GGA)) {
+            if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GGA)) {
 
                 if (hazer_parse_gga(&position[system], vector, count) == 0) {
 
@@ -2391,7 +2391,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, HAZER_NMEA_SENTENCE_RMC)) {
+            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_RMC)) {
 
                 if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 
@@ -2413,7 +2413,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, HAZER_NMEA_SENTENCE_GLL)) {
+            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GLL)) {
 
                 if (hazer_parse_gll(&position[system], vector, count) == 0) {
 
@@ -2435,7 +2435,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, HAZER_NMEA_SENTENCE_VTG)) {
+            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_VTG)) {
 
                 if (hazer_parse_vtg(&position[system], vector, count) == 0) {
 
@@ -2452,7 +2452,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, HAZER_NMEA_SENTENCE_GSA)) {
+            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GSA)) {
 
                 if (hazer_parse_gsa(&active_cache, vector, count) == 0) {
 
@@ -2509,7 +2509,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, HAZER_NMEA_SENTENCE_GSV)) {
+            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GSV)) {
 
                 if  ((rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
 
@@ -2537,7 +2537,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, HAZER_NMEA_SENTENCE_TXT)) {
+            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_TXT)) {
 
                 if  (hazer_parse_txt(vector, count) == 0) {
 
@@ -2551,7 +2551,11 @@ consume:
 
                 }
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && hazer_is_pubx_id(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
+            } else if (talker != HAZER_TALKER_PUBX) {
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA Other reject \"%s\"\n", vector[0]);
+
+            } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
 
                 if  (hazer_parse_pubx_position(&position[system], &active[system], vector, count) == 0) {
 
@@ -2574,7 +2578,7 @@ consume:
 
                 }
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && hazer_is_pubx_id(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS)) {
+            } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS)) {
 
                 if ((rc = hazer_parse_pubx_svstatus(view, active, vector, count)) != 0x00) {
 
@@ -2606,7 +2610,7 @@ consume:
 
                 }
 
-            } else if ((count > 2) && (talker == HAZER_TALKER_PUBX) && hazer_is_pubx_id(vector, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME)) {
+            } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME)) {
 
                 if (hazer_parse_pubx_time(&position[system], vector, count) == 0) {
 

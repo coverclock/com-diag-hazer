@@ -205,6 +205,7 @@ int main(void)
         yodel_ubx_ack_t data = YODEL_UBX_ACK_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_ACK_Class, YODEL_UBX_ACK_NAK_Id));
         assert(yodel_ubx_ack(&data, message, size) == 0);
         assert(data.state == 0);
     END;
@@ -213,6 +214,7 @@ int main(void)
         yodel_ubx_ack_t data = YODEL_UBX_ACK_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_ACK_Class, YODEL_UBX_ACK_ACK_Id));
         assert(yodel_ubx_ack(&data, message, size) == 0);
         assert(data.state == !0);
     END;
@@ -221,6 +223,7 @@ int main(void)
         yodel_ubx_cfg_valget_t data = YODEL_UBX_CFG_VALGET_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id));
         assert(yodel_ubx_cfg_valget(message, size) == 0);
     END;
 
@@ -228,6 +231,7 @@ int main(void)
         yodel_ubx_cfg_valget_t data = YODEL_UBX_CFG_VALGET_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id));
         assert(yodel_ubx_cfg_valget(message, size) == 0);
     END;
 
@@ -235,12 +239,14 @@ int main(void)
         yodel_ubx_mon_hw_t data = YODEL_UBX_MON_HW_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_MON_HW_Class, YODEL_UBX_MON_HW_Id));
         assert(yodel_ubx_mon_hw(&data, message, size) == 0);
     END;
 
     BEGIN("\\xb5b\\n\\x04\\xdc\\0EXT CORE 1.00 (94e56e)\\0\\0\\0\\0\\0\\0\\0\\000190000\\0\\0ROM BASE 0x118B2060\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0FWVER=HPG 1.11\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0PROTVER=27.10\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0MOD=ZED-F9P\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0GPS;GLO;GAL;BDS\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0QZSS\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x9au");
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_MON_VER_Class, YODEL_UBX_MON_VER_Id));
         assert(yodel_ubx_mon_ver(message, size) == 0);
     END;
 
@@ -248,6 +254,7 @@ int main(void)
         yodel_ubx_nav_status_t data = YODEL_UBX_NAV_STATUS_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_NAV_STATUS_Class, YODEL_UBX_NAV_STATUS_Id));
         assert(yodel_ubx_nav_status(&data, message, size) == 0);
     END;
 
@@ -255,6 +262,7 @@ int main(void)
         yodel_ubx_nav_svin_t data = YODEL_UBX_NAV_SVIN_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_NAV_SVIN_Class, YODEL_UBX_NAV_SVIN_Id));
         assert(yodel_ubx_nav_svin(&data, message, size) == 0);
     END;
 
@@ -262,6 +270,7 @@ int main(void)
         yodel_ubx_rxm_rtcm_t data = YODEL_UBX_RXM_RTCM_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_RXM_RTCM_Class, YODEL_UBX_RXM_RTCM_Id));
         assert(yodel_ubx_rxm_rtcm(&data, message, size) == 0);
     END;
 
@@ -270,6 +279,7 @@ int main(void)
         memset(&data, 0xA5, sizeof(data));
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_MON_COMMS_Class, YODEL_UBX_MON_COMMS_Id));
         assert(yodel_ubx_mon_comms(&data, message, size) == 4);
 		assert(data.prefix.version == 0);
 		assert(data.prefix.nPorts == 4);

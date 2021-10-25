@@ -370,6 +370,26 @@ typedef enum YodelId {
 } yodel_id_t;
 
 /*******************************************************************************
+ * PROCESSING HELPERS
+ ******************************************************************************/
+
+/**
+ * Return true if the UBX packet class and identifier matches the specified
+ * values.
+ * @param bp points to the buffer.
+ * @param length is the length of the buffer in bytes.
+ * @param klass is the desired class.
+ * @param id is the desired identifier.
+ * @return true if the class and the id match.
+ */
+static inline int yodel_is_ubx_class_id(const void * bp, ssize_t length, uint8_t klass, uint8_t id)
+{
+    const uint8_t * hp = (const uint8_t *)bp;
+
+    return ((length > YODEL_UBX_ID) && (hp[YODEL_UBX_CLASS] == klass) && (hp[YODEL_UBX_ID] == id));
+}
+
+/*******************************************************************************
  * PROCESSING UBX-NAV-HPPOSLLH MESSAGES
  ******************************************************************************/
 

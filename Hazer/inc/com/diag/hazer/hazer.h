@@ -1292,24 +1292,26 @@ extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], 
  * Return true if the NMEA sentence name following the talker matches
  * the specified three letter name.
  * @param vector is the Hazer parsed vector (a 2D array).
+ * @param count is the number of slots in the vector.
  * @param name is the nul-terminated three letter name.
- * @return true if the name matches the field.
+ * @return true if the name matches the field, false otherwise.
  */
-static inline int hazer_is_nmea_name(const hazer_vector_t vector, const char name[4])
+static inline int hazer_is_nmea_name(const hazer_vector_t vector, ssize_t count, const char name[4])
 {
-    return ((vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][3]), name) == 0));
+    return ((count > 1) && (vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][3]), name) == 0));
 }
 
 /**
  * Return true if the second field in the vector matches the specified
  * PUBX message id.
  * @param vector is the Hazer parsed vector (a 2D array).
+ * @param count is the number of slots in the vector.
  * @param id is the nul-terminated two letter message identifier.
  * @return true if the id matches the field.
  */
-static inline int hazer_is_pubx_id(const hazer_vector_t vector, const char id[3])
+static inline int hazer_is_pubx_id(const hazer_vector_t vector, ssize_t count, const char id[3])
 {
-    return ((vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][1]), "PUBX") == 0) && (strcmp(vector[1], id) == 0));
+    return ((count > 2) && (vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][1]), "PUBX") == 0) && (strcmp(vector[1], id) == 0));
 }
 
 /**
