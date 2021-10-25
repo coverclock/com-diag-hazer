@@ -525,22 +525,6 @@ int yodel_ubx_cfg_valget(void * bp, ssize_t length)
     return rc;
 }
 
-int yodel_ubx_mon_ver(const void * bp, ssize_t length)
-{
-    int rc = -1;
-    const unsigned char * hp = (const unsigned char *)bp;
-
-    if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_VER_Class) {
-        /* Do nothing. */
-    } else if (hp[YODEL_UBX_ID] != YODEL_UBX_MON_VER_Id) {
-        /* Do nothing. */
-    } else {
-        rc = 0;
-    }
-
-    return rc;
-}
-
 int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_t length)
 {
     int rc = -1;

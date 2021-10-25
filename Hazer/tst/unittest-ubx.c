@@ -247,7 +247,6 @@ int main(void)
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
         assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_MON_VER_Class, YODEL_UBX_MON_VER_Id));
-        assert(yodel_ubx_mon_ver(message, size) == 0);
     END;
 
     BEGIN("\\xb5b\\x01\\x03\\x10\\0h\\x15i\\x0f\\x05\\xdd\\0\\bkn\\0\\0\\xde\\x1e\\xbf\\0\\x87V");

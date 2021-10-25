@@ -832,15 +832,6 @@ enum YodelUbxMonVerConstants {
     YODEL_UBX_MON_VER_extension_LENGTH	= 30,
 };
 
-/**
- * Process a possible UBX-MON-VER message. The UBX-MON-VER message is variable
- * length containing a variable number of character strings.
- * @param bp points to a buffer with a UBX header and payload.
- * @param length is the length of the header, payload, and checksum in bytes.
- * @return 0 if the message was valid, <0 otherwise.
- */
-extern int yodel_ubx_mon_ver(const void * bp, ssize_t length);
-
 /*******************************************************************************
  * PROCESSING UBX-NAV-SVIN MESSAGES
  ******************************************************************************/

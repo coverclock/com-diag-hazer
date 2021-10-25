@@ -2755,19 +2755,9 @@ consume:
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_VER_Class, YODEL_UBX_MON_VER_Id)) {
 
-                if (yodel_ubx_mon_ver(buffer, length) == 0) {
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VER accept\n");
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VER accept\n");
-
-                    process_ubx_mon_ver(buffer, length);
-
-                } else {
-
-                    print_error(buffer, length);
-
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VER reject\n");
-
-                }
+                process_ubx_mon_ver(buffer, length);
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_SVIN_Class, YODEL_UBX_NAV_SVIN_Id)) {
 
