@@ -9,7 +9,9 @@
  * @details
  */
 
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
 #include "com/diag/diminuto/diminuto_absolute.h"
@@ -943,13 +945,42 @@ void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
     }
 }
 
-void print_error_f(const char * file, int line, const char * buffer, size_t length)
+/*
+ * This is an expensive function. But we only call it if the GPS source
+ * sends us a malformed sentence/packet/message. That's a pretty serious
+ * failure, which is why we log at WARNING.
+ */
+void print_error_f(const char * file, int line, const void * buffer, size_t length)
 {
-    int save = 0;
-    static const size_t MINIMUM = sizeof("\r\n") - 1;
+    int error = errno;
+    const uint8_t * bp = (const uint8_t *)buffer;
+    size_t ll = length;
+    unsigned char * expanded = (unsigned char *)0;
+    unsigned char * ep = (unsigned char *)0;
+    static unsigned char HEX[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-    save = errno;
-    length = (length > MINIMUM) ? (length - MINIMUM) : 0;
-    diminuto_log_log(DIMINUTO_LOG_PRIORITY_WARNING, "%s@%d: \"%*.*s\": \"%s\" (%d)\n", file, line, length, length, buffer, strerror(save), save);
-    errno = save;
+    expanded = (unsigned char *)malloc((length * (sizeof("\\xab") - 1)) + 1);
+    if (expanded == (unsigned char *)0) {
+        diminuto_perror("malloc");
+        return;
+    }
+    ep = expanded;
+
+    while ((ll--) > 0) {
+        if (isprint(*bp)) {
+            *(ep++) = *(bp++);
+        } else {
+            *(ep++) = '\\';
+            *(ep++) = 'x';
+            *(ep++) = HEX[(*bp & 0xf0) >> 4];
+            *(ep++) = HEX[*(bp++) & 0x0f];
+        }
+    }
+    *(ep++) = '\0';
+
+    diminuto_log_log(DIMINUTO_LOG_PRIORITY_WARNING, "%s@%d: {%s}[%zu]: \"%s\" (%d)\n", file, line, expanded, length, strerror(error), error);
+
+    free(expanded);
+
+    errno = error;
 }

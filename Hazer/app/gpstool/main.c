@@ -2291,6 +2291,14 @@ consume:
          ** PROCESS
          **/
 
+#if 0
+        /*
+         * Just for testing.
+         */
+        errno = ENOTSUP;
+        print_error(buffer, length);
+#endif
+
         switch (format) {
 
         case NMEA:
@@ -2651,96 +2659,238 @@ consume:
              * UBX PACKETS
              */
 
-            if (yodel_ubx_nav_hpposllh(&(solution.payload), buffer, length) == 0) {
+            if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_HPPOSLLH_Class, YODEL_UBX_NAV_HPPOSLLH_Id)) {
 
-                solution.ticks = timeout;
-                refresh = !0;
-                trace = !0;
+                if (yodel_ubx_nav_hpposllh(&(solution.payload), buffer, length) == 0) {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-HPPOSLLH accept\n");
+                    solution.ticks = timeout;
+                    refresh = !0;
+                    trace = !0;
 
-                acquire_fix("UBX-NAV-HPPOSLLH");
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-HPPOSLLH accept\n");
 
-            } else if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
+                    acquire_fix("UBX-NAV-HPPOSLLH");
 
-                hardware.ticks = timeout;
-                refresh = !0;
-
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-HW accept\n");
-
-            } else if (yodel_ubx_nav_status(&(status.payload), buffer, length) == 0) {
-
-                status.ticks = timeout;
-                refresh = !0;
-
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-STATUS accept\n");
-
-            } else if (yodel_ubx_ack(&acknak, buffer, length) == 0) {
-
-                if (acknak.state) {
-                    DIMINUTO_LOG_NOTICE("Parse UBX UBX-ACK-ACK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
-                } else if (!nakquit) {
-                    DIMINUTO_LOG_NOTICE("Parse UBX UBX-ACK-NAK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                 } else {
-                    DIMINUTO_LOG_WARNING("Parse UBX UBX-ACK-NAK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
-                    xc = 1;
-                    eof = !0;
+
+                    print_error(buffer, length);
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-HPPOSLLH reject\n");
+
                 }
 
-                acknakpending = 0;
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_HW_Class, YODEL_UBX_MON_HW_Id)) {
 
-            } else if (yodel_ubx_cfg_valget(buffer, length) == 0) {
+                if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-CFG-VALGET accept\n");
+                    hardware.ticks = timeout;
+                    refresh = !0;
 
-                process_ubx_cfg_valget(buffer, length);
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-HW accept\n");
 
-            } else if (yodel_ubx_mon_ver(buffer, length) == 0) {
+                } else {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VER accept\n");
+                    print_error(buffer, length);
 
-                process_ubx_mon_ver(buffer, length);
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-HW reject\n");
 
-            } else if (yodel_ubx_nav_svin(&base.payload, buffer, length) == 0) {
+                }
 
-                base.ticks = timeout;
-                refresh = !0;
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_STATUS_Class, YODEL_UBX_NAV_STATUS_Id)) {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-SVIN accept\n");
+                if (yodel_ubx_nav_status(&(status.payload), buffer, length) == 0) {
 
-            } else if (yodel_ubx_nav_att(&(attitude.payload), buffer, length) == 0) {
+                    status.ticks = timeout;
+                    refresh = !0;
 
-                attitude.ticks = timeout;
-                refresh = !0;
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-STATUS accept\n");
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ATT accept\n");
+                } else {
 
-            } else if (yodel_ubx_nav_odo(&(odometer.payload), buffer, length) == 0) {
+                    print_error(buffer, length);
 
-                odometer.ticks = timeout;
-                refresh = !0;
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-STATUS reject\n");
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ODO accept\n");
+                }
 
-            } else if (yodel_ubx_nav_pvt(&(posveltim.payload), buffer, length) == 0) {
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_ACK_Class, YODEL_UBX_ACK_NAK_Id) || yodel_is_ubx_class_id(buffer, length, YODEL_UBX_ACK_Class, YODEL_UBX_ACK_ACK_Id)) {
 
-                posveltim.ticks = timeout;
-                refresh = !0;
+                if (yodel_ubx_ack(&acknak, buffer, length) == 0) {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-PVT accept\n");
+                    if (acknak.state) {
+                        DIMINUTO_LOG_NOTICE("Parse UBX UBX-ACK-ACK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                    } else if (!nakquit) {
+                        DIMINUTO_LOG_NOTICE("Parse UBX UBX-ACK-NAK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                    } else {
+                        DIMINUTO_LOG_WARNING("Parse UBX UBX-ACK-NAK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                        xc = 1;
+                        eof = !0;
+                    }
 
-            } else if (yodel_ubx_rxm_rtcm(&rover.payload, buffer, length) == 0) {
+                    acknakpending = 0;
 
-                rover.ticks = timeout;
-                refresh = !0;
+                } else {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RTCM accept\n");
+                    print_error(buffer, length);
 
-            } else if ((rc = yodel_ubx_mon_comms(&ports, buffer, length)) >= 0) {
+                    DIMINUTO_LOG_WARNING("Parse UBX UBX-ACK-ACK/NAK reject\n");
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS accept\n");
+                }
 
-                process_ubx_mon_comms(&ports, rc);
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id)) {
+
+                if (yodel_ubx_cfg_valget(buffer, length) == 0) {
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-CFG-VALGET accept\n");
+
+                    process_ubx_cfg_valget(buffer, length);
+
+                } else {
+
+                    print_error(buffer, length);
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-CFG-VALGET reject\n");
+
+                }
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_VER_Class, YODEL_UBX_MON_VER_Id)) {
+
+                if (yodel_ubx_mon_ver(buffer, length) == 0) {
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VER accept\n");
+
+                    process_ubx_mon_ver(buffer, length);
+
+                } else {
+
+                    print_error(buffer, length);
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VER reject\n");
+
+                }
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_SVIN_Class, YODEL_UBX_NAV_SVIN_Id)) {
+
+                if (yodel_ubx_nav_svin(&base.payload, buffer, length) == 0) {
+
+                    base.ticks = timeout;
+                    refresh = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-SVIN accept\n");
+
+                } else {
+
+                    print_error(buffer, length);
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-SVIN reject\n");
+
+                }
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_ATT_Class, YODEL_UBX_NAV_ATT_Id)) {
+
+                if (yodel_ubx_nav_att(&(attitude.payload), buffer, length) == 0) {
+
+                    attitude.ticks = timeout;
+                    refresh = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ATT accept\n");
+
+                } else {
+
+                    print_error(buffer, length);
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ATT reject\n");
+                }
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_ODO_Class, YODEL_UBX_NAV_ODO_Id)) {
+
+                if (yodel_ubx_nav_odo(&(odometer.payload), buffer, length) == 0) {
+
+                    odometer.ticks = timeout;
+                    refresh = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ODO accept\n");
+
+                } else {
+
+                    print_error(buffer, length);
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ODO reject\n");
+
+                }
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_PVT_Class, YODEL_UBX_NAV_PVT_Id)) {
+
+                if (yodel_ubx_nav_pvt(&(posveltim.payload), buffer, length) == 0) {
+
+                    posveltim.ticks = timeout;
+                    refresh = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-PVT accept\n");
+
+                } else {
+
+                    print_error(buffer, length);
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-PVT reject\n");
+                }
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_RXM_RTCM_Class, YODEL_UBX_RXM_RTCM_Id)) {
+
+                if (yodel_ubx_rxm_rtcm(&rover.payload, buffer, length) == 0) {
+
+                    rover.ticks = timeout;
+                    refresh = !0;
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RTCM accept\n");
+
+                } else {
+
+                    print_error(buffer, length);
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RTCM reject\n");
+
+                }
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_COMMS_Class, YODEL_UBX_MON_COMMS_Id)) {
+
+                if ((rc = yodel_ubx_mon_comms(&ports, buffer, length)) >= 0) {
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS accept\n");
+
+                    process_ubx_mon_comms(&ports, rc);
+
+                } else {
+
+                    print_error(buffer, length);
+
+                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS reject\n");
+
+                }
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_TIMEGPS_Class, YODEL_UBX_NAV_TIMEGPS_Id)) {
+
+                /* TODO */
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-TIMEGPS accept\n");
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_TIMEUTC_Class, YODEL_UBX_NAV_TIMEUTC_Id)) {
+
+                /* TODO */
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-TIMEUTC accept\n");
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_CLOCK_Class, YODEL_UBX_NAV_CLOCK_Id)) {
+
+                /* TODO */
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-CLOCK accept\n");
+
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_TIM_TP_Class, YODEL_UBX_TIM_TP_Id)) {
+
+                /* TODO */
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-TIM-TP accept\n");
 
             } else {
 

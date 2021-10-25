@@ -1228,6 +1228,173 @@ enum YodelUbxNavPvtFlags3 {
  */
 extern int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t length);
 
+/*******************************************************************************
+ * PROCESSING UBX-NAV-TIMEGPS MESSAGES
+ ******************************************************************************/
+
+enum YodelUbxNavTimegpsConstants {
+    YODEL_UBX_NAV_TIMEGPS_Class			= 0x01,
+    YODEL_UBX_NAV_TIMEGPS_Id			= 0x20,
+    YODEL_UBX_NAV_TIMEGPS_Length		= 16,
+};
+
+/**
+ * UBX-NAV-TIMEGPS (0x01, 0x20) [16] carries the GPS time solution.
+ * Ublox 8 R24, p. 397.
+ */
+typedef struct YodelUbxNavTimegps {
+    uint32_t iTOW;          /* GPS time of the week of the epoch (ms). */
+    int32_t fTOW;           /* Fractional part of iTOW (ns). */
+    int16_t week;           /* GPS week number of the epoch. */
+    int8_t leapS;           /* GPS leap seconds (GPS-UTC) (s). */
+    uint8_t valid;          /* Validity flags. */
+    uint32_t tAcc;          /* Time accuracy estimate (ns). */
+} yodel_ubx_nav_timegps_t __attribute__((aligned(4)));
+
+/**
+ * @def YODEL_UBX_NAV_TIMEGPS_INITIALIZER
+ * Initialize a YodelUbxNavTimegps structure.
+ */
+#define YODEL_UBX_NAV_TIMEGPS_INITIALIZER \
+    { 0, }
+
+#if 0
+/**
+ * Process a possible UBX-NAV-TIMEGPS message.
+ * @param mp points to a UBX-NAV-TIMEGPS structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_nav_timegps(yodel_ubx_nav_timegps_t * mp, const void * bp, ssize_t length);
+#endif
+
+/*******************************************************************************
+ * PROCESSING UBX-NAV-TIMEUTC MESSAGES
+ ******************************************************************************/
+
+enum YodelUbxNavTimeutcConstants {
+    YODEL_UBX_NAV_TIMEUTC_Class			= 0x01,
+    YODEL_UBX_NAV_TIMEUTC_Id			= 0x21,
+    YODEL_UBX_NAV_TIMEUTC_Length		= 20,
+};
+
+/**
+ * UBX-NAV-TIMEUTC (0x01, 0x21) [16] carries the UTC time solution.
+ * Ublox 8 R24, p. 400.
+ */
+typedef struct YodelUbxNavTimeutc {
+    uint32_t iTOW;          /* GPS time of the week of the epoch (ms). */
+    uint32_t tAcc;          /* Time accuracy estimate. */
+    int32_t nano;           /* Fraction of a second [-1^9..1^9]. */
+    int16_t year;           /* Year [1999...2099]. */
+    int8_t month;           /* Month [1..12]. */
+    int8_t day;             /* Day [1..31]. */
+    int8_t hour;            /* Hour [0..23]. */
+    int8_t min;             /* Minute [0..59]. */
+    int8_t second;          /* Second [0..60] (for leap second). */
+    uint8_t valid;          /* Validity flags. */
+} yodel_ubx_nav_timeutc_t __attribute__((aligned(4)));
+
+/**
+ * @def YODEL_UBX_NAV_TIMEUTC_INITIALIZER
+ * Initialize a YodelUbxNavTimegps structure.
+ */
+#define YODEL_UBX_NAV_TIMEUTC_INITIALIZER \
+    { 0, }
+
+#if 0
+/**
+ * Process a possible UBX-NAV-TIMEUTC message.
+ * @param mp points to a UBX-NAV-TIMEUTC structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_nav_timeutc(yodel_ubx_nav_timeutc_t * mp, const void * bp, ssize_t length);
+#endif
+
+/*******************************************************************************
+ * PROCESSING UBX-NAV-CLOCK MESSAGES
+ ******************************************************************************/
+
+enum YodelUbxNavClockConstants {
+    YODEL_UBX_NAV_CLOCK_Class			= 0x01,
+    YODEL_UBX_NAV_CLOCK_Id				= 0x22,
+    YODEL_UBX_NAV_CLOCK_Length			= 20,
+};
+
+/**
+ * UBX-NAV-CLOCK (0x01, 0x20) [20] carries the clock solution.
+ * Ublox 8 R24, p. 359.
+ */
+typedef struct YodelUbxNavClock {
+    uint32_t iTOW;          /* GPS time of week in epoch (ms). */
+    int32_t clkB;           /* Clock bias (ns). */
+    int32_t clkD;           /* Clock drift (ns/s). */
+    uint32_t tAcc;          /* Time accuracy estimate (ns). */
+    uint32_t fAcc;          /* Frequency accuracy estimate (ps/s). */
+} yodel_ubx_nav_clock_t __attribute__((aligned(4)));
+
+/**
+ * @def YODEL_UBX_NAV_CLOCK_INITIALIZER
+ * Initialize a YodelUbxNavClock structure.
+ */
+#define YODEL_UBX_NAV_CLOCK_INITIALIZER \
+    { 0, }
+
+#if 0
+/**
+ * Process a possible UBX-NAV-CLOCK message.
+ * @param mp points to a UBX-NAV-CLOCK structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_nav_clock(yodel_ubx_nav_clock_t * mp, const void * bp, ssize_t length);
+#endif
+
+/*******************************************************************************
+ * PROCESSING UBX-TIM-TP MESSAGES
+ ******************************************************************************/
+
+enum YodelUbxTimTpConstants {
+    YODEL_UBX_TIM_TP_Class			= 0x0d,
+    YODEL_UBX_TIM_TP_Id				= 0x01,
+    YODEL_UBX_TIM_TP_Length			= 16,
+};
+
+/**
+ * UBX-TIM-TP (0x0d, 0x01) [16] carries time pulse time data.
+ * Ublox 8 R19, p. 327.
+ */
+typedef struct YodelUbxTimTp {
+    uint32_t towMS;         /* Time pulse time of time base week (ms). */
+    uint32_t towSubMS;      /* Submillisecond part of towMS (2^-32 ms). */
+    int32_t qErr;           /* Quantization error of time pulse. */
+    uint16_t week;          /* Time pulse time base week number (weeks). */
+    uint8_t flags;          /* Flags. */
+    uint8_t refInfo;        /* Time reference information. */
+} yodel_ubx_tim_tp_t __attribute__((aligned(4)));
+
+/**
+ * @def YODEL_UBX_TIM_TP_INITIALIZER
+ * Initialize a YodelUbxTimTp structure.
+ */
+#define YODEL_UBX_TIM_TP_INITIALIZER \
+    { 0, }
+
+#if 0
+/**
+ * Process a possible UBX-TIM-TP message.
+ * @param mp points to a UBX-TIM-TP structure in which to save the payload.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int int yodel_ubx_tim_tp(yodel_ubx_tim_tp_t * mp, const void * bp, ssize_t length);
+#endif
+
 /******************************************************************************
  * ENDIAN CONVERSION
  ******************************************************************************/

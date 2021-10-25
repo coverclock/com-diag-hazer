@@ -102,14 +102,14 @@ extern void print_odometer(FILE * fp, const yodel_odometer_t * sp);
 extern void print_posveltim(FILE * fp, const yodel_posveltim_t * sp);
 
 /**
- * Print (really: log) an errno error message using the NMEA sentence
+ * Print (really: log) an errno error message using data in a buffer.
  * minus the CR and LF end matter.
  * @param file is the file name (typically __FILE__).
  * @param line is the line number (typically __LINE__).
- * @param buffer points to the NMEA sentence.
- * @param length is the sentence length in bytes (not including the NUL).
+ * @param buffer points to the buffer.
+ * @param length is the buffer data length in bytes.
  */
-extern void print_error_f(const char * file, int line, const char * buffer, size_t length);
+extern void print_error_f(const char * file, int line, const void * buffer, size_t length);
 
 /**
  * @def print_error
