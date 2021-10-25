@@ -17,11 +17,11 @@
 #include "globals.h"
 #include "process.h"
 
-void process_ubx_cfg_valget(const uint8_t * buffer, ssize_t length)
+void process_ubx_cfg_valget(const void * buffer, ssize_t length)
 {
-    const yodel_ubx_cfg_valget_t * pp = (const yodel_ubx_cfg_valget_t *)buffer;
+    const yodel_ubx_cfg_valget_t * pp = (const yodel_ubx_cfg_valget_t *)&(((const char *)buffer)[YODEL_UBX_PAYLOAD]);
     const char * bb = (const char *)0;
-    const char * ee = &buffer[length - YODEL_UBX_CHECKSUM];
+    const char * ee = &((const char *)buffer)[length - YODEL_UBX_CHECKSUM];
     const char * layer = (const char *)0;
     yodel_ubx_cfg_valget_key_t kk = 0;
     size_t ss = 0;
@@ -144,10 +144,10 @@ void process_ubx_mon_comms(const yodel_ubx_mon_comms_t * pp, int count)
 
 }
 
-void process_ubx_mon_ver(const uint8_t * buffer, ssize_t length)
+void process_ubx_mon_ver(const void * buffer, ssize_t length)
 {
-    const char * bb = &buffer[YODEL_UBX_PAYLOAD];
-    const char * ee = &buffer[length - YODEL_UBX_CHECKSUM];
+    const char * bb = &((const char *)buffer)[YODEL_UBX_PAYLOAD];
+    const char * ee = &((const char *)buffer)[length - YODEL_UBX_CHECKSUM];
 
     do {
 

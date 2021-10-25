@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2021 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Process API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -14,10 +14,22 @@
 
 #include "com/diag/hazer/yodel.h"
 
-extern void process_ubx_cfg_valget(const uint8_t * buffer, ssize_t length);
+/**
+ * Process a UBX-CFG-VALGET message from a buffer that has been converted
+ * to host byte order in place.
+ * @param buffer points to the buffer.
+ * @param length is the number of payload bytes in the buffer.
+ */
+extern void process_ubx_cfg_valget(const void * buffer, ssize_t length);
 
 extern void process_ubx_mon_comms(const yodel_ubx_mon_comms_t * pp, int count);
 
-extern void process_ubx_mon_ver(const uint8_t * buffer, ssize_t length);
+/**
+ * Process a UBX-MON-VER message from a buffer that has been converted
+ * to host byte order in place.
+ * @param buffer points to the buffer.
+ * @param length is the number of payload bytes in the buffer.
+ */
+extern void process_ubx_mon_ver(const void * buffer, ssize_t length);
 
 #endif
