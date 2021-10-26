@@ -1656,7 +1656,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         }
 
         if (message <= 0) {
-            errno = ENOMSG;
+            errno = 0;
             break;
         }
 
@@ -1921,7 +1921,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         }
 
         if (strcmp(vector[2], "A") != 0) {
-            errno = ENOMSG;
+            errno = 0;
             break;
         }
 
@@ -2058,7 +2058,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         }
 
         if (strcmp(vector[6], "A") != 0) {
-            errno = ENOMSG;
+            errno = 0;
             break;
         }
 
@@ -2159,7 +2159,7 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
         }
 
         if (strcmp(vector[9], "N") == 0) {
-            errno = ENOMSG;
+            errno = 0;
             break;
         }
 
@@ -2291,13 +2291,13 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
 
         if (strcmp(vector[8], "NF") == 0) {
             activep->mode = HAZER_MODE_NOFIX;
-            errno = ENOMSG;
+            errno = 0;
             break;
         }
 
         if (strcmp(vector[18], "0") == 0) {
             activep->mode = HAZER_MODE_ZERO;
-            errno = ENOMSG;
+            errno = 0;
             break;
         }
 
