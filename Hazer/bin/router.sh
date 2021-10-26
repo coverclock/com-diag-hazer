@@ -17,5 +17,5 @@ exec 2>>${ERRFIL}
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 exec coreable rtktool \
-    -p ${ROUTER} -t 30 \
+    -p ${ROUTER} -t 30 -M \
     < /dev/null 1> /dev/null
