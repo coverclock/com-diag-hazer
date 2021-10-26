@@ -487,6 +487,73 @@ extern void yodel_format_hpalt2aaltitude(int32_t whole, int8_t fraction, int32_t
  */
 extern void yodel_format_hpacc2accuracy(int32_t whole,  int32_t * metersp, uint32_t * tenthousandthsp);
 
+/******************************************************************************
+ * ENDIAN CONVERSION
+ ******************************************************************************/
+
+#if !defined(_BSD_SOURCE)
+#define _BSD_SOURCE
+#endif
+#include <endian.h>
+
+/**
+ * @def COM_DIAG_YODEL_LETOH
+ * Convert in-place variable @a _FIELD_ from Little Endian byte order to Host
+ * byte order. The field width 8, 16, 32, or 64 bits, is inferred automatically.
+ * The field must be appropriately aligned. Little endian (not network byte
+ * order) is used because the u-blox specification requires it.
+ */
+#define COM_DIAG_YODEL_LETOH(_FIELD_) \
+    do { \
+        switch (sizeof(_FIELD_)) { \
+        case sizeof(uint8_t): \
+            break; \
+        case sizeof(uint16_t): \
+            _FIELD_ = le16toh(_FIELD_); \
+            break; \
+        case sizeof(uint32_t): \
+            _FIELD_ = le32toh(_FIELD_); \
+            break; \
+        case sizeof(uint64_t): \
+            _FIELD_ = le64toh(_FIELD_); \
+            break; \
+        default: \
+            break; \
+        } \
+    } while (0)
+
+/**
+ * @def COM_DIAG_YODEL_HTOLE
+ * Convert in-place variable @a _FIELD_ from Host byte order to Little Endian
+ * byte order. The field width 8, 16, 32, or 64 bits, is inferred automatically.
+ * The field must be appropriately aligned. Little endian (not network byte
+ * order) is used because the u-blox specification requires it.
+ */
+#define COM_DIAG_YODEL_HTOLE(_FIELD_) \
+    do { \
+        switch (sizeof(_FIELD_)) { \
+        case sizeof(uint8_t): \
+            break; \
+        case sizeof(uint16_t): \
+            _FIELD_ = htole16(_FIELD_); \
+            break; \
+        case sizeof(uint32_t): \
+            _FIELD_ = htole32(_FIELD_); \
+            break; \
+        case sizeof(uint64_t): \
+            _FIELD_ = htole64(_FIELD_); \
+            break; \
+        default: \
+            break; \
+        } \
+    } while (0)
+
+/*****************************************
+ *****************************************
+ ** UBX MESSAGES THAT PROVIDE PNT STATE **
+ *****************************************
+ ****************************************/
+
 /*******************************************************************************
  * PROCESSING UBX-MON-HW MESSAGES
  ******************************************************************************/
@@ -741,98 +808,6 @@ enum YodelUbxAckConstants {
 extern int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length);
 
 /*******************************************************************************
- * PROCESSING UBX-CFG-VALGET MESSAGES
- ******************************************************************************/
-
-/**
- * UBX-CFG-VALGET is how generation 9 handles device configuration queries.\
- * N.B. The layer field here is an enumeration, but in a UBX-CFG-VALSET message
- * it is a bit mask. You can only VALGET one layer at a time, but you can VALSET
- * multiple layers in one message.
- * Ublox 9, p. 85.
- */
-typedef struct YodelUbxCfgValget {
-    uint8_t version;		/* Message version: send 0, receive 1. */
-    uint8_t layer;			/* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
-    uint8_t reserved[2];	/* Reserved. */
-    uint8_t cfgData[0];		/* Beginning of variable number key/value pairs. */
-} yodel_ubx_cfg_valget_t;
-
-/**
- * @def YODEL_UBX_CFG_VALGET_INITIALIZER
- * Initialize the fixed portion of a YodelUbxCfgValget structure.
- */
-#define YODEL_UBX_CFG_VALGET_INITIALIZER \
-    { 0, }
-
-/**
- * UBX-CFG-VALGET constants.
- */
-enum YodelUbxCfgValgetConstants {
-    YODEL_UBX_CFG_VALGET_Class			= 0x06,
-    YODEL_UBX_CFG_VALGET_Id				= 0x8b,
-    YODEL_UBX_CFG_VALGET_Length			= 4,
-    YODEL_UBX_CFG_VALGET_Key_Size_SHIFT	= 28,
-    YODEL_UBX_CFG_VALGET_Key_Size_MASK	= 0x7,
-};
-
-/**
- * Note that the way UBX-CFG-VALGET encodes the layer (as an enumeration)
- * is NOT how UBX-CFG-VALSET encodes the layer (as a bit mask so that multiple
- * layers can be modified with a single VALSET command). Unless there is a
- * compelling reason not to, I stick with RAM so that a power cycle can
- * restore the default to defaults.
- * Ublox 9, p. 86
- */
-enum YodelUbxCfgValgetLayer {
-    YODEL_UBX_CFG_VALGET_Layer_RAM	= 0,
-    YODEL_UBX_CFG_VALGET_Layer_BBR	= 1,
-    YODEL_UBX_CFG_VALGET_Layer_NVM	= 2,
-    YODEL_UBX_CFG_VALGET_Layer_ROM	= 7,
-};
-
-/**
- * Ublox 9, p. 191
- */
-enum YodelUbxCfgValgetSize {
-    YODEL_UBX_CFG_VALGET_Size_BIT	= 0x01,
-    YODEL_UBX_CFG_VALGET_Size_ONE	= 0x02,
-    YODEL_UBX_CFG_VALGET_Size_TWO	= 0x03,
-    YODEL_UBX_CFG_VALGET_Size_FOUR	= 0x04,
-    YODEL_UBX_CFG_VALGET_Size_EIGHT	= 0x05,
-};
-
-/**
- * UBX configuration key identifiers are four bytes little endian.
- */
-typedef uint32_t yodel_ubx_cfg_valget_key_t;
-
-/**
- * Process a possible UBX-CFG-VALGET message. The buffer is passed as non-const
- * because the byte-swapping of the variable length payload, both key IDs and
- * their values, is performed in-place.
- * @param bp points to a buffer with a UBX header and payload.
- * @param length is the length of the header, payload, and checksum in bytes.
- * @return 0 if the message was valid, <0 otherwise.
- */
-extern int yodel_ubx_cfg_valget(void * bp, ssize_t length);
-
-/*******************************************************************************
- * PROCESSING UBX-MON-VER MESSAGES
- ******************************************************************************/
-
-/**
- * UBX-MON-VER constants.
- */
-enum YodelUbxMonVerConstants {
-    YODEL_UBX_MON_VER_Class				= 0x0a,
-    YODEL_UBX_MON_VER_Id				= 0x04,
-    YODEL_UBX_MON_VER_swVersion_LENGTH	= 30,
-    YODEL_UBX_MON_VER_hwVersion_LENGTH	= 10,
-    YODEL_UBX_MON_VER_extension_LENGTH	= 30,
-};
-
-/*******************************************************************************
  * PROCESSING UBX-NAV-SVIN MESSAGES
  ******************************************************************************/
 
@@ -925,103 +900,6 @@ enum YodelUbxRxmRtcmConstants {
  * @return 0 if the message was valid, <0 otherwise.
  */
 extern int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_t length);
-
-/*******************************************************************************
- * PROCESSING UBX-MON-COMMS MESSAGES
- ******************************************************************************/
-
-/**
- * UBX-MON-COMMS port indices.
- * Ublox 9 "Integration Manual" R05, p. 34..35.
- */
-enum YodelUbxMonCommsPort {
-    YODEL_UBX_MON_COMMS_PORT_FIRST  = 0,
-    YODEL_UBX_MON_COMMS_PORT_I2C    = YODEL_UBX_MON_COMMS_PORT_FIRST,
-    YODEL_UBX_MON_COMMS_PORT_UART1,
-    YODEL_UBX_MON_COMMS_PORT_UART2,
-    YODEL_UBX_MON_COMMS_PORT_USB,
-    YODEL_UBX_MON_COMMS_PORT_SPI,
-    YODEL_UBX_MON_COMMS_PORT_LAST   = YODEL_UBX_MON_COMMS_PORT_SPI,
-};
-
-/**
- * UBX-MON-COMMS (0x0A, 0x36) [8 + 40 * nPorts] reports the communication ports
- * utilization.
- * Ublox 9 "Interface Description" R07, p. 131..132.
- */
-typedef struct YodelUbxMonComms {
-    struct {
-        uint8_t version;        /* Message version. */
-        uint8_t nPorts;         /* Number of ports included. */
-        uint8_t txErrors;       /* TX error bitmask. */
-        uint8_t reserved1[1];   /* Reserved. */
-        uint8_t protIds[4];     /* Protocol identifiers. */
-    } prefix;
-    struct {
-        uint16_t portId;        /* Port identifier. */
-        uint16_t txPending;     /* Number of bytes pending in TX buffer. */
-        uint32_t txBytes;       /* Number of bytes ever sent. */
-        uint8_t txUsage;        /* Percentage recent usage TX buffer. */
-        uint8_t txPeakUsage;    /* Percentage maximum usage TX buffer. */
-        uint16_t rxPending;     /* Number of bytes pending in RX buffer. */
-        uint32_t rxBytes;       /* Number of bytes ever received. */
-        uint8_t rxUsage;        /* Percentage recent usage RX buffer. */
-        uint8_t rxPeakUsage;    /* Percentage maximum usage RX buffer. */
-        uint16_t overrunErrs;   /* Number of 100ms timeslots with overrun. */
-        uint16_t msgs[4];       /* Number of parsed message per protocol. */
-        uint8_t reserved2[8];   /* Reserved. */
-        uint32_t skipped;       /* Number of bytes skipped. */
-    } port[YODEL_UBX_MON_COMMS_PORT_LAST + 1];
-} yodel_ubx_mon_comms_t  __attribute__((aligned(4)));
-
-/**
- * @def YODEL_UBX_MON_COMMS_INITIALIZER
- * Initialize a YodelUbxMonComms structure.
- */
-#define YODEL_UBX_MON_COMMS_INITIALIZER \
-    { 0, }
-
-/**
- * UBX-MON-COMMS port identifiers.
- * Ublox 9 "Integration Manual" R05, p. 34..35.
- */
-enum YodelUbxMonCommsPortId {
-    YODEL_UBX_MON_COMMS_PORTID_I2C      = 0x0000,
-    YODEL_UBX_MON_COMMS_PORTID_UART1    = 0x0001,
-    YODEL_UBX_MON_COMMS_PORTID_UART2    = 0x0102, /* (sic) */
-    YODEL_UBX_MON_COMMS_PORTID_USB      = 0x0003,
-    YODEL_UBX_MON_COMMS_PORTID_SPI      = 0x0004,
-};
-
-/**
- * UBX-MON-COMMS protocol identifiers.
- * Ublox 9 "Interface Description" R07, p. 131..132.
- */
-enum YodelUbxMonCommsProtId {
-    YODEL_UBX_MON_COMMS_PROTID_UBX    = 0,
-    YODEL_UBX_MON_COMMS_PROTID_NMEA   = 1,
-    YODEL_UBX_MON_COMMS_PROTID_RTCM2  = 2,
-    YODEL_UBX_MON_COMMS_PROTID_RTCM3  = 5,
-    YODEL_UBX_MON_COMMS_PROTID_NONE   = 256,
-};
-
-/**
- * UBX-MON-COMMS constants.
- */
-enum YodelUbxMonCommsConstants {
-    YODEL_UBX_MON_COMMS_Class	= 0x0a,
-    YODEL_UBX_MON_COMMS_Id		= 0x36,
-    YODEL_UBX_MON_COMMS_Length	= sizeof(((yodel_ubx_mon_comms_t *)0)->prefix), /* Minimum. */
-};
-
-/**
- * Process a possible UBX-MON-COMMST message. The buffer is passed as non-const
- * because the byte-swapping of the payload is performed in-place.
- * @param bp points to a buffer with a UBX header and payload.
- * @param length is the length of the header, payload, and checksum in bytes.
- * @return 0 if the message was valid, <0 otherwise.
- */
-extern int yodel_ubx_mon_comms(void * bp, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-NAV-ATT MESSAGES
@@ -1219,6 +1097,213 @@ enum YodelUbxNavPvtFlags3 {
  */
 extern int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t length);
 
+/********************************************
+ ********************************************
+ ** UBX MESSAGES THAT HAVE EPHEMERAL STATE **
+ ********************************************
+ *******************************************/
+
+/*******************************************************************************
+ * PROCESSING UBX-CFG-VALGET MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-CFG-VALGET is how generation 9 handles device configuration queries.\
+ * N.B. The layer field here is an enumeration, but in a UBX-CFG-VALSET message
+ * it is a bit mask. You can only VALGET one layer at a time, but you can VALSET
+ * multiple layers in one message.
+ * Ublox 9, p. 85.
+ */
+typedef struct YodelUbxCfgValget {
+    uint8_t version;		/* Message version: send 0, receive 1. */
+    uint8_t layer;			/* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
+    uint8_t reserved[2];	/* Reserved. */
+    uint8_t cfgData[0];		/* Beginning of variable number key/value pairs. */
+} yodel_ubx_cfg_valget_t;
+
+/**
+ * @def YODEL_UBX_CFG_VALGET_INITIALIZER
+ * Initialize the fixed portion of a YodelUbxCfgValget structure.
+ */
+#define YODEL_UBX_CFG_VALGET_INITIALIZER \
+    { 0, }
+
+/**
+ * UBX-CFG-VALGET constants.
+ */
+enum YodelUbxCfgValgetConstants {
+    YODEL_UBX_CFG_VALGET_Class			= 0x06,
+    YODEL_UBX_CFG_VALGET_Id				= 0x8b,
+    YODEL_UBX_CFG_VALGET_Length			= 4,
+    YODEL_UBX_CFG_VALGET_Key_Size_SHIFT	= 28,
+    YODEL_UBX_CFG_VALGET_Key_Size_MASK	= 0x7,
+};
+
+/**
+ * Note that the way UBX-CFG-VALGET encodes the layer (as an enumeration)
+ * is NOT how UBX-CFG-VALSET encodes the layer (as a bit mask so that multiple
+ * layers can be modified with a single VALSET command). Unless there is a
+ * compelling reason not to, I stick with RAM so that a power cycle can
+ * restore the default to defaults.
+ * Ublox 9, p. 86
+ */
+enum YodelUbxCfgValgetLayer {
+    YODEL_UBX_CFG_VALGET_Layer_RAM	= 0,
+    YODEL_UBX_CFG_VALGET_Layer_BBR	= 1,
+    YODEL_UBX_CFG_VALGET_Layer_NVM	= 2,
+    YODEL_UBX_CFG_VALGET_Layer_ROM	= 7,
+};
+
+/**
+ * Ublox 9, p. 191
+ */
+enum YodelUbxCfgValgetSize {
+    YODEL_UBX_CFG_VALGET_Size_BIT	= 0x01,
+    YODEL_UBX_CFG_VALGET_Size_ONE	= 0x02,
+    YODEL_UBX_CFG_VALGET_Size_TWO	= 0x03,
+    YODEL_UBX_CFG_VALGET_Size_FOUR	= 0x04,
+    YODEL_UBX_CFG_VALGET_Size_EIGHT	= 0x05,
+};
+
+/**
+ * UBX configuration key identifiers are four bytes little endian.
+ */
+typedef uint32_t yodel_ubx_cfg_valget_key_t;
+
+/**
+ * Process a possible UBX-CFG-VALGET message. The buffer is passed as non-const
+ * because the byte-swapping of the variable length payload, both key IDs and
+ * their values, is performed in-place.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_cfg_valget(void * bp, ssize_t length);
+
+/*******************************************************************************
+ * PROCESSING UBX-MON-COMMS MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-MON-COMMS port indices.
+ * Ublox 9 "Integration Manual" R05, p. 34..35.
+ */
+enum YodelUbxMonCommsPort {
+    YODEL_UBX_MON_COMMS_PORT_FIRST  = 0,
+    YODEL_UBX_MON_COMMS_PORT_I2C    = YODEL_UBX_MON_COMMS_PORT_FIRST,
+    YODEL_UBX_MON_COMMS_PORT_UART1,
+    YODEL_UBX_MON_COMMS_PORT_UART2,
+    YODEL_UBX_MON_COMMS_PORT_USB,
+    YODEL_UBX_MON_COMMS_PORT_SPI,
+    YODEL_UBX_MON_COMMS_PORT_LAST   = YODEL_UBX_MON_COMMS_PORT_SPI,
+};
+
+/**
+ * UBX-MON-COMMS (0x0A, 0x36) [8 + 40 * nPorts] reports the communication ports
+ * utilization.
+ * Ublox 9 "Interface Description" R07, p. 131..132.
+ */
+typedef struct YodelUbxMonComms {
+    struct {
+        uint8_t version;        /* Message version. */
+        uint8_t nPorts;         /* Number of ports included. */
+        uint8_t txErrors;       /* TX error bitmask. */
+        uint8_t reserved1[1];   /* Reserved. */
+        uint8_t protIds[4];     /* Protocol identifiers. */
+    } prefix;
+    struct {
+        uint16_t portId;        /* Port identifier. */
+        uint16_t txPending;     /* Number of bytes pending in TX buffer. */
+        uint32_t txBytes;       /* Number of bytes ever sent. */
+        uint8_t txUsage;        /* Percentage recent usage TX buffer. */
+        uint8_t txPeakUsage;    /* Percentage maximum usage TX buffer. */
+        uint16_t rxPending;     /* Number of bytes pending in RX buffer. */
+        uint32_t rxBytes;       /* Number of bytes ever received. */
+        uint8_t rxUsage;        /* Percentage recent usage RX buffer. */
+        uint8_t rxPeakUsage;    /* Percentage maximum usage RX buffer. */
+        uint16_t overrunErrs;   /* Number of 100ms timeslots with overrun. */
+        uint16_t msgs[4];       /* Number of parsed message per protocol. */
+        uint8_t reserved2[8];   /* Reserved. */
+        uint32_t skipped;       /* Number of bytes skipped. */
+    } port[YODEL_UBX_MON_COMMS_PORT_LAST + 1];
+} yodel_ubx_mon_comms_t  __attribute__((aligned(4)));
+
+/**
+ * @def YODEL_UBX_MON_COMMS_INITIALIZER
+ * Initialize a YodelUbxMonComms structure.
+ */
+#define YODEL_UBX_MON_COMMS_INITIALIZER \
+    { 0, }
+
+/**
+ * UBX-MON-COMMS port identifiers.
+ * Ublox 9 "Integration Manual" R05, p. 34..35.
+ */
+enum YodelUbxMonCommsPortId {
+    YODEL_UBX_MON_COMMS_PORTID_I2C      = 0x0000,
+    YODEL_UBX_MON_COMMS_PORTID_UART1    = 0x0001,
+    YODEL_UBX_MON_COMMS_PORTID_UART2    = 0x0102, /* (sic) */
+    YODEL_UBX_MON_COMMS_PORTID_USB      = 0x0003,
+    YODEL_UBX_MON_COMMS_PORTID_SPI      = 0x0004,
+};
+
+/**
+ * UBX-MON-COMMS protocol identifiers.
+ * Ublox 9 "Interface Description" R07, p. 131..132.
+ */
+enum YodelUbxMonCommsProtId {
+    YODEL_UBX_MON_COMMS_PROTID_UBX    = 0,
+    YODEL_UBX_MON_COMMS_PROTID_NMEA   = 1,
+    YODEL_UBX_MON_COMMS_PROTID_RTCM2  = 2,
+    YODEL_UBX_MON_COMMS_PROTID_RTCM3  = 5,
+    YODEL_UBX_MON_COMMS_PROTID_NONE   = 256,
+};
+
+/**
+ * UBX-MON-COMMS constants.
+ */
+enum YodelUbxMonCommsConstants {
+    YODEL_UBX_MON_COMMS_Class	= 0x0a,
+    YODEL_UBX_MON_COMMS_Id		= 0x36,
+    YODEL_UBX_MON_COMMS_Length	= sizeof(((yodel_ubx_mon_comms_t *)0)->prefix), /* Minimum. */
+};
+
+/**
+ * Process a possible UBX-MON-COMMST message. The buffer is passed as non-const
+ * because the byte-swapping of the payload is performed in-place.
+ * @param bp points to a buffer with a UBX header and payload.
+ * @param length is the length of the header, payload, and checksum in bytes.
+ * @return 0 if the message was valid, <0 otherwise.
+ */
+extern int yodel_ubx_mon_comms(void * bp, ssize_t length);
+
+/************************************************
+ ************************************************
+ ** UBX MESSAGES THAT REQUIRE NO PREPROCESSING **
+ ************************************************
+ ***********************************************/
+
+/*******************************************************************************
+ * PROCESSING UBX-MON-VER MESSAGES
+ ******************************************************************************/
+
+/**
+ * UBX-MON-VER constants.
+ */
+enum YodelUbxMonVerConstants {
+    YODEL_UBX_MON_VER_Class				= 0x0a,
+    YODEL_UBX_MON_VER_Id				= 0x04,
+    YODEL_UBX_MON_VER_swVersion_LENGTH	= 30,
+    YODEL_UBX_MON_VER_hwVersion_LENGTH	= 10,
+    YODEL_UBX_MON_VER_extension_LENGTH	= 30,
+};
+
+/*********************************************
+ *********************************************
+ ** UBX MESSAGES THAT ARE WORKS IN PROGRESS **
+ *********************************************
+ ********************************************/
+
 /*******************************************************************************
  * PROCESSING UBX-NAV-TIMEGPS MESSAGES
  ******************************************************************************/
@@ -1385,66 +1470,5 @@ typedef struct YodelUbxTimTp {
  */
 extern int int yodel_ubx_tim_tp(yodel_ubx_tim_tp_t * mp, const void * bp, ssize_t length);
 #endif
-
-/******************************************************************************
- * ENDIAN CONVERSION
- ******************************************************************************/
-
-#if !defined(_BSD_SOURCE)
-#define _BSD_SOURCE
-#endif
-#include <endian.h>
-
-/**
- * @def COM_DIAG_YODEL_LETOH
- * Convert in-place variable @a _FIELD_ from Little Endian byte order to Host
- * byte order. The field width 8, 16, 32, or 64 bits, is inferred automatically.
- * The field must be appropriately aligned. Little endian (not network byte
- * order) is used because the u-blox specification requires it.
- */
-#define COM_DIAG_YODEL_LETOH(_FIELD_) \
-    do { \
-        switch (sizeof(_FIELD_)) { \
-        case sizeof(uint8_t): \
-            break; \
-        case sizeof(uint16_t): \
-            _FIELD_ = le16toh(_FIELD_); \
-            break; \
-        case sizeof(uint32_t): \
-            _FIELD_ = le32toh(_FIELD_); \
-            break; \
-        case sizeof(uint64_t): \
-            _FIELD_ = le64toh(_FIELD_); \
-            break; \
-        default: \
-            break; \
-        } \
-    } while (0)
-
-/**
- * @def COM_DIAG_YODEL_HTOLE
- * Convert in-place variable @a _FIELD_ from Host byte order to Little Endian
- * byte order. The field width 8, 16, 32, or 64 bits, is inferred automatically.
- * The field must be appropriately aligned. Little endian (not network byte
- * order) is used because the u-blox specification requires it.
- */
-#define COM_DIAG_YODEL_HTOLE(_FIELD_) \
-    do { \
-        switch (sizeof(_FIELD_)) { \
-        case sizeof(uint8_t): \
-            break; \
-        case sizeof(uint16_t): \
-            _FIELD_ = htole16(_FIELD_); \
-            break; \
-        case sizeof(uint32_t): \
-            _FIELD_ = htole32(_FIELD_); \
-            break; \
-        case sizeof(uint64_t): \
-            _FIELD_ = htole64(_FIELD_); \
-            break; \
-        default: \
-            break; \
-        } \
-    } while (0)
 
 #endif

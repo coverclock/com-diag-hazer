@@ -337,9 +337,9 @@ int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * bp, ssize
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_HPPOSLLH_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_HPPOSLLH_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_HPPOSLLH_Length)) {
         errno = ENODATA;
     } else {
@@ -363,9 +363,9 @@ int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_HW_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_MON_HW_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_MON_HW_Length)) {
         errno = ENODATA;
     } else {
@@ -392,9 +392,9 @@ int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ssize_t l
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_STATUS_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_STATUS_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_STATUS_Length)) {
         errno = ENODATA;
     } else {
@@ -414,9 +414,9 @@ int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_ACK_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if ((hp[YODEL_UBX_ID] != YODEL_UBX_ACK_ACK_Id) && (hp[YODEL_UBX_ID] != YODEL_UBX_ACK_NAK_Id)) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_ACK_Length)) {
         errno = ENODATA;
     } else {
@@ -434,9 +434,9 @@ int yodel_ubx_cfg_valget(void * bp, ssize_t length)
     unsigned char * hp = (unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_CFG_VALGET_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_CFG_VALGET_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length < (YODEL_UBX_SHORTEST + YODEL_UBX_CFG_VALGET_Length)) {
         errno = ENODATA;
     } else {
@@ -535,9 +535,9 @@ int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_t lengt
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_RXM_RTCM_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_RXM_RTCM_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_RXM_RTCM_Length)) {
         errno = ENODATA;
     } else {
@@ -557,9 +557,9 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t lengt
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_SVIN_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_SVIN_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_SVIN_Length)) {
         errno = ENODATA;
     } else {
@@ -586,9 +586,9 @@ int yodel_ubx_mon_comms(void * bp, ssize_t length)
     yodel_ubx_mon_comms_t comms = YODEL_UBX_MON_COMMS_INITIALIZER;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_COMMS_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_MON_COMMS_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length < (YODEL_UBX_SHORTEST + YODEL_UBX_MON_COMMS_Length)) {
         errno = ENODATA;
     } else {
@@ -626,9 +626,9 @@ int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_ATT_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_ATT_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_ATT_Length)) {
         errno = ENODATA;
     } else {
@@ -652,9 +652,9 @@ int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_ODO_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_ODO_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_ODO_Length)) {
         errno = ENODATA;
     } else {
@@ -675,9 +675,9 @@ int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t length)
     const unsigned char * hp = (const unsigned char *)bp;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_PVT_Class) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (hp[YODEL_UBX_ID] != YODEL_UBX_NAV_PVT_Id) {
-        errno = 0;
+        errno = ENOMSG;
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_PVT_Length)) {
         errno = ENODATA;
     } else {

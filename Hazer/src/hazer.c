@@ -1331,22 +1331,22 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
          */
     
         if (count < 2) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (*vector[0] != HAZER_STIMULUS_START) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[0] + sizeof("$XX") - 1, GGA) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -1458,22 +1458,22 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
          */
 
         if (count < 2) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strnlen(vector[0], sizeof("$XXGSA")) != (sizeof("$XXGSA") - 1)) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (*vector[0] != HAZER_STIMULUS_START) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[0] + sizeof("$XX") - 1, GSA) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -1615,22 +1615,22 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          */
     
         if (count < 2) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strnlen(vector[0], sizeof("$XXGSV")) != (sizeof("$XXGSV") - 1)) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (*vector[0] != HAZER_STIMULUS_START) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[0] + sizeof("$XX") - 1, GSV) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -1656,7 +1656,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         }
 
         if (message <= 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -1892,22 +1892,22 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
          */
 
         if (count < 2) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strnlen(vector[0], sizeof("$XXRMC")) != (sizeof("$XXRMC") - 1)) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (*vector[0] != HAZER_STIMULUS_START) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[0] + sizeof("$XX") - 1, RMC) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -1921,7 +1921,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
         }
 
         if (strcmp(vector[2], "A") != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -2029,22 +2029,22 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
          */
 
         if (count < 2) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strnlen(vector[0], sizeof("$XXGGA")) != (sizeof("$XXGGA") - 1)) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (*vector[0] != HAZER_STIMULUS_START) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[0] + sizeof("$XX") - 1, GLL) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -2058,7 +2058,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         }
 
         if (strcmp(vector[6], "A") != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -2130,22 +2130,22 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
          */
 
         if (count < 2) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strnlen(vector[0], sizeof("$XXVTG")) != (sizeof("$XXVTG") - 1)) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (*vector[0] != HAZER_STIMULUS_START) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[0] + sizeof("$XX") - 1, VTG) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -2159,7 +2159,7 @@ int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count)
         }
 
         if (strcmp(vector[9], "N") == 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -2256,27 +2256,27 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
          */
 
         if (count < 3) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (vector[0][0] != HAZER_STIMULUS_START) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(&vector[0][1], PUBX) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[1], ID) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -2291,13 +2291,13 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
 
         if (strcmp(vector[8], "NF") == 0) {
             activep->mode = HAZER_MODE_NOFIX;
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[18], "0") == 0) {
             activep->mode = HAZER_MODE_ZERO;
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -2514,27 +2514,27 @@ int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], ch
         /* IDENTIFY */
 
         if (count < 4) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (vector[0][0] != HAZER_STIMULUS_START) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(&vector[0][1], PUBX) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[1], ID) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
@@ -2712,27 +2712,27 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
          */
 
         if (count < 3) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strnlen(vector[0], sizeof(PUBX) + 1) != sizeof(PUBX)) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (vector[0][0] != HAZER_STIMULUS_START) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(&vector[0][1], PUBX) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
         if (strcmp(vector[1], ID) != 0) {
-            errno = 0;
+            errno = ENOMSG;
             break;
         }
 
