@@ -1636,11 +1636,11 @@ in Boulder Colorado. Mr. Gabbard generously shared some results off
 his professional Trimble GPS rover taken at NGS survey marker
 KK1446 that I have used to test this code.
 
-Thanks to several manufacturers GNSS devices, or of products that
+Thanks to several manufacturers of GNSS devices, or of products that
 have GNSS devices embedded within them, who, because of design flaws
 and bugs in their products, led to vast improvements in this code.
-Almost every time I test a new GNSS-based product I find the
-opportunity for improvement.
+No, I'm not kidding: almost every time I test a new GNSS-based product
+I find the opportunity for improvement.
 
 Special thanks to Mrs. Overclock for her assistance in road testing
 (literally) this software and for her understanding regarding having
