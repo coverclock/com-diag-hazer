@@ -34,6 +34,16 @@ satellite systems. Behind all the software work I present here is a
 vast collection of hardware, firmware, and radio frequency expertise
 contributed by the developers of the GNSS products I use.
 
+If you're wondering why I don't use the excellent open source GPS Daemon
+(gpsd) and its GPS Monitor (gpsmon), the answer is: I have, in many
+projects, typically in conjunction with the open source NTPsec Daemon
+(ntpd). Hazer was developed as an excuse for me to learn in detail
+more about how GPS works and how NMEA and UBX sentences are formatted
+(because I only learn by doing), and also to develop an NMEA and UBX
+parsing library that I can incorporate into the kinds of embedded systems
+I am frequently called to work upon. Hazer and gpstool have also turned
+out to be really useful tools for testing and evaluating GPS devices.
+
 # Abstract
 
 This file is part of the Digital Aggregates Corporation Hazer
@@ -102,18 +112,7 @@ the Networked Transport of RTCM via Internet Protocol (Ntrip), but instead
 uses its own trivial data format consisting of raw RTCM messages preceeded
 by a four-byte sequence number carried over UDP datagrams.
 
-> If you're wondering why I don't use the excellent open source GPS Daemon
-> (gpsd) and its GPS Monitor (gpsmon), the answer is: I have, in many
-> projects, typically in conjunction with the open source NTPsec Daemon
-> (ntpd). Hazer was developed as an excuse for me to learn in detail
-> more about how GPS works and how NMEA and UBX sentences are formatted
-> (because I only learn by doing), and also to develop an NMEA and UBX
-> parsing library that I can incorporate into the kinds of embedded systems
-> I am frequently called to work upon. Hazer and gpstool have also turned
-> out to be really useful tools for testing and evaluating GPS devices.
-
-This software is an original work of its author and the Digital Aggregates
-Corporation PNT division.
+This software is an original work of its author.
 
 # Dependencies
 
