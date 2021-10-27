@@ -431,6 +431,7 @@ enum YodelUbxNavHpposllhConstants {
 
 /**
  * Process a possible UBX-NAV-HPPOSLLH message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-HPPOSLLH structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -630,6 +631,7 @@ enum YodelUbxMonHwFlagsJammingState {
 
 /**
  * Process a possible UBX-MON-HW message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-MON-HW structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -755,6 +757,7 @@ enum YodelUbxNavStatusFlags2SpoolDetState {
 
 /**
  * Process a possible UBX-NAV-STATUS message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-STATUS structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -800,6 +803,7 @@ enum YodelUbxAckConstants {
 
 /**
  * Process a possible UBX-ACK-ACK or UBX-ACK-NAK message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-ACK structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -852,6 +856,7 @@ enum YodelUbxNavSvinConstants {
 
 /**
  * Process a possible UBX-NAV-SVIN message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-SVIN structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -894,6 +899,7 @@ enum YodelUbxRxmRtcmConstants {
 
 /**
  * Process a possible UBX-RXM-RTCM message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-RXM-RTCM structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -936,6 +942,7 @@ typedef struct YodelUbxNavAtt {
 
 /**
  * Process a possible UBX-NAV-ATT message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-ATT structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -975,6 +982,7 @@ typedef struct YodelUbxNavOdo {
 
 /**
  * Process a possible UBX-NAV-ODO message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-ODO structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -1090,6 +1098,7 @@ enum YodelUbxNavPvtFlags3 {
 
 /**
  * Process a possible UBX-NAV-PVT message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-PVT structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -1174,6 +1183,7 @@ typedef uint32_t yodel_ubx_cfg_valget_key_t;
  * Process a possible UBX-CFG-VALGET message. The buffer is passed as non-const
  * because the byte-swapping of the variable length payload, both key IDs and
  * their values, is performed in-place.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
@@ -1271,6 +1281,7 @@ enum YodelUbxMonCommsConstants {
 /**
  * Process a possible UBX-MON-COMMST message. The buffer is passed as non-const
  * because the byte-swapping of the payload is performed in-place.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
@@ -1337,6 +1348,7 @@ typedef struct YodelUbxNavTimegps {
 #if 0
 /**
  * Process a possible UBX-NAV-TIMEGPS message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-TIMEGPS structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -1382,6 +1394,7 @@ typedef struct YodelUbxNavTimeutc {
 #if 0
 /**
  * Process a possible UBX-NAV-TIMEUTC message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-TIMEUTC structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -1422,6 +1435,7 @@ typedef struct YodelUbxNavClock {
 #if 0
 /**
  * Process a possible UBX-NAV-CLOCK message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-CLOCK structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
@@ -1463,6 +1477,7 @@ typedef struct YodelUbxTimTp {
 #if 0
 /**
  * Process a possible UBX-TIM-TP message.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-TIM-TP structure in which to save the payload.
  * @param bp points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
