@@ -1085,8 +1085,18 @@ the libraries and binaries in the system directories.)
     cd ~/src/com-diag-hazer/Hazer
     . out/host/bin/setup
     make sanity
-    gpstool -?
-    rtktool -?
+    
+## Functional Tests
+
+There are a bunch of scripts that use actual hardware. Some of them require
+home-built test fixtures and General Purpose Input/Output (GPIO) pins. But
+there is a small collection of functional tests that do not require any
+GNSS device at all. Mostly I use these to make sure that gpstool does not
+throw an assert and core dump.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup
+    make functional
 
 # Directories
 
@@ -1096,7 +1106,7 @@ the libraries and binaries in the system directories.)
 * dat - data captured from Hazer, Yodel, and Tumbleweed tests (some in LFS).
 * fun - functional test source files.
 * inc - public header files.
-* out - build artifacts.
+* out - build and test artifacts (not under source control).
 * fs - file system overlay that may be useful on the host on which Hazer runs.
 * src - feature implementation and private header source files.
 * tst - unit test source files (does not require a GPS receiver).
