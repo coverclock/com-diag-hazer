@@ -354,6 +354,7 @@ int main(int argc, char * argv[])
     size_t io_size = BUFSIZ;
     size_t io_maximum = 0;
     size_t io_total = 0;
+    size_t io_waiting = 0;
     /*
      * Source variables.
      */
@@ -1460,6 +1461,10 @@ int main(int argc, char * argv[])
     sync = 0;
     frame = 0;
 
+    io_maximum = 0;
+    io_total = 0;
+    io_waiting = 0;
+
     /*
      * Initialize screen iff we're doing full-screen stuff with
      * ANSI escape sequences.
@@ -1646,8 +1651,9 @@ consume:
 
                 if (!sync) {
 
-                    if ((io_total % DATAGRAM_SIZE) == 0) {
-                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%llu] 0x%02x %c %c %c\n", (unsigned long long)io_total, ch, nmea_state, ubx_state, rtcm_state);
+                    io_waiting += 1;
+                    if ((io_waiting % DATAGRAM_SIZE) == 0) {
+                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%llu] 0x%02x %c %c %c\n", (unsigned long long)io_waiting, ch, nmea_state, ubx_state, rtcm_state);
                     }
 
                     if (verbose) {
@@ -1679,6 +1685,7 @@ consume:
                 } else {
 
                     sync = 0;
+                    io_waiting += 1;
 
                     /*
                      * Normally I'd log this at WARNING or NOTICE. But
@@ -1723,6 +1730,7 @@ consume:
                         DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x NMEA\n", (unsigned long long)io_total, ch);
 
                         sync = !0;
+                        io_waiting = 0;
 
                         if (verbose) {
                             sync_in(length);
@@ -1751,6 +1759,7 @@ consume:
                         DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x UBX\n", (unsigned long long)io_total, ch);
 
                         sync = !0;
+                        io_waiting = 0;
 
                         if (verbose) {
                             sync_in(length);
@@ -1778,6 +1787,7 @@ consume:
                         DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x RTCM\n", (unsigned long long)io_total, ch);
 
                         sync = !0;
+                        io_waiting = 0;
 
                         if (verbose) {
                             sync_in(length);
