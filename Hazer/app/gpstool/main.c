@@ -835,6 +835,13 @@ int main(int argc, char * argv[])
         return 1;
     }
 
+#if 0
+    extern void print_error_t1(void);
+    extern void print_error_t2(void);
+    print_error_t1();
+    print_error_t2();
+#endif
+
     /**
      ** INITIALIZATION
      **/
@@ -2299,14 +2306,6 @@ consume:
         /**
          ** PROCESS
          **/
-
-#if 0
-        /*
-         * Just for testing.
-         */
-        errno = ENOTSUP;
-        print_error(buffer, length);
-#endif
 
         switch (format) {
 
