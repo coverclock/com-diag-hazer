@@ -1048,3 +1048,16 @@ void print_error_t2(void)
     diminuto_assert(BUFFER[257] == '\0');
 }
 #endif
+
+#if 0
+#include <stdio.h>
+void main(void) {
+    int data;
+    for (data = 0; data < 256; ++data) {
+        if (data == 0) { printf("%16s'\\x%2.2x', ", "", data); }
+        else if ((data % 8) == 0) { printf("\n%16s'\\x%2.2x', ", "", data); }
+        else { printf("'\\x%2.2x', ", data); }
+    }
+    putchar('\n');
+}
+#endif
