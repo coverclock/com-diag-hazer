@@ -1991,8 +1991,6 @@ consume:
 
         }
 
-        fflush(sink_fp);
-
         /*
          * If one of the input sources indicated end of file, we're done.
          * (This may be the only time I've found a legitimate use for a goto.)
@@ -3085,6 +3083,10 @@ consume:
         }
 
 render:
+
+        if (sink_fp != (FILE *)0) {
+            fflush(sink_fp);
+        }
 
         /**
          ** REPORT

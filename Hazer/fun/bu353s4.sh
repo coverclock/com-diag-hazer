@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2018 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2018-2021 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
@@ -13,7 +13,7 @@ RATE=${2:-4800}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-DIR=$(readlink -e $(dirname ${0})/..)/log
+DIR=$(readlink -e $(dirname ${0})/..)/tmp
 mkdir -p ${DIR}
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 2> ${DIR}/${PROGRAM}.log
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 2> ${DIR}/${PROGRAM}.err
