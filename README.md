@@ -376,10 +376,10 @@ Error messages may be displayed with the following error numbers for
 malformed input data. (System calls and library functions may also
 cause error messages not related to the input data to be displayed.)
 
-* EINVAL - invalid character in a field.
-* EIO - checksum or cyclic redundancy check (CRC) mismatch.
+* EINVAL - invalid character in a field e.g. alpha in a numeric field.
+* EIO - error in the end matter e.g. checksum or cyclic redundancy check (CRC).
 * ENODATA - below minimum length or number of fields.
-* ENOMSG - no discernable identification in beginning matter.
+* ENOMSG - error in the begin matter e.g. no discernable identifiers.
 * ERANGE - time, latitude, longitude, etc. value out of range.
 
 # Devices
