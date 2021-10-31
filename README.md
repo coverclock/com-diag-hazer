@@ -370,6 +370,18 @@ never been exercised using actual GPS receivers.
 * Galileo - 301..336
 * BeiDou 2 - 401..437
 
+# Errors
+
+Error messages may be displayed with the following error numbers for
+malformed input data. (System calls and library functions may also
+cause error messages not related to the input data to be displayed.)
+
+* EINVAL - invalid character in a field.
+* EIO - checksum or cyclic redundancy check (CRC) mismatch.
+* ENODATA - below minimum length or number of fields.
+* ENOMSG - no discernable identification in beginning matter.
+* ERANGE - time, latitude, longitude, etc. value out of range.
+
 # Devices
 
 Hazer has been successfully tested with the following GPS chipsets.
