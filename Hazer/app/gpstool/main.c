@@ -2374,7 +2374,7 @@ consume:
 
             } else if ((talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {
 
-                DIMINUTO_LOG_INFORMATION("Parse NMEA Sentence Other  %s \"%.*s\"", HAZER_TALKER_NAME[talker], (int)(length - 2) /* Exclude CR and LF. */, buffer);
+                DIMINUTO_LOG_INFORMATION("Parse NMEA Sentence Other %s \"%.*s\"", HAZER_TALKER_NAME[talker], (int)(length - 2) /* Exclude CR and LF. */, buffer);
                 continue;
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
