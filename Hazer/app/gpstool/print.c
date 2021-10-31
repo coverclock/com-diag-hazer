@@ -955,7 +955,7 @@ void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
  * is to emit a string that not only captures the bad data but which
  * could be cut and pasted into a C program or a CLI command.
  */
-void print_error_f(const char * file, int line, const void * buffer, size_t length)
+void print_error_f(const char * file, int line, const void * buffer, ssize_t length)
 {
     int error = errno;
     const uint8_t * bp = (const uint8_t *)buffer;
@@ -964,9 +964,21 @@ void print_error_f(const char * file, int line, const void * buffer, size_t leng
     unsigned char * ep = (unsigned char *)0;
     static unsigned char HEX[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
+    if (buffer == (const void *)0) {
+        errno = EINVAL;
+        diminuto_perror("print_error_f: buffer");
+        return;
+    }
+
+    if (length <= 0) {
+        errno = EINVAL;
+        diminuto_perror("print_error_f: length");
+        return;
+    }
+
     expanded = (unsigned char *)malloc((length * (sizeof("\\xab") - 1)) + 1);
     if (expanded == (unsigned char *)0) {
-        diminuto_perror("malloc");
+        diminuto_perror("print_error_f: malloc");
         return;
     }
     ep = expanded;

@@ -1811,16 +1811,31 @@ consume:
 
                 /*
                  * If all the state machines have stopped, or at least one has
-                 * stopped while the rest are still in their state state, then
+                 * stopped while the rest are still in their start state, then
                  * either we have never had synchronization, or we lost
-                 * synchronization. Restart all of them.
+                 * synchronization. Restart all of them. We print an error
+                 * message if any of the state machines failed on a CRC or
+                 * checksum check.
                  */
 
                 if (common_machine_is_stalled(nmea_state, ubx_state, rtcm_state)) {
 
                     if (sync) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Stop [%llu] 0x%02x%s%s%s\n", (unsigned long long)io_total, ch, nmea_context.error ? " NMEA": "", ubx_context.error ? " UBX" : "", rtcm_context.error ? " RTCM" : "");
+                        DIMINUTO_LOG_INFORMATION("Sync Stop [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+
+                        if (nmea_context.error) {
+                            errno = EIO;
+                            print_error(nmea_buffer.payload.nmea, nmea_context.bp - nmea_buffer.payload.nmea - 1);
+                        } else if (ubx_context.error) {
+                            errno = EIO;
+                            print_error(ubx_buffer.payload.ubx, ubx_context.bp - ubx_buffer.payload.ubx - 1);
+                        } else if (rtcm_context.error) {
+                            errno = EIO;
+                            print_error(rtcm_buffer.payload.rtcm, rtcm_context.bp - rtcm_buffer.payload.rtcm - 1);
+                        } else {
+                            /* Do nothing. */
+                        }
 
                         if (verbose) {
                             sync_out(ch);
@@ -1831,9 +1846,10 @@ consume:
                             goto stop;
                         }
 
+                        sync = 0;
+
                     }
 
-                    sync = 0;
                     frame = 0;
 
                     nmea_state = HAZER_STATE_START;

@@ -128,7 +128,9 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             hazer_checksum(ch, &(pp->cs));
             action = HAZER_ACTION_SAVE;
         } else {
+            /* Not an error since could be UBX or RTCM data. */
             state = HAZER_STATE_STOP;
+            action = HAZER_ACTION_TERMINATE;
         }
         break;
 
@@ -139,6 +141,7 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         } else {
             pp->error = !0;
             state = HAZER_STATE_STOP;
+            action = HAZER_ACTION_TERMINATE;
         }
         break;
 
@@ -149,6 +152,7 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
         } else {
             pp->error = !0;
             state = HAZER_STATE_STOP;
+            action = HAZER_ACTION_TERMINATE;
         }
         break;
 
@@ -157,7 +161,9 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             state = HAZER_STATE_LF;
             action = HAZER_ACTION_SAVE;
         } else {
+            pp->error = !0;
             state = HAZER_STATE_STOP;
+            action = HAZER_ACTION_TERMINATE;
         }
         break;
 
@@ -166,7 +172,9 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
             state = HAZER_STATE_END;
             action = HAZER_ACTION_TERMINATE;
         } else {
+            pp->error = !0;
             state = HAZER_STATE_STOP;
+            action = HAZER_ACTION_TERMINATE;
         }
         break;
 

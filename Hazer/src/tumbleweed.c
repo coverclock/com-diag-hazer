@@ -132,6 +132,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
         } else {
             pp->error = !0;
             state = TUMBLEWEED_STATE_STOP;
+            action = TUMBLEWEED_ACTION_TERMINATE;
         }
         break;
 
@@ -142,6 +143,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
         } else {
             pp->error = !0;
             state = TUMBLEWEED_STATE_STOP;
+            action = TUMBLEWEED_ACTION_TERMINATE;
         }
         break;
 
@@ -152,6 +154,7 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
         } else {
             pp->error = !0;
             state = TUMBLEWEED_STATE_STOP;
+            action = TUMBLEWEED_ACTION_TERMINATE;
         }
         break;
 

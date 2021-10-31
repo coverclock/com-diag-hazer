@@ -109,7 +109,7 @@ extern void print_posveltim(FILE * fp, const yodel_posveltim_t * sp);
  * @param buffer points to the buffer.
  * @param length is the buffer data length in bytes.
  */
-extern void print_error_f(const char * file, int line, const void * buffer, size_t length);
+extern void print_error_f(const char * file, int line, const void * buffer, ssize_t length);
 
 /**
  * @def print_error
