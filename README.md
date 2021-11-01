@@ -490,7 +490,7 @@ Raspberry Pi 4 Model B
 Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
 Raspbian 10 "Buster"    
 Linux 5.10.17    
-gcc 8.3.0    
+Gnu 8.3.0    
 
 VMware Workstation 15 Pro under Windows 10    
 Intel Core i7-3520M x86_64 @ 2.90GHz x 2    
