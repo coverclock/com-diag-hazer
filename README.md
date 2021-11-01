@@ -370,18 +370,6 @@ never been exercised using actual GPS receivers.
 * Galileo - 301..336
 * BeiDou 2 - 401..437
 
-# Errors
-
-Error messages may be displayed with the following error numbers for
-malformed input data. (System calls and library functions may also
-cause error messages not related to the input data to be displayed.)
-
-* EINVAL - invalid character in a field e.g. alpha in a numeric field.
-* EIO - error in the end matter e.g. checksum or cyclic redundancy check (CRC).
-* ENODATA - below minimum length or number of fields.
-* ENOMSG - error in the begin matter e.g. no discernable identifiers.
-* ERANGE - time, latitude, longitude, etc. value out of range.
-
 # Devices
 
 Hazer has been successfully tested with the following GPS chipsets.
@@ -626,6 +614,30 @@ Intel Celeron N4100 @ 1.10GHz x 2 x 2
 Ubuntu MATE 19.10 "eoan"    
 Linux 5.3.0    
 gcc 9.2.1    
+
+# Diagnostics
+
+## Errors
+
+Error messages may be logged by gpstool with the following error numbers
+(errno) for malformed input data. (Errors reported by system calls and
+library functions may also cause error messages not related to the input
+data to be logged.)
+
+* EINVAL - invalid character in a field e.g. alpha in a numeric field.
+* EIO - error in the end matter e.g. checksum or cyclic redundancy check (CRC).
+* ENODATA - below minimum length or number of fields.
+* ENOMSG - error in the begin matter e.g. no discernable identifiers.
+* ERANGE - time, latitude, longitude, etc. value out of range.
+
+## Synchronization
+
+The following log messages regarding input stream synchronization may
+be reported by gpstool.
+
+* Sync Start - one of the state machines has signaled that a valid NMEA, UBX, or RTCM frame has been read with expected beginning and ending matter, including a correct checksum or CRC. The input stream is synchronized where it had not been before.
+* Sync Stop - all three state machines have entered their stop states. This indicates that all have given up trying to synchronize to the input stream. All three state machines will be restarted.
+* Sync Lost - the input stream had been synchronized, but at the beginning of the next frame, none of the expected beginning matter for a NMEA, UBX, or RTCM frame was recognized. All three state machines will be restarted.
 
 # Articles
 
