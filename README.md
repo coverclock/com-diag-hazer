@@ -510,6 +510,12 @@ Ubuntu MATE 19.10 "eoan"
 Linux 5.3.0    
 Gnu 9.2.1    
 
+Pi-Top 3 (Raspberry Pi 3 Model B+)    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+pi-topOS "Polaris" (Raspbian 9.9 "Stretch")    
+Linux 4.19.66    
+Gnu 6.3.0    
+
 # Diagnostics
 
 ## Errors
