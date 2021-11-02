@@ -33,7 +33,7 @@ passes overhead. It is in the Pacific Ocean.
 When your GNSS application has a bug and it ends up telling you you're at
 latitude and longitude all zeros, you've found "Null Island". There isn't
 actually an island there, but there might be a bouy with weather sensors.
-Nul Island is off the western coast of Africa in the Gulf of Guinea.
+Null Island is off the western coast of Africa in the Gulf of Guinea.
 
 0°0’0″N, 0°00’0″W
 
