@@ -793,3 +793,18 @@ Do this enough (like I have) and the latency will become obvious as
 you notice a discrepancy between the actual system time reported in
 the gpstool "LOC" (local) output line and the GNSS time reported in
 the gpstool "TIM" (time) output line.
+
+## Time Dilation
+
+Due to the centripedal acceleration in their orbits, the atomic clocks
+in the GPS satellites run slower than atomic clocks on the ground,
+losing 7us per day (Special Relativity).
+
+Due to the altitude of their orbits placing them further from the mass
+of the Earth, the atomic clocks in the GPS satellites run faster than
+atomic clocks on the ground, gaining 45us per day (General Relativity).
+
+The net effect is that the atomic clocks in the GPS satellites gain
+38us per day. This has to be taken into account in the calculation of
+the position solutions.
+
