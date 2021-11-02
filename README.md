@@ -451,7 +451,7 @@ the Globalsat mobile satellite service provider.
 
 GlobalTop Technology (GTop) is part of Sierra Wireless.
 
-SiRF is part of Qualcomm.
+SiRF is part of Qualcom (since 2015, and prior to that a product of CSR plc).
 
 # Platforms
 
