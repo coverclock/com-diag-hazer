@@ -733,3 +733,63 @@ Decimal Degrees: 39.7942756, -105.1534148
 What3Words.com:	///beard.hobby.funds    
 
 maps.google.com plus.codes: QRVW+PJ    
+
+## Stupid Cat Tricks
+
+gpstool has a couple of deliberate design features that might seem to be
+problems, but they are there for a reason.
+
+gpstool can be configured to receive NMEA sentences, UBX packets, and RTCM
+messages via datagrams using User Datagram Protocol (UDP). This approach has
+a big security hole: this technique has no authentication mechanism, nor is
+the data stream encrypted. This allows gpstool to be spoofed by another
+computer sending it bogus datagrams, or for a Man In The Middle attack to
+spy on the data being forwarded.
+
+I used UDP specifically because of its low overhead and the fact that
+datagrams are tossed away rather than being sent late if the sending
+queue somehow becomes clogged. I wrote about this at length in my blog.
+
+C. Overclock, "Better Never Than Late", 2017-02-16,
+<https://coverclock.blogspot.com/2017/02/better-never-than-late.html>
+
+I do think I should fix this - probably using something like the Secure
+Real-Time Protocol (SRTP) - but that hasn't happened yet.
+
+You will also notice that there is no buffering between the source
+of input data - be it standard input, a UDP socket, a serial port,
+or a named pipe - and the NMEA, UBX, and RTCM state machines that feed
+validated data into the processing stage of gpstool. This was done for
+much the same reason: to keep gpstool as real-time as possible. It is
+better to lose some data - after all, a solution update will typically
+arrive in the next second - and have to resynchronize to the input stream
+because gpstool could not keep up with the input source, than to add
+latency to the display of the positioning, navigation, and timing
+information.
+
+However, it is really easy to add buffering - potentially a lot of it - just
+by rethinking the command line. When you connect two applications via a pipe
+
+    ls -l | more
+
+you are creating an asynchronous ring buffer between the data source
+(ls -l) and the data sink (more). According to pipe(7), the buffer is
+sixteen virtual pages in size. With a typical virtual page size of four
+kilobytes (which is true of all the systems I regularly use, including
+the Raspberry Pi 4), that makes the buffer sixty-four kilobytes in size.
+
+So you can add a bunch of buffering just by using a utility like socat
+(socket catenate) to read data from the input source (like a serial port
+in this example) and pipe it to gpstool.
+
+    socat -u OPEN:/dev/ttyACM0,b9600 - | gpstool -S - -E
+
+You can add even more buffering, sixty-four kilobytes at a time, by
+adding more cat commands.
+
+    socat -u OPEN:/dev/ttyACM0,b9600 - | cat | cat | gpstool -S - -E
+
+Do this enough (like I have) and the latency will become obvious as
+you notice a discrepancy between the actual system time reported in
+the gpstool "LOC" (local) output line and the GNSS time reported in
+the gpstool "TIM" (time) output line.
