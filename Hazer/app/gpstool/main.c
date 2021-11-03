@@ -152,6 +152,7 @@
 #include "print.h"
 #include "process.h"
 #include "sync.h"
+#include "test.h"
 #include "threads.h"
 #include "types.h"
 
@@ -183,7 +184,7 @@ int main(int argc, char * argv[])
     int process = 0;
     int strobepin = (((int)1)<<((sizeof(int)*8)-1));
     int ppspin = (((int)1)<<((sizeof(int)*8)-1));
-    int test = TEST;
+    int test = 0;
     int serial = 0;
     int daemon = 0;
     int nakquit = 0;
@@ -835,13 +836,6 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-#if 0
-    extern void print_error_t1(void);
-    extern void print_error_t2(void);
-    print_error_t1();
-    print_error_t2();
-#endif
-
     /**
      ** INITIALIZATION
      **/
@@ -1486,6 +1480,23 @@ int main(int argc, char * argv[])
             fflush(out_fp);
         }
     }
+
+#if defined(TEST_ERROR)
+
+    /*
+     * This code tests the print_error macro and its underlying
+     * print_error_f function.
+     */
+
+    if ((test & TEST_ERROR) != 0) {
+        extern void print_error_t1(void);
+        extern void print_error_t2(void);
+
+        print_error_t1();
+        print_error_t2();
+    }
+
+#endif
 
     /**
      ** LOOP
@@ -3092,6 +3103,8 @@ render:
          ** REPORT
          **/
 
+#if defined(TEST_EXPIRATION)
+
         /*
          * This code is just for testing the expiration feature.
          * It turns out to be remarkably difficult to block the most recent
@@ -3144,6 +3157,8 @@ render:
                 crowbar -= 1;
             }
         }
+
+#endif
 
         /*
          * Generate the display if necessary and sufficient reasons exist.

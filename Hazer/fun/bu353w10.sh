@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2018-2020 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2018-2021 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
@@ -28,4 +28,10 @@ for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} ${OPTION}"
 done
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 ${OPTIONS} 2> ${LOG}/${PROGRAM}.err
+# A pipe has a capacity of 16 virtual pages. Given a page size
+# of 4KB, a pipe has a capacity of 64KB. Reference: pipe(7).
+# This technique yields a dedicated reader of the device (using
+# socat), and places a 64KB ring buffer between the reader and
+# gpstool. (This is an experiment).
+
+socat -u OPEN:${DEVICE},b${RATE} - | eval coreable gpstool -S - -E -t 10 ${OPTIONS} 2> ${LOG}/${PROGRAM}.err

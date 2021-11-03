@@ -141,14 +141,6 @@ typedef enum Stage {
     STAGE_BOTTOM    = 'B',
 } stage_t;
 
-/**
- * What kind of special test mode is being done?
- */
-typedef enum Test {
-    TEST            = 0,
-    TEST_EXPIRATION = 1,
-} test_t;
-
 /*******************************************************************************
  * HIGH PRECISION SOLUTION
  ******************************************************************************/
