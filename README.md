@@ -506,7 +506,7 @@ GNU 7.5.0
 
 GPD Micro PC    
 Intel Celeron N4100 x86_64 @ 1.10GHz x 2 x 2    
-Ubuntu MATE 19.10 "eoan"    
+Ubuntu MATE 19.10 "Eoan"    
 Linux 5.3.0    
 GNU 9.2.1    
 
