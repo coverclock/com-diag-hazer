@@ -486,6 +486,12 @@ Raspbian 9.13 "Stretch"
 Linux 4.19.66    
 GNU 6.3.0    
 
+Raspberry Pi 3 Model B+ with a touch-sensitive LCD display    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Raspbian 9.4 "Stretch"    
+Linux 4.14.30    
+GNU 6.3.0    
+
 Raspberry Pi 4 Model B    
 Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
 Raspbian 10 "Buster"    
