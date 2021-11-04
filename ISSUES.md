@@ -268,3 +268,16 @@ Compare this against the checksum of the corrected sentence.
     checksum '$GPRMC,140422.000,A,3947.6540,N,10509.2006,W,0.00,125.17,211021,,,D*50'
     $GPRMC,140422.000,A,3947.6540,N,10509.2006,W,0.00,125.17,211021,,,D*7E\r\n
 
+## BU353W10 U-blox M8 UBX-MON-HW reporting jamming
+
+I routinely test multiple GNSS devices at a time. Some U-blox devices
+support a jamming detection capability whose output is reported in the
+optional UBX-MON-HW message. I notice if I put one of these devices too
+close to other GNSS devices (a few inches) is reports a lot of changes
+in the jamming metric. If I move it farther away, it's okay.
+
+This apparently isn't unusual; I've seen remarks on various GNSS
+discussion groups (like the Time Nuts mailing list) that advise
+separating GPS antennas by ten centimeters (based on the GPS L1
+wavelength) or more.
+
