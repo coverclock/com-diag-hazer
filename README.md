@@ -466,55 +466,55 @@ Dell OptiPlex 7040
 Intel Core i7-6700T x86_64 @ 2.8GHz x 4 x 2    
 Ubuntu 16.04.2 "Xenial"    
 Linux 4.4.0    
-Gnu 5.4.0
+GNU 5.4.0
 
 Intel NUC5i7RYH    
 Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
 Ubuntu 20.04.3 "Focal"    
 Linux 5.4.0    
-Gnu 9.3.0    
+GNU 9.3.0    
 
 Intel NUC7i7BNH    
 Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
 Ubuntu 20.04.3 "Focal""    
 Linux 5.11.0    
-Gnu 9.3.0    
+GNU 9.3.0    
 
 Raspberry Pi 3 Model B+    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 Raspbian 9.13 "Stretch"    
 Linux 4.19.66    
-Gnu 6.3.0    
+GNU 6.3.0    
 
 Raspberry Pi 4 Model B    
 Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
 Raspbian 10 "Buster"    
 Linux 5.10.17    
-Gnu 8.3.0    
+GNU 8.3.0    
 
 VMware Workstation 15 Pro under Windows 10    
 Intel Core i7-3520M x86_64 @ 2.90GHz x 2    
 Ubuntu 19.10 "Eoan"    
 Linux 5.3.0    
-Gnu 9.2.1    
+GNU 9.2.1    
 
 HP Mini 110-1100    
 Intel Atom N270 i686 @ 1.6GHz x 2    
 Mint 19.3 "Tricia"    
 Linux 5.0.0    
-Gnu 7.5.0    
+GNU 7.5.0    
 
 GPD Micro PC    
 Intel Celeron N4100 x86_64 @ 1.10GHz x 2 x 2    
 Ubuntu MATE 19.10 "eoan"    
 Linux 5.3.0    
-Gnu 9.2.1    
+GNU 9.2.1    
 
 Pi-Top 3 (Raspberry Pi 3 Model B+)    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
 pi-topOS "Polaris" (Raspbian 9.9 "Stretch")    
 Linux 4.19.66    
-Gnu 6.3.0    
+GNU 6.3.0    
 
 # Diagnostics
 
