@@ -532,12 +532,12 @@ data to be logged.)
 * ERANGE - time, latitude, longitude, etc. value out of range.
 
 Each Hazer library function that parses NMEA sentences (hazer), UBX packets
-(yodel), or RTCM messages (tumbleweed) returns a value >= 0 if the data was
+(yodel), or RTCM messages (tumbleweed) returns a value >= 0 if the data were
 valid and any PNT structures passed to the function were updated. If the
-function returns a value < 0, the data was rejected, and errno is set
-to a value. If errno > 0, then the data was invalid and the error number,
+function returns a value < 0, the data were rejected, and errno is set
+to a value. If errno > 0, then the data were invalid and the error number,
 as indicated in the list above, suggests the reason why. If errno == 0, then
-the data was valid but indicated that the GNSS device did not have a valid
+the data were valid but indicated that the GNSS device did not have a valid
 solution, so the PNT structures were not updated.
 
 ## Synchronization
