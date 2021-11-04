@@ -113,8 +113,8 @@ extern void print_error_f(const char * file, int line, const void * buffer, ssiz
 
 /**
  * @def print_error
- * Calls print_error_f with __FILE__ and __LINE__ if errno != 0.
+ * Calls print_error_f with __FILE__ and __LINE__.
  */
-#define print_error(_BUFFER_, _LENGTH_) ((errno != 0) ? print_error_f(__FILE__, __LINE__, _BUFFER_, _LENGTH_) : (void)0)
+#define print_error(_BUFFER_, _LENGTH_) print_error_f(__FILE__, __LINE__, _BUFFER_, _LENGTH_)
 
 #endif

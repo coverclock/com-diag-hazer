@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2018-2019 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2018-2021 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Support for proprietary UBX messaging as used by ublox AG devices.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -399,7 +399,8 @@ static inline int yodel_is_ubx_class_id(const void * bp, ssize_t length, uint8_t
  */
 typedef struct YodelUbxNavHpposllh {
     uint8_t version;
-    uint8_t reserved[3];
+    uint8_t reserved1[2];
+    uint8_t flags;
     uint32_t iTOW;
     int32_t lon;
     int32_t lat;
@@ -418,7 +419,7 @@ typedef struct YodelUbxNavHpposllh {
  * Initialize a YodelUbxNavHpposllh structure.
  */
 #define YODEL_UBX_NAV_HPPOSLLH_INITIALIZER \
-    { 0, }
+    { 0, 0, 0, 0x1, 0, }
 
 /**
  * UBX-NAV-HPPOSLLH constants.
@@ -427,6 +428,13 @@ enum YodelUbxNavHpposllhConstants {
     YODEL_UBX_NAV_HPPOSLLH_Class	= 0x01,
     YODEL_UBX_NAV_HPPOSLLH_Id		= 0x14,
     YODEL_UBX_NAV_HPPOSLLH_Length	= 36,
+};
+
+/**
+ * UBX-NAV-HPPOSLLH.flags masks.
+ */
+enum YodelUbxNavHpposllhFlags {
+    YODEL_UBX_NAV_HPPOSLLH_flags_invalidL1h     = 0x1,
 };
 
 /**

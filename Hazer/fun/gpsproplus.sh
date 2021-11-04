@@ -30,7 +30,7 @@ exec 2>>${ERRFIL}
 # A pipe has a capacity of 16 virtual pages. Given a page size
 # of 4KB, a pipe has a capacity of 64KB. Reference: pipe(7)
 
-socat -u OPEN:${DEVICE},b${RATE} - | cat | cat | coreable gpstool -S - -t 10 -F 1 -E
+#socat -u OPEN:${DEVICE},b${RATE} - | cat | cat | coreable gpstool -S - -t 10 -F 1 -E
 
 #exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -t 10 -F 1 -E -C ${CATFIL}
-#exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -t 10 -F 1 -E
+exec coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -t 10 -F 1 -E

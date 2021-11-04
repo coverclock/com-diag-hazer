@@ -1664,7 +1664,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         }
 
         if (message <= 0) {
-            errno = 0;
+            errno = EINVAL;
             break;
         }
 

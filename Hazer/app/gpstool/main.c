@@ -2422,13 +2422,15 @@ consume:
 
                     acquire_fix("NMEA GGA");
 
+                } else if (errno == 0) {
+
+                    relinquish_fix("NMEA GGA");
+
                 } else {
 
                     print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA GGA reject\n");
-
-                    relinquish_fix("NMEA GGA");
 
                 }
 
@@ -2444,13 +2446,15 @@ consume:
 
                     acquire_fix("NMEA RMC");
 
+                } else if (errno == 0) {
+
+                    relinquish_fix("NMEA RMC");
+
                 } else {
 
                     print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA RMC reject\n");
-
-                    relinquish_fix("NMEA RMC");
 
                 }
 
@@ -2466,13 +2470,15 @@ consume:
 
                     acquire_fix("NMEA GLL");
 
+                } else if (errno == 0) {
+
+                    relinquish_fix("NMEA GLL");
+
                 } else {
 
                     print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse NMEA GLL reject\n");
-
-                    relinquish_fix("NMEA GLL");
 
                 }
 
@@ -2609,13 +2615,15 @@ consume:
 
                     acquire_fix("PUBX POSITION");
 
+                } else if (errno == 0) {
+
+                    relinquish_fix("PUBX POSITION");
+
                 } else {
 
                     print_error(buffer, length);
 
                     DIMINUTO_LOG_DEBUG("Parse PUBX POSITION reject\n");
-
-                    relinquish_fix("PUBX POSITION");
 
                 }
 
@@ -2703,6 +2711,10 @@ consume:
                     DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-HPPOSLLH accept\n");
 
                     acquire_fix("UBX-NAV-HPPOSLLH");
+
+                } else if (errno == 0) {
+
+                    relinquish_fix("UBX-NAV-HPPOSLLH");
 
                 } else {
 

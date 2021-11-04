@@ -354,7 +354,11 @@ int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * bp, ssize
         COM_DIAG_YODEL_LETOH(mp->hMSL);
         COM_DIAG_YODEL_LETOH(mp->hAcc);
         COM_DIAG_YODEL_LETOH(mp->vAcc);
-        rc = 0;
+        if (mp->flags & YODEL_UBX_NAV_HPPOSLLH_flags_invalidL1h) {
+            errno = 0;
+        } else {
+            rc = 0;
+        }
     }
 
     return rc;
