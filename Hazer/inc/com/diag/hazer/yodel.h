@@ -419,7 +419,7 @@ typedef struct YodelUbxNavHpposllh {
  * Initialize a YodelUbxNavHpposllh structure.
  */
 #define YODEL_UBX_NAV_HPPOSLLH_INITIALIZER \
-    { 0, 0, 0, 0x1, 0, }
+    { 0, { 0, }, 0x1, 0, }
 
 /**
  * UBX-NAV-HPPOSLLH constants.
