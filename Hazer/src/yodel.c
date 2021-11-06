@@ -346,17 +346,20 @@ int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * bp, ssize
     } else if (length != (YODEL_UBX_SHORTEST + YODEL_UBX_NAV_HPPOSLLH_Length)) {
         errno = ENODATA;
     } else {
-        memcpy(mp, &(hp[YODEL_UBX_PAYLOAD]), sizeof(*mp));
-        COM_DIAG_YODEL_LETOH(mp->iTOW);
-        COM_DIAG_YODEL_LETOH(mp->lon);
-        COM_DIAG_YODEL_LETOH(mp->lat);
-        COM_DIAG_YODEL_LETOH(mp->height);
-        COM_DIAG_YODEL_LETOH(mp->hMSL);
-        COM_DIAG_YODEL_LETOH(mp->hAcc);
-        COM_DIAG_YODEL_LETOH(mp->vAcc);
-        if (mp->flags & YODEL_UBX_NAV_HPPOSLLH_flags_invalidL1h) {
+        yodel_ubx_nav_hpposllh_t hpposllh = YODEL_UBX_NAV_HPPOSLLH_INITIALIZER;
+
+        memcpy(&hpposllh, &(hp[YODEL_UBX_PAYLOAD]), sizeof(hpposllh));
+        if ((hpposllh.flags & YODEL_UBX_NAV_HPPOSLLH_flags_invalidL1h) != 0) {
             errno = 0;
         } else {
+            COM_DIAG_YODEL_LETOH(hpposllh.iTOW);
+            COM_DIAG_YODEL_LETOH(hpposllh.lon);
+            COM_DIAG_YODEL_LETOH(hpposllh.lat);
+            COM_DIAG_YODEL_LETOH(hpposllh.height);
+            COM_DIAG_YODEL_LETOH(hpposllh.hMSL);
+            COM_DIAG_YODEL_LETOH(hpposllh.hAcc);
+            COM_DIAG_YODEL_LETOH(hpposllh.vAcc);
+            memcpy(mp, &hpposllh, sizeof(*mp));
             rc = 0;
         }
     }
@@ -590,7 +593,6 @@ int yodel_ubx_mon_comms(void * bp, ssize_t length)
     unsigned char * hp = (unsigned char *)bp;
     int ii = 0;
     int jj = 0;
-    yodel_ubx_mon_comms_t comms = YODEL_UBX_MON_COMMS_INITIALIZER;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_COMMS_Class) {
         errno = ENOMSG;
@@ -599,6 +601,8 @@ int yodel_ubx_mon_comms(void * bp, ssize_t length)
     } else if (length < (YODEL_UBX_SHORTEST + YODEL_UBX_MON_COMMS_Length)) {
         errno = ENODATA;
     } else {
+        yodel_ubx_mon_comms_t comms = YODEL_UBX_MON_COMMS_INITIALIZER;
+
         hp += YODEL_UBX_PAYLOAD;
         length -= YODEL_UBX_PAYLOAD;
         memcpy(&comms.prefix, hp, sizeof(comms.prefix));

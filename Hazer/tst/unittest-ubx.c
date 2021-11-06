@@ -14,6 +14,7 @@
 #define _BSD_SOURCE
 #endif
 #include <endian.h>
+#include <errno.h>
 #include <string.h>
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
@@ -348,6 +349,43 @@ int main(void)
 		assert(data.port[3].msgs[2] == 0);
 		assert(data.port[3].msgs[3] == 0);
 		assert(data.port[3].skipped == 0);
+    END;
+
+    BEGIN("\\xb5b\\x01\\x14$\\0\\0\\0\\0\\0pC\\xfd!m\\xddR\\xc1\\xba\\x1e\\xb8\\x17c\\xc7\\x19\\0_\\x1b\\x1a\\0\\xfa\\x18\\xfd\\xfcT2\\0\\0\\x16L\\0\\0\\xd85");
+        yodel_ubx_nav_hpposllh_t data = YODEL_UBX_NAV_HPPOSLLH_INITIALIZER;
+        static const yodel_ubx_nav_hpposllh_t INIT = YODEL_UBX_NAV_HPPOSLLH_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_NAV_HPPOSLLH_Class, YODEL_UBX_NAV_HPPOSLLH_Id));
+        assert(memcmp(&data, &INIT, sizeof(data)) == 0);
+        assert(yodel_ubx_nav_hpposllh(&data, message, size) == 0);
+        diminuto_dump(stderr, &data, sizeof(data));
+        assert(data.version == 0);
+        assert(data.flags == 0x00);
+        assert(data.iTOW == 570246000U);
+        assert(data.lon == -1051533971);
+        assert(data.lat == 397942458);
+        assert(data.height == 1689443);
+        assert(data.hMSL == 1710943);
+        assert(data.lonHp == -6);
+        assert(data.latHp == 24);
+        assert(data.heightHp == -3);
+        assert(data.hMSLHp == -4);
+        assert(data.hAcc == 12884U);
+        assert(data.vAcc == 19478U);
+    END;
+
+    BEGIN("\\xb5b\\x01\\x14$\\0\\0\\0\\0\\1pC\\xfd!m\\xddR\\xc1\\xba\\x1e\\xb8\\x17c\\xc7\\x19\\0_\\x1b\\x1a\\0\\xfa\\x18\\xfd\\xfcT2\\0\\0\\x16L\\0\\0\\xd85");
+        yodel_ubx_nav_hpposllh_t data = YODEL_UBX_NAV_HPPOSLLH_INITIALIZER;
+        static const yodel_ubx_nav_hpposllh_t INIT = YODEL_UBX_NAV_HPPOSLLH_INITIALIZER;
+        fprintf(stderr, "\"%s\"[%zu]\n", string, length);
+        diminuto_dump(stderr, message, size);
+        assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_NAV_HPPOSLLH_Class, YODEL_UBX_NAV_HPPOSLLH_Id));
+        assert(memcmp(&data, &INIT, sizeof(data)) == 0);
+        assert(yodel_ubx_nav_hpposllh(&data, message, size) < 0);
+        assert(errno == 0);
+        diminuto_dump(stderr, &data, sizeof(data));
+        assert(memcmp(&data, &INIT, sizeof(data)) == 0);
     END;
 
     /**************************************************************************/
