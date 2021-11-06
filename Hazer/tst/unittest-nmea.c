@@ -136,6 +136,7 @@ int main(void)
         rc = hazer_is_nmea_name(vector, count, "GGA");
         assert(rc == !0);
 
+        errno = ~0;
         rc = hazer_parse_gga(&position, vector, count);
         assert(rc < 0);
         assert(errno == 0);
@@ -253,6 +254,7 @@ int main(void)
         rc = hazer_is_nmea_name(vector, count, "RMC");
         assert(rc == !0);
 
+        errno = ~0;
         rc = hazer_parse_rmc(&position, vector, count);
         assert(rc < 0);
         assert(errno == 0);
@@ -433,6 +435,7 @@ int main(void)
         rc = hazer_is_nmea_name(vector, count, "VTG");
         assert(rc == !0);
 
+        errno = ~0;
         rc = hazer_parse_vtg(&position, vector, count);
         assert(rc < 0);
         assert(errno == 0);
