@@ -382,6 +382,7 @@ int main(void)
         diminuto_dump(stderr, message, size);
         assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_NAV_HPPOSLLH_Class, YODEL_UBX_NAV_HPPOSLLH_Id));
         assert(memcmp(&data, &INIT, sizeof(data)) == 0);
+        errno = ~0;
         assert(yodel_ubx_nav_hpposllh(&data, message, size) < 0);
         assert(errno == 0);
         diminuto_dump(stderr, &data, sizeof(data));

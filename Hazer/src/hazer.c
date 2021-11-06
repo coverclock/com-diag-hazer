@@ -1374,7 +1374,14 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
         }
 
         if (position.sat_used == 0) {
+#if 0
+            /*
+             * The API contract is that the PNT structures are not
+             * updated if <0 is returned.
+             */
             positionp->sat_used = 0;
+#endif
+            errno = 0;
             break;
         }
 
@@ -2298,13 +2305,25 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         }
 
         if (strcmp(vector[8], "NF") == 0) {
+#if 0
+            /*
+             * The API contract is that the PNT structures are not
+             * updated if <0 is returned.
+             */
             activep->mode = HAZER_MODE_NOFIX;
+#endif
             errno = 0;
             break;
         }
 
         if (strcmp(vector[18], "0") == 0) {
+#if 0
+            /*
+             * The API contract is that the PNT structures are not
+             * updated if <0 is returned.
+             */
             activep->mode = HAZER_MODE_ZERO;
+#endif
             errno = 0;
             break;
         }

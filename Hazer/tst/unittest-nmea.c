@@ -71,7 +71,6 @@ int main(void)
 
         rc = hazer_parse_gga(&position, vector, count);
         assert(rc == 0);
-        assert(errno == 0);
         assert(strcmp(position.label, "GGA") == 0);
         assert(position.sat_used == 12);
         assert(position.utc_nanoseconds == 50187000000000ULL);
@@ -89,6 +88,58 @@ int main(void)
         position.ticks = 1;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, 1));
+    }
+
+    {
+        static const char * DATA = "$GNGGA,135627.00,3947.65338,N,10509.20216,W,2,0,0.67,1708.6,M,-21.5,M,,0000*7D\r\n";
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
+        ssize_t length = -1;
+        size_t count = 0;
+        int rc = -1;
+        char * pointer = (char *)0;
+        char msn = 0;
+        char lsn = 0;
+        hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
+
+        strncpy(buffer, DATA, sizeof(buffer));
+        buffer[sizeof(buffer) - 1] = '\0';
+        assert(strcmp(DATA, buffer) == 0);
+
+        length = hazer_length(buffer, sizeof(buffer));
+        assert(length == strlen(buffer));
+
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
+        assert(pointer != (char *)0);
+        assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+        assert(pointer[1] == msn);
+        assert(pointer[2] == lsn);
+        assert(pointer[3] == '\r');
+        assert(pointer[4] == '\n');
+
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
+        assert(count == 16);
+
+        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(length == (strlen(temporary) + 1));
+        temporary[length - 1] = msn;
+        temporary[length] = lsn;
+        temporary[length + 1] = '\r';
+        temporary[length + 2] = '\n';
+        temporary[length + 3] = '\0';
+        assert(strcmp(DATA, temporary) == 0);
+
+        rc = hazer_is_nmea_name(vector, count, "GGA");
+        assert(rc == !0);
+
+        rc = hazer_parse_gga(&position, vector, count);
+        assert(rc < 0);
+        assert(errno == 0);
+        assert(memcmp(&position, &POSITION, sizeof(position)) == 0);
     }
 
     {
@@ -138,7 +189,6 @@ int main(void)
 
         rc = hazer_parse_rmc(&position, vector, count);
         assert(rc == 0);
-        assert(errno == 0);
         assert(strcmp(position.label, "RMC") == 0);
         assert(position.utc_nanoseconds == 50188000000000ULL);
         assert(position.dmy_nanoseconds == 1533600000000000000ULL); /* date -u -d "August 7 2018" +"%s.%N" */
@@ -155,7 +205,58 @@ int main(void)
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(&position, 1));
+    }
 
+    {
+        static const char * DATA = "$GNRMC,135628.00,N,3947.65337,N,10509.20223,W,0.010,,070818,,,D*7B\r\n";
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
+        ssize_t length = -1;
+        size_t count = 0;
+        int rc = -1;
+        char * pointer = (char *)0;
+        char msn = 0;
+        char lsn = 0;
+        hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
+
+        strncpy(buffer, DATA, sizeof(buffer));
+        buffer[sizeof(buffer) - 1] = '\0';
+        assert(strcmp(DATA, buffer) == 0);
+
+        length = hazer_length(buffer, sizeof(buffer));
+        assert(length == strlen(buffer));
+
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
+        assert(pointer != (char *)0);
+        assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+        assert(pointer[1] == msn);
+        assert(pointer[2] == lsn);
+        assert(pointer[3] == '\r');
+        assert(pointer[4] == '\n');
+
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
+        assert(count == 14);
+
+        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(length == (strlen(temporary) + 1));
+        temporary[length - 1] = msn;
+        temporary[length] = lsn;
+        temporary[length + 1] = '\r';
+        temporary[length + 2] = '\n';
+        temporary[length + 3] = '\0';
+        assert(strcmp(DATA, temporary) == 0);
+
+        rc = hazer_is_nmea_name(vector, count, "RMC");
+        assert(rc == !0);
+
+        rc = hazer_parse_rmc(&position, vector, count);
+        assert(rc < 0);
+        assert(errno == 0);
+        assert(memcmp(&position, &POSITION, sizeof(position)) == 0);
     }
 
     {
@@ -205,7 +306,6 @@ int main(void)
 
         rc = hazer_parse_gll(&position, vector, count);
         assert(rc == 0);
-        assert(errno == 0);
         assert(strcmp(position.label, "GLL") == 0);
         assert(position.utc_nanoseconds == 50188000000000ULL);
         assert(position.dmy_nanoseconds == HAZER_NANOSECONDS_UNSET);
@@ -269,7 +369,6 @@ int main(void)
 
         rc = hazer_parse_vtg(&position, vector, count);
         assert(rc == 0);
-        assert(errno == 0);
         assert(strcmp(position.label, "VTG") == 0);
         assert(position.utc_nanoseconds == HAZER_NANOSECONDS_UNSET);
         assert(position.dmy_nanoseconds == HAZER_NANOSECONDS_UNSET);
@@ -286,6 +385,58 @@ int main(void)
         position.ticks = 1;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, 1));
+    }
+
+    {
+        static const char * DATA = "$GNVTG,,T,,M,0.021,N,0.040,K,N*35\r\n";
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
+        ssize_t length = -1;
+        size_t count = 0;
+        int rc = -1;
+        char * pointer = (char *)0;
+        char msn = 0;
+        char lsn = 0;
+        hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
+
+        strncpy(buffer, DATA, sizeof(buffer));
+        buffer[sizeof(buffer) - 1] = '\0';
+        assert(strcmp(DATA, buffer) == 0);
+
+        length = hazer_length(buffer, sizeof(buffer));
+        assert(length == strlen(buffer));
+
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
+        assert(pointer != (char *)0);
+        assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+        assert(pointer[1] == msn);
+        assert(pointer[2] == lsn);
+        assert(pointer[3] == '\r');
+        assert(pointer[4] == '\n');
+
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
+        assert(count == 11);
+
+        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(length == (strlen(temporary) + 1));
+        temporary[length - 1] = msn;
+        temporary[length] = lsn;
+        temporary[length + 1] = '\r';
+        temporary[length + 2] = '\n';
+        temporary[length + 3] = '\0';
+        assert(strcmp(DATA, temporary) == 0);
+
+        rc = hazer_is_nmea_name(vector, count, "VTG");
+        assert(rc == !0);
+
+        rc = hazer_parse_vtg(&position, vector, count);
+        assert(rc < 0);
+        assert(errno == 0);
+        assert(memcmp(&position, &POSITION, sizeof(position)) == 0);
     }
 
     {
@@ -333,7 +484,6 @@ int main(void)
 
         rc = hazer_parse_gsa(&active, vector, count);
         assert(rc == 0);
-        assert(errno == 0);
         assert(strcmp(active.label, "GSA") == 0);
         assert(active.active == 12);
         assert(active.pdop == 127);
@@ -401,7 +551,6 @@ int main(void)
 
         rc = hazer_parse_gsa(&active, vector, count);
         assert(rc == 0);
-        assert(errno == 0);
         assert(strcmp(active.label, "GSA") == 0);
         assert(active.active == 12);
         assert(active.pdop == 127);
@@ -477,7 +626,6 @@ int main(void)
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(((ii == 3) && (rc == 0)) || (rc > 0));
-            assert(errno == 0);
             assert(strcmp(view.label, "GSV") == 0);
             assert(view.view == 15);
 
@@ -641,7 +789,6 @@ int main(void)
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(((ii == 3) && (rc == 0)) || (rc > 0));
-            assert(errno == 0);
             assert(strcmp(view.label, "GSV") == 0);
             assert(view.view == 15);
 
