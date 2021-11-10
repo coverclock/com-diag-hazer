@@ -1513,17 +1513,17 @@ int main(int argc, char * argv[])
          */
 
         if (diminuto_terminator_check()) {
-            DIMINUTO_LOG_NOTICE("SIGTERM");
+            DIMINUTO_LOG_NOTICE("Signal Terminate");
             break;
         }
 
         if (diminuto_pipe_check()) {
-            DIMINUTO_LOG_NOTICE("SIGPIPE");
+            DIMINUTO_LOG_NOTICE("Signal Pipe");
             break;
         }
 
         if (diminuto_interrupter_check()) {
-            DIMINUTO_LOG_NOTICE("SIGINT");
+            DIMINUTO_LOG_NOTICE("Signal Interrupt");
             break;
         }
 
@@ -1534,7 +1534,7 @@ int main(int argc, char * argv[])
              * background, and later disconnect my terminal session and
              * let it run.
              */
-            DIMINUTO_LOG_INFORMATION("SIGHUP");
+            DIMINUTO_LOG_INFORMATION("Signal Hangup");
             checkpoint = !0;
         }
 
