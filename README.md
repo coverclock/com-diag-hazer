@@ -524,7 +524,7 @@ GNU 6.3.0
 
 Pi-Top 4 (Raspberry Pi 4 Model B)    
 Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
-pi-topOS (Raspbian 10 "Buster")    
+pi-topOS "Sirius" (Raspbian 10 "Buster")    
 Linux 5.4.79    
 GNU 8.3.0    
 
