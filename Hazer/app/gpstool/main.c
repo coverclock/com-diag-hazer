@@ -2485,6 +2485,10 @@ consume:
                     position[system].ticks = timeout;
                     refresh = !0;
 
+                } else if (errno == 0) {
+
+                    relinquish_fix("NMEA VTG");
+
                 } else {
 
                     print_error(buffer, length);
@@ -2563,7 +2567,7 @@ consume:
                     view[system].ticks = timeout;
                     if (rc == 0) {
                         refresh = !0;
-                        DIMINUTO_LOG_DEBUG("Received NMEA GSV final\n");
+                        DIMINUTO_LOG_DEBUG("Received NMEA GSV complete\n");
                     } else {
                         DIMINUTO_LOG_DEBUG("Received NMEA GSV partial\n");
                     }
