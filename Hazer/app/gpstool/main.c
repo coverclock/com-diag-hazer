@@ -1959,7 +1959,7 @@ consume:
 
             } else if (surveyor_length == TUMBLEWEED_RTCM_SHORTEST) {
 
-                DIMINUTO_LOG_DEBUG("Surveyor RTCM keepalive received");
+                DIMINUTO_LOG_DEBUG("Surveyor Keepalive received");
 
             } else if (dev_fp == (FILE *)0) {
 
@@ -2062,7 +2062,7 @@ consume:
                 network_total += surveyor_total;
             }
 
-            DIMINUTO_LOG_DEBUG("Surveyor RTCM keepalive sent");
+            DIMINUTO_LOG_DEBUG("Surveyor Keepalive sent");
 
         }
 
@@ -2375,7 +2375,7 @@ consume:
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
 
                 if (hazer_is_nmea_name(vector, count, "GSA") || hazer_is_nmea_name(vector, count, "GSV")) {
-                    DIMINUTO_LOG_INFORMATION("Parse NMEA Talker Other \"%c%c\"", vector[0][1], vector[0][2]);
+                    DIMINUTO_LOG_INFORMATION("Received NMEA Talker Other \"%c%c\"", vector[0][1], vector[0][2]);
                 }
                 continue;
 
@@ -2385,13 +2385,13 @@ consume:
 
             } else if ((talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {
 
-                DIMINUTO_LOG_INFORMATION("Parse NMEA Sentence Other %s \"%.*s\"", HAZER_TALKER_NAME[talker], (int)(length - 2) /* Exclude CR and LF. */, buffer);
+                DIMINUTO_LOG_INFORMATION("Received NMEA Sentence Other %s \"%.*s\"", HAZER_TALKER_NAME[talker], (int)(length - 2) /* Exclude CR and LF. */, buffer);
                 continue;
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 
                 if (hazer_is_nmea_name(vector, count, "GSA") || hazer_is_nmea_name(vector, count, "GSV")) {
-                    DIMINUTO_LOG_INFORMATION("Parse NMEA System Other \"%c%c\"\n", vector[0][1], vector[0][2]);
+                    DIMINUTO_LOG_INFORMATION("Received NMEA System Other \"%c%c\"\n", vector[0][1], vector[0][2]);
                 }
                 continue;
 
@@ -2412,13 +2412,13 @@ consume:
 
             if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GGA)) {
 
+                DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
+
                 if (hazer_parse_gga(&position[system], vector, count) == 0) {
 
                     position[system].ticks = timeout;
                     refresh = !0;
                     trace = !0;
-
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GGA accept\n");
 
                     acquire_fix("NMEA GGA");
 
@@ -2430,19 +2430,17 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GGA reject\n");
-
                 }
 
             } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_RMC)) {
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
 
                 if (hazer_parse_rmc(&position[system], vector, count) == 0) {
 
                     position[system].ticks = timeout;
                     refresh = !0;
                     trace = !0;
-
-                    DIMINUTO_LOG_DEBUG("Parse NMEA RMC accept\n");
 
                     acquire_fix("NMEA RMC");
 
@@ -2454,19 +2452,17 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse NMEA RMC reject\n");
-
                 }
 
             } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GLL)) {
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
 
                 if (hazer_parse_gll(&position[system], vector, count) == 0) {
 
                     position[system].ticks = timeout;
                     refresh = !0;
                     trace = !0;
-
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GLL accept\n");
 
                     acquire_fix("NMEA GLL");
 
@@ -2478,28 +2474,26 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GLL reject\n");
-
                 }
 
             } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_VTG)) {
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA VTG\n");
 
                 if (hazer_parse_vtg(&position[system], vector, count) == 0) {
 
                     position[system].ticks = timeout;
                     refresh = !0;
 
-                    DIMINUTO_LOG_DEBUG("Parse NMEA VTG accept\n");
-
                 } else {
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse NMEA VTG reject\n");
-
                 }
 
             } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GSA)) {
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA GSA\n");
 
                 if (hazer_parse_gsa(&active_cache, vector, count) == 0) {
 
@@ -2532,8 +2526,6 @@ consume:
                     active[system].ticks = timeout;
                     refresh = !0;
 
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GSA accept\n");
-
                     /*
                      * If the GSA sentences indicates a fix and we haven't
                      * seen a fix from any sentence prior to this, we log
@@ -2552,11 +2544,11 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GSA reject\n");
-
                 }
 
             } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GSV)) {
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA GSV\n");
 
                 if  ((rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
 
@@ -2571,38 +2563,38 @@ consume:
                     view[system].ticks = timeout;
                     if (rc == 0) {
                         refresh = !0;
-                        DIMINUTO_LOG_DEBUG("Parse NMEA GSV accept final\n");
+                        DIMINUTO_LOG_DEBUG("Received NMEA GSV final\n");
                     } else {
-                        DIMINUTO_LOG_DEBUG("Parse NMEA GSV accept partial\n");
+                        DIMINUTO_LOG_DEBUG("Received NMEA GSV partial\n");
                     }
 
                 } else {
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse NMEA GSV reject\n");
-
                 }
 
             } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_TXT)) {
 
+                DIMINUTO_LOG_DEBUG("Parse NMEA TXT\n");
+
                 if  (hazer_parse_txt(vector, count) == 0) {
 
-                    DIMINUTO_LOG_INFORMATION("Parse NMEA TXT accept \"%.*s\"", (int)(length - 2) /* Exclude CR and LF. */, buffer);
+                    DIMINUTO_LOG_INFORMATION("Received NMEA TXT \"%.*s\"", (int)(length - 2) /* Exclude CR and LF. */, buffer);
 
                 } else {
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse NMEA TXT reject\n");
-
                 }
 
             } else if (talker != HAZER_TALKER_PUBX) {
 
-                DIMINUTO_LOG_DEBUG("Parse NMEA Other reject \"%s\"\n", vector[0]);
+                DIMINUTO_LOG_INFORMATION("Received NMEA Other \"%s\"\n", vector[0]);
 
             } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
+
+                DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
 
                 if  (hazer_parse_pubx_position(&position[system], &active[system], vector, count) == 0) {
 
@@ -2610,8 +2602,6 @@ consume:
                     active[system].ticks = timeout;
                     refresh = !0;
                     trace = !0;
-
-                    DIMINUTO_LOG_DEBUG("Parse PUBX POSITION accept\n");
 
                     acquire_fix("PUBX POSITION");
 
@@ -2623,11 +2613,11 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse PUBX POSITION reject\n");
-
                 }
 
             } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS)) {
+
+                DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS\n");
 
                 if ((rc = hazer_parse_pubx_svstatus(view, active, vector, count)) != 0x00) {
 
@@ -2647,7 +2637,7 @@ consume:
                             }
                             active[system].ticks = timeout;
                             refresh = !0;
-                            DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS accept (%s)\n", HAZER_SYSTEM_NAME[system]);
+                            DIMINUTO_LOG_DEBUG("Received PUBX SVSTATUS (%s)\n", HAZER_SYSTEM_NAME[system]);
                         }
                     }
 
@@ -2655,11 +2645,11 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS reject\n");
-
                 }
 
             } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME)) {
+
+                DIMINUTO_LOG_DEBUG("Parse PUBX TIME\n");
 
                 if (hazer_parse_pubx_time(&position[system], vector, count) == 0) {
 
@@ -2673,22 +2663,18 @@ consume:
                      * receiver), we don't reset the position timer or indicate
                      * a refresh. We'll depend on a valid position fix (perhaps
                      * from the PUBX,00 sentence) to indicate a position
-                     * refresh.
+                     * refresh. We still update the time in the structure.
                      */
-
-                    DIMINUTO_LOG_DEBUG("Parse PUBX TIME accept\n");
 
                 } else {
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse PUBX TIME reject\n");
-
                 }
 
             } else {
 
-                DIMINUTO_LOG_DEBUG("Parse NMEA Other reject \"%s\"\n", vector[0]);
+                DIMINUTO_LOG_INFORMATION("Received PUBX Other \"%s\"\n", vector[0]);
 
             }
 
@@ -2702,13 +2688,13 @@ consume:
 
             if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_HPPOSLLH_Class, YODEL_UBX_NAV_HPPOSLLH_Id)) {
 
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-HPPOSLLH\n");
+
                 if (yodel_ubx_nav_hpposllh(&(solution.payload), buffer, length) == 0) {
 
                     solution.ticks = timeout;
                     refresh = !0;
                     trace = !0;
-
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-HPPOSLLH accept\n");
 
                     acquire_fix("UBX-NAV-HPPOSLLH");
 
@@ -2720,54 +2706,50 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-HPPOSLLH reject\n");
-
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_HW_Class, YODEL_UBX_MON_HW_Id)) {
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-HW\n");
 
                 if (yodel_ubx_mon_hw(&(hardware.payload), buffer, length) == 0) {
 
                     hardware.ticks = timeout;
                     refresh = !0;
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-HW accept\n");
-
                 } else {
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-HW reject\n");
-
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_STATUS_Class, YODEL_UBX_NAV_STATUS_Id)) {
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-STATUS\n");
 
                 if (yodel_ubx_nav_status(&(status.payload), buffer, length) == 0) {
 
                     status.ticks = timeout;
                     refresh = !0;
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-STATUS accept\n");
-
                 } else {
 
                     print_error(buffer, length);
-
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-STATUS reject\n");
 
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_ACK_Class, YODEL_UBX_ACK_NAK_Id) || yodel_is_ubx_class_id(buffer, length, YODEL_UBX_ACK_Class, YODEL_UBX_ACK_ACK_Id)) {
 
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-ACK-ACK/NAK\n");
+
                 if (yodel_ubx_ack(&acknak, buffer, length) == 0) {
 
                     if (acknak.state) {
-                        DIMINUTO_LOG_NOTICE("Parse UBX UBX-ACK-ACK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                        DIMINUTO_LOG_NOTICE("Received UBX UBX-ACK-ACK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                     } else if (!nakquit) {
-                        DIMINUTO_LOG_NOTICE("Parse UBX UBX-ACK-NAK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                        DIMINUTO_LOG_NOTICE("Received UBX UBX-ACK-NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                     } else {
-                        DIMINUTO_LOG_WARNING("Parse UBX UBX-ACK-NAK accept 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
+                        DIMINUTO_LOG_WARNING("Received UBX UBX-ACK-NAK 0x%02x 0x%02x (%d)\n", acknak.clsID, acknak.msgID, acknakpending);
                         xc = 1;
                         eof = !0;
                     }
@@ -2778,15 +2760,13 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_WARNING("Parse UBX UBX-ACK-ACK/NAK reject\n");
-
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id)) {
 
-                if (yodel_ubx_cfg_valget(buffer, length) == 0) {
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-CFG-VALGET\n");
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-CFG-VALGET accept\n");
+                if (yodel_ubx_cfg_valget(buffer, length) == 0) {
 
                     process_ubx_cfg_valget(buffer, length);
 
@@ -2794,104 +2774,94 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-CFG-VALGET reject\n");
-
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_VER_Class, YODEL_UBX_MON_VER_Id)) {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VER accept\n");
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-VER\n");
 
                 process_ubx_mon_ver(buffer, length);
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_SVIN_Class, YODEL_UBX_NAV_SVIN_Id)) {
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-SVIN\n");
 
                 if (yodel_ubx_nav_svin(&base.payload, buffer, length) == 0) {
 
                     base.ticks = timeout;
                     refresh = !0;
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-SVIN accept\n");
-
                 } else {
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-SVIN reject\n");
-
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_ATT_Class, YODEL_UBX_NAV_ATT_Id)) {
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ATT\n");
 
                 if (yodel_ubx_nav_att(&(attitude.payload), buffer, length) == 0) {
 
                     attitude.ticks = timeout;
                     refresh = !0;
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ATT accept\n");
-
                 } else {
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ATT reject\n");
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_ODO_Class, YODEL_UBX_NAV_ODO_Id)) {
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ODO\n");
 
                 if (yodel_ubx_nav_odo(&(odometer.payload), buffer, length) == 0) {
 
                     odometer.ticks = timeout;
                     refresh = !0;
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ODO accept\n");
-
                 } else {
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-ODO reject\n");
-
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_PVT_Class, YODEL_UBX_NAV_PVT_Id)) {
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-PVT\n");
 
                 if (yodel_ubx_nav_pvt(&(posveltim.payload), buffer, length) == 0) {
 
                     posveltim.ticks = timeout;
                     refresh = !0;
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-PVT accept\n");
-
                 } else {
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-PVT reject\n");
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_RXM_RTCM_Class, YODEL_UBX_RXM_RTCM_Id)) {
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RTCM\n");
 
                 if (yodel_ubx_rxm_rtcm(&rover.payload, buffer, length) == 0) {
 
                     rover.ticks = timeout;
                     refresh = !0;
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RTCM accept\n");
-
                 } else {
 
                     print_error(buffer, length);
-
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RTCM reject\n");
 
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_COMMS_Class, YODEL_UBX_MON_COMMS_Id)) {
 
-                if (yodel_ubx_mon_comms(buffer, length) == 0) {
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS\n");
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS accept\n");
+                if (yodel_ubx_mon_comms(buffer, length) == 0) {
 
                     process_ubx_mon_comms(buffer, length);
 
@@ -2899,37 +2869,35 @@ consume:
 
                     print_error(buffer, length);
 
-                    DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS reject\n");
-
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_TIMEGPS_Class, YODEL_UBX_NAV_TIMEGPS_Id)) {
 
-                /* TODO */
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-TIMEGPS\n");
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-TIMEGPS accept\n");
+                /* TODO */
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_TIMEUTC_Class, YODEL_UBX_NAV_TIMEUTC_Id)) {
 
-                /* TODO */
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-TIMEUTC\n");
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-TIMEUTC accept\n");
+                /* TODO */
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_CLOCK_Class, YODEL_UBX_NAV_CLOCK_Id)) {
 
-                /* TODO */
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-CLOCK\n");
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-NAV-CLOCK accept\n");
+                /* TODO */
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_TIM_TP_Class, YODEL_UBX_TIM_TP_Id)) {
 
-                /* TODO */
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-TIM-TP\n");
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-TIM-TP accept\n");
+                /* TODO */
 
             } else {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX Other reject 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
+                DIMINUTO_LOG_INFORMATION("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
 
             }
 
@@ -2954,13 +2922,13 @@ consume:
             kinematics.ticks = timeout;
             refresh = !0;
 
-            DIMINUTO_LOG_DEBUG("Parse RTCM Any accept %d %lld\n", kinematics.number, (long long int)kinematics.length);
+            DIMINUTO_LOG_DEBUG("Received RTCM (%d) [%lld]\n", kinematics.number, (long long int)kinematics.length);
 
             break;
 
         case FORMAT:
 
-            DIMINUTO_LOG_ERROR("Parse Unknown Any reject 0x%x\n", buffer[0]);
+            DIMINUTO_LOG_WARNING("Received Unknown 0x%x\n", buffer[0]);
 
             break;
 
