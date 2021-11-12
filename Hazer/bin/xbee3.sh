@@ -17,8 +17,8 @@
 # to the RPi's serial port that you don't run them near the cellular antenna. I
 # suspect this can induct spurious signals into the serial bit stream.
 #
-# usage: wheatstone [ GPSDEVICE [ NETDEVICE [ GPSRATE [ NETRATE [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ] ]
-# example: wheatstone /dev/ttyUSB1 /dev/ttyUSB0
+# usage: xbee3 [ GPSDEVICE [ NETDEVICE [ GPSRATE [ NETRATE [ ERRFIL [ OUTFIL [ CSVFIL [ PIDFIL [ LIMIT ] ] ] ] ] ] ] ] ]
+# example: xbee3 /dev/ttyUSB1 /dev/ttyUSB0
 
 ##
 ## SETUP

@@ -1149,8 +1149,8 @@ throw an assert and core dump.
 
 ## UDP over LTE-M (Wheatstone)
 
-* wheatstone - like tracker but over a serial-attached Digi XBEE 3 LTE-M radio.
-* wheatstoneshutdown - shuts down Digi XBEE 3 LTE-M radio (recommended before powering off).
+* xbee3 - like tracker but over a serial-attached Digi XBEE 3 LTE-M radio.
+* xbee3shutdown - shuts down Digi XBEE 3 LTE-M radio (recommended before powering off).
 
 ## OpenStreetMap Moving Map (Tesoro)
 

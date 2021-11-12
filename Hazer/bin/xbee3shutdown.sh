@@ -5,8 +5,8 @@
 # https://github.com/coverclock/com-diag-hazer
 # Shutdown a Digi XBEE3 LTE-M radio module on a Digi XBIB-CU-TH board.
 # This is strongly recommended prior to powering it off.
-# usage: wheatstoneshutdown [ NETDEVICE [ NETRATE ] ]
-# example: wheatstoneshutdown /dev/ttyUSB0
+# usage: xbee3shutdown [ NETDEVICE [ NETRATE ] ]
+# example: xbee3shutdown /dev/ttyUSB0
 
 PROGRAM=$(basename ${0})
 NETDEVICE=${2:-"/dev/ttyUSB0"}
