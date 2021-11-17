@@ -11,7 +11,7 @@
 #
 # USAGE
 #
-# peruse TASK FILE
+# peruse TASK TYPE
 #
 # EXAMPLES
 #
@@ -28,36 +28,36 @@ SAVDIR=${COM_DIAG_HAZER_SAVDIR:-${ROOT}/tmp}
 
 PROGRAM=$(basename ${0})
 TASK=${1}
-FILE=${2:-"out"}
+TYPE=${2:-"out"}
 LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
 DIRECTORY=${4:-${SAVDIR}}
 
 mkdir -p ${DIRECTORY}
-touch ${DIRECTORY}/${TASK}.${FILE}
+touch ${DIRECTORY}/${TASK}.${TYPE}
 
 . ${ROOT}/bin/setup
 
 trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF} 2> /dev/null; exit 0" SIGINT SIGQUIT SIGTERM
 
 if [[ "${TASK}" == "router" ]]; then
-    cat ${DIRECTORY}/${TASK}.${FILE}
+    cat ${DIRECTORY}/${TASK}.${TYPE}
     test /var/log/syslog.1 && grep rtktool /var/log/syslog.1
     grep rtktool /var/log/syslog
     tail -n 0 -f /var/log/syslog | grep rtktool
-elif [[ "${FILE}" == "err" ]]; then
-    cat ${DIRECTORY}/${TASK}.${FILE}
-    tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE}
-elif [[ "${FILE}" == "out" ]]; then
-    stdbuf -oL observe ${DIRECTORY}/${TASK}.${FILE} |
+elif [[ "${TYPE}" == "err" ]]; then
+    cat ${DIRECTORY}/${TASK}.${TYPE}
+    tail -n 0 -f ${DIRECTORY}/${TASK}.${TYPE}
+elif [[ "${TYPE}" == "out" ]]; then
+    stdbuf -oL observe ${DIRECTORY}/${TASK}.${TYPE} |
         while read FILENAME; do
             if [[ -f ${FILENAME} ]]; then
                 clear
                 awk -f ${ROOT}/bin/${PROGRAM}.awk < ${FILENAME} | head -n ${LIMIT}
             fi
         done
-elif [[ "${FILE}" == "csv" ]]; then
-    tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE} | csv2tty
+elif [[ "${TYPE}" == "csv" ]]; then
+    tail -n 0 -f ${DIRECTORY}/${TASK}.${TYPE} | csv2tty
 else
-    cat ${DIRECTORY}/${TASK}.${FILE}
-    tail -n 0 -f ${DIRECTORY}/${TASK}.${FILE}
+    cat ${DIRECTORY}/${TASK}.${TYPE}
+    tail -n 0 -f ${DIRECTORY}/${TASK}.${TYPE}
 fi

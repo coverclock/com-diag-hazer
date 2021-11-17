@@ -4,9 +4,11 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # This uses a Bluetooth-connected GNSS device like the Garmin GLO.
-# N.B. The GLO has a high update rate (10Hz) relative to other GNSS
-# devices (typically 1Hz or sometimes 5Hz). That means that the NMEA
-# stream seldom if ever looks drained and idle to gpstool.
+# N.B. The GLO has a high update rate (10Hz), but a low transmission
+# rate (4800bps), relative to other GNSS devices (typically 1Hz or
+# sometimes 5Hz, at 9600 or even 115800bps). That means that the NMEA
+# stream seldom if ever looks drained and idle to gpstool. This turned
+# out to be remarkably difficult to handle to my satisfaction.
 # N.B. The GLO works okay, but I've never had any luck pairing the
 # Bad Elf GPS Pro+ Bluetooth-connected GNSS device with the RPi.
 
@@ -31,8 +33,11 @@ SAVDIR=${COM_DIAG_HAZER_SAVDIR:-${BASDIR}/tmp}
 RUNDIR=${XDG_RUNTIME_DIR:-"/run/user/${UID}"}
 
 GPSDEV=${1:-"/dev/rfcomm0"}
-ERRFIL=${2-"${SAVDIR}/${PGMNAM}.err"}
-OUTFIL=${3-"${RUNDIR}/${PGMNAM}.out"}
+GPSBPS=${2:-"4800"}
+INPSEC=${3:-"2"}
+OUTSEC=${4:-"1"}
+ERRFIL=${5:-"${SAVDIR}/${PGMNAM}.err"}
+OUTFIL=${6:-"${RUNDIR}/${PGMNAM}.out"}
 
 HEDDIR=$(dirname ${OUTFIL})
 HEDFIL=$(basename ${OUTFIL})
@@ -49,6 +54,9 @@ echo "${PGMNAM}: PGMDIR=${PGMDIR}" 1>&2
 echo "${PGMNAM}: BASDIR=${BASDIR}" 1>&2
 echo "${PGMNAM}: SAVDIR=${SAVDIR}" 1>&2
 echo "${PGMNAM}: GPSDEV=${GPSDEV}" 1>&2
+echo "${PGMNAM}: GPSBPS=${GPSBPS}" 1>&2
+echo "${PGMNAM}: INPSEC=${INPSEC}" 1>&2
+echo "${PGMNAM}: OUTSEC=${OUTSEC}" 1>&2
 echo "${PGMNAM}: ERRFIL=${ERRFIL}" 1>&2
 echo "${PGMNAM}: OUTFIL=${OUTFIL}" 1>&2
 echo "${PGMNAM}: HEDDIR=${HEDDIR}" 1>&2
@@ -62,7 +70,7 @@ cp /dev/null ${OUTFIL}
 
 . ${BASDIR}/bin/setup
 
-coreable gpstool -D ${GPSDEV} -t 10 -H ${OUTFIL} -E -i 1 -F 1 &
+coreable gpstool -D ${GPSDEV} -b ${GPSBPS} -8 -n -1 -t 10 -H ${OUTFIL} -E -i ${INPSEC} -F ${OUTSEC} < /dev/null > /dev/null &
 GPSPID=$!
 echo "${PGMNAM}: GPSPID=${GPSPID}" 1>&2
 

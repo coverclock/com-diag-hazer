@@ -343,10 +343,10 @@ int main(int argc, char * argv[])
     diminuto_sticks_t elapsed = 0;
     seconds_t expiration_was = 0;
     seconds_t expiration_now = 0;
-    seconds_t display_last = 0;
+    seconds_t slow_last = 0;
     seconds_t keepalive_last = 0;
-    seconds_t trace_last = 0;
-    seconds_t command_last = 0;
+    seconds_t frequency_last = 0;
+    seconds_t postpone_last = 0;
     seconds_t bypass_last = 0;
     /*
      * I/O buffer variables.
@@ -782,7 +782,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -C FILE     Catenate input to FILE or named pipe.\n");
             fprintf(stderr, "       -D DEVICE   Use DEVICE for input or output.\n");
             fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
-            fprintf(stderr, "       -F SECONDS  Set report Frequency to 1/SECONDS, 0 for no delay.\n");
+            fprintf(stderr, "       -F SECONDS  Update report no more than every SECONDS seconds, 0 always, <0 never.\n");
             fprintf(stderr, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
             fprintf(stderr, "       -G :PORT    Use local PORT as dataGram source.\n");
             fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
@@ -813,7 +813,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -f SECONDS  Set trace Frequency to 1/SECONDS.\n");
             fprintf(stderr, "       -g MASK     Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
             fprintf(stderr, "       -h          Use RTS/CTS Hardware flow control for DEVICE.\n");
-            fprintf(stderr, "       -i SECONDS  Bypass input check every SECONDS seconds, 0 for always, -1 for never.\n");
+            fprintf(stderr, "       -i SECONDS  Bypass input check every SECONDS seconds, 0 always, <0 never.\n");
             fprintf(stderr, "       -k MASK     Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
             fprintf(stderr, "       -l          Use Local control for DEVICE.\n");
             fprintf(stderr, "       -m          Use Modem control for DEVICE.\n");
@@ -821,11 +821,11 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -o          Use Odd parity for DEVICE.\n");
             fprintf(stderr, "       -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).\n");
             fprintf(stderr, "       -s          Use XON/XOFF (control-Q/control-S) for DEVICE.\n");
-            fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds.\n");
+            fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds [0..255].\n");
             fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
-            fprintf(stderr, "       -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds.\n");
+            fprintf(stderr, "       -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds, 0 always, <0 never.\n");
             fprintf(stderr, "       -x          EXit if a NAK is received.\n");
-            fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds.\n");
+            fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds, 0 always, <0 never.\n");
             fprintf(stderr, "       -z          Exit if all state machines stop.\n");
             return 1;
             break;
@@ -1443,10 +1443,10 @@ int main(int argc, char * argv[])
      */
 
     expiration_now = expiration_was =
-        display_last =
-            trace_last =
+        slow_last =
+            frequency_last =
                 bypass_last =
-                    command_last = Now / Frequency;
+                    postpone_last = Now / Frequency;
 
     keepalive_last = (Now / Frequency) - keepalive;
 
@@ -1499,7 +1499,7 @@ int main(int argc, char * argv[])
 #endif
 
     /**
-     ** LOOP
+     ** START
      **/
 
     DIMINUTO_LOG_NOTICE("Start");
@@ -1539,8 +1539,10 @@ int main(int argc, char * argv[])
         }
 
         /**
-         ** INPUT
+         ** TOP
          **/
+
+        DIMINUTO_LOG_DEBUG("Stage Top\n");
 
         /*
          * We keep looking for input from one of our sources until one of them
@@ -2092,7 +2094,7 @@ consume:
             /* Do nothing. */
         } else if (diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
-        } else if (!expired(&command_last, postpone)) {
+        } else if (!expired(&postpone_last, postpone)) {
             /* Do nothing. */
         } else {
 
@@ -2992,7 +2994,7 @@ consume:
             /* Do nothing. */
         } else if (!trace) {
             /* Do nothing. */
-        } else if (!expired(&trace_last, frequency)) {
+        } else if (!expired(&frequency_last, frequency)) {
             /* Do nothing. */
         } else {
             emit_trace(trace_fp, position, &solution, &attitude, &posveltim, &base);
@@ -3041,6 +3043,8 @@ consume:
          * is all about. Note that the code below is non-blocking.
          */
 
+        DIMINUTO_LOG_DEBUG("Stage Bottom\n");
+
         stage = STAGE_BOTTOM;
         available = 0;
         ready = 0;
@@ -3077,15 +3081,17 @@ consume:
             diminuto_assert(0);
         }
 
+        /**
+         ** RENDER
+         **/
+
 render:
+
+        DIMINUTO_LOG_DEBUG("Stage Render%s\n", refresh ? " refresh" : "");
 
         if (sink_fp != (FILE *)0) {
             fflush(sink_fp);
         }
-
-        /**
-         ** REPORT
-         **/
 
 #if defined(TEST_EXPIRATION)
 
@@ -3147,8 +3153,10 @@ render:
         /*
          * Generate the display if necessary and sufficient reasons exist.
          */
+DIMINUTO_LOG_DEBUG("DEBUG SLOW %lld %lld\n",
+(long long int)slow_last, (long long int)slow);
 
-        if (!expired(&display_last, slow)) {
+        if (!expired(&slow_last, slow)) {
 
             /* Do nothing. */
 
@@ -3177,8 +3185,10 @@ render:
             }
 
             /*
-             * Update the display.
+             * UPDATE
              */
+
+            DIMINUTO_LOG_DEBUG("Stage Update\n");
 
             if (escape) {
                 fputs("\033[3;1H", out_fp);
@@ -3195,7 +3205,6 @@ render:
                 print_corrections(out_fp, &base, &rover, &kinematics, &updates);
                 print_actives(out_fp, active);
                 print_views(out_fp, view, active);
-
             }
             if (escape) {
                 fputs("\033[0J", out_fp);
@@ -3226,19 +3235,19 @@ render:
         }
 
         if (eof) {
-            DIMINUTO_LOG_NOTICE("Stop");
+            DIMINUTO_LOG_NOTICE("End");
             break;
         }
 
     }
 
     /**
-     ** FINIALIZATION
+     ** STOP
      **/
 
 stop:
 
-    DIMINUTO_LOG_NOTICE("Final");
+    DIMINUTO_LOG_NOTICE("Stop");
 
     if (verbose) {
         sync_end();
@@ -3359,7 +3368,7 @@ stop:
         free(command_node);
     }
 
-    DIMINUTO_LOG_NOTICE("End");
+    DIMINUTO_LOG_NOTICE("Exit");
 
     fflush(stderr);
 
