@@ -4,27 +4,70 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # This uses a Bluetooth-connected GNSS device like the Garmin GLO.
+# N.B. The GLO has a high update rate (10Hz) relative to other GNSS
+# devices (typically 1Hz or sometimes 5Hz). That means that the NMEA
+# stream seldom if ever looks drained and idle to gpstool.
+# N.B. The GLO works okay, but I've never had any luck pairing the
+# Bad Elf GPS Pro+ Bluetooth-connected GNSS device with the RPi.
+
+# sudo bluetoothctl
+# power on
+# agent on
+# scan on
+# :
+# (Wait for something like "Device 01:23:45:67:89:AB Garmin GLO #12345".)
+# :
+# scan off
+# pair 01:23:45:67:89:AB
+# quit
+# sudo rfcomm bind 0 01:23:45:67:89:AB 1
+# sudo chmod 666 /dev/rfcomm0
 
 PGMDIR=$(dirname ${0})
-BASDIR=$(readlink -e ${PGMDIR}/..)
 PGMNAM=$(basename -s .sh ${0})
+
+BASDIR=$(readlink -e ${PGMDIR}/..)
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-${BASDIR}/tmp}
+RUNDIR=${XDG_RUNTIME_DIR:-"/run/user/${UID}"}
+
 GPSDEV=${1:-"/dev/rfcomm0"}
 ERRFIL=${2-"${SAVDIR}/${PGMNAM}.err"}
-OUTFIL=${3-"${SAVDIR}/${PGMNAM}.out"}
+OUTFIL=${3-"${RUNDIR}/${PGMNAM}.out"}
+
+HEDDIR=$(dirname ${OUTFIL})
+HEDFIL=$(basename ${OUTFIL})
+HEDTSK=${HEDFIL%%.*}
+HEDTYP=${HEDFIL#*.}
+HEDLIM=$(($(stty size | cut -d ' ' -f 1) - 2))
 
 mkdir -p $(dirname ${ERRFIL})
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
+
+echo "${PGMNAM}: RUNDIR=${RUNDIR}" 1>&2
+echo "${PGMNAM}: PGMDIR=${PGMDIR}" 1>&2
+echo "${PGMNAM}: BASDIR=${BASDIR}" 1>&2
+echo "${PGMNAM}: SAVDIR=${SAVDIR}" 1>&2
+echo "${PGMNAM}: GPSDEV=${GPSDEV}" 1>&2
+echo "${PGMNAM}: ERRFIL=${ERRFIL}" 1>&2
+echo "${PGMNAM}: OUTFIL=${OUTFIL}" 1>&2
+echo "${PGMNAM}: HEDDIR=${HEDDIR}" 1>&2
+echo "${PGMNAM}: HEDFIL=${HEDFIL}" 1>&2
+echo "${PGMNAM}: HEDTSK=${HEDTSK}" 1>&2
+echo "${PGMNAM}: HEDTYP=${HEDTYP}" 1>&2
+echo "${PGMNAM}: HEDLIM=${HEDLIM}" 1>&2
 
 mkdir -p $(dirname ${OUTFIL})
 cp /dev/null ${OUTFIL}
 
 . ${BASDIR}/bin/setup
 
-SELF=$$
-trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF} 2> /dev/null; exit 0" SIGINT SIGQUIT SIGTERM
+coreable gpstool -D ${GPSDEV} -t 10 -H ${OUTFIL} -E -i 1 -F 1 &
+GPSPID=$!
+echo "${PGMNAM}: GPSPID=${GPSPID}" 1>&2
 
-coreable gpstool -D ${GPSDEV} -t 10 -H ${OUTFIL} -E -F 1 &
+GLOPID=$$
+trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${GLOPID} ${GPSPID} 2> /dev/null; exit 0" SIGINT SIGQUIT SIGTERM
+echo "${PGMNAM}: GLOPID=${GLOPID}" 1>&2
 
-peruse ${PGMNAM} out
+peruse ${HEDTSK} ${HEDTYP} ${HEDLIM} ${HEDDIR} < /dev/null
