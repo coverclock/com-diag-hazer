@@ -12,8 +12,8 @@ SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
 # On the pi-top 4, try something like
 #    pitop4 127.0.0.1:12345
-# where localhost is the endpoint host name from /etc/hosts or IP address,
-# and wheatstone is the endpoint service name from /etc/services or port number.
+# where 127.0.0.1 is the endpoint host name from /etc/hosts or IP address,
+# and 12345 is the endpoint service name from /etc/services or port number.
 
 PROGRAM=$(basename ${0})
 ENDPOINT=${1:-"127.0.0.1:12345"}
@@ -42,9 +42,9 @@ exec 2>>${ERRFIL}
 rm -f ${CSVFIO}
 mkfifo ${CSVFIO}
 
-. $(readlink -e $(dirname ${0})/../bin)/setup
-
 trap "trap '' SIGINT SIGQUIT SIGTERM; kill -TERM -- -${SELF} 2> /dev/null; exit 0" SIGINT SIGQUIT SIGTERM
+
+. $(readlink -e $(dirname ${0})/../bin)/setup
 
 csv2dgm -U ${ENDPOINT} -j < ${CSVFIO} 1> /dev/null &
 
