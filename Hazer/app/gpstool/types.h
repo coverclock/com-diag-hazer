@@ -132,15 +132,6 @@ typedef enum Emission {
     OPT_Z           = 'Z',
 } emission_t;
 
-/**
- * What stage is the consumer in?
- */
-typedef enum Stage {
-    STAGE           = '?',
-    STAGE_TOP       = 'A',
-    STAGE_BOTTOM    = 'B',
-} stage_t;
-
 /*******************************************************************************
  * HIGH PRECISION SOLUTION
  ******************************************************************************/

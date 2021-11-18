@@ -364,7 +364,6 @@ int main(int argc, char * argv[])
     int ready = 0;
     int fd = -1;
     ssize_t available = 0;
-    stage_t stage = STAGE;
     format_t format = FORMAT;
     FILE * fp = (FILE *)0;
     uint8_t * buffer = (uint8_t *)0;
@@ -422,7 +421,7 @@ int main(int argc, char * argv[])
     static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:vxw:y:z?";
 
     /**
-     ** PREINITIALIZATION
+     ** INITIALIZATION
      **/
 
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
@@ -837,7 +836,7 @@ int main(int argc, char * argv[])
     }
 
     /**
-     ** INITIALIZATION
+     ** START
      **/
 
     if (daemon) {
@@ -850,7 +849,7 @@ int main(int argc, char * argv[])
     }
     diminuto_assert(Process >= 0);
 
-    DIMINUTO_LOG_NOTICE("Begin");
+    DIMINUTO_LOG_NOTICE("Start");
 
     if (daemon) {
         size_t commandlength = 0;
@@ -1499,10 +1498,10 @@ int main(int argc, char * argv[])
 #endif
 
     /**
-     ** START
+     ** BEGIN
      **/
 
-    DIMINUTO_LOG_NOTICE("Start");
+    DIMINUTO_LOG_NOTICE("Begin");
 
     while (!0) {
 
@@ -1542,7 +1541,7 @@ int main(int argc, char * argv[])
          ** TOP
          **/
 
-        DIMINUTO_LOG_DEBUG("Stage Top\n");
+        DIMINUTO_LOG_DEBUG("Top\n");
 
         /*
          * We keep looking for input from one of our sources until one of them
@@ -1554,7 +1553,6 @@ int main(int argc, char * argv[])
          * signal handlers. Note that the code below may block.
          */
 
-        stage = STAGE_TOP;
         available = 0;
         ready = 0;
         fd = -1;
@@ -1584,7 +1582,7 @@ int main(int argc, char * argv[])
 
 consume:
 
-        DIMINUTO_LOG_DEBUG("Consume %c [%d] (%d) [%lld] [%llu]\n", stage, ready, fd, (long long signed int)available, (long long unsigned int)io_maximum);
+        DIMINUTO_LOG_DEBUG("Consume [%d] (%d) [%zd]\n", ready, fd, available);
 
         /*
          * At this point, either available > 0 (there is pending data in
@@ -3043,9 +3041,8 @@ consume:
          * is all about. Note that the code below is non-blocking.
          */
 
-        DIMINUTO_LOG_DEBUG("Stage Bottom\n");
+        DIMINUTO_LOG_DEBUG("Bottom %d\n", ((Now / Frequency) >= (bypass_last + bypass)));
 
-        stage = STAGE_BOTTOM;
         available = 0;
         ready = 0;
         fd = -1;
@@ -3087,7 +3084,7 @@ consume:
 
 render:
 
-        DIMINUTO_LOG_DEBUG("Stage Render%s\n", refresh ? " refresh" : "");
+        DIMINUTO_LOG_DEBUG("Render %d %d %d\n", ((Now / Frequency) >= (slow_last + slow)), refresh, report);
 
         if (sink_fp != (FILE *)0) {
             fflush(sink_fp);
@@ -3153,8 +3150,6 @@ render:
         /*
          * Generate the display if necessary and sufficient reasons exist.
          */
-DIMINUTO_LOG_DEBUG("DEBUG SLOW %lld %lld\n",
-(long long int)slow_last, (long long int)slow);
 
         if (!expired(&slow_last, slow)) {
 
@@ -3187,8 +3182,6 @@ DIMINUTO_LOG_DEBUG("DEBUG SLOW %lld %lld\n",
             /*
              * UPDATE
              */
-
-            DIMINUTO_LOG_DEBUG("Stage Update\n");
 
             if (escape) {
                 fputs("\033[3;1H", out_fp);

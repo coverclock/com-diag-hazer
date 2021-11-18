@@ -34,7 +34,7 @@ RUNDIR=${XDG_RUNTIME_DIR:-"/run/user/${UID}"}
 
 GPSDEV=${1:-"/dev/rfcomm0"}
 GPSBPS=${2:-"4800"}
-INPSEC=${3:-"2"}
+INPSEC=${3:-"1"}
 OUTSEC=${4:-"1"}
 ERRFIL=${5:-"${SAVDIR}/${PGMNAM}.err"}
 OUTFIL=${6:-"${RUNDIR}/${PGMNAM}.out"}
