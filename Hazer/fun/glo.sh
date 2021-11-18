@@ -70,7 +70,9 @@ cp /dev/null ${OUTFIL}
 
 . ${BASDIR}/bin/setup
 
-coreable gpstool -D ${GPSDEV} -b ${GPSBPS} -8 -n -1 -t 10 -H ${OUTFIL} -E -i ${INPSEC} -F ${OUTSEC} < /dev/null > /dev/null &
+# exec coreable gpstool -D ${GPSDEV} -b ${GPSBPS} -8 -n -1 -t 10 -E -i ${INPSEC} -F ${OUTSEC} < /dev/null
+
+coreable gpstool -D ${GPSDEV} -b ${GPSBPS} -8 -n -1 -t 10 -H ${OUTFIL} -R -i ${INPSEC} -F ${OUTSEC} < /dev/null > /dev/null &
 GPSPID=$!
 echo "${PGMNAM}: GPSPID=${GPSPID}" 1>&2
 

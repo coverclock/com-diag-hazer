@@ -1481,8 +1481,8 @@ int main(int argc, char * argv[])
     if (escape) {
         fputs(ANSI_INI, out_fp);
         if (report) {
-            fprintf(out_fp, "INP [%3d]\n", 0);
-            fprintf(out_fp, "OUT [%3d]\n", 0);
+            fprintf(out_fp, "INP [  0]\n");
+            fprintf(out_fp, "OUT [  0]\n");
             print_local(out_fp);
         }
         fflush(out_fp);
@@ -3163,16 +3163,7 @@ render:
 
             /* Do nothing. */
 
-        } else if (!refresh) {
-
-            if (escape) {
-                fputs(ANSI_LOC, out_fp);
-            }
-            if (report) {
-                print_local(out_fp);
-            }
-
-        } else {
+        } else if (refresh) {
 
             /*
              * If we're monitoring a 1PPS pin, update our copy of its
@@ -3231,6 +3222,22 @@ render:
             }
 
             refresh = 0;
+
+        } else if (headless == (const char *)0) {
+
+            if (escape) {
+                fputs(ANSI_LOC, out_fp);
+            }
+            if (report) {
+                print_local(out_fp);
+            }
+
+        } else {
+
+            /*
+             * The output display isn't running in real-time
+             * so there's no point in updating the LOCal time.
+             */
 
         }
 
