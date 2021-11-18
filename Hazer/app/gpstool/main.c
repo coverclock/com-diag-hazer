@@ -419,6 +419,14 @@ int main(int argc, char * argv[])
      * Command line options.
      */
     static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:vxw:y:z?";
+    /*
+     * ANSI escape sequences
+     */
+    static const char ANSI_INI[] = "\033[1;1H\033[0J"; /* [1,1] Erase to end of screen. */
+    static const char ANSI_INP[] = "\033[1;1H\033[0K"; /* [1,1] Erase to end of line.   */
+    static const char ANSI_OUT[] = "\033[2;1H\033[0K"; /* [2,1] Erase to end of line.   */
+    static const char ANSI_LOC[] = "\033[3;1H";        /* [3,1]                         */
+    static const char ANSI_END[] = "\033[0J";          /*       Erase to end of screen. */
 
     /**
      ** INITIALIZATION
@@ -1471,13 +1479,13 @@ int main(int argc, char * argv[])
      */
 
     if (escape) {
-        fputs("\033[1;1H\033[0J", out_fp);
+        fputs(ANSI_INI, out_fp);
         if (report) {
             fprintf(out_fp, "INP [%3d]\n", 0);
             fprintf(out_fp, "OUT [%3d]\n", 0);
             print_local(out_fp);
-            fflush(out_fp);
         }
+        fflush(out_fp);
     }
 
 #if defined(TEST_ERROR)
@@ -1640,9 +1648,9 @@ consume:
                 if (!debug) {
                     /* Do nothing. */
                 } else if (isprint(ch)) {
-                    fprintf(stderr, "Datum [%llu] 0x%02x '%c'\n", (unsigned long long)io_total, ch, ch);
+                    fprintf(stderr, "Datum [%zu] 0x%02x '%c'\n", io_total, ch, ch);
                 } else {
-                    fprintf(stderr, "Datum [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+                    fprintf(stderr, "Datum [%zu] 0x%02x\n", io_total, ch);
                 }
 
                 /*
@@ -1671,7 +1679,7 @@ consume:
 
                     io_waiting += 1;
                     if ((io_waiting % DATAGRAM_SIZE) == 0) {
-                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%llu] 0x%02x %c %c %c\n", (unsigned long long)io_waiting, ch, nmea_state, ubx_state, rtcm_state);
+                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%zu] 0x%02x %c %c %c\n", io_waiting, ch, nmea_state, ubx_state, rtcm_state);
                     }
 
                     if (verbose) {
@@ -1716,7 +1724,7 @@ consume:
                      * but it shows up using a USB hardware analyzer.
                      */
 
-                    DIMINUTO_LOG_INFORMATION("Sync Lost [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+                    DIMINUTO_LOG_INFORMATION("Sync Lost [%zu] 0x%02x\n", io_total, ch);
 
                     if (verbose) {
                         sync_out(ch);
@@ -1745,7 +1753,7 @@ consume:
 
                     if (!sync) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x NMEA\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x NMEA\n", io_total, ch);
 
                         sync = !0;
                         io_waiting = 0;
@@ -1774,7 +1782,7 @@ consume:
 
                     if (!sync) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x UBX\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x UBX\n", io_total, ch);
 
                         sync = !0;
                         io_waiting = 0;
@@ -1802,7 +1810,7 @@ consume:
 
                     if (!sync) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Start [%llu] 0x%02x RTCM\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x RTCM\n", io_total, ch);
 
                         sync = !0;
                         io_waiting = 0;
@@ -1833,7 +1841,7 @@ consume:
 
                     if (sync) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Stop [%llu] 0x%02x\n", (unsigned long long)io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Stop [%zu] 0x%02x\n", io_total, ch);
 
                         if (nmea_context.error) {
                             errno = EIO;
@@ -2155,7 +2163,7 @@ consume:
                 }
 
                 if (escape) {
-                    fputs("\033[2;1H\033[0K", out_fp);
+                    fputs(ANSI_OUT, out_fp);
                 }
                 if (report) {
                     fprintf(out_fp, "OUT [%3zd] ", command_total - 1); print_buffer(out_fp, command_buffer, command_total - 1 /* Minus terminating nul. */, limitation);
@@ -2273,7 +2281,7 @@ consume:
         }
 
         if (escape) {
-            fputs("\033[1;1H\033[0K", out_fp);
+            fputs(ANSI_INP, out_fp);
         }
         if (report) {
             fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation);
@@ -3158,9 +3166,8 @@ render:
         } else if (!refresh) {
 
             if (escape) {
-                fputs("\033[3;1H", out_fp);
+                fputs(ANSI_LOC, out_fp);
             }
-
             if (report) {
                 print_local(out_fp);
             }
@@ -3184,7 +3191,7 @@ render:
              */
 
             if (escape) {
-                fputs("\033[3;1H", out_fp);
+                fputs(ANSI_LOC, out_fp);
             }
             if (report) {
                 print_local(out_fp);
@@ -3200,7 +3207,7 @@ render:
                 print_views(out_fp, view, active);
             }
             if (escape) {
-                fputs("\033[0J", out_fp);
+                fputs(ANSI_END, out_fp);
             }
             if (report) {
                 fflush(out_fp);
@@ -3317,7 +3324,7 @@ stop:
     Now = diminuto_time_elapsed();
     diminuto_assert(Now >= 0);
     if (Now > Epoch) {
-        DIMINUTO_LOG_INFORMATION("Bandwidth size=%lluB maximum=%lluB total=%lluB sustained=%lluBPS\n", (unsigned long long)io_size, (unsigned long long)io_maximum, (unsigned long long)io_total, (unsigned long long)((io_total * Frequency) / (Now - Epoch)));
+        DIMINUTO_LOG_INFORMATION("Bandwidth size=%zuB maximum=%zuB total=%zuB sustained=%zuBPS\n", io_size, io_maximum, io_total, (ssize_t)((io_total * Frequency) / (Now - Epoch)));
     }
 
     free(io_buffer);

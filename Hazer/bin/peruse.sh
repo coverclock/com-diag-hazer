@@ -51,8 +51,9 @@ elif [[ "${TYPE}" == "out" ]]; then
     stdbuf -oL observe ${DIRECTORY}/${TASK}.${TYPE} |
         while read FILENAME; do
             if [[ -f ${FILENAME} ]]; then
-                clear
-                awk -f ${ROOT}/bin/${PROGRAM}.awk < ${FILENAME} | head -n ${LIMIT}
+                #clear
+                #awk -f ${ROOT}/bin/${PROGRAM}.awk < ${FILENAME} | head -n ${LIMIT}
+		head -n ${LIMIT} ${FILENAME}
             fi
         done
 elif [[ "${TYPE}" == "csv" ]]; then
