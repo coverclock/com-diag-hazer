@@ -522,6 +522,7 @@ int main(int argc, char * argv[])
         case 'H':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             report = !0;
+            escape = 0;
             process = !0;
             headless = optarg;
             break;
