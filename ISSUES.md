@@ -89,6 +89,22 @@ The u-blox support forum has another person reporting something similar.
 
 <https://portal.u-blox.com/s/question/0D52p00008vA2ElCAK/seeing-partial-nmea-sentences-on-usb-interface>
 
+Update 2021-11-20: Recently I revisited the Garmin GLO, a Bluetooth-connected
+GPS device that updates at 10MHz but with a serial data rate of only 4800
+BPS. This device is a little challenging to manager: given its update rate
+that is an order of magnitude higher than the typical USB GPS device, but
+with a relatively low serial data rate, it means there is seldom if ever
+a time when there is not data available to be read from the RPi's Bluetooth
+/dev/rfcomm device. Yet running this application on an RPi 4B over the span
+of several days, not once did gpstool have to resync with the input stream.
+Compare this with the u-blox Gen 8 and Gen 9 GNSS devices that update at
+1MHz, with a serial data rate of 9600 or even 115200 BPS, for which resyncing
+is required every few minutes. I would really like to believe that the resync
+issues is in my software (because then I could fix it). But that fact that
+I don't see this happening with non-u-blox devices makes that opinion hard
+to keep. (Regardless, u-blox devices remain my favorite GNSS devices for
+other reasons; I can live with the resyncing.)
+
 ## End Of File (EOF) on U-blox UBX-ZED-F9P when using Ubuntu VM
 
 Several times, while running this software under Ubunto 19.10 in a
