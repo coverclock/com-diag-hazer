@@ -166,7 +166,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
     /* NUM */
 
-    fprintf(fp, ", %llu", (long long unsigned int)(sn++));
+    fprintf(fp, ", %llu", (diminuto_llu_t)(sn++));
 
     /* FIX */
 
@@ -204,7 +204,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
     seconds = ticks / NANO;
     nanoseconds = ticks % NANO;
-    fprintf(fp, ", %llu.%09llu", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
+    fprintf(fp, ", %llu.%09llu", (diminuto_llu_t)seconds, (diminuto_llu_t)nanoseconds);
 
     /* TIM */
 
@@ -212,7 +212,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
         seconds = pa[system].tot_nanoseconds / NANO;
         nanoseconds = pa[system].tot_nanoseconds % NANO;
-        fprintf(fp, ", %llu.%09llu", (long long unsigned int)seconds, (long long unsigned int)nanoseconds);
+        fprintf(fp, ", %llu.%09llu", (diminuto_llu_t)seconds, (diminuto_llu_t)nanoseconds);
 
     } else {
 
@@ -229,29 +229,29 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
     if (sp->ticks > 0) {
 
         yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &nanodegrees);
-        fprintf(fp, ", %d.%09llu", degrees, (long long unsigned int)nanodegrees);
+        fprintf(fp, ", %d.%09llu", degrees, (diminuto_llu_t)nanodegrees);
 
         yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &degrees, &nanodegrees);
-        fprintf(fp, ", %d.%09llu", degrees, (long long unsigned int)nanodegrees);
+        fprintf(fp, ", %d.%09llu", degrees, (diminuto_llu_t)nanodegrees);
 
         yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &decimillimeters);
-        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (diminuto_lld_t)meters, (diminuto_llu_t)decimillimeters);
 
         yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &decimillimeters);
-        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (diminuto_lld_t)meters, (diminuto_llu_t)decimillimeters);
 
         yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &decimillimeters);
-        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (diminuto_lld_t)meters, (diminuto_llu_t)decimillimeters);
 
         yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &decimillimeters);
-        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (diminuto_lld_t)meters, (diminuto_llu_t)decimillimeters);
 
     } else if (pa[system].ticks > 0) {
 
         if (pa[system].lat_digits > 0) {
 
             hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &decimicrodegrees);
-            fprintf(fp, ", %d.%07llu", degrees, (long long unsigned int)decimicrodegrees);
+            fprintf(fp, ", %d.%07llu", degrees, (diminuto_llu_t)decimicrodegrees);
 
         } else {
 
@@ -262,7 +262,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
         if (pa[system].lon_digits > 0) {
 
             hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &decimicrodegrees);
-            fprintf(fp, ", %d.%07llu", degrees, (long long unsigned int)decimicrodegrees);
+            fprintf(fp, ", %d.%07llu", degrees, (diminuto_llu_t)decimicrodegrees);
 
         } else {
 
@@ -277,7 +277,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
             meters = totalmillimeters / MILLI;
             millimeters = abs64(totalmillimeters) % MILLI;
-            fprintf(fp, ", %lld.%03llu", (long long signed int)meters, (long long unsigned int)millimeters);
+            fprintf(fp, ", %lld.%03llu", (diminuto_lld_t)meters, (diminuto_llu_t)millimeters);
 
         } else {
 
@@ -291,7 +291,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
             meters = totalmillimeters / MILLI;
             millimeters = abs64(totalmillimeters) % MILLI;
-            fprintf(fp, ", %lld.%03llu", (long long signed int)meters, (long long unsigned int)millimeters);
+            fprintf(fp, ", %lld.%03llu", (diminuto_lld_t)meters, (diminuto_llu_t)millimeters);
 
         } else {
 
@@ -340,7 +340,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
             degrees = pa[system].cog_nanodegrees / NANO;
             nanodegrees = abs64(pa[system].cog_nanodegrees) % NANO;
-            fprintf(fp, ", %ld.%09llu", (long signed int)degrees, (long long unsigned int)nanodegrees);
+            fprintf(fp, ", %ld.%09llu", (long signed int)degrees, (diminuto_llu_t)nanodegrees);
 
         } else {
 
@@ -401,7 +401,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
         fprintf(fp, ", %d", bp->payload.obs);
 
         yodel_format_hpacc2accuracy(bp->payload.meanAcc, &meters, &decimillimeters);
-        fprintf(fp, ", %lld.%04llu", (long long signed int)meters, (long long unsigned int)decimillimeters);
+        fprintf(fp, ", %lld.%04llu", (diminuto_lld_t)meters, (diminuto_llu_t)decimillimeters);
 
     } else {
 
