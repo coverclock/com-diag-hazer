@@ -17,7 +17,10 @@ endif
 ifeq ($(MACHINE),armv7l)
 ARCH				:=	arm
 endif
-OS					:=	linux
+ifeq ($(MACHINE),aarch64)
+ARCH				:=	arm
+endif
+OS				:=	linux
 TOOLCHAIN			:=
 KERNELCHAIN			:=
 KERNEL_REV			:=	$(shell uname -r)

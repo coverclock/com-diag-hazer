@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	50# API changes that may require that applications be modified.
 MINOR				:=	2# Only functionality or features added with no legacy API changes.
-BUILD				:=	2# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	3# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -361,6 +361,7 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    "Host=\"$(HOST)\"\n"' >> $@
 	echo '    "Kernel=\"$(KERNEL_REV)\"\n"' >> $@
 	echo '    "License=\"$(LICENSE)\"\n"' >> $@
+	echo '    "Machine=\"$(MACHINE)\"\n"' >> $@
 	echo '    "Modified=\"$(MODIFIED)\"\n"' >> $@
 	echo '    "Os=\"$(OS)\"\n"' >> $@
 	echo '    "Release=\"" COM_DIAG_$(SYMBOL)_RELEASE "\"\n"' >> $@
@@ -428,6 +429,7 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 	echo '    "Host=\\"$(HOST)\\"\\n"' >> $@
 	echo '    "Kernel=\\"$(KERNEL_REV)\\"\\n"' >> $@
 	echo '    "License=\\"$(LICENSE)\\"\\n"' >> $@
+	echo '    "Machine=\\"$(MACHINE)\\"\\n"' >> $@
 	echo '    "Modified=\\"$(MODIFIED)\\"\\n"' >> $@
 	echo '    "Os=\\"$(OS)\\"\\n"' >> $@
 	echo '    "Release=\\"" COM_DIAG_$(SYMBOL)_RELEASE "\\"\\n"' >> $@
