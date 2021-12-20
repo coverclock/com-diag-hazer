@@ -554,11 +554,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &tenmillionths);
             diminuto_assert((-90 <= degrees) && (degrees <= 90));
             diminuto_assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
-            fprintf(fp, " %4d.%07llu,", degrees, (long long unsigned int)tenmillionths);
+            fprintf(fp, " %4d.%07llu,", degrees, (diminuto_llu_t)tenmillionths);
 
             hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &tenmillionths);
             diminuto_assert((-180 <= degrees) && (degrees <= 180));
-            fprintf(fp, " %4d.%07llu", degrees, (long long unsigned int)tenmillionths);
+            fprintf(fp, " %4d.%07llu", degrees, (diminuto_llu_t)tenmillionths);
             diminuto_assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
 
             fprintf(fp, "%7s", "");
@@ -588,7 +588,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             meters = millimeters / 1000LL;
             thousandths = abs64(millimeters) % 1000LLU;
-            fprintf(fp, " %6lld.%03llum MSL", (long long signed int)meters, (long long unsigned int)thousandths);
+            fprintf(fp, " %6lld.%03llum MSL", (diminuto_lld_t)meters, (diminuto_llu_t)thousandths);
 
             millimeters += pa[system].sep_millimeters;
 
@@ -596,7 +596,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             meters = millimeters / 1000LL;
             thousandths = abs64(millimeters) % 1000LLU;
-            fprintf(fp, " %6lld.%03llum GEO", (long long signed int)meters, (long long unsigned int)thousandths);
+            fprintf(fp, " %6lld.%03llum GEO", (diminuto_lld_t)meters, (diminuto_llu_t)thousandths);
 
             fprintf(fp, "%11s", "");
 
@@ -628,11 +628,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             degrees = pa[system].cog_nanodegrees / 1000000000LL;
             billionths = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
-            fprintf(fp, " %4lld.%09llu%lcT", (long long signed int)degrees, (long long unsigned int)billionths, (wint_t)DEGREE);
+            fprintf(fp, " %4lld.%09llu%lcT", (diminuto_lld_t)degrees, (diminuto_llu_t)billionths, (wint_t)DEGREE);
 
             degrees = pa[system].mag_nanodegrees / 1000000000LL;
             billionths = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
-            fprintf(fp, " %4lld.%09llu%lcM", (long long signed int)degrees, (long long unsigned int)billionths, (wint_t)DEGREE);
+            fprintf(fp, " %4lld.%09llu%lcM", (diminuto_lld_t)degrees, (diminuto_llu_t)billionths, (wint_t)DEGREE);
 
             fprintf(fp, "%29s", "");
 
@@ -664,11 +664,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             knots = pa[system].sog_microknots / 1000000LL;
             thousandths = (abs64(pa[system].sog_microknots) % 1000000LLU) / 1000LLU;
-            fprintf(fp, " %7lld.%03lluknots", (long long signed int)knots, (long long unsigned int)thousandths);
+            fprintf(fp, " %7lld.%03lluknots", (diminuto_lld_t)knots, (diminuto_llu_t)thousandths);
 
             kilometersperhour = pa[system].sog_millimetersperhour / 1000000LL;
             thousandths = (abs64(pa[system].sog_millimetersperhour) % 1000000LLU) / 1000LLU;
-            fprintf(fp, " %7lld.%03llukph", (long long signed int)kilometersperhour, (long long unsigned int)thousandths);
+            fprintf(fp, " %7lld.%03llukph", (diminuto_lld_t)kilometersperhour, (diminuto_llu_t)thousandths);
 
             meterspersecond = pa[system].sog_millimetersperhour;
             meterspersecond /= 1000.0;
@@ -790,13 +790,13 @@ void print_solution(FILE * fp, const yodel_solution_t * sp)
         fputs("HPP", fp);
 
         yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &decimaldegrees, &billionths);
-        fprintf(fp, " %4d.%09llu,", decimaldegrees, (long long unsigned int)billionths);
+        fprintf(fp, " %4d.%09llu,", decimaldegrees, (diminuto_llu_t)billionths);
 
         yodel_format_hppos2degrees(sp->payload.lon, sp->payload.lonHp, &decimaldegrees, &billionths);
-        fprintf(fp, " %4d.%09llu", decimaldegrees, (long long unsigned int)billionths);
+        fprintf(fp, " %4d.%09llu", decimaldegrees, (diminuto_llu_t)billionths);
 
         yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
-        fprintf(fp, " %lc%6lld.%04llum", (wint_t)PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
+        fprintf(fp, " %lc%6lld.%04llum", (wint_t)PLUSMINUS, (diminuto_lld_t)meters, (diminuto_llu_t)tenthousandths);
 
         fprintf(fp, "%22s", "");
 
@@ -807,13 +807,13 @@ void print_solution(FILE * fp, const yodel_solution_t * sp)
         fputs("HPA", fp);
 
         yodel_format_hpalt2aaltitude(sp->payload.hMSL, sp->payload.hMSLHp, &meters, &tenthousandths);
-        fprintf(fp, " %6lld.%04llum MSL", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        fprintf(fp, " %6lld.%04llum MSL", (diminuto_lld_t)meters, (diminuto_llu_t)tenthousandths);
 
         yodel_format_hpalt2aaltitude(sp->payload.height, sp->payload.heightHp, &meters, &tenthousandths);
-        fprintf(fp, " %6lld.%04llum GEO", (long long signed int)meters, (long long unsigned int)tenthousandths);
+        fprintf(fp, " %6lld.%04llum GEO", (diminuto_lld_t)meters, (diminuto_llu_t)tenthousandths);
 
         yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
-        fprintf(fp, " %lc%6lld.%04llum", (wint_t)PLUSMINUS, (long long signed int)meters, (long long unsigned int)tenthousandths);
+        fprintf(fp, " %lc%6lld.%04llum", (wint_t)PLUSMINUS, (diminuto_lld_t)meters, (diminuto_llu_t)tenthousandths);
 
         fprintf(fp, "%19s", "");
 
