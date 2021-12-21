@@ -1,4 +1,5 @@
-# Copyright 2014 Digital Aggregates Corporation
+# vi: set ts=4 shiftwidth=4:
+# Copyright 2014-2021 Digital Aggregates Corporation
 # Licensed under the terms in LICENSE.txt
 # author:Chip Overclock
 # mailto:coverclock@diag.com
@@ -9,6 +10,7 @@
 # orchard: Mac OS X 10.9.5 running on a Mac Mini "late 2012".
 # WORK IN PROGRESS!
 
+MACHINE				:=	x86_64
 ARCH				:=	x86_64
 OS					:=	darwin
 TOOLCHAIN			:=
