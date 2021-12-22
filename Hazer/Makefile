@@ -119,12 +119,6 @@ A2SOARCH			:=	-shared -Wl,-soname,lib$(PROJECT).$(SO).$(MAJOR).$(MINOR)
 
 MODE				:= 755
 
-########## Configuration Makefile
-
-TARGETMAKEFILE		:= $(CFG_DIR)/$(TARGET).mk
-
-include $(TARGETMAKEFILE)
-
 ########## Diminuto Configuration
 
 DIMINUTO_TITLE		:=	Diminuto
@@ -138,6 +132,12 @@ DIMINUTO_LIBRARIES	:=	$(DIMINUTO_ROOT)/$(OUT)/$(LIB_DIR)
 
 DIMINUTO_CPPFLAGS	:=	-iquote $(DIMINUTO_HEADERS)
 DIMINUTO_LDFLAGS	:=	-L$(DIMINUTO_LIBRARIES) -l$(DIMINUTO_PROJECT) -lpthread -lrt -ldl
+
+########## Configuration Makefile
+
+TARGETMAKEFILE		:= $(CFG_DIR)/$(TARGET).mk
+
+include $(TARGETMAKEFILE)
 
 ########## Commands and Option Flags
 
