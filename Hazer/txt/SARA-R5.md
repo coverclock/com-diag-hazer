@@ -17,7 +17,7 @@ NMEA output.
 
 What the /dev devices are will depend on the order that the
 USB-to-serial devices enumerate; I plug in "UART 1" first
-so it will be /dev/ttyUSB0, and then "USART 2" so it will
+so it will be /dev/ttyUSB0, and then "UART 2" so it will
 be /dev/ttyUSB1.
 
 ### Reset Module
