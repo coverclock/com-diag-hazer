@@ -1152,11 +1152,6 @@ throw an assert and core dump.
 * survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
 * ubxval - converts a number into a UBX-usable form.
 
-## UDP over LTE-M (Wheatstone)
-
-* xbee3 - like tracker but over a serial-attached Digi XBEE 3 LTE-M radio.
-* xbee3shutdown - shuts down Digi XBEE 3 LTE-M radio (recommended before powering off).
-
 ## OpenStreetMap Moving Map (Tesoro)
 
 * csvdataset - convert CSV file into a JSON object array for a static map.
@@ -1165,6 +1160,12 @@ throw an assert and core dump.
 * csvplayback - playback a stored CSV file, forward JSON to a UDP endpoint.
 * jsonmeter - meters lines from a JSON file based on interarrival times.
 * tracker - capture CSV with gpstool, forward JSON to an UDP endpoint, with peruse and hups.
+
+## UDP over LTE-M (Wheatstone)
+
+* sarar5 - tracker using a USB-attached U-Blox SARA-R5 LTE-M radio (WIP).
+* xbee3 - tracker using a serial-attached Digi XBEE 3 LTE-M radio.
+* xbee3shutdown - shuts down Digi XBEE 3 LTE-M radio (recommended before powering off).
 
 ## Output Control
 
