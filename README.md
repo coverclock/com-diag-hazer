@@ -157,6 +157,7 @@ Linux/GNU distros install by default.
     sudo apt-get install bc
     sudo apt-get install inotify-tools
     sudo apt-get install socat
+    sudo apt-get install expect
 
 ## Workflow
     
@@ -415,11 +416,12 @@ Hazer has been successfully tested with the following GPS devices.
 * Pharos GPS-500 (SiRF Star III+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
 * RaceDayQuads RDQ Micro M8N (U-Blox 8/UBX-NEO-M8N, 9600 8n1, N/A, ttyS, 1Hz) [4] [8] [14]    
 * Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]    
-* SparkFun GPS Dead Reckoning gen 8 (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [11]    
-* SparkFun GPS NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [6] [8] [10]    
+* SparkFun Dead Reckoning gen 8 (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [11]    
+* SparkFun Dead Reckoning gen 9 (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]    
 * SparkFun GPS-RTK2 (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
-* SparkFun GPS SAM-M8Q (U-Blox 8/UBX-SAM-M8Q, 9600 8n1, N/A, ttyS, 1Hz) [4] [6] [8] [14]    
-* SparkFun GPS Dead Reckoning gen 9 (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]    
+* SparkFun NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [6] [8] [10]    
+* SparkFun SAM-M8Q (U-Blox 8/UBX-SAM-M8Q, 9600 8n1, N/A, ttyS, 1Hz) [4] [6] [8] [14]    
+* SparkFun SARA-R5 (U-Blox SARA-R5, configurable, v1a86p7523, ttyUSB, 1Hz) [17] [18] [19]
 * Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * TOPGNSS GN-803G (U-Blox 8/UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
 * Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8N1, N/A, ttyS, 1Hz) [4]    
@@ -442,6 +444,9 @@ Footnotes:
 [14] Make sure you mount this component side down, patch antenna side up.    
 [15] Uses Bluetooth (see procedure for pairing in <https://github.com/coverclock/com-diag-hazer/blob/master/REMARKS.md>).    
 [16] Uses Bluetooth but refuses to pair with Raspberry Pi.    
+[17] This SparkFun board requires opening (cutting) and closing (soldering) traces for dual UART operation.    
+[18] This U-Blox gen 9 receiver is embedded in a U-Blox LTE-M module which required a lot of config via AT commands.    
+[19] 1PPS (a.k.a. TPS in the docs) only has a pulse width of a few microseconds hence LED inoperative (bug).    
 
 Notes:
 
