@@ -52,7 +52,7 @@ be /dev/ttyUSB1.
 
     AT+UGPS=0
 
-### Power Up GNSS with GPS, GLONASS, SBAS
+### Power Up GNSS with GPS, GLONASS, GALILEO, SBAS
 
     AT+UGPS=1,0,71
 
