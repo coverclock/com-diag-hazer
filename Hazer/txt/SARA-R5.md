@@ -43,43 +43,47 @@ module will save the settings in NVRAM.
 Some of these commands need to be done everytime the
 module is rebooted.
 
-### Reset Module
+### General Configuration
+
+#### Reset Module
 
     AT+CFUN=16
 
-### Set UART to 115200 baud
+#### Set UART to 115200 baud
 
     AT+IPR=115200
 
-### Enable Dual UART Operation
+#### Enable Dual UART Operation
 
     AT+USIO=4
 
-### Enable GPIO 1 (a.k.a. 16) for Network Status Indication
+#### Enable GPIO 1 (a.k.a. 16) for Network Status Indication
 
     AT+UGPIOC=16,2
 
-### Enable GPIO 6 (a.k.a. 19) for Time Pulse Output
+#### Enable GPIO 6 (a.k.a. 19) for Time Pulse Output
 
     AT+UGPIOC=19,22
 
-### Set GNSS to Profile 1 (GNSS data flow to and from AUX UART)
+### GNSS Configuration
+
+#### Set GNSS to Profile 1 (GNSS data flow to and from AUX UART)
 
     AT+UGPRF=1
 
-### Set Time Pulse to 1PPS using GNSS/LTE (best effort)
+#### Set Time Pulse to 1PPS using GNSS/LTE (best effort)
 
     AT+UTIME=1,1
 
-### Power Down GNSS
+#### Power Down GNSS
 
     AT+UGPS=0
 
-### Power Up GNSS with GPS, GLONASS, GALILEO, SBAS
+#### Power Up GNSS with GPS, GLONASS, GALILEO, SBAS
 
     AT+UGPS=1,0,71
 
-### Enable Desired NMEA Sentences
+#### Enable Desired NMEA Sentences
 
     AT+UGGGA=1
     AT+UGGLL=1
@@ -88,3 +92,5 @@ module is rebooted.
     AT+UGRMC=1
     AT+UGVTG=1
     AT+UGZDA=1
+
+### LTE-M Configuration
