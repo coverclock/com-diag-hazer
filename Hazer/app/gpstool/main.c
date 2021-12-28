@@ -3183,7 +3183,7 @@ render:
              */
 
             if (escape) {
-                fputs(ANSI_INI, out_fp);
+                fputs(ANSI_LOC, out_fp);
             }
             if (report) {
                 print_local(out_fp);
