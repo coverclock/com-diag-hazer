@@ -1,46 +1,57 @@
 # SparkFun SARA-R5 Configuration for Wheatstone
 
 These are my notes for using the SparkFun SARA-R5 board, which features
-a U-Blox SARA-R5 module. The U-Blox module incorporates both a GNSS
-receiver, an LTE-M radio, and a fairly complex interface accessed via
-AT commands. The SparkFun board comes initially set up for one-UART
-operation that connects the GNSS module to the LTE-M radio. For my
-purposes, I had to modify the board (as directed by the SparkFun
-instructions) for dual-UART operation.
+a U-blox SARA-R5 module. The U-blox module incorporates both a GNSS
+receiver, an LTE-M radio, and a fairly complex interface accessed via AT
+commands. The SparkFun board comes initially set up for one-UART operation
+that connects the GNSS module to the LTE-M radio. For my purposes,
+I had to adapt the board (as described in the SparkFun instructions)
+for dual-UART operation. This required both hardware changes (opening
+and closing traces) and software configuration changes (both persistent
+and non-persistent).
 
-## References
+## Links
 
 <https://learn.sparkfun.com/tutorials/lte-gnss-breakout---sara-r5-hookup-guide/hardware-overview>
 
-U-Blox, "SARA-R4/SARA-R5 series - LwM2M objects and commands - Application
+<https://www.sparkfun.com/products/18031>
+
+<https://www.u-blox.com/en/product/sara-r5-series>
+
+## References
+
+U-blox, "SARA-R4/SARA-R5 series - LwM2M objects and commands - Application
 note", UBX-18068860-R04, 2020-02-26
 
-U-Blox, "SARA-R5 series - Application development guide - Application
+U-blox, "SARA-R5 series - Application development guide - Application
 note", UBX-20009652-R01, 2020-10-28
 
-U-Blox, "SARA-R5 series - Internet applications development guide -
+U-blox, "SARA-R5 series - Internet applications development guide -
 Application note", UBX-20032566-R01, 2020-10-26
 
-U-Blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
+U-blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
 AT commands manual", UBX-19047455-R06, 2020-09-28
 
-U-Blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
+U-blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
 Data sheet", UBX-19016638-R07, 2020-10-02
 
-U-Blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
+U-blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
+Product summary", UBX-18051286-R13, 2021
+
+U-blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
 System integration manual", UBX-19041356-R04, 2020-10-12
 
-U-Blox, "SARA-R5 series - Positioning implementation - Application
+U-blox, "SARA-R5 series - Positioning implementation - Application
 note", UBX-20012413-R01, 2020-10-02
 
-U-Blox, "SARA-R5 series - Positioning and timing implementation - Application
+U-blox, "SARA-R5 series - Positioning and timing implementation - Application
 note", UBX-20012413-R03, 2021-06-28
 
 ## Hardware Configuration
 
 The Sparkfun SARA-R5 board requires opening (cutting) and closing
 (soldering) traces to enable dual UART operation.  Refer to the SparkFun
-Hookup Guide (URL above), but here is a summary of what I did. I used
+Hookup Guide (link above), but here is a summary of what I did. I used
 a small ceramic blade tool to do the cutting, and a Weller soldering
 station to do the soldering.
 
@@ -64,7 +75,8 @@ once the SW configuration is completed.
 What the /dev devices are will depend on the order that the USB-to-serial
 devices enumerate; I plug in "UART 1" first so it will be /dev/ttyUSB0,
 and then "UART 2" so it will be /dev/ttyUSB1. Both devices enumerate as
-v=1a86, p=7523.
+v=1a86, p=7523; haven't figured out yet how to discriminate between the
+two for udev hot-plug magic.
 
 ## Software Configuration
 
@@ -135,7 +147,7 @@ being emitted from the AUX UART a.k.a. UART 2.
 
 #### Set Mobile Network Operator Profile
 
-Mine is AT&T. Your mileage may vary.
+I use AT&T as my LTE-M MNO; your mileage may vary.
 
     AT+UMNOPROF=2
 
@@ -149,7 +161,7 @@ Mine is AT&T. Your mileage may vary.
 
 #### Set Packet Data Protocol Context and Access Point Name
 
-I use AT&T as my LTE M2M MNO, and its APN is "m2m.com.attz"; your mileage
+I use AT&T as my LTE-M MNO, and its APN is "m2m.com.attz"; your mileage
 may vary.
 
     AT+CGDCONT=0,"IP","m2m.com.attz"
@@ -160,7 +172,7 @@ may vary.
 
 #### Set Packet Switched Data Configuration: Protocol, APN, DNS1, DNS2, CID
 
-I use AT&T as my LTE M2M MNO, and its APN is "m2m.com.attz"; your mileage
+I use AT&T as my LTE-M MNO, and its APN is "m2m.com.attz"; your mileage
 may vary.
 
     AT+UPSD=0,0,0
