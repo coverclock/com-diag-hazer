@@ -12,11 +12,29 @@ instructions) for dual-UART operation.
 
 <https://learn.sparkfun.com/tutorials/lte-gnss-breakout---sara-r5-hookup-guide/hardware-overview>
 
-U-Blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud - AT
-commands manual", UBX-19047455-R06, 2020-09-28
+U-Blox, "SARA-R4/SARA-R5 series - LwM2M objects and commands - Application
+note", UBX-18068860-R04, 2020-02-26
+
+U-Blox, "SARA-R5 series - Application development guide - Application
+note", UBX-20009652-R01, 2020-10-28
 
 U-Blox, "SARA-R5 series - Internet applications development guide -
 Application note", UBX-20032566-R01, 2020-10-26
+
+U-Blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
+AT commands manual", UBX-19047455-R06, 2020-09-28
+
+U-Blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
+Data sheet", UBX-19016638-R07, 2020-10-02
+
+U-Blox, "SARA-R5 series - LTE-M/NB-IoT modules with secure cloud -
+System integration manual", UBX-19041356-R04, 2020-10-12
+
+U-Blox, "SARA-R5 series - Positioning implementation - Application
+note", UBX-20012413-R01, 2020-10-02
+
+U-Blox, "SARA-R5 series - Positioning and timing implementation - Application
+note", UBX-20012413-R03, 2021-06-28
 
 ## Hardware Configuration
 
@@ -131,13 +149,19 @@ Mine is AT&T. Your mileage may vary.
 
 #### Set Packet Data Protocol Context and Access Point Name
 
-    AT+CGDCONT=0,"IP","<MNO APN name>"
+I use AT&T as my LTE M2M MNO, and its APN is "m2m.com.attz"; your mileage
+may vary.
+
+    AT+CGDCONT=0,"IP","m2m.com.attz"
 
 #### Turn Radio Back On
 
     AT+CFUN=1
 
 #### Set Packet Switched Data Configuration: Protocol, APN, DNS1, DNS2, CID
+
+I use AT&T as my LTE M2M MNO, and its APN is "m2m.com.attz"; your mileage
+may vary.
 
     AT+UPSD=0,0,0
     AT+UPSD=0,1,"m2m.com.attz"
