@@ -3,10 +3,6 @@ com-diag-hazer
 
 Parse NMEA strings and other typical output from GNSS devices.
 
-# Thanks
-
-[![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/coverclock)
-
 # Copyright
 
 Copyright 2017-2021 by the Digital Aggregates Corporation, Colorado, USA.
