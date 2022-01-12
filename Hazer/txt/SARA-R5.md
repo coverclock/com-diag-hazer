@@ -1,14 +1,20 @@
 # SparkFun SARA-R5 Configuration for Wheatstone
 
+> THIS IS A WORK IN PROGRESS (WIP). That's a way of saying I don't have it
+> working yet. These notes merely document what I'm trying right now. Currently
+> I have the M8 GNSS receiver working with my Hazer gpstool, but the cellular
+> radio so far eludes me. I have used the same AT&T LTE-M SIM successfully
+> on Digi XBEE3 module.
+
 These are my notes for using the SparkFun SARA-R5 board, which features
-a U-blox SARA-R5 module. The U-blox module incorporates both a GNSS
-receiver, an LTE-M radio, and a fairly complex interface accessed via AT
-commands. The SparkFun board comes initially set up for one-UART operation
-that connects the GNSS module to the LTE-M radio. For my purposes,
-I had to adapt the board (as described in the SparkFun instructions)
-for dual-UART operation. This required both hardware changes (opening
-and closing traces) and software configuration changes (both persistent
-and non-persistent).
+a U-blox SARA-R510M8S-00B module. The U-blox module incorporates both
+a M8030 GNSS receiver and an LTE-M radio, and provides a fairly complex
+interface accessed via AT commands. The SparkFun board comes initially
+set up for one-UART operation that connects the GNSS module to the
+LTE-M radio. For my purposes, I had to modify the board (as described in
+the SparkFun instructions) for dual-UART operation. This required both
+hardware changes (opening and closing traces) and software configuration
+changes (both persistent and non-persistent).
 
 ## Links
 
@@ -81,39 +87,39 @@ two for udev hot-plug magic.
 ## Software Configuration
 
 Some of these commands only need to be done once; the module will save
-the settings in NVRAM.
+the settings persistently in NVRAM.
 
-Some of these commands need to be done everytime the module is rebooted.
+Some of these commands need to be done every time the module is rebooted.
 
 ### General Configuration
 
-#### Reboot Module
+#### Enable Verbose Messages
 
-    AT+CFUN=16
+    AT+CMEE=2
 
-#### Set UART to 115200 baud
+#### Set UART to 115200 baud (PERSISTENT)
 
     AT+IPR=115200
 
-#### Enable Dual UART Operation
+#### Enable Dual UART Operation (PERSISTENT)
 
     AT+USIO=4
 
-#### Enable GPIO 1 (a.k.a. 16) for Network Status Indication
+#### Enable GPIO 1 a.k.a. 16 for Network Status Indication (PERSISTENT)
 
     AT+UGPIOC=16,2
 
-#### Enable GPIO 6 (a.k.a. 19) for Time Pulse Output
+#### Enable GPIO 6 a.k.a. 19 for Time Pulse Output (PERSISTENT)
 
     AT+UGPIOC=19,22
 
 ### GNSS Configuration
 
-#### Set GNSS to Profile 1 (GNSS data flow to and from AUX UART)
+#### Set GNSS to Profile 1: GNSS data flow to and from AUX UART (PERSISTENT)
 
     AT+UGPRF=1
 
-#### Set Time Pulse to 1PPS using GNSS/LTE (best effort)
+#### Set Time Pulse to 1PPS using GNSS/LTE
 
     AT+UTIME=1,1
 
@@ -123,7 +129,7 @@ Some of these commands need to be done everytime the module is rebooted.
 
 #### Power Up GNSS with GPS, GLONASS, GALILEO, SBAS
 
-This needs to be done everytime the module is rebooted.
+This needs to be done every time the module is rebooted.
 
     AT+UGPS=1,0,71
 
@@ -141,13 +147,17 @@ being emitted from the AUX UART a.k.a. UART 2.
 
 ### LTE-M Configuration
 
-#### Turn Radio Off (GNSS continues to run)
+I use AT&T as my LTE-M Mobile Network Operator (MNO). The Access Point
+Name (APN) and other parameters are specific to the service plan I have
+with AT&T. Your mileage may vary.
+
+THIS IS A WORK IN PROGRESS. (Which is a way of saying it doesn't work.)
+
+#### Turn Radio Off; GNSS continues to run
 
     AT+CFUN=0
 
-#### Set Mobile Network Operator Profile
-
-I use AT&T as my LTE-M MNO; your mileage may vary.
+#### Set Mobile Network Operator Profile to AT&T (PERSISTENT)
 
     AT+UMNOPROF=2
 
@@ -155,37 +165,34 @@ I use AT&T as my LTE-M MNO; your mileage may vary.
 
     AT+CFUN=16
 
-#### Turn Radio Off (again)
+#### Set Packet Data Protocol Context, Protocol, and Access Point Name
 
-    AT+CFUN=0
+    AT+CGDCONT=1,"IPV4V6","m2m.com.attz"
 
-#### Set Packet Data Protocol Context and Access Point Name
+#### Set Packet Switched Data Profile 1: Protocol, APN, DNS1, DNS2, CID
 
-I use AT&T as my LTE-M MNO, and its APN is "m2m.com.attz"; your mileage
-may vary.
+    AT+UPSD=1,0,2
+    AT+UPSD=1,1,"m2m.com.attz"
+    AT+UPSD=1,4,"8.8.8.8"
+    AT+UPSD=1,5,"8.8.4.4"
+    AT+UPSD=1,100,1
 
-    AT+CGDCONT=0,"IP","m2m.com.attz"
-
-#### Turn Radio Back On
+##### Turn Radio On
 
     AT+CFUN=1
 
-#### Set Packet Switched Data Configuration: Protocol, APN, DNS1, DNS2, CID
+#### Activate Packet Switched Data Profile 1
 
-I use AT&T as my LTE-M MNO, and its APN is "m2m.com.attz"; your mileage
-may vary.
+    AT+UPSDA=1,3
 
-    AT+UPSD=0,0,0
-    AT+UPSD=0,1,"m2m.com.attz"
-    AT+UPSD=0,4,"8.8.8.8"
-    AT+UPSD=0,5,"8.8.4.4"
-    AT+UPSD=0,100,0
+#### Enable MNO Registration
 
-#### Activate Packet Switched Data Configuration
+    AT+CREG=1
 
-    AT+UPSDA=0,3
+#### Get MNO Registration Status
+
+    AT+CREG?
 
 #### Get Connection Status
 
     AT+COPS?
-
