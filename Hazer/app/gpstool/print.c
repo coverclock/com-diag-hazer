@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2021 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This implements the gpstool Print API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+#include <alloca.h>
 #include "com/diag/diminuto/diminuto_absolute.h"
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_countof.h"
@@ -977,11 +978,7 @@ void print_error_f(const char * file, int line, const void * buffer, ssize_t len
         return;
     }
 
-    expanded = (unsigned char *)malloc((length * (sizeof("\\xab") - 1)) + 1);
-    if (expanded == (unsigned char *)0) {
-        diminuto_perror("print_error_f: malloc");
-        return;
-    }
+    expanded = (unsigned char *)alloca((length * (sizeof("\\xab") - 1)) + 1); /* No error return. */
     ep = expanded;
 
     while ((ll--) > 0) {
@@ -1003,8 +1000,6 @@ void print_error_f(const char * file, int line, const void * buffer, ssize_t len
     *(ep++) = '\0';
 
     diminuto_log_log(DIMINUTO_LOG_PRIORITY_WARNING, "%s@%d: \"%s\"[%zu]: \"%s\" (%d)\n", file, line, expanded, length, strerror(error), error);
-
-    free(expanded);
 
     errno = error;
 }
