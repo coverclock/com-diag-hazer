@@ -5,7 +5,7 @@ Parse NMEA strings and other typical output from GNSS devices.
 
 # Copyright
 
-Copyright 2017-2021 by the Digital Aggregates Corporation, Colorado, USA.
+Copyright 2017-2022 by the Digital Aggregates Corporation, Colorado, USA.
 
 # License
 
