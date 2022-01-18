@@ -19,6 +19,7 @@
 # EXAMPLES
 #
 if false; then
+peruse base
 peruse base out
 peruse base out 128
 peruse base out 128 /tmp
