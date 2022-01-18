@@ -77,8 +77,7 @@ case ${1} in
     ;;
 esac
 
-# echo ${CASE} \"${DIRECTORY}\" \"${TASK}\" \"${TYPE}\" \"${LIMIT}\"
-# exit 0
+echo ${PROGRAM}: ${CASE} ${DIRECTORY} '/' ${TASK} '.' ${TYPE} '@' ${LIMIT} 1>&2
 
 mkdir -p ${DIRECTORY}
 touch ${DIRECTORY}/${TASK}.${TYPE}
