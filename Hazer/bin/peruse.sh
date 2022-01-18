@@ -18,19 +18,21 @@
 #
 # EXAMPLES
 #
-# peruse base out
-# peruse base err
-# peruse rover out
-# peruse rover err
-# peruse router err
-# peruse base.out
-# peruse base.out 72
-# peruse base.out 72 /tmp
-# peruse /tmp/base
-# peruse /tmp/base out
-# peruse /tmp/base out 72
-# peruse /tmp/base.out
-# peruse /tmp/base.out 72
+if false; then
+peruse base out
+peruse base err
+peruse rover out
+peruse rover err
+peruse router err
+peruse base.out
+peruse base.out 128
+peruse base.out 128 /tmp
+peruse /tmp/base
+peruse /tmp/base out
+peruse /tmp/base out 128
+peruse /tmp/base.out
+peruse /tmp/base.out 128
+fi
 
 if [[ $# -eq 0 ]]; then
     exit 1
