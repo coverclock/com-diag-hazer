@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2019-2021 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2019-2022 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
@@ -11,7 +11,10 @@
 #
 # USAGE
 #
-# peruse TASK TYPE
+# peruse TASK [ TYPE [ LIMIT [ DIRECTORY ] ] ]
+# peruse TASK.TYPE [ LIMIT [ DIRECTORY ] ]
+# peruse DIRECTORY/TASK [ TYPE [ LIMIT ] ]
+# peruse DIRECTORY/TASK.TYPE [ LIMIT ]
 #
 # EXAMPLES
 #
@@ -20,17 +23,62 @@
 # peruse rover out
 # peruse rover err
 # peruse router err
+# peruse base.out
+# peruse base.out 72
+# peruse base.out 72 /tmp
+# peruse /tmp/base
+# peruse /tmp/base out
+# peruse /tmp/base out 72
+# peruse /tmp/base.out
+# peruse /tmp/base.out 72
+
+if [[ $# -eq 0 ]]; then
+    exit 1
+fi
 
 SELF=$$
 
+PROGRAM=$(basename ${0})
 ROOT=$(readlink -e $(dirname ${0})/..)
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-${ROOT}/tmp}
 
-PROGRAM=$(basename ${0})
-TASK=${1}
-TYPE=${2:-"out"}
-LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
-DIRECTORY=${4:-${SAVDIR}}
+CASE="none"
+case ${1} in
+(*/*.*)
+    CASE="path"
+    DIRECTORY=$(dirname ${1})
+    FILENAME=$(basename ${1})
+    TASK=${FILENAME%%.*}
+    TYPE=${FILENAME##*.}
+    LIMIT=${2:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+    ;;
+(*.*)
+    CASE="file"
+    FILENAME=${1}
+    TASK=${FILENAME%%.*}
+    TYPE=${FILENAME##*.}
+    LIMIT=${2:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+    DIRECTORY=${3:-${SAVDIR}}
+    ;;
+(*/*)
+    CASE="directory"
+    DIRECTORY=$(dirname ${1})
+    FILENAME=$(basename ${1})
+    TASK=${FILENAME}
+    TYPE=${2:-"out"}
+    LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+    ;;
+(*)
+    CASE="default"
+    TASK=${1}
+    TYPE=${2:-"out"}
+    LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+    DIRECTORY=${4:-${SAVDIR}}
+    ;;
+esac
+
+# echo ${CASE} \"${DIRECTORY}\" \"${TASK}\" \"${TYPE}\" \"${LIMIT}\"
+# exit 0
 
 mkdir -p ${DIRECTORY}
 touch ${DIRECTORY}/${TASK}.${TYPE}
