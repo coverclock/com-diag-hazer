@@ -937,6 +937,8 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://www.celestis.com/resources/faq/what-are-the-azimuth-and-elevation-of-a-satellite/>
 
+<https://ciechanow.ski/gps/>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
