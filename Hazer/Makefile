@@ -119,6 +119,8 @@ A2SOARCH			:=	-shared -Wl,-soname,lib$(PROJECT).$(SO).$(MAJOR).$(MINOR)
 
 MODE				:= 755
 
+BACKSLASHES			:= 2
+
 ########## Diminuto Configuration
 
 DIMINUTO_TITLE		:=	Diminuto
@@ -335,12 +337,10 @@ $(OUT)/$(FUN_DIR)/%:	$(OUT)/$(OBX_DIR)/$(FUN_DIR)/%.o $(TARGETLIBRARIESXX) $(TAR
 # NOTE: in the generated C code below, whether you should have \\n or \n in the
 # echo statements seems to depend on what version of make you are running.
 
-SLASHES=2
-
-ifeq ($(SLASHES), 1)
+ifeq ($(BACKSLASHES), 1)
 
 $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
-	@echo MAKE_VERSION=$(MAKE_VERSION) SLASHES=$(SLASHES)
+	@echo MAKE_VERSION=$(MAKE_VERSION) BACKSLASHES=$(BACKSLASHES)
 	D=`dirname $@`; mkdir -p $$D
 	echo '/* GENERATED FILE! DO NOT EDIT! */' > $@
 	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
@@ -405,10 +405,10 @@ $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
 
 endif
 
-ifeq ($(SLASHES), 2)
+ifeq ($(BACKSLASHES), 2)
 
 $(OUT)/$(GEN_DIR)/vintage.c:	Makefile
-	@echo MAKE_VERSION=$(MAKE_VERSION) SLASHES=$(SLASHES)
+	@echo MAKE_VERSION=$(MAKE_VERSION) BACKSLASHES=$(BACKSLASHES)
 	D=`dirname $@`; mkdir -p $$D
 	echo '/* GENERATED FILE! DO NOT EDIT! */' > $@
 	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
