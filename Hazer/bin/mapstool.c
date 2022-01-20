@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
     int seconds = 0;
     int millionths = 0;
     int direction = 0;
+    int debug = 0;
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
     argv++;
@@ -117,12 +118,20 @@ int main(int argc, char *argv[])
 
     if ((argc > 0) && (strcmp(*argv, "-d") == 0)) {
         (void)coordinates_debug(!0);
+        debug = !0;
         argv++;
         argc--;
     }
 
     (void)setenv("LC_ALL", "en_US.utf8", 0);
     (void)setlocale(LC_ALL, "");
+
+    if (debug) {
+        fprintf(stderr, "%s[%d]: sizeof(wchar_t)=%zu\n", __FILE__, __LINE__, sizeof(wchar_t));
+        fprintf(stderr, "%s[%d]: sizeof(wint_t)=%zu\n", __FILE__, __LINE__, sizeof(wint_t));
+        fprintf(stderr, "%s[%d]: VALUE=0x%x\n", __FILE__, __LINE__, (wchar_t)DEGREE);
+        fprintf(stderr, "%s[%d]: DISPLAY=\'%lc\'\n", __FILE__, __LINE__, (wint_t)DEGREE);
+    }
 
     while (argc-- > 0) {
         if (strcmp(*argv, "-D") == 0) {
