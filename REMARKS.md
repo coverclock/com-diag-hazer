@@ -808,3 +808,16 @@ The net effect is that the atomic clocks in the GPS satellites gain
 38us per day. This has to be taken into account in the calculation of
 the position solutions.
 
+## Microsoft CBL-Mariner 1.0
+
+Microsoft has released its own Fedora-like distribution of Linux -
+CBL-Mariner 1.0 (for Common Base Linux) - indended for its Azure
+cloud service. I easily got it running in a virtual machine using
+VMware Fusion on my desktop Mac, ported my Diminuto C library and
+Hazer GPS project over to it, and geolocated like a boss using a
+BU353W10 USB dongle. It does have some wierdness: it's lacks the
+Unicode fonts to display the degree and plus minus symbols (trying
+to address this), the Diminuto IPv6 unit tests don't work (will
+look at this), and the Makefile requires single backslashes
+instead of the double backslashes that I've had to use in more
+recent Linux distros (no clue, it's a recent version of make).
