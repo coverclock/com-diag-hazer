@@ -14,8 +14,8 @@
 
 #include <sys/types.h>
 #include <wchar.h>
+#include "com/diag/hazer/common.h"
 #include "types.h"
-#include "hazer.h"
 
 /**
  * Encodings for fix type.
@@ -75,16 +75,6 @@ static const size_t LIMIT = 80 - (sizeof("OUT ") - 1) - (sizeof("[123] ") - 1) -
  * length.
  */
 static const size_t UNLIMITED = ~(size_t)0;
-
-/**
- * This is the Unicode for the degree symbol.
- */
-static const wchar_t DEGREE = 0x00B0;
-
-/**
- * This is the Unicode for the plus&minus symbol.
- */
-static const wchar_t PLUSMINUS = 0x00B1;
 
 /*
  * This is the size of the temporary buffer we use to capture unknown stuff.

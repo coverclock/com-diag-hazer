@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Convert coordinates into a Google Maps friendly form.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -84,14 +84,10 @@
 #include <locale.h>
 #include <wchar.h>
 #include <errno.h>
+#include "com/diag/hazer/common.h"
 #include "com/diag/hazer/coordinates.h"
 #include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_assert.h"
-
-/**
- * This is the Unicode for the degree symbol.
- */
-static const wchar_t DEGREE = 0x00B0;
 
 int main(int argc, char *argv[])
 {
@@ -129,8 +125,8 @@ int main(int argc, char *argv[])
     if (debug) {
         fprintf(stderr, "%s[%d]: sizeof(wchar_t)=%zu\n", __FILE__, __LINE__, sizeof(wchar_t));
         fprintf(stderr, "%s[%d]: sizeof(wint_t)=%zu\n", __FILE__, __LINE__, sizeof(wint_t));
-        fprintf(stderr, "%s[%d]: VALUE=0x%x\n", __FILE__, __LINE__, (wchar_t)DEGREE);
-        fprintf(stderr, "%s[%d]: DISPLAY=\'%lc\'\n", __FILE__, __LINE__, (wint_t)DEGREE);
+        fprintf(stderr, "%s[%d]: DEGREE=0x%x=\'%lc\'\n", __FILE__, __LINE__, COMMON_DEGREE, (wint_t)COMMON_DEGREE);
+        fprintf(stderr, "%s[%d]: PLUSMINUS=0x%x=\'%lc\'\n", __FILE__, __LINE__, COMMON_PLUSMINUS, (wint_t)COMMON_PLUSMINUS);
     }
 
     while (argc-- > 0) {
@@ -155,7 +151,7 @@ int main(int argc, char *argv[])
             diminuto_assert((0 <= minutes) && (minutes <= 59));
             diminuto_assert((0 <= seconds) && (seconds <= 59));
             diminuto_assert((0 <= millionths) && (millionths <= 999999));
-            printf("%2d%lc%02d'%02d.%06d\"%c,", degrees, (wint_t)DEGREE, minutes, seconds, millionths, (direction < 0) ? 'S' : 'N');
+            printf("%2d%lc%02d'%02d.%06d\"%c,", degrees, (wint_t)COMMON_DEGREE, minutes, seconds, millionths, (direction < 0) ? 'S' : 'N');
             degrees = 0;
             minutes = 0;
             seconds = 0;
@@ -166,7 +162,7 @@ int main(int argc, char *argv[])
             diminuto_assert((0 <= minutes) && (minutes <= 59));
             diminuto_assert((0 <= seconds) && (seconds <= 59));
             diminuto_assert((0 <= millionths) && (millionths <= 999999));
-            printf(" %3d%lc%02d'%02d.%06d\"%c\n", degrees, (wint_t)DEGREE, minutes, seconds, millionths, (direction < 0) ? 'W' : 'E');
+            printf(" %3d%lc%02d'%02d.%06d\"%c\n", degrees, (wint_t)COMMON_DEGREE, minutes, seconds, millionths, (direction < 0) ? 'W' : 'E');
             argv++;
         } else {
             printf("%.9lf, %.9lf\n", latitude, longitude);

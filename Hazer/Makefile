@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	50# API changes that may require that applications be modified.
 MINOR				:=	4# Only functionality or features added with no legacy API changes.
-BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	1# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -117,9 +117,9 @@ SO					:=	so
 
 A2SOARCH			:=	-shared -Wl,-soname,lib$(PROJECT).$(SO).$(MAJOR).$(MINOR)
 
-MODE				:= 755
+MODE				:=	755
 
-BACKSLASHES			:= 2
+BACKSLASHES			:=	2
 
 ########## Diminuto Configuration
 
@@ -153,6 +153,7 @@ AR					:=	$(CROSS_COMPILE)ar
 RANLIB				:=	$(CROSS_COMPILE)ranlib
 STRIP				:=	$(CROSS_COMPILE)strip
 
+#CDEFINES			:=	-DCOMMON_DEGREE_VALUE=\'*\' -DCOMMON_PLUSMINUS_VALUE=\'~\'
 CDEFINES			:=
 
 ARFLAGS				:=	crsv

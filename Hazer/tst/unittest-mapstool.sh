@@ -22,129 +22,147 @@ PROGRAM=$(basename ${0})
 
 XC=0
 
-ACTUAL=$(mapstool "39.794212196, -105.153349930")
+ACTUAL=$(mapstool -d "39.794212196, -105.153349930")
 EXPECTED="39.794212196, -105.153349930"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool "39 47 39.16390(N) 105 09 12.05974(W)")
+ACTUAL=$(mapstool -d "39 47 39.16390(N) 105 09 12.05974(W)")
 EXPECTED="39.794212194, -105.153349928"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool "39°47'39.163\"N, 105°09'12.060\"W")
+ACTUAL=$(mapstool -d "39°47'39.163\"N, 105°09'12.060\"W")
 EXPECTED="39.794211944, -105.153350000"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -D "39.794212196, -105.153349930")
+ACTUAL=$(mapstool -d -D "39.794212196, -105.153349930")
 EXPECTED="39.794212196, -105.153349930"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -D "39 47 39.16390(N) 105 09 12.05974(W)")
+ACTUAL=$(mapstool -d -D "39 47 39.16390(N) 105 09 12.05974(W)")
 EXPECTED="39.794212194, -105.153349928"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -D "39°47'39.163\"N, 105°09'12.060\"W")
+ACTUAL=$(mapstool -d -D "39°47'39.163\"N, 105°09'12.060\"W")
 EXPECTED="39.794211944, -105.153350000"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -P "39.794212196, -105.153349930")
+ACTUAL=$(mapstool -d -P "39.794212196, -105.153349930")
 EXPECTED="39°47'39.163905\"N, 105°09'12.059748\"W"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -P "39 47 39.16390(N) 105 09 12.05974(W)")
+ACTUAL=$(mapstool -d -P "39 47 39.16390(N) 105 09 12.05974(W)")
 EXPECTED="39°47'39.163899\"N, 105°09'12.059740\"W"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -P "39°47'39.163\"N, 105°09'12.060\"W")
+ACTUAL=$(mapstool -d -P "39°47'39.163\"N, 105°09'12.060\"W")
 EXPECTED="39°47'39.162999\"N, 105°09'12.060000\"W"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool "HPP   39.794212196, -105.153349930")
+ACTUAL=$(mapstool -d "HPP   39.794212196, -105.153349930")
 EXPECTED="39.794212196, -105.153349930"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool "NGS  39 47 39.16390(N) 105 09 12.05974(W)")
+ACTUAL=$(mapstool -d "NGS  39 47 39.16390(N) 105 09 12.05974(W)")
 EXPECTED="39.794212194, -105.153349928"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool "POS 39°47'39.163\"N, 105°09'12.060\"W")
+ACTUAL=$(mapstool -d "POS 39°47'39.163\"N, 105°09'12.060\"W")
 EXPECTED="39.794211944, -105.153350000"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -D "HPP   39.794212196, -105.153349930")
+ACTUAL=$(mapstool -d -D "HPP   39.794212196, -105.153349930")
 EXPECTED="39.794212196, -105.153349930"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -D "NGS  39 47 39.16390(N) 105 09 12.05974(W)")
+ACTUAL=$(mapstool -d -D "NGS  39 47 39.16390(N) 105 09 12.05974(W)")
 EXPECTED="39.794212194, -105.153349928"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -D "POS 39°47'39.163\"N, 105°09'12.060\"W")
+ACTUAL=$(mapstool -d -D "POS 39°47'39.163\"N, 105°09'12.060\"W")
 EXPECTED="39.794211944, -105.153350000"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -P "HPP    39.794212196, -105.153349930")
+ACTUAL=$(mapstool -d -P "HPP    39.794212196, -105.153349930")
 EXPECTED="39°47'39.163905\"N, 105°09'12.059748\"W"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -P "NGS  39 47 39.16390(N) 105 09 12.05974(W)")
+ACTUAL=$(mapstool -d -P "NGS  39 47 39.16390(N) 105 09 12.05974(W)")
 EXPECTED="39°47'39.163899\"N, 105°09'12.059740\"W"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
-ACTUAL=$(mapstool -P "POS 39°47'39.163\"N, 105°09'12.060\"W")
+ACTUAL=$(mapstool -d -P "POS 39°47'39.163\"N, 105°09'12.060\"W")
 EXPECTED="39°47'39.162999\"N, 105°09'12.060000\"W"
+echo ${PROGRAM}: ACTUAL="\"${ACTUAL}\"" EXPECTED="\"${EXPECTED}\"" 1>&2
 if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
-	echo FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
+	echo ${PROGRAM}: FAIL! ${ACTUAL} != ${EXPECTED} 1>&2
 	XC=1
 fi
 
