@@ -119,8 +119,7 @@ A2SOARCH			:=	-shared -Wl,-soname,lib$(PROJECT).$(SO).$(MAJOR).$(MINOR)
 
 MODE				:=	755
 
-#BACKSLASHES		:=	1
-BACKSLASHES			:=	2
+BACKSLASHES			:=	1
 
 ########## Diminuto Configuration
 
@@ -154,8 +153,7 @@ AR					:=	$(CROSS_COMPILE)ar
 RANLIB				:=	$(CROSS_COMPILE)ranlib
 STRIP				:=	$(CROSS_COMPILE)strip
 
-#CDEFINES			:=	-DCOMMON_DEGREE_VALUE=\'*\' -DCOMMON_PLUSMINUS_VALUE=\'~\'
-CDEFINES			:=
+CDEFINES			:=	-DCOMMON_DEGREE_VALUE=\'*\' -DCOMMON_PLUSMINUS_VALUE=\'~\'
 
 ARFLAGS				:=	crsv
 CPPFLAGS			:=	$(CDEFINES) -iquote $(SRC_DIR) -iquote $(INC_DIR) -iquote $(OUT)/$(INC_DIR) $(DIMINUTO_CPPFLAGS) $(CPPARCH)
