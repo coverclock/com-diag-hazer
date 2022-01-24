@@ -154,6 +154,9 @@ RANLIB				:=	$(CROSS_COMPILE)ranlib
 STRIP				:=	$(CROSS_COMPILE)strip
 
 CDEFINES			:=	-DCOMMON_DEGREE_VALUE=\'*\' -DCOMMON_PLUSMINUS_VALUE=\'~\'
+# wget https://packages.microsoft.com/cbl-mariner/1.0/prod/base/x86_64/rpms/freefont-20120503-2.cm1.x86_64.rpm
+# sudo rpm -i freefont-20120503-2.cm1.x86_64.rpm
+#CDEFINES			:=
 
 ARFLAGS				:=	crsv
 CPPFLAGS			:=	$(CDEFINES) -iquote $(SRC_DIR) -iquote $(INC_DIR) -iquote $(OUT)/$(INC_DIR) $(DIMINUTO_CPPFLAGS) $(CPPARCH)

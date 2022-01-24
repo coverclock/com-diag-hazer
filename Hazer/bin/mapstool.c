@@ -123,10 +123,18 @@ int main(int argc, char *argv[])
     (void)setlocale(LC_ALL, "");
 
     if (debug) {
+        static const wchar_t DEGREE = 0x00b0;
+        static const wchar_t PLUSMINUS = 0x00b1;
         fprintf(stderr, "%s[%d]: sizeof(wchar_t)=%zu\n", __FILE__, __LINE__, sizeof(wchar_t));
         fprintf(stderr, "%s[%d]: sizeof(wint_t)=%zu\n", __FILE__, __LINE__, sizeof(wint_t));
-        fprintf(stderr, "%s[%d]: DEGREE=0x%x=\'%lc\'\n", __FILE__, __LINE__, COMMON_DEGREE, (wint_t)COMMON_DEGREE);
-        fprintf(stderr, "%s[%d]: PLUSMINUS=0x%x=\'%lc\'\n", __FILE__, __LINE__, COMMON_PLUSMINUS, (wint_t)COMMON_PLUSMINUS);
+        fprintf(stderr, "%s[%d]: DEGREE=0x%x=\'%lc\'", __FILE__, __LINE__, DEGREE, (wint_t)DEGREE);
+        fputc('\n', stderr);
+        fprintf(stderr, "%s[%d]: PLUSMINUS=0x%x=\'%lc\'", __FILE__, __LINE__, PLUSMINUS, (wint_t)PLUSMINUS);
+        fputc('\n', stderr);
+        fprintf(stderr, "%s[%d]: COMMON_DEGREE=0x%x=\'%lc\'", __FILE__, __LINE__, COMMON_DEGREE, (wint_t)COMMON_DEGREE);
+        fputc('\n', stderr);
+        fprintf(stderr, "%s[%d]: COMMON_PLUSMINUS=0x%x=\'%lc\'", __FILE__, __LINE__, COMMON_PLUSMINUS, (wint_t)COMMON_PLUSMINUS);
+        fputc('\n', stderr);
     }
 
     while (argc-- > 0) {
