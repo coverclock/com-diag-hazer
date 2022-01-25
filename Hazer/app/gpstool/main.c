@@ -891,11 +891,14 @@ int main(int argc, char * argv[])
      * which we use to display stuff like the degree sign.
      */
 
-    (void)setenv("LC_ALL", "en_US.utf8", 0);
-    if ((locale = setlocale(LC_ALL, "")) != (char *)0) {
-        DIMINUTO_LOG_INFORMATION("Locale \"%s\"", locale);
+    rc = setenv("LC_ALL", "en_US.UTF-8", 0);
+    if (rc < 0) {
+        diminuto_perror("setenv");
+    }
+    if ((locale = setlocale(LC_ALL, "")) == (char *)0) {
+        diminuto_perror("setlocale");
     } else {
-        DIMINUTO_LOG_WARNING("Locale Null");
+        DIMINUTO_LOG_INFORMATION("Locale \"%s\"", locale);
     }
 
     if (identity != (const char *)0) {

@@ -86,12 +86,14 @@
 #include <errno.h>
 #include "com/diag/hazer/common.h"
 #include "com/diag/hazer/coordinates.h"
-#include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_assert.h"
+#include "com/diag/diminuto/diminuto_log.h"
 
 int main(int argc, char *argv[])
 {
     const char * program = (const char *)0;
+    const char * locale = (const char *)0;
+    int rc = 0;
     int position = 0;
     double latitude = 0.0;
     double longitude = 0.0;
@@ -119,8 +121,16 @@ int main(int argc, char *argv[])
         argc--;
     }
 
-    (void)setenv("LC_ALL", "en_US.utf8", 0);
-    (void)setlocale(LC_ALL, "");
+    rc = setenv("LC_ALL", "en_US.UTF-8", 0);
+    if (rc < 0) {
+        diminuto_perror("setenv");
+        return 1;
+    }
+    locale = setlocale(LC_ALL, "");
+    if (locale == (const char *)0) {
+        diminuto_perror("setlocale");
+        return 1;
+    }
 
     if (debug) {
         static const wchar_t DEGREE = 0x00b0;
