@@ -54,7 +54,6 @@
 #include <errno.h>
 #include <signal.h>
 #include <pthread.h>
-#include <locale.h>
 #include "types.h"
 
 /*******************************************************************************
@@ -114,7 +113,6 @@ int main(int argc, char * argv[])
     char * end = (char *)0;
     int rc = 0;
     int comparison = 0;
-    char * locale = (char *)0;
     const char * rendezvous = (const char *)0;
     diminuto_ipc_endpoint_t endpoint = { 0, };
     diminuto_ipv6_buffer_t ipv6 = { 0, };
@@ -208,17 +206,6 @@ int main(int argc, char * argv[])
      **************************************************************************/
 
     DIMINUTO_LOG_INFORMATION("Begin");
-
-    /*
-     * Necessary to get stuff like wchar_t and the "%lc" format to work,
-     * which we use to display stuff like the degree sign.
-     */
-    (void)setenv("LC_ALL", "en_US.utf8", 0);
-    if ((locale = setlocale(LC_ALL, "")) != (char *)0) {
-        DIMINUTO_LOG_INFORMATION("Locale \"%s\"", locale);
-    } else {
-        DIMINUTO_LOG_WARNING("Locale %p", locale);
-    }
 
     if (daemon) {
         rc = diminuto_daemon(Program);
