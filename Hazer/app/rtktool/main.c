@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the implementation of the rtktool RTK router.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -69,7 +69,7 @@ static const char * Program = (const char *)0;
  * HELPERS
  ******************************************************************************/
 
-static int comparator(diminuto_tree_t * tap, diminuto_tree_t * tbp)
+static int comparator(const diminuto_tree_t * tap, const diminuto_tree_t * tbp)
 {
     int rc = 0;
     client_t * cap = (client_t *)0;
