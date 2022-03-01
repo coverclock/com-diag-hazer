@@ -144,7 +144,7 @@ enum HazerGnssConstants {
  *
  * The USGlobalSat ND-105C routinely violates the NMEA spec as to
  * the maximum message length of 79 characters between the initial
- * '$' and the terminating \r\n by (so far) one character.
+ * '$' and the terminating CR LF by (so far) one character.
  *
  * The NaviSys GR-701W with the uBlox-7 chipset emits proprietary
  * PUBX messages longer than the NMEA spec.
@@ -845,7 +845,7 @@ extern uint16_t hazer_parse_dop(const char * string, char ** endp);
 #define HAZER_PROPRIETARY_SENTENCE_PMTK "PMTK"
 
 /**
- * @define HAZER_PROPRIETARY SENTENCE_PSRF
+ * @def HAZER_PROPRIETARY_SENTENCE_PSRF
  * SiRF NMEA Reference Manual, 2-1, Input Messages
  */
 #define HAZER_PROPRIETARY_SENTENCE_PSRF "PSRF"
@@ -935,7 +935,7 @@ typedef struct HazerPosition {
     }
 
 /**
- * @define HAZER_POSITIONS_INITIALIZER
+ * @def HAZER_POSITIONS_INITIALIZER
  * Initialize an array of HazerPosition structures.
  */
 #define HAZER_POSITIONS_INITIALIZER \
@@ -1073,7 +1073,7 @@ typedef struct HazerActive {
     }
 
 /**
- * @define HAZER_ACTIVES_INITIALIZER
+ * @def HAZER_ACTIVES_INITIALIZER
  * Initialize an array of HazerActive structures.
  */
 #define HAZER_ACTIVES_INITIALIZER \
@@ -1204,7 +1204,7 @@ typedef struct HazerView {
     }
 
 /**
- * @define HAZER_VIEWS_INITIALIZER
+ * @def HAZER_VIEWS_INITIALIZER
  * Initialize an array of HazerView structures.
  */
 #define HAZER_VIEWS_INITIALIZER \
