@@ -7,6 +7,8 @@ Parse NMEA strings and other typical output from GNSS devices.
 
 Copyright 2017-2022 by the Digital Aggregates Corporation, Colorado, USA.
 
+Except where noted, this software is an original work of its author.
+
 # License
 
 Licensed under the terms in LICENSE.txt. 
@@ -109,6 +111,22 @@ uses its own trivial data format consisting of raw RTCM messages preceeded
 by a four-byte sequence number carried over UDP datagrams.
 
 This software is an original work of its author.
+
+# Manual Pages and Reference Manual
+
+These PDFs of
+[manual pages](https://www.dropbox.com/s/0pi1b0u23r0noxk/manpages.pdf?dl=0)
+and associated
+[reference manual](https://www.dropbox.com/s/grls9ufnowzu0e5/refman.pdf?dl=0)
+were built from Hazer's embedded Doxygen comments on
+2022-03-01
+using tag
+50.4.3
+.
+
+The unit tests (```Hazer/tst```), functional tests (```Hazer/fun```),
+and command line uilities (```Hazer/bin```) contain useful and non-trivial
+examples of how to use the Hazer library.
 
 # Dependencies
 
