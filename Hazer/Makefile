@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	50# API changes that may require that applications be modified.
 MINOR				:=	4# Only functionality or features added with no legacy API changes.
-BUILD				:=	4# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	5# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -714,14 +714,20 @@ depend:	$(TARGETSYNTHESIZED)
 
 ########## Installation
 
-.PHONY:	install install-bin install-lib install-include
+.PHONY:	install install-app install-bin install-lib install-include
 
 INSTALL_DIR := /usr/local
 INSTALL_BIN := $(INSTALL_DIR)/bin
 INSTALL_LIB := $(INSTALL_DIR)/lib
 INSTALL_INC := $(INSTALL_DIR)/include
 
-install:	install-bin install-lib install-include
+install:	install-app install-bin install-lib install-include
+
+install-app:
+	mkdir -p $(INSTALL_BIN)
+	for B in $(OUT)/$(APP_DIR)/*; do \
+		install $$B $(INSTALL_BIN); \
+	done
 
 install-bin:
 	mkdir -p $(INSTALL_BIN)
