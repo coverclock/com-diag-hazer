@@ -660,6 +660,9 @@ Chip Overclock, "Advanced Static Route Maps With OpenStreetMap", 2021-03,
 Chip Overclock, "Where the RF Meets the Road", 2021-03,
 <https://coverclock.blogspot.com/2021/03/where-rf-meets-road.html>
 
+Chip Overclock, "Solar Power", 2022-03,
+<https://coverclock.blogspot.com/2022/03/solar-power.html>
+
 # Media
 
 John Sloan, "BU-353W10 Tear Down", album, <https://flic.kr/s/aHsmWxTpfs>
