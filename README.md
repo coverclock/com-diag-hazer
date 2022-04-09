@@ -1254,7 +1254,7 @@ throw an assert and core dump.
 
 # Environmental Variables
 
-    COM_DIAG_HAZER_SAVDIR
+    export COM_DIAG_HAZER_SAVDIR="${HOME}/save"
 
 Some scripts in the bin and fun directories save stdout, stderr, CSV,
 or DGNSS parameters in files.  Setting this environmental variable
@@ -1265,12 +1265,13 @@ Makefile configuration file (typically "host"). The DGNSS parameters are
 saved in ${HOME}/fix, or if ${HOME} is not set, in /var/tmp/fix. All of
 these defaults are overridden if the environmental variable is set.
 
-    COM_DIAG_DIMINUTO_LOG_MASK
+    export COM_DIAG_DIMINUTO_LOG_MASK=0xff
 
 Sets the default log mask for Diminuto for those applications that set
-the log mask from the environment. The value is an eight-bit number
-in decimal, hexadecimal, or even octal. In addition, the string "~0"
-can be used to enable all log levels.
+the mask from the environment. The value is an eight-bit number
+in decimal, hexadecimal, or even octal. In addition, the string ```~0```
+can be used to enable all log levels, equivalent to ```255```, ```0xff```,
+or ```0377```.
 
 # Comma Separated Value (CSV) Output
 
