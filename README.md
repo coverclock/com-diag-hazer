@@ -100,7 +100,7 @@ from serial(ish) devices, or from a UDP socket, and can send validated data to
 a remote UDP socket, write it to a device, and display the interpreted
 information.
 
-Hazer also includes a rtktool application that is a point-to-multipoint GNSS
+Hazer also includes an rtktool application that is a point-to-multipoint GNSS
 router that can receive data via a UDP socket from a remote gpstool and
 forward it to one or more remote gpstools via UDP. This is used along with
 gpstool to implement a DGNSS system using a stationary base station in survey
