@@ -753,8 +753,11 @@ queue somehow becomes clogged. I wrote about this at length in my blog.
 C. Overclock, "Better Never Than Late", 2017-02-16,
 <https://coverclock.blogspot.com/2017/02/better-never-than-late.html>
 
-I do think I should fix this - probably using something like the Secure
-Real-Time Protocol (SRTP) - but that hasn't happened yet.
+One of my complaints about the various encrypted-UDP schemes is
+that most of the ones I have studied defeat the entire advantage of
+using UDP by implementing TCP-like behavior in user-space on top
+of UDP. However, it is trivial to use other tools to tunnel the UDP
+output of gpstool through an encrypted connection.
 
 You will also notice that there is no buffering between the source
 of input data - be it standard input, a UDP socket, a serial port,
