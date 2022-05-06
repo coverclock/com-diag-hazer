@@ -821,3 +821,30 @@ to address this), the Diminuto IPv6 unit tests don't work (will
 look at this), and the Makefile requires single backslashes
 instead of the double backslashes that I've had to use in more
 recent Linux distros (no clue, it's a recent version of make).
+
+## GNSS Restrictions
+
+Formerly: restricted operation above 18,000m altitude and 515m/s
+velocity.
+
+Currently (as of 2016): restriction decryption of precise positioning
+signals, steerable antennas designed to avoid jamming, designed to
+deliver 500kg payload at least 300km.
+
+(Many current commercial receivers will of course still have the former
+restrictions in place, implemented in HW, FW, or SW.)
+
+U.S. Department of Commerce, Export Administration Regulations
+(EAR)
+
+U.S. Department of Commerce, Commerce Control List (CCL)
+
+U.S. Department of State, International Traffic in Arms Regulations
+(ITAR)
+
+U.S. Department of State, United States Munitions List (USML)
+
+U.S. Government, CODE OF FEDERAL REGULATIONS, Title 22, Chapter I,
+Subchapter M, Part 121, Enumeration of Articles, Section 121.1,
+"The United States Munitions List" (USML), updated 2022-03-24,
+<https://www.ecfr.gov/current/title-22/chapter-I/subchapter-M/part-121/subject-group-ECFRf7e5fe639be4566/section-121.1>
