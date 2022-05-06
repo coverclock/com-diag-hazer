@@ -278,11 +278,16 @@ void print_local(FILE * fp)
     diminuto_assert((0 <= hour) && (hour <= 23));
     diminuto_assert((0 <= minute) && (minute <= 59));
     diminuto_assert((0 <= second) && (second <= 59));
-    milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-    diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
-    hour += day * 24;
 
-    fprintf(fp, " %02d:%02d:%02d.%03lu", hour, minute, second, (long unsigned int)milliseconds);
+    /*
+     * I limited the resolution to seconds just to save space on a
+     * crowded output line, especially when (for example) a DGNSS base
+     * station runs for a long time. The monotonic time has nothing to
+     * do with the higher precision time displayed above that is
+     * probably adjusted via NTP. It's more like uptime(1).
+     */
+
+    fprintf(fp, " %03d/%02d:%02d:%02d", day, hour, minute, second);
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
 

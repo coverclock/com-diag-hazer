@@ -100,7 +100,7 @@ from serial(ish) devices, or from a UDP socket, and can send validated data to
 a remote UDP socket, write it to a device, and display the interpreted
 information.
 
-Hazer also includes a rtktool application that is a point-to-multipoint GNSS
+Hazer also includes an rtktool application that is a point-to-multipoint GNSS
 router that can receive data via a UDP socket from a remote gpstool and
 forward it to one or more remote gpstools via UDP. This is used along with
 gpstool to implement a DGNSS system using a stationary base station in survey
@@ -659,6 +659,9 @@ Chip Overclock, "Advanced Static Route Maps With OpenStreetMap", 2021-03,
 
 Chip Overclock, "Where the RF Meets the Road", 2021-03,
 <https://coverclock.blogspot.com/2021/03/where-rf-meets-road.html>
+
+Chip Overclock, "Solar Power", 2022-03,
+<https://coverclock.blogspot.com/2022/03/solar-power.html>
 
 # Media
 
@@ -1251,7 +1254,7 @@ throw an assert and core dump.
 
 # Environmental Variables
 
-    COM_DIAG_HAZER_SAVDIR
+    export COM_DIAG_HAZER_SAVDIR="${HOME}/save"
 
 Some scripts in the bin and fun directories save stdout, stderr, CSV,
 or DGNSS parameters in files.  Setting this environmental variable
@@ -1262,12 +1265,13 @@ Makefile configuration file (typically "host"). The DGNSS parameters are
 saved in ${HOME}/fix, or if ${HOME} is not set, in /var/tmp/fix. All of
 these defaults are overridden if the environmental variable is set.
 
-    COM_DIAG_DIMINUTO_LOG_MASK
+    export COM_DIAG_DIMINUTO_LOG_MASK=0xff
 
 Sets the default log mask for Diminuto for those applications that set
-the log mask from the environment. The value is an eight-bit number
-in decimal, hexadecimal, or even octal. In addition, the string "~0"
-can be used to enable all log levels.
+the mask from the environment. The value is an eight-bit number
+in decimal, hexadecimal, or even octal. In addition, the string ```~0```
+can be used to enable all log levels, equivalent to ```255```, ```0xff```,
+or ```0377```.
 
 # Comma Separated Value (CSV) Output
 
