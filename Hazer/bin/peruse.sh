@@ -47,6 +47,14 @@ PROGRAM=$(basename ${0})
 ROOT=$(readlink -e $(dirname ${0})/..)
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-${ROOT}/tmp}
 
+if SIZE=$(stty size 2> /dev/null); then
+  SIZE=$(echo ${SIZE} | cut -d ' ' -f 1)
+  SIZE=$((${SIZE} - 2))
+else
+  SIZE=24
+  SIZE=$((${SIZE} - 1))
+fi
+
 CASE="none"
 case ${1} in
 (*/*.*)
@@ -55,14 +63,14 @@ case ${1} in
     FILENAME=$(basename ${1})
     TASK=${FILENAME%%.*}
     TYPE=${FILENAME##*.}
-    LIMIT=${2:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+    LIMIT=${2:-${SIZE}}
     ;;
 (*.*)
     CASE="file"
     FILENAME=${1}
     TASK=${FILENAME%%.*}
     TYPE=${FILENAME##*.}
-    LIMIT=${2:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+    LIMIT=${2:-${SIZE}}
     DIRECTORY=${3:-${SAVDIR}}
     ;;
 (*/*)
@@ -71,13 +79,13 @@ case ${1} in
     FILENAME=$(basename ${1})
     TASK=${FILENAME}
     TYPE=${2:-"out"}
-    LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+    LIMIT=${3:-${SIZE}}
     ;;
 (*)
     CASE="default"
     TASK=${1}
     TYPE=${2:-"out"}
-    LIMIT=${3:-$(($(stty size | cut -d ' ' -f 1) - 2))}
+    LIMIT=${3:-${SIZE}}
     DIRECTORY=${4:-${SAVDIR}}
     ;;
 esac
@@ -103,7 +111,7 @@ elif [[ "${TYPE}" == "out" ]]; then
     stdbuf -oL observe ${DIRECTORY}/${TASK}.${TYPE} |
         while read FILENAME; do
             if [[ -f ${FILENAME} ]]; then
-                clear
+                clear 2> /dev/null
                 awk -f ${ROOT}/bin/${PROGRAM}.awk < ${FILENAME} | head -n ${LIMIT}
             fi
         done
