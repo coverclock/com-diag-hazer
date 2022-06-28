@@ -110,8 +110,6 @@ the Networked Transport of RTCM via Internet Protocol (Ntrip), but instead
 uses its own trivial data format consisting of raw RTCM messages preceeded
 by a four-byte sequence number carried over UDP datagrams.
 
-This software is an original work of its author.
-
 # Manual Pages and Reference Manual
 
 These PDFs of
@@ -251,15 +249,17 @@ taking location updates, in the form of datagrams containing JSON over
 UDP, either in real-time or from playback, from Hazer using scripts like
 csvfollow and csvplayback.
 
-# Versioning
+# Branching
 
-Both Hazer and Diminuto are complex enough that I moved to a "master" and
+Hazer is big and complex enough that I sometimes move to a "master" and
 "develop" dual branch model of development. I make and test major changes
 in the "develop" branch, and when I think I have a stable release, I merge
 "develop" into the "master" branch. I still make what I consider to be minor
 changes in the master branch.
 
-I still try to tag releases with a three-number tuple that is defined in the
+# Versioning
+
+I tag major releases with a three-number tuple that is defined in the
 build Makefile for each project. Release numbers, e.g. 22.2.1, consist of a
 major number (22), a minor number (2), and a build number (1). The major
 number changes when I've made a change significant enough that I think

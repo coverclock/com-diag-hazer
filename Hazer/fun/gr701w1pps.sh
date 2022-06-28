@@ -10,7 +10,7 @@
 # it exports the 1PPS signal via data carrier detect (DCD), which
 # is the reason for the "-c" option below. This script also
 # configures the gpstool to forward the 1PPS signal by strobing a
-# GPIO pin, the "-p" option. In this case, it uses GPIO pin 20 on
+# GPIO pin, the "-p" option. In this case, it uses GPIO pin 16 on
 # a hardware test fixture I fabricated. I run this script on a
 # Raspberry Pi as user "pi", which has access to the GPIO pins
 # by virtue of being in group "gpio".
