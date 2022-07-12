@@ -56,7 +56,7 @@ exec 2>>${ERRFIL}
 # UBX-CFG-GNSS [0]
 
 exec coreable gpstool \
-    -H ${OUTFIL} -t 10 \
+    -H ${OUTFIL} -F 1 -t 10 \
     -T ${CSVFIL} \
     -O ${PIDFIL} \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \

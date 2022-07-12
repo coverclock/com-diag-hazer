@@ -852,44 +852,32 @@ void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 
         fputs("ATT", fp);
 
-        if (sp->payload.accRoll != 0) {
-            fprintf(fp, " %4d.%01u%lc roll %lc%4d.%01u%lc",
-                sp->payload.roll / CENTIMILLI,
-                abs32(sp->payload.roll) % CENTIMILLI / (CENTIMILLI / 10),
-                (wint_t)COMMON_DEGREE,
-                (wint_t)COMMON_PLUSMINUS,
-                sp->payload.accRoll / CENTIMILLI,
-                abs32(sp->payload.accRoll) % CENTIMILLI / (CENTIMILLI / 10),
-                (wint_t)COMMON_DEGREE);
-        } else {
-            fprintf(fp, " %21s", "");
-        }
+        fprintf(fp, " %4d.%01u%lc roll %lc%4d.%01u%lc",
+            sp->payload.roll / CENTIMILLI,
+            abs32(sp->payload.roll) % CENTIMILLI / (CENTIMILLI / 10),
+            (wint_t)COMMON_DEGREE,
+            (wint_t)COMMON_PLUSMINUS,
+            sp->payload.accRoll / CENTIMILLI,
+            abs32(sp->payload.accRoll) % CENTIMILLI / (CENTIMILLI / 10),
+            (wint_t)COMMON_DEGREE);
 
-        if (sp->payload.accPitch != 0) {
-            fprintf(fp, " %4d.%01u%lc pitch %lc%4d.%01u%lc",
-                sp->payload.pitch / CENTIMILLI,
-                abs32(sp->payload.pitch) % CENTIMILLI / (CENTIMILLI / 10),
-                (wint_t)COMMON_DEGREE,
-                (wint_t)COMMON_PLUSMINUS,
-                sp->payload.accPitch / CENTIMILLI,
-                abs32(sp->payload.accPitch) % CENTIMILLI / (CENTIMILLI / 10),
-                (wint_t)COMMON_DEGREE);
-        } else {
-            fprintf(fp, " %22s", "");
-        }
+        fprintf(fp, " %4d.%01u%lc pitch %lc%4d.%01u%lc",
+            sp->payload.pitch / CENTIMILLI,
+            abs32(sp->payload.pitch) % CENTIMILLI / (CENTIMILLI / 10),
+            (wint_t)COMMON_DEGREE,
+            (wint_t)COMMON_PLUSMINUS,
+            sp->payload.accPitch / CENTIMILLI,
+            abs32(sp->payload.accPitch) % CENTIMILLI / (CENTIMILLI / 10),
+            (wint_t)COMMON_DEGREE);
 
-        if (sp->payload.accHeading != 0) {
-            fprintf(fp, " %4d.%01u%lc yaw %lc%4d.%01u%lc",
-                sp->payload.heading / CENTIMILLI,
-                abs32(sp->payload.heading) % CENTIMILLI / (CENTIMILLI / 10),
-                (wint_t)COMMON_DEGREE,
-                (wint_t)COMMON_PLUSMINUS,
-                sp->payload.accHeading / CENTIMILLI,
-                abs32(sp->payload.accHeading) % CENTIMILLI / (CENTIMILLI / 10),
-                (wint_t)COMMON_DEGREE);
-        } else {
-            fprintf(fp, " %20s", "");
-        }
+        fprintf(fp, " %4d.%01u%lc yaw %lc%4d.%01u%lc",
+            sp->payload.heading / CENTIMILLI,
+            abs32(sp->payload.heading) % CENTIMILLI / (CENTIMILLI / 10),
+            (wint_t)COMMON_DEGREE,
+            (wint_t)COMMON_PLUSMINUS,
+            sp->payload.accHeading / CENTIMILLI,
+            abs32(sp->payload.accHeading) % CENTIMILLI / (CENTIMILLI / 10),
+            (wint_t)COMMON_DEGREE);
 
         fprintf(fp, "%1s", "");
 
