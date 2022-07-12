@@ -57,6 +57,12 @@ they are in the GSA message and hence in the gpstool ACT output.
 So far I have only noticed this in the NMEA sentences for the Chinese
 Beidou (GB) constellation.
 
+(I went to the u-blox web site to get the latest FW binary, which I applied
+to the F9R. I noticed that u-blox has discontinued this product for "lack of
+customer interest". I'm not surprised; I questioned the market for a relatively
+expensive chip that combines differential GNSS with an IMU. I still notice
+GSA/GSV discrepancies in FWVER HPS 1.21.)
+
 ## Lost Characters on Gen 8 and Gen 9 U-blox Modules using USB ACM Port
 
 I've been troubleshooting a weird issue with sequences of characters being

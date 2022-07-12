@@ -53,6 +53,9 @@
  * "u-blox ZED-F9R module Product summary", UBX-19048775-R04, ublox AG,
  * 2020
  *
+ * "u-blox F9 high precision sensor fusion GNSS receiver - Interface
+ * description", UBX-19056845-R01, ublox AG, 2020-10-28
+ *
  * Eric S. Raymond, "NMEA Revealed", 2.21, http://www.catb.org/gpsd/NMEA.html,
  * 2016-01
  *
@@ -236,6 +239,7 @@ typedef enum HazerTalker {
     HAZER_TALKER_GLONASS,                   /* GL */
     HAZER_TALKER_GNSS,                      /* GN */
     HAZER_TALKER_GPS,                       /* GP */
+    HAZER_TALKER_QZSS2,                     /* GQ */
     HAZER_TALKER_INSTRUMENTATION,           /* II */
     HAZER_TALKER_NAVIGATION,                /* IN */
     HAZER_TALKER_LORANC,                    /* LC */
@@ -263,6 +267,7 @@ typedef enum HazerTalker {
     "GL", \
     "GN", \
     "GP", \
+    "GQ", \
     "II", \
     "IN", \
     "LC", \
