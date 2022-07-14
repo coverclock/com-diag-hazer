@@ -56,6 +56,9 @@
  * "u-blox F9 high precision sensor fusion GNSS receiver - Interface
  * description", UBX-19056845-R01, ublox AG, 2020-10-28
  *
+ * "ZED-F9T u-blox F9 high accuracy timing module - Integration Manual",
+ * UBX-19005590-R05, ublox AG, 2020-11-18
+ *
  * Eric S. Raymond, "NMEA Revealed", 2.21, http://www.catb.org/gpsd/NMEA.html,
  * 2016-01
  *

@@ -1089,14 +1089,12 @@ hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
      */
 
     case HAZER_TALKER_BEIDOU1:
-        system = HAZER_SYSTEM_BEIDOU;
-        break;
-
     case HAZER_TALKER_BEIDOU2:
         system = HAZER_SYSTEM_BEIDOU;
         break;
 
     case HAZER_TALKER_QZSS:
+    case HAZER_TALKER_QZSS2:
         system = HAZER_SYSTEM_QZSS;
         break;
 
