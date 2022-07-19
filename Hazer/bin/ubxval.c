@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2019-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Converts a number into a UBX-friendly form.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -16,7 +16,7 @@
  *
  * USAGE
  *
- * ubxval [ -1 | -2 | -4 | -8 ] NUMBER
+ * ubxval [ -1 | -2 | -4 | -8 | +1 | +2 | +4 | +8 ] NUMBER
  */
 
 #include <stdio.h>
