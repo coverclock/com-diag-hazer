@@ -27,10 +27,11 @@ exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-# Note: the UBX-CFG-TP5 message is deprecated, but I was unable to get the UBX-CFG-VALSET
-# equivalents to work on the ZED-F9T running FWVER 2.01 PROTVER 29.00. I noticed that the
-# SparkFun u-blox GNSS library for Arduino still uses the UBX-CFG-TP5 message. (I haven't
-# gotten the UBX-CFG-TP5 message to work yet either using Timepulse 0.)
+# Note: the UBX-CFG-TP5 message is deprecated, but I was unable to get the
+# UBX-CFG-VALSET equivalents to work on the ZED-F9T running FWVER 2.01
+# PROTVER 29.00. I noticed that the SparkFun 2.2.11 u-blox GNSS library for
+# Arduino still uses the deprecated UBX-CFG-TP5 message. (I haven't gotten
+# configuring Timepulse 1 (versus 2) working using either mechanism.)
 
 # UBX-MON-VER [0]
 
@@ -38,7 +39,7 @@ exec 2>>${ERRFIL}
 # UBX-CFG-VALSET [12] V0 RAM 0x0000 CFG-TMODE-SVIN_MIN_DUR 300 (@sec = 5min)
 # UBX-CFG-VALSET [12] V0 RAM 0x0000 CFG-TMODE-SVIN_ACC_LIMIT 250 (@0.1mm = 2.5cm = ~1in)
 
-# UBX-CFG-TP5 [32] 1 1 0x0000 0[2] 0[2] 1,000,000[4] 1,000,000[4] 100,000[4] 100,000[4] 0[4] 0x2077[4]
+# UBX-CFG-TP5 [32] 1 1 0x0000 0[2] 0[2] 10[4] 10[4] 5[4] 5[4] 0[4] 0x2077[4]
 
 exec coreable gpstool \
     -H ${OUTFIL} -F 1 -t 10 \
@@ -50,14 +51,14 @@ exec coreable gpstool \
     -A '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20'"$(ubxval -1 1)" \
     -A '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40'"$(ubxval -4 300)" \
     -A '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40'"$(ubxval -4 250)" \
-    -A '\xb5\x62\x06\x31'"$(ubxval -2 32)$(ubxval -1 1)$(ubxval -1 1)"'\x00\x00'"$(ubxval -2 0)$(ubxval -2 0)$(ubxval -4 1000000)$(ubxval -4 1000000)$(ubxval -4 100000)$(ubxval -4 100000)$(ubxval -4 0)$(ubxval -4 0x2077)" \
+    -A '\xb5\x62\x06\x31'"$(ubxval -2 32)$(ubxval -1 1)$(ubxval -1 1)"'\x00\x00'"$(ubxval -2 0)$(ubxval -2 0)$(ubxval -4 10000000)$(ubxval -4 10000000)$(ubxval -4 5)$(ubxval -4 5)$(ubxval -4 0)$(ubxval -4 0x247f)" \
     < /dev/null 1> /dev/null
 
 #####
 
 # UBX-CFG-TP5 [32] 0 1 0x0000 0[2] 0[2] 1,000,000[4] 1,000,000[4] 100,000[4] 100,000[4] 0[4] 0x2477[4]
 
-#    -A '\xb5\x62\x06\x31'"$(ubxval -2 32)$(ubxval -1 0)$(ubxval -1 1)"'\x00\x00'"$(ubxval -2 0)$(ubxval -2 0)$(ubxval -4 1000000)$(ubxval -4 1000000)$(ubxval -4 100000)$(ubxval -4 100000)$(ubxval -4 0)$(ubxval -4 0x2477)" \
+#    -A '\xb5\x62\x06\x31'"$(ubxval -2 32)$(ubxval -1 0)$(ubxval -1 1)"'\x00\x00'"$(ubxval -2 0)$(ubxval -2 0)$(ubxval -4 1000000)$(ubxval -4 1000000)$(ubxval -4 100000)$(ubxval -4 100000)$(ubxval -4 50)$(ubxval -4 0x2477)" \
 
 #####
 
