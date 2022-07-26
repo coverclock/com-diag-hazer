@@ -88,17 +88,17 @@ gpstool \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x20050030)$(ubxval -1 0)" \
     \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40050024)$(ubxval -4 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40500025)$(ubxval -4 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40050025)$(ubxval -4 1)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002a)$(ubxval -D 0.5)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002b)$(ubxval -D 0.5)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x2005000c)$(ubxval -1 1)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x1005000a)$(ubxval -1 1)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x10050009)$(ubxval -1 1)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x1005000b)$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002b)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x10050007)$(ubxval -1 1)" \
     \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40050026)$(ubxval -4 10000000)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x50050027)$(ubxval -4 10000000)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40050027)$(ubxval -4 10000000)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002c)$(ubxval -D 0.5)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002d)$(ubxval -D 0.5)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x20050017)$(ubxval -1 1)" \
