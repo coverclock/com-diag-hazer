@@ -66,7 +66,7 @@ exec 2>>${ERRFIL}
 
 # exit
 
-exec coreable gpstool \
+gpstool \
     -H ${OUTFIL} -F 1 -t 10 \
     -O ${PIDFIL} \
     -N ${FIXFIL} \
@@ -76,32 +76,36 @@ exec coreable gpstool \
     \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  4)"'\x01\x04\x01\x00' \
     \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x01\x00\x03\x20'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00\x10\x00\x03\x40'"$(ubxval -4 300)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00\x11\x00\x03\x40'"$(ubxval -4 250)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x20030001)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40030010)$(ubxval -4 300)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40030011)$(ubxval -4 250)" \
     \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x20\x05\x00\x23'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x20\x05\x00\x30'"$(ubxval -1 0)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  4)"'\x01\x04\x03\x00' \
     \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00\x40\x05\x00\x24'"$(ubxval -4 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00\x40\x50\x00\x25'"$(ubxval -4 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00\x50\x05\x00\x2a'"$(ubxval -D 0.5)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00\x50\x05\x00\x2b'"$(ubxval -D 0.5)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x20\x05\x00\x0c'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x10\x05\x00\x0a'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x10\x05\x00\x09'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x10\x05\x00\x0b'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x50\x05\x00\x2b'"$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  4)"'\x01\x04\x01\x00' \
     \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00\x40\x05\x00\x26'"$(ubxval -4 10000000)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00\x50\x05\x00\x27'"$(ubxval -4 10000000)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00\x50\x05\x00\x2c'"$(ubxval -D 0.5)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00\x50\x05\x00\x2d'"$(ubxval -D 0.5)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x20\x05\x00\x17'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x10\x05\x00\x15'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x10\x05\x00\x14'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x10\x05\x00\x16'"$(ubxval -1 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00\x10\x05\x00\x12'"$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x20050023)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x20050030)$(ubxval -1 0)" \
+    \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40050024)$(ubxval -4 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40500025)$(ubxval -4 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002a)$(ubxval -D 0.5)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002b)$(ubxval -D 0.5)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x2005000c)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x1005000a)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x10050009)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x1005000b)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002b)$(ubxval -1 1)" \
+    \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x40050026)$(ubxval -4 10000000)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)"'\x01\x04\x02\x00'"$(ubxval -4 0x50050027)$(ubxval -4 10000000)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002c)$(ubxval -D 0.5)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)"'\x01\x04\x02\x00'"$(ubxval -4 0x5005002d)$(ubxval -D 0.5)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x20050017)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x10050015)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x10050014)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x10050016)$(ubxval -1 1)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)"'\x01\x04\x02\x00'"$(ubxval -4 0x10050012)$(ubxval -1 1)" \
     \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  4)"'\x01\x04\x03\x00' \
     \
