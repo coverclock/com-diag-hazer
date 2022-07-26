@@ -3,11 +3,10 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the U-blox ZED-UBX-F9T as a high precision
+# Configure and reset the U-blox ZED-UBX-F9T as a high precision
 # time and frequency reference in "survey-in" mode, with TP1
 # emitting a 1PPS, and TP2 emitting a 10MHz square wave. This
 # is part of the "Metronome" sub-project.
-# THIS IS A WORK IN PROGRESS.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
@@ -62,11 +61,11 @@ exec 2>>${ERRFIL}
 
 # UBX-CFG-VALSET [4] V1 Flash Apply 0x00
 
-# UBX-CFG-RST [4] coldstart hardwareshutdownreset
+# UBX-CFG-RST [4] Hotstart ControlledSoftwarereset
 
 # exit
 
-gpstool \
+exec gpstool \
     -H ${OUTFIL} -F 1 -t 10 \
     -O ${PIDFIL} \
     -N ${FIXFIL} \
@@ -109,21 +108,6 @@ gpstool \
     \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  4)"'\x01\x04\x03\x00' \
     \
-    -U '\xb5\x62\x06\x04'"$(ubxval -2 4)"'\xff\xff\x04\x00' \
+    -U '\xb5\x62\x06\x04'"$(ubxval -2 4)$(ubxval -2 0x0000)$(ubxval -1 0x01)"'\x00' \
     -U '' \
     < /dev/null 1> /dev/null
-
-#####
-
-# UBX-CFG-TP5 [32] 1 1 0x0000 0[2] 0[2] 10[4] 10[4] 5[4] 5[4] 0[4] 0x2077[4]
-
-#    -A '\xb5\x62\x06\x31'"$(ubxval -2 32)$(ubxval -1 1)$(ubxval -1 1)"'\x00\x00'"$(ubxval -2 0)$(ubxval -2 0)$(ubxval -4 10000000)$(ubxval -4 10000000)$(ubxval -4 5)$(ubxval -4 5)$(ubxval -4 0)$(ubxval -4 0x247f)" \
-
-#####
-
-# UBX-CFG-TP5 [32] 0 1 0x0000 0[2] 0[2] 1,000,000[4] 1,000,000[4] 100,000[4] 100,000[4] 0[4] 0x2477[4]
-
-#    -A '\xb5\x62\x06\x31'"$(ubxval -2 32)$(ubxval -1 0)$(ubxval -1 1)"'\x00\x00'"$(ubxval -2 0)$(ubxval -2 0)$(ubxval -4 1000000)$(ubxval -4 1000000)$(ubxval -4 100000)$(ubxval -4 100000)$(ubxval -4 50)$(ubxval -4 0x2477)" \
-
-#####
-
