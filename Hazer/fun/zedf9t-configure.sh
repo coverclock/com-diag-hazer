@@ -26,8 +26,6 @@ exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-# UBX-MON-VER [0]
-
 # UBX-CFG-VALSET [4] V1 RAM Start 0x00
 
 # UBX-CFG-VALSET [9] V1 RAM Continue 0x00 CFG-TMODE-MODE SURVEY_IN
@@ -59,10 +57,6 @@ exec 2>>${ERRFIL}
 
 # UBX-CFG-VALSET [4] V1 RAM Apply 0x00
 
-# UBX-NAV-HPPOSLLH 0x01 0x14
-
-# UBX-CFG-RST [4] Hotstart ControlledSoftwarereset
-
 # exit
 
 exec gpstool \
@@ -70,8 +64,6 @@ exec gpstool \
     -O ${PIDFIL} \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -x \
-    -U '\xb5\x62\x0a\x04\x00\x00' \
-    \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  4)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 1)"'\x00' \
     \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x20030001)$(ubxval -1 1)" \
@@ -107,5 +99,5 @@ exec gpstool \
     \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  4)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 3)"'\x00' \
     \
-    -U '\xb5\x62\x06\x04'"$(ubxval -2 4)$(ubxval -2 0x0000)$(ubxval -1 0x01)"'\x00' \
+    -U '' \
     < /dev/null 1> /dev/null
