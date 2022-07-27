@@ -797,8 +797,17 @@ ublox, 6cc4473, 2018-12-20
 u-blox 9, "ZED-F9P Integration Manual", UBX-18010802-R03,
 ublox, 2018-12-20
 
-ublox 9, "ZED-F9T u-blox F9 high accuracy timing module -
-Integration Manual", UBX-19005590-R05, 2020-11-18
+u-blox 9, "ZED-F9T series Product Summary", UBX-18011626-R06,
+ublox, 2022
+
+u-blox 9, "ZED-F9T Data Sheet", UBX-18053713-R07,
+2022-01-04
+
+u-blox 9, "u-blox ZED-F9T Interface Description", UBX-18053584-R02,
+ublox, 2019-06-13
+
+u-blox 9, "ZED-F9T Integration Manual", UBX-19005590-R05,
+2020-11-18
 
 # Tools
 
