@@ -10,7 +10,7 @@
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
-PROGRAM=$(basename ${0})
+PROGRAM=$(basename ${0%-*})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-38400}
 ERRFIL=${3-"${SAVDIR}/${PROGRAM}.err"}

@@ -3,7 +3,8 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Run the U-blox ZED-UBX-F9T. This is part of the "Metronome" sub-project.
+# Run the U-blox ZED-UBX-F9T.
+# This is part of the "Metronome" sub-project.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
