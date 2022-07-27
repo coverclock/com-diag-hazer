@@ -109,7 +109,3 @@ exec gpstool \
     \
     -U '\xb5\x62\x06\x04'"$(ubxval -2 4)$(ubxval -2 0x0000)$(ubxval -1 0x01)"'\x00' \
     < /dev/null 1> /dev/null
-
-# UBX-CFG-CFG clearall (Flash+BBR)
-#    -A '\xb5\x62\x06\x09\x0c\x00\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00' \
-#    -U '' \
