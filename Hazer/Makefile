@@ -809,32 +809,23 @@ $(SSL_OUT)/%.pwd:	$(SSL_DIR)/%.cnf
 	grep output_password $< | sed -e 's/^.*=[ \t]*//' -e 's/#.*$$//' > $@
 	chmod 600 $@
 
-$(SSL_OUT)/producer.key:
+$(SSL_OUT)/%.pem:	$(SSL_OUT)/%.key $(SSL_OUT)/%.crt
+	cat $^ > $@
+	chmod 600 $@
+
+$(SSL_OUT)/%.key:
 	D=`dirname $@`; mkdir -p $$D
 	$(OPENSSL) genrsa -out $@ $(SSL_LEN)
 	chmod 600 $@
 
-$(SSL_OUT)/producer.crt:	$(SSL_OUT)/producer.key $(SSL_DIR)/producer.cnf
-	$(OPENSSL) req -config $(SSL_DIR)/producer.cnf -new -key $< -x509 -days $(SSL_EXP) -out $@
+$(SSL_OUT)/rover.crt:	$(SSL_OUT)/rover.key $(SSL_DIR)/rover.cnf
+	$(OPENSSL) req -config $(SSL_DIR)/rover.cnf -new -key $< -x509 -days $(SSL_EXP) -out $@
 	chmod 600 $@
 
-$(SSL_OUT)/producer.pem:	$(SSL_OUT)/producer.key $(SSL_OUT)/producer.crt
-	cat $^ > $@
-	chmod 600 $@
-
-$(SSL_OUT)/consumer.key:
-	D=`dirname $@`; mkdir -p $$D
-	$(OPENSSL) genrsa -out $@ $(SSL_LEN)
-	chmod 600 $@
-
-$(SSL_OUT)/consumer.crt:	$(SSL_OUT)/consumer.key $(SSL_DIR)/consumer.cnf
-	$(OPENSSL) req -config $(SSL_DIR)/consumer.cnf -new -key $< -x509 -days $(SSL_EXP) -out $@
-	chmod 600 $@
-
-$(SSL_OUT)/consumer.pem:	$(SSL_OUT)/consumer.key $(SSL_OUT)/consumer.crt
-	cat $^ > $@
+$(SSL_OUT)/base.crt:	$(SSL_OUT)/base.key $(SSL_DIR)/base.cnf
+	$(OPENSSL) req -config $(SSL_DIR)/base.cnf -new -key $< -x509 -days $(SSL_EXP) -out $@
 	chmod 600 $@
 
 .PHONY:	stagecoach
 
-stagecoach:	$(SSL_OUT)/producer.pem $(SSL_OUT)/consumer.pem
+stagecoach:	$(SSL_OUT)/rover.pem $(SSL_OUT)/base.pem
