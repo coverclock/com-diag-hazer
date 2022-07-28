@@ -207,6 +207,13 @@ You have to initialize LFS once per machine for every repo it is used in.
 You can also safely skip installing LFS, and ignore the large data files, to
 use this repo.
 
+## Secure Socket Layer
+
+The optional scripts that provide an authenticated and encrypted tunnel
+through which datagrams can be forwarded require OpenSSL.
+
+     sudo apt-get install openssl libssl-dev libssl-doc
+
 ## geodesic
 
 The geodesic application is based on algorithms described in
