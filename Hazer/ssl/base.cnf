@@ -17,7 +17,7 @@ ST                     = Colorado
 L                      = Wheat Ridge
 O                      = Prairie Thorn
 OU                     = Stagecoach
-CN                     = consumer.prairiethorn.org
+CN                     = base.prairiethorn.org
 emailAddress           = stagecoach@prairiethorn.org
 
 [ usr_cert ]

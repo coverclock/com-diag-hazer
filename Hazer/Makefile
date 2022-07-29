@@ -804,6 +804,10 @@ SSL_OUT			:=	$(OUT)/$(SSL_DIR)
 SSL_EXP			:=	365
 SSL_LEN			:=	3072
 
+$(SSL_OUT)/%.txt:	$(SSL_OUT)/%.pem
+	$(OPENSSL) x509 -text -noout -in $< > $@
+	chmod 600 $@
+
 $(SSL_OUT)/%.pwd:	$(SSL_DIR)/%.cnf
 	D=`dirname $@`; mkdir -p $$D
 	grep output_password $< | sed -e 's/^.*=[ \t]*//' -e 's/#.*$$//' > $@
@@ -828,4 +832,10 @@ $(SSL_OUT)/base.crt:	$(SSL_OUT)/base.key $(SSL_DIR)/base.cnf
 
 .PHONY:	stagecoach
 
-stagecoach:	$(SSL_OUT)/rover.pem $(SSL_OUT)/base.pem
+ROVER_FILES	:=	$(SSL_OUT)/rover.pem $(SSL_OUT)/rover.pwd $(SSL_OUT)/rover.txt
+BASE_FILES	:=	$(SSL_OUT)/base.pem $(SSL_OUT)/base.pwd $(SSL_OUT)/base.txt
+
+stagecoach:	$(ROVER_FILES) $(BASE_FILES)
+
+stagecoach-clean:
+	rm -fr $(SSL_OUT)

@@ -6,6 +6,7 @@
 
 [ req ]
 prompt                 = no
+output_password        = 5t863c08ch
 default_bits           = 3072
 default_md             = sha256
 distinguished_name     = req_distinguished_name
@@ -16,7 +17,7 @@ ST                     = Colorado
 L                      = Wheat Ridge
 O                      = Prairie Thorn
 OU                     = Stagecoach
-CN                     = producer.prairiethorn.org
+CN                     = rover.prairiethorn.org
 emailAddress           = stagecoach@prairiethorn.org
 
 [ usr_cert ]
