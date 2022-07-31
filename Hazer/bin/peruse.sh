@@ -51,7 +51,7 @@ if SIZE=$(stty size 2> /dev/null); then
   SIZE=$(echo ${SIZE} | cut -d ' ' -f 1)
   SIZE=$((${SIZE} - 2))
 else
-  SIZE=24
+  SIZE=25
   SIZE=$((${SIZE} - 1))
 fi
 
