@@ -207,6 +207,13 @@ You have to initialize LFS once per machine for every repo it is used in.
 You can also safely skip installing LFS, and ignore the large data files, to
 use this repo.
 
+## Secure Socket Layer
+
+The optional scripts that provide an authenticated and encrypted tunnel
+through which datagrams can be forwarded require OpenSSL.
+
+     sudo apt-get install openssl libssl-dev libssl-doc
+
 ## geodesic
 
 The geodesic application is based on algorithms described in
@@ -347,7 +354,7 @@ constellations and systems.
 These talkers have been observed in the wild coming from actual GPS receivers.
 
 * GA - Galileo (as in Galileo Galilei) - EU
-* GB - BeiDou 2 (as in The Big Dipper) a.k.a. COMPASS - China
+* GB - BeiDou (as in The Big Dipper) a.k.a. COMPASS - China
 * GL - Globalnaya Navigazionnaya Sputnikovaya Sistema (GLONASS) - Russia
 * GN - Global Navigation Satellite System (GNSS) - Generic
 * GP - Global Positioning System (GPS) a.k.a. Navstar GPS - USA
@@ -356,6 +363,7 @@ Support for these talkers has been unit tested but the talkers have never been
 observed in the wild.
 
 * BD - BeiDou (as in The Big Dipper) - China
+* GQ - Quasi-Zenith Satellite System (QZSS) - Japan
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
 
 # Identifiers
@@ -387,7 +395,7 @@ never been exercised using actual GPS receivers.
 
 # Devices
 
-Hazer has been successfully tested with the following GPS chipsets.
+I have successfully tested Hazer with the following GPS chipsets.
 
 * MediaTek MTK3339    
 * Quectel L80-R    
@@ -399,8 +407,7 @@ Hazer has been successfully tested with the following GPS chipsets.
 * U-Blox 8    
 * U-Blox 9
 
-Hazer has been successfully tested with the following serial-to-USB chipsets
-used by GPS devices.
+I have successfully tested Hazer with the following serial-to-USB chipsets.
 
 * Cygnal Integrated Products    
 * FTDI    
@@ -408,7 +415,7 @@ used by GPS devices.
 * Silicon Labs CP2104    
 * U-Blox (apparently integrated into the GPS chip itself)    
 
-Hazer has been successfully tested with the following GPS devices.
+I have successfully tested Hazer with the following GPS devices.
 
 * Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [12]    
 * Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
@@ -430,12 +437,13 @@ Hazer has been successfully tested with the following GPS devices.
 * Pharos GPS-500 (SiRF Star III+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
 * RaceDayQuads RDQ Micro M8N (U-Blox 8/UBX-NEO-M8N, 9600 8n1, N/A, ttyS, 1Hz) [4] [8] [14]    
 * Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]    
-* SparkFun Dead Reckoning gen 8 (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [11]    
-* SparkFun Dead Reckoning gen 9 (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]    
 * SparkFun GPS-RTK2 (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
 * SparkFun NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [6] [8] [10]    
+* SparkFun NEO-M8U (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [11]    
 * SparkFun SAM-M8Q (U-Blox 8/UBX-SAM-M8Q, 9600 8n1, N/A, ttyS, 1Hz) [4] [6] [8] [14]    
 * SparkFun SARA-R5 (U-Blox 8/M8030/UBX-R5, autobaud, v1a86p7523, ttyUSB, 1Hz) [17] [18] [19]
+* SparkFun ZED-F9R (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]    
+* SparkFun ZED-F9T (U-Blox 9/UBX-ZED-F9T, 38400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [20]   
 * Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * TOPGNSS GN-803G (U-Blox 8/UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
 * Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8N1, N/A, ttyS, 1Hz) [4]    
@@ -461,6 +469,7 @@ Footnotes:
 [17] This SparkFun board requires opening (cutting) and closing (soldering) traces for dual UART operation.    
 [18] This U-Blox gen 8 receiver is embedded in a U-Blox LTE-M module which required a lot of config via AT commands.    
 [19] 1PPS (a.k.a. TPS in the docs) only has a pulse width of a few microseconds hence LED inoperative (bug).    
+[20] Timing and frequency reference claimed +/- 5ns.
 
 Notes:
 
@@ -792,8 +801,20 @@ v15-20.30.22-23.01, UBX-13003221-R15, ublox, 26415b7, 2018-03-06
 u-blox 9, "ZED-F9P Interface Description", UBX-18010854-R05,
 ublox, 6cc4473, 2018-12-20
 
-u-blox 9 integration, "ZED-F9P Integration Manual", UBX-18010802-R03,
+u-blox 9, "ZED-F9P Integration Manual", UBX-18010802-R03,
 ublox, 2018-12-20
+
+u-blox 9, "ZED-F9T series Product Summary", UBX-18011626-R06,
+ublox, 2022
+
+u-blox 9, "ZED-F9T Data Sheet", UBX-18053713-R07,
+2022-01-04
+
+u-blox 9, "u-blox ZED-F9T Interface Description", UBX-18053584-R02,
+ublox, 2019-06-13
+
+u-blox 9, "ZED-F9T Integration Manual", UBX-19005590-R05,
+2020-11-18
 
 # Tools
 
@@ -959,6 +980,8 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 <https://www.celestis.com/resources/faq/what-are-the-azimuth-and-elevation-of-a-satellite/>
 
 <https://ciechanow.ski/gps/>
+
+<https://learn.sparkfun.com/tutorials/how-to-upgrade-firmware-of-a-u-blox-gnss-receiver/all>
 
 # Soundtrack
 

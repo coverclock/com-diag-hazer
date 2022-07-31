@@ -50,6 +50,15 @@
  * "u-blox ZED-F9P Interface Description*, UBX-18010854-R05, ublox AG,
  * 2018-12-20
  *
+ * "u-blox ZED-F9R module Product summary", UBX-19048775-R04, ublox AG,
+ * 2020
+ *
+ * "u-blox F9 high precision sensor fusion GNSS receiver - Interface
+ * description", UBX-19056845-R01, ublox AG, 2020-10-28
+ *
+ * "ZED-F9T u-blox F9 high accuracy timing module - Integration Manual",
+ * UBX-19005590-R05, ublox AG, 2020-11-18
+ *
  * Eric S. Raymond, "NMEA Revealed", 2.21, http://www.catb.org/gpsd/NMEA.html,
  * 2016-01
  *
@@ -225,22 +234,23 @@ typedef enum HazerAction {
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerTalker {
-    HAZER_TALKER_BEIDOU2			= 0,
-    HAZER_TALKER_DSC,
-    HAZER_TALKER_ECDIS,
-    HAZER_TALKER_GALILEO,
-    HAZER_TALKER_BEIDOU1,
-    HAZER_TALKER_GLONASS,
-    HAZER_TALKER_GNSS,
-    HAZER_TALKER_GPS,
-    HAZER_TALKER_INSTRUMENTATION,
-    HAZER_TALKER_NAVIGATION,
-    HAZER_TALKER_LORANC,
-    HAZER_TALKER_PMTK,
-    HAZER_TALKER_PSRF,
-    HAZER_TALKER_PUBX,
-    HAZER_TALKER_QZSS,
-    HAZER_TALKER_RADIO,
+    HAZER_TALKER_BEIDOU2			= 0,    /* BD */
+    HAZER_TALKER_DSC,                       /* CD */
+    HAZER_TALKER_ECDIS,                     /* EC */
+    HAZER_TALKER_GALILEO,                   /* GA */
+    HAZER_TALKER_BEIDOU1,                   /* GB */
+    HAZER_TALKER_GLONASS,                   /* GL */
+    HAZER_TALKER_GNSS,                      /* GN */
+    HAZER_TALKER_GPS,                       /* GP */
+    HAZER_TALKER_QZSS2,                     /* GQ */
+    HAZER_TALKER_INSTRUMENTATION,           /* II */
+    HAZER_TALKER_NAVIGATION,                /* IN */
+    HAZER_TALKER_LORANC,                    /* LC */
+    HAZER_TALKER_PMTK,                      /* PMTK */
+    HAZER_TALKER_PSRF,                      /* PSRF */
+    HAZER_TALKER_PUBX,                      /* PUBX */
+    HAZER_TALKER_QZSS,                      /* QZ */
+    HAZER_TALKER_RADIO,                     /* ZV */
     HAZER_TALKER_TOTAL,
 } hazer_talker_t;
 
@@ -260,6 +270,7 @@ typedef enum HazerTalker {
     "GL", \
     "GN", \
     "GP", \
+    "GQ", \
     "II", \
     "IN", \
     "LC", \
@@ -281,14 +292,14 @@ extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerSystem {
-    HAZER_SYSTEM_GNSS		    = 0,
-    HAZER_SYSTEM_GPS,
-    HAZER_SYSTEM_GLONASS,
-    HAZER_SYSTEM_GALILEO,
-    HAZER_SYSTEM_BEIDOU,
-    HAZER_SYSTEM_SBAS,
-    HAZER_SYSTEM_IMES,
-    HAZER_SYSTEM_QZSS,
+    HAZER_SYSTEM_GNSS		    = 0,        /* GNSS */
+    HAZER_SYSTEM_GPS,                       /* NAVSTAR */
+    HAZER_SYSTEM_GLONASS,                   /* GLONASS */
+    HAZER_SYSTEM_GALILEO,                   /* GALILEO */
+    HAZER_SYSTEM_BEIDOU,                    /* COMPASS */
+    HAZER_SYSTEM_SBAS,                      /* SBAS */
+    HAZER_SYSTEM_IMES,                      /* IMES */
+    HAZER_SYSTEM_QZSS,                      /* QZSS */
     HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 

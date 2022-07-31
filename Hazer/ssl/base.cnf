@@ -1,0 +1,28 @@
+# Copyright 2022 Digital Aggregates Corporation, Colorado, USA.
+# Licensed under the terms in LICENSE.txt
+# Chip Overclock (mailto:coverclock@diag.com)
+# https://github.com/coverclock/com-diag-hazer
+# In support of the Stagecoach sub-project in com-diag-hazer.
+
+[ req ]
+prompt                 = no
+output_password        = 5t863c08ch
+default_bits           = 3072
+default_md             = sha256
+distinguished_name     = req_distinguished_name
+
+[ req_distinguished_name ]
+C                      = US
+ST                     = Colorado
+L                      = Wheat Ridge
+O                      = Prairie Thorn
+OU                     = Stagecoach
+CN                     = consumer.prairiethorn.org
+emailAddress           = stagecoach@prairiethorn.org
+
+[ usr_cert ]
+basicConstraints       = CA:FALSE
+nsComment              = "OpenSSL Generated Certificate"
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid,issuer
+subjectAltName         = DNS:localhost

@@ -1089,14 +1089,12 @@ hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
      */
 
     case HAZER_TALKER_BEIDOU1:
-        system = HAZER_SYSTEM_BEIDOU;
-        break;
-
     case HAZER_TALKER_BEIDOU2:
         system = HAZER_SYSTEM_BEIDOU;
         break;
 
     case HAZER_TALKER_QZSS:
+    case HAZER_TALKER_QZSS2:
         system = HAZER_SYSTEM_QZSS;
         break;
 
@@ -1680,6 +1678,12 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             break;
         }
 
+        /*
+         * These fields are in decimal even though they may have a
+         * leading zero (which in C/C++ conventions would make them
+         * octal).
+         */
+
         sequence = message - 1;
         channel = sequence * HAZER_GNSS_VIEWS;
         first = channel;
@@ -1699,7 +1703,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          */
 
         for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
-
+        
             if (channel >= satellites) {
                 break;
             }
@@ -1710,15 +1714,38 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 
             /*
              * I'm pretty sure my U-Blox ZED-F9P-00B-01 chip has a
-             * firmware bug.  I believe this GSV sentence that it
+             * firmware bug. I believe this GSV sentence that it
              * sent is incorrect.
              *
-             * $GLGSV,3,3,11,85,26,103,25,86,02,152,29,1*75\r\n.
+             * $GLGSV,3,3,11,85,26,103,25,86,02,152,29,1*75\r\n
              *
              * I think either there should be a third set of four
              * fields for the eleventh satellite, or the total count
              * should be ten instead of eleven. So we check for that
              * here.
+             *
+             * We don't emit an error message because it happens all
+             * time time; we'd flood the log file.
+             */
+
+            
+            /*
+             * I'm pretty sure my U-Blox ZED-F9R-00B-00 chip has a
+             * firmware bug. I believe thesze two successive GSV sentencest
+             * that it send are probably incorrect.
+             *
+             * $GBGSV,1,1,04,23,15,154,34,27,57,250,33,28,65,039,36,37,61,186,44,1*7A\r\n
+             * $GBGSV,1,1,02,14,03,072,,30,07,241,,0*75\r\n
+             *
+             * Note that they both identify as messages 1 of 1, instead of
+             * messages 1 of 2 and 2 of 2. While this is possible, it seems
+             * unlikely. Because the second message appears to override the
+             * first message, the satellites in the first message do not
+             * appear in the Hazer SAT output, even though they are in the
+             * GSA message and hence in the Hazer ACT output.
+             *
+             * So far I have only noticed this in the NMEA sentences for
+             * the Chinese Beidou (GB) constellation.
              */
 
             if ((index + 4) >= count) {
