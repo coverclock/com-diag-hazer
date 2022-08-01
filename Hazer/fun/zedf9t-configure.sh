@@ -10,16 +10,15 @@
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
-PROGRAM=$(basename ${0%-*})
+PROGRAM=$(basename ${0})
+FILNAM=$(basename ${0%-*})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-38400}
-ERRFIL=${3-"${SAVDIR}/${PROGRAM}.err"}
-OUTFIL=${4-"${SAVDIR}/${PROGRAM}.out"}
-PIDFIL=${5-"${SAVDIR}/${PROGRAM}.pid"}
+ERRFIL=${3-"${SAVDIR}/${FILNAM}.err"}
+OUTFIL=${4-"${SAVDIR}/${FILNAM}.out"}
 
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
-mkdir -p $(dirname ${PIDFIL})
 
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
@@ -61,7 +60,6 @@ exec 2>>${ERRFIL}
 
 exec gpstool \
     -H ${OUTFIL} -F 1 -t 10 \
-    -O ${PIDFIL} \
     -D ${DEVICE} -b ${RATE} -8 -n -1 \
     -x \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  4)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 1)"'\x00' \
@@ -79,8 +77,8 @@ exec gpstool \
     \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x40050024)$(ubxval -4 1)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x40050025)$(ubxval -4 1)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x5005002a)$(ubxval -D 0.5)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x5005002b)$(ubxval -D 0.5)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x5005002a)$(ubxval -D 10.0)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x5005002b)$(ubxval -D 10.0)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x2005000c)$(ubxval -1 1)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x1005000a)$(ubxval -1 1)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x10050009)$(ubxval -1 1)" \
@@ -89,8 +87,8 @@ exec gpstool \
     \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x40050026)$(ubxval -4 10000000)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2 12)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x40050027)$(ubxval -4 10000000)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x5005002c)$(ubxval -D 0.5)" \
-    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x5005002d)$(ubxval -D 0.5)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x5005002c)$(ubxval -D 50.0)" \
+    -A '\xb5\x62\x06\x8a'"$(ubxval -2 16)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x5005002d)$(ubxval -D 50.0)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x20050017)$(ubxval -1 1)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x10050015)$(ubxval -1 1)" \
     -A '\xb5\x62\x06\x8a'"$(ubxval -2  9)$(ubxval -1 1)$(ubxval -1 0x01)$(ubxval -1 2)"'\x00'"$(ubxval -4 0x10050014)$(ubxval -1 1)" \
