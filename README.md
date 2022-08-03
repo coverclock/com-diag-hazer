@@ -1211,6 +1211,10 @@ throw an assert and core dump.
 * xbee3 - tracker using a serial-attached Digi XBEE 3 LTE-M radio.
 * xbee3shutdown - shuts down Digi XBEE 3 LTE-M radio (recommended before powering off).
 
+## Precision Time and Frequency Reference (Metronome)
+
+* reference - configures the ZED-F9T to emit 1PPS (TP1) and 10MHz (TP2).
+
 ## Output Control
 
 * checkpoint - move the out/TARGET/tmp directory to a timestamped name.
@@ -1276,6 +1280,8 @@ throw an assert and core dump.
 * ubxrestoredefaults - sends UBX message to restore defaults to U-blox battery backed RAM (BBRAM).
 * uputronics - exercises the Uputronics GPS board for the Rasperry Pi.
 * zedf9r - exercise UBX-ZED-F9R device.
+* zedf9t - exercise UBX-ZED-F9R device.
+* zedf9t-configure - configure UBX-ZED-F9R device.
 
 # Environmental Variables
 
