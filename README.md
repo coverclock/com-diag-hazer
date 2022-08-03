@@ -570,7 +570,7 @@ data to be logged.)
 * EINVAL - invalid character in a field e.g. alpha in a numeric field.
 * EIO - error in the end matter e.g. checksum or cyclic redundancy check (CRC).
 * ENODATA - below minimum length or number of fields.
-* ENOMSG - error in the begin matter e.g. no discernable identifiers.
+* ENOMSG - error in the start matter e.g. no discernable identifiers.
 * ERANGE - time, latitude, longitude, etc. value out of range.
 
 Each Hazer library function that parses NMEA sentences (hazer), UBX packets
