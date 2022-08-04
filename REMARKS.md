@@ -799,7 +799,7 @@ the gpstool "TIM" (time) output line.
 
 ## Time Dilation
 
-Due to the centripedal acceleration in their orbits, the atomic clocks
+Due to the centripetal acceleration in their orbits, the atomic clocks
 in the GPS satellites run slower than atomic clocks on the ground,
 losing 7us per day (Special Relativity).
 
