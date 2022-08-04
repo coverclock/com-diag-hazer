@@ -14,8 +14,8 @@ PROGRAM=$(basename ${0})
 FILNAM=$(basename ${0%-*})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-38400}
-ERRFIL=${3-"${SAVDIR}/${FILNAM}.err"}
-OUTFIL=${4-"${SAVDIR}/${FILNAM}.out"}
+ERRFIL=${3:-"${SAVDIR}/${FILNAM}.err"}
+OUTFIL=${4:-"${SAVDIR}/${FILNAM}.out"}
 
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
