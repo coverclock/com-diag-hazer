@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Datagram API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -14,7 +14,19 @@
 
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
+#include "com/diag/diminuto/diminuto_ipc.h"
 #include "types.h"
+
+/**
+ * Choose a protocol, IPV4 or IPV6, based on the contents of the endpoint,
+ * and an expressed preference in the event that both address types are
+ * available. This implements business logic specific to gpstool; your
+ * mileage may vary.
+ * @param ep points to a populated endpoint structure.
+ * @param preference is the protocol preference.
+ * @return a protocol enumeration.
+ */
+extern protocol_t choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol_t preference);
 
 /**
  * Log connection information.

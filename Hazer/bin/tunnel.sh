@@ -7,33 +7,42 @@
 
 SSLDIR=${COM_DIAG_HAZER_SSLDIR:-$(readlink -e $(dirname ${0})/..)/ssl}
 
+# endpoint "localhost:tumbleweed" type IPV4 ipv4 127.0.0.1 ipv6 ::1 tcp 0 udp 21010 local ""
+#        1                      2    3    4    5         6    7   8   910  11    12    13 14
+
 PROGRAM=$(basename ${0})
 ROLE=${1:-""}
 if [[ "${ROLE}" == "rover" ]]; then
-	SOURCE=${2:-"21010"}
-	HOST=${3:-"localhost"}
-	SINK=${4:-"24040"}
+	SOURCE=${2:-"tumbleweed"}
+	DGMHOST=$(endpoint "localhost:${SOURCE}" | cut -d ' ' -f 6)
+	DGMPORT=$(endpoint "localhost:${SOURCE}" | cut -d ' ' -f 12)
+	SINK=${3:-"localhost:stagecoach"}
+	SSLHOST=$(endpoint "${SINK}" | cut -d ' ' -f 6)
+	SSLPORT=$(endpoint "${SINK}" | cut -d ' ' -f 12)
+	COMMON=${4:-"localhost"}
 	PEMFIL=${5:-"${SSLDIR}/rover.pem"}
 	CRTFIL=${6:-"${SSLDIR}/base.crt"}
-	COMMON=${7:-"base.prairiethorn.org"}
 elif [[ "${ROLE}" == "base" ]]; then
-	HOST=${2:-"localhost"}
-	SOURCE=${3:-"24040"}
-	SINK=${4:-"21011"}
+	SOURCE=${2:-"stagecoach"}
+	SSLHOST=$(endpoint "localhost:${SINK}" | cut -d ' ' -f 6)
+	SSLPORT=$(endpoint "localhost:${SINK}" | cut -d ' ' -f 12)
+	SINK=${3:-"tumbleweed"}
+	DGMHOST=$(endpoint "localhost:${SINK}" | cut -d ' ' -f 6)
+	DGMPORT=$(endpoint "localhost:${SINK}" | cut -d ' ' -f 12)
+	COMMON=${4:-"localhost"}
 	PEMFIL=${5:-"${SSLDIR}/base.pem"}
 	CRTFIL=${6:-"${SSLDIR}/rover.crt"}
-	COMMON=${7:-"rover.prairiethorn.org"}
 else
 	echo ${PROGRAM}: ${ROLE}? 1>&2
 	exit 1
 fi
 
 if [[ "${ROLE}" == "rover" ]]; then
-	COMMAND="socat UDP-DATAGRAM:localhost:${SOURCE} openssl-connect:${HOST}:${SINK},openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL}"
+	COMMAND="socat UDP4-RECV:${DGMPORT} openssl-connect:${SSLHOST}:${SSLPORT},openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL}"
 	echo ${PROGRAM}: ${COMMAND} 1>&2
 	${COMMAND}
 elif [[ "${ROLE}" == "base" ]]; then
-	COMMAND="socat openssl-listen:${SOURCE},reuseaddr,fork,openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL},verify=1 UDP-DATAGRAM:${HOST}:${SINK}"
+	COMMAND="socat openssl-listen:${SSLPORT},reuseaddr,fork,openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL},verify=1 - | gpstool -S - -G localhost:${DGMPORT} -g 0x7"
 	echo ${PROGRAM}: ${COMMAND} 1>&2
 	${COMMAND}
 else

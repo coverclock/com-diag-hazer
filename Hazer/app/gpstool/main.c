@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2021 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This implements the gpstool main program.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -195,6 +195,7 @@ int main(int argc, char * argv[])
     seconds_t frequency = 1;
     seconds_t postpone = 0;
     seconds_t bypass = -1;
+    protocol_t preference = PROTOCOL;
     /*
      * Configuration command variables.
      */
@@ -395,6 +396,7 @@ int main(int argc, char * argv[])
     hazer_active_t active_cache = HAZER_ACTIVE_INITIALIZER;
     int time_valid = 0;
     int time_valid_prior = 0;
+    protocol_t protocol = PROTOCOL;
     /*
      * Counters.
      */
@@ -418,7 +420,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "1278A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:vxw:y:z?";
+    static const char OPTIONS[] = "124678A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:vxw:y:z?";
     /*
      * ANSI escape sequences
      */
@@ -454,9 +456,13 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             stopbits = 2;
             break;
-        case '7':
+        case '4':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
-            databits = 7;
+            preference = IPV4;
+            break;
+        case '6':
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
+            preference = IPV6;
             break;
         case '8':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
@@ -775,66 +781,69 @@ int main(int argc, char * argv[])
                             "               [ -N FILE ]\n"
                             "               [ -K [ -k MASK ] ]\n"
                             "               [ -A STRING ... ] [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ] [ -x ]\n"
-                            "               [ -G :PORT | -G IP:PORT [ -g MASK ] ]\n"
-                            "               [ -Y :PORT | -Y IP:PORT [ -y SECONDS ] ]\n"
+                            "               [ -4 | -6 ]\n"
+                            "               [ -G :PORT | -G HOST:PORT [ -g MASK ] ]\n"
+                            "               [ -Y :PORT | -Y HOST:PORT [ -y SECONDS ] ]\n"
                             "               [ -I PIN | -c ] [ -p PIN ]\n"
                             "               [ -M ] [ -X MASK ] [ -V ]\n"
                             , Program);
-            fprintf(stderr, "       -1          Use one stop bit for DEVICE.\n");
-            fprintf(stderr, "       -2          Use two stop bits for DEVICE.\n");
-            fprintf(stderr, "       -7          Use seven data bits for DEVICE.\n");
-            fprintf(stderr, "       -8          Use eight data bits for DEVICE.\n");
-            fprintf(stderr, "       -A STRING   Collapse STRING, append Ubx end matter, write to DEVICE, expect ACK/NAK.\n");
-            fprintf(stderr, "       -A ''       Exit when this empty STRING is processed.\n");
-            fprintf(stderr, "       -B BYTES    Set the input Buffer size to BYTES bytes.\n");
-            fprintf(stderr, "       -C FILE     Catenate input to FILE or named pipe.\n");
-            fprintf(stderr, "       -D DEVICE   Use DEVICE for input or output.\n");
-            fprintf(stderr, "       -E          Like -R but use ANSI Escape sequences.\n");
-            fprintf(stderr, "       -F SECONDS  Update report no more than every SECONDS seconds, 0 always, <0 never.\n");
-            fprintf(stderr, "       -G IP:PORT  Use remote IP and PORT as dataGram sink.\n");
-            fprintf(stderr, "       -G :PORT    Use local PORT as dataGram source.\n");
-            fprintf(stderr, "       -H HEADLESS Like -R but writes each iteration to HEADLESS file.\n");
-            fprintf(stderr, "       -I PIN      Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).\n");
-            fprintf(stderr, "       -K          Write input to DEVICE sinK from datagram source.\n");
-            fprintf(stderr, "       -L FILE     Write pretty-printed input to FILE file.\n");
-            fprintf(stderr, "       -M          Run in the background as a daeMon.\n");
-            fprintf(stderr, "       -N FILE     Use fix FILE to save ARP LLH for subsequeNt fixed mode.\n");
-            fprintf(stderr, "       -O FILE     Save process identifier in FILE.\n");
-            fprintf(stderr, "       -P          Process incoming data even if no report is being generated.\n");
-            fprintf(stderr, "       -R          Print a Report on standard output.\n");
-            fprintf(stderr, "       -S FILE     Use source FILE or named pipe for input.\n");
-            fprintf(stderr, "       -T FILE     Save the PVT CSV Trace to FILE.\n");
-            fprintf(stderr, "       -U STRING   Collapse STRING, append Ubx end matter, write to DEVICE.\n");
-            fprintf(stderr, "       -U ''       Exit when this empty STRING is processed.\n");
-            fprintf(stderr, "       -V          Log Version in the form of release, vintage, and revision.\n");
-            fprintf(stderr, "       -W STRING   Collapse STRING, append NMEA end matter, Write to DEVICE.\n");
-            fprintf(stderr, "       -W ''       Exit when this empty STRING is processed.\n");
-            fprintf(stderr, "       -X MASK     Enable special test modes via MASK.\n");
-            fprintf(stderr, "       -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.\n");
-            fprintf(stderr, "       -Y :PORT    Use local PORT as surveYor source.\n");
-            fprintf(stderr, "       -Z STRING   Collapse STRING, write to DEVICE.\n");
-            fprintf(stderr, "       -Z ''       Exit when this empty STRING is processed.\n");
-            fprintf(stderr, "       -b BPS      Use BPS bits per second for DEVICE.\n");
-            fprintf(stderr, "       -c          Take 1PPS from DCD (requires -D and implies -m).\n");
-            fprintf(stderr, "       -d          Display Debug output on standard error.\n");
-            fprintf(stderr, "       -e          Use Even parity for DEVICE.\n");
-            fprintf(stderr, "       -f SECONDS  Set trace Frequency to 1/SECONDS.\n");
-            fprintf(stderr, "       -g MASK     Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
-            fprintf(stderr, "       -h          Use RTS/CTS Hardware flow control for DEVICE.\n");
-            fprintf(stderr, "       -i SECONDS  Bypass input check every SECONDS seconds, 0 always, <0 never.\n");
-            fprintf(stderr, "       -k MASK     Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
-            fprintf(stderr, "       -l          Use Local control for DEVICE.\n");
-            fprintf(stderr, "       -m          Use Modem control for DEVICE.\n");
-            fprintf(stderr, "       -n          Use No parity for DEVICE.\n");
-            fprintf(stderr, "       -o          Use Odd parity for DEVICE.\n");
-            fprintf(stderr, "       -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).\n");
-            fprintf(stderr, "       -s          Use XON/XOFF (control-Q/control-S) for DEVICE.\n");
-            fprintf(stderr, "       -t SECONDS  Timeout GNSS data after SECONDS seconds [0..255].\n");
-            fprintf(stderr, "       -v          Display Verbose output on standard error.\n");
-            fprintf(stderr, "       -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds, 0 always, <0 never.\n");
-            fprintf(stderr, "       -x          EXit if a NAK is received.\n");
-            fprintf(stderr, "       -y SECONDS  Send surveYor a keep alive every SECONDS seconds, 0 always, <0 never.\n");
-            fprintf(stderr, "       -z          Exit if all state machines stop.\n");
+            fprintf(stderr, "       -1              Use one stop bit for DEVICE.\n");
+            fprintf(stderr, "       -2              Use two stop bits for DEVICE.\n");
+            fprintf(stderr, "       -4              Prefer IPv4 for HOST.\n");
+            fprintf(stderr, "       -6              Prefer IPv6 for HOST.\n");
+            fprintf(stderr, "       -7              Use seven data bits for DEVICE.\n");
+            fprintf(stderr, "       -8              Use eight data bits for DEVICE.\n");
+            fprintf(stderr, "       -A STRING       Collapse STRING, append Ubx end matter, write to DEVICE, expect ACK/NAK.\n");
+            fprintf(stderr, "       -A ''           Exit when this empty STRING is processed.\n");
+            fprintf(stderr, "       -B BYTES        Set the input Buffer size to BYTES bytes.\n");
+            fprintf(stderr, "       -C FILE         Catenate input to FILE or named pipe.\n");
+            fprintf(stderr, "       -D DEVICE       Use DEVICE for input or output.\n");
+            fprintf(stderr, "       -E              Like -R but use ANSI Escape sequences.\n");
+            fprintf(stderr, "       -F SECONDS      Update report no more than every SECONDS seconds, 0 always, <0 never.\n");
+            fprintf(stderr, "       -G HOST:PORT    Use remote HOST and PORT as dataGram sink.\n");
+            fprintf(stderr, "       -G :PORT        Use local PORT as dataGram source.\n");
+            fprintf(stderr, "       -H HEADLESS     Like -R but writes each iteration to HEADLESS file.\n");
+            fprintf(stderr, "       -I PIN          Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).\n");
+            fprintf(stderr, "       -K              Write input to DEVICE sinK from datagram source.\n");
+            fprintf(stderr, "       -L FILE         Write pretty-printed input to FILE file.\n");
+            fprintf(stderr, "       -M              Run in the background as a daeMon.\n");
+            fprintf(stderr, "       -N FILE         Use fix FILE to save ARP LLH for subsequeNt fixed mode.\n");
+            fprintf(stderr, "       -O FILE         Save process identifier in FILE.\n");
+            fprintf(stderr, "       -P              Process incoming data even if no report is being generated.\n");
+            fprintf(stderr, "       -R              Print a Report on standard output.\n");
+            fprintf(stderr, "       -S FILE         Use source FILE or named pipe for input.\n");
+            fprintf(stderr, "       -T FILE         Save the PVT CSV Trace to FILE.\n");
+            fprintf(stderr, "       -U STRING       Collapse STRING, append Ubx end matter, write to DEVICE.\n");
+            fprintf(stderr, "       -U ''           Exit when this empty STRING is processed.\n");
+            fprintf(stderr, "       -V              Log Version in the form of release, vintage, and revision.\n");
+            fprintf(stderr, "       -W STRING       Collapse STRING, append NMEA end matter, Write to DEVICE.\n");
+            fprintf(stderr, "       -W ''           Exit when this empty STRING is processed.\n");
+            fprintf(stderr, "       -X MASK         Enable special test modes via MASK.\n");
+            fprintf(stderr, "       -Y HOST:PORT    Use remote HOST and PORT as keepalive sink and surveYor source.\n");
+            fprintf(stderr, "       -Y :PORT        Use local PORT as surveYor source.\n");
+            fprintf(stderr, "       -Z STRING       Collapse STRING, write to DEVICE.\n");
+            fprintf(stderr, "       -Z ''           Exit when this empty STRING is processed.\n");
+            fprintf(stderr, "       -b BPS          Use BPS bits per second for DEVICE.\n");
+            fprintf(stderr, "       -c              Take 1PPS from DCD (requires -D and implies -m).\n");
+            fprintf(stderr, "       -d              Display Debug output on standard error.\n");
+            fprintf(stderr, "       -e              Use Even parity for DEVICE.\n");
+            fprintf(stderr, "       -f SECONDS      Set trace Frequency to 1/SECONDS.\n");
+            fprintf(stderr, "       -g MASK         Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
+            fprintf(stderr, "       -h              Use RTS/CTS Hardware flow control for DEVICE.\n");
+            fprintf(stderr, "       -i SECONDS      Bypass input check every SECONDS seconds, 0 always, <0 never.\n");
+            fprintf(stderr, "       -k MASK         Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
+            fprintf(stderr, "       -l              Use Local control for DEVICE.\n");
+            fprintf(stderr, "       -m              Use Modem control for DEVICE.\n");
+            fprintf(stderr, "       -n              Use No parity for DEVICE.\n");
+            fprintf(stderr, "       -o              Use Odd parity for DEVICE.\n");
+            fprintf(stderr, "       -p PIN          Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).\n");
+            fprintf(stderr, "       -s              Use XON/XOFF (control-Q/control-S) for DEVICE.\n");
+            fprintf(stderr, "       -t SECONDS      Timeout GNSS data after SECONDS seconds [0..255].\n");
+            fprintf(stderr, "       -v              Display Verbose output on standard error.\n");
+            fprintf(stderr, "       -w SECONDS      Write STRING to DEVICE no more than every SECONDS seconds, 0 always, <0 never.\n");
+            fprintf(stderr, "       -x              EXit if a NAK is received.\n");
+            fprintf(stderr, "       -y SECONDS      Send surveYor a keep alive every SECONDS seconds, 0 always, <0 never.\n");
+            fprintf(stderr, "       -z              Exit if all state machines stop.\n");
             return 1;
             break;
         }
@@ -948,7 +957,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (remote_endpoint.udp == 0) {
         /* Do nothing. */
-    } else if (!diminuto_ipc6_is_unspecified(&remote_endpoint.ipv6)) {
+    } else if ((protocol = choose_protocol(&remote_endpoint, preference)) == IPV6) {
 
         remote_protocol = IPV6;
 
@@ -960,7 +969,7 @@ int main(int argc, char * argv[])
 
         role = PRODUCER;
 
-    } else if (!diminuto_ipc4_is_unspecified(&remote_endpoint.ipv4)) {
+    } else if (protocol == IPV4) {
 
         remote_protocol = IPV4;
 
@@ -971,6 +980,20 @@ int main(int argc, char * argv[])
         diminuto_assert(rc >= 0);
 
         role = PRODUCER;
+
+    } else if (preference == IPV4) {
+
+        Device = remote_option;
+
+        remote_protocol = IPV4;
+
+        remote_fd = diminuto_ipc4_datagram_peer(remote_endpoint.udp);
+        diminuto_assert(remote_fd >= 0);
+
+        rc = diminuto_mux_register_read(&mux, remote_fd);
+        diminuto_assert(rc >= 0);
+
+        role = CONSUMER;
 
     } else {
 
@@ -990,6 +1013,8 @@ int main(int argc, char * argv[])
 
     if (remote_fd >= 0) {
         show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp);
+        DIMINUTO_LOG_INFORMATION("Remote Role '%c'\n", role);
+        DIMINUTO_LOG_INFORMATION("Remote Mask 0x%x\n", remote_mask);
     }
 
     /*
@@ -1006,7 +1031,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (surveyor_endpoint.udp == 0) {
         /* Do nothing. */
-    } else if (!diminuto_ipc6_is_unspecified(&surveyor_endpoint.ipv6)) {
+    } else if ((protocol = choose_protocol(&surveyor_endpoint, preference)) == IPV6) {
 
         /*
          * Sending keepalives and receiving updates via IPv6.
@@ -1023,7 +1048,7 @@ int main(int argc, char * argv[])
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
         diminuto_assert(rc >= 0);
 
-    } else if (!diminuto_ipc4_is_unspecified(&surveyor_endpoint.ipv4)) {
+    } else if (protocol == IPV4) {
 
         /*
          * Sending keepalives and receiving updates via IPv4.
@@ -1040,11 +1065,29 @@ int main(int argc, char * argv[])
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
         diminuto_assert(rc >= 0);
 
+    } else if (preference == IPV4) {
+
+        /*
+         * Receiving updates passively via IPv4 with keepalives disabled.
+         */
+
+        surveyor_protocol = IPV4;
+
+        surveyor_fd = diminuto_ipc4_datagram_peer(surveyor_endpoint.udp);
+        diminuto_assert(surveyor_fd >= 0);
+
+        rc = diminuto_mux_register_read(&mux, surveyor_fd);
+        diminuto_assert(rc >= 0);
+
+        keepalive = -1;
+
     } else {
 
         /*
          * Receiving updates passively via IPv6 with keepalives disabled.
          */
+
+        surveyor_protocol = IPV6;
 
         surveyor_fd = diminuto_ipc6_datagram_peer(surveyor_endpoint.udp);
         diminuto_assert(surveyor_fd >= 0);
@@ -1213,6 +1256,7 @@ int main(int argc, char * argv[])
         diminuto_assert(dev_fp != (FILE *)0);
 
         DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\"\n", fileno(dev_fp), device, readonly ? "ro" : "rw", Device);
+        DIMINUTO_LOG_INFORMATION("Device Mask 0x%x\n", device_mask);
 
         /*
          * Note that we set our input file pointer provisionally; we may
@@ -1907,11 +1951,11 @@ consume:
 
             if (remote_total < sizeof(remote_buffer.header)) {
 
-                DIMINUTO_LOG_WARNING("Remote Length [%zd]\n", remote_total);
+                DIMINUTO_LOG_WARNING("Datagram Length [%zd]\n", remote_total);
 
             } else if ((remote_size = datagram_validate(&remote_sequence, &remote_buffer.header, remote_total, &outoforder_counter, &missing_counter)) < 0) {
 
-                DIMINUTO_LOG_NOTICE("Remote Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
+                DIMINUTO_LOG_NOTICE("Datagram Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
             } else if (common_machine_is_nmea(remote_buffer.payload.nmea[0]) && ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0)) {
 
@@ -1920,7 +1964,7 @@ consume:
                 length = remote_length;
                 format = NMEA;
 
-                DIMINUTO_LOG_DEBUG("Remote NMEA [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+                DIMINUTO_LOG_DEBUG("Datagram NMEA [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
             } else if (common_machine_is_ubx(remote_buffer.payload.ubx[0]) && ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0)) {
 
@@ -1929,7 +1973,7 @@ consume:
                 length = remote_length;
                 format = UBX;
 
-                DIMINUTO_LOG_DEBUG("Remote UBX [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+                DIMINUTO_LOG_DEBUG("Datagram UBX [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
             } else if (common_machine_is_rtcm(remote_buffer.payload.rtcm[0]) && ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0)) {
 
@@ -1938,11 +1982,11 @@ consume:
                 length = remote_length;
                 format = RTCM;
 
-                DIMINUTO_LOG_DEBUG("Remote RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+                DIMINUTO_LOG_DEBUG("Datagram RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
             } else {
 
-                DIMINUTO_LOG_ERROR("Remote Other [%zd] [%zd] [%zd] 0x%02x\n", remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
+                DIMINUTO_LOG_ERROR("Datagram Other [%zd] [%zd] [%zd] 0x%02x\n", remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
 
             }
 
@@ -2244,6 +2288,7 @@ consume:
             remote_total = send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
             if (remote_total > 0) {
                 network_total += remote_total;
+                DIMINUTO_LOG_DEBUG("Datagram Sent 0x%x [%zd] [%zd]", format, remote_total, network_total);
             }
         }
 
