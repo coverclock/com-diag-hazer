@@ -210,7 +210,7 @@ int main(int argc, char * argv[])
     /*
      * FILE pointer variables.
      */
-    FILE * in_fp = stdin;
+    FILE * in_fp = (FILE *)0;
     FILE * out_fp = stdout;
     FILE * dev_fp = (FILE *)0;
     FILE * sink_fp = (FILE *)0;
@@ -1013,6 +1013,7 @@ int main(int argc, char * argv[])
 
     if (remote_fd >= 0) {
         show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp);
+        DIMINUTO_LOG_INFORMATION("Remote Protocol '%c'\n", remote_protocol);
         DIMINUTO_LOG_INFORMATION("Remote Role '%c'\n", role);
         DIMINUTO_LOG_INFORMATION("Remote Mask 0x%x\n", remote_mask);
     }
@@ -1101,6 +1102,7 @@ int main(int argc, char * argv[])
 
     if (surveyor_fd >= 0) {
         show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp);
+        DIMINUTO_LOG_INFORMATION("Surveyor Protocol '%c'\n", surveyor_protocol);
     }
 
     /*
@@ -1291,16 +1293,41 @@ int main(int argc, char * argv[])
             Device = source;
         }
 
-        if ((in_fp = fopen(source, "r")) != (FILE *)0) {
-            /* Do nothing. */
-        } else {
+        if ((in_fp = fopen(source, "r")) == (FILE *)0) {
             diminuto_perror(source);
             diminuto_assert(in_fp != (FILE *)0);
         }
 
     }
 
-    DIMINUTO_LOG_INFORMATION("Source (%d) \"%s\" %s\n", fileno(in_fp), Device, readonly ? "ro" : "rw");
+    /*
+     * If in_fp now points to anything (a file, a FIFO, a DEVICE), get its
+     * file descriptor so we can multiplex on it, and mess with the standard
+     * I/O buffer.
+     */
+
+    if (in_fp != (FILE *)0) {
+
+        in_fd = fileno(in_fp);
+
+        DIMINUTO_LOG_INFORMATION("Source (%d) \"%s\" %s\n", in_fd, Device, readonly ? "ro" : "rw");
+
+        DIMINUTO_LOG_INFORMATION("Buffer Default [%zu]\n", (size_t)BUFSIZ);
+        if (io_size > BUFSIZ) {
+            io_buffer = malloc(io_size);
+            diminuto_assert(io_buffer != (void *)0);
+            rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
+            diminuto_assert(rc == 0);
+            DIMINUTO_LOG_INFORMATION("Buffer Read [%zu]\n", io_size);
+        }
+
+        rc = diminuto_mux_register_read(&mux, in_fd);
+        diminuto_assert(rc >= 0);
+
+    }
+
+    DIMINUTO_LOG_INFORMATION("Buffer Sync [%zu]\n", (size_t)SYNCBUFFER);
+    DIMINUTO_LOG_INFORMATION("Buffer Datagram [%zu]\n", (size_t)DATAGRAM_SIZE);
 
     /*
      * If we are using some other sink of output (e.g. a file, a FIFO, etc.),
@@ -1321,30 +1348,6 @@ int main(int argc, char * argv[])
     if (sink_fp != (FILE *)0) {
         DIMINUTO_LOG_INFORMATION("Sink (%d) \"%s\"\n", fileno(sink_fp), sink);
     }
-
-    /*
-     * Our input source is either standard input (either implicitly or
-     * explicitly), a serial(ish) device, or a file or maybe a FIFO
-     * a.k.a. a named pipe, remarkably useful BTW, see mkfifo(1). So
-     * now we can get its underlying file descriptor. We also mess around
-     * with the input stream standard I/O buffer.
-     */
-
-    in_fd = fileno(in_fp);
-
-    rc = diminuto_mux_register_read(&mux, in_fd);
-    diminuto_assert(rc >= 0);
-
-    if (io_size > BUFSIZ) {
-        io_buffer = malloc(io_size);
-        diminuto_assert(io_buffer != (void *)0);
-        rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
-        diminuto_assert(rc == 0);
-    }
-    DIMINUTO_LOG_INFORMATION("Buffer Default [%zu]\n", (size_t)BUFSIZ);
-    DIMINUTO_LOG_INFORMATION("Buffer Read [%zu]\n", io_size);
-    DIMINUTO_LOG_INFORMATION("Buffer Sync [%zu]\n", (size_t)SYNCBUFFER);
-    DIMINUTO_LOG_INFORMATION("Buffer Datagram [%zu]\n", (size_t)DATAGRAM_SIZE);
 
     /*
      * If we are running headless, create our temporary output file using the
@@ -1613,12 +1616,12 @@ int main(int argc, char * argv[])
         ready = 0;
         fd = -1;
 
-        if ((available = diminuto_file_ready(in_fp)) > 0) {
+        if ((in_fp != (FILE *)0) && ((available = diminuto_file_ready(in_fp)) > 0)) {
             fd = in_fd;
             if (available > io_maximum) {
                 io_maximum = available;
             }
-        } else if (serial && ((available = diminuto_serial_available(in_fd)) > 0)) {
+        } else if (serial && (in_fd >= 0) && ((available = diminuto_serial_available(in_fd)) > 0)) {
             fd = in_fd;
             if (available > io_maximum) {
                 io_maximum = available;
@@ -1925,7 +1928,7 @@ consume:
 
                 }
 
-            } while (diminuto_file_ready(in_fp) > 0);
+            } while ((in_fp != (FILE *)0) && (diminuto_file_ready(in_fp) > 0));
 
             /*
              * At this point, either we ran out of data in the input
@@ -1944,7 +1947,9 @@ consume:
              * is a serious bug either in this software or in the transport.
              */
 
+fprintf(stderr, "%s[%d]: receive %d\n", __FILE__, __LINE__, remote_fd);
             remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer));
+fprintf(stderr, "%s[%d]: received %zd\n", __FILE__, __LINE__, remote_total);
             if (remote_total > 0) {
                 network_total += remote_total;
             }
@@ -3109,13 +3114,13 @@ consume:
         } else if (hazer_has_pending_gsv(view, countof(view))) {
             fd = in_fd;
             goto consume;
-        } else if ((available = diminuto_file_ready(in_fp)) > 0) {
+        } else if ((in_fp != (FILE *)0) && ((available = diminuto_file_ready(in_fp)) > 0)) {
             fd = in_fd;
             if (available > io_maximum) {
                 io_maximum = available;
             }
             goto consume;
-        } else if (serial && (available = diminuto_serial_available(in_fd)) > 0) {
+        } else if (serial && (in_fd >= 0) && ((available = diminuto_serial_available(in_fd)) > 0)) {
             fd = in_fd;
             if (available > io_maximum) {
                 io_maximum = available;
