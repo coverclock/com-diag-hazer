@@ -96,9 +96,11 @@ All three projects reside in the Hazer repository.
 When I use the term "Hazer", I am not very good about distinguishing whether
 I am talking about the software stack, the project, or the entire repo.
 
-Hazer includes a gpstool application as a kind of Swiss Army knife for dealing
-with various GNSS devices. gpstool accepts data streams from standard input,
-from serial(ish) devices, or from a UDP socket, and can send validated data to
+Hazer includes a gpstool application as a kind of Swiss Army knife
+for dealing with various GNSS devices. gpstool accepts data streams
+from standard input, from serial-ish devices including serial USB,
+from files or anything that looks like a file e.g. a FIFO (a.k.a.
+a named pipe), or from a UDP socket, and can send validated data to
 a remote UDP socket, write it to a device, and display the interpreted
 information.
 
@@ -211,8 +213,9 @@ use this repo.
 
 ## Secure Socket Layer
 
-The optional scripts that provide an authenticated and encrypted tunnel
-through which datagrams can be forwarded require OpenSSL.
+The optional (work in progress) scripts that provide an authenticated
+and encrypted tunnel through which datagrams can be forwarded require
+OpenSSL.
 
      sudo apt-get install openssl libssl-dev libssl-doc
 
