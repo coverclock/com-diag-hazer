@@ -296,6 +296,20 @@ can deconfigure GPIO pins using the Diminuto pintool utility
     # pintool -p 18 -n
     # pintool -p 16 -n
 
+## Using SSL tunnel (example)
+
+Ultimately there will be four instances of gpstool running.
+
+### On Base
+
+    tunnel base 55555 12346 &
+    gpstool -G :12346 -4 -E
+
+### On Rover
+
+    tunnel rover 12345 localhost:55555 &
+    gpstool -D /dev/ttyACM0 -b 38400 -8 -n -1 -4 -G localhost:12345 -g 0x7 -E
+
 ## True Versus Magnetic Bearings
 
 GPS devices compute the true bearing by comparing successive position fixes to
