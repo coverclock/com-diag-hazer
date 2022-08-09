@@ -5,10 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # Tunnels what would normally be a UDP datagram channel into a
 # OpenSSL secure socket channel that is authenticated and
-# encrypted. Note that the resulting output of the SSL channel
-# has to be resynced to recover the message boundaries. Also
-# note that the default IP protocol on both ends is IPv4.
-# WORK IN PROGRESS!
+# encrypted.
 
 SSLDIR=${COM_DIAG_HAZER_SSLDIR:-$(readlink -e $(dirname ${0})/..)/ssl}
 
@@ -45,16 +42,27 @@ else
 fi
 
 if [[ "${ROLE}" == "rover" ]]; then
-	COMMAND="socat UDP${PROTOCOL}-RECV:${DGMPORT} openssl-connect:${SSLHOST}:${SSLPORT},openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL}"
+
+	# gpstool must be used on the rover side to remove the
+	# header from each datagram and then pipe the concantenated
+	# results to the SSL tunnel.
+
+	COMMAND="gpstool -G :${DGMPORT} -${PROTOCOL} -C - -P | socat - openssl-connect:${SSLHOST}:${SSLPORT},openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL}"
 	echo ${PROGRAM}: ${COMMAND} 1>&2
-	eval ${COMMAND}
+	eval exec ${COMMAND}
+
 elif [[ "${ROLE}" == "base" ]]; then
-	COMMAND="socat OPENSSL-LISTEN:${SSLPORT},reuseaddr,fork,openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL},verify=1 - | gpstool -S - -${PROTOCOL} -G localhost:${DGMPORT} -g 0x7"
+
+	# gpstool must be used on the base side to recover the
+	# message boundaries from the SSL tunnel and then forward
+	# the results to the UDP socket.
+
+	COMMAND="socat OPENSSL-LISTEN:${SSLPORT},reuseaddr,fork,openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL},verify=1 - | gpstool -S - -${PROTOCOL} -G localhost:${DGMPORT} -g 0x7 -P"
 	echo ${PROGRAM}: ${COMMAND} 1>&2
-	eval ${COMMAND}
+	eval exec ${COMMAND}
+
 else
+
 	echo ${PROGRAM}: ${ROLE}! 1>&2
 	exit 4
 fi
-
-exit 0

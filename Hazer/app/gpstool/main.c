@@ -371,6 +371,7 @@ int main(int argc, char * argv[])
     uint8_t * buffer = (uint8_t *)0;
     ssize_t size = 0;
     ssize_t length = 0;
+    size_t written = 0;
     /*
      * Display variables.
      */
@@ -1727,7 +1728,7 @@ consume:
                 }
 
                 /*
-                 * We the single byte to the Catenate file sink to insure we
+                 * We put the single byte to the Catenate file sink to insure we
                  * capture even invalid characters from the input source before
                  * we check for frame synchronization.
                  */
@@ -1958,7 +1959,7 @@ consume:
              * UBX packet, or NMEA message to process, or we hit end of file.
              */
 
-        } else if (fd == remote_fd) {
+        } else if ((role == CONSUMER) && (fd == remote_fd)) {
 
             /*
              * Receive a NMEA, UBX, or RTCM datagram from a remote gpstool.
@@ -2013,6 +2014,15 @@ consume:
 
                 DIMINUTO_LOG_ERROR("Datagram Other [%zd] [%zd] [%zd] 0x%02x\n", remote_total, remote_size, remote_length, remote_buffer.payload.data[0]);
 
+            }
+
+            /*
+             * Write the datagram to the Cantenate file if it exists.
+             */
+
+            if (sink_fp != (FILE *)0) {
+                written = fwrite(buffer, 1, size - 1 /* Minus trailing NUL. */, sink_fp);
+                diminuto_assert(written == (size - 1));
             }
 
         } else if (fd == surveyor_fd) {
