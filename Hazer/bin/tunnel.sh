@@ -3,6 +3,11 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# Tunnels what would normally be a UDP datagram channel into a
+# OpenSSL secure socket channel that is authenticated and
+# encrypted. Note that the resulting output of the SSL channel
+# has to be resynced to recover the message boundaries. Also
+# note that the default IP protocol on both ends is IPv4.
 # WORK IN PROGRESS!
 
 SSLDIR=${COM_DIAG_HAZER_SSLDIR:-$(readlink -e $(dirname ${0})/..)/ssl}
@@ -22,29 +27,31 @@ if [[ "${ROLE}" == "rover" ]]; then
 	COMMON=${4:-"localhost"}
 	PEMFIL=${5:-"${SSLDIR}/rover.pem"}
 	CRTFIL=${6:-"${SSLDIR}/base.crt"}
+	PROTOCOL=${7:-"4"}
 elif [[ "${ROLE}" == "base" ]]; then
 	SOURCE=${2:-"stagecoach"}
-	SSLHOST=$(endpoint "localhost:${SINK}" | cut -d ' ' -f 6)
-	SSLPORT=$(endpoint "localhost:${SINK}" | cut -d ' ' -f 12)
+	SSLHOST=$(endpoint "localhost:${SOURCE}" | cut -d ' ' -f 6)
+	SSLPORT=$(endpoint "localhost:${SOURCE}" | cut -d ' ' -f 12)
 	SINK=${3:-"tumbleweed"}
 	DGMHOST=$(endpoint "localhost:${SINK}" | cut -d ' ' -f 6)
 	DGMPORT=$(endpoint "localhost:${SINK}" | cut -d ' ' -f 12)
 	COMMON=${4:-"localhost"}
 	PEMFIL=${5:-"${SSLDIR}/base.pem"}
 	CRTFIL=${6:-"${SSLDIR}/rover.crt"}
+	PROTOCOL=${7:-"4"}
 else
 	echo ${PROGRAM}: ${ROLE}? 1>&2
 	exit 1
 fi
 
 if [[ "${ROLE}" == "rover" ]]; then
-	COMMAND="socat UDP4-RECV:${DGMPORT} openssl-connect:${SSLHOST}:${SSLPORT},openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL}"
+	COMMAND="socat UDP${PROTOCOL}-RECV:${DGMPORT} openssl-connect:${SSLHOST}:${SSLPORT},openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL}"
 	echo ${PROGRAM}: ${COMMAND} 1>&2
-	${COMMAND}
+	eval ${COMMAND}
 elif [[ "${ROLE}" == "base" ]]; then
-	COMMAND="socat openssl-listen:${SSLPORT},reuseaddr,fork,openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL},verify=1 - | gpstool -S - -G localhost:${DGMPORT} -g 0x7"
+	COMMAND="socat OPENSSL-LISTEN:${SSLPORT},reuseaddr,fork,openssl-commonname=${COMMON},cert=${PEMFIL},cafile=${CRTFIL},verify=1 - | gpstool -S - -${PROTOCOL} -G localhost:${DGMPORT} -g 0x7"
 	echo ${PROGRAM}: ${COMMAND} 1>&2
-	${COMMAND}
+	eval ${COMMAND}
 else
 	echo ${PROGRAM}: ${ROLE}! 1>&2
 	exit 4
