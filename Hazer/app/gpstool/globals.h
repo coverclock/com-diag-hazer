@@ -33,10 +33,9 @@ extern char Hostname[HOST_NAME_MAX];
 extern pid_t Process;
 
 /**
- * This is the path name to the serial device we are reading from
- * or writing to.
+ * This is the name of the source of input.
  */
-extern const char * Device;
+extern const char * Source;
 
 /**
  * This is our POSIX thread mutual exclusion semaphore.

@@ -276,6 +276,7 @@ int main(int argc, char * argv[])
     int dev_fd = -1;
     int remote_fd = -1;
     int surveyor_fd = -1;
+    int source_fd = -1;
     /*
      * 1PPS poller thread variables.
      */
@@ -983,12 +984,13 @@ int main(int argc, char * argv[])
 
     } else if (preference == IPV4) {
 
-        Device = remote_option;
+        Source = remote_option;
 
         remote_protocol = IPV4;
 
         remote_fd = diminuto_ipc4_datagram_peer(remote_endpoint.udp);
         diminuto_assert(remote_fd >= 0);
+        source_fd = remote_fd;
 
         rc = diminuto_mux_register_read(&mux, remote_fd);
         diminuto_assert(rc >= 0);
@@ -997,12 +999,13 @@ int main(int argc, char * argv[])
 
     } else {
 
-        Device = remote_option;
+        Source = remote_option;
 
         remote_protocol = IPV6;
 
         remote_fd = diminuto_ipc6_datagram_peer(remote_endpoint.udp);
         diminuto_assert(remote_fd >= 0);
+        source_fd = remote_fd;
 
         rc = diminuto_mux_register_read(&mux, remote_fd);
         diminuto_assert(rc >= 0);
@@ -1213,17 +1216,17 @@ int main(int argc, char * argv[])
 
     } else if (strcmp(device, "-") == 0) {
 
-        Device = "stdin";
+        Source = "stdin";
 
         in_fp = stdin;
 
     } else {
 
-        Device = strrchr(device, '/');
-        if (Device != (const char *)0) {
-            Device += 1;
+        Source = strrchr(device, '/');
+        if (Source != (const char *)0) {
+            Source += 1;
         } else {
-            Device = device;
+            Source = device;
         }
 
         dev_fd = open(device, readonly ? O_RDONLY : O_RDWR);
@@ -1257,7 +1260,7 @@ int main(int argc, char * argv[])
         }
         diminuto_assert(dev_fp != (FILE *)0);
 
-        DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\"\n", fileno(dev_fp), device, readonly ? "ro" : "rw", Device);
+        DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\"\n", dev_fd, device, readonly ? "ro" : "rw", Source);
         DIMINUTO_LOG_INFORMATION("Device Mask 0x%x\n", device_mask);
 
         /*
@@ -1280,17 +1283,17 @@ int main(int argc, char * argv[])
 
     } else if (strcmp(source, "-") == 0) {
 
-        Device = "stdin";
+        Source = "stdin";
 
         in_fp = stdin;
 
     } else {
 
-        Device = strrchr(source, '/');
-        if (Device != (const char *)0) {
-            Device += 1;
+        Source = strrchr(source, '/');
+        if (Source != (const char *)0) {
+            Source += 1;
         } else {
-            Device = source;
+            Source = source;
         }
 
         if ((in_fp = fopen(source, "r")) == (FILE *)0) {
@@ -1309,8 +1312,7 @@ int main(int argc, char * argv[])
     if (in_fp != (FILE *)0) {
 
         in_fd = fileno(in_fp);
-
-        DIMINUTO_LOG_INFORMATION("Source (%d) \"%s\" %s\n", in_fd, Device, readonly ? "ro" : "rw");
+        source_fd = in_fd;
 
         DIMINUTO_LOG_INFORMATION("Buffer Default [%zu]\n", (size_t)BUFSIZ);
         if (io_size > BUFSIZ) {
@@ -1328,6 +1330,14 @@ int main(int argc, char * argv[])
 
     DIMINUTO_LOG_INFORMATION("Buffer Sync [%zu]\n", (size_t)SYNCBUFFER);
     DIMINUTO_LOG_INFORMATION("Buffer Datagram [%zu]\n", (size_t)DATAGRAM_SIZE);
+
+    /*
+     * This is our source of input data, which at this point can be UDP socket,
+     * a file, a serial-ish device, a FIFO, or maybe something I haven't thought
+     * of but which can be abstracted as a path in the file system.
+     */
+
+    DIMINUTO_LOG_INFORMATION("Source (%d) \"%s\" %s\n", source_fd, Source, readonly ? "ro" : "rw");
 
     /*
      * If we are using some other sink of output (e.g. a file, a FIFO, etc.),
@@ -1947,9 +1957,7 @@ consume:
              * is a serious bug either in this software or in the transport.
              */
 
-fprintf(stderr, "%s[%d]: receive %d\n", __FILE__, __LINE__, remote_fd);
             remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer));
-fprintf(stderr, "%s[%d]: received %zd\n", __FILE__, __LINE__, remote_total);
             if (remote_total > 0) {
                 network_total += remote_total;
             }

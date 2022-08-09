@@ -15,9 +15,9 @@ const char * Program = (const char *)0;
 
 char Hostname[HOST_NAME_MAX] = { '\0' };
 
-pid_t Process = 0;
+pid_t Process = -1;
 
-const char * Device = "stdin";
+const char * Source = "stdin"; /* Default. */
 
 pthread_mutex_t Mutex = PTHREAD_MUTEX_INITIALIZER;
 
