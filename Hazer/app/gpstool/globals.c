@@ -17,7 +17,7 @@ char Hostname[HOST_NAME_MAX] = { '\0' };
 
 pid_t Process = -1;
 
-const char * Source = "stdin"; /* Default. */
+const char * Source = (const char *)0;
 
 pthread_mutex_t Mutex = PTHREAD_MUTEX_INITIALIZER;
 

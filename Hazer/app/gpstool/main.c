@@ -1018,7 +1018,7 @@ int main(int argc, char * argv[])
         show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp);
         DIMINUTO_LOG_INFORMATION("Remote Protocol '%c'\n", remote_protocol);
         DIMINUTO_LOG_INFORMATION("Remote Role '%c'\n", role);
-        DIMINUTO_LOG_INFORMATION("Remote Mask 0x%x\n", remote_mask);
+        DIMINUTO_LOG_INFORMATION("Remote Mask 0x%lx\n", remote_mask);
     }
 
     /*
@@ -1217,7 +1217,6 @@ int main(int argc, char * argv[])
     } else if (strcmp(device, "-") == 0) {
 
         Source = "stdin";
-
         in_fp = stdin;
 
     } else {
@@ -1261,7 +1260,7 @@ int main(int argc, char * argv[])
         diminuto_assert(dev_fp != (FILE *)0);
 
         DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\"\n", dev_fd, device, readonly ? "ro" : "rw", Source);
-        DIMINUTO_LOG_INFORMATION("Device Mask 0x%x\n", device_mask);
+        DIMINUTO_LOG_INFORMATION("Device Mask 0x%lx\n", device_mask);
 
         /*
          * Note that we set our input file pointer provisionally; we may
@@ -1284,7 +1283,6 @@ int main(int argc, char * argv[])
     } else if (strcmp(source, "-") == 0) {
 
         Source = "stdin";
-
         in_fp = stdin;
 
     } else {
@@ -1301,6 +1299,19 @@ int main(int argc, char * argv[])
             diminuto_assert(in_fp != (FILE *)0);
         }
 
+    }
+
+    /*
+     * If we have absolute no input source, we fall back onto standard
+     * input. Note that the input file pointer can legitimately be null
+     * if we are reading datagrams from a forwarding instance of gpstool,
+     * but in that case Source will not be null.
+     */
+
+    if (Source == (const char *)0) {
+
+        Source = "stdin";
+        in_fp = stdin;
     }
 
     /*
@@ -1333,8 +1344,9 @@ int main(int argc, char * argv[])
 
     /*
      * This is our source of input data, which at this point can be UDP socket,
-     * a file, a serial-ish device, a FIFO, or maybe something I haven't thought
-     * of but which can be abstracted as a path in the file system.
+     * a file, a serial-ish device, a FIFO, standard input, or maybe something
+     * I haven't thought of but which can be abstracted as a path in the file
+     * system.
      */
 
     DIMINUTO_LOG_INFORMATION("Source (%d) \"%s\" %s\n", source_fd, Source, readonly ? "ro" : "rw");
