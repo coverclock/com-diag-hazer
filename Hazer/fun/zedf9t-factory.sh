@@ -5,6 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # Clear Flash and Battery-Backed RAM (BBR) configurations (if any)
 # in the ZED-F9T, and software reset the device.
+# Probably best to power cycle device after this.
 # This is part of the "Metronome" project.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
