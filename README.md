@@ -995,6 +995,8 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
 
+<https://stjarnhimlen.se/comp/time.html> Paul Schlyter, "Time Scales"
+
 # Build
 
 ## Diminuto
