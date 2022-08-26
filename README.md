@@ -995,6 +995,8 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
 
+<https://stjarnhimlen.se/comp/time.html> Paul Schlyter, "Time Scales"
+
 # Build
 
 ## Diminuto
@@ -1286,8 +1288,11 @@ throw an assert and core dump.
 * ubxrestoredefaults - sends UBX message to restore defaults to U-blox battery backed RAM (BBRAM).
 * uputronics - exercises the Uputronics GPS board for the Rasperry Pi.
 * zedf9r - exercise UBX-ZED-F9R device.
-* zedf9t - exercise UBX-ZED-F9R device.
-* zedf9t-configure - configure UBX-ZED-F9R device.
+* zedf9t - exercise UBX-ZED-F9T device.
+* zedf9t-configure - configure UBX-ZED-F9T RAM for 1PPS (TP1) and 10MHz (TP2).
+* zedf9t-factory - factory reset UBX-ZED-F9T device.
+* zedf9t-flash - configure the UBX-ZED-F9T flash for 1PPS (TP1) and 10MHz (TP2).
+* zedf9t-reset - software reset UBX-ZED-F9T device.
 
 # Environmental Variables
 
