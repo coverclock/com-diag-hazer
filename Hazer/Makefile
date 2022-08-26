@@ -78,7 +78,6 @@ MOD_DIR				:=	mod# Loadable user modules
 OBC_DIR				:=	obc# C object modules
 OUT_DIR				:=	out# Build artifacts
 SRC_DIR				:=	src# Library source files
-SSL_DIR				:=	ssl# Secure Socket Layer files
 SYM_DIR				:=	sym# Unstripped executable binaries
 TGZ_DIR				:=	tgz# Compressed tarballs
 TST_DIR				:=	tst# Unit tests
@@ -120,7 +119,7 @@ A2SOARCH			:=	-shared -Wl,-soname,lib$(PROJECT).$(SO).$(MAJOR).$(MINOR)
 
 MODE				:=	755
 
-#BACKSLASHES		:=	1
+#BACKSLASHES			:=	1
 BACKSLASHES			:=	2
 
 ########## Diminuto Configuration
@@ -790,52 +789,3 @@ functional:
 valgrind:
 	cat dat/hazer/ubx-cam-m8q-dan-1.dat dat/hazer/ubx-cam-m8q-dan-2.dat | valgrind gpstool -R
 	cat dat/hazer/bu353w10-1.dat dat/hazer/bu353w10-2.dat dat/hazer/bu353w10-3.dat dat/hazer/bu353w10-4.dat | valgrind gpstool -R
-
-########## Stagecoach
-
-# In support of the Stagecoach subproject in com-diag-hazer.
-# This section is not built by default.
-
-OPENSSL			:=	openssl
-C_REHASH		:=	c_rehash
-
-SSL_OUT			:=	$(OUT)/$(SSL_DIR)
-
-SSL_EXP			:=	365
-SSL_LEN			:=	3072
-
-$(SSL_OUT)/%.txt:	$(SSL_OUT)/%.pem
-	$(OPENSSL) x509 -text -noout -in $< > $@
-	chmod 600 $@
-
-$(SSL_OUT)/%.pwd:	$(SSL_DIR)/%.cnf
-	D=`dirname $@`; mkdir -p $$D
-	grep output_password $< | sed -e 's/^.*=[ \t]*//' -e 's/#.*$$//' > $@
-	chmod 600 $@
-
-$(SSL_OUT)/%.pem:	$(SSL_OUT)/%.key $(SSL_OUT)/%.crt
-	cat $^ > $@
-	chmod 600 $@
-
-$(SSL_OUT)/%.key:
-	D=`dirname $@`; mkdir -p $$D
-	$(OPENSSL) genrsa -out $@ $(SSL_LEN)
-	chmod 600 $@
-
-$(SSL_OUT)/rover.crt:	$(SSL_OUT)/rover.key $(SSL_DIR)/rover.cnf
-	$(OPENSSL) req -config $(SSL_DIR)/rover.cnf -new -key $< -x509 -days $(SSL_EXP) -out $@
-	chmod 600 $@
-
-$(SSL_OUT)/base.crt:	$(SSL_OUT)/base.key $(SSL_DIR)/base.cnf
-	$(OPENSSL) req -config $(SSL_DIR)/base.cnf -new -key $< -x509 -days $(SSL_EXP) -out $@
-	chmod 600 $@
-
-.PHONY:	stagecoach
-
-ROVER_FILES	:=	$(SSL_OUT)/rover.pem $(SSL_OUT)/rover.pwd $(SSL_OUT)/rover.txt
-BASE_FILES	:=	$(SSL_OUT)/base.pem $(SSL_OUT)/base.pwd $(SSL_OUT)/base.txt
-
-stagecoach:	$(ROVER_FILES) $(BASE_FILES)
-
-stagecoach-clean:
-	rm -fr $(SSL_OUT)
