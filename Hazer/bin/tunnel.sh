@@ -6,6 +6,7 @@
 # Tunnels what would normally be a UDP datagram channel into a
 # OpenSSL secure socket channel that is authenticated and
 # encrypted.
+# EXPERIMENTAL and DEPRECATED
 
 SSLDIR=${COM_DIAG_HAZER_SSLDIR:-$(readlink -e $(dirname ${0})/..)/ssl}
 
@@ -65,4 +66,5 @@ else
 
 	echo ${PROGRAM}: ${ROLE}! 1>&2
 	exit 4
+
 fi

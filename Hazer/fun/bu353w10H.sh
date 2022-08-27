@@ -13,7 +13,7 @@ RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../fun)/ubx8
 
-LOG=$(readlink -e $(dirname ${0})/..)/log
+LOG=$(readlink -e $(dirname ${0})/..)/tmp
 mkdir -p ${LOG}
 
 OPTIONS=""
@@ -21,4 +21,4 @@ for OPTION in ${COMMANDS}; do
     OPTIONS="${OPTIONS} ${OPTION}"
 done
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${LOG}/${PROGRAM}.out -t 10 ${OPTIONS} 2> ${LOG}/${PROGRAM}.err
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${LOG}/${PROGRAM}.out -F 1 -t 10 ${OPTIONS} 2>> ${LOG}/${PROGRAM}.err
