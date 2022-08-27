@@ -991,6 +991,10 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 
 <https://learn.sparkfun.com/tutorials/how-to-upgrade-firmware-of-a-u-blox-gnss-receiver/all>
 
+<https://www.wired.com/story/satellite-time-distribution/> W. Ralston,
+"When the UK's Timing Systems Fail, This Service Will Save Them",
+WIRED, 2022-08-26
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
