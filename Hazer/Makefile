@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	50# API changes that may require that applications be modified.
 MINOR				:=	9# Only functionality or features added with no legacy API changes.
-BUILD				:=	3# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	4# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -665,9 +665,13 @@ patch:	$(OLD) $(NEW)
 
 ########## Rules
 
-$(OUT)/$(OBC_DIR)/%.txt:	%.c $(TARGETSYNTHESIZED)
+$(OUT)/$(OBC_DIR)/%.c:	%.c $(TARGETSYNTHESIZED)
 	D=`dirname $@`; mkdir -p $$D
 	$(CC) -E $(CPPFLAGS) -c $< > $@
+
+$(OUT)/$(OBC_DIR)/%.s:	%.c $(TARGETSYNTHESIZED)
+	D=`dirname $@`; mkdir -p $$D
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
 
 $(OUT)/$(OBC_DIR)/%.o:	%.c $(TARGETSYNTHESIZED)
 	D=`dirname $@`; mkdir -p $$D
