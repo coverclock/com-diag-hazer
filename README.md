@@ -1001,11 +1001,11 @@ Hadhazy, "Cosmic GPS", *Aerospace America*, 2020-05
 "When the UK's Timing Systems Fail, This Service Will Save Them",
 WIRED, 2022-08-26
 
+<https://stjarnhimlen.se/comp/time.html> Paul Schlyter, "Time Scales"
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
-
-<https://stjarnhimlen.se/comp/time.html> Paul Schlyter, "Time Scales"
 
 # Build
 
