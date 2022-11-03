@@ -25,6 +25,10 @@
 # sudo rfcomm bind 0 01:23:45:67:89:AB 1
 # sudo chmod 666 /dev/rfcomm0
 
+# sudo rfcomm release all
+
+# serialtool -D /dev/rfcomm0 -b 4800 -8 -n -1
+
 PGMDIR=$(dirname ${0})
 PGMNAM=$(basename -s .sh ${0})
 
