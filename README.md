@@ -476,7 +476,7 @@ Footnotes:
 [18] This U-Blox gen 8 receiver is embedded in a U-Blox LTE-M module which required a lot of config via AT commands.    
 [19] 1PPS (a.k.a. TPS in the docs) only has a pulse width of a few microseconds hence LED inoperative (bug).    
 [20] Timing and frequency reference claimed +/- 5ns.    
-[21] Supposed to receive both GPS and GLONASS but my GLO and neither of my GLO 2 units do so.    
+[21] Supposed to receive both GPS and GLONASS but my GLO and both of my GLO 2 units just receive GPS.    
 [22] Rumored to differ from the original GLO only by its increased battery life.    
 
 Notes:
