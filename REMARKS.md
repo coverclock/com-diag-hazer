@@ -200,6 +200,13 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     quit
     > sudo rfcomm bind 0 01:23:45:67:89:AB 1
     > sudo chmod 666 /dev/rfcomm0
+
+Look at the raw NMEA output.
+
+    > serialtool -D /dev/rfcomm0 -b 4800 -8 -n -1
+
+Run gpstool.
+
     > gpstool -D /dev/rfcomm0 -b 4800 -8 -n -1 -E
 
     $GPVTG,350.4,T,341.6,M,000.08,N,0000.15,K,D*18\r\n
@@ -220,20 +227,16 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     GSV [12] sat  72 elv 39 azm 326 snr 30dBHz con GPS
     GSV [13] sat   3 elv 14 azm  67 snr 27dBHz con GPS
 
-You can release the Bluetooth device.
+Release the Bluetooth device and turn the Bluetooth radio off.
 
     > sudo rfcomm release 0
     > sudo bluetoothctl
     power off
     quit
 
-You can release all paired Bluetooth devices.
+Release all paired Bluetooth devices.
 
     > sudo rfcomm release all
-
-You can look at the raw NMEA output.
-
-    > serialtool -D /dev/rfcomm0 -b 4800 -8 -n -1
 
 ## Using One Pulse Per Second
 
