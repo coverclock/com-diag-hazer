@@ -27,6 +27,8 @@
 # sudo rfcomm bind 0 01:23:45:67:89:AB 1
 # sudo chmod 666 /dev/rfcomm0
 #
+# socat -u OPEN:/dev/rfcomm0,b4800 -
+#
 # serialtool -D /dev/rfcomm0 -b 4800 -8 -n -1
 #
 # gpstool -D /dev/rfcomm0 -b 4800 -8 -n -1 -E

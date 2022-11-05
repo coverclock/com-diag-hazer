@@ -201,7 +201,14 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     > sudo rfcomm bind 0 01:23:45:67:89:AB 1
     > sudo chmod 666 /dev/rfcomm0
 
-Look at the raw NMEA output.
+Look at the raw NMEA output using the standard socat tool. This lets you examine
+the output of the device without depending on Hazer or Diminuto in any way.
+
+    > socat -u OPEN:/dev/rfcomm0,b4800
+
+Look at the raw NMEA output using the Diminuto serialtool. This is a good
+functional test of the Diminuto serial port API that Hazer uses without
+actually depending on Hazer.
 
     > serialtool -D /dev/rfcomm0 -b 4800 -8 -n -1
 
