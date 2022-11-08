@@ -428,8 +428,8 @@ I have successfully tested Hazer with the following GPS devices.
 * Digi XBIB-C-GPS (U-blox 8/UBX-CAM-M8Q, 9600 8N1, N/A, ttyS, 1Hz) [4]    
 * Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [9]    
-* Garmin GLO (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [4] [15]    
-* Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [4] [15] [21]    
+* Garmin GLO (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [15] [21]    
+* Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [15] [21] [22]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
 * GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
 * GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]    
@@ -476,7 +476,8 @@ Footnotes:
 [18] This U-Blox gen 8 receiver is embedded in a U-Blox LTE-M module which required a lot of config via AT commands.    
 [19] 1PPS (a.k.a. TPS in the docs) only has a pulse width of a few microseconds hence LED inoperative (bug).    
 [20] Timing and frequency reference claimed +/- 5ns.    
-[21] Rumored to differ from the original GLO only by its increased battery life.    
+[21] Supposed to receive both GPS and GLONASS but my GLO and both of my GLO 2 units just receive GPS.    
+[22] Rumored to differ from the original GLO only by its increased battery life.    
 
 Notes:
 

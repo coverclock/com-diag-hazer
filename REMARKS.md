@@ -200,7 +200,21 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     quit
     > sudo rfcomm bind 0 01:23:45:67:89:AB 1
     > sudo chmod 666 /dev/rfcomm0
-    > gpstool -D /dev/rfcomm0 -E
+
+Look at the raw NMEA output using the standard socat tool. This lets you examine
+the output of the device without depending on Hazer or Diminuto in any way.
+
+    > socat -u OPEN:/dev/rfcomm0,b4800
+
+Look at the raw NMEA output using the Diminuto serialtool. This is a good
+functional test of the Diminuto serial port API that Hazer uses without
+actually depending on Hazer.
+
+    > serialtool -D /dev/rfcomm0 -b 4800 -8 -n -1
+
+Run gpstool.
+
+    > gpstool -D /dev/rfcomm0 -b 4800 -8 -n -1 -E
 
     $GPVTG,350.4,T,341.6,M,000.08,N,0000.15,K,D*18\r\n
     MAP 2017-09-14T14:22:05Z 39*47'39.20"N,105*09'12.13"W  5613.45' N     0.092mph
@@ -220,10 +234,16 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     GSV [12] sat  72 elv 39 azm 326 snr 30dBHz con GPS
     GSV [13] sat   3 elv 14 azm  67 snr 27dBHz con GPS
 
+Release the Bluetooth device and turn the Bluetooth radio off.
+
     > sudo rfcomm release 0
     > sudo bluetoothctl
     power off
     quit
+
+Release all paired Bluetooth devices.
+
+    > sudo rfcomm release all
 
 ## Using One Pulse Per Second
 
