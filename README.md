@@ -109,7 +109,7 @@ router that can receive data via a UDP socket from a remote gpstool and
 forward it to one or more remote gpstools via UDP. This is used along with
 gpstool to implement a DGNSS system using a stationary base station in survey
 mode to provide real-time corrections to one or more mobile rovers. This
-project, called Tumblweed (same as the RTCM software stack), does not use
+project, called Tumbleweed (same as the RTCM software stack), does not use
 the Networked Transport of RTCM via Internet Protocol (Ntrip), but instead
 uses its own trivial data format consisting of raw RTCM messages preceeded
 by a four-byte sequence number carried over UDP datagrams.
