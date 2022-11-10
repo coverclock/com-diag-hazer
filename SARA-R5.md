@@ -55,11 +55,14 @@ note", UBX-20012413-R03, 2021-06-28
 
 ## Hardware Configuration
 
-The Sparkfun SARA-R5 board requires opening (cutting) and closing
+The SparkFun SARA-R5 board requires opening (cutting) and closing
 (soldering) traces to enable dual UART operation.  Refer to the SparkFun
 Hookup Guide (link above), but here is a summary of what I did. I used
 a small ceramic blade tool to do the cutting, and a Weller soldering
-station to do the soldering.
+station to do the soldering. (Note to SparkFun: it would be great for
+hobbiests if these were jumpers; users concerned about vibration could
+still put a solder bridge between the pins or even wirewrap them
+together.)
 
 * Open (cut) "DSR O RTS2 O".
 * Open (cut) "RI CTS2 O".
