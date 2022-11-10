@@ -213,3 +213,7 @@ THIS IS A WORK IN PROGRESS. (Which is a way of saying it doesn't work.)
 #### Get Connection Status
 
     AT+COPS?
+
+#### Ping
+
+    AT+UPING="www.google.com"
