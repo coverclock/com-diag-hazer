@@ -98,6 +98,10 @@ the settings persistently in NVRAM.
 
 Some of these commands need to be done every time the module is rebooted.
 
+### Factory Reset
+
+    AT+UFACTORY=0.0
+
 ### General Configuration
 
 #### Enable Verbose Messages
