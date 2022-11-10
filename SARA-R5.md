@@ -174,12 +174,12 @@ THIS IS A WORK IN PROGRESS. (Which is a way of saying it doesn't work.)
 
 #### Set Packet Data Protocol Context, Protocol, and Access Point Name
 
-    AT+CGDCONT=1,"IPV4V6","m2m.com.attz"
+    AT+CGDCONT=1,"IPV4V6","m2m64.com.attz"
 
 #### Set Packet Switched Data Profile 1: Protocol, APN, DNS1, DNS2, CID
 
     AT+UPSD=1,0,2
-    AT+UPSD=1,1,"m2m.com.attz"
+    AT+UPSD=1,1,"m2m64.com.attz"
     AT+UPSD=1,4,"8.8.8.8"
     AT+UPSD=1,5,"8.8.4.4"
     AT+UPSD=1,100,1
