@@ -1,10 +1,7 @@
 # SparkFun SARA-R5 Configuration for Wheatstone
 
-> THIS IS A WORK IN PROGRESS (WIP). That's a way of saying I don't have it
-> working yet. These notes merely document what I'm trying right now. Currently
-> I have the M8 GNSS receiver working with my Hazer gpstool, but the cellular
-> radio so far eludes me. I have used the same AT&T LTE-M SIM successfully
-> on Digi XBEE3 module.
+> THIS IS A WORK IN PROGRESS (WIP). So far I have managed to ping
+> external hosts on the internet, including my own web server.
 
 These are my notes for using the SparkFun SARA-R5 board, which features
 a U-blox SARA-R510M8S-00B module. The U-blox module incorporates both
@@ -16,9 +13,9 @@ the SparkFun instructions) for dual-UART operation. This required both
 hardware changes (opening and closing traces) and software configuration
 changes (both persistent and non-persistent).
 
-Note that the "Wheatstone" project designation includes other LTE-M radio
-modules, including ones not made by U-blox, and boards not made by
-SparkFun.
+Note that the "Wheatstone" project designation includes work I've done
+with other LTE-M radio modules, including ones not made by U-blox, and
+boards not made by SparkFun.
 
 ## Links
 
@@ -157,8 +154,6 @@ being emitted from the AUX UART a.k.a. UART 2.
 I use AT&T as my LTE-M Mobile Network Operator (MNO). The Access Point
 Name (APN) and other parameters are specific to the service plan I have
 with AT&T. Your mileage may vary.
-
-THIS IS A WORK IN PROGRESS. (Which is a way of saying it doesn't work.)
 
 #### Turn Radio Off; GNSS continues to run
 
