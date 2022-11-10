@@ -98,10 +98,6 @@ the settings persistently in NVRAM.
 
 Some of these commands need to be done every time the module is rebooted.
 
-### Factory Reset
-
-    AT+UFACTORY=0.0
-
 ### General Configuration
 
 #### Enable Verbose Messages
@@ -199,6 +195,16 @@ THIS IS A WORK IN PROGRESS. (Which is a way of saying it doesn't work.)
 #### Enable MNO Registration
 
     AT+CREG=1
+
+### Other Useful Stuff
+
+#### Factory Reset
+
+    AT+UFACTORY=0.0
+
+#### Extract IMEI
+
+    AT+CGSN=255
 
 #### Get MNO Registration Status
 
