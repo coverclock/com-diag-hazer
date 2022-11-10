@@ -16,6 +16,10 @@ the SparkFun instructions) for dual-UART operation. This required both
 hardware changes (opening and closing traces) and software configuration
 changes (both persistent and non-persistent).
 
+Note that the "Wheatstone" project designation includes other LTE-M radio
+modules, including ones not made by U-blox, and boards not made by
+SparkFun.
+
 ## Links
 
 <https://learn.sparkfun.com/tutorials/lte-gnss-breakout---sara-r5-hookup-guide/hardware-overview>
