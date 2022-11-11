@@ -1,10 +1,7 @@
 # SparkFun SARA-R5 Configuration for Wheatstone
 
-> THIS IS A WORK IN PROGRESS (WIP). That's a way of saying I don't have it
-> working yet. These notes merely document what I'm trying right now. Currently
-> I have the M8 GNSS receiver working with my Hazer gpstool, but the cellular
-> radio so far eludes me. I have used the same AT&T LTE-M SIM successfully
-> on Digi XBEE3 module.
+> THIS IS A WORK IN PROGRESS (WIP). So far I have managed to ping
+> external hosts on the internet, including my own web server.
 
 These are my notes for using the SparkFun SARA-R5 board, which features
 a U-blox SARA-R510M8S-00B module. The U-blox module incorporates both
@@ -25,9 +22,9 @@ wise to power the board from external power using pins it has for just
 this purpose. Currently I'm using an powered USB hub between the board
 and the Pi.
 
-Note that the "Wheatstone" project designation includes other LTE-M radio
-modules, including ones not made by U-blox, and boards not made by
-SparkFun.
+Note that the "Wheatstone" project designation includes work I've done
+with other LTE-M radio modules, including ones not made by U-blox, and
+boards not made by SparkFun.
 
 ## Links
 
@@ -168,8 +165,6 @@ I use AT&T as my LTE-M Mobile Network Operator (MNO). The Access Point
 Name (APN) and other parameters are specific to the service plan I have
 with AT&T. Your mileage may vary.
 
-THIS IS A WORK IN PROGRESS. (Which is a way of saying it doesn't work.)
-
 #### Turn Radio Off; GNSS continues to run
 
     AT+CFUN=0
@@ -206,6 +201,16 @@ THIS IS A WORK IN PROGRESS. (Which is a way of saying it doesn't work.)
 
     AT+CREG=1
 
+### Other Useful Stuff
+
+#### Factory Reset
+
+    AT+UFACTORY=0.0
+
+#### Extract IMEI
+
+    AT+CGSN=255
+
 #### Get MNO Registration Status
 
     AT+CREG?
@@ -213,3 +218,7 @@ THIS IS A WORK IN PROGRESS. (Which is a way of saying it doesn't work.)
 #### Get Connection Status
 
     AT+COPS?
+
+#### Ping
+
+    AT+UPING="www.google.com"
