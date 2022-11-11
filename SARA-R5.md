@@ -11,10 +11,19 @@ a U-blox SARA-R510M8S-00B module. The U-blox module incorporates both
 a M8030 GNSS receiver and an LTE-M radio, and provides a fairly complex
 interface accessed via AT commands. The SparkFun board comes initially
 set up for one-UART operation that connects the GNSS module to the
-LTE-M radio. For my purposes, I had to modify the board (as described in
-the SparkFun instructions) for dual-UART operation. This required both
+LTE-M radio. For my purposes, I modified the board as described in
+the SparkFun instructions for dual-UART operation. This required both
 hardware changes (opening and closing traces) and software configuration
 changes (both persistent and non-persistent).
+
+There is some evidence that this device exhibits an issue that I have
+encountered in other cellular devices: it draws more power than the
+Raspberry Pi can provide over its USB A ports. This manifests in two
+ways: the device cannot use enough transmit power to connect to the
+cellular network; and the Raspberry Pi resets. It would probably be
+wise to power the board from external power using pins it has for just
+this purpose. Currently I'm using an powered USB hub between the board
+and the Pi.
 
 Note that the "Wheatstone" project designation includes other LTE-M radio
 modules, including ones not made by U-blox, and boards not made by
@@ -89,7 +98,8 @@ What the /dev devices are will depend on the order that the USB-to-serial
 devices enumerate; I plug in "UART 1" first so it will be /dev/ttyUSB0,
 and then "UART 2" so it will be /dev/ttyUSB1. Both devices enumerate as
 v=1a86, p=7523; haven't figured out yet how to discriminate between the
-two for udev hot-plug magic.
+two for udev hot-plug magic. Both devices appear to support autobaud;
+I'm using both at 115200 BPS.
 
 ## Software Configuration
 
@@ -174,12 +184,12 @@ THIS IS A WORK IN PROGRESS. (Which is a way of saying it doesn't work.)
 
 #### Set Packet Data Protocol Context, Protocol, and Access Point Name
 
-    AT+CGDCONT=1,"IPV4V6","m2m.com.attz"
+    AT+CGDCONT=1,"IPV4V6","m2m64.com.attz"
 
 #### Set Packet Switched Data Profile 1: Protocol, APN, DNS1, DNS2, CID
 
     AT+UPSD=1,0,2
-    AT+UPSD=1,1,"m2m.com.attz"
+    AT+UPSD=1,1,"m2m64.com.attz"
     AT+UPSD=1,4,"8.8.8.8"
     AT+UPSD=1,5,"8.8.4.4"
     AT+UPSD=1,100,1
