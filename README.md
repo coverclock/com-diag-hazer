@@ -454,8 +454,6 @@ I have successfully tested Hazer with the following GPS devices.
 * TOPGNSS GN-803G (U-Blox 8/UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [^2] [^4] [^8]    
 * Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8N1, N/A, ttyS, 1Hz) [^4]    
 
-## Footnotes
-
 [^1]: A good inexpensive introductory GPS device easily acquired from numerous sources.    
 [^2]: Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
 [^3]: Install udev rules in overlay to prevent ModemManager from toying with device.    
@@ -485,10 +483,10 @@ GlobalSat is also known as GlobalSat Technology, USGlobalSat, US
 GlobalSat Technology, or GlobalSat Worldcom, but is apparently not
 the same as the Globalsat mobile satellite service provider.
 
-GlobalTop Technology a.k.a. GTop is part of Sierra Wireless.
+GlobalTop Technology is also known as GTop, and is part of Sierra
+Wireless.
 
-SiRF is part of Qualcom since 2015, and prior to that a product
-of CSR plc.
+SiRF is part of Qualcom.
 
 # Platforms
 
