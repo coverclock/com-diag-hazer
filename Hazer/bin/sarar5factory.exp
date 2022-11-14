@@ -7,6 +7,14 @@
 
 set argc [ llength $argv ]
 set device "/dev/ttyUSB1"
+set speed "115200"
 if { $argc > 0 } { set device [ lindex $argv 0 ] }
+if { $argc > 1 } { set speed [ lindex $argv 1 ] }
+puts $device
+puts $speed
 
+exec stty -F $device $speed raw -clocal -echo -istrip -hup
+spawn -open [ open $device w+ ]
 
+close
+exit
