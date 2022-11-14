@@ -3,6 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# WORK IN PROGRESS
 # Enables a factory reset on the next reset/power up of the
 # U-blox SARA-R5 device using the serial connection to the
 # cellular modem AT interface.
