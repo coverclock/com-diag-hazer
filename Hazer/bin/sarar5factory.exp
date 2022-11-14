@@ -3,33 +3,40 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Usage: sarar5factory.exp [ DEVICE ]
+# Enables a factory reset on the next reset/power up of the
+# U-blox SARA-R5 device using the serial connection to the
+# cellular modem AT interface.
+# Usage: sarar5factory.exp [ DEVICE [ BPS ] ]
+# Defaults: sarar5factory.exp /dev/ttyUSB1 115200
 
 set argc [ llength $argv ]
 set device "/dev/ttyUSB1"
-set speed "115200"
+set bps "115200"
 if { $argc > 0 } { set device [ lindex $argv 0 ] }
-if { $argc > 1 } { set speed [ lindex $argv 1 ] }
-#send_user $device
-#send_user $speed
+if { $argc > 1 } { set bps [ lindex $argv 1 ] }
 
-exec stty -F $device $speed raw -clocal -echo -istrip -hup
+send_user "Setting $device $bps\r\n"
+exec stty -F $device $bps raw -clocal -echo -istrip -hup
+send_user "Opening $device\r\n"
 spawn -open [ open $device w+ ]
 
+send_user "Sending AT\r\n"
 send "AT\r"
 expect {
-    "+PACSP0\r\n" { exp_continue }
-    "AT\r\n" { exp_continue }
-    timeout exit
-    "OK\r\n"
+    "+PACSP0\r\n" { send_user "Received +PACSP0\r\n"; exp_continue }
+    timeout { send_user "Timedout"; exit 1 }
+    "\rOK\r\n"
 }
+send_user "Received OK\r\n"
 
+send_user "Sending AT+UFACTORY=0,0\r\n"
 send "AT+UFACTORY=0,0\r"
 expect {
-    "AT+UFACTORY=0,0\r\n" { exp_continue }
-    timeout exit
-    "OK\r\n"
+    timeout { send_user "Timedout"; exit 1 }
+    "\rOK\r\n"
 }
+send_user "Received OK\r\n"
 
+send_user "Closing\r\n"
 close
-exit
+exit 0
