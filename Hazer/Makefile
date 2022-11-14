@@ -177,6 +177,7 @@ TARGETGENERATED		:=	$(addprefix $(OUT)/$(BIN_DIR)/,$(GENERATED)) $(addprefix $(O
 TARGETOBJECTS		:=	$(addprefix $(OUT)/$(OBC_DIR)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.c))))
 TARGETSCRIPTS		:=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.sh)))
 TARGETSCRIPTS		+=	$(addprefix $(OUT)/,$(wildcard $(BIN_DIR)/*.awk))
+TARGETSCRIPTS		+=	$(addprefix $(OUT)/,$(wildcard $(BIN_DIR)/*.exp))
 TARGETSYNTHESIZED	:=	$(addprefix $(OUT)/$(INC_DIR)/com/diag/$(PROJECT)/,$(SYNTHESIZED))
 TARGETUNITTESTS		:=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.c)))
 TARGETUNITTESTS		+=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.sh)))
@@ -683,6 +684,11 @@ $(OUT)/%:	%.sh
 	chmod $(MODE) $@
 
 $(OUT)/%.awk:	%.awk
+	D=`dirname $@`; mkdir -p $$D
+	cp $< $@
+	chmod $(MODE) $@
+
+$(OUT)/%.exp:	%.exp
 	D=`dirname $@`; mkdir -p $$D
 	cp $< $@
 	chmod $(MODE) $@
