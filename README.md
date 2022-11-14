@@ -422,72 +422,71 @@ I have successfully tested Hazer with the following serial-to-USB chipsets.
 
 I have successfully tested Hazer with the following GPS devices.
 
-* Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [12]    
-* Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
-* Bad Elf GPS Pro + (STMicroelectronics/MediaTek MTK, 9600 8n1, v0483p5740, ttyACM, 1Hz) [4] [16]    
-* Digi XBIB-C-GPS (U-blox 8/UBX-CAM-M8Q, 9600 8N1, N/A, ttyS, 1Hz) [4]    
-* Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
-* Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [9]    
-* Garmin GLO (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [15] [21]    
-* Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [15] [21] [22]    
-* Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
+* Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [^12]    
+* Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [^8] [^10]    
+* Bad Elf GPS Pro + (STMicroelectronics/MediaTek MTK, 9600 8n1, v0483p5740, ttyACM, 1Hz) [^4] [^16]    
+* Digi XBIB-C-GPS (U-blox 8/UBX-CAM-M8Q, 9600 8N1, N/A, ttyS, 1Hz) [^4]    
+* Eleduino Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
+* Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [^9]    
+* Garmin GLO (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21]    
+* Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21] [^22]    
+* Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
 * GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
-* GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [1]    
-* GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [1] [2] [4] [8] [13]    
+* GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [^1]    
+* GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [^1] [^2] [^4] [^8] [^13]    
 * GlobalSat ND-105C (SiRF Star III+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * Jackson Labs Technologies CSAC GPSDO (U-Blox 6/UBX-LEA-6T, 115200 8n1, N/A, ttyS, 1Hz)    
 * Lynq Technologies Smart Compass (U-Blox 8/UBX-CAM-M8Q, 115200 8n1, v1fc9p0194, ttyACM, 1Hz)    
-* MakerFocus USB-Port-GPS (Quectel L80-R+Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [2] [6]    
-* NaviSys GR-701W (U-Blox 7+Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [5] [7] [8]    
-* Pharos GPS-360 (SiRF Star II+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
-* Pharos GPS-500 (SiRF Star III+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [3]    
-* RaceDayQuads RDQ Micro M8N (U-Blox 8/UBX-NEO-M8N, 9600 8n1, N/A, ttyS, 1Hz) [4] [8] [14]    
-* Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [2]    
-* SparkFun GPS-RTK2 (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10]    
-* SparkFun NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [6] [8] [10]    
-* SparkFun NEO-M8U (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [4] [8] [11]    
-* SparkFun SAM-M8Q (U-Blox 8/UBX-SAM-M8Q, 9600 8n1, N/A, ttyS, 1Hz) [4] [6] [8] [14]    
-* SparkFun SARA-R5 (U-Blox 8/M8030/UBX-R5, autobaud, v1a86p7523, ttyUSB, 1Hz) [17] [18] [19]
-* SparkFun ZED-F9R (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [11]    
-* SparkFun ZED-F9T (U-Blox 9/UBX-ZED-F9T, 38400 8N1, v1516p01a9, ttyACM, 1Hz) [8] [10] [20]   
-* Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [2]    
-* TOPGNSS GN-803G (U-Blox 8/UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [2] [4] [8]    
-* Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8N1, N/A, ttyS, 1Hz) [4]    
+* MakerFocus USB-Port-GPS (Quectel L80-R+Cygnal, 9600 8N1, v10C4pEA60, ttyUSB, 1Hz) [^2] [^6]    
+* NaviSys GR-701W (U-Blox 7+Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [^5] [^7] [^8]    
+* Pharos GPS-360 (SiRF Star II+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [^3]    
+* Pharos GPS-500 (SiRF Star III+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [^3]    
+* RaceDayQuads RDQ Micro M8N (U-Blox 8/UBX-NEO-M8N, 9600 8n1, N/A, ttyS, 1Hz) [^4] [^8] [^14]    
+* Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [^2]    
+* SparkFun GPS-RTK2 (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [^8] [^10]    
+* SparkFun NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [^6] [^8] [^10]    
+* SparkFun NEO-M8U (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [^4] [^8] [^11]    
+* SparkFun SAM-M8Q (U-Blox 8/UBX-SAM-M8Q, 9600 8n1, N/A, ttyS, 1Hz) [^4] [^6] [^8] [^14]    
+* SparkFun SARA-R5 (U-Blox 8/M8030/UBX-R5, autobaud, v1a86p7523, ttyUSB, 1Hz) [^17] [^18] [^19]
+* SparkFun ZED-F9R (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [^8] [^10] [^11]    
+* SparkFun ZED-F9T (U-Blox 9/UBX-ZED-F9T, 38400 8N1, v1516p01a9, ttyACM, 1Hz) [^8] [^10] [^20]   
+* Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
+* TOPGNSS GN-803G (U-Blox 8/UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [^2] [^4] [^8]    
+* Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8N1, N/A, ttyS, 1Hz) [^4]    
 
-Footnotes:
+[^1]: A good inexpensive introductory GPS device easily acquired from numerous sources.    
+[^2]: Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
+[^3]: Install udev rules in overlay to prevent ModemManager from toying with device.    
+[^4]: Receives GPS (U.S.) *and* GLONASS (Russia) constellations concurrently.    
+[^5]: Receives GPS (U.S.) *or* GLONASS (Russia) constellations via configuration.    
+[^6]: I have used the 1PPS indication exported via a digital output pin.    
+[^7]: I have used the 1PPS indication exported via Data Carrier Detect (DCD).    
+[^8]: Supports UBX.    
+[^9]: A software defined radio (SDR).    
+[^10]: Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* COMPASS (China) concurrently.    
+[^11]: Has integrated Inertial Measurement Unit (IMU).    
+[^12]: Equipped with a CR1220 3V button cell.    
+[^13]: A tear down of the BU-353W10 reveals it has a button cell for its battery backed RAM.    
+[^14]: Make sure you mount this component side down, patch antenna side up.    
+[^15]: Uses Bluetooth (see procedure for pairing in <https://github.com/coverclock/com-diag-hazer/blob/master/REMARKS.md>).    
+[^16]: Uses Bluetooth but refuses to pair with Raspberry Pi.    
+[^17]: This SparkFun board requires opening (cutting) and closing (soldering) traces for dual UART operation.    
+[^18]: This U-Blox gen 8 receiver is embedded in a U-Blox LTE-M module which required a lot of config via AT commands.    
+[^19]: 1PPS (a.k.a. TPS in the docs) only has a pulse width of a few microseconds hence LED inoperative (bug).    
+[^20]: Timing and frequency reference claimed +/- 5ns.    
+[^21]: Supposed to receive both GPS and GLONASS but my GLO and both of my GLO 2 units just receive GPS.    
+[^22]: Rumored to differ from the original GLO only by its increased battery life.    
 
-[1] A good inexpensive introductory GPS device easily acquired from numerous sources.    
-[2] Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
-[3] Install udev rules in overlay to prevent ModemManager from toying with device.    
-[4] Receives GPS (U.S.) *and* GLONASS (Russia) constellations concurrently.    
-[5] Receives GPS (U.S.) *or* GLONASS (Russia) constellations via configuration.    
-[6] I have used the 1PPS indication exported via a digital output pin.    
-[7] I have used the 1PPS indication exported via Data Carrier Detect (DCD).    
-[8] Supports UBX.    
-[9] A software defined radio (SDR).    
-[10] Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), *and* COMPASS (China) concurrently.    
-[11] Has integrated Inertial Measurement Unit (IMU).    
-[12] Equipped with a CR1220 3V button cell.    
-[13] A tear down of the BU-353W10 reveals it has a button cell for its battery backed RAM.    
-[14] Make sure you mount this component side down, patch antenna side up.    
-[15] Uses Bluetooth (see procedure for pairing in <https://github.com/coverclock/com-diag-hazer/blob/master/REMARKS.md>).    
-[16] Uses Bluetooth but refuses to pair with Raspberry Pi.    
-[17] This SparkFun board requires opening (cutting) and closing (soldering) traces for dual UART operation.    
-[18] This U-Blox gen 8 receiver is embedded in a U-Blox LTE-M module which required a lot of config via AT commands.    
-[19] 1PPS (a.k.a. TPS in the docs) only has a pulse width of a few microseconds hence LED inoperative (bug).    
-[20] Timing and frequency reference claimed +/- 5ns.    
-[21] Supposed to receive both GPS and GLONASS but my GLO and both of my GLO 2 units just receive GPS.    
-[22] Rumored to differ from the original GLO only by its increased battery life.    
+## Notes
 
-Notes:
+GlobalSat is also known as GlobalSat Technology, USGlobalSat, US
+GlobalSat Technology, or GlobalSat Worldcom, but is apparently not
+the same as the Globalsat mobile satellite service provider.
 
-GlobalSat is also known as GlobalSat Technology, USGlobalSat, US GlobalSat
-Technology, or GlobalSat Worldcom, but is apparently not the same as
-the Globalsat mobile satellite service provider.
+GlobalTop Technology is also known as GTop, and is part of Sierra
+Wireless.
 
-GlobalTop Technology (GTop) is part of Sierra Wireless.
-
-SiRF is part of Qualcom (since 2015, and prior to that a product of CSR plc).
+SiRF is part of Qualcom.
 
 # Platforms
 
@@ -1331,8 +1330,8 @@ or ```0377```.
 # Comma Separated Value (CSV) Output
 
 The -T flag for gpstool will cause the utility to save the current
-Position, Velocity, Time (PVT) solution once a second to a "trace"
-file in CSV format as described below. This makes it easy to analyze
+Position, Velocity, Time (PVT) solution once a second to a "trace
+file" in CSV format as described below. This makes it easy to analyze
 results using tools like Excel and several tools provided by Hazer itself.
 The PVT solution is taken from the high precision u-blox UBX-NAV-HPPOSLLH
 message if it is available, from the ensemble GNSS solution if it exists,
@@ -1343,29 +1342,29 @@ if it is available. Fields which are not available or are not supported
 by the receiver have values coded as "0." instead of an empty string to
 simplify parsing in post-processing.
 
-* NAM - 0: hostname of computer running gpstool.
-* NUM - 1: sequence number of observation.
-* FIX - 2: 0=no fix, 1=dead reckoning, 2=2D, 3=3D, 4=combined, 5=time only.
-* SYS - 3: 0=ensemble, 1=GPS, 2=GLONASS, 3=GALILEO, 4=BEIDOU.
-* SAT - 4: number of satellites used in position fix.
-* CLK - 5: local time in decimal seconds since the POSIX Epoch.
-* TIM - 6: GPS time in decimal seconds since the POSIX Epoch.
-* LAT - 7: WGS84 latitude in decimal degrees.
-* LON - 8: WGS84 longitude in decimal degrees.
-* HAC - 9: reported horizontal error in decimal meters.
-* MSL - 10: altitude above Mean Sea Level in decimal meters.
-* GEO - 11: altitude above WGS84 ellipse in decimal meters.
-* VAC - 12: reported vertical error in decimal meters.
-* SOG - 13: speed over ground in decimal knots.
-* COG - 14: course over ground in decimal degrees.
-* ROL - 15: roll in decimal degrees from IMU.
-* PIT - 16: pitch in decimal degrees from IMU.
-* YAW - 17: yaw in decimal degrees form IMU.
-* RAC - 18: roll accuracy in decimal degrees.
-* PAC - 19: pitch accuracy in decimal degrees.
-* YAC - 20: yaw accuracy in decimal degrees.
-* OBS - 21: number of survey observations.
-* MAC - 22: mean accuracy of survey fix.
+*  0 - NAM: hostname of computer running gpstool.
+*  1 - NUM: sequence number of observation.
+*  2 - FIX: 0=no fix, 1=dead reckoning, 2=2D, 3=3D, 4=combined, 5=time only.
+*  3 - SYS: 0=ensemble, 1=GPS, 2=GLONASS, 3=GALILEO, 4=BEIDOU.
+*  4 - SAT: number of satellites used in position fix.
+*  5 - CLK: local time in decimal seconds since the POSIX Epoch.
+*  6 - TIM: GPS time in decimal seconds since the POSIX Epoch.
+*  7 - LAT: WGS84 latitude in decimal degrees.
+*  8 - LON: WGS84 longitude in decimal degrees.
+*  9 - HAC: reported horizontal error in decimal meters.
+* 10 - MSL: altitude above Mean Sea Level in decimal meters.
+* 11 - GEO: altitude above WGS84 ellipse in decimal meters.
+* 12 - VAC: reported vertical error in decimal meters.
+* 13 - SOG: speed over ground in decimal knots.
+* 14 - COG: course over ground in decimal degrees.
+* 15 - ROL: roll in decimal degrees from IMU.
+* 16 - PIT: pitch in decimal degrees from IMU.
+* 17 - YAW: yaw in decimal degrees form IMU.
+* 18 - RAC: roll accuracy in decimal degrees.
+* 19 - PAC: pitch accuracy in decimal degrees.
+* 20 - YAC: yaw accuracy in decimal degrees.
+* 21 - OBS: number of survey observations.
+* 22 - MAC: mean accuracy of survey fix.
 
 A snippet of an actual CSV file looks like this.
 
