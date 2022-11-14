@@ -24,16 +24,16 @@ send_user "Sending AT\r\n"
 send "AT\r"
 expect {
     "+PACSP0\r\n" { send_user "Received +PACSP0\r\n"; exp_continue }
-    timeout { send_user "Timedout"; exit 1 }
-    "\rOK\r\n"
+    timeout { send_user "Timeout\r\n"; exit 1 }
+    "\nOK\r\n"
 }
 send_user "Received OK\r\n"
 
 send_user "Sending AT+UFACTORY=0,0\r\n"
 send "AT+UFACTORY=0,0\r"
 expect {
-    timeout { send_user "Timedout"; exit 1 }
-    "\rOK\r\n"
+    timeout { send_user "Timeout\r\n"; exit 1 }
+    "\nOK\r\n"
 }
 send_user "Received OK\r\n"
 
