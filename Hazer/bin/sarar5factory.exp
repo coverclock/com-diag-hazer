@@ -10,11 +10,26 @@ set device "/dev/ttyUSB1"
 set speed "115200"
 if { $argc > 0 } { set device [ lindex $argv 0 ] }
 if { $argc > 1 } { set speed [ lindex $argv 1 ] }
-puts $device
-puts $speed
+#send_user $device
+#send_user $speed
 
 exec stty -F $device $speed raw -clocal -echo -istrip -hup
 spawn -open [ open $device w+ ]
+
+send "AT\r"
+expect {
+    "+PACSP0\r\n" { exp_continue }
+    "AT\r\n" { exp_continue }
+    timeout exit
+    "OK\r\n"
+}
+
+send "AT+UFACTORY=0,0\r"
+expect {
+    "AT+UFACTORY=0,0\r\n" { exp_continue }
+    timeout exit
+    "OK\r\n"
+}
 
 close
 exit
