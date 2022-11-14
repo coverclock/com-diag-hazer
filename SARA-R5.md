@@ -36,6 +36,9 @@ boards not made by SparkFun.
 
 ## References
 
+SparkFun, "SparkFun LTE GNSS Breakout - SARA-R510M8S",
+<https://github.com/sparkfun/SparkFun_LTE_GNSS_Breakout_SARA-R510M8S>
+
 U-blox, "SARA-R4/SARA-R5 series - LwM2M objects and commands - Application
 note", UBX-18068860-R04, 2020-02-26
 
