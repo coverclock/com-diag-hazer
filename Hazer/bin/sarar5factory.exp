@@ -3,23 +3,23 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# WORK IN PROGRESS
 # Enables a factory reset on the next reset/power up of the
 # U-blox SARA-R5 device using the serial connection to the
-# cellular modem AT interface.
-# Usage: sarar5factory.exp [ DEVICE [ BPS ] ]
+# cellular modem AT interface. This script uses the Diminuto
+# serialtool utility to leverage its O_NONBLOCK openat(2).
+# THIS IS A WORK IN PROGRESS.
+# Usage: sarar5factory.exp [ DEVICE [ RATE ] ]
 # Defaults: sarar5factory.exp /dev/ttyUSB1 115200
 
 set argc [ llength $argv ]
 set device "/dev/ttyUSB1"
-set bps "115200"
+set rate "115200"
 if { $argc > 0 } { set device [ lindex $argv 0 ] }
-if { $argc > 1 } { set bps [ lindex $argv 1 ] }
+if { $argc > 1 } { set rate [ lindex $argv 1 ] }
 
-send_user "Setting $device $bps\r\n"
-exec stty -F $device $bps raw -clocal -echo -istrip -hup
 send_user "Opening $device\r\n"
-spawn -open [ open $device w+ ]
+set stty_init raw
+spawn serialtool -D $device -b $rate -8 -n -1 -N -r
 
 send_user "Sending AT\r\n"
 send "AT\r"
@@ -33,6 +33,7 @@ send_user "Received OK\r\n"
 send_user "Sending AT+UFACTORY=0,0\r\n"
 send "AT+UFACTORY=0,0\r"
 expect {
+    "+PACSP0\r\n" { send_user "Received +PACSP0\r\n"; exp_continue }
     timeout { send_user "Timeout\r\n"; exit 1 }
     "\nOK\r\n"
 }
