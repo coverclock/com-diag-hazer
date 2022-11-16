@@ -1,0 +1,132 @@
+#!/usr/bin/expect --
+# Copyright 2022 Digital Aggregates Corporation, Colorado, USA
+# Licensed under the terms in LICENSE.txt
+# Chip Overclock <coverclock@diag.com>
+# https://github.com/coverclock/com-diag-hazer
+# Enables a factory reset on the next reset/power up of the
+# U-blox SARA-R5 device using the serial connection to the
+# cellular modem AT interface. This script uses the Diminuto
+# serialtool utility to leverage its O_NONBLOCK openat(2).
+# THIS IS A WORK IN PROGRESS.
+# Usage: sarar5factory.exp [ DEVICE [ RATE [ PROFILE [ PROTOCOL [ APN [ DNS1 [ DNS2 ] ] ] ] ] ] ]
+# Defaults: sarar5factory.exp /dev/ttyUSB1 115200 2 IPV4V6 m2m64.com.attz 8.8.8.8 8.8.4.4
+
+# Set defaults.
+
+set device "/dev/ttyUSB1"
+set rate "115200"
+set profile "2"
+set protocol "IPV4V6"
+set apn "m2m64.com.attz"
+set dns1 "8.8.8.8"
+set dns2 "8.8.4.4"
+
+# Set parameters.
+
+set argc [ llength $argv ]
+if { $argc > 0 } { set device   [ lindex $argv 0 ] }
+if { $argc > 1 } { set rate     [ lindex $argv 1 ] }
+if { $argc > 2 } { set profile  [ lindex $argv 2 ] }
+if { $argc > 3 } { set protocol [ lindex $argv 3 ] }
+if { $argc > 4 } { set apn      [ lindex $argv 4 ] }
+if { $argc > 5 } { set dsn1     [ lindex $argv 5 ] }
+if { $argc > 6 } { set dns2     [ lindex $argv 6 ] }
+
+# Prevent '\r' from being translated to '\n'.
+
+set stty_init "raw"
+
+send_user "Opening $device\n"
+spawn serialtool -N -O -D $device -b $rate -8 -n -1
+
+# Terminate any partial or invalid command entered prior.
+
+send_user "Sending Carriage Return\n"
+send "\r"
+
+# Autobaud connection to current baud rate.
+
+set command "AT"
+set response "OK"
+
+send_user "Sending $command\n"
+send_user "Expecting $response\n"
+send "$command\r"
+expect {
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    "$command" { send_user "Echoed\n"; exp_continue; }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "$response"
+}
+send_user "Received $response\n"
+
+set command "AT"
+set response "OK"
+
+send_user "Sending $command\n"
+send_user "Expecting $response\n"
+send "$command\r"
+expect {
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    "$command" { send_user "Echoed\n"; exp_continue; }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "$response"
+}
+send_user "Received $response\n"
+
+# Proceed with configuration.
+
+set commands [ list \
+    "AT+CMEE=2" \
+    "AT+UTIME=1,1" \
+    "AT+UGPS=0" \
+    "AT+UGPS=1,0,71" \
+    "AT+IPR=$rate" \
+    "AT+USIO=4" \
+    "AT+UGPIOC=16,2" \
+    "AT+UGPIOC=19,22" \
+    "AT+UGPRF=1" \
+    "AT+UGGGA=1" \
+    "AT+UGGLL=1" \
+    "AT+UGGSA=1" \
+    "AT+UGGSV=1" \
+    "AT+UGRMC=1" \
+    "AT+UGVTG=1" \
+    "AT+CFUN=0" \
+    "AT+UMNOPROF=$profile" \
+    "AT+CGDCONT=1,\"$protocol\",\"$apn\"" \
+    "AT+UPSD=1,0,2" \
+    "AT+UPSD=1,1,\"$apn\"" \
+    "AT+UPSD=1,4,\"$dns1\"" \
+    "AT+UPSD=1,5,\"$dns2\"" \
+    "AT+UPSD=1,100,1" \
+    "AT+CFUN=1" \
+    "AT+UPSDA=1,3" \
+    "AT+CREG=1" \
+]
+
+set commandn [ llength $commands ]
+set commandi 0
+while { $commandi < $commandn } {
+    set command [ lindex $commands $commandi ]
+    set commandi [ expr $commandi + 1 ]
+    set response "OK"
+    send_user "Sending $command\n"
+    send_user "Expecting $response\n"
+    send "$command\r"
+    expect {
+        "$command" { send_user "Echoed\n"; exp_continue }
+        timeout { send_user "Timeout\n"; exit 1 }
+        "$response"
+    }
+    send_user "Received $response\n"
+}
+
+send_user "Rebooting\n"
+send "AT+CFUN=16\r"
+
+send_user "Closing\n"
+close
+exit 0

@@ -11,40 +11,75 @@
 # Usage: sarar5factory.exp [ DEVICE [ RATE ] ]
 # Defaults: sarar5factory.exp /dev/ttyUSB1 115200
 
-set argc [ llength $argv ]
+# Set defaults.
+
 set device "/dev/ttyUSB1"
 set rate "115200"
-if { $argc > 0 } { set device [ lindex $argv 0 ] }
-if { $argc > 1 } { set rate [ lindex $argv 1 ] }
 
-# Or else '\r' translated to '\n'.
+# Set parameters.
+
+set argc [ llength $argv ]
+if { $argc > 0 } { set device [ lindex $argv 0 ] }
+if { $argc > 1 } { set rate   [ lindex $argv 1 ] }
+
+# Prevent '\r' from being translated to '\n'.
+
 set stty_init "raw"
 
 send_user "Opening $device\n"
 spawn serialtool -N -O -D $device -b $rate -8 -n -1
 
+# Terminate any partial or invalid command entered prior.
+
 send_user "Sending Carriage Return\n"
 send "\r"
 
-send_user "Sending AT\n"
-send "AT\r"
-expect {
-    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
-    "AT" { send_user "Echoed\n"; exp_continue; }
-    timeout { send_user "Timeout\n"; exit 1 }
-    "OK"
-}
-send_user "Received OK\n"
+# Autobaud connection to current baud rate.
 
-send_user "Sending AT+UFACTORY=0,0\n"
-send "AT+UFACTORY=0,0\r"
+set command "AT"
+set response "OK"
+
+send_user "Sending $command\n"
+send_user "Expecting $response\n"
+send "$command\r"
 expect {
     "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
-    "AT+UFACTORY=0,0" { send_user "Echoed\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    "$command" { send_user "Echoed\n"; exp_continue; }
     timeout { send_user "Timeout\n"; exit 1 }
-    "OK"
+    "$response"
 }
-send_user "Received OK\n"
+send_user "Received $response\n"
+
+set command "AT"
+set response "OK"
+
+send_user "Sending $command\n"
+send_user "Expecting $response\n"
+send "$command\r"
+expect {
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    "$command" { send_user "Echoed\n"; exp_continue; }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "$response"
+}
+send_user "Received $response\n"
+
+# Proceed with configuration.
+
+set command "AT+UFACTORY=0,0"
+set response "OK"
+
+send_user "Sending $command\n"
+send_user "Expecting $response\n"
+send "$command\r"
+expect {
+    "$command" { send_user "Echoed\n"; exp_continue }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "$response"
+}
+send_user "Received $response\n"
 
 send_user "Closing\n"
 close
