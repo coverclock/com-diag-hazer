@@ -17,39 +17,35 @@ set rate "115200"
 if { $argc > 0 } { set device [ lindex $argv 0 ] }
 if { $argc > 1 } { set rate [ lindex $argv 1 ] }
 
-stty raw
+# Or else '\r' translated to '\n'.
 set stty_init "raw"
 
-send_user "Opening $device\r\n"
-spawn serialtool -N -O -D $device -b $rate -8 -n -1 -r
+send_user "Opening $device\n"
+spawn serialtool -N -O -D $device -b $rate -8 -n -1
 
-send_user "Sending Carriage Return\r\n"
-send -raw "\r"
+send_user "Sending Carriage Return\n"
+send "\r"
+
+send_user "Sending AT\n"
+send "AT\r"
 expect {
-    "\n+PACSP0\r\n" { send_user "Received +PACSP0\r\n"; exp_continue }
-    timeout { send_user "Timeout\r\n"; exit 1 }
-    "\n"
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "AT" { send_user "Echoed\n"; exp_continue; }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "OK"
 }
-send_user "Received New Line\r\n"
+send_user "Received OK\n"
 
-send_user "Sending AT\r\n"
-send -raw "AT\r"
+send_user "Sending AT+UFACTORY=0,0\n"
+send "AT+UFACTORY=0,0\r"
 expect {
-    "\n+PACSP0\r\n" { send_user "Received +PACSP0\r\n"; exp_continue }
-    timeout { send_user "Timeout\r\n"; exit 1 }
-    "\nOK\r\n"
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "AT+UFACTORY=0,0" { send_user "Echoed\n"; exp_continue }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "OK"
 }
-send_user "Received OK\r\n"
+send_user "Received OK\n"
 
-send_user "Sending AT+UFACTORY=0,0\n\r"
-send -raw "AT+UFACTORY=0,0\r"
-expect {
-    "\n+PACSP0\r\n" { send_user "Received +PACSP0\r\n"; exp_continue }
-    timeout { send_user "Timeout\r\n"; exit 1 }
-    "\nOK\r\n"
-}
-send_user "Received OK\r\n"
-
-send_user "Closing\r\n"
+send_user "Closing\n"
 close
 exit 0
