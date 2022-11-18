@@ -33,7 +33,7 @@ spawn serialtool -N -D $device -b $rate -8 -n -1
 send_user "Sending Carriage Return\n"
 send "\r"
 
-# Proceed with configuration including initial autobaud.
+# Proceed with configuration.
 
 set commands [ list \
     "AT" \

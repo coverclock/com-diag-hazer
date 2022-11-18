@@ -33,12 +33,59 @@ spawn serialtool -N -D $device -b $rate -8 -n -1
 send_user "Sending Carriage Return\n"
 send "\r"
 
-# Proceed with configuration including initial autobaud.
+# Proceed with configuration.
 
 set commands [ list \
     "AT" \
     "AT" \
     "AT+CMEE=2" \
+]
+
+set commandn [ llength $commands ]
+set commandi 0
+while { $commandi < $commandn } {
+    set command [ lindex $commands $commandi ]
+    set commandi [ expr $commandi + 1 ]
+    set response "OK"
+    send_user "Sending $command\n"
+    send_user "Expecting $response\n"
+    send "$command\r"
+    expect {
+        "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+        "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+        "$command" { send_user "Echoed\n"; exp_continue }
+        timeout { send_user "Timeout\n"; exit 1 }
+        "ERROR" { send_user "Failed\n"; exit 1 }
+        "$response"
+    }
+    send_user "Received $response\n"
+}
+
+set commands [ list \
+    "AT+UGPS=0" \
+]
+
+set commandn [ llength $commands ]
+set commandi 0
+while { $commandi < $commandn } {
+    set command [ lindex $commands $commandi ]
+    set commandi [ expr $commandi + 1 ]
+    set response "OK"
+    send_user "Sending $command\n"
+    send_user "Expecting $response\n"
+    send "$command\r"
+    expect {
+        "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+        "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+        "$command" { send_user "Echoed\n"; exp_continue }
+        timeout { send_user "Timeout\n"; exit 1 }
+        "ERROR" { send_user "Probably already off\n" }
+        "$response"
+    }
+    send_user "Received $response\n"
+}
+
+set commands [ list \
     "AT+UGPRF=1" \
     "AT+UGGGA=1" \
     "AT+UGGLL=1" \
@@ -48,8 +95,9 @@ set commands [ list \
     "AT+UGVTG=1" \
     "AT+UGPIOC=16,2" \
     "AT+UGPIOC=19,22" \
-    "AT+UGPS=1,0,71" \
+    "AT+ULOCGNSS=1,0,3,7,0,0,1,1,2,0,9,79,0,0" \
     "AT+UTIME=1,1" \
+    "AT+UGPS=1,0,71" \
 ]
 
 set commandn [ llength $commands ]

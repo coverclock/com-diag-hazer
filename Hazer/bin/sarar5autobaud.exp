@@ -25,7 +25,7 @@ set stty_init "raw"
 send_user "Opening $device\n"
 spawn serialtool -N -D $device -b $rate -8 -n -1
 
-# Proceed with autobaud (must use "AT" or "at").
+# Proceed with autobaud (must use "AT\r" or "at\r").
 
 send_user "Sending Carriage Return\n"
 send "\r"
@@ -33,19 +33,55 @@ sleep 1
 
 send_user "Sending first AT\n"
 send "A"
-sleep 1
+expect {
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "ERROR" { send_user "Failed\n"; exit 1 }
+    "A"
+}
 send "T"
-sleep 1
+expect {
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "ERROR" { send_user "Failed\n"; exit 1 }
+    "T"
+}
 send "\r"
-sleep 1
+expect {
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "ERROR" { send_user "Failed\n"; exit 1 }
+    "\r\n"
+}
 
 send_user "Sending second AT\n"
 send "A"
-sleep 1
+expect {
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "ERROR" { send_user "Failed\n"; exit 1 }
+    "A"
+}
 send "T"
-sleep 1
+expect {
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "ERROR" { send_user "Failed\n"; exit 1 }
+    "T"
+}
 send "\r"
-sleep 1
+expect {
+    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+    timeout { send_user "Timeout\n"; exit 1 }
+    "ERROR" { send_user "Failed\n"; exit 1 }
+    "\r\n"
+}
 
 send_user "Closing\n"
 close
