@@ -3,33 +3,24 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configures a U-blox SARA-R5 device using the serial connection
-# to the cellular modem AT interface. This script uses the Diminuto
+# Enables a factory reset on the next reset/power up of the
+# U-blox SARA-R5 device using the serial connection to the
+# cellular modem AT interface. This script uses the Diminuto
 # serialtool utility to leverage its O_NONBLOCK openat(2).
 # THIS IS A WORK IN PROGRESS.
-# Usage: sarar5setup.exp [ DEVICE [ RATE [ PROVIDER [ PROTOCOL [ APN [ DNS1 [ DNS2 ] ] ] ] ] ] ]
-# Defaults: sarar5setup.exp /dev/ttyUSB1 115200 2 IPV4V6 m2m64.com.attz 8.8.8.8 8.8.4.4
+# Usage: sarar5factoryreset.exp [ DEVICE [ RATE ] ]
+# Defaults: sarar5factoryreset.exp /dev/ttyUSB1 115200
 
 # Set defaults.
 
 set device "/dev/ttyUSB1"
 set rate "115200"
-set provider "2"
-set protocol "IPV4V6"
-set apn "m2m64.com.attz"
-set dns1 "8.8.8.8"
-set dns2 "8.8.4.4"
 
 # Set parameters.
 
 set argc [ llength $argv ]
-if { $argc > 0 } { set device   [ lindex $argv 0 ] }
-if { $argc > 1 } { set rate     [ lindex $argv 1 ] }
-if { $argc > 2 } { set provider [ lindex $argv 2 ] }
-if { $argc > 3 } { set protocol [ lindex $argv 3 ] }
-if { $argc > 4 } { set apn      [ lindex $argv 4 ] }
-if { $argc > 5 } { set dsn1     [ lindex $argv 5 ] }
-if { $argc > 6 } { set dns2     [ lindex $argv 6 ] }
+if { $argc > 0 } { set device [ lindex $argv 0 ] }
+if { $argc > 1 } { set rate   [ lindex $argv 1 ] }
 
 # Prevent '\r' from being translated to '\n'.
 
@@ -49,32 +40,7 @@ set commands [ list \
     "AT" \
     "AT" \
     "AT+CMEE=2" \
-    "AT+IPR=$rate" \
-    "AT+USIO=4" \
-    \
-    "AT+UGPIOC=16,2" \
-    "AT+UGPIOC=19,22" \
-    "AT+UTIME=1,1" \
-    "AT+UGPS=1,0,71" \
-    "AT+UGPRF=1" \
-    "AT+UGGGA=1" \
-    "AT+UGGLL=1" \
-    "AT+UGGSA=1" \
-    "AT+UGGSV=1" \
-    "AT+UGRMC=1" \
-    "AT+UGVTG=1" \
-    \
-    "AT+CFUN=0" \
-    "AT+UMNOPROF=$provider" \
-    "AT+CGDCONT=1,\"$protocol\",\"$apn\"" \
-    "AT+UPSD=1,0,2" \
-    "AT+UPSD=1,1,\"$apn\"" \
-    "AT+UPSD=1,4,\"$dns1\"" \
-    "AT+UPSD=1,5,\"$dns2\"" \
-    "AT+UPSD=1,100,1" \
-    "AT+CFUN=1" \
-    "AT+UPSDA=1,3" \
-    "AT+CREG=1" \
+    "AT+UFACTORY=0,0" \
 ]
 
 set commandn [ llength $commands ]
@@ -97,9 +63,8 @@ while { $commandi < $commandn } {
     send_user "Received $response\n"
 }
 
-send_user "Rebooting\n"
-send "AT+CFUN=16\r"
-
 send_user "Closing\n"
 close
+
+send_user "Device will factory reset upon next device reset.\n"
 exit 0

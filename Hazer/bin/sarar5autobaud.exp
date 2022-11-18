@@ -1,0 +1,53 @@
+#!/usr/bin/expect --
+# Copyright 2022 Digital Aggregates Corporation, Colorado, USA
+# Licensed under the terms in LICENSE.txt
+# Chip Overclock <coverclock@diag.com>
+# https://github.com/coverclock/com-diag-hazer
+# THIS IS A WORK IN PROGRESS.
+# Usage: sarar5autobaud.exp [ DEVICE [ RATE ] ]
+# Defaults: sarar5autobaud.exp /dev/ttyUSB1 115200
+
+# Set defaults.
+
+set device "/dev/ttyUSB1"
+set rate "115200"
+
+# Set parameters.
+
+set argc [ llength $argv ]
+if { $argc > 0 } { set device [ lindex $argv 0 ] }
+if { $argc > 1 } { set rate   [ lindex $argv 1 ] }
+
+# Prevent '\r' from being translated to '\n'.
+
+set stty_init "raw"
+
+send_user "Opening $device\n"
+spawn serialtool -N -D $device -b $rate -8 -n -1
+
+# Proceed with autobaud (must use "AT" or "at").
+
+send_user "Sending Carriage Return\n"
+send "\r"
+sleep 1
+
+send_user "Sending first AT\n"
+send "A"
+sleep 1
+send "T"
+sleep 1
+send "\r"
+sleep 1
+
+send_user "Sending second AT\n"
+send "A"
+sleep 1
+send "T"
+sleep 1
+send "\r"
+sleep 1
+
+send_user "Closing\n"
+close
+
+exit 0

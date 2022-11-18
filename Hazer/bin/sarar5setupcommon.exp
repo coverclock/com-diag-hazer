@@ -8,7 +8,7 @@
 # serialtool utility to leverage its O_NONBLOCK openat(2).
 # THIS IS A WORK IN PROGRESS.
 # Usage: sarar5setupcommon.exp [ DEVICE [ RATE ] ]
-# Defaults: sarar5setup.exp /dev/ttyUSB1 115200
+# Defaults: sarar5setupcommon.exp /dev/ttyUSB1 115200
 
 # Set defaults.
 

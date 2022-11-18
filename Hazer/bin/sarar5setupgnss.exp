@@ -7,8 +7,8 @@
 # to the cellular modem AT interface. This script uses the Diminuto
 # serialtool utility to leverage its O_NONBLOCK openat(2).
 # THIS IS A WORK IN PROGRESS.
-# Usage: sarar5setup.exp [ DEVICE [ RATE ] ]
-# Defaults: sarar5setup.exp /dev/ttyUSB1 115200
+# Usage: sarar5setupgnss.exp [ DEVICE [ RATE ] ]
+# Defaults: sarar5setupgnss.exp /dev/ttyUSB1 115200
 
 # Set defaults.
 
@@ -48,8 +48,8 @@ set commands [ list \
     "AT+UGVTG=1" \
     "AT+UGPIOC=16,2" \
     "AT+UGPIOC=19,22" \
-    "AT+UTIME=1,1" \
     "AT+UGPS=1,0,71" \
+    "AT+UTIME=1,1" \
 ]
 
 set commandn [ llength $commands ]
