@@ -27,60 +27,44 @@ if { $argc > 1 } { set rate   [ lindex $argv 1 ] }
 set stty_init "raw"
 
 send_user "Opening $device\n"
-spawn serialtool -N -O -D $device -b $rate -8 -n -1
+spawn serialtool -N -D $device -b $rate -8 -n -1
 
 # Terminate any partial or invalid command entered prior.
 
 send_user "Sending Carriage Return\n"
 send "\r"
 
-# Autobaud connection to current baud rate.
+# Proceed with configuration including initial autobaud.
 
-set command "AT"
-set response "OK"
+set commands [ list \
+    "AT" \
+    "AT" \
+    "AT+CMEE=2" \
+    "AT+UFACTORY=0,0" \
+]
 
-send_user "Sending $command\n"
-send_user "Expecting $response\n"
-send "$command\r"
-expect {
-    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
-    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
-    "$command" { send_user "Echoed\n"; exp_continue; }
-    timeout { send_user "Timeout\n"; exit 1 }
-    "$response"
+set commandn [ llength $commands ]
+set commandi 0
+while { $commandi < $commandn } {
+    set command [ lindex $commands $commandi ]
+    set commandi [ expr $commandi + 1 ]
+    set response "OK"
+    send_user "Sending $command\n"
+    send_user "Expecting $response\n"
+    send "$command\r"
+    expect {
+        "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
+        "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
+        "$command" { send_user "Echoed\n"; exp_continue }
+        timeout { send_user "Timeout\n"; exit 1 }
+        "ERROR" { send_user "Failed\n"; exit 1 }
+        "$response"
+    }
+    send_user "Received $response\n"
 }
-send_user "Received $response\n"
-
-set command "AT"
-set response "OK"
-
-send_user "Sending $command\n"
-send_user "Expecting $response\n"
-send "$command\r"
-expect {
-    "+PACSP0" { send_user "Received +PACSP0\n"; exp_continue }
-    "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
-    "$command" { send_user "Echoed\n"; exp_continue; }
-    timeout { send_user "Timeout\n"; exit 1 }
-    "$response"
-}
-send_user "Received $response\n"
-
-# Proceed with configuration.
-
-set command "AT+UFACTORY=0,0"
-set response "OK"
-
-send_user "Sending $command\n"
-send_user "Expecting $response\n"
-send "$command\r"
-expect {
-    "$command" { send_user "Echoed\n"; exp_continue }
-    timeout { send_user "Timeout\n"; exit 1 }
-    "$response"
-}
-send_user "Received $response\n"
 
 send_user "Closing\n"
 close
+
+send_user "Device will factory reset upon next device reset.\n"
 exit 0

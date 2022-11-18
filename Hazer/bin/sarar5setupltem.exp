@@ -49,21 +49,6 @@ set commands [ list \
     "AT" \
     "AT" \
     "AT+CMEE=2" \
-    "AT+IPR=$rate" \
-    "AT+USIO=4" \
-    \
-    "AT+UGPIOC=16,2" \
-    "AT+UGPIOC=19,22" \
-    "AT+UTIME=1,1" \
-    "AT+UGPS=1,0,71" \
-    "AT+UGPRF=1" \
-    "AT+UGGGA=1" \
-    "AT+UGGLL=1" \
-    "AT+UGGSA=1" \
-    "AT+UGGSV=1" \
-    "AT+UGRMC=1" \
-    "AT+UGVTG=1" \
-    \
     "AT+CFUN=0" \
     "AT+UMNOPROF=$provider" \
     "AT+CGDCONT=1,\"$protocol\",\"$apn\"" \
