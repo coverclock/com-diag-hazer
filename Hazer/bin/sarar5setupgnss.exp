@@ -62,6 +62,7 @@ while { $commandi < $commandn } {
 }
 
 set commands [ list \
+    "AT+UGPS?" \
     "AT+UGPS=0" \
 ]
 
@@ -79,7 +80,8 @@ while { $commandi < $commandn } {
         "+PACSP1" { send_user "Received +PACSP1\n"; exp_continue }
         "$command" { send_user "Echoed\n"; exp_continue }
         timeout { send_user "Timeout\n"; exit 1 }
-        "ERROR" { send_user "Probably already off\n" }
+        "ERROR" { send_user "Perhaps already off\n" }
+        "+UGPS: 0" { send_user "Already off\n"; exp_continue }
         "$response"
     }
     send_user "Received $response\n"
@@ -93,12 +95,13 @@ set commands [ list \
     "AT+UGGSV=1" \
     "AT+UGRMC=1" \
     "AT+UGVTG=1" \
-    "AT+UGPIOC=16,2" \
-    "AT+UGPIOC=19,22" \
     "AT+ULOCGNSS=1,0,3,7,0,0,1,1,2,0,9,79,0,0" \
-    "AT+UTIME=1,1" \
-    "AT+UGPS=1,0,71" \
+    "AT+UGPS=1,0,79" \
 ]
+
+#   "AT+UGPIOC=16,2"
+#   "AT+UGPIOC=19,22"
+#   "AT+UTIME=1,1"
 
 set commandn [ llength $commands ]
 set commandi 0

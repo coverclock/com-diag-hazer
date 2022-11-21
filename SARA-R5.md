@@ -108,7 +108,19 @@ the settings persistently in NVRAM.
 
 Some of these commands need to be done every time the module is rebooted.
 
-### General Configuration
+### Scripted Configuration
+
+This is the order that works.
+
+    sarar5autobaud.exp
+    sarar5factoryreset.exp
+    # Reset device (e.g. using SparkFun's reset button)
+    sarar5autobaud.exp
+    sarar5setupcommon.exp
+    sarar5setupgnss.exp
+    sarar5setupltem.exp
+
+### Manual Configuration
 
 #### Enable Verbose Messages
 
@@ -122,33 +134,21 @@ Some of these commands need to be done every time the module is rebooted.
 
     AT+USIO=4
 
-#### Enable GPIO 1 a.k.a. 16 for Network Status Indication (PERSISTENT)
-
-    AT+UGPIOC=16,2
-
-#### Enable GPIO 6 a.k.a. 19 for Time Pulse Output (PERSISTENT)
-
-    AT+UGPIOC=19,22
-
 ### GNSS Configuration
 
 #### Set GNSS to Profile 1: GNSS data flow to and from AUX UART (PERSISTENT)
 
     AT+UGPRF=1
 
-#### Set Time Pulse to 1PPS using GNSS/LTE
-
-    AT+UTIME=1,1
-
 #### Power Down GNSS
 
     AT+UGPS=0
 
-#### Power Up GNSS with GPS, GLONASS, GALILEO, SBAS
+#### Power Up GNSS with GPS, GLONASS, GALILEO, BEIDOU, SBAS
 
 This needs to be done every time the module is rebooted.
 
-    AT+UGPS=1,0,71
+    AT+UGPS=1,0,79
 
 #### Enable Desired NMEA Sentences
 
@@ -178,7 +178,7 @@ with AT&T. Your mileage may vary.
 
 #### Reboot Module
 
-    AT+CFUN=16
+    AT+CFUN=16t status
 
 #### Set Packet Data Protocol Context, Protocol, and Access Point Name
 
