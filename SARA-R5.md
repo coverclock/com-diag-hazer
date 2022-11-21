@@ -225,3 +225,11 @@ with AT&T. Your mileage may vary.
 #### Ping
 
     AT+UPING="www.google.com"
+
+### Issues
+
+I have gotten the host computer into a state in which the ttyUSB serial
+ports no longer enumeration untill I reboot the host. This is one of the
+advantages of using an SBC like a Raspberry Pi instead of your desktop
+or laptop.
+
