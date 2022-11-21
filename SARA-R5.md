@@ -229,7 +229,11 @@ with AT&T. Your mileage may vary.
 ### Issues
 
 I have gotten the host computer into a state in which the ttyUSB serial
-ports no longer enumeration untill I reboot the host. This is one of the
+devices no longer enumerate until I reboot the host. This is one of the
 advantages of using an SBC like a Raspberry Pi instead of your desktop
 or laptop.
 
+The enumeration of the ttyUSB serial devices depends on the order in
+whcih you plug them in. They appear to enumeration with the same
+vendor and device identifiers, so I have not found an easy with which
+to descriminate between them.
