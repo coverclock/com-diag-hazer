@@ -3,10 +3,10 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configures a U-blox SARA-R5 device using the serial connection
-# to the cellular modem AT interface. This script uses the Diminuto
-# serialtool utility to leverage its O_NONBLOCK openat(2).
 # THIS IS A WORK IN PROGRESS.
+# Configures the common parameters on a U-blox SARA-R5 device using the
+# serial connection to the cellular modem AT interface. This script uses
+# the Diminuto serialtool utility to leverage its O_NONBLOCK openat(2).
 # Usage: sarar5setupcommon.exp [ DEVICE [ RATE ] ]
 # Defaults: sarar5setupcommon.exp /dev/ttyUSB1 115200
 

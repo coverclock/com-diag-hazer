@@ -4,6 +4,7 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # THIS IS A WORK IN PROGRESS.
+# Verifies connectivity to the AT serial interface on a U-blox SARA-R5 device.
 # Usage: sarar5verify.exp [ DEVICE [ RATE ] ]
 # Defaults: sarar5verify.exp /dev/ttyUSB1 115200
 

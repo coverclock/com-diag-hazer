@@ -3,11 +3,11 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# THIS IS A WORK IN PROGRESS.
 # Enables a factory reset on the next reset/power up of the
 # U-blox SARA-R5 device using the serial connection to the
 # cellular modem AT interface. This script uses the Diminuto
 # serialtool utility to leverage its O_NONBLOCK openat(2).
-# THIS IS A WORK IN PROGRESS.
 # Usage: sarar5factoryreset.exp [ DEVICE [ RATE ] ]
 # Defaults: sarar5factoryreset.exp /dev/ttyUSB1 115200
 

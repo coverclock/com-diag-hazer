@@ -4,6 +4,7 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # THIS IS A WORK IN PROGRESS.
+# Try to autobaud the SARA-R5 via its LTE-M serial channel.
 # Usage: sarar5autobaud.exp [ DEVICE [ RATE ] ]
 # Defaults: sarar5autobaud.exp /dev/ttyUSB1 115200
 
