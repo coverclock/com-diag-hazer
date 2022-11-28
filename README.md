@@ -1005,6 +1005,8 @@ WIRED, 2022-08-26
 
 <https://stjarnhimlen.se/comp/time.html> Paul Schlyter, "Time Scales"
 
+<https://www.gpsrchive.com/Shared/Satellites/GPS%20vs%20GLONASS%20vs%20Galileo.html>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
