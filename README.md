@@ -790,6 +790,10 @@ IETF, July 2002
 
 H. Lyons, "Atomic Clocks", *Scientific American*, 1957-02
 
+Richard Mason et al., *Analyzing a More Resilient National Positioning,
+Navigation, and Timing Capability*, Homeland Security Operational Analysis
+Center, RAND Corporation, 2021
+
 Greg Milner, *Pinpoint: How GPS is Changing Technology, Culture, and Our Minds*,
 W. W. Norton, 2017-05-16
 
