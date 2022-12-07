@@ -205,9 +205,8 @@ int main(void)
 
     {
         ssize_t size = 0;
-        int rc = 0;
         static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xca, '\0' };
-        const unsigned char * here = (const char *)0;
+        const unsigned char * here = (const unsigned char *)0;
         uint8_t ck_a = 0;
         uint8_t ck_b = 0;
 
@@ -221,7 +220,7 @@ int main(void)
         size = yodel_length(UBX, sizeof(UBX));
         assert(size == (sizeof(UBX) - 1));
 
-        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
+        here = (const unsigned char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a == here[0]) && (ck_b == here[1]));
     }
@@ -230,16 +229,15 @@ int main(void)
 
     {
         ssize_t size = 0;
-        int rc = 0;
         static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0c, 0xca, '\0' }; /* Bad checksum. */
-        const unsigned char * here = (const char *)0;
+        const unsigned char * here = (const unsigned char *)0;
         uint8_t ck_a = 0;
         uint8_t ck_b = 0;
 
         size = yodel_length(UBX, sizeof(UBX));
         assert(size == (sizeof(UBX) - 1));
 
-        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
+        here = (const unsigned char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a != here[0]) || (ck_b != here[1]));
     }
@@ -248,16 +246,15 @@ int main(void)
 
     {
         ssize_t size = 0;
-        int rc = 0;
         static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 3, 4, 0x0d, 0xc8, '\0' }; /* Bad checksum. */
-        const unsigned char * here = (const char *)0;
+        const unsigned char * here = (const unsigned char *)0;
         uint8_t ck_a = 0;
         uint8_t ck_b = 0;
 
         size = yodel_length(UBX, sizeof(UBX));
         assert(size == (sizeof(UBX) - 1));
 
-        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
+        here = (const unsigned char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a != here[0]) || (ck_b != here[1]));
     }
@@ -266,16 +263,15 @@ int main(void)
 
     {
         ssize_t size = 0;
-        int rc = 0;
         static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x00, 1, 2, 5, 4, 0x0d, 0xca, '\0' }; /* Payload corrupted. */
-        const unsigned char * here = (const char *)0;
+        const unsigned char * here = (const unsigned char *)0;
         uint8_t ck_a = 0;
         uint8_t ck_b = 0;
 
         size = yodel_length(UBX, sizeof(UBX));
         assert(size == (sizeof(UBX) - 1));
 
-        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
+        here = (const unsigned char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a != here[0]) || (ck_b != here[1]));
     }
@@ -284,7 +280,6 @@ int main(void)
 
     {
         ssize_t size = 0;
-        int rc = 0;
         static const uint8_t UBLOX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x04, 0x01, 1, 2, 3, 4, 0x0d, 0xca, '\0' }; /* Length too long for buffer. */
 
         size = yodel_length(UBLOX, sizeof(UBLOX)); /* Length overflows buffer. */
@@ -295,16 +290,15 @@ int main(void)
 
     {
         ssize_t size = 0;
-        int rc = 0;
         static const uint8_t UBX[] = { 0xb5, 0x62, 0xa5, 0x5a, 0x02, 0x00, 1, 2, 3, 4, 0x0d, 0xca, '\0' }; /* Length too short for payload. */
-        const unsigned char * here = (const char *)0;
+        const unsigned char * here = (const unsigned char *)0;
         uint8_t ck_a = 0;
         uint8_t ck_b = 0;
 
         size = yodel_length(UBX, sizeof(UBX)); /* Length not correct. */
         assert(size >= 0);
 
-        here = (const char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
+        here = (const unsigned char *)yodel_checksum_buffer(UBX, size, &ck_a, &ck_b);
         assert(here != (const unsigned char *)0);
         assert((ck_a != here[0]) || (ck_b != here[1]));
     }

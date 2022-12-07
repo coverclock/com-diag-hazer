@@ -29,18 +29,18 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        char msn = 0;
-        char lsn = 0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
         hazer_buffer_t temporary = { 0 };
 
         assert(!hazer_is_valid_time(&position));
 
-        strncpy(buffer, DATA, sizeof(buffer));
+        strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, buffer) == 0);
+        assert(strcmp(DATA, (char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen(buffer));
+        assert(length == strlen((char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -54,13 +54,13 @@ int main(void)
         assert(count == 22);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen(temporary) + 1));
+        assert(length == (strlen((char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, temporary) == 0);
+        assert(strcmp(DATA, (char *)temporary) == 0);
 
         rc = hazer_is_pubx_id(vector, count, "00");
         assert(rc == !0);
@@ -98,18 +98,18 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        char msn = 0;
-        char lsn = 0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
         hazer_buffer_t temporary = { 0 };
 
         assert(!hazer_is_valid_time(&position));
 
-        strncpy(buffer, DATA, sizeof(buffer));
+        strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, buffer) == 0);
+        assert(strcmp(DATA, (char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen(buffer));
+        assert(length == strlen((char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -123,13 +123,13 @@ int main(void)
         assert(count == 22);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen(temporary) + 1));
+        assert(length == (strlen((char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, temporary) == 0);
+        assert(strcmp(DATA, (char *)temporary) == 0);
 
         rc = hazer_is_pubx_id(vector, count, "00");
         assert(rc == !0);
@@ -153,18 +153,18 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        char msn = 0;
-        char lsn = 0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
         hazer_buffer_t temporary = { 0 };
 
         assert(!hazer_is_valid_time(&position));
 
-        strncpy(buffer, DATA, sizeof(buffer));
+        strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, buffer) == 0);
+        assert(strcmp(DATA, (char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen(buffer));
+        assert(length == strlen((char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -178,13 +178,13 @@ int main(void)
         assert(count == 22);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen(temporary) + 1));
+        assert(length == (strlen((char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, temporary) == 0);
+        assert(strcmp(DATA, (char *)temporary) == 0);
 
         rc = hazer_is_pubx_id(vector, count, "00");
         assert(rc == !0);
@@ -206,16 +206,16 @@ int main(void)
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        char msn = 0;
-        char lsn = 0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
         hazer_buffer_t temporary = { 0 };
 
-        strncpy(buffer, DATA, sizeof(buffer));
+        strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, buffer) == 0);
+        assert(strcmp(DATA, (char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen(buffer));
+        assert(length == strlen((char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -229,13 +229,13 @@ int main(void)
         assert(count == 118);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen(temporary) + 1));
+        assert(length == (strlen((char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, temporary) == 0);
+        assert(strcmp(DATA, (char *)temporary) == 0);
 
         rc = hazer_is_pubx_id(vector, count, "03");
         assert(rc == !0);
@@ -443,18 +443,18 @@ $PUBX,03,19,
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
-        char msn = 0;
-        char lsn = 0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
         hazer_buffer_t temporary = { 0 };
 
         assert(!hazer_is_valid_time(&position));
 
-        strncpy(buffer, DATA, sizeof(buffer));
+        strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, buffer) == 0);
+        assert(strcmp(DATA, (char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen(buffer));
+        assert(length == strlen((char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -468,13 +468,13 @@ $PUBX,03,19,
         assert(count == 11);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen(temporary) + 1));
+        assert(length == (strlen((char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, temporary) == 0);
+        assert(strcmp(DATA, (char *)temporary) == 0);
 
         rc = hazer_is_pubx_id(vector, count, "04");
         assert(rc == !0);

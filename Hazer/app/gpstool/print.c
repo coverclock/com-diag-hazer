@@ -204,9 +204,6 @@ void print_local(FILE * fp)
     int hour = 0;
     int minute = 0;
     int second = 0;
-    int degrees = 0;
-    int minutes = 0;
-    int seconds = 0;
     diminuto_sticks_t offset = 0;
     diminuto_ticks_t fraction = 0;
     diminuto_sticks_t milliseconds = 0;

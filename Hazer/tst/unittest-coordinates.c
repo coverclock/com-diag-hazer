@@ -66,6 +66,7 @@ int main(int argc, char * argv[])
 
         ff = 0.0;
         rc = sscanf("-179.999999", COORDINATES_SCANF_HPP, &ff);
+        assert(rc == 1);
         assert(ff == -179.999999);
 
         dd = 0;
@@ -73,9 +74,10 @@ int main(int argc, char * argv[])
         ff = 0.0;
         cc = '\0';
         rc = sscanf("179 59 59.999999(W)", COORDINATES_SCANF_NGS, &dd, &mm, &ff, &cc);
+        assert(rc == 4);
         assert(dd == 179);
         assert(mm == 59);
-        assert(ff = 59.999999);
+        assert(ff == 59.999999);
         assert(cc == 'W');
 
         dd = 0;
@@ -83,9 +85,10 @@ int main(int argc, char * argv[])
         ff = 0.0;
         cc = '\0';
         rc = sscanf("179°59'59.999999\"W", COORDINATES_SCANF_POS, &dd, &mm, &ff, &cc);
+        assert(rc == 4);
         assert(dd == 179);
         assert(mm == 59);
-        assert(ff = 59.999999);
+        assert(ff == 59.999999);
         assert(cc == 'W');
     } 
 
@@ -142,6 +145,7 @@ int main(int argc, char * argv[])
         char longitudedirection = '\0';
         char * locale = (char *)0;
         locale = setlocale(LC_ALL, "");
+        assert(locale != (char *)0);
         latituderc = sscanf(EXAMPLE_POS_LATITUDE, COORDINATES_SCANF_POS, &latitudedegrees, &latitudeminutes, &latitudeseconds, &latitudedirection);
         longituderc = sscanf(EXAMPLE_POS_LONGITUDE, COORDINATES_SCANF_POS, &longitudedegrees, &longitudeminutes, &longitudeseconds, &longitudedirection);
         fprintf(stderr, "POS LATITUDE=\"%s\"[%d] latitude=%u°%02u'%012.9lf\"%c LONGITUDE=\"%s\"[%d] longitude=%u°%02u'%012.9lf\"%c\n", EXAMPLE_POS_LATITUDE, latituderc, latitudedegrees, latitudeminutes, latitudeseconds, latitudedirection, EXAMPLE_POS_LONGITUDE, longituderc, longitudedegrees, longitudeminutes, longitudeseconds, longitudedirection);

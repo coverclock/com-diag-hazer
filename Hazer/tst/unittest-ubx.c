@@ -221,7 +221,6 @@ int main(void)
     END;
 
     BEGIN("\\xb5b\\x06\\x8b\\f\\0\\x01\\0\\0\\0\\x11\\0\\x03@\\xa0\\x86\\x01\\0\\x19'");
-        yodel_ubx_cfg_valget_t data = YODEL_UBX_CFG_VALGET_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
         assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id));
@@ -229,7 +228,6 @@ int main(void)
     END;
 
     BEGIN("\\xb5b\\x06\\x8b\\t\\0\\x01\\0\\0\\0\\xbf\\x02\\x91 \\x01\\x0e\\xf5");
-        yodel_ubx_cfg_valget_t data = YODEL_UBX_CFG_VALGET_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
         assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id));

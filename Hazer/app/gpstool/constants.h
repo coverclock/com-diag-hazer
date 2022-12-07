@@ -62,7 +62,7 @@ static const char * const HEADINGS[] = {
 /**
  * Encoding for empty CSV field.
  */
-static const char const EMPTY[] = ", 0.";
+static const char EMPTY[] = ", 0.";
 
 /**
  * If we're displaying in real-time using full screen control, we try to limit

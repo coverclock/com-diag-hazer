@@ -55,11 +55,11 @@ typedef struct DatagramHeader {
  */
 enum {
     DATAGRAM_SIZE = (
-        (HAZER_NMEA_LONGEST > YODEL_UBX_LONGEST)
-            ? ((HAZER_NMEA_LONGEST > TUMBLEWEED_RTCM_LONGEST)
+        ((size_t)HAZER_NMEA_LONGEST > (size_t)YODEL_UBX_LONGEST)
+            ? (((size_t)HAZER_NMEA_LONGEST > (size_t)TUMBLEWEED_RTCM_LONGEST)
                 ? HAZER_NMEA_LONGEST
                 : TUMBLEWEED_RTCM_LONGEST)
-            : ((YODEL_UBX_LONGEST > TUMBLEWEED_RTCM_LONGEST)
+            : (((size_t)YODEL_UBX_LONGEST > (size_t)TUMBLEWEED_RTCM_LONGEST)
                 ? YODEL_UBX_LONGEST
                 : TUMBLEWEED_RTCM_LONGEST)
     ),

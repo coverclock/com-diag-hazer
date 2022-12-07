@@ -24,7 +24,7 @@
 #include "buffer.h"
 #include "emit.h"
 
-ssize_t emit_sentence(FILE * fp, char * sentence, size_t size)
+ssize_t emit_sentence(FILE * fp, const char * sentence, size_t size)
 {
     ssize_t rc = -1;
     uint8_t * bp = (uint8_t *)0;
@@ -53,7 +53,7 @@ ssize_t emit_sentence(FILE * fp, char * sentence, size_t size)
     return rc;
 }
 
-ssize_t emit_packet(FILE * fp, void * packet, size_t size)
+ssize_t emit_packet(FILE * fp, const void * packet, size_t size)
 {
     ssize_t rc = -1;
     uint8_t * bp = (uint8_t *)0;
@@ -85,7 +85,7 @@ ssize_t emit_packet(FILE * fp, void * packet, size_t size)
     return rc;
 }
 
-ssize_t emit_data(FILE * fp, void * data, size_t size)
+ssize_t emit_data(FILE * fp, const void * data, size_t size)
 {
     ssize_t rc = -1;
 

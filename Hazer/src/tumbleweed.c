@@ -56,7 +56,6 @@ int tumbleweed_finalize(void)
 
 tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void * buffer, size_t size, tumbleweed_context_t * pp)
 {
-    int done = !0;
     tumbleweed_action_t action = TUMBLEWEED_ACTION_SKIP;
     tumbleweed_state_t old = state;
 
@@ -335,9 +334,9 @@ ssize_t tumbleweed_length(const void * buffer, size_t size)
 {
     ssize_t result = -1;
     uint16_t length = 0;
-    const unsigned char * message = (const char *)0;
+    const unsigned char * message = (const unsigned char *)0;
 
-    message = (const char *)buffer;
+    message = (const unsigned char *)buffer;
 
     if (size < TUMBLEWEED_RTCM_SHORTEST) {
         /* Do nothing. */
@@ -363,9 +362,9 @@ int tumbleweed_message(const void * buffer, size_t size)
 {
     int result = -1;
     uint16_t number = 0;
-    const unsigned char * message = (const char *)0;
+    const unsigned char * message = (const unsigned char *)0;
 
-    message = (const char *)buffer;
+    message = (const unsigned char *)buffer;
 
     if (size < (TUMBLEWEED_RTCM_SHORTEST + TUMBLEWEED_RTCM_NUMBER)) {
         /* Do nothing. */

@@ -21,7 +21,7 @@ KERNEL_DIR			:=	/lib/modules/$(KERNEL_REV)/build
 GNUARCH				:=	-D_USE_GNU -D_GNU_SOURCE
 # sudo apt-get install linux-headers-$(uname -r)
 CPPARCH				:=	-isystem /usr/src/linux-headers-$(KERNEL_REV) $(GNUARCH)
-CARCH				:=	-rdynamic -fPIC
+CARCH				:=	-rdynamic -fPIC -Wall
 CXXARCH				:=	$(CARCH)
 LDARCH				:=	-L$(OUT)/$(LIB_DIR)
 MOARCH				:=	-L$(OUT)/$(LIB_DIR)

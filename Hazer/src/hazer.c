@@ -72,7 +72,6 @@ int hazer_finalize(void)
 
 hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size_t size, hazer_context_t * pp)
 {
-    int done = !0;
     hazer_action_t action = HAZER_ACTION_SKIP;
     hazer_state_t old = state;
 
@@ -1606,7 +1605,6 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int rc = -1;
     int messages = 0;
     int message = 0;
-    int start = 0;
     int index = 4;
     int slot = 0;
     int sequence = 0;

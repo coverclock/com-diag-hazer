@@ -24,7 +24,7 @@
  * @param size is the size of the NMEA sentence in bytes including the terminating nul.
  * @return total length emitted for success, <0 for error.
  */
-extern ssize_t emit_sentence(FILE * fp, char * sentence, size_t size);
+extern ssize_t emit_sentence(FILE * fp, const char * sentence, size_t size);
 
 /**
  * Emit a UBX configuration packet to the specified stream after adding the
@@ -34,7 +34,7 @@ extern ssize_t emit_sentence(FILE * fp, char * sentence, size_t size);
  * @param size is the size of the UBX packet in bytes including the terminating nul.
  * @return total length emitted for success, <0 for error.
  */
-extern ssize_t emit_packet(FILE * fp, void * packet, size_t size);
+extern ssize_t emit_packet(FILE * fp, const void * packet, size_t size);
 
 /**
  * Emit configuration data to the specified stream exactly as is.
@@ -43,7 +43,7 @@ extern ssize_t emit_packet(FILE * fp, void * packet, size_t size);
  * @param size is the size of the datum in bytes including the terminating nul.
  * @return total length emitted for success, <0 for error.
  */
-extern ssize_t emit_data(FILE * fp, void * data, size_t size);
+extern ssize_t emit_data(FILE * fp, const void * data, size_t size);
 
 /**
  * Save the current PVT solution to the trace file in CSV format.

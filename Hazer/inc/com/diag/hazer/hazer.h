@@ -467,6 +467,10 @@ extern hazer_system_t hazer_map_pubxid_to_system(uint16_t id);
 /**
  * This buffer is large enough to contain the largest NMEA sentence,
  * according to the NMEA spec, plus a trailing NUL (and then some).
+ * Unlike UBX packets and RTCM messages, NMEA sentences should have
+ * only readable characters, not binary bytes. But declaring them
+ * to be unsigned bytes means the checksum algorithm doesn't have to
+ * worry about sine extention during arithmetic operations.
  * NMEA 0183 4.10, 5.3, p. 11
  */
 typedef uint8_t (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
@@ -481,7 +485,7 @@ typedef uint8_t (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
  * Hazer NMEA parser state machine context (which needs no initial value).
  */
 typedef struct HazerContext {
-    uint8_t * bp;		/* Current buffer pointer. */
+    uint8_t * bp;  		/* Current buffer pointer. */
     size_t sz;			/* Remaining buffer size in bytes. */
     size_t tot;			/* Total size once sentence is complete. */
     uint8_t cs;			/* Running checksum. */
@@ -1345,7 +1349,7 @@ extern int hazer_has_pending_gsv(const hazer_view_t va[], size_t count);
  * @param positionp points to the position.
  * @return true if time, date, and monotonic clock are true for the position.
  */
-static int hazer_is_valid_time(const hazer_position_t * positionp)
+static inline int hazer_is_valid_time(const hazer_position_t * positionp)
 {
     return ((positionp->ticks > 0) &&
             (positionp->utc_nanoseconds != HAZER_NANOSECONDS_UNSET) &&

@@ -34,7 +34,7 @@ void print_buffer(FILE * fp, const void * buffer, size_t size, size_t limit)
     size_t current = 0;
     int end = 0;
 
-    for (bb = buffer; size > 0; --size) {
+    for (bb = (const char *)buffer; size > 0; --size) {
         diminuto_phex_emit(fp, *(bb++), UNLIMITED, 0, !0, 0, &current, &end, 0);
         if (current >= limit) { break; }
     }
@@ -43,9 +43,9 @@ void print_buffer(FILE * fp, const void * buffer, size_t size, size_t limit)
 
 void dump_buffer(FILE * fp, const void * buffer, size_t size)
 {
-    const unsigned char * bb = (const char *)0;
+    const unsigned char * bb = (const unsigned char *)0;
 
-    for (bb = buffer; size > 0; --size) {
+    for (bb = (const unsigned char *)buffer; size > 0; --size) {
         fprintf(fp, "\\x%2.2x", *(bb++));
     }
     fputc('\n', fp);

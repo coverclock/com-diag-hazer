@@ -59,7 +59,6 @@ int yodel_finalize(void)
  */
 yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size_t size, yodel_context_t * pp)
 {
-    int done = !0;
     yodel_action_t action = YODEL_ACTION_SKIP;
     yodel_state_t old = state;
 
@@ -282,9 +281,9 @@ ssize_t yodel_length(const void * buffer, size_t size)
 {
    ssize_t result = -1;
    uint16_t length = 0;
-   const unsigned char * packet = (const char *)0;
+   const unsigned char * packet = (const unsigned char *)0;
 
-   packet = (const char *)buffer;
+   packet = (const unsigned char *)buffer;
 
    if (size < YODEL_UBX_SHORTEST) {
        /* Do nothing. */
@@ -451,12 +450,11 @@ int yodel_ubx_cfg_valget(void * bp, ssize_t length)
         errno = ENODATA;
     } else {
         yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)0;
-        char * bb = (char *)0;
-        const char * ee = (const char *)0;
+        unsigned char * bb = (unsigned char *)0;
+        const unsigned char * ee = (const unsigned char *)0;
         yodel_ubx_cfg_valget_key_t kk = 0;
         size_t ss = 0;
         size_t ll = 0;
-        uint8_t vv1 = 0;
         uint16_t vv16 = 0;
         uint32_t vv32 = 0;
         uint64_t vv64 = 0;

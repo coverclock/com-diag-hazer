@@ -67,11 +67,11 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
 {
     int rc = -1;
     const uint8_t * bp = (const uint8_t *)0;
-    char msn = '\0';
-    char lsn = '\0';
+    uint8_t msn = '\0';
+    uint8_t lsn = '\0';
     size_t length = 0;
     ssize_t validated = 0;
-    uint8_t * buffer = (char *)0;
+    uint8_t * buffer = (uint8_t *)0;
 
     do {
         bp = hazer_checksum_buffer(sentence, size, &msn, &lsn);
@@ -86,7 +86,7 @@ static int print_sentence(FILE * fp, const char * sentence, size_t size)
             diminuto_perror("malloc");
             break;
         }
-        strncpy(buffer, sentence, length);
+        strncpy((char *)buffer, sentence, length);
         buffer[length++] = HAZER_STIMULUS_CHECKSUM;
         buffer[length++] = msn;
         buffer[length++] = lsn;
@@ -174,7 +174,7 @@ static int print_message(FILE * fp, const void * message, size_t size)
     uint8_t crc3 = 0;
     size_t length = 0;
     ssize_t validated = 0;
-    uint8_t * buffer = (char *)0;
+    uint8_t * buffer = (uint8_t *)0;
 
     do {
         bp = tumbleweed_checksum_buffer(message, size, &crc1, &crc2, &crc3);
@@ -215,7 +215,7 @@ int main(int argc, char * argv[])
 {
     int xc = 0;
     int index = 0;
-    uint8_t * buffer = (char *)0;
+    uint8_t * buffer = (uint8_t *)0;
     size_t length = 0;
     ssize_t size = 0;
     int rc = 0;
@@ -223,21 +223,21 @@ int main(int argc, char * argv[])
     diminuto_log_setmask();
 
     for (index = 1; index < argc; index += 1) {
-        buffer = argv[index];
+        buffer = (uint8_t *)argv[index];
         if (buffer[0] == '\0') {
             fputc('\n', stdout);
             DIMINUTO_LOG_WARNING("expanded: empty?");
             continue;
         }
-        length = strlen(buffer) + 1;
-        size = diminuto_escape_collapse(buffer, buffer, length);
+        length = strlen((char *)buffer) + 1;
+        size = diminuto_escape_collapse((char *)buffer, (char *)buffer, length);
         if (buffer[0] == '\0') {
             fputc('\n', stdout);
             DIMINUTO_LOG_WARNING("collapsed: empty?");
             continue;
         }
         if (buffer[0] == HAZER_STIMULUS_START) {
-            rc = print_sentence(stdout, buffer, size - 1);
+            rc = print_sentence(stdout, (char *)buffer, size - 1);
         } else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
             rc = print_packet(stdout, buffer, size - 1);
         } else if (buffer[0] == TUMBLEWEED_STIMULUS_PREAMBLE) {

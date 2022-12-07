@@ -257,9 +257,6 @@ int main(int argc, char * argv[])
     diminuto_ipc_endpoint_t surveyor_endpoint = { 0, };
     ssize_t surveyor_size = 0;
     ssize_t surveyor_length = 0;
-    uint8_t surveyor_crc1 = 0;
-    uint8_t surveyor_crc2 = 0;
-    uint8_t surveyor_crc3 = 0;
     /*
      * Network variables.
      */
@@ -367,7 +364,6 @@ int main(int argc, char * argv[])
     int fd = -1;
     ssize_t available = 0;
     format_t format = FORMAT;
-    FILE * fp = (FILE *)0;
     uint8_t * buffer = (uint8_t *)0;
     ssize_t size = 0;
     ssize_t length = 0;
@@ -408,10 +404,8 @@ int main(int argc, char * argv[])
      * Miscellaneous variables.
      */
     int rc = 0;
-    size_t sz = 0;
     char * locale = (char *)0;
     int ii = 0;
-    int jj = 0;
     /*
      * External symbols.
      */
@@ -1820,7 +1814,7 @@ consume:
                 nmea_state = hazer_machine(nmea_state, ch, nmea_buffer.payload.nmea, sizeof(nmea_buffer.payload.nmea), &nmea_context);
                 if (nmea_state == HAZER_STATE_END) {
 
-                    buffer = nmea_buffer.payload.nmea;
+                    buffer = (uint8_t *)nmea_buffer.payload.nmea;
                     size = hazer_size(&nmea_context);
                     length = size - 1;
                     format = NMEA;
@@ -2202,11 +2196,11 @@ consume:
 
             } else {
 
-                command_size = strlen(command_string) + 1;
+                command_size = strlen((const char *)command_string) + 1;
                 DIMINUTO_LOG_NOTICE("Out \'%s\'[%zd]", command_string, command_size);
                 command_buffer = (uint8_t *)malloc(command_size + 8 /* e.g. *, CHECKSUMA, CHECKSUMB, CR, LF, NUL. */);
                 diminuto_assert(command_buffer != (uint8_t *)0);
-                command_length = diminuto_escape_collapse(command_buffer, command_string, command_size);
+                command_length = diminuto_escape_collapse((char *)command_buffer, (const char *)command_string, command_size);
 
                 /*
                  * Since collapse() always includes a terminating NUL, the
@@ -2228,7 +2222,7 @@ consume:
                     command_total = emit_packet(dev_fp, command_buffer, command_length);
                     break;
                 case OPT_W:
-                    command_total = emit_sentence(dev_fp, command_buffer, command_length);
+                    command_total = emit_sentence(dev_fp, (const char *)command_buffer, command_length);
                     break;
                 case OPT_Z:
                     command_total = emit_data(dev_fp, command_buffer, command_length);
@@ -2441,7 +2435,7 @@ consume:
              * the array in an argv[][] manner.
              */
 
-            strncpy(tokenized, buffer, sizeof(tokenized));
+            strncpy((char *)tokenized, (const char *)buffer, sizeof(tokenized));
             tokenized[sizeof(tokenized) - 1] = '\0';
             count = hazer_tokenize(vector, diminuto_countof(vector), tokenized, length);
             diminuto_assert(count > 0);
@@ -3022,7 +3016,7 @@ consume:
 
             break;
 
-        case FORMAT:
+        default:
 
             DIMINUTO_LOG_WARNING("Received Unknown 0x%x\n", buffer[0]);
 

@@ -27,7 +27,7 @@ int main(void)
          * Derived from output captured from a UBX-ZED-F9P on 2019-06-04.
          * Also added some sentences from Wikipedia, "NMEA 0183", 2019-05-27.
          */
-        static const uint8_t * DATA[] = {
+        static const char * DATA[] = {
             "$GNRMC,171629.00,A,3947.65423,N,10509.20101,W,0.023,,040619,,,A,V*07\r\n",
             "$GNVTG,,T,,M,0.023,N,0.043,K,A*3B\r\n",
             "$GNGGA,171629.00,3947.65423,N,10509.20101,W,1,12,0.66,1711.8,M,-21.5,M,,*4C\r\n",
@@ -71,8 +71,8 @@ int main(void)
         ssize_t size;
         ssize_t length;
         const uint8_t * pointer;
-        char msn;
-        char lsn;
+        uint8_t msn;
+        uint8_t lsn;
         int ii;
         int rc;
         uint8_t cs;
@@ -90,12 +90,12 @@ int main(void)
             size = strlen(DATA[ii]);
             diminuto_dump(stderr, DATA[ii], size);
 
-            length = hazer_length(DATA[ii], size);
+            length = hazer_length((uint8_t *)DATA[ii], size);
             assert(length == size);
 
             msn = '\0';
             lsn = '\0';
-            pointer = (char *)hazer_checksum_buffer(DATA[ii], size, &msn, &lsn);
+            pointer = (const uint8_t *)hazer_checksum_buffer((const uint8_t *)DATA[ii], size, &msn, &lsn);
             assert(pointer != (uint8_t *)0);
             assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
             assert(pointer[1] == msn);
@@ -112,20 +112,20 @@ int main(void)
             assert(pointer[2] == lsn);
 
             state = HAZER_STATE_START;
-            pointer = DATA[ii];
+            pointer = (uint8_t *)DATA[ii];
             while ((length--) > 0) {
                 state = hazer_machine(state, *(pointer++), buffer, sizeof(buffer), &context);
                 if (state == HAZER_STATE_END) { break; }
                 assert(state != HAZER_STATE_STOP);
             }
             assert(state == HAZER_STATE_END);
-            assert(strncmp(DATA[ii], buffer, size) == 0);
+            assert(strncmp(DATA[ii], (char *)buffer, size) == 0);
 
             length = hazer_size(&context);
             length -= 1; /* Included trailing NUL. */
             assert(size == length);
 
-            length = hazer_validate(DATA[ii], size);
+            length = hazer_validate((uint8_t *)DATA[ii], size);
             assert(length == size);
         }
 
@@ -137,7 +137,7 @@ int main(void)
         /*
          * UBX-ZED-F9P, 2019-06-04
          */
-        static const uint8_t * DATA[] = {
+        static const char * DATA[] = {
             "\\xb5b\\x01\\x14$\\0\\0\\0\\0\\0\\x18\\xec\\x01\\x0eB\\xdfR\\xc1c\\x1e\\xb8\\x17\\xbf\\xca\\x19\\0\\xbb\\x1e\\x1a\\0\\x1f\\x1c\\xff\\xffw4\\0\\0\\xfbV\\0\\0\\x9a\\x9c",
             "\\xb5b\\x01;(\\0\\0\\0\\0\\0\\x18\\xec\\x01\\x0e\\x95\\0\\0\\0\\x10\\x15Z\\xf8\\xffh\\xc2\\xe3\\xdaj5\\x18\\x1e\\xe4\\xfa\\0^\\xe8\\0\\0\\x96\\0\\0\\0\\0\\x01\\0\\0\\xf9\\xea",
             "\\xb5b\\x01\\x14$\\0\\0\\0\\0\\0\\0\\xf0\\x01\\x0eD\\xdfR\\xc1b\\x1e\\xb8\\x17\\xd3\\xca\\x19\\0\\xcf\\x1e\\x1a\\0\\x16.\\xfc\\xfc\\x894\\0\\0@W\\0\\0\\n\\xd0",
@@ -155,7 +155,6 @@ int main(void)
         uint8_t csa;
         uint8_t csb;
         int ii;
-        int rc;
         yodel_buffer_t buffer;
         yodel_context_t context;
         yodel_state_t state;
@@ -175,7 +174,7 @@ int main(void)
 
                 csa = 0;
                 csb = 0;
-                pointer = (char *)yodel_checksum_buffer(message, size, &csa, &csb);
+                pointer = (const uint8_t *)yodel_checksum_buffer(message, size, &csa, &csb);
                 assert(pointer != (uint8_t *)0);
                 assert(pointer[0] == csa);
                 assert(pointer[1] == csb);
@@ -209,7 +208,7 @@ int main(void)
         /*
          * UBX-ZED-F9P, 2019-06-04
          */
-        static const uint8_t * DATA[] = {
+        static const char * DATA[] = {
             "\\xd3\\0\\x98C \\08\\a\\xb0b\\0\\0A\\x14p\\n\\0\\0\\0\\0 \\0\\x80\\0}ui)\\x89)H\\xc9\\x89H\\xa8\\xb0\\x85\\xfc\\xfa\\x1a\\x85\\x93w\\xbf\\xb5\\x1e/\\xcd\\xaf\\xd1C\\x0e\\xc6p\\xf5y\\x13\\xd6q \\xe2y\\x98\\x1d\\xe7\\x1a[\\xc3\\x87\\b\\x01\\xfd\\x8f\\xc4\\0\\xd3\\xf0]\\x05\\x81\\xc2\\xe5\\xfa`\\xc0\\x15K \\xdf\\xe1\\x03y\\xcc\\x0ea\\x13\\xddv/C\\xfd@\\xe8z\\x04\\x1bZ\\xb7v7w7w@\\x01\\x133@\\xdc\\x14H\\xec\\xb3_0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xa4\\xad\\x1a",
             "\\xd3\\0\\bL\\xe0\\0\\x8a\\0\\0\\0\\0\\xa8\\xf7*",
             "\\xd3\\0\\x98C \\08\\a\\xc0\\x02\\0\\0A\\x14p\\n\\0\\0\\0\\0 \\0\\x80\\0}ui)\\x89)H\\xc9\\x89H\\xa8\\xb0\\x86\\0\\xfa\\x9a\\xa5\\x8by\\xbe\\xb5\\x1e7\\x91\\xefW\\xc5\\x8f\\vw}\\xac\\xd4\\x82k\\xfc\\xd81\\xb3\\x1dB[>\\x8eR\\x1d\\x9b\\xfb\\xaa\\v\\xf9=\\xb0\\xad\\x05\\x03\\x02\\xe7\\xfex\\xfb\\xd5\\xee \\xd5\\x92\\x03P\\x96\\x0f5\\xf3\\xd3)\\x9f`e\\x03\\x9bX\\x0e\\xe6\\xe6\\xb7v7w7w@\\x01\\x13S@\\xe4\\x14J\\xec\\xb3_0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\xbc\\0\\xa7",
@@ -228,7 +227,6 @@ int main(void)
         uint8_t crc2;
         uint8_t crc3;
         int ii;
-        int rc;
         tumbleweed_buffer_t buffer;
         tumbleweed_context_t context;
         tumbleweed_state_t state;
@@ -249,7 +247,7 @@ int main(void)
                 crc1 = 0;
                 crc2 = 0;
                 crc3 = 0;
-                pointer = (char *)tumbleweed_checksum_buffer(message, size, &crc1, &crc2, &crc3);
+                pointer = (const uint8_t *)tumbleweed_checksum_buffer(message, size, &crc1, &crc2, &crc3);
                 assert(pointer != (uint8_t *)0);
                 assert(pointer[0] == crc1);
                 assert(pointer[1] == crc2);

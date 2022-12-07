@@ -70,7 +70,7 @@
 
 static void emit(void * pp, size_t ss)
 {
-    unsigned char * cc = (char *)0;
+    unsigned char * cc = (unsigned char *)0;
 
     for (cc = (unsigned char *)pp; ss > 0; --ss) {
         printf("\\x%02x", *(cc++));

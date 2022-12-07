@@ -63,7 +63,7 @@ int main(void)
     /**************************************************************************/
 
     memset(vector, ~0, sizeof(vector));
-    strcpy(buffer, BUFFER);
+    strcpy((char *)buffer, BUFFER);
     count = hazer_tokenize(vector, COUNT, buffer, sizeof(buffer));
     assert(count == 5);
     assert(vector[4] == (char *)0);
@@ -112,7 +112,7 @@ int main(void)
     memset(datagram, ~0, sizeof(datagram));
     size = hazer_serialize(datagram, sizeof(datagram), vector, count);
     assert(size == sizeof(DATAGRAM));
-    assert(strcmp(datagram, DATAGRAM) == 0);
+    assert(strcmp((char *)datagram, DATAGRAM) == 0);
 
     /**************************************************************************/
 
