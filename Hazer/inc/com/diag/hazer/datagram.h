@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Common facilities for using datagrams.
  * @author Chip Overclock <mailto:coverclock@diag.com>

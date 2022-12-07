@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2019 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Computes and displays the checksum of an NMEA, UBX, or RTCM message.
  * @author Chip Overclock <mailto:coverclock@diag.com>

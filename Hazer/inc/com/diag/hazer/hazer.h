@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2021 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Parse common NMEA strings from GNSS devices.
  * @author Chip Overclock <mailto:coverclock@diag.com>

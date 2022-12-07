@@ -1,5 +1,5 @@
 # vi: set ts=4 shiftwidth=4:
-# Copyright 2017-2021 Digital Aggregates Corporation
+# Copyright 2017-2022 Digital Aggregates Corporation
 # Licensed under the terms in LICENSE.txt
 # author:Chip Overclock
 # mailto:coverclock@diag.com

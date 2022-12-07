@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Emit API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
