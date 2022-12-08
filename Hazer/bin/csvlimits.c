@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Filter that determines the boundaries of the solutions in a CSV file.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -26,7 +26,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <values.h>
-#include "../app/gpstool/constants.h"
 
 int main(int argc, char *argv[])
 {
@@ -74,6 +73,8 @@ int main(int argc, char *argv[])
     extern int opterr;
     extern int optopt;
 
+    // fprintf(stderr, "%.9lf %.9lf %.9lf\n", MINDOUBLE, -MAXDOUBLE, MAXDOUBLE);
+
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
     while ((opt = getopt(argc, argv, "?dv")) >= 0) {
@@ -105,18 +106,12 @@ int main(int argc, char *argv[])
 
         // fputs(here, stdout);
 
-        if (strncmp(buffer, HEADINGS[0], sizeof(HEADINGS[0])) == 0) {
-            if (verbose) {
-                fprintf(stderr, "%s", buffer);
-            }
-            continue;
-        }
-
-        // fputs(here, stdout);
-
         here = buffer;
 
         if (*here != '"') { 
+            if (verbose) {
+                fprintf(stderr, "%s", here);
+            }
             continue;
         }
 
@@ -155,6 +150,10 @@ int main(int argc, char *argv[])
         }
 
         // fputs(here, stdout);
+
+        if (fix < 3) {
+            continue;
+        }
 
         count += 1;
 
