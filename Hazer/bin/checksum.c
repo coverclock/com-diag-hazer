@@ -229,7 +229,7 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_WARNING("expanded: empty?");
             continue;
         }
-        length = strlen((char *)buffer) + 1;
+        length = strlen((const char *)buffer) + 1;
         size = diminuto_escape_collapse((char *)buffer, (char *)buffer, length);
         if (buffer[0] == '\0') {
             fputc('\n', stdout);

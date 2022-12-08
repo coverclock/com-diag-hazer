@@ -34,7 +34,7 @@
         unsigned char * message = (unsigned char *)0; \
         size_t size = 0; \
         string = (const unsigned char *)(_MESSAGE_); \
-        length = strlen((char *)string) + 1; \
+        length = strlen((const char *)string) + 1; \
         message = (unsigned char *)malloc(length); \
         size = diminuto_escape_collapse((char *)message, (const char *)string, length); \
         size -= 1; \

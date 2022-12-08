@@ -41,10 +41,10 @@ int main(void)
 
         strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, (char *)buffer) == 0);
+        assert(strcmp(DATA, (const char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen((char *)buffer));
+        assert(length == strlen((const char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -58,13 +58,13 @@ int main(void)
         assert(count == 16);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((char *)temporary) + 1));
+        assert(length == (strlen((const char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, (char *)temporary) == 0);
+        assert(strcmp(DATA, (const char *)temporary) == 0);
 
         rc = hazer_is_nmea_name(vector, count, "GGA");
         assert(rc == !0);
@@ -108,10 +108,10 @@ int main(void)
 
         strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, (char *)buffer) == 0);
+        assert(strcmp(DATA, (const char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen((char *)buffer));
+        assert(length == strlen((const char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -125,13 +125,13 @@ int main(void)
         assert(count == 16);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((char *)temporary) + 1));
+        assert(length == (strlen((const char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, (char *)temporary) == 0);
+        assert(strcmp(DATA, (const char *)temporary) == 0);
 
         rc = hazer_is_nmea_name(vector, count, "GGA");
         assert(rc == !0);
@@ -160,10 +160,10 @@ int main(void)
 
         strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, (char *)buffer) == 0);
+        assert(strcmp(DATA, (const char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen((char *)buffer));
+        assert(length == strlen((const char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -177,13 +177,13 @@ int main(void)
         assert(count == 14);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((char *)temporary) + 1));
+        assert(length == (strlen((const char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, (char *)temporary) == 0);
+        assert(strcmp(DATA, (const char *)temporary) == 0);
 
         rc = hazer_is_nmea_name(vector, count, "RMC");
         assert(rc == !0);
@@ -226,10 +226,10 @@ int main(void)
 
         strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, (char *)buffer) == 0);
+        assert(strcmp(DATA, (const char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen((char *)buffer));
+        assert(length == strlen((const char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -243,13 +243,13 @@ int main(void)
         assert(count == 14);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((char *)temporary) + 1));
+        assert(length == (strlen((const char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, (char *)temporary) == 0);
+        assert(strcmp(DATA, (const char *)temporary) == 0);
 
         rc = hazer_is_nmea_name(vector, count, "RMC");
         assert(rc == !0);
@@ -278,10 +278,10 @@ int main(void)
 
         strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, (char *)buffer) == 0);
+        assert(strcmp(DATA, (const char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen((char *)buffer));
+        assert(length == strlen((const char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -295,13 +295,13 @@ int main(void)
         assert(count == 9);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((char *)temporary) + 1));
+        assert(length == (strlen((const char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, (char *)temporary) == 0);
+        assert(strcmp(DATA, (const char *)temporary) == 0);
 
         rc = hazer_is_nmea_name(vector, count, "GLL");
         assert(rc == !0);
@@ -341,10 +341,10 @@ int main(void)
 
         strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, (char *)buffer) == 0);
+        assert(strcmp(DATA, (const char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen((char *)buffer));
+        assert(length == strlen((const char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -358,13 +358,13 @@ int main(void)
         assert(count == 11);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((char *)temporary) + 1));
+        assert(length == (strlen((const char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, (char *)temporary) == 0);
+        assert(strcmp(DATA, (const char *)temporary) == 0);
 
         rc = hazer_is_nmea_name(vector, count, "VTG");
         assert(rc == !0);
@@ -407,10 +407,10 @@ int main(void)
 
         strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, (char *)buffer) == 0);
+        assert(strcmp(DATA, (const char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen((char *)buffer));
+        assert(length == strlen((const char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -424,13 +424,13 @@ int main(void)
         assert(count == 11);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((char *)temporary) + 1));
+        assert(length == (strlen((const char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, (char *)temporary) == 0);
+        assert(strcmp(DATA, (const char *)temporary) == 0);
 
         rc = hazer_is_nmea_name(vector, count, "VTG");
         assert(rc == !0);
@@ -457,10 +457,10 @@ int main(void)
 
         strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, (char *)buffer) == 0);
+        assert(strcmp(DATA, (const char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen((char *)buffer));
+        assert(length == strlen((const char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -474,13 +474,13 @@ int main(void)
         assert(count == 19);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((char *)temporary) + 1));
+        assert(length == (strlen((const char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, (char *)temporary) == 0);
+        assert(strcmp(DATA, (const char *)temporary) == 0);
 
         rc = hazer_is_nmea_name(vector, count, "GSA");
         assert(rc == !0);
@@ -524,10 +524,10 @@ int main(void)
 
         strncpy((char *)buffer, DATA, sizeof(buffer));
         buffer[sizeof(buffer) - 1] = '\0';
-        assert(strcmp(DATA, (char *)buffer) == 0);
+        assert(strcmp(DATA, (const char *)buffer) == 0);
 
         length = hazer_length(buffer, sizeof(buffer));
-        assert(length == strlen((char *)buffer));
+        assert(length == strlen((const char *)buffer));
 
         pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
         assert(pointer != (char *)0);
@@ -541,13 +541,13 @@ int main(void)
         assert(count == 20);
 
         length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((char *)temporary) + 1));
+        assert(length == (strlen((const char *)temporary) + 1));
         temporary[length - 1] = msn;
         temporary[length] = lsn;
         temporary[length + 1] = '\r';
         temporary[length + 2] = '\n';
         temporary[length + 3] = '\0';
-        assert(strcmp(DATA, (char *)temporary) == 0);
+        assert(strcmp(DATA, (const char *)temporary) == 0);
 
         rc = hazer_is_nmea_name(vector, count, "GSA");
         assert(rc == !0);
@@ -599,10 +599,10 @@ int main(void)
 
             strncpy((char *)buffer, DATA[ii], sizeof(buffer));
             buffer[sizeof(buffer) - 1] = '\0';
-            assert(strcmp(DATA[ii], (char *)buffer) == 0);
+            assert(strcmp(DATA[ii], (const char *)buffer) == 0);
 
             length = hazer_length(buffer, sizeof(buffer));
-            assert(length == strlen((char *)buffer));
+            assert(length == strlen((const char *)buffer));
 
             pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
             assert(pointer != (char *)0);
@@ -616,13 +616,13 @@ int main(void)
             assert(((ii == 3) && (count == 17)) || (count == 21));
 
             length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-            assert(length == (strlen((char *)temporary) + 1));
+            assert(length == (strlen((const char *)temporary) + 1));
             temporary[length - 1] = msn;
             temporary[length] = lsn;
             temporary[length + 1] = '\r';
             temporary[length + 2] = '\n';
             temporary[length + 3] = '\0';
-            assert(strcmp(DATA[ii], (char *)temporary) == 0);
+            assert(strcmp(DATA[ii], (const char *)temporary) == 0);
 
             rc = hazer_is_nmea_name(vector, count, "GSV");
             assert(rc == !0);
@@ -762,10 +762,10 @@ int main(void)
 
             strncpy((char *)buffer, DATA[ii], sizeof(buffer));
             buffer[sizeof(buffer) - 1] = '\0';
-            assert(strcmp(DATA[ii], (char *)buffer) == 0);
+            assert(strcmp(DATA[ii], (const char *)buffer) == 0);
 
             length = hazer_length(buffer, sizeof(buffer));
-            assert(length == strlen((char *)buffer));
+            assert(length == strlen((const char *)buffer));
 
             pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
             assert(pointer != (char *)0);
@@ -779,13 +779,13 @@ int main(void)
             assert(((ii == 3) && (count == 18)) || (count == 22));
 
             length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-            assert(length == (strlen((char *)temporary) + 1));
+            assert(length == (strlen((const char *)temporary) + 1));
             temporary[length - 1] = msn;
             temporary[length] = lsn;
             temporary[length + 1] = '\r';
             temporary[length + 2] = '\n';
             temporary[length + 3] = '\0';
-            assert(strcmp(DATA[ii], (char *)temporary) == 0);
+            assert(strcmp(DATA[ii], (const char *)temporary) == 0);
 
             rc = hazer_is_nmea_name(vector, count, "GSV");
             assert(rc == !0);

@@ -119,7 +119,7 @@ int main(void)
                 assert(state != HAZER_STATE_STOP);
             }
             assert(state == HAZER_STATE_END);
-            assert(strncmp(DATA[ii], (char *)buffer, size) == 0);
+            assert(strncmp(DATA[ii], (const char *)buffer, size) == 0);
 
             length = hazer_size(&context);
             length -= 1; /* Included trailing NUL. */
