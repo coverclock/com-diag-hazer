@@ -260,7 +260,7 @@ int main(int argc, char * argv[])
     /*
      * Network variables.
      */
-    uint64_t network_total = 0;
+    ssize_t network_total = 0;
     /*
      * Keepalive variables.
      */
