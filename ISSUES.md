@@ -309,6 +309,17 @@ Compare this against the checksum of the corrected sentence.
     checksum '$GPRMC,140422.000,A,3947.6540,N,10509.2006,W,0.00,125.17,211021,,,D*50'
     $GPRMC,140422.000,A,3947.6540,N,10509.2006,W,0.00,125.17,211021,,,D*7E\r\n
 
+### Update 2023-01-04
+
+The recent 3.0.0 update from Bad Elf that provided new firmware images
+for both the Pro+ itself and for its MTK GNSS chipset seems to have fixed the
+corrupted RMC sentence issue and allowed the device to pair with a Raspberry
+Pi 4. (The update was to fix a GPS week rollover bug.) However, although I
+can pair the device with a Pi, I haven't had any luck receiving NMEA sentences
+over the resulting BlueTooth serial port. gpstool, serialtool (Diminuto), and
+socat all get an "out of memory" error when they try to open the /dev/rfcomm
+port.
+
 ## BU353W10 U-blox M8 UBX-MON-HW reporting jamming
 
 I routinely test multiple GNSS devices at a time. Some U-blox devices
