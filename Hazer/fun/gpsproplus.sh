@@ -1,12 +1,12 @@
 #!/bin/bash
-# Copyright 2021 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2021-2022 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # This script tests the Bad Elf GPS Pro+ via its USB connection.
 # The Pro+ supports Bluetooth connectivity to the Bad Elf iPhone
 # application, but alas the device refuses to pair with the
-# Raspberry Pi.
+# Raspberry Pi with firmware prior to 3.0.0.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
