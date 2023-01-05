@@ -21,9 +21,9 @@
 # :
 # (Wait for something like "Device 01:23:45:67:89:AB Garmin GLO #12345".)
 # :
+# quit
 # scan off
 # pair 01:23:45:67:89:AB
-# quit
 # sudo rfcomm bind 0 01:23:45:67:89:AB 1
 # sudo chmod 666 /dev/rfcomm0
 #

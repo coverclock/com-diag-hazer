@@ -195,8 +195,9 @@ You can use gpstool with Bluetooth GPS units like the Garmin GLO.
     agent on
     scan on
     ...
-    scan off
     pair 01:23:45:67:89:AB
+    ...
+    scan off
     quit
     > sudo rfcomm bind 0 01:23:45:67:89:AB 1
     > sudo chmod 666 /dev/rfcomm0

@@ -5,7 +5,7 @@ Parse NMEA strings and other typical output from GNSS devices.
 
 # Copyright
 
-Copyright 2017-2022 by the Digital Aggregates Corporation, Colorado, USA.
+Copyright 2017-2023 by the Digital Aggregates Corporation, Colorado, USA.
 
 Except where noted, this software is an original work of its author.
 
@@ -469,7 +469,7 @@ I have successfully tested Hazer with the following GPS devices.
 [^13]: A tear down of the BU-353W10 reveals it has a button cell for its battery backed RAM.    
 [^14]: Make sure you mount this component side down, patch antenna side up.    
 [^15]: Uses Bluetooth (see procedure for pairing in <https://github.com/coverclock/com-diag-hazer/blob/master/REMARKS.md>).    
-[^16]: Uses Bluetooth but refuses to pair with Raspberry Pi.    
+[^16]: Bluetooth pairs with Raspberry Pi after update to FW 3.0.0.
 [^17]: This SparkFun board requires opening (cutting) and closing (soldering) traces for dual UART operation.    
 [^18]: This U-Blox gen 8 receiver is embedded in a U-Blox LTE-M module which required a lot of config via AT commands.    
 [^19]: 1PPS (a.k.a. TPS in the docs) only has a pulse width of a few microseconds hence LED inoperative (bug).    
@@ -1268,7 +1268,8 @@ throw an assert and core dump.
 * datagramsource - exercises a datagram sink.
 * dgnss - a script used to test other DNSS scripts.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
-* gpsproplus - exercises the Bad Elf GPS Pro+ receiver.
+* gpsproplusblue - exercises the Bad Elf GPS Pro+ receiver via Bluetooth.
+* gpsproplususb - exercises the Bad Elf GPS Pro+ receiver via USB.
 * gr701w - exercises the NaviSys GR701W receiver.    
 * gr701w1pps - exercises the NaviSys GR701W receiver and its 1PPS output.    
 * lowresolution - same as bin/base.sh but with much much lower standards.
