@@ -19,6 +19,8 @@ North America (1901)
 
 51°28’40″N, 0°00’06″W
 
+<https://coverclock.blogspot.com/2020/05/negative-results-are-still-results.html>
+
 ## Point Nemo
 
 Latin for "no one", this is the location on Earth that is the furthest
