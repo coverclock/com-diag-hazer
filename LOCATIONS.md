@@ -39,6 +39,10 @@ Null Island is off the western coast of Africa in the Gulf of Guinea.
 
 ## Homestead at Bruin, Elliot County, Kentucky
 
+The old Greene family home where I used to spend my summers growing up.
+
 38°11'13.3"N, 83°01'09.6"W
 
 <https://goo.gl/maps/p23M3s69JiCHyrVi9>
+
+<https://coverclock.blogspot.com/2008/09/accessibility.html>
