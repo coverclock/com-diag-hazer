@@ -45,6 +45,8 @@ The old Greene family home where I used to spend my summers growing up.
 
 38°11'13.3"N, 83°01'09.6"W
 
+38.187028, -83.019324
+
 <https://goo.gl/maps/p23M3s69JiCHyrVi9>
 
 <https://coverclock.blogspot.com/2008/09/accessibility.html>
