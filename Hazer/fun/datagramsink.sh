@@ -1,12 +1,13 @@
 #!/bin/bash
-# Copyright 2019 Digital Aggregates Corporation, Colorado, USA<BR>
+# Copyright 2019-2023 Digital Aggregates Corporation, Colorado, USA<BR>
 # Licensed under the terms in LICENSE.txt<BR>
 # Chip Overclock (coverclock@diag.com)<BR>
 # https://github.com/coverclock/com-diag-hazer
 #
-# This script tests the sink or receive side of the Tumbleweed UDP channel
-# by receiving packets on the RTCM port, displaying them on standard error,
-# and then echoing them back to the sender.
+# This script receives datagrams and displays them on
+# standard output using phex, which converts unprintable
+# characters (including newlines) into C-style printable
+# escape sequences.
 
 ROOT=$(dirname ${0})
 PROGRAM=$(basename ${0})
