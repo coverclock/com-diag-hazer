@@ -1218,6 +1218,7 @@ throw an assert and core dump.
 * proxy - receive UDP packets from the Base and forward to the Rover.
 * router - routes UDP packets received from a base to all rovers.
 * rover - configures and runs a UBX-ZED-F9P as a corrected rover.
+* rtk2dgm - simulates a rover by sending keep alives to a base station.
 * station - runs a UBX-ZED-F9P with no additional configuration.
 * survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
 * ubxval - converts a number into a UBX-usable form.
