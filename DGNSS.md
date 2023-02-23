@@ -404,3 +404,8 @@ group (preferred), or run as root, in order to access serial devices
 like GPS receivers.
 
 Also read the Issues section in the Diminuto README.
+
+Note (2023-02-23): The related repository Codex, while not a
+pre-requisite, contains an experimental (i.e. "new")  application
+"stagecoach" that has been successfully used as an SSL tunnel
+for Hazer datagrams between Tumbleweed UDP endpoints.

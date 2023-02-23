@@ -211,14 +211,6 @@ You have to initialize LFS once per machine for every repo it is used in.
 You can also safely skip installing LFS, and ignore the large data files, to
 use this repo.
 
-## Secure Socket Layer
-
-The optional (work in progress) scripts that provide an authenticated
-and encrypted tunnel through which datagrams can be forwarded require
-OpenSSL.
-
-     sudo apt-get install openssl libssl-dev libssl-doc
-
 ## geodesic
 
 The geodesic application is based on algorithms described in
@@ -305,7 +297,11 @@ built.
 
 <https://github.com/coverclock/com-diag-diminuto>
 
+# Related
+
 <https://github.com/coverclock/com-diag-tesoro>
+
+<https://github.com/coverclock/com-diag-codex>
 
 # Sentences
 

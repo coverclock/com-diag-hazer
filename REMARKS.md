@@ -317,20 +317,6 @@ can deconfigure GPIO pins using the Diminuto pintool utility
     # pintool -p 18 -n
     # pintool -p 16 -n
 
-## Using SSL tunnel (example)
-
-Ultimately there will be four instances of gpstool running.
-
-### On Base
-
-    tunnel base 55555 12346 &
-    gpstool -G :12346 -4 -E
-
-### On Rover
-
-    tunnel rover 12345 localhost:55555 &
-    gpstool -D /dev/ttyACM0 -b 38400 -8 -n -1 -4 -G localhost:12345 -g 0x7 -E
-
 ## True Versus Magnetic Bearings
 
 GPS devices compute the true bearing by comparing successive position fixes to
@@ -886,3 +872,43 @@ U.S. Government, CODE OF FEDERAL REGULATIONS, Title 22, Chapter I,
 Subchapter M, Part 121, Enumeration of Articles, Section 121.1,
 "The United States Munitions List" (USML), updated 2022-03-24,
 <https://www.ecfr.gov/current/title-22/chapter-I/subchapter-M/part-121/subject-group-ECFRf7e5fe639be4566/section-121.1>
+
+## Tunneling UDP datagrams over SSL using Stagecoach
+
+(Warning: this describes an experimental work in progress.)
+
+The Stagecoach sub-project in the Codex repository
+
+<https://github.com/coverclock/com-diag-codex>
+
+implements a tool that forwards UDP datagrams over an TCP SSL tunnel
+and returns response datagrams to the UDP sender. This can be used on
+the remote Tumbleweed Rover to forward Hazer gpstool update requests
+(which are just empty RTCM messages) to the remote Hazer Tumbleweed
+rtktool router, which will respond with the latest RTCM update from the
+remote Hazer Tumbleweed base.
+
+Stagecoach provides an SSL tunnel between two UDP endpoints while
+preserving datagram boundaries. It is agnostic as to the data being
+passed via UDP, but it was written specifically to provide this capability
+for the gpstool utility that is part of the Hazer project. gpstool can
+forward NMEA sentences, RTK messages, or CSV packets to UDP port, but
+lacks any authentication or encryption capability. In this manner,
+Stagecoach serves as a proxy for the server on the client end, and
+proxy for the client on the server end.
+
+### Diagram
+
+    Client (Rover):  gpstool -- [tumbleweed UDP port] -- stagecoach -c
+                                                              |
+                                                       [stagecoach SSL TCP port]
+                                                             |
+    Server (Router): rtktool -- [tumbleweed UDP port] -- stagecoach -s
+
+### Example: On the Stagecoach Client (Remote Tumbleweed Rover)
+
+    stagecoach -C /etc/ssl/certs/clientcert.pem -K /etc/ssl/certs/clientkey.pem -P /etc/ssl/certs -f router:stagecoach -n 0.0.0.0:tumbleweed -c &
+
+### Example: On the Stagecoach Server (Local Tumbleweed Router)
+
+    stagecoach -C /etc/ssl/certs/servercert.pem -K /etc/ssl/certs/serverkey.pem -P /etc/ssl/certs -f base:tumbleweed -n 0.0.0.0:stagecoach -s &
