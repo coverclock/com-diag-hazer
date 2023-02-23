@@ -292,12 +292,15 @@ int main(int argc, char * argv[])
                     received = be32toh(response.header);
                     if (first) {
                         first = false;
-                    } else if (received == expected) {
-                        /* Do nothing. */
+                        expected = received + 1;
+                    } else if (received > expected) {
+                        fprintf(stderr, "%s: lost! (%u!=%u) [%d]\n", program, received, expected, (signed)received - (signed)expected);
+                        expected = received + 1;
+                    } else if (received < expected) {
+                        fprintf(stderr, "%s: order! (%u!=%u) [%d]\n", program, received, expected, (signed)received - (signed)expected);
                     } else {
-                        fprintf(stderr, "%s: sequence! (%u!=%u) [%d]\n", program, received, expected, (signed)received - (signed)expected);
+                        expected = received + 1;
                     }
-                    expected = received + 1;
                     size = fwrite(&response.payload, bytes - sizeof(sequence_t), 1, stdout);
                     diminuto_assert(size == 1);
                 }
