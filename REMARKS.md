@@ -890,14 +890,14 @@ remote Hazer Tumbleweed base.
 
 From the Stagecoach documentation:
 
-"Stagecoach provides an SSL tunnel between two UDP endpoints while
-preserving datagram boundaries. It is agnostic as to the data being
-passed via UDP, but it was written specifically to provide this capability
-for the gpstool utility that is part of the Hazer project. gpstool can
-forward NMEA sentences, RTK messages, or CSV packets to UDP port, but
-lacks any authentication or encryption capability. In this manner,
-Stagecoach serves as a proxy for the server on the client end, and
-proxy for the client on the server end."
+> Stagecoach provides an SSL tunnel between two UDP endpoints while
+> preserving datagram boundaries. It is agnostic as to the data being
+> passed via UDP, but it was written specifically to provide this capability
+> for the gpstool utility that is part of the Hazer project. gpstool can
+> forward NMEA sentences, RTK messages, or CSV packets to UDP port, but
+> lacks any authentication or encryption capability. In this manner,
+> Stagecoach serves as a proxy for the server on the client end, and
+> proxy for the client on the server end.
 
 ### Diagram
 
