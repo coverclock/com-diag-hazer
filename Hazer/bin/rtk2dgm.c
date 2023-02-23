@@ -3,14 +3,14 @@
  * @file
  * @copyright Copyright 2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
- * @brief Simulates a Tumbleweed rover communicating with a Tumbleweed router.
+ * @brief Simulates a Tumbleweed rover to communicate with a Tumbleweed router.
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
  *
  * ABSTRACT
  *
- * Sends an empty RTK packet with a Hazer datagram header to a remote
+ * Sends empty RTK packets with a Hazer datagram header to a remote
  * UDP port. If a response datagram is received, the Hazer header is
  * stripped off and the remainder of the datagram (which may be binary and
  * unprintable) is emitted to standard output. In normal usage, this
@@ -270,17 +270,22 @@ int main(int argc, char * argv[])
                     diminuto_assert(false);
                     break;
                 }
+
+                /*
+                 * VALIDATE
+                 */
+
                 error = false;
                 if (rc != 0) {
-                    fprintf(stderr, "%s: address!\n", program);
+                    fprintf(stderr, "%s: address! (%s!=%s)\n", program, source.buffer, sink.buffer);
                     error = true;
                 }
                 if (port != endpoint.udp) {
-                    fprintf(stderr, "%s: port!\n", program);
+                    fprintf(stderr, "%s: port! (%d!=%d)\n", program, port, endpoint.udp);
                     error = true;
                 }
                 if (bytes <= sizeof(sequence_t)) {
-                    fprintf(stderr, "%s: size!\n", program);
+                    fprintf(stderr, "%s: size! (%zd<=%zu)\n", program, bytes, sizeof(sequence_t));
                     error = true;
                 }
                 if (!error) {
@@ -290,12 +295,13 @@ int main(int argc, char * argv[])
                     } else if (received == expected) {
                         /* Do nothing. */
                     } else {
-                        fprintf(stderr, "%s: sequence! (%u!=%u)\n", program, received, expected);
+                        fprintf(stderr, "%s: sequence! (%u!=%u) [%d]\n", program, received, expected, (signed)received - (signed)expected);
                     }
                     expected = received + 1;
                     size = fwrite(&response.payload, bytes - sizeof(sequence_t), 1, stdout);
                     diminuto_assert(size == 1);
                 }
+
             }
 
             /*

@@ -1,9 +1,9 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2021 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2021-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
- * @brief Computes and displays the checksum of an NMEA, UBX, or RTCM message.
+ * @brief Forwards a subset of CSV output into other formats as a datagram.
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
