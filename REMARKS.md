@@ -907,8 +907,8 @@ proxy for the client on the server end.
 
 ### Example: On the Stagecoach Client (Remote Tumbleweed Rover)
 
-    stagecoach -C /etc/ssl/certs/clientcert.pem -K /etc/ssl/certs/clientkey.pem -P /etc/ssl/certs -f router:stagecoach -n 0.0.0.0:tumbleweed -c &
+    stagecoach -C /etc/ssl/certs/clientcert.pem -K /etc/ssl/private/clientkey.pem -P /etc/ssl/certs -f router:stagecoach -n 0.0.0.0:tumbleweed -c &
 
 ### Example: On the Stagecoach Server (Local Tumbleweed Router)
 
-    stagecoach -C /etc/ssl/certs/servercert.pem -K /etc/ssl/certs/serverkey.pem -P /etc/ssl/certs -f base:tumbleweed -n 0.0.0.0:stagecoach -s &
+    stagecoach -C /etc/ssl/certs/servercert.pem -K /etc/ssl/private/serverkey.pem -P /etc/ssl/certs -f base:tumbleweed -n 0.0.0.0:stagecoach -s &
