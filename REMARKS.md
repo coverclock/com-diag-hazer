@@ -897,7 +897,7 @@ From the Stagecoach documentation:
 > forward NMEA sentences, RTK messages, or CSV packets to UDP port, but
 > lacks any authentication or encryption capability. In this manner,
 > Stagecoach serves as a proxy for the server on the client end, and
-> proxy for the client on the server end.
+> as a proxy for the client on the server end.
 
 ### Diagram
 
