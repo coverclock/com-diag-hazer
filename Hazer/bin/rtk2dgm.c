@@ -3,7 +3,7 @@
  * @file
  * @copyright Copyright 2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
- * @brief Computes and displays the checksum of an NMEA, UBX, or RTCM message.
+ * @brief Simulates a Tumbleweed rover communicating with a Tumbleweed router.
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
