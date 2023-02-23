@@ -20,13 +20,16 @@
  * Developed for use with a Hazer Tumbleweed differential GNSS base station
  * and a Codex Stagecoach OpenSSL tunnel.
  *
+ * The command line flags match what gpstool uses for the same parameters.
+ * The 'Y' is supposed to remind you of the word "surveyor".
+ *
  * USAGE
  *
- * rtk2dgm [ -U HOST:PORT ] [ -y SECONDS ]
+ * rtk2dgm [ -Y HOST:PORT ] [ -y SECONDS ]
  * 
  * EXAMPLE
  *
- * rtk2dgm -Y eljefe:tumbleweed -y 5
+ * rtk2dgm -Y eljefe:tumbleweed -y 1
  *
  * REFERENCES
  *
@@ -55,6 +58,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#if !defined(_BSD_SOURCE)
+#define _BSD_SOURCE
+#endif
+#include <endian.h>
 
 /*
  * CONSTANTS
@@ -67,6 +74,12 @@ enum Constants {
 /*
  * TYPES
  */
+
+typedef union Buffer {
+    diminuto_ipv6_buffer_t buffer6;
+    diminuto_ipv4_buffer_t buffer4;
+    uint8_t buffer[0];
+} buffer_t;
 
 typedef uint32_t sequence_t;
 
@@ -100,19 +113,24 @@ int main(int argc, char * argv[])
     diminuto_ticks_t now = 0;
     request_t request = { 0, { 0xd3, 0x00, 0x00, 0x47, 0xea, 0x4b } };
     response_t response = { 0, { 0, } };
-    sequence_t header = 0;
+    sequence_t sending = 0;
+    sequence_t received = 0;
+    sequence_t expected = 0;
     diminuto_ipc_endpoint_t endpoint = { 0, };
     diminuto_mux_t mux = { 0, };
     diminuto_mux_t * muxp = (diminuto_mux_t *)0;
     diminuto_ipv4_t ipv4 = 0;
     diminuto_ipv6_t ipv6 = { 0, };
     diminuto_port_t port = 0;
+    buffer_t source = { { '\0', } };
+    buffer_t sink = { { '\0', } };
     int sock = -1;
     int rc = 0;
     int nfds = 0;
     int fd = -1;
     ssize_t bytes = -1;
     size_t size = 0;
+    bool first = true;
 
     do {
 
@@ -124,7 +142,7 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "U:y:")) >= 0) {
+        while ((opt = getopt(argc, argv, "?Y:y:")) >= 0) {
             switch (opt) {
             case 'Y':
                 if (diminuto_ipc_endpoint(optarg, &endpoint) != 0) {
@@ -145,10 +163,12 @@ int main(int argc, char * argv[])
                     endpointname = optarg;
                     sock = diminuto_ipc4_datagram_peer(0);
                     diminuto_assert(sock >= 0);
+                    (void)diminuto_ipc4_address2string(endpoint.ipv4, &sink, sizeof(sink));
                 } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
                     endpointname = optarg;
                     sock = diminuto_ipc6_datagram_peer(0);
                     diminuto_assert(sock >= 0);
+                    (void)diminuto_ipc6_address2string(endpoint.ipv6, &sink, sizeof(sink));
                 } else {
                     errno = EINVAL;
                     diminuto_perror(optarg);
@@ -167,13 +187,17 @@ int main(int argc, char * argv[])
                 }
                 break;
             default:
-                fprintf(stderr, "usage: %s [ -Y HOST:PORT ] [ -y SECONDS ]\n", program);
+                fprintf(stderr, "usage: %s [ -? ] [ -Y HOST:PORT ] [ -y SECONDS ]\n", program);
                 error = true;
                 break;
             }
         }
 
-        if (endpointname == (const char *)0) {
+        if (error) {
+            /* Do nothing. */
+        } else if (endpointname != (const char *)0) {
+            /* Do nothing. */
+        } else {
             errno = EINVAL;
             diminuto_perror("-Y HOST:PORT");
             error = true;
@@ -233,11 +257,13 @@ int main(int argc, char * argv[])
                 case DIMINUTO_IPC_TYPE_IPV4:
                     bytes = diminuto_ipc4_datagram_receive_generic(sock, &response, sizeof(response), &ipv4, &port, 0);
                     diminuto_assert(bytes > 0);
+                    (void)diminuto_ipc4_address2string(ipv4, &source, sizeof(source));
                     rc = diminuto_ipc4_compare(&ipv4, &endpoint.ipv4);
                     break;
                 case DIMINUTO_IPC_TYPE_IPV6:
                     bytes = diminuto_ipc6_datagram_receive_generic(sock, &response, sizeof(response), &ipv6, &port, 0);
                     diminuto_assert(bytes > 0);
+                    (void)diminuto_ipc6_address2string(ipv6, &source, sizeof(source));
                     rc = diminuto_ipc6_compare(&ipv6, &endpoint.ipv6);
                     break;
                 default:
@@ -258,10 +284,15 @@ int main(int argc, char * argv[])
                     error = true;
                 }
                 if (!error) {
-                    if (response.header != (header + 1)) {
-                        fprintf(stderr, "%s: sequence!\n", program);
+                    received = be32toh(response.header);
+                    if (first) {
+                        first = false;
+                    } else if (received == expected) {
+                        /* Do nothing. */
+                    } else {
+                        fprintf(stderr, "%s: sequence! (%u!=%u)\n", program, received, expected);
                     }
-                    header = response.header;
+                    expected = received + 1;
                     size = fwrite(&response.payload, bytes - sizeof(sequence_t), 1, stdout);
                     diminuto_assert(size == 1);
                 }
@@ -273,6 +304,7 @@ int main(int argc, char * argv[])
 
             now = diminuto_time_elapsed();
             if ((now - then) >= period) {
+                request.header = htobe32(sending);
                 switch (endpoint.type) {
                 case DIMINUTO_IPC_TYPE_IPV4:
                     bytes = diminuto_ipc4_datagram_send(sock, &request, sizeof(request), endpoint.ipv4, endpoint.udp);
@@ -286,7 +318,7 @@ int main(int argc, char * argv[])
                     diminuto_assert(false);
                     break;
                 } 
-                request.header += 1;
+                sending += 1;
                 then = now;
             }
 
@@ -298,8 +330,10 @@ int main(int argc, char * argv[])
      * FINALIZE
      */
 
-    sock = diminuto_ipc_close(sock);
-    diminuto_assert(sock < 0);
+    if (sock >= 0) {
+        sock = diminuto_ipc_close(sock);
+        diminuto_assert(sock < 0);
+    }
 
     exit(xc);
 }
