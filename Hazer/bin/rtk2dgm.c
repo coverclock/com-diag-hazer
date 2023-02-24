@@ -50,6 +50,7 @@
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_types.h"
+#include "com/diag/hazer/tumbleweed.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,7 +86,7 @@ typedef uint32_t sequence_t;
 
 typedef struct Request {
     sequence_t header;
-    uint8_t payload[6];
+    const uint8_t payload[6];
 } request_t;
 
 typedef struct Response {
@@ -129,6 +130,7 @@ int main(int argc, char * argv[])
     int nfds = 0;
     int fd = -1;
     ssize_t bytes = -1;
+    ssize_t validity = -1;
     size_t size = 0;
     bool first = true;
 
@@ -222,6 +224,8 @@ int main(int argc, char * argv[])
 
         then = diminuto_time_elapsed() - period;
 
+        diminuto_assert(tumbleweed_validate(&request.payload, sizeof(request.payload)));
+
         /*
          * WORK LOOP
          */
@@ -284,8 +288,13 @@ int main(int argc, char * argv[])
                     fprintf(stderr, "%s: port! (%d!=%d)\n", program, port, endpoint.udp);
                     error = true;
                 }
-                if (bytes <= sizeof(sequence_t)) {
-                    fprintf(stderr, "%s: size! (%zd<=%zu)\n", program, bytes, sizeof(sequence_t));
+                if (bytes <= sizeof(request_t)) { /* Smallest RTCM message. */
+                    fprintf(stderr, "%s: size! (%zd<=%zu)\n", program, bytes, sizeof(request_t));
+                    error = true;
+                }
+                validity = tumbleweed_validate(&response.payload, bytes - sizeof(sequence_t));
+                if (validity < 0) {
+                    fprintf(stderr, "%s: payload! (%zd)\n", program, validity);
                     error = true;
                 }
                 if (!error) {
