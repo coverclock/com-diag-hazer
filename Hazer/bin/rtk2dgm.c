@@ -3,7 +3,7 @@
  * @file
  * @copyright Copyright 2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
- * @brief Simulates a Tumbleweed rover to communicate with a Tumbleweed router.
+ * @brief Simulates a Tumbleweed rover communicating with a Tumbleweed router.
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
@@ -107,9 +107,9 @@ int main(int argc, char * argv[])
     bool error = false;
     char * end = (char *)0;
     const char * endpointname = (const char *)0;
-    long seconds = 0;
-    diminuto_sticks_t period = 25000000000LL;
-    diminuto_sticks_t timeout = 12500000000LL;;
+    long number = 0;
+    diminuto_sticks_t period  = 25000000000LL; /* 25s (from SIP) */
+    diminuto_sticks_t timeout =  1000000000LL; /*  1s */
     diminuto_ticks_t then = 0;
     diminuto_ticks_t now = 0;
     request_t request = { 0, { 0xd3, 0x00, 0x00, 0x47, 0xea, 0x4b } };
@@ -133,6 +133,7 @@ int main(int argc, char * argv[])
     ssize_t validity = -1;
     size_t size = 0;
     bool first = true;
+    diminuto_endpoint_buffer_t buffer = { '\0', };
 
     do {
 
@@ -144,7 +145,7 @@ int main(int argc, char * argv[])
 
         program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
-        while ((opt = getopt(argc, argv, "?Y:y:")) >= 0) {
+        while ((opt = getopt(argc, argv, "?Y:t:y:")) >= 0) {
             switch (opt) {
             case 'Y':
                 if (diminuto_ipc_endpoint(optarg, &endpoint) != 0) {
@@ -177,19 +178,28 @@ int main(int argc, char * argv[])
                     break;
                 }
                 break;
-            case 'y':
-                seconds = strtol(optarg, &end, 0);
-                if ((end == (char *)0) || (*end != '\0') || (seconds < 0)) {
+            case 't':
+                number = strtol(optarg, &end, 0);
+                if ((end == (char *)0) || (*end != '\0') || (number <= 0)) {
                     errno = EINVAL;
                     diminuto_perror(optarg);
                     error = true;
                 } else {
-                    period = diminuto_frequency_units2ticks(seconds, 1 /* Hz */);
-                    timeout = period / 2;
+                   timeout = diminuto_frequency_units2ticks(number, 1000 /* Hz: milliseconds */);
+                }
+                break;
+            case 'y':
+                number = strtol(optarg, &end, 0);
+                if ((end == (char *)0) || (*end != '\0') || (number <= 0)) {
+                    errno = EINVAL;
+                    diminuto_perror(optarg);
+                    error = true;
+                } else {
+                    period = diminuto_frequency_units2ticks(number, 1 /* Hz: seconds */);
                 }
                 break;
             default:
-                fprintf(stderr, "usage: %s [ -? ] [ -Y HOST:PORT ] [ -y SECONDS ]\n", program);
+                fprintf(stderr, "usage: %s [ -? ] [ -Y HOST:PORT ] [ -t MILLISECONDS ] [ -y SECONDS ]\n", program);
                 error = true;
                 break;
             }
@@ -208,6 +218,8 @@ int main(int argc, char * argv[])
         if (error) {
             break;
         }
+
+        fprintf(stderr, "%s: endpoint=\"%s\"=%s timeout=%zdticks period=%zdticks\n", program, endpointname, diminuto_ipc_endpoint2string(&endpoint, buffer, sizeof(buffer)), timeout, period);
 
         /*
          * INITIALIZE

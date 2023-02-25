@@ -7,8 +7,9 @@
 
 PROGRAM=$(basename ${0})
 ENDPOINT=${1:-"localhost:tumbleweed"}
-SECONDS=${2:-"1"}
+SECONDS=${2:-"25"}
+MILLISECONDS=${3:-"1000"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-rtk2dgm -Y ${ENDPOINT} -y ${SECONDS}
+rtk2dgm -Y ${ENDPOINT} -y ${SECONDS} -t ${MILLISECONDS}
