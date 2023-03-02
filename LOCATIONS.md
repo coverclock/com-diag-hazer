@@ -64,7 +64,7 @@ the view of the Front Range of the Rocky Mountains is spectacular
 from here is just a happy coincidence. (The fact that there is easy
 parking and access to the marker is also a good thing.)
 
-    KK1446  DESIGNATION -  DOVER
+     KK1446  DESIGNATION -  DOVER
      KK1446  PID         -  KK1446
      KK1446  STATE/COUNTY-  CO/JEFFERSON
      KK1446  COUNTRY     -  US
