@@ -61,8 +61,15 @@ The old Greene family home where I used to spend my summers growing up.
 
 This is a NGS marker at which I do a lot of testing. The fact that
 the view of the Front Range of the Rocky Mountains is spectacular
-from here is just a happy coincidence. (The fact that there is easy
-parking and access to the marker is also a good thing.)
+from here is just a happy coincidence. The fact that there is easy
+parking and access to the marker is also a good thing. This location
+is so good, I once ran into a professional surveyor who was using it
+to calibrate his equipment; he told me he often brings his lunch to
+eat there.
+
+39°49'18.0"N 105°05'42.6"W
+
+39.821667, -105.095167
 
      KK1446  DESIGNATION -  DOVER
      KK1446  PID         -  KK1446
