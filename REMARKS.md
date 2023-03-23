@@ -914,3 +914,25 @@ From the Stagecoach documentation:
 ### Example: On the Stagecoach Server (Local Tumbleweed Router)
 
     stagecoach -C /etc/ssl/certs/servercert.pem -K /etc/ssl/private/serverkey.pem -P /etc/ssl/certs -f base:tumbleweed -n 0.0.0.0:stagecoach -s &
+
+## Testing the SparkFun LoRa Serial Radios
+
+As part of the Conestoga project I'm playing with the SparkFun LoRa serial
+radios. These radios come as a set of two pre-paired LoRa radios, and can be
+powered and communicated with via a USB C cable. They enumerate as a serial
+modem.
+
+* ttyACM
+* 57600 baud 8n1
+* USB vendor 1b4f
+* USB product 002a
+
+To sanity test these, I ran the Diminuto loopback utility on one Raspberry Pi
+
+    loopback -D /dev/ttyACM0 -b 57600 -8 -n -1 -d
+
+with the standard screen utility on a second Raspberry Pi
+
+    screen /dev/ttyACM0 57600 8n1
+
+and just verified that what I typed on the second Pi was echoed back verbatim.
