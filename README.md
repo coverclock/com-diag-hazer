@@ -1356,8 +1356,8 @@ simplify parsing in post-processing.
 *  2 - FIX: 0=no fix, 1=dead reckoning, 2=2D, 3=3D, 4=combined, 5=time only.
 *  3 - SYS: 0=ensemble, 1=GPS, 2=GLONASS, 3=GALILEO, 4=BEIDOU.
 *  4 - SAT: number of satellites used in position fix.
-*  5 - CLK: UTC system time in decimal seconds since the POSIX Epoch.
-*  6 - TIM: GPS time in decimal seconds since the POSIX Epoch.
+*  5 - CLK: UTC from host time in decimal seconds since the POSIX Epoch.
+*  6 - TIM: UTC from GPS time in decimal seconds since the POSIX Epoch.
 *  7 - LAT: WGS84 latitude in decimal degrees.
 *  8 - LON: WGS84 longitude in decimal degrees.
 *  9 - HAC: reported horizontal error in decimal meters.
