@@ -200,7 +200,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
     /* CLK */
 
-    ticks = diminuto_frequency_ticks2units(Now, NANO);
+    ticks = diminuto_frequency_ticks2units(Clock, NANO);
 
     seconds = ticks / NANO;
     nanoseconds = ticks % NANO;
