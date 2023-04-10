@@ -917,18 +917,26 @@ From the Stagecoach documentation:
 
 ## Testing the SparkFun LoRa Serial Radios
 
-As part of the Conestoga project, I'm playing with the SparkFun LoRa serial
+As part of the Fothergill project, I'm playing with the SparkFun LoRa serial
 radios. These radios come as a set of two pre-paired LoRa radios, and can be
-powered and communicated with via a USB C cable.
+powered and communicated with via USB C cables. Testing with them has suggested
+they are fiercely slow and prone to disconnect.
 
 <https://www.sparkfun.com/products/20029>
 
-They enumerate as a serial modem.
+They enumerate as serial modems.
 
-* ttyACM
-* 57600 baud 8n1
-* USB vendor 1b4f
-* USB product 002a
+* Device ttyACM
+* Serial 57600 baud 8n1
+* USB Vendor 1b4f
+* USB Product 002a
+* Frequency 902-928 MHz
+* Channels 50
+* Frequency Hopping
+* Broadcast Power 30dbm
+* Airspeed 4800 bps (about 480 bytes/second including overhead)
+* AES Encryption
+* Software CRC
 
 To sanity test these, I ran the Diminuto loopback utility on one Raspberry Pi
 
@@ -939,7 +947,3 @@ with the standard screen utility on a second Raspberry Pi
     screen /dev/ttyACM0 57600 8n1
 
 and just verified that what I typed on the second Pi was echoed back verbatim.
-
-With a little work, I think these might be used to exchange RTCM updates
-between a DGNSS rover and base station for RTK, or to forward CSV traces
-back to a home base.
