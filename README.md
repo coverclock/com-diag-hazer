@@ -1268,6 +1268,7 @@ throw an assert and core dump.
 * datagramsink - exercises a datagram source.
 * datagramsource - exercises a datagram sink.
 * dgnss - a script used to test other DNSS scripts.
+* fothergill - runs gpstool and forwards CSV traces across LoRa radio channel.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
 * gpsproplusblue - exercises the Bad Elf GPS Pro+ receiver via Bluetooth.
 * gpsproplususb - exercises the Bad Elf GPS Pro+ receiver via USB.
