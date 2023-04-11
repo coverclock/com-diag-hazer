@@ -3,12 +3,10 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# THIS IS A WORK IN PROGRESS.
 # In support of testing the Fothergill project, in which gpstool
 # forwards CSV-based traces over LoRa radios using HDLC-like
 # framing. Note that the LoRa radio channel is sucky slow and
 # will disconnect if overrun, which happens easily.
-# UNTESTED.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
