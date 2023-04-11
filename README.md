@@ -59,9 +59,9 @@ repositories:
 * Wheatstone (LTE-M support),
 * Tesoro (OSM support),
 * Metronome (precision time and frequency support),
-* Stagecoach (OpenSSL tunnelling),
-* Conestoga (serial port tunnelling),
-* Fothergill (LoRa support).
+* Stagecoach (UDP/OpenSSL gateway),
+* Conestoga (UDP/serial gateway),
+* Fothergill (LoRa/serial gateway).
 
 The Hazer repo includes parsers for three different input formats - NMEA,
 UBX, and RTCM - and interprets many of the data records represented in
