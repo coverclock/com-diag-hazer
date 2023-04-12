@@ -16,3 +16,5 @@ while [ -c ${RADDEV} ]; do
 	RADXIT=$?
 	log -I -N ${PROGRAM} -n "framertool exited! (${RADXIT})"
 done
+
+exit 1
