@@ -7,7 +7,12 @@
 # forwards CSV-based traces over LoRa radios using HDLC-like
 # framing.
 
+PROGRAM=$(basename ${0})
 RADDEV=${1:-"/dev/ttyACM0"}
 RADBPS=${2:-57600}
 
-exec framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 -d
+while true; do
+	framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 -d
+	RADXIT=$?
+	log -I -N ${PROGRAM} -n "framertool exited! (${RADXIT})"
+done
