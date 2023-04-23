@@ -193,7 +193,7 @@ TARGETALL			:=	$(TARGETLIBRARIES) $(TARGETPROGRAMS)
 
 ########## Main Entry Points
 
-.PHONY:	all dist clean pristine clobber scratch
+.PHONY:	all dist clean pristine clobber scratch refresh
 
 all:	$(TARGETALL)
 
@@ -211,6 +211,10 @@ scratch:
 	make pristine
 	make depend
 	make all
+
+refresh:
+	git pull
+	make scratch
 
 clobber:	pristine
 	rm -f .cscope.lst .cscope.out .cscope.out.in .cscope.out.po
