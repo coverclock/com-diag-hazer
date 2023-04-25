@@ -11,4 +11,4 @@ PROGRAM=$(basename ${0})
 RADDEV=${1:-"/dev/ttyACM0"}
 RADBPS=${2:-57600}
 
-exec framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1
+exec framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 < /dev/null
