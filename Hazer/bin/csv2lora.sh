@@ -8,30 +8,37 @@
 
 while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT YAW RAC PAC YAC OBS MAC; do
 
-	if [[ "${NUM}" == "NUM," ]]; then
-		continue
-	fi
+        if [[ "${NUM}" == "NUM," ]]; then
+                continue
+        fi
 
-	TIM=${TIM%,}
-	TIME=$(date -d "@${TIM}" -u '+%Y-%m-%dT%H:%M:%SZ')
+        FIX=${FIX%,}
+        TYPE=$(csvfix2str ${FIX})
 
-	LAT=${LAT%,}
-	LON=${LON%,}
-	POSITION=$(mapstool -P "${LAT} ${LON}" | sed 's/\.[0-9][0-9]*"/"/g')
-	LATITUDE=${POSITION%%,*}
-	LONGITUDE=${POSITION##*, }
+        SYS=${SYS%,}
+        SYSTEM=$(csvsys2str ${SYS})
 
-	MSL=${MSL%.*}
+        SAT=${SAT%,}
 
-	SOG=${SOG%.*}
+        TIM=${TIM%,}
+        TIME=$(date -d "@${TIM}" -u '+%Y-%m-%dT%H:%M:%SZ')
 
-	COG=${COG%,}
-	COMPASS=$(compasstool ${COG})
-	COG=${COG%.*}
+        LAT=${LAT%,}
+        LON=${LON%,}
+        POSITION=$(mapstool -P "${LAT} ${LON}" | sed 's/\.[0-9][0-9]*"/"/g')
+        LATITUDE=${POSITION%%,*}
+        LONGITUDE=${POSITION##*, }
 
-	printf "%-20s %12s %12s %5sm %4skn %3s %-3s\n" "${TIME}" "${LATITUDE}" "${LONGITUDE}" "${MSL}" "${SOG}" "${COG}" "${COMPASS}" 
+        MSL=${MSL%.*}
+
+        SOG=${SOG%.*}
+
+        COG=${COG%,}
+        COMPASS=$(compasstool ${COG})
+        COG=${COG%.*}
+
+        printf "%-2s %-2s %-2s %-20s %12s %12s %5sm %4skn %3s %-3s\n" "${SYSTEM}" "${SAT}" "${TYPE}" "${TIME}" "${LATITUDE}," "${LONGITUDE}" "${MSL}" "${SOG}" "${COG}" "${COMPASS}"
 
 done
 
 exit 0
-

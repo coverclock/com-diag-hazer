@@ -11,4 +11,9 @@ PROGRAM=$(basename ${0})
 RADDEV=${1:-"/dev/ttyACM0"}
 RADBPS=${2:-57600}
 
-exec framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 < /dev/null
+# If the LoRaSerial device (which this script was written specifically
+# to test) disconnects from the USB bus (which it is wont to do, an
+# issue I am debugging), framertool will receive an EOF from the standard
+# I/O library and exit.
+
+exec framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 -r < /dev/null

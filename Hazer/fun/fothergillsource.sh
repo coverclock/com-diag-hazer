@@ -5,8 +5,7 @@
 # https://github.com/coverclock/com-diag-hazer
 # In support of testing the Fothergill project, in which gpstool
 # forwards CSV-based traces over LoRa radios using HDLC-like
-# framing. Note that the LoRa radio channel is sucky slow and
-# will disconnect if overrun, which happens easily.
+# framing.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
@@ -25,14 +24,26 @@ exec 2>>${ERRFIL}
 
 rm -f ${FIFO} 2> /dev/null
 mkfifo ${FIFO}
-cat ${FIFO} | framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 > /dev/null &
+
+# If the LoRaSerial device (which this script was written specifically
+# to test) disconnects from the USB bus (which it is wont to do, an
+# issue I am examining), framertool will receive an EOF from the standard
+# I/O library and exit. This will tear down the pipeline it is part of.
+# When that happens, the OS will send the process on the other end of the
+# FIFO, which is gpstool, a SIGPIPE signal. When gpstool receives this, it
+# will exit after logging a message. The message can be found in the ERRFIL
+# established above.
+
+cat ${FIFO} | csv2lora | framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 -r > /dev/null &
 PIPE=$!
+
 trap "kill ${PIPE} 2> /dev/null; rm -f ${FIFO} 2> /dev/null" SIGINT SIGQUIT SIGTERM EXIT
+
 echo "${PROGRAM}: ${RADDEV} ${RADBPS} ${GPSDEV} ${GPSBPS} ${FIFO} ${ERRFIL} ${PIPE}" 1>&2
 
-# N.B. gpstool does not emit any trace (-T) data until the GPS
-# receiver establishes a fix. For a cold start, this can take
-# several minutes to happen. Nothing will show up in the FIFO
-# or on the LoRa channel until that happens.
+# gpstool does not emit any trace (-T) data until the GPS receiver
+# establishes a fix. For a GPS cold start, this can take several minutes to
+# happen. Nothing will show up in the FIFO or on the LoRa channel until
+# that happens.
 
-coreable gpstool -D ${GPSDEV} -b ${GPSBPS} -8 -n -1 -T ${FIFO} -f 10 -E -t 10
+gpstool -D ${GPSDEV} -b ${GPSBPS} -8 -n -1 -T ${FIFO} -f 10 -E -t 10
