@@ -29,15 +29,13 @@ spawn serialtool -N -D $device -b $rate -8 -n -1 -r
 
 # Seems easy to overrun device.
 
-set send_slow { 1 .01 }
-
-# Terminate any partial or invalid command entered prior.
-
-send_user "Sending Carriage Return\n"
-send -s "\r"
-sleep 5
+set send_slow { 1 .1 }
 
 # Enter command mode (sometimes takes a long time).
+
+send_user "Sending CR\n"
+send -s "\r"
+sleep 2
 
 send_user "Sending +++\n"
 send -s "+++\r"
