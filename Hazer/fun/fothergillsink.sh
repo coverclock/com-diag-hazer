@@ -16,4 +16,4 @@ RADBPS=${2:-57600}
 # issue I am debugging), framertool will receive an EOF from the standard
 # I/O library and exit.
 
-exec framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 -r < /dev/null
+exec framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 -h < /dev/null

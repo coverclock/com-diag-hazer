@@ -34,7 +34,7 @@ mkfifo ${FIFO}
 # will exit after logging a message. The message can be found in the ERRFIL
 # established above.
 
-cat ${FIFO} | csv2lora | framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 -r > /dev/null &
+cat ${FIFO} | csv2lora | framertool -D ${RADDEV} -b ${RADBPS} -8 -n -1 -h > /dev/null &
 PIPE=$!
 
 trap "kill ${PIPE} 2> /dev/null; rm -f ${FIFO} 2> /dev/null" SIGINT SIGQUIT SIGTERM EXIT
