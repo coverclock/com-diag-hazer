@@ -66,10 +66,14 @@ while { $commandi < $commandn } {
     }
 }
 
-# Reboot the radio.
+sleep 5
 
-send_user "Sending ATZ\n"
-send -s "ATZ\r"
+# Exit command mode (may "OK" may not)..
+
+send_user "Sending ATO\n"
+send -s "ATO\r"
+
+# Recommend power cycling radio after this.
 
 send_user "Closing\n"
 close
