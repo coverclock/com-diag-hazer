@@ -1,0 +1,77 @@
+#!/usr/bin/expect --
+# Copyright 2023 Digital Aggregates Corporation, Colorado, USA
+# Licensed under the terms in LICENSE.txt
+# Chip Overclock <coverclock@diag.com>
+# https://github.com/coverclock/com-diag-hazer
+# THIS IS A WORK IN PROGRESS.
+# Configures a SparkFun LoRaSerial radio to be a SERVER in MULTIPOINT mode.
+# There can be only one server.
+# Usage: loraserialserver.exp [ DEVICE [ RATE ] ]
+# Defaults: loraserialserver.exp /dev/ttyACM0 57600
+
+# Set defaults.
+
+set device "/dev/ttyACM0"
+set rate "57600"
+
+# Set parameters.
+
+set argc [ llength $argv ]
+if { $argc > 0 } { set device   [ lindex $argv 0 ] }
+if { $argc > 1 } { set rate     [ lindex $argv 1 ] }
+
+# Prevent '\r' from being translated to '\n'.
+
+set stty_init "raw"
+
+send_user "Opening $device\n"
+spawn serialtool -N -D $device -b $rate -8 -n -1 -r
+
+# Seems easy to overrun device.
+
+set send_slow { 1 .01 }
+
+# Terminate any partial or invalid command entered prior.
+
+send_user "Sending Carriage Return\n"
+send -s "\r"
+sleep 5
+
+# Enter command mode (sometimes takes a long time).
+
+send_user "Sending +++\n"
+send -s "+++\r"
+sleep 5
+
+# Proceed with configuration.
+
+set commands [ list \
+    "AT" \
+    "AT" \
+    "AT-FLOWCONTROL=1" \
+    "AT-OPERATINGMODE=0" \
+    "AT-SERVER=1" \
+]
+
+set commandn [ llength $commands ]
+set commandi 0
+while { $commandi < $commandn } {
+    set command [ lindex $commands $commandi ]
+    set commandi [ expr $commandi + 1 ]
+    send_user "Sending $command\n"
+    send -s "$command\r"
+    expect {
+        timeout { send_user "Timeout\n"; exit 1 }
+        "ERROR" { send_user "Error\n"; exit 1 }
+        "OK"    { send_user "Acknowledged\n" }
+    }
+}
+
+# Exit command mode (sometimes "OK" sometimes not).
+
+send_user "Sending ATO\n"
+send -s "ATO\r"
+
+send_user "Closing\n"
+close
+exit 0
