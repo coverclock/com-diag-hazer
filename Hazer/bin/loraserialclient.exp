@@ -49,6 +49,7 @@ set commands [ list \
     "AT-FLOWCONTROL=1" \
     "AT-OPERATINGMODE=0" \
     "AT-SERVER=0" \
+    "ATW" \
 ]
 
 set commandn [ llength $commands ]
@@ -65,10 +66,10 @@ while { $commandi < $commandn } {
     }
 }
 
-# Exit command mode (sometimes "OK" sometimes not).
+# Reboot the radio.
 
-send_user "Sending ATO\n"
-send -s "ATO\r"
+send_user "Sending ATZ\n"
+send -s "ATZ\r"
 
 send_user "Closing\n"
 close
