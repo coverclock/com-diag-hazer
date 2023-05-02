@@ -6,7 +6,7 @@
 # THIS IS A WORK IN PROGRESS.
 # Configures a SparkFun LoRaSerial radio to enable hardware flow
 # control.
-# Usage: loraserialclient.exp [ DEVICE [ RATE ] ]
+# Usage: loraserialrtscts.exp [ DEVICE [ RATE ] ]
 # Defaults: loraserialrtscts.exp /dev/ttyACM0 57600
 
 # Set defaults.
