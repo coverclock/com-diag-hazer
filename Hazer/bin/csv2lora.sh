@@ -19,6 +19,8 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
 	NAM=${NAM##\"}
 	NAM=${NAM%%\",}
 
+        NUM=${NUM%,}
+
         FIX=${FIX%,}
         FIX=$(csvfix2str ${FIX})
 
@@ -44,7 +46,7 @@ while read NAM NUM FIX SYS SAT CLK TIM LAT LON HAC MSL GEO VAC SOG COG ROL PIT Y
         DIR=$(compasstool ${COG})
         COG=${COG%.*}
 
-        printf "%s %-2s %2s %-2s %-20s %12s %12s %5sm %4skn %3s %-3s\n" "${NAM}" "${SYS}" "${SAT}" "${FIX}" "${TIM}" "${LAT}," "${LON}" "${MSL}" "${SOG}" "${COG}" "${DIR}"
+        printf "%s %s %-2s %2s %-2s %-20s %12s %12s %5sm %4skn %3s %-3s\n" "${NAM}" "${NUM}" "${SYS}" "${SAT}" "${FIX}" "${TIM}" "${LAT}," "${LON}" "${MSL}" "${SOG}" "${COG}" "${DIR}"
 
 done
 
