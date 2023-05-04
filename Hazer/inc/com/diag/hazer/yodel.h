@@ -31,6 +31,9 @@
  *
  * "u-blox 8 / u-blox M8 Receiver Description Including Protocol Specification",
  * UBX-13003221-R19, ublox AG, 2020-05-20
+ *
+ * "u-blox F10 TIM 3.01 - u-blox F10 GNSS timing receiver - Interface
+ * Description", UBX-23003447-R01, ublox AG, 2023-03-21
  */
 
 #include <stdio.h>
@@ -75,11 +78,11 @@ extern int yodel_finalize(void);
  * UBlox 8 R15, p. 134
  */
 enum YodelUbxConstants {
-    YODEL_UBX_UNSUMMED	= 2,	/* SYNC1[1], SYNC2[1] */
-    YODEL_UBX_SUMMED	= 4,	/* CLASS[1], ID[1], LENGTH[2] ... */
-    YODEL_UBX_SHORTEST	= 8,	/* UNSUMMED[2], SUMMED[4], CK_A[1], CK_B[1] */
-    YODEL_UBX_CHECKSUM	= 2,	/* CK_A[1], CK_B[1] */
-    YODEL_UBX_LONGEST	= 1024,	/* Rounded up from SHORTEST + (64 * (4 + 8)). */
+    YODEL_UBX_UNSUMMED  = 2,    /* SYNC1[1], SYNC2[1] */
+    YODEL_UBX_SUMMED    = 4,    /* CLASS[1], ID[1], LENGTH[2] ... */
+    YODEL_UBX_SHORTEST  = 8,    /* UNSUMMED[2], SUMMED[4], CK_A[1], CK_B[1] */
+    YODEL_UBX_CHECKSUM  = 2,    /* CK_A[1], CK_B[1] */
+    YODEL_UBX_LONGEST   = 1024, /* Rounded up from SHORTEST + (64 * (4 + 8)). */
 };
 
 /**
@@ -103,13 +106,13 @@ typedef uint8_t (yodel_buffer_t)[YODEL_UBX_LONGEST + 1];
  * UBlox 8 R15, p. 134
  */
 enum YodelUbxOffsets {
-    YODEL_UBX_SYNC_1		= 0,	/* Always 0xb5. */
-    YODEL_UBX_SYNC_2		= 1,	/* Always 0x62. */
-    YODEL_UBX_CLASS			= 2,
-    YODEL_UBX_ID			= 3,
-    YODEL_UBX_LENGTH_LSB	= 4,	/* 16-bit, little endian (LSB). */
-    YODEL_UBX_LENGTH_MSB 	= 5,	/* 16-bit, little endian (MSB). */
-    YODEL_UBX_PAYLOAD		= 6,
+    YODEL_UBX_SYNC_1        = 0,    /* Always 0xb5. */
+    YODEL_UBX_SYNC_2        = 1,    /* Always 0x62. */
+    YODEL_UBX_CLASS         = 2,
+    YODEL_UBX_ID            = 3,
+    YODEL_UBX_LENGTH_LSB    = 4,    /* 16-bit, little endian (LSB). */
+    YODEL_UBX_LENGTH_MSB    = 5,    /* 16-bit, little endian (MSB). */
+    YODEL_UBX_PAYLOAD       = 6,
 };
 
 /**
@@ -120,11 +123,11 @@ enum YodelUbxOffsets {
  * UBlox 8 R15, p. 134
  */
 typedef struct YodelUbxHeader {
-    uint8_t sync_1;		/* 0xb5 */
-    uint8_t sync_2;		/* 0x62 */
+    uint8_t sync_1;     /* 0xb5 */
+    uint8_t sync_2;     /* 0x62 */
     uint8_t classx;
-    uint8_t	id;
-    uint16_t length;	/* little endian */
+    uint8_t id;
+    uint16_t length;    /* little endian */
     uint8_t payload[0];
 } yodel_ubx_header_t __attribute__((__aligned__(2)));
 
@@ -143,46 +146,46 @@ typedef struct YodelUbxHeader {
  * failed; that might be of interest to the application.
  */
 typedef enum YodelState {
-    YODEL_STATE_STOP		= 'X',
-    YODEL_STATE_START		= 'S',
-    YODEL_STATE_SYNC_2		= 'Y',
-    YODEL_STATE_CLASS		= 'C',
-    YODEL_STATE_ID			= 'I',
-    YODEL_STATE_LENGTH_1	= 'L',
-    YODEL_STATE_LENGTH_2	= 'M',
-    YODEL_STATE_PAYLOAD		= 'P',
-    YODEL_STATE_CK_A		= 'A',
-    YODEL_STATE_CK_B		= 'B',
-    YODEL_STATE_END			= 'E',
+    YODEL_STATE_STOP        = 'X',
+    YODEL_STATE_START       = 'S',
+    YODEL_STATE_SYNC_2      = 'Y',
+    YODEL_STATE_CLASS       = 'C',
+    YODEL_STATE_ID          = 'I',
+    YODEL_STATE_LENGTH_1    = 'L',
+    YODEL_STATE_LENGTH_2    = 'M',
+    YODEL_STATE_PAYLOAD     = 'P',
+    YODEL_STATE_CK_A        = 'A',
+    YODEL_STATE_CK_B        = 'B',
+    YODEL_STATE_END         = 'E',
 } yodel_state_t;
 
 /**
  * UBX state machine stimuli.
  */
 enum YodelStimulus {
-    YODEL_STIMULUS_SYNC_1		= 0xb5,	/* ISO 8859.1 for 'mu'. */
-    YODEL_STIMULUS_SYNC_2		= 0x62,	/* 'b' but in hex in doc. */
+    YODEL_STIMULUS_SYNC_1       = 0xb5, /* ISO 8859.1 for 'mu'. */
+    YODEL_STIMULUS_SYNC_2       = 0x62, /* 'b' but in hex in doc. */
 };
 
 /**
  * UBX state machine actions.
  */
 typedef enum YodelAction {
-    YODEL_ACTION_SKIP		= 'X',
-    YODEL_ACTION_SAVE		= 'S',
-    YODEL_ACTION_TERMINATE	= 'T',
+    YODEL_ACTION_SKIP       = 'X',
+    YODEL_ACTION_SAVE       = 'S',
+    YODEL_ACTION_TERMINATE  = 'T',
 } yodel_action_t;
 
 /**
  * Yodel UBX parser state machine context (which needs no initial value).
  */
 typedef struct YodelContext {
-    uint8_t * bp;		/* Current buffer pointer. */
-    size_t sz;			/* Remaining buffer size in bytes. */
-    size_t tot;			/* Total size once packet is complete. */
-    uint16_t ln;		/* Payload length in bytes. */
-    uint8_t csa;		/* Running Fletcher checksum A. */
-    uint8_t csb;		/* Running Fletcher checksum B. */
+    uint8_t * bp;       /* Current buffer pointer. */
+    size_t sz;          /* Remaining buffer size in bytes. */
+    size_t tot;         /* Total size once packet is complete. */
+    uint16_t ln;        /* Payload length in bytes. */
+    uint8_t csa;        /* Running Fletcher checksum A. */
+    uint8_t csb;        /* Running Fletcher checksum B. */
     uint8_t error;      /* Checksum error indication. */
 } yodel_context_t;
 
@@ -275,16 +278,18 @@ extern ssize_t yodel_validate(const void * buffer, size_t size);
  * UBLOX8 R24 Appendix A p. 446.
  * UBLOX9 R04 p. 238.
  * UBLOX9 R05 p. 242.
+ * UBLOX10 R01, pp. 13-16
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum YodelSystem {
-    YODEL_SYSTEM_GPS				= 0,
-    YODEL_SYSTEM_SBAS				= 1,
-    YODEL_SYSTEM_GALILEO			= 2,
-    YODEL_SYSTEM_BEIDOU				= 3,
+    YODEL_SYSTEM_GPS                = 0,    /* GPS   G */
+    YODEL_SYSTEM_SBAS               = 1,    /* SBAS  S */
+    YODEL_SYSTEM_GALILEO            = 2,    /* GAL   E */
+    YODEL_SYSTEM_BEIDOU             = 3,    /* BDS   B */
     YODEL_SYSTEM_IMES               = 4,
-    YODEL_SYSTEM_QZSS				= 5,
-    YODEL_SYSTEM_GLONASS			= 6,
+    YODEL_SYSTEM_QZSS               = 5,    /* QZSS  Q */
+    YODEL_SYSTEM_GLONASS            = 6,    /* GLO   R */
+    YODEL_SYSTEM_NAVIC              = 7,    /* NavIC N */
     YODEL_SYSTEM_GNSS,
     YODEL_SYSTEM_TOTAL,
 } yodel_system_t;
@@ -307,6 +312,7 @@ typedef enum YodelSystem {
         "IMES", \
         "QZSS", \
         "GLONASS", \
+        "NAVIC", \
         "GNSS", \
         (const char *)0, \
     }
@@ -314,59 +320,67 @@ typedef enum YodelSystem {
 /**
  * GNSS satellite identifiers.
  * UBLOX9 R05 p. 242.
+ * UBLOX10 R01, pp. 13-16
  */
 typedef enum YodelId {
     /*                        0,     */
-    YODEL_ID_GPS_FIRST		= 1,
+    YODEL_ID_GPS_FIRST      = 1,
     /*                        :      */
-    YODEL_ID_GPS_LAST		= 32,
-    YODEL_ID_SBAS1_FIRST	= 33,
+    YODEL_ID_GPS_LAST       = 32,
+    YODEL_ID_BEIDOU1_FIRST  = 33,
     /*                        :      */
-    YODEL_ID_SBAS1_LAST		= 64,
-    YODEL_ID_GLONASS1_FIRST	= 65,
+    YODEL_ID_BEIDOU1_LAST   = 64,
+    YODEL_ID_GLONASS1_FIRST = 65,
     /*                        :      */
-    YODEL_ID_GLONASS1_LAST	= 96,
-    /*						  97,    */
-    /*						   :     */
-    /*						  119,   */
-    YODEL_ID_SBAS2_FIRST	= 120,
+    YODEL_ID_GLONASS1_LAST  = 96,
+    /*                        97,    */
+    /*                         :     */
+    /*                        119,   */
+    YODEL_ID_SBAS_FIRST     = 120,
     /*                        :      */
-    YODEL_ID_SBAS2_LAST		= 158,
-    YODEL_ID_BEIDOU1_FIRST	= 159,
+    YODEL_ID_SBAS_LAST      = 158,
+    YODEL_ID_BEIDOU2_FIRST  = 159,
     /*                        :      */
-    YODEL_ID_BEIDOU1_LAST	= 163,
-    /*						  164,   */
-    /*						   :     */
-    /*						  172,   */
-    YODEL_ID_IMES_FIRST		= 173,
+    YODEL_ID_BEIDOU2_LAST   = 163,
+    /*                        164,   */
+    /*                         :     */
+    /*                        172,   */
+    YODEL_ID_IMES_FIRST     = 173,
     /*                        :      */
-    YODEL_ID_IMES_LAST		= 182,
-    /*						  183,   */
-    /*						   :     */
-    /*						  192,   */
-    YODEL_ID_QZSS_FIRST		= 193,
+    YODEL_ID_IMES_LAST      = 182,
+    /*                        183,   */
+    /*                         :     */
+    /*                        192,   */
+    YODEL_ID_QZSS_FIRST     = 193,
     /*                        :      */
-    YODEL_ID_QZSS_LAST		= 197,
-    /*						  198,   */
-    /*						   :     */
-    /*						  254,   */
-    YODEL_ID_GLONASS2_FIRST	= 255,
-    YODEL_ID_GLONASS2_LAST	= 255,
-    /*						  256,   */
-    /*						   :     */
-    /*						  300,   */
-    YODEL_ID_GALILEO_FIRST	= 301,
+    YODEL_ID_QZSS_LAST      = 202,
+    /*                        203,   */
+    /*                         :     */
+    /*                        210,   */
+    YODEL_ID_GALILEO1_FIRST = 211,
     /*                        :      */
-    YODEL_ID_GALILEO_LAST	= 336,
-    /*						  337,   */
-    /*						   :     */
-    /*						  400,   */
-    YODEL_ID_BEIDOU2_FIRST	= 401,
+    YODEL_ID_GALILEO1_LAST  = 246,
+    YODEL_ID_NAVIC_FIRST    = 247,
+    /*                         :     */
+    YODEL_ID_NAVIC_LAST     = 253,
+    /*                        254,   */
+    YODEL_ID_GLONASS2_FIRST = 255,
+    YODEL_ID_GLONASS2_LAST  = 255,
+    /*                        256,   */
+    /*                         :     */
+    /*                        300,   */
+    YODEL_ID_GALILEO2_FIRST = 301,
     /*                        :      */
-    YODEL_ID_BEIDOU2_LAST	= 437,
-    /*						  438,   */
-    /*						   :     */
-    /*						  65535, */
+    YODEL_ID_GALILEO2_LAST  = 336,
+    /*                        337,   */
+    /*                         :     */
+    /*                        400,   */
+    YODEL_ID_BEIDOU3_FIRST  = 401,
+    /*                        :      */
+    YODEL_ID_BEIDOU3_LAST   = 437,
+    /*                        438,   */
+    /*                         :     */
+    /*                        65535, */
 } yodel_id_t;
 
 /*******************************************************************************
@@ -425,9 +439,9 @@ typedef struct YodelUbxNavHpposllh {
  * UBX-NAV-HPPOSLLH constants.
  */
 enum YodelUbxNavHpposllhConstants {
-    YODEL_UBX_NAV_HPPOSLLH_Class	= 0x01,
-    YODEL_UBX_NAV_HPPOSLLH_Id		= 0x14,
-    YODEL_UBX_NAV_HPPOSLLH_Length	= 36,
+    YODEL_UBX_NAV_HPPOSLLH_Class    = 0x01,
+    YODEL_UBX_NAV_HPPOSLLH_Id       = 0x14,
+    YODEL_UBX_NAV_HPPOSLLH_Length   = 36,
 };
 
 /**
@@ -602,39 +616,39 @@ typedef struct YodelUbxMonHw {
  * UBX-MON-HW constants.
  */
 enum YodelUbxMonHwConstants {
-    YODEL_UBX_MON_HW_Class	= 0x0a,
-    YODEL_UBX_MON_HW_Id		= 0x09,
-    YODEL_UBX_MON_HW_Length	= 60,
+    YODEL_UBX_MON_HW_Class  = 0x0a,
+    YODEL_UBX_MON_HW_Id     = 0x09,
+    YODEL_UBX_MON_HW_Length = 60,
 };
 
 /**
  * UBX-MON-HW.flags masks.
  */
 enum YodelUbxMonHwFlagsMasks {
-    YODEL_UBX_MON_HW_flags_rtcCalib_MASK		= 0x1,
-    YODEL_UBX_MON_HW_flags_safeBoot_MASK		= 0x1,
-    YODEL_UBX_MON_HW_flags_jammingState_MASK	= 0x3,
-    YODEL_UBX_MON_HW_flags_xtalAbsent_MASK		= 0x1,
+    YODEL_UBX_MON_HW_flags_rtcCalib_MASK        = 0x1,
+    YODEL_UBX_MON_HW_flags_safeBoot_MASK        = 0x1,
+    YODEL_UBX_MON_HW_flags_jammingState_MASK    = 0x3,
+    YODEL_UBX_MON_HW_flags_xtalAbsent_MASK      = 0x1,
 };
 
 /**
  * UBX-MON-HW.flags left shifts.
  */
 enum YodelUbxMonHwFlagsShifts {
-    YODEL_UBX_MON_HW_flags_rtcCalib_SHIFT		= 0,
-    YODEL_UBX_MON_HW_flags_safeBoot_SHIFT		= 1,
-    YODEL_UBX_MON_HW_flags_jammingState_SHIFT	= 2,
-    YODEL_UBX_MON_HW_flags_xtalAbsent_SHIFT		= 4,
+    YODEL_UBX_MON_HW_flags_rtcCalib_SHIFT       = 0,
+    YODEL_UBX_MON_HW_flags_safeBoot_SHIFT       = 1,
+    YODEL_UBX_MON_HW_flags_jammingState_SHIFT   = 2,
+    YODEL_UBX_MON_HW_flags_xtalAbsent_SHIFT     = 4,
 };
 
 /**
  * UBX-MON-HW.Flags.JammingState values.
  */
 enum YodelUbxMonHwFlagsJammingState {
-    YODEL_UBX_MON_HW_flags_jammingState_unknown		= 0,
-    YODEL_UBX_MON_HW_flags_jammingState_none		= 1,
-    YODEL_UBX_MON_HW_flags_jammingState_warning		= 2,
-    YODEL_UBX_MON_HW_flags_jammingState_critical	= 3,
+    YODEL_UBX_MON_HW_flags_jammingState_unknown     = 0,
+    YODEL_UBX_MON_HW_flags_jammingState_none        = 1,
+    YODEL_UBX_MON_HW_flags_jammingState_warning     = 2,
+    YODEL_UBX_MON_HW_flags_jammingState_critical    = 3,
 };
 
 /**
@@ -676,91 +690,91 @@ typedef struct YodelUbxNavStatus {
  * UBX-NAV-STATUS constants.
  */
 enum YodelUbxNavStatusConstants {
-    YODEL_UBX_NAV_STATUS_Class	= 0x01,
-    YODEL_UBX_NAV_STATUS_Id		= 0x03,
-    YODEL_UBX_NAV_STATUS_Length	= 16,
+    YODEL_UBX_NAV_STATUS_Class  = 0x01,
+    YODEL_UBX_NAV_STATUS_Id     = 0x03,
+    YODEL_UBX_NAV_STATUS_Length = 16,
 };
 
 /**
  * UBX-NAV-STATUS.flags masks.
  */
 enum YodelUbxNavStatusFlagsMasks {
-    YODEL_UBX_NAV_STATUS_flags_gpsFixOk_MASK	= 0x1,
-    YODEL_UBX_NAV_STATUS_flags_diffSoln_MASK	= 0x1,
-    YODEL_UBX_NAV_STATUS_flags_wknSet_MASK		= 0x1,
-    YODEL_UBX_NAV_STATUS_flags_towSet_MASK		= 0x1,
+    YODEL_UBX_NAV_STATUS_flags_gpsFixOk_MASK    = 0x1,
+    YODEL_UBX_NAV_STATUS_flags_diffSoln_MASK    = 0x1,
+    YODEL_UBX_NAV_STATUS_flags_wknSet_MASK      = 0x1,
+    YODEL_UBX_NAV_STATUS_flags_towSet_MASK      = 0x1,
 };
 
 /**
  * UBX-NAV-STATUS.flags left shifts.
  */
 enum YodelUbxNavStatusFlagsShifts {
-    YODEL_UBX_NAV_STATUS_flags_gpsFixOk_SHIFT	= 0,
-    YODEL_UBX_NAV_STATUS_flags_diffSoln_SHIFT	= 1,
-    YODEL_UBX_NAV_STATUS_flags_wknSet_SHIFT		= 2,
-    YODEL_UBX_NAV_STATUS_flags_towSet_SHIFT		= 3,
+    YODEL_UBX_NAV_STATUS_flags_gpsFixOk_SHIFT   = 0,
+    YODEL_UBX_NAV_STATUS_flags_diffSoln_SHIFT   = 1,
+    YODEL_UBX_NAV_STATUS_flags_wknSet_SHIFT     = 2,
+    YODEL_UBX_NAV_STATUS_flags_towSet_SHIFT     = 3,
 };
 
 /**
  * UBX-NAV-STATUS.fixStat masks.
  */
 enum YodelUbxNavStatusFixStatMasks {
-    YODEL_UBX_NAV_STATUS_fixStat_diffCorr_MASK		= 0x1,
-    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_MASK	= 0x3,
+    YODEL_UBX_NAV_STATUS_fixStat_diffCorr_MASK      = 0x1,
+    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_MASK   = 0x3,
 };
 
 /**
  * UBX-NAV-STATUS.fixStat left shifts.
  */
 enum YodelUbxNavStatusFixStatShifts {
-    YODEL_UBX_NAV_STATUS_fixStat_diffCorr_SHIFT		= 0,
-    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_SHIFT	= 6,
+    YODEL_UBX_NAV_STATUS_fixStat_diffCorr_SHIFT     = 0,
+    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_SHIFT  = 6,
 };
 
 /**
  * UBX-NAV-STATUS.fixStat.mapMatching values.
  */
 enum YodelUbxNavStatusFixStatMapMatching {
-    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_none			= 0,
-    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_unused			= 1,
-    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_applied		= 2,
-    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_deadreckoning	= 3,
+    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_none           = 0,
+    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_unused         = 1,
+    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_applied        = 2,
+    YODEL_UBX_NAV_STATUS_fixStat_mapMatching_deadreckoning  = 3,
 };
 
 /**
  * UBX-NAV-STATUS.flags2 masks.
  */
 enum YodelUbxNavStatusFlags2Masks {
-    YODEL_UBX_NAV_STATUS_flags2_psmState_MASK		= 0x3,
-    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK	= 0x3,
+    YODEL_UBX_NAV_STATUS_flags2_psmState_MASK       = 0x3,
+    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_MASK  = 0x3,
 };
 
 /**
  * UBX-NAV-STATUS.flags2 left shifts.
  */
 enum YodelUbxNavStatusFlags2Shifts {
-    YODEL_UBX_NAV_STATUS_flags2_psmState_SHIFT			= 0,
-    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT		= 3,
+    YODEL_UBX_NAV_STATUS_flags2_psmState_SHIFT          = 0,
+    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_SHIFT     = 3,
 };
 
 /**
  * UBX-NAV-STATUS.flags2.psmState values.
  */
 enum YodelUbxNavStatusFlags2PsmState {
-    YODEL_UBX_NAV_STATUS_flags2_psmState_acquisition	= 0,
-    YODEL_UBX_NAV_STATUS_flags2_psmState_nospoofing		= 1,
-    YODEL_UBX_NAV_STATUS_flags2_psmState_tracking		= 2,
-    YODEL_UBX_NAV_STATUS_flags2_psmState_inactive		= 3,
+    YODEL_UBX_NAV_STATUS_flags2_psmState_acquisition    = 0,
+    YODEL_UBX_NAV_STATUS_flags2_psmState_nospoofing     = 1,
+    YODEL_UBX_NAV_STATUS_flags2_psmState_tracking       = 2,
+    YODEL_UBX_NAV_STATUS_flags2_psmState_inactive       = 3,
 };
 
 /**
  * UBX-NAV-STATUS.flags2.spoofDetState values.
  */
 enum YodelUbxNavStatusFlags2SpoolDetState {
-    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_unknown	= 0,
-    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_none		= 1,
-    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_one		= 2,
-    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_many		= 3,
+    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_unknown   = 0,
+    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_none      = 1,
+    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_one       = 2,
+    YODEL_UBX_NAV_STATUS_flags2_spoofDetState_many      = 3,
 };
 
 /**
@@ -783,9 +797,9 @@ extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ss
  * Ublox 8 R15, p. 145.
  */
 typedef struct YodelUbxAck {
-    uint8_t clsID;		/* Class of packet ACKed or NAKed. */
-    uint8_t msgID;		/* Message of packet ACKed or NAKed. */
-    uint8_t state;		/* True if ACK, false if NAK. */
+    uint8_t clsID;      /* Class of packet ACKed or NAKed. */
+    uint8_t msgID;      /* Message of packet ACKed or NAKed. */
+    uint8_t state;      /* True if ACK, false if NAK. */
 } yodel_ubx_ack_t;
 
 /**
@@ -803,10 +817,10 @@ typedef struct YodelUbxAck {
  * UBX-ACK constants.
  */
 enum YodelUbxAckConstants {
-    YODEL_UBX_ACK_Class		= 0x05,
-    YODEL_UBX_ACK_Length	= 2,
-    YODEL_UBX_ACK_NAK_Id	= 0x00,
-    YODEL_UBX_ACK_ACK_Id	= 0x01,
+    YODEL_UBX_ACK_Class     = 0x05,
+    YODEL_UBX_ACK_Length    = 2,
+    YODEL_UBX_ACK_NAK_Id    = 0x00,
+    YODEL_UBX_ACK_ACK_Id    = 0x01,
 };
 
 /**
@@ -857,9 +871,9 @@ typedef struct YodelUbxNavSvin {
  * UBX-NAV-SVIN constants.
  */
 enum YodelUbxNavSvinConstants {
-    YODEL_UBX_NAV_SVIN_Class	= 0x01,
-    YODEL_UBX_NAV_SVIN_Id		= 0x3b,
-    YODEL_UBX_NAV_SVIN_Length	= 40,
+    YODEL_UBX_NAV_SVIN_Class    = 0x01,
+    YODEL_UBX_NAV_SVIN_Id       = 0x3b,
+    YODEL_UBX_NAV_SVIN_Length   = 40,
 };
 
 /**
@@ -882,11 +896,11 @@ extern int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_
  * Ublox 9 R05, p. 181.
  */
 typedef struct YodelUbxRxmRtcm {
-    uint8_t version;		/* Message version. */
-    uint8_t flags;			/* If true, crcFailed. */
-    uint16_t subType;		/* Message sub type if RTCM 4072. */
-    uint16_t refStation;	/* Reference station identification. */
-    uint16_t msgType;		/* Message type. */
+    uint8_t version;        /* Message version. */
+    uint8_t flags;          /* If true, crcFailed. */
+    uint16_t subType;       /* Message sub type if RTCM 4072. */
+    uint16_t refStation;    /* Reference station identification. */
+    uint16_t msgType;       /* Message type. */
 } yodel_ubx_rxm_rtcm_t __attribute__((aligned(2)));
 
 /**
@@ -900,9 +914,9 @@ typedef struct YodelUbxRxmRtcm {
  * UBX-RXM-RTCM constants.
  */
 enum YodelUbxRxmRtcmConstants {
-    YODEL_UBX_RXM_RTCM_Class	= 0x02,
-    YODEL_UBX_RXM_RTCM_Id		= 0x32,
-    YODEL_UBX_RXM_RTCM_Length	= 8,
+    YODEL_UBX_RXM_RTCM_Class    = 0x02,
+    YODEL_UBX_RXM_RTCM_Id       = 0x32,
+    YODEL_UBX_RXM_RTCM_Length   = 8,
 };
 
 /**
@@ -920,9 +934,9 @@ extern int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_
  ******************************************************************************/
 
 enum YodelUbxNavAttConstants {
-    YODEL_UBX_NAV_ATT_Class				= 0x01,
-    YODEL_UBX_NAV_ATT_Id				= 0x05,
-    YODEL_UBX_NAV_ATT_Length			= 32,
+    YODEL_UBX_NAV_ATT_Class             = 0x01,
+    YODEL_UBX_NAV_ATT_Id                = 0x05,
+    YODEL_UBX_NAV_ATT_Length            = 32,
 };
 
 /**
@@ -963,9 +977,9 @@ extern int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * bp, ssize_t 
  ******************************************************************************/
 
 enum YodelUbxNavOdoConstants {
-    YODEL_UBX_NAV_ODO_Class				= 0x01,
-    YODEL_UBX_NAV_ODO_Id				= 0x09,
-    YODEL_UBX_NAV_ODO_Length			= 20,
+    YODEL_UBX_NAV_ODO_Class             = 0x01,
+    YODEL_UBX_NAV_ODO_Id                = 0x09,
+    YODEL_UBX_NAV_ODO_Length            = 20,
 };
 
 /**
@@ -1003,9 +1017,9 @@ extern int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * bp, ssize_t 
  ******************************************************************************/
 
 enum YodelUbxNavPvtConstants {
-    YODEL_UBX_NAV_PVT_Class				= 0x01,
-    YODEL_UBX_NAV_PVT_Id				= 0x07,
-    YODEL_UBX_NAV_PVT_Length			= 92,
+    YODEL_UBX_NAV_PVT_Class             = 0x01,
+    YODEL_UBX_NAV_PVT_Id                = 0x07,
+    YODEL_UBX_NAV_PVT_Length            = 92,
 };
 
 /**
@@ -1059,10 +1073,10 @@ typedef struct YodelUbxNavPvt {
  * UBX-NAV-PVT valid values.
  */
 enum YodelUbxNavPvtValid {
-    YODEL_UBX_NAV_PVT_valid_validMsg	    = 0x08,
-    YODEL_UBX_NAV_PVT_valid_fullyResolved	= 0x04,
-    YODEL_UBX_NAV_PVT_valid_validTime	    = 0x02,
-    YODEL_UBX_NAV_PVT_valid_validDate	    = 0x01,
+    YODEL_UBX_NAV_PVT_valid_validMsg        = 0x08,
+    YODEL_UBX_NAV_PVT_valid_fullyResolved   = 0x04,
+    YODEL_UBX_NAV_PVT_valid_validTime       = 0x02,
+    YODEL_UBX_NAV_PVT_valid_validDate       = 0x01,
 };
 
 /**
@@ -1081,11 +1095,11 @@ enum YodelUbxNavPvtFixTypes {
  * UBX-NAV-PVT flags values.
  */
 enum YodelUbxNavPvtFlags {
-    YODEL_UBX_NAV_PVT_flags_carrSoln	    = 0xc0,
-    YODEL_UBX_NAV_PVT_flags_headVehValid	= 0x20,
-    YODEL_UBX_NAV_PVT_flags_psmState	    = 0x1c,
-    YODEL_UBX_NAV_PVT_flags_diffSoln	    = 0x02,
-    YODEL_UBX_NAV_PVT_flags_gnssFixOK	    = 0x01,
+    YODEL_UBX_NAV_PVT_flags_carrSoln        = 0xc0,
+    YODEL_UBX_NAV_PVT_flags_headVehValid    = 0x20,
+    YODEL_UBX_NAV_PVT_flags_psmState        = 0x1c,
+    YODEL_UBX_NAV_PVT_flags_diffSoln        = 0x02,
+    YODEL_UBX_NAV_PVT_flags_gnssFixOK       = 0x01,
 };
 
 /**
@@ -1093,8 +1107,8 @@ enum YodelUbxNavPvtFlags {
  */
 enum YodelUbxNavPvtFlags2 {
     YODEL_UBX_NAV_PVT_flags2_confirmedTime  = 0x80,
-    YODEL_UBX_NAV_PVT_flags2_confirmedDate	= 0x40,
-    YODEL_UBX_NAV_PVT_flags2_confirmedAvai	= 0x20,
+    YODEL_UBX_NAV_PVT_flags2_confirmedDate  = 0x40,
+    YODEL_UBX_NAV_PVT_flags2_confirmedAvai  = 0x20,
 };
 
 /**
@@ -1132,10 +1146,10 @@ extern int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t 
  * Ublox 9, p. 85.
  */
 typedef struct YodelUbxCfgValget {
-    uint8_t version;		/* Message version: send 0, receive 1. */
-    uint8_t layer;			/* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
-    uint8_t reserved[2];	/* Reserved. */
-    uint8_t cfgData[0];		/* Beginning of variable number key/value pairs. */
+    uint8_t version;        /* Message version: send 0, receive 1. */
+    uint8_t layer;          /* 0: RAM, 1: Battery Backed RAM, 2: Flash, 3: ROM. */
+    uint8_t reserved[2];    /* Reserved. */
+    uint8_t cfgData[0];     /* Beginning of variable number key/value pairs. */
 } yodel_ubx_cfg_valget_t;
 
 /**
@@ -1149,11 +1163,11 @@ typedef struct YodelUbxCfgValget {
  * UBX-CFG-VALGET constants.
  */
 enum YodelUbxCfgValgetConstants {
-    YODEL_UBX_CFG_VALGET_Class			= 0x06,
-    YODEL_UBX_CFG_VALGET_Id				= 0x8b,
-    YODEL_UBX_CFG_VALGET_Length			= 4,
-    YODEL_UBX_CFG_VALGET_Key_Size_SHIFT	= 28,
-    YODEL_UBX_CFG_VALGET_Key_Size_MASK	= 0x7,
+    YODEL_UBX_CFG_VALGET_Class          = 0x06,
+    YODEL_UBX_CFG_VALGET_Id             = 0x8b,
+    YODEL_UBX_CFG_VALGET_Length         = 4,
+    YODEL_UBX_CFG_VALGET_Key_Size_SHIFT = 28,
+    YODEL_UBX_CFG_VALGET_Key_Size_MASK  = 0x7,
 };
 
 /**
@@ -1165,21 +1179,21 @@ enum YodelUbxCfgValgetConstants {
  * Ublox 9, p. 86
  */
 enum YodelUbxCfgValgetLayer {
-    YODEL_UBX_CFG_VALGET_Layer_RAM	= 0,
-    YODEL_UBX_CFG_VALGET_Layer_BBR	= 1,
-    YODEL_UBX_CFG_VALGET_Layer_NVM	= 2,
-    YODEL_UBX_CFG_VALGET_Layer_ROM	= 7,
+    YODEL_UBX_CFG_VALGET_Layer_RAM  = 0,
+    YODEL_UBX_CFG_VALGET_Layer_BBR  = 1,
+    YODEL_UBX_CFG_VALGET_Layer_NVM  = 2,
+    YODEL_UBX_CFG_VALGET_Layer_ROM  = 7,
 };
 
 /**
  * Ublox 9, p. 191
  */
 enum YodelUbxCfgValgetSize {
-    YODEL_UBX_CFG_VALGET_Size_BIT	= 0x01,
-    YODEL_UBX_CFG_VALGET_Size_ONE	= 0x02,
-    YODEL_UBX_CFG_VALGET_Size_TWO	= 0x03,
-    YODEL_UBX_CFG_VALGET_Size_FOUR	= 0x04,
-    YODEL_UBX_CFG_VALGET_Size_EIGHT	= 0x05,
+    YODEL_UBX_CFG_VALGET_Size_BIT   = 0x01,
+    YODEL_UBX_CFG_VALGET_Size_ONE   = 0x02,
+    YODEL_UBX_CFG_VALGET_Size_TWO   = 0x03,
+    YODEL_UBX_CFG_VALGET_Size_FOUR  = 0x04,
+    YODEL_UBX_CFG_VALGET_Size_EIGHT = 0x05,
 };
 
 /**
@@ -1281,9 +1295,9 @@ enum YodelUbxMonCommsProtId {
  * UBX-MON-COMMS constants.
  */
 enum YodelUbxMonCommsConstants {
-    YODEL_UBX_MON_COMMS_Class	= 0x0a,
-    YODEL_UBX_MON_COMMS_Id		= 0x36,
-    YODEL_UBX_MON_COMMS_Length	= sizeof(((yodel_ubx_mon_comms_t *)0)->prefix), /* Minimum. */
+    YODEL_UBX_MON_COMMS_Class   = 0x0a,
+    YODEL_UBX_MON_COMMS_Id      = 0x36,
+    YODEL_UBX_MON_COMMS_Length  = sizeof(((yodel_ubx_mon_comms_t *)0)->prefix), /* Minimum. */
 };
 
 /**
@@ -1310,11 +1324,11 @@ extern int yodel_ubx_mon_comms(void * bp, ssize_t length);
  * UBX-MON-VER constants.
  */
 enum YodelUbxMonVerConstants {
-    YODEL_UBX_MON_VER_Class				= 0x0a,
-    YODEL_UBX_MON_VER_Id				= 0x04,
-    YODEL_UBX_MON_VER_swVersion_LENGTH	= 30,
-    YODEL_UBX_MON_VER_hwVersion_LENGTH	= 10,
-    YODEL_UBX_MON_VER_extension_LENGTH	= 30,
+    YODEL_UBX_MON_VER_Class             = 0x0a,
+    YODEL_UBX_MON_VER_Id                = 0x04,
+    YODEL_UBX_MON_VER_swVersion_LENGTH  = 30,
+    YODEL_UBX_MON_VER_hwVersion_LENGTH  = 10,
+    YODEL_UBX_MON_VER_extension_LENGTH  = 30,
 };
 
 /*********************************************
@@ -1328,9 +1342,9 @@ enum YodelUbxMonVerConstants {
  ******************************************************************************/
 
 enum YodelUbxNavTimegpsConstants {
-    YODEL_UBX_NAV_TIMEGPS_Class			= 0x01,
-    YODEL_UBX_NAV_TIMEGPS_Id			= 0x20,
-    YODEL_UBX_NAV_TIMEGPS_Length		= 16,
+    YODEL_UBX_NAV_TIMEGPS_Class         = 0x01,
+    YODEL_UBX_NAV_TIMEGPS_Id            = 0x20,
+    YODEL_UBX_NAV_TIMEGPS_Length        = 16,
 };
 
 /**
@@ -1370,9 +1384,9 @@ extern int yodel_ubx_nav_timegps(yodel_ubx_nav_timegps_t * mp, const void * bp, 
  ******************************************************************************/
 
 enum YodelUbxNavTimeutcConstants {
-    YODEL_UBX_NAV_TIMEUTC_Class			= 0x01,
-    YODEL_UBX_NAV_TIMEUTC_Id			= 0x21,
-    YODEL_UBX_NAV_TIMEUTC_Length		= 20,
+    YODEL_UBX_NAV_TIMEUTC_Class         = 0x01,
+    YODEL_UBX_NAV_TIMEUTC_Id            = 0x21,
+    YODEL_UBX_NAV_TIMEUTC_Length        = 20,
 };
 
 /**
@@ -1416,9 +1430,9 @@ extern int yodel_ubx_nav_timeutc(yodel_ubx_nav_timeutc_t * mp, const void * bp, 
  ******************************************************************************/
 
 enum YodelUbxNavClockConstants {
-    YODEL_UBX_NAV_CLOCK_Class			= 0x01,
-    YODEL_UBX_NAV_CLOCK_Id				= 0x22,
-    YODEL_UBX_NAV_CLOCK_Length			= 20,
+    YODEL_UBX_NAV_CLOCK_Class           = 0x01,
+    YODEL_UBX_NAV_CLOCK_Id              = 0x22,
+    YODEL_UBX_NAV_CLOCK_Length          = 20,
 };
 
 /**
@@ -1457,9 +1471,9 @@ extern int yodel_ubx_nav_clock(yodel_ubx_nav_clock_t * mp, const void * bp, ssiz
  ******************************************************************************/
 
 enum YodelUbxTimTpConstants {
-    YODEL_UBX_TIM_TP_Class			= 0x0d,
-    YODEL_UBX_TIM_TP_Id				= 0x01,
-    YODEL_UBX_TIM_TP_Length			= 16,
+    YODEL_UBX_TIM_TP_Class          = 0x0d,
+    YODEL_UBX_TIM_TP_Id             = 0x01,
+    YODEL_UBX_TIM_TP_Length         = 16,
 };
 
 /**

@@ -50,6 +50,9 @@
  * "u-blox ZED-F9P Interface Description*, UBX-18010854-R05, ublox AG,
  * 2018-12-20
  *
+ * "u-blox F10 TIM 3.01 - u-blox F10 GNSS timing receiver - Interface
+ * Description", UBX-23003447-R01, ublox AG, 2023-03-21
+ *
  * "u-blox ZED-F9R module Product summary", UBX-19048775-R04, ublox AG,
  * 2020
  *
@@ -138,11 +141,11 @@ extern int hazer_finalize(void);
  * NMEA 0183, 4.10, 5.3
  */
 enum HazerGnssConstants {
-    HAZER_GNSS_SATELLITES   = 32,	/* Per constellation or system. */
-    HAZER_GNSS_VIEWS        = 4,	/* Per NMEA GSV message. */
-    HAZER_GNSS_ACTIVES		= 12,	/* Per NMEA GSA message. */
-    HAZER_GNSS_SECONDS		= 255,	/* Maximum lifetime. */
-    HAZER_GNSS_DOP			= 9999,	/* Maximum DOP in units * 100 */
+    HAZER_GNSS_SATELLITES   = 32,   /* Per constellation or system. */
+    HAZER_GNSS_VIEWS        = 4,    /* Per NMEA GSV message. */
+    HAZER_GNSS_ACTIVES      = 12,   /* Per NMEA GSA message. */
+    HAZER_GNSS_SECONDS      = 255,  /* Maximum lifetime. */
+    HAZER_GNSS_DOP          = 9999, /* Maximum DOP in units * 100 */
 };
 
 /**
@@ -178,14 +181,14 @@ enum HazerNmeaConstants {
  * failed; that might be of interest to the application.
  */
 typedef enum HazerState {
-    HAZER_STATE_STOP		= 'X',
-    HAZER_STATE_START		= 'S',
-    HAZER_STATE_PAYLOAD		= 'P',
-    HAZER_STATE_MSN			= 'M',
-    HAZER_STATE_LSN			= 'L',
-    HAZER_STATE_CR			= 'R',
-    HAZER_STATE_LF			= 'N',
-    HAZER_STATE_END			= 'E',
+    HAZER_STATE_STOP        = 'X',
+    HAZER_STATE_START       = 'S',
+    HAZER_STATE_PAYLOAD     = 'P',
+    HAZER_STATE_MSN         = 'M',
+    HAZER_STATE_LSN         = 'L',
+    HAZER_STATE_CR          = 'R',
+    HAZER_STATE_LF          = 'N',
+    HAZER_STATE_END         = 'E',
 } hazer_state_t;
 
 /**
@@ -225,8 +228,8 @@ enum HazerStimulus {
  */
 typedef enum HazerAction {
     HAZER_ACTION_SKIP               = 'X',
-    HAZER_ACTION_SAVE				= 'S',
-    HAZER_ACTION_TERMINATE			= 'T',
+    HAZER_ACTION_SAVE               = 'S',
+    HAZER_ACTION_TERMINATE          = 'T',
 } hazer_action_t;
 
 /**
@@ -234,11 +237,12 @@ typedef enum HazerAction {
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerTalker {
-    HAZER_TALKER_BEIDOU2			= 0,    /* BD */
+    HAZER_TALKER_BEIDOU2            = 0,    /* BD */
     HAZER_TALKER_DSC,                       /* CD */
     HAZER_TALKER_ECDIS,                     /* EC */
     HAZER_TALKER_GALILEO,                   /* GA */
     HAZER_TALKER_BEIDOU1,                   /* GB */
+    HAZER_TALKER_NAVIC,                     /* GI */
     HAZER_TALKER_GLONASS,                   /* GL */
     HAZER_TALKER_GNSS,                      /* GN */
     HAZER_TALKER_GPS,                       /* GP */
@@ -267,6 +271,7 @@ typedef enum HazerTalker {
     "EC", \
     "GA", \
     "GB", \
+    "GI", \
     "GL", \
     "GN", \
     "GP", \
@@ -292,7 +297,7 @@ extern const char * HAZER_TALKER_NAME[/* hazer_talker_t */];
  * These must be in the same order as the corresponding strings below.
  */
 typedef enum HazerSystem {
-    HAZER_SYSTEM_GNSS		    = 0,        /* GNSS */
+    HAZER_SYSTEM_GNSS           = 0,        /* GNSS */
     HAZER_SYSTEM_GPS,                       /* NAVSTAR */
     HAZER_SYSTEM_GLONASS,                   /* GLONASS */
     HAZER_SYSTEM_GALILEO,                   /* GALILEO */
@@ -300,6 +305,7 @@ typedef enum HazerSystem {
     HAZER_SYSTEM_SBAS,                      /* SBAS */
     HAZER_SYSTEM_IMES,                      /* IMES */
     HAZER_SYSTEM_QZSS,                      /* QZSS */
+    HAZER_SYSTEM_NAVIC,                     /* NavIC */
     HAZER_SYSTEM_TOTAL,
 } hazer_system_t;
 
@@ -322,6 +328,7 @@ typedef enum HazerSystem {
         "SBAS", \
         "IMES", \
         "QZSS", \
+        "NAVIC", \
         (const char *)0, \
     }
 
@@ -333,15 +340,21 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
 /**
  * NMEA GNSS system identifiers.
  * NMEA 0183 4.10 table 20 p. 94-95.
+ * UBLOX10 R01, p. 16
+ * Raymond, "NMEA Revealed"
  */
 typedef enum HazerNmea {
     HAZER_NMEA_GPS              = 1,
     HAZER_NMEA_GLONASS          = 2,
     HAZER_NMEA_GALILEO          = 3,
     HAZER_NMEA_BEIDOU           = 4,
-    HAZER_NMEA_SBAS             = 5,
-    HAZER_NMEA_IMES             = 6,
-    HAZER_NMEA_QZSS             = 15,
+#if 0
+    HAZER_NMEA_SBAS             = 5,    /* OBSOLETE */
+    HAZER_NMEA_IMES             = 6,    /* OBSOLETE */
+#endif
+    HAZER_NMEA_QZSS             = 5,
+    HAZER_NMEA_NAVIC            = 6,
+    HAZER_NMEA_QZSS2            = 15,   /* DEPRECATED */
 } hazer_nmea_t;
 
 /**
@@ -356,51 +369,61 @@ extern hazer_system_t hazer_map_nmea_to_system(uint8_t constellation);
  * NMEA 0183 4.10 p. 94.
  * UBLOX8 R15 p. 373.
  * UBLOX8 R19 Appendix A p. 402.
+ * Raymond, "NMEA Revealed"
  * There are some conflicts between these documents, and my most recent
  * receiver, the U-blox 9, doesn't match these anyway. Despite the
  * documentation, I don't consider these reliable.
  */
 typedef enum HazerNmeaId {
     /*                        0,     */
-    HAZER_NMEA_GPS_FIRST	= 1,
-    HAZER_NMEA_GPS_LAST		= 32,
-    HAZER_NMEA_SBAS_FIRST	= 33,
-    HAZER_NMEA_SBAS_LAST	= 64,
+    HAZER_NMEA_GPS_FIRST    = 1,
+    /*                         :     */
+    HAZER_NMEA_GPS_LAST     = 32,
+    HAZER_NMEA_SBAS1_FIRST  = 33,
+    /*                         :     */
+    HAZER_NMEA_SBAS1_LAST   = 64,
     HAZER_NMEA_GLONASS_FIRST= 65,
-    HAZER_NMEA_GLONASS_LAST	= 96,
-    /*						  97,    */
-    /*						   :     */
-    /*						  151,   */
-    HAZER_NMEA_SBASX_FIRST	= 152,
-    HAZER_NMEA_SBASX_LAST	= 158,
-    /*						  159,   */
-    /*						   :     */
-    /*						  172,   */
-    HAZER_NMEA_IMES_FIRST	= 173,
-    HAZER_NMEA_IMES_LAST	= 182,
-    /*						  183,   */
-    /*						   :     */
-    /*						  192,   */
-    HAZER_NMEA_QZSS_FIRST	= 193,
-    HAZER_NMEA_QZSS_LAST	= 197,
-    /*						  198,   */
-    /*						   :     */
-    /*						  200,   */
+    /*                         :     */
+    HAZER_NMEA_GLONASS_LAST = 96,
+    /*                        97,    */
+    /*                         :     */
+    /*                        151,   */
+    HAZER_NMEA_SBAS2_FIRST  = 152,
+    /*                         :     */
+    HAZER_NMEA_SBAS2_LAST   = 158,
+    /*                        159,   */
+    /*                         :     */
+    /*                        172,   */
+    HAZER_NMEA_IMES_FIRST   = 173,
+    /*                         :     */
+    HAZER_NMEA_IMES_LAST    = 182,
+    /*                        183,   */
+    /*                         :     */
+    /*                        192,   */
+    HAZER_NMEA_QZSS_FIRST   = 193,
+    /*                         :     */
+    HAZER_NMEA_QZSS_LAST    = 197,
+    /*                        198,   */
+    /*                         :     */
+    /*                        200,   */
     HAZER_NMEA_BEIDOU1_FIRST= 201,
-    HAZER_NMEA_BEIDOU1_LAST	= 235,
-    /*						  236,   */
-    /*						   :     */
-    /*						  300,   */
+    /*                         :     */
+    HAZER_NMEA_BEIDOU1_LAST = 235,
+    /*                        236,   */
+    /*                         :     */
+    /*                        300,   */
     HAZER_NMEA_GALILEO_FIRST= 301,
-    HAZER_NMEA_GALILEO_LAST	= 336,
-    /*						  337,   */
-    /*						   :     */
-    /*						  400,   */
+    /*                         :     */
+    HAZER_NMEA_GALILEO_LAST = 336,
+    /*                        337,   */
+    /*                         :     */
+    /*                        400,   */
     HAZER_NMEA_BEIDOU2_FIRST= 401,
-    HAZER_NMEA_BEIDOU2_LAST	= 437,
-    /*						  438,   */
-    /*						   :     */
-    /*						  65535, */
+    /*                         :     */
+    HAZER_NMEA_BEIDOU2_LAST = 437,
+    /*                        438,   */
+    /*                         :     */
+    /*                        65535, */
 } hazer_nmeaid_t;
 
 /**
@@ -414,6 +437,8 @@ extern hazer_system_t hazer_map_nmeaid_to_system(uint16_t id);
 
 /**
  * Proprietary UBX GNSS satellite identifiers used in NMEA-like PUBX sentences.
+ * N.B. PUBX sentences from UBX devices seem largely deprecated in favor of
+ * proprietary binary UBX messages as supported by Yodel.
  * UBLOX R24 Appendix A p. 446.
  */
 typedef enum HazerPubxId {
@@ -485,12 +510,12 @@ typedef uint8_t (hazer_buffer_t)[HAZER_NMEA_LONGEST + 1]; /* plus NUL */
  * Hazer NMEA parser state machine context (which needs no initial value).
  */
 typedef struct HazerContext {
-    uint8_t * bp;  		/* Current buffer pointer. */
-    size_t sz;			/* Remaining buffer size in bytes. */
-    size_t tot;			/* Total size once sentence is complete. */
-    uint8_t cs;			/* Running checksum. */
-    uint8_t msn;		/* Most significant checksum nibble character. */
-    uint8_t lsn;		/* Least significant checksum nibble character. */
+    uint8_t * bp;       /* Current buffer pointer. */
+    size_t sz;          /* Remaining buffer size in bytes. */
+    size_t tot;         /* Total size once sentence is complete. */
+    uint8_t cs;         /* Running checksum. */
+    uint8_t msn;        /* Most significant checksum nibble character. */
+    uint8_t lsn;        /* Least significant checksum nibble character. */
     uint8_t error;      /* Syntax or checksum error indication. */
 } hazer_context_t;
 
@@ -907,7 +932,7 @@ static const uint64_t HAZER_NANOSECONDS_UNSET = HAZER_NANOSECONDS_INITIALIZER;
  * derived from the NMEA stream.
  */
 typedef struct HazerPosition {
-    uint64_t old_nanoseconds;	    /* Prior total nanoseconds. */
+    uint64_t old_nanoseconds;       /* Prior total nanoseconds. */
     uint64_t tot_nanoseconds;       /* Total nanoseconds. */
     uint64_t utc_nanoseconds;       /* Time in nanoseconds since 00:00 UTC. */
     uint64_t dmy_nanoseconds;       /* Date in nanoseconds since POSIX epoch. */
@@ -919,17 +944,17 @@ typedef struct HazerPosition {
     int64_t sog_millimetersperhour; /* Speed Over Ground in millimeters per hour. */
     int64_t cog_nanodegrees;        /* Course Over Ground true in nanodegrees. */
     int64_t mag_nanodegrees;        /* Magnetic bearing in nanodegrees. */
-    const char * label;			    /* Label for sentence. */
+    const char * label;             /* Label for sentence. */
     uint8_t sat_used;               /* Number of satellites used. */
     uint8_t lat_digits;             /* Significant digits of latitude. */
     uint8_t lon_digits;             /* Significant digits of longitude. */
     uint8_t alt_digits;             /* Significant digits of altitude. */
     uint8_t sep_digits;             /* Significant digits of seperation. */
     uint8_t sog_digits;             /* Significant digits of Speed On Ground. */
-    uint8_t smm_digits;			    /* Significant digits of SOG mm/h. */
+    uint8_t smm_digits;             /* Significant digits of SOG mm/h. */
     uint8_t cog_digits;             /* Significant digits of Course On Ground. */
     uint8_t mag_digits;             /* Significant digits of Magnetic bearing. */
-    hazer_expiry_t ticks;		    /* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
     uint8_t unused[1];              /* Unused. */
 } hazer_position_t;
 
@@ -1060,16 +1085,16 @@ extern const char * HAZER_MODE_NAME[/* hazer_mode_t */];
  * constellation that were used in the position solution.
  */
 typedef struct HazerActive {
-    const char * label;			        /* Label for sentence. */
+    const char * label;                 /* Label for sentence. */
     uint16_t id[HAZER_GNSS_ACTIVES];    /* Satellites active. */
-    uint16_t pdop;				        /* Position Dilution Of Precision * 100. */
-    uint16_t hdop;				        /* Horizontal Dilution Of Precision * 100. */
-    uint16_t vdop;				        /* Vertical Dilution Of Precision * 100. */
-    uint16_t tdop;				        /* Time Dilution Of Precision * 100. */
-    uint8_t system;				        /* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
+    uint16_t pdop;                      /* Position Dilution Of Precision * 100. */
+    uint16_t hdop;                      /* Horizontal Dilution Of Precision * 100. */
+    uint16_t vdop;                      /* Vertical Dilution Of Precision * 100. */
+    uint16_t tdop;                      /* Time Dilution Of Precision * 100. */
+    uint8_t system;                     /* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
     uint8_t active;                     /* Number of satellites active. */
     uint8_t mode;                       /* Navigation mode: see HazerMode. */
-    hazer_expiry_t ticks;		        /* Lifetime in application-defined ticks. */
+    hazer_expiry_t ticks;               /* Lifetime in application-defined ticks. */
 } hazer_active_t;
 
 /**
@@ -1138,7 +1163,7 @@ typedef struct HazerSatellite {
     int16_t azm_degrees;        /* Azimuth in whole degrees. */
     int8_t snr_dbhz;            /* Signal/Noise Ratio in dBHz. */
     uint8_t signal;             /* Signal band identifier. */
-    uint8_t phantom;			/* If true, elevation or azimuth were empty. */
+    uint8_t phantom;            /* If true, elevation or azimuth were empty. */
     uint8_t untracked;          /* If true, signal strength was empty. */
     uint8_t unused;             /* If true, unused. */
 } hazer_satellite_t;
@@ -1163,12 +1188,12 @@ typedef struct HazerSatellite {
  * have channels configured.
  */
 typedef struct HazerView {
-    const char * label;			/* Label for sentence. */
+    const char * label;         /* Label for sentence. */
     hazer_satellite_t sat[HAZER_GNSS_SATELLITES]; /* Satellites viewed. */
     uint8_t view;               /* Number of satellites in view. */
     uint8_t channels;           /* Number of channels used in view. */
-    uint8_t pending;			/* Number of updates pending. */
-    hazer_expiry_t ticks;		/* Lifetime in application-defined ticks. */
+    uint8_t pending;            /* Number of updates pending. */
+    hazer_expiry_t ticks;       /* Lifetime in application-defined ticks. */
 } hazer_view_t;
 
 /**

@@ -1097,6 +1097,10 @@ hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
         system = HAZER_SYSTEM_QZSS;
         break;
 
+    case HAZER_TALKER_NAVIC:
+        system = HAZER_SYSTEM_NAVIC;
+        break;
+
     default:
         /* Do nothing. */
         break;
@@ -1114,27 +1118,42 @@ hazer_system_t hazer_map_nmea_to_system(uint8_t constellation)
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
 
     switch (constellation) {
+
     case HAZER_NMEA_GPS:
         system = HAZER_SYSTEM_GPS;
         break;
+
     case HAZER_NMEA_GLONASS:
         system = HAZER_SYSTEM_GLONASS;
         break;
+
     case HAZER_NMEA_GALILEO:
         system = HAZER_SYSTEM_GALILEO;
         break;
+
     case HAZER_NMEA_BEIDOU:
         system = HAZER_SYSTEM_BEIDOU;
         break;
+
+#if 0
     case HAZER_NMEA_SBAS:
         system = HAZER_SYSTEM_SBAS;
         break;
+
     case HAZER_NMEA_IMES:
         system = HAZER_SYSTEM_IMES;
         break;
+#endif
+
     case HAZER_NMEA_QZSS:
+    case HAZER_NMEA_QZSS2:
         system = HAZER_SYSTEM_QZSS;
         break;
+
+    case HAZER_NMEA_NAVIC:
+        system = HAZER_SYSTEM_NAVIC;
+        break;
+
     default:
         break;
     }
@@ -1155,10 +1174,13 @@ hazer_system_t hazer_map_nmeaid_to_system(uint16_t id)
         /* Do nothing. */
     } else if ((HAZER_NMEA_GPS_FIRST <= id) && (id <= HAZER_NMEA_GPS_LAST)) {
         candidate = HAZER_SYSTEM_GPS;
-    } else if ((HAZER_NMEA_SBAS_FIRST <= id) && (id <= HAZER_NMEA_SBAS_LAST)) {
+    } else if ((HAZER_NMEA_SBAS1_FIRST <= id) && (id <= HAZER_NMEA_SBAS1_LAST)) {
         candidate = HAZER_SYSTEM_SBAS;
     } else if ((HAZER_NMEA_GLONASS_FIRST <= id) && (id <= HAZER_NMEA_GLONASS_LAST)) {
         candidate = HAZER_SYSTEM_GLONASS;
+    } else if ((HAZER_NMEA_SBAS2_FIRST <= id) && (id <= HAZER_NMEA_SBAS2_LAST)) {
+        candidate = HAZER_SYSTEM_SBAS;
+    } else if ((HAZER_NMEA_GLONASS_FIRST <= id) && (id <= HAZER_NMEA_GLONASS_LAST)) {
     } else if ((HAZER_NMEA_BEIDOU1_FIRST <= id) && (id <= HAZER_NMEA_BEIDOU1_LAST)) {
         candidate = HAZER_SYSTEM_BEIDOU;
     } else if ((HAZER_NMEA_IMES_FIRST <= id) && (id <= HAZER_NMEA_IMES_LAST)) {

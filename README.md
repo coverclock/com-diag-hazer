@@ -802,6 +802,9 @@ National Marine Electronics Association, 2012
 
 NovAtel, "An Introduction to GNSS", 2nd ed., NovAtel Inc., 2015
 
+Eric S. Raymond, "NMEA Revealed", 2023-05-03,
+<https://gpsd.gitlab.io/gpsd/NMEA.html>
+
 RTCM 10403.3, "Differential GNSS (Global Navigation Satellite Systems) Services -
 Version 3", 141-2016-SC104-STD, 2016-10-07
 
@@ -827,14 +830,17 @@ ublox, 2018-12-20
 u-blox 9, "ZED-F9T series Product Summary", UBX-18011626-R06,
 ublox, 2022
 
-u-blox 9, "ZED-F9T Data Sheet", UBX-18053713-R07,
+u-blox 9, "ZED-F9T Data Sheet", UBX-18053713-R07, ublox,
 2022-01-04
 
 u-blox 9, "u-blox ZED-F9T Interface Description", UBX-18053584-R02,
 ublox, 2019-06-13
 
-u-blox 9, "ZED-F9T Integration Manual", UBX-19005590-R05,
+u-blox 9, "ZED-F9T Integration Manual", UBX-19005590-R05, ublox,
 2020-11-18
+
+u-blox 10, "u-blox F10 TIM 3.01 - u-blox F10 GNSS timing receiver -
+Interface Description", UBX-23003447-R01, ublox, 2023-03-21
 
 # Tools
 

@@ -77,9 +77,13 @@ int main(void)
         UNITTEST_PARSE_NMEA_SYSTEM(HAZER_NMEA_GLONASS, HAZER_SYSTEM_GLONASS);
         UNITTEST_PARSE_NMEA_SYSTEM(HAZER_NMEA_GALILEO, HAZER_SYSTEM_GALILEO);
         UNITTEST_PARSE_NMEA_SYSTEM(HAZER_NMEA_BEIDOU, HAZER_SYSTEM_BEIDOU);
+#if 0
         UNITTEST_PARSE_NMEA_SYSTEM(HAZER_NMEA_SBAS, HAZER_SYSTEM_SBAS);
         UNITTEST_PARSE_NMEA_SYSTEM(HAZER_NMEA_IMES, HAZER_SYSTEM_IMES);
+#endif
         UNITTEST_PARSE_NMEA_SYSTEM(HAZER_NMEA_QZSS, HAZER_SYSTEM_QZSS);
+        UNITTEST_PARSE_NMEA_SYSTEM(HAZER_NMEA_QZSS2, HAZER_SYSTEM_QZSS);
+        UNITTEST_PARSE_NMEA_SYSTEM(HAZER_NMEA_NAVIC, HAZER_SYSTEM_NAVIC);
         assert(hazer_map_nmea_to_system(constellation) == HAZER_SYSTEM_TOTAL);
     }
 
@@ -90,8 +94,9 @@ int main(void)
 
     for (id = 0, index = 0; index <= 0xffff; ++index, ++id) {
         UNITTEST_PARSE_NMEAID_SYSTEM(HAZER_NMEA_GPS_FIRST, HAZER_NMEA_GPS_LAST, HAZER_SYSTEM_GPS);
-        UNITTEST_PARSE_NMEAID_SYSTEM(HAZER_NMEA_SBAS_FIRST, HAZER_NMEA_SBAS_LAST, HAZER_SYSTEM_SBAS);
+        UNITTEST_PARSE_NMEAID_SYSTEM(HAZER_NMEA_SBAS1_FIRST, HAZER_NMEA_SBAS1_LAST, HAZER_SYSTEM_SBAS);
         UNITTEST_PARSE_NMEAID_SYSTEM(HAZER_NMEA_GLONASS_FIRST, HAZER_NMEA_GLONASS_LAST, HAZER_SYSTEM_GLONASS);
+        UNITTEST_PARSE_NMEAID_SYSTEM(HAZER_NMEA_SBAS2_FIRST, HAZER_NMEA_SBAS2_LAST, HAZER_SYSTEM_SBAS);
         UNITTEST_PARSE_NMEAID_SYSTEM(HAZER_NMEA_IMES_FIRST, HAZER_NMEA_IMES_LAST, HAZER_SYSTEM_IMES);
         UNITTEST_PARSE_NMEAID_SYSTEM(HAZER_NMEA_QZSS_FIRST, HAZER_NMEA_QZSS_LAST, HAZER_SYSTEM_QZSS);
         UNITTEST_PARSE_NMEAID_SYSTEM(HAZER_NMEA_BEIDOU1_FIRST, HAZER_NMEA_BEIDOU1_LAST, HAZER_SYSTEM_BEIDOU);
@@ -142,8 +147,8 @@ int main(void)
         static const hazer_active_t ACTIVE = {
                 NULL,
                 {
-                    HAZER_NMEA_SBAS_FIRST,
-                    HAZER_NMEA_SBAS_LAST,
+                    HAZER_NMEA_SBAS1_FIRST,
+                    HAZER_NMEA_SBAS1_LAST,
                 },
                 HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
@@ -158,9 +163,25 @@ int main(void)
         static const hazer_active_t ACTIVE = {
                 NULL,
                 {
-                    HAZER_NMEA_SBAS_FIRST,
+                    HAZER_NMEA_SBAS2_FIRST,
+                    HAZER_NMEA_SBAS2_LAST,
+                },
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
+                HAZER_SYSTEM_TOTAL,
+                2,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_SBAS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_NMEA_SBAS1_FIRST,
                     HAZER_NMEA_GPS_FIRST,
-                    HAZER_NMEA_SBAS_LAST,
+                    HAZER_NMEA_SBAS1_LAST,
                 },
                 HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
@@ -176,8 +197,42 @@ int main(void)
                 NULL,
                 {
                     HAZER_NMEA_GPS_FIRST,
-                    HAZER_NMEA_SBAS_FIRST,
-                    HAZER_NMEA_SBAS_LAST,
+                    HAZER_NMEA_SBAS1_FIRST,
+                    HAZER_NMEA_SBAS1_LAST,
+                },
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
+                HAZER_SYSTEM_TOTAL,
+                3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_NMEA_SBAS2_FIRST,
+                    HAZER_NMEA_GPS_FIRST,
+                    HAZER_NMEA_SBAS2_LAST,
+                },
+                HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
+                HAZER_SYSTEM_TOTAL,
+                3,
+        };
+
+        assert(hazer_map_active_to_system(&ACTIVE) == HAZER_SYSTEM_GPS);
+
+    }
+
+    {
+        static const hazer_active_t ACTIVE = {
+                NULL,
+                {
+                    HAZER_NMEA_GPS_FIRST,
+                    HAZER_NMEA_SBAS2_FIRST,
+                    HAZER_NMEA_SBAS2_LAST,
                 },
                 HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP,
                 HAZER_SYSTEM_TOTAL,
