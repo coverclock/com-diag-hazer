@@ -21,9 +21,6 @@
 #include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_types.h"
-#include "com/diag/hazer/hazer_release.h"
-#include "com/diag/hazer/hazer_revision.h"
-#include "com/diag/hazer/hazer_vintage.h"
 #include "com/diag/hazer/common.h"
 #include "constants.h"
 #include "globals.h"
@@ -208,6 +205,7 @@ void print_local(FILE * fp)
     diminuto_ticks_t fraction = 0;
     diminuto_sticks_t milliseconds = 0;
     int rc = 0;
+    extern const char * COM_DIAG_HAZER_RELEASE_VALUE;
 
     fputs("LOC", fp);
 
@@ -286,7 +284,7 @@ void print_local(FILE * fp)
 
     fprintf(fp, " %03d/%02d:%02d:%02d", day, hour, minute, second);
 
-    fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE);
+    fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE_VALUE);
 
     fprintf(fp, " %10d", Process);
 

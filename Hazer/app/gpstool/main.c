@@ -140,9 +140,6 @@
 #include <unistd.h>
 #include <wchar.h>
 #include "com/diag/hazer/common.h"
-#include "com/diag/hazer/hazer_release.h"
-#include "com/diag/hazer/hazer_revision.h"
-#include "com/diag/hazer/hazer_vintage.h"
 #include "buffer.h"
 #include "constants.h"
 #include "datagram.h"
@@ -413,6 +410,10 @@ int main(int argc, char * argv[])
     extern int optind;
     extern int opterr;
     extern int optopt;
+    extern const char * COM_DIAG_HAZER_RELEASE_VALUE;
+    extern const char * COM_DIAG_HAZER_VINTAGE_VALUE;
+    extern const char * COM_DIAG_HAZER_REVISION_VALUE;
+    extern const char * COM_DIAG_DIMINUTO_RELEASE_VALUE;
     /*
      * Command line options.
      */
@@ -436,7 +437,8 @@ int main(int argc, char * argv[])
     diminuto_log_setmask();
 
     DIMINUTO_LOG_NOTICE("Program %s\n", argv[0]);
-    DIMINUTO_LOG_INFORMATION("Release %s\n", COM_DIAG_HAZER_RELEASE);
+    DIMINUTO_LOG_INFORMATION("Hazer %s\n", COM_DIAG_HAZER_RELEASE_VALUE);
+    DIMINUTO_LOG_INFORMATION("Diminuto %s\n", COM_DIAG_DIMINUTO_RELEASE_VALUE);
 
     /*
      * OPTIONS
@@ -589,7 +591,7 @@ int main(int argc, char * argv[])
             break;
         case 'V':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
-            DIMINUTO_LOG_NOTICE("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            DIMINUTO_LOG_NOTICE("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE_VALUE, COM_DIAG_HAZER_VINTAGE_VALUE, COM_DIAG_HAZER_REVISION_VALUE);
             break;
         case 'W':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);

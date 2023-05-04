@@ -38,9 +38,6 @@
 #include "com/diag/diminuto/diminuto_delay.h"
 #include "com/diag/diminuto/diminuto_daemon.h"
 #include "com/diag/diminuto/diminuto_assert.h"
-#include "com/diag/hazer/hazer_release.h"
-#include "com/diag/hazer/hazer_revision.h"
-#include "com/diag/hazer/hazer_vintage.h"
 #include "com/diag/hazer/tumbleweed.h"
 #include <unistd.h>
 #include <stdio.h>
@@ -146,6 +143,9 @@ int main(int argc, char * argv[])
     extern int optind;
     extern int opterr;
     extern int optopt;
+    extern const char * COM_DIAG_HAZER_RELEASE_VALUE;
+    extern const char * COM_DIAG_HAZER_VINTAGE_VALUE;
+    extern const char * COM_DIAG_HAZER_REVISION_VALUE;
 
     /***************************************************************************
      * PREINITIALIZATION
@@ -167,7 +167,7 @@ int main(int argc, char * argv[])
             daemon = !0;
             break;
         case 'V':
-            DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE, COM_DIAG_HAZER_VINTAGE, COM_DIAG_HAZER_REVISION);
+            DIMINUTO_LOG_INFORMATION("Version %s %s %s %s\n", Program, COM_DIAG_HAZER_RELEASE_VALUE, COM_DIAG_HAZER_VINTAGE_VALUE, COM_DIAG_HAZER_REVISION_VALUE);
             break;
         case 'd':
             debug = !0;
