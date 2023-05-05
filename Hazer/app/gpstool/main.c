@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This implements the gpstool main program.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -125,6 +125,9 @@
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_thread.h"
+#include "com/diag/diminuto/diminuto_version.h"
+#include "com/diag/hazer/common.h"
+#include "com/diag/hazer/hazer_version.h"
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -139,7 +142,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <wchar.h>
-#include "com/diag/hazer/common.h"
 #include "buffer.h"
 #include "constants.h"
 #include "datagram.h"
@@ -410,10 +412,6 @@ int main(int argc, char * argv[])
     extern int optind;
     extern int opterr;
     extern int optopt;
-    extern const char * COM_DIAG_HAZER_RELEASE_VALUE;
-    extern const char * COM_DIAG_HAZER_VINTAGE_VALUE;
-    extern const char * COM_DIAG_HAZER_REVISION_VALUE;
-    extern const char * COM_DIAG_DIMINUTO_RELEASE_VALUE;
     /*
      * Command line options.
      */

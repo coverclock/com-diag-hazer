@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This implements the gpstool Print API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -9,11 +9,6 @@
  * @details
  */
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <alloca.h>
 #include "com/diag/diminuto/diminuto_absolute.h"
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_countof.h"
@@ -22,6 +17,12 @@
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_types.h"
 #include "com/diag/hazer/common.h"
+#include "com/diag/hazer/hazer_version.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <alloca.h>
 #include "constants.h"
 #include "globals.h"
 #include "print.h"
@@ -205,7 +206,6 @@ void print_local(FILE * fp)
     diminuto_ticks_t fraction = 0;
     diminuto_sticks_t milliseconds = 0;
     int rc = 0;
-    extern const char * COM_DIAG_HAZER_RELEASE_VALUE;
 
     fputs("LOC", fp);
 

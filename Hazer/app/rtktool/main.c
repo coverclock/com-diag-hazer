@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2019-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the implementation of the rtktool RTK router.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -39,6 +39,7 @@
 #include "com/diag/diminuto/diminuto_daemon.h"
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/hazer/tumbleweed.h"
+#include "com/diag/hazer/hazer_version.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -143,9 +144,6 @@ int main(int argc, char * argv[])
     extern int optind;
     extern int opterr;
     extern int optopt;
-    extern const char * COM_DIAG_HAZER_RELEASE_VALUE;
-    extern const char * COM_DIAG_HAZER_VINTAGE_VALUE;
-    extern const char * COM_DIAG_HAZER_REVISION_VALUE;
 
     /***************************************************************************
      * PREINITIALIZATION
