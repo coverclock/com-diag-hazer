@@ -384,20 +384,25 @@ Hazer recognizes the following satellite identifiers in the GSA and GSV
 messages.
 
 These satellite identifiers have been observed in the wild coming from actual
-GPS receivers.
+GNSS receivers.
 
 * GPS - 1..32
 * SBAS - 33..64
 * GLONASS - 65..96
 
 Support for these satellite identifiers has been unit tested but has
-never been exercised using actual GPS receivers.
+these identifiers have never been observed in the wild. (Hazer has
+successfully used GNSS devices that are receiving signals from the BeiDou
+and Galileo constellations, but those devices used the GSA System ID
+field so that Hazer does not have to infer the constellation from the
+satellite identifier.)
 
+* SBAS - 152..158
 * IMES - 173..182
 * QZSS - 193..197
 * BeiDou - 201..235
 * Galileo - 301..336
-* BeiDou 2 - 401..437
+* BeiDou - 401..437
 
 # Devices
 
