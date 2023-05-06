@@ -332,3 +332,34 @@ This apparently isn't unusual; I've seen remarks on various GNSS
 discussion groups (like the Time Nuts mailing list) that advise
 separating GPS antennas by ten centimeters (based on the GPS L1
 wavelength) or more.
+
+## NMEA 0183 4.11
+
+The National Marine Electronics Association (NMEA) 0183 standard describes
+the output of virtually every GNSS device by any manufacturer ever. NMEA
+recently issued version 4.11 of this standard. Previous versions of
+0183 cost hundreds of dollars, which was expensive but within my price
+range. The NMEA web site ```nmea.org``` as of 2023-05-06 had this to
+say about the 4.11 standard.
+
+    The NMEA 0183 Interface Standard has a tiered pricing system
+    based on industry group. Being that NMEA is a marine electronics
+    industry association, NMEA does not issue memberships to non marine
+    entities. All non marine companies must purchase the NMEA 0183 standard
+    based on the industry their company serves. NMEA will verify this
+    information. Additionally, Associate memberships (individuals) cannot
+    join NMEA specifically to get the member discount on interface standards
+    purchases, as there is no way for NMEA to verify the intended industry
+    group use of the standard.  Due to copyright and licensing, the NMEA
+    0183 Standard is not sold via an online store. Customers must email
+    info@nmea.org or call 410-975-9425 to purchase via credit card or bank
+    wire. Upon payment and verification, NMEA will email a secure download
+    link to the purchaser in pdf format. NMEA 0183 pricing is as follows:
+    NMEA 0183- Marine Industry  $1000 (NMEA Member), $2000 (non member)
+    NMEA 0183- Government / Industrial / Testing  $7,500
+    NMEA 0183- Consumer Electronics  $10,000
+
+Charging thousands of dollars for the 0183 standard places is outside
+of my price range, or indeed the price range of virtually any individual
+for which, like me, GNSS is a side gig or a hobby. Heck, I don't even know
+which category I would be in.
