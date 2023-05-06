@@ -367,7 +367,7 @@ These talkers have been observed in the wild coming from actual GPS receivers.
 Support for these talkers has been unit tested but the talkers have never been
 observed in the wild.
 
-* BD - BeiDou (as in The Big Dipper) - China
+* BD - BeiDou (as in The Big Dipper) a.k.a. COMPASS - China
 * GI - Navigation with Indian Constellation (NavIC) a.k.a. Indian Regional Navigation Satellite System (IRNSS) - India
 * GQ - Quasi-Zenith Satellite System (QZSS) - Japan
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
