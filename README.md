@@ -569,7 +569,7 @@ pi-topOS "Sirius" (Raspbian 10 "Buster")
 Linux 5.4.79    
 GNU 8.3.0    
 
-StarFive VisionFive (RISC-V SBC)
+StarFive VisionFive (RISC-V SBC)    
 riscv64 @ 1GHz x 2     
 Fedora 33 (Rawhide)     
 Linux 5.15.10     
