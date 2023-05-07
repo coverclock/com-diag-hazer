@@ -575,6 +575,12 @@ Fedora 33 (Rawhide)
 Linux 5.15.10     
 GNU 10.3.1    
 
+OrangePi 5    
+aarch64 @ 2.4GHz x 8    
+Ubuntu 22.04.2 LTS (Jammy Jellyfish)    
+Linux 5.10.110    
+GNU 11.3.0    
+
 # Diagnostics
 
 ## Errors
