@@ -219,7 +219,7 @@ int main(int argc, char * argv[])
             break;
         }
 
-        fprintf(stderr, "%s: endpoint=\"%s\"=%s timeout=%zdticks period=%zdticks\n", program, endpointname, diminuto_ipc_endpoint2string(&endpoint, buffer, sizeof(buffer)), timeout, period);
+        fprintf(stderr, "%s: endpoint=\"%s\"=%s timeout=%lldticks period=%lldticks\n", program, endpointname, diminuto_ipc_endpoint2string(&endpoint, buffer, sizeof(buffer)), (diminuto_lld_t)timeout, (diminuto_lld_t)period);
 
         /*
          * INITIALIZE
