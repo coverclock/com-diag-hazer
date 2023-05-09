@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	52# API changes that may require that applications be modified.
 MINOR				:=	1# Only functionality or features added with no legacy API changes.
-BUILD				:=	1# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	2# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -95,7 +95,7 @@ OUT					:=	$(OUT_DIR)/$(TARGET)
 TEMP_DIR			:=	/tmp
 ROOT_DIR			:=	$(HOME_DIR)/$(TARGET)
 
-GITURL				:=	https://github.com/coverclock/com-diag-$(PROJECT).git
+GITURL				:=	$(shell git config --get remote.origin.url).git
 
 GENERATED			:=	vintage generate setup $(PROJECT)
 SYNTHESIZED			:=	$(PROJECT)_release.h $(PROJECT)_vintage.h $(PROJECT)_revision.h
