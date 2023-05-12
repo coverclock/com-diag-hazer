@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2018-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2018-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the NMEA unit test.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -899,6 +899,68 @@ int main(void)
         assert(view.sat[14].azm_degrees == 183);
         assert(view.sat[14].snr_dbhz == 45);
         assert(view.sat[14].signal == 3);
+    }
+
+    {
+        static const char * DATA = "$GNZDA,171305.00,12,05,2023,00,00*7C\r\n";
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        ssize_t length = -1;
+        size_t count = 0;
+        int rc = -1;
+        char * pointer = (char *)0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
+        hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
+
+        strncpy((char *)buffer, DATA, sizeof(buffer));
+        buffer[sizeof(buffer) - 1] = '\0';
+        assert(strcmp(DATA, (const char *)buffer) == 0);
+
+        length = hazer_length(buffer, sizeof(buffer));
+        assert(length == strlen((const char *)buffer));
+
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
+        assert(pointer != (char *)0);
+        assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+        assert(pointer[1] == msn);
+        assert(pointer[2] == lsn);
+        assert(pointer[3] == '\r');
+        assert(pointer[4] == '\n');
+
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
+        assert(count == 8);
+
+        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(length == (strlen((const char *)temporary) + 1));
+        temporary[length - 1] = msn;
+        temporary[length] = lsn;
+        temporary[length + 1] = '\r';
+        temporary[length + 2] = '\n';
+        temporary[length + 3] = '\0';
+        assert(strcmp(DATA, (const char *)temporary) == 0);
+
+        rc = hazer_is_nmea_name(vector, count, "ZDA");
+        assert(rc == !0);
+
+        rc = hazer_parse_zda(&position, vector, count);
+        assert(rc == 0);
+        assert(strcmp(position.label, "ZDA") == 0);
+        assert(position.utc_nanoseconds == 61985000000000ULL);
+        assert(position.dmy_nanoseconds == 1683849600000000000ULL);
+        assert(position.tot_nanoseconds == (position.utc_nanoseconds + position.dmy_nanoseconds));
+        assert(position.old_nanoseconds == position.tot_nanoseconds);
+        assert(position.tz_nanoseconds == 0LL);
+
+        position.ticks = 0;
+        assert(!hazer_is_valid_time(&position));
+        assert(!hazer_has_valid_time(&position, 1));
+        position.ticks = 1;
+        assert(hazer_is_valid_time(&position));
+        assert(hazer_has_valid_time(&position, 1));
     }
 
     return 0;

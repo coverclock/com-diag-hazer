@@ -2664,6 +2664,24 @@ consume:
 
                 }
 
+            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_ZDA)) {
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA ZDA\n");
+
+                if (hazer_parse_zda(&position[system], vector, count) == 0) {
+
+                    position[system].ticks = timeout;
+                    refresh = !0;
+                    trace = !0;
+
+                    acquire_fix("NMEA ZDA");
+
+                } else {
+
+                    print_error(buffer, length);
+
+                }
+
             } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_TXT)) {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA TXT\n");

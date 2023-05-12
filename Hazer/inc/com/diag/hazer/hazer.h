@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Parse common NMEA strings from GNSS devices.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -695,6 +695,19 @@ extern uint64_t hazer_parse_utc(const char * string, char ** endp);
 extern uint64_t hazer_parse_dmy(const char * string, char ** endp);
 
 /**
+ * Parse three strings containing the date as day, month, year in NMEA
+ * ZDA format into an integer number of nanoseconds since the start of the
+ * POSIX epoch. The address of the terminating character in the string that
+ * failed to parse is returned, or of the year string if all succeeded.
+ * @param stringd points to the day string.
+ * @param stringm points to the month string.
+ * @param stringy points to the year string.
+ * @param endp points to where the terminating address is stored.
+ * @return an integer number of microseconds.
+ */
+extern uint64_t hazer_parse_d_m_y(const char * stringd, const char * stringm, const char * stringy, char ** endp);
+
+/**
  * Parse a string containing the latitude or longitude in NMEA format into
  * a signed integer number of nanominutes. The address of the terminating
  * character in the string is returned.
@@ -918,7 +931,7 @@ extern hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker);
 
 /**
  * @def HAZER_NANOSECONDS_INITIALIZER
- * Nanosecond fields are initialized to this value (because 0 is a value value).
+ * Nanosecond fields are initialized to this value (because 0 is a valid value).
  */
 #define HAZER_NANOSECONDS_INITIALIZER ((uint64_t)-1)
 
@@ -936,6 +949,7 @@ typedef struct HazerPosition {
     uint64_t tot_nanoseconds;       /* Total nanoseconds. */
     uint64_t utc_nanoseconds;       /* Time in nanoseconds since 00:00 UTC. */
     uint64_t dmy_nanoseconds;       /* Date in nanoseconds since POSIX epoch. */
+    int64_t tz_nanoseconds;         /* Time zone in nanoseconds from UTC. */
     int64_t lat_nanominutes;        /* Latitude in nanominutes. */
     int64_t lon_nanominutes;        /* Longitude in nanominutes. */
     int64_t alt_millimeters;        /* Altitude above MSL in millimeters. */
@@ -965,6 +979,7 @@ typedef struct HazerPosition {
 #define HAZER_POSITION_INITIALIZER \
     { \
         HAZER_NANOSECONDS_INITIALIZER, HAZER_NANOSECONDS_INITIALIZER, HAZER_NANOSECONDS_INITIALIZER, HAZER_NANOSECONDS_INITIALIZER, \
+        0, \
         0, 0, 0, 0, \
         0, 0, 0, 0, \
         (const char *)0, \
@@ -1029,6 +1044,16 @@ extern int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t
  * @return 0 for success, <0 otherwise.
  */
 extern int hazer_parse_vtg(hazer_position_t * positionp, char * vector[], size_t count);
+
+/**
+ * Parse a ZDA NMEA sentence, updating the time and date.
+ * If <0 is returned, errno is set to >0 if the sentence is malformed.
+ * @param positionp points to the position structure.
+ * @param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return 0 for success, <0 otherwise.
+ */
+extern int hazer_parse_zda(hazer_position_t * positionp, char * vector[], size_t count);
 
 /*******************************************************************************
  * PARSING SATELLITE ELEVATION, AZIMUTH, AND SIGNAL STRENGTH SENTENCES

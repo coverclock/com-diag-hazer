@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the implementation of the Hazer module.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -579,6 +579,58 @@ uint64_t hazer_parse_dmy(const char * string, char ** endp)
         seconds = mktime(&datetime); 
         if (seconds == (time_t)-1) {
             *endp = (char *)string; /* No, I really mean it. */
+            break;
+        }
+
+        nanoseconds = seconds;
+        nanoseconds -= timezone;
+        nanoseconds *= 1000000000ULL;
+
+    } while (0);
+
+    return nanoseconds;
+}
+
+uint64_t hazer_parse_d_m_y(const char * stringd, const char * stringm, const char * stringy, char ** endp)
+{
+    uint64_t nanoseconds = 0;
+    time_t seconds = 0;
+    unsigned int dd = 0;
+    unsigned int mm = 0;
+    unsigned int yyyy = 0;
+    struct tm datetime = { 0, };
+    extern long timezone;
+
+    do {
+
+        dd = strtoul(stringd, endp, 10);
+        if (**endp != '\0') {
+            break;
+        }
+
+        mm = strtoul(stringm, endp, 10);
+        if (**endp != '\0') {
+            break;
+        }
+
+        yyyy = strtoul(stringy, endp, 10);
+        if (**endp != '\0') {
+            break;
+        }
+
+        /*
+         * We let mktime check the fields since it is
+         * more complicated with a variable number of
+         * days per months and depending on the year.
+         */
+
+        datetime.tm_mday = dd;
+        datetime.tm_mon = mm - 1;
+        datetime.tm_year = yyyy - 1900;
+
+        seconds = mktime(&datetime); 
+        if (seconds == (time_t)-1) {
+            *endp = (char *)stringy; /* No, I really mean it. */
             break;
         }
 
@@ -1300,13 +1352,6 @@ static void update_time(hazer_position_t * positionp)
  ******************************************************************************/
 
 /*
- * The most recent copy of the NMEA 0183 standard I have is 4.10. There is a
- * 4.11 version now, but NMEA wants an (IMO) astronomical $2000 for a copy of
- * it. It's time for GPS receiver manufacturers to form an industry association
- * to fork the NMEA standard and produces a non-proprietary (or at least
- * reasonably priced) standard. Or maybe ISO or ANSI should do so (although
- * that wouldn't be cheap either.)
- *
  * Why all the syntax and validity checking of NMEA(-ish) sentences? Because
  * after five years I finally tested a GPS device - a Bad Elf GPS Pro+ that I
  * bought used off eBay - that required it. The device reads NMEA output from a
@@ -2005,6 +2050,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
             errno = EINVAL;
             break;
         }
+
         position.lat_nanominutes = hazer_parse_latlon(vector[3], *(vector[4]), &position.lat_digits, &end);
         if (*end != '\0') {
             errno = EINVAL;
@@ -2294,6 +2340,102 @@ int hazer_parse_txt(char * vector[], size_t count)
     } else {
         rc = 0;
     }
+
+    return rc;
+}
+
+int hazer_parse_zda(hazer_position_t * positionp, char * vector[], size_t count)
+{
+    int rc = -1;
+    char * end = (char *)0;
+    int sign = 1;
+    hazer_position_t position = HAZER_POSITION_INITIALIZER;
+    static const char ZDA[] = HAZER_NMEA_SENTENCE_ZDA;
+
+    do {
+
+        /*
+         * IDENTIFY
+         */
+
+        if (count < 2) {
+            errno = ENOMSG;
+            break;
+        }
+
+        if (strnlen(vector[0], sizeof("$XXZDA")) != (sizeof("$XXZDA") - 1)) {
+            errno = ENOMSG;
+            break;
+        }
+
+        if (*vector[0] != HAZER_STIMULUS_START) {
+            errno = ENOMSG;
+            break;
+        }
+
+        if (strcmp(vector[0] + sizeof("$XX") - 1, ZDA) != 0) {
+            errno = ENOMSG;
+            break;
+        }
+
+        /*
+         * VALIDATE
+         */
+
+        if (count < 8) {
+            errno = ENODATA;
+            break;
+        }
+
+        position.utc_nanoseconds = hazer_parse_utc(vector[1], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        position.dmy_nanoseconds = hazer_parse_d_m_y(vector[2], vector[3], vector[4], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        /*
+         * NMEA 0183 4.10 p. 132 Note 1
+         */
+
+        position.tz_nanoseconds = strtol(vector[5], &end, 10) * 60LL * 60LL * 1000000000LL;
+        if (*end != '\0') {
+            break;
+        }
+
+        if (position.tz_nanoseconds < 0) {
+            position.tz_nanoseconds *= -1;
+            sign = -1;
+        }
+
+        position.tz_nanoseconds += strtoul(vector[6], &end, 10) * 60LL * 1000000000LL;
+        if (*end != '\0') {
+            break;
+        }
+
+        if (sign < 0) {
+            position.tz_nanoseconds *= sign;
+        }
+
+        /*
+         * APPLY
+         */
+
+        positionp->utc_nanoseconds = position.utc_nanoseconds;
+        positionp->dmy_nanoseconds = position.dmy_nanoseconds;
+        positionp->tz_nanoseconds = position.tz_nanoseconds;
+        update_time(positionp);
+
+        positionp->label = ZDA;
+
+        rc = 0;
+
+    } while (0);
 
     return rc;
 }
