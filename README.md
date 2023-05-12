@@ -417,6 +417,7 @@ I have successfully tested Hazer with the following GPS chipsets.
 * U-Blox 7    
 * U-Blox 8    
 * U-Blox 9
+* U-Blox 10
 
 I have successfully tested Hazer with the following serial-to-USB chipsets.
 
@@ -424,11 +425,12 @@ I have successfully tested Hazer with the following serial-to-USB chipsets.
 * FTDI    
 * Prolific    
 * Silicon Labs CP2104    
-* U-Blox (apparently integrated into the GPS chip itself)    
+* U-Blox (when it is integrated into the GPS chip itself)    
 
 I have successfully tested Hazer with the following GPS devices.
 
 * Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [^12]    
+* Ardusimple SimpleGNSS (U-Blox 10/UBX-NEO-F10T, 38400 8n1, v0403p6015, ttyUSB, 1Hz) [^8] [^23]
 * Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [^8] [^10]    
 * Bad Elf GPS Pro + (STMicroelectronics/MediaTek MTK, 9600 8n1, v0483p5740, ttyACM, 1Hz) [^4] [^16]    
 * Digi XBIB-C-GPS (U-blox 8/UBX-CAM-M8Q, 9600 8N1, N/A, ttyS, 1Hz) [^4]    
@@ -482,6 +484,7 @@ I have successfully tested Hazer with the following GPS devices.
 [^20]: Timing and frequency reference claimed +/- 5ns.    
 [^21]: Supposed to receive both GPS and GLONASS but my GLO and both of my GLO 2 units just receive GPS.    
 [^22]: Rumored to differ from the original GLO only by its increased battery life.    
+[^23]: Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), COMPASS (China), *and* NavIC (India) concurrently.    
 
 ## Notes
 
