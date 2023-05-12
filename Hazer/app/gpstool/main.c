@@ -3003,6 +3003,12 @@ consume:
 
                 /* TODO */
 
+            } else if (yodel_is_ubx_class_id(buffer, length, 0x02, 0x77)) {
+
+                DIMINUTO_LOG_DEBUG("Parse UBX 0x02 0x77\n");
+
+                /* TODO (Can't find the documentation for this one.) */
+
             } else {
 
                 DIMINUTO_LOG_INFORMATION("Parse UBX Other 0x%02x 0x%02x\n", buffer[YODEL_UBX_CLASS], buffer[YODEL_UBX_ID]);
