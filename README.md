@@ -440,7 +440,7 @@ I have successfully tested Hazer with the following GPS devices.
 * Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21] [^22]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
 * GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
-* GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz) [^1]    
+* GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [^1] [^2] [^4] [^8] [^13]    
 * GlobalSat ND-105C (SiRF Star III+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * Jackson Labs Technologies CSAC GPSDO (U-Blox 6/UBX-LEA-6T, 115200 8n1, N/A, ttyS, 1Hz)    
@@ -462,7 +462,7 @@ I have successfully tested Hazer with the following GPS devices.
 * TOPGNSS GN-803G (U-Blox 8/UBX-M8030-KT, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [^2] [^4] [^8]    
 * Uputronics Raspberry Pi GPS Expansion Board v4.1 (U-Blox 8/M8, 9600 8N1, N/A, ttyS, 1Hz) [^4]    
 
-[^1]: A good inexpensive introductory GPS device easily acquired from numerous sources.    
+[^1]: A good inexpensive introductory GPS device easily acquired from numerous sources; it is my go-to device to regression test Hazer and gpstool.    
 [^2]: Emits all sorts of interesting stuff in unsolicited $GPTXT or $GNTXT sentences.    
 [^3]: Install udev rules in overlay to prevent ModemManager from toying with device.    
 [^4]: Receives GPS (U.S.) *and* GLONASS (Russia) constellations concurrently.    
