@@ -21,6 +21,9 @@ RATE=${2:-38400}
 ERRFIL="${SAVDIR}/${PROGRAM}.err"
 mkdir -p $(dirname ${ERRFIL})
 
+OUTFIL="${SAVDIR}/${PROGRAM}.out"
+mkdir -p $(dirname ${OUTFIL})
+
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H 2>> ${ERRFIL}
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -H ${OUTFIL} 2>> ${ERRFIL}
