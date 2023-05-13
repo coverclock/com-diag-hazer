@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2021 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2021-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the implementation of the rtktool RTK router.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -250,17 +250,17 @@ int main(int argc, char * argv[])
     if (daemon) {
         rc = diminuto_daemon(Program);
         DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)getpid(), (int)getppid(), (int)getsid(getpid()));
-        diminuto_assert(rc == 0);
+        diminuto_contract(rc == 0);
     }
 
     rc = diminuto_terminator_install(!0);
-    diminuto_assert(rc >= 0);
+    diminuto_contract(rc >= 0);
 
     rc = diminuto_interrupter_install(!0);
-    diminuto_assert(rc >= 0);
+    diminuto_contract(rc >= 0);
 
     rc = diminuto_pipe_install(!0);
-    diminuto_assert(rc >= 0);
+    diminuto_contract(rc >= 0);
 
     diminuto_mux_init(&mux);
 
@@ -270,27 +270,27 @@ int main(int argc, char * argv[])
 
     if (udprendezvous != (char *)0) {
         udpsock = diminuto_ipc6_datagram_peer(udpendpoint.udp);
-        diminuto_assert(udpsock >= 0);
+        diminuto_contract(udpsock >= 0);
         DIMINUTO_LOG_INFORMATION("Source (%d) \"%s\" [%s]:%d", udpsock, udprendezvous, diminuto_ipc6_address2string(udpendpoint.ipv6, buffer6, sizeof(buffer6)), udpendpoint.udp);
         rc = diminuto_mux_register_read(&mux, udpsock);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
     }
 
     if (tcprendezvous != (char *)0) {
         tcpsock = diminuto_ipc6_stream_provider(tcpendpoint.tcp);
-        diminuto_assert(tcpsock >= 0);
+        diminuto_contract(tcpsock >= 0);
         DIMINUTO_LOG_INFORMATION("Sink (%d) \"%s\" [%s]:%d", tcpsock, tcprendezvous, diminuto_ipc6_address2string(tcpendpoint.ipv6, buffer6, sizeof(buffer6)), tcpendpoint.udp);
         rc = diminuto_mux_register_accept(&mux, tcpsock);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
     }
 
     frequency = diminuto_frequency();
     DIMINUTO_LOG_INFORMATION("Frequency %llu\n", (unsigned long long)frequency);
-    diminuto_assert(frequency > 0);
+    diminuto_contract(frequency > 0);
 
     DIMINUTO_LOG_INFORMATION("Buffer %zd\n", total);
     buffer = (char *)malloc(total);
-    diminuto_assert(buffer != (char *)0);
+    diminuto_contract(buffer != (char *)0);
 
     /***************************************************************************
      * WORK
@@ -342,7 +342,7 @@ int main(int argc, char * argv[])
         } else if (errno == EINTR) {
             continue;
         } else {
-            diminuto_assert(0);
+            diminuto_panic();
         }
 
         /*
@@ -380,7 +380,7 @@ int main(int argc, char * argv[])
                     if (sent <= 0) {
                         DIMINUTO_LOG_NOTICE("Close %d", fd);
                         rc = diminuto_mux_close(&mux, fd);
-                        diminuto_assert(rc >= 0);
+                        diminuto_contract(rc >= 0);
                     }
                 }
             }
@@ -404,7 +404,7 @@ int main(int argc, char * argv[])
             if (fd >= 0) {
                 DIMINUTO_LOG_NOTICE("Accept %d [%s]:%d\n", fd, diminuto_ipc6_address2string(address6, buffer6, sizeof(buffer6)), port);
                 rc = diminuto_mux_register_write(&mux, fd);
-                diminuto_assert(rc >= 0);
+                diminuto_contract(rc >= 0);
             }
 
         } else {

@@ -568,7 +568,7 @@ int main(int argc, char * argv[])
             }
             input[sizeof(input) - 1] = '\0';
             length = strnlen(input, sizeof(input));
-            diminuto_assert((length > 0) && (input[length - 1] == '\n'));
+            diminuto_contract((length > 0) && (input[length - 1] == '\n'));
 
             if (verbose) { fprintf(stderr, "%s: input=\"%s\"\n", program, expand(buffer, input, sizeof(buffer), length)); }
 
@@ -705,7 +705,7 @@ int main(int argc, char * argv[])
             snprintf(output, sizeof(output), format, token[NAM], token[NUM], token[TIM], token[LAT], token[LON], token[MSL], year, month, day, hour, minute, second);
             output[sizeof(output) - 1] = '\0';
             length = strnlen(output, sizeof(output));
-            diminuto_assert((length > 0) && (output[length - 1] == '\n'));
+            diminuto_contract((length > 0) && (output[length - 1] == '\n'));
 
             if (verbose) { fprintf(stderr, "%s: output=\"%s\"\n", program, expand(buffer, output, sizeof(buffer), length)); }
 

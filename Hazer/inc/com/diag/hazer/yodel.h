@@ -1508,4 +1508,27 @@ typedef struct YodelUbxTimTp {
 extern int int yodel_ubx_tim_tp(yodel_ubx_tim_tp_t * mp, const void * bp, ssize_t length);
 #endif
 
+/*******************************************************************************
+ * PROCESSING UBX-RXM-RAWX MESSAGES
+ ******************************************************************************/
+
+/*
+ * The UBX-NEO-F10T issues this message by default, but having found zero
+ * public documentation on it, I'm inferring its name from references
+ * in the device's Datasheet and Interface documents.
+ *
+ * EXAMPLES
+ *
+ * \xb5b\x02w\x10\0\0\x01\v\x01`\xef\xef\0\0\b\t\"\x03\f\x06\0\x1cB
+ * \xb5b\x02w\x10\0\0\0\v\x01`\xef\xef\0\0\b\t\"\x03\v\x06\0\x1a0
+ * \xb5b\x02w\x10\0\0\x01\0\x01m\0\xf0\0\0\x13\x14\x1d\x04\f\x06\0B\x83
+ * \xb5b\x02w\x10\0\0\0\0\x01m\0\xf0\0\0\x13\x14\x1d\x04\v\x06\0@q
+ *
+ */
+
+enum YodelUbxRxmRawxConstants {
+    YODEL_UBX_RXM_RAWX_Class        = 0x02,
+    YODEL_UBX_RXM_RAWX_Id           = 0x77,
+};
+
 #endif

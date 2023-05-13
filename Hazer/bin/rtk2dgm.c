@@ -165,12 +165,12 @@ int main(int argc, char * argv[])
                 } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV4) {
                     endpointname = optarg;
                     sock = diminuto_ipc4_datagram_peer(0);
-                    diminuto_assert(sock >= 0);
+                    diminuto_contract(sock >= 0);
                     (void)diminuto_ipc4_address2string(endpoint.ipv4, &sink, sizeof(sink));
                 } else if (endpoint.type == DIMINUTO_IPC_TYPE_IPV6) {
                     endpointname = optarg;
                     sock = diminuto_ipc6_datagram_peer(0);
-                    diminuto_assert(sock >= 0);
+                    diminuto_contract(sock >= 0);
                     (void)diminuto_ipc6_address2string(endpoint.ipv6, &sink, sizeof(sink));
                 } else {
                     errno = EINVAL;
@@ -226,17 +226,17 @@ int main(int argc, char * argv[])
          */
 
         muxp = diminuto_mux_init(&mux);
-        diminuto_assert(muxp != (diminuto_mux_t *)0);
+        diminuto_contract(muxp != (diminuto_mux_t *)0);
 
         rc = diminuto_mux_register_read(&mux, sock);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         rc = diminuto_terminator_install(0);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         then = diminuto_time_elapsed() - period;
 
-        diminuto_assert(tumbleweed_validate(&request.payload, sizeof(request.payload)));
+        diminuto_contract(tumbleweed_validate(&request.payload, sizeof(request.payload)));
 
         /*
          * WORK LOOP
@@ -249,7 +249,7 @@ int main(int argc, char * argv[])
              */
  
             nfds = diminuto_mux_wait(&mux, timeout);
-            diminuto_assert((nfds >= 0) || ((nfds < 0) && (errno == EINTR)));
+            diminuto_contract((nfds >= 0) || ((nfds < 0) && (errno == EINTR)));
 
             /*
              * CHECK
@@ -267,23 +267,23 @@ int main(int argc, char * argv[])
             if (nfds <= 0) {
                 /* Do nothing. */
             } else if ((fd = diminuto_mux_ready_read(&mux)) != sock) {
-                diminuto_assert(false);
+                diminuto_panic();
             } else {
                 switch (endpoint.type) {
                 case DIMINUTO_IPC_TYPE_IPV4:
                     bytes = diminuto_ipc4_datagram_receive_generic(sock, &response, sizeof(response), &ipv4, &port, 0);
-                    diminuto_assert(bytes > 0);
+                    diminuto_contract(bytes > 0);
                     (void)diminuto_ipc4_address2string(ipv4, &source, sizeof(source));
                     rc = diminuto_ipc4_compare(&ipv4, &endpoint.ipv4);
                     break;
                 case DIMINUTO_IPC_TYPE_IPV6:
                     bytes = diminuto_ipc6_datagram_receive_generic(sock, &response, sizeof(response), &ipv6, &port, 0);
-                    diminuto_assert(bytes > 0);
+                    diminuto_contract(bytes > 0);
                     (void)diminuto_ipc6_address2string(ipv6, &source, sizeof(source));
                     rc = diminuto_ipc6_compare(&ipv6, &endpoint.ipv6);
                     break;
                 default:
-                    diminuto_assert(false);
+                    diminuto_panic();
                     break;
                 }
 
@@ -323,7 +323,7 @@ int main(int argc, char * argv[])
                         expected = received + 1;
                     }
                     size = fwrite(&response.payload, bytes - sizeof(sequence_t), 1, stdout);
-                    diminuto_assert(size == 1);
+                    diminuto_contract(size == 1);
                 }
 
             }
@@ -338,14 +338,14 @@ int main(int argc, char * argv[])
                 switch (endpoint.type) {
                 case DIMINUTO_IPC_TYPE_IPV4:
                     bytes = diminuto_ipc4_datagram_send(sock, &request, sizeof(request), endpoint.ipv4, endpoint.udp);
-                    diminuto_assert(bytes == sizeof(request));
+                    diminuto_contract(bytes == sizeof(request));
                     break;
                 case DIMINUTO_IPC_TYPE_IPV6:
                     bytes = diminuto_ipc6_datagram_send(sock, &request, sizeof(request), endpoint.ipv6, endpoint.udp);
-                    diminuto_assert(bytes == sizeof(request));
+                    diminuto_contract(bytes == sizeof(request));
                     break;
                 default:
-                    diminuto_assert(false);
+                    diminuto_panic();
                     break;
                 } 
                 sending += 1;
@@ -362,7 +362,7 @@ int main(int argc, char * argv[])
 
     if (sock >= 0) {
         sock = diminuto_ipc_close(sock);
-        diminuto_assert(sock < 0);
+        diminuto_contract(sock < 0);
     }
 
     exit(xc);

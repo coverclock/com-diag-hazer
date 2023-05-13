@@ -468,7 +468,7 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
-            diminuto_assert(command != (command_t *)0);
+            diminuto_contract(command != (command_t *)0);
             command->emission = OPT_A;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
@@ -581,7 +581,7 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
-            diminuto_assert(command != (command_t *)0);
+            diminuto_contract(command != (command_t *)0);
             command->emission = OPT_U;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
@@ -595,7 +595,7 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
-            diminuto_assert(command != (command_t *)0);
+            diminuto_contract(command != (command_t *)0);
             command->emission = OPT_W;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
@@ -627,7 +627,7 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             readonly = 0;
             command = (command_t *)malloc(sizeof(command_t));
-            diminuto_assert(command != (command_t *)0);
+            diminuto_contract(command != (command_t *)0);
             command->emission = OPT_Z;
             command_node = &(command->link);
             diminuto_list_datainit(command_node, optarg);
@@ -855,13 +855,13 @@ int main(int argc, char * argv[])
 
     if (daemon) {
         rc = diminuto_daemon(Program);
-        diminuto_assert(rc == 0);
+        diminuto_contract(rc == 0);
         Process = getpid();
         DIMINUTO_LOG_NOTICE("Daemon %s %d %d %d %d", Program, rc, (int)Process, (int)getppid(), (int)getsid(Process));
     } else {
         Process = getpid();
     }
-    diminuto_assert(Process >= 0);
+    diminuto_contract(Process >= 0);
 
     DIMINUTO_LOG_NOTICE("Start");
 
@@ -871,11 +871,11 @@ int main(int argc, char * argv[])
         size_t commandresult = 0;
 
         commandlength = diminuto_command_length(argc, (const char **)argv);
-        diminuto_assert(commandlength > 0);
+        diminuto_contract(commandlength > 0);
         commandline = (char *)malloc(commandlength);
-        diminuto_assert(commandline != (char *)0);
+        diminuto_contract(commandline != (char *)0);
         commandresult = diminuto_command_line(argc, (const char **)argv, commandline, commandlength);
-        diminuto_assert(commandresult == commandlength);
+        diminuto_contract(commandresult == commandlength);
         DIMINUTO_LOG_NOTICE("Command \"%s\"\n", commandline);
         free(commandline);
     }
@@ -908,7 +908,7 @@ int main(int argc, char * argv[])
 
     if (identity != (const char *)0) {
         rc = diminuto_lock_file(identity);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
     }
         
 
@@ -928,7 +928,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else {
         diminuto_perror(logging);
-        diminuto_assert(log_fp != (FILE *)0);
+        diminuto_contract(log_fp != (FILE *)0);
     }
 
     if (log_fp != (FILE *)0) {
@@ -958,10 +958,10 @@ int main(int argc, char * argv[])
         remote_protocol = IPV6;
 
         remote_fd = diminuto_ipc6_datagram_peer(0);
-        diminuto_assert(remote_fd >= 0);
+        diminuto_contract(remote_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(remote_fd, !0);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         role = PRODUCER;
 
@@ -970,10 +970,10 @@ int main(int argc, char * argv[])
         remote_protocol = IPV4;
 
         remote_fd = diminuto_ipc4_datagram_peer(0);
-        diminuto_assert(remote_fd >= 0);
+        diminuto_contract(remote_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(remote_fd, !0);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         role = PRODUCER;
 
@@ -984,11 +984,11 @@ int main(int argc, char * argv[])
         remote_protocol = IPV4;
 
         remote_fd = diminuto_ipc4_datagram_peer(remote_endpoint.udp);
-        diminuto_assert(remote_fd >= 0);
+        diminuto_contract(remote_fd >= 0);
         source_fd = remote_fd;
 
         rc = diminuto_mux_register_read(&mux, remote_fd);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         role = CONSUMER;
 
@@ -999,11 +999,11 @@ int main(int argc, char * argv[])
         remote_protocol = IPV6;
 
         remote_fd = diminuto_ipc6_datagram_peer(remote_endpoint.udp);
-        diminuto_assert(remote_fd >= 0);
+        diminuto_contract(remote_fd >= 0);
         source_fd = remote_fd;
 
         rc = diminuto_mux_register_read(&mux, remote_fd);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         role = CONSUMER;
 
@@ -1039,13 +1039,13 @@ int main(int argc, char * argv[])
         surveyor_protocol = IPV6;
 
         surveyor_fd = diminuto_ipc6_datagram_peer(0);
-        diminuto_assert(surveyor_fd >= 0);
+        diminuto_contract(surveyor_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
     } else if (protocol == IPV4) {
 
@@ -1056,13 +1056,13 @@ int main(int argc, char * argv[])
         surveyor_protocol = IPV4;
 
         surveyor_fd = diminuto_ipc4_datagram_peer(0);
-        diminuto_assert(surveyor_fd >= 0);
+        diminuto_contract(surveyor_fd >= 0);
 
         rc = diminuto_ipc_set_nonblocking(surveyor_fd, !0);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
     } else if (preference == IPV4) {
 
@@ -1073,10 +1073,10 @@ int main(int argc, char * argv[])
         surveyor_protocol = IPV4;
 
         surveyor_fd = diminuto_ipc4_datagram_peer(surveyor_endpoint.udp);
-        diminuto_assert(surveyor_fd >= 0);
+        diminuto_contract(surveyor_fd >= 0);
 
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         keepalive = -1;
 
@@ -1089,10 +1089,10 @@ int main(int argc, char * argv[])
         surveyor_protocol = IPV6;
 
         surveyor_fd = diminuto_ipc6_datagram_peer(surveyor_endpoint.udp);
-        diminuto_assert(surveyor_fd >= 0);
+        diminuto_contract(surveyor_fd >= 0);
 
         rc = diminuto_mux_register_read(&mux, surveyor_fd);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         keepalive = -1;
 
@@ -1121,21 +1121,21 @@ int main(int argc, char * argv[])
         (void)diminuto_pin_unexport_ignore(strobepin);
 
         rc = diminuto_pin_export(strobepin);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         rc = diminuto_pin_direction(strobepin, !0);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         rc = diminuto_pin_active(strobepin, activehigh);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         strobe_fp = diminuto_pin_open(strobepin, !0);
-        diminuto_assert(strobe_fp != (FILE *)0);
+        diminuto_contract(strobe_fp != (FILE *)0);
 
         DIMINUTO_LOG_INFORMATION("Strobe (%d) \"%s\" %d\n", fileno(strobe_fp), strobe, strobepin);
 
         rc = diminuto_pin_clear(strobe_fp);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
     }
 
     /*
@@ -1158,24 +1158,24 @@ int main(int argc, char * argv[])
         (void)diminuto_pin_unexport_ignore(ppspin);
 
         rc = diminuto_pin_export(ppspin);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         rc = diminuto_pin_direction(ppspin, 0);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         rc = diminuto_pin_active(ppspin, activehigh);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_BOTH);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         pps_fp = diminuto_pin_open(ppspin, 0);
-        diminuto_assert(pps_fp != (FILE *)0);
+        diminuto_contract(pps_fp != (FILE *)0);
 
         DIMINUTO_LOG_INFORMATION("1pps (%d) \"%s\" %d\n", fileno(pps_fp), pps, ppspin);
 
         rc = diminuto_pin_get(pps_fp);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
         poller.ppsfp = pps_fp;
         poller.strobefp = strobe_fp;
@@ -1183,10 +1183,10 @@ int main(int argc, char * argv[])
         poller.done = 0;
 
         threadp = diminuto_thread_init(&thread, gpiopoller);
-        diminuto_assert(threadp == &thread);
+        diminuto_contract(threadp == &thread);
 
         threadrc = diminuto_thread_start(&thread, &poller);
-        diminuto_assert(threadrc == 0);
+        diminuto_contract(threadrc == 0);
     }
 
     /*
@@ -1200,7 +1200,7 @@ int main(int argc, char * argv[])
      * N.B. For USB GPS devices, it takes a moment or three for the device to
      * enumerate and show up in the file system. If you, for example, plug in
      * the GPS device and start gpstool too quickly, the open(2) will fail, the
-     * diminuto_assert(3) will fire, and the application will dump core. I do
+     * diminuto_contract(3) will fire, and the application will dump core. I do
      * this routinely, alas. Maybe in the future I'll add a check, a delay, and
      * a retry.
      */
@@ -1227,7 +1227,7 @@ int main(int argc, char * argv[])
         if (dev_fd < 0) {
             diminuto_perror(device);
         }
-        diminuto_assert(dev_fd >= 0);
+        diminuto_contract(dev_fd >= 0);
 
         serial = diminuto_serial_valid(dev_fd);
         if (serial) {
@@ -1235,10 +1235,10 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_INFORMATION("Serial (%d) \"%s\" %d %d%c%d%s%s%s\n", dev_fd, device, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
 
             rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
-            diminuto_assert(rc == 0);
+            diminuto_contract(rc == 0);
 
             rc = diminuto_serial_raw(dev_fd);
-            diminuto_assert(rc == 0);
+            diminuto_contract(rc == 0);
 
         }
 
@@ -1252,7 +1252,7 @@ int main(int argc, char * argv[])
         if (dev_fp == (FILE *)0) {
             diminuto_perror(device);
         }
-        diminuto_assert(dev_fp != (FILE *)0);
+        diminuto_contract(dev_fp != (FILE *)0);
 
         DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\"\n", dev_fd, device, readonly ? "ro" : "rw", Source);
         DIMINUTO_LOG_INFORMATION("Device Mask 0x%lx\n", device_mask);
@@ -1291,7 +1291,7 @@ int main(int argc, char * argv[])
 
         if ((in_fp = fopen(source, "r")) == (FILE *)0) {
             diminuto_perror(source);
-            diminuto_assert(in_fp != (FILE *)0);
+            diminuto_contract(in_fp != (FILE *)0);
         }
 
     }
@@ -1323,14 +1323,14 @@ int main(int argc, char * argv[])
         DIMINUTO_LOG_INFORMATION("Buffer Default [%zu]\n", (size_t)BUFSIZ);
         if (io_size > BUFSIZ) {
             io_buffer = malloc(io_size);
-            diminuto_assert(io_buffer != (void *)0);
+            diminuto_contract(io_buffer != (void *)0);
             rc = setvbuf(in_fp, io_buffer, _IOFBF, io_size);
-            diminuto_assert(rc == 0);
+            diminuto_contract(rc == 0);
             DIMINUTO_LOG_INFORMATION("Buffer Read [%zu]\n", io_size);
         }
 
         rc = diminuto_mux_register_read(&mux, in_fd);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
 
     }
 
@@ -1359,7 +1359,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else {
         diminuto_perror(sink);
-        diminuto_assert(sink_fp != (FILE *)0);
+        diminuto_contract(sink_fp != (FILE *)0);
     }
 
     if (sink_fp != (FILE *)0) {
@@ -1373,7 +1373,7 @@ int main(int argc, char * argv[])
 
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_create(headless, &temporary);
-        diminuto_assert(out_fp != (FILE *)0);
+        diminuto_contract(out_fp != (FILE *)0);
         DIMINUTO_LOG_INFORMATION("Observation (%d) \"%s\"\n", fileno(out_fp), headless);
     }
 
@@ -1403,10 +1403,10 @@ int main(int argc, char * argv[])
         poller.done = 0;
 
         threadp = diminuto_thread_init(&thread, dcdpoller);
-        diminuto_assert(threadp == &thread);
+        diminuto_contract(threadp == &thread);
 
         threadrc = diminuto_thread_start(&thread, &poller);
-        diminuto_assert(threadrc == 0);
+        diminuto_contract(threadrc == 0);
 
     }
 
@@ -1422,7 +1422,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else {
         diminuto_perror(tracing);
-        diminuto_assert(trace_fp != (FILE *)0);
+        diminuto_contract(trace_fp != (FILE *)0);
     }
 
     if (trace_fp != (FILE *)0) {
@@ -1434,16 +1434,16 @@ int main(int argc, char * argv[])
      */
 
     rc = diminuto_terminator_install(0);
-    diminuto_assert(rc >= 0);
+    diminuto_contract(rc >= 0);
 
     rc = diminuto_pipe_install(0);
-    diminuto_assert(rc >= 0);
+    diminuto_contract(rc >= 0);
 
     rc = diminuto_interrupter_install(!0);
-    diminuto_assert(rc >= 0);
+    diminuto_contract(rc >= 0);
 
     rc = diminuto_hangup_install(!0);
-    diminuto_assert(rc >= 0);
+    diminuto_contract(rc >= 0);
 
     /*
      * How much of each packet do we display? Depends on whether we're doing
@@ -1461,13 +1461,13 @@ int main(int argc, char * argv[])
      */
 
     rc = hazer_initialize();
-    diminuto_assert(rc == 0);
+    diminuto_contract(rc == 0);
 
     rc = yodel_initialize();
-    diminuto_assert(rc == 0);
+    diminuto_contract(rc == 0);
 
     rc = tumbleweed_initialize();
-    diminuto_assert(rc == 0);
+    diminuto_contract(rc == 0);
 
     if (debug) {
         hazer_debug(stderr);
@@ -1498,13 +1498,13 @@ int main(int argc, char * argv[])
      */
 
     Frequency = diminuto_frequency();
-    diminuto_assert(Frequency > 0);
+    diminuto_contract(Frequency > 0);
 
     Clock = diminuto_time_clock();
-    diminuto_assert(Clock >= 0);
+    diminuto_contract(Clock >= 0);
 
     Epoch = diminuto_time_elapsed();
-    diminuto_assert(Epoch >= 0);
+    diminuto_contract(Epoch >= 0);
 
     Now = Epoch;
 
@@ -1649,11 +1649,11 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         } else if (ready > 0) {
             fd = diminuto_mux_ready_read(&mux);
-            diminuto_assert(fd >= 0);
+            diminuto_contract(fd >= 0);
         } else if (errno == EINTR) {
             continue;
         } else {
-            diminuto_assert(0);
+            diminuto_panic();
         }
 
 consume:
@@ -1729,7 +1729,7 @@ consume:
 
                 if (sink_fp != (FILE *)0) {
                     rc = fputc(ch, sink_fp);
-                    diminuto_assert(rc != EOF);
+                    diminuto_contract(rc != EOF);
                 }
 
                 /*
@@ -2016,7 +2016,7 @@ consume:
 
             if (sink_fp != (FILE *)0) {
                 written = fwrite(buffer, 1, size - 1 /* Minus trailing NUL. */, sink_fp);
-                diminuto_assert(written == (size - 1));
+                diminuto_contract(written == (size - 1));
             }
 
         } else if (fd == surveyor_fd) {
@@ -2083,7 +2083,7 @@ consume:
              */
 
             DIMINUTO_LOG_ERROR("Multiplexor Fail [%d] (%d) <%d %d %d>\n", ready, fd, dev_fd, remote_fd, surveyor_fd);
-            diminuto_assert(0);
+            diminuto_panic();
 
         }
 
@@ -2105,10 +2105,10 @@ consume:
          */
 
         Clock = diminuto_time_clock();
-        diminuto_assert(Clock >= 0);
+        diminuto_contract(Clock >= 0);
 
         Now = diminuto_time_elapsed();
-        diminuto_assert(Now >= 0);
+        diminuto_contract(Now >= 0);
 
         /**
          ** KEEPALIVE
@@ -2182,11 +2182,11 @@ consume:
         } else {
 
             command_node = diminuto_list_dequeue(&command_list);
-            diminuto_assert(command_node != (diminuto_list_t *)0);
+            diminuto_contract(command_node != (diminuto_list_t *)0);
 
             command = diminuto_containerof(command_t, link, command_node);
             command_string = diminuto_list_data(command_node);
-            diminuto_assert(command_string != (uint8_t *)0);
+            diminuto_contract(command_string != (uint8_t *)0);
 
             if (command_string[0] == '\0') {
 
@@ -2199,7 +2199,7 @@ consume:
                 command_size = strlen((const char *)command_string) + 1;
                 DIMINUTO_LOG_NOTICE("Out \'%s\'[%zd]", command_string, command_size);
                 command_buffer = (uint8_t *)malloc(command_size + 8 /* e.g. *, CHECKSUMA, CHECKSUMB, CR, LF, NUL. */);
-                diminuto_assert(command_buffer != (uint8_t *)0);
+                diminuto_contract(command_buffer != (uint8_t *)0);
                 command_length = diminuto_escape_collapse((char *)command_buffer, (const char *)command_string, command_size);
 
                 /*
@@ -2208,7 +2208,7 @@ consume:
                  * wackiness ensues below, so we check it anyway.
                  */
 
-                diminuto_assert(command_length > 1);
+                diminuto_contract(command_length > 1);
 
                 switch (command->emission) {
                 case OPT_A:
@@ -2232,7 +2232,7 @@ consume:
                     break;
                 }
 
-                diminuto_assert(command_total > 1);
+                diminuto_contract(command_total > 1);
 
                  if (verbose) {
                     fputs("Output:\n", stderr);
@@ -2438,9 +2438,9 @@ consume:
             strncpy((char *)tokenized, (const char *)buffer, sizeof(tokenized));
             tokenized[sizeof(tokenized) - 1] = '\0';
             count = hazer_tokenize(vector, diminuto_countof(vector), tokenized, length);
-            diminuto_assert(count > 0);
-            diminuto_assert(vector[count - 1] == (char *)0);
-            diminuto_assert(count <= diminuto_countof(vector));
+            diminuto_contract(count > 0);
+            diminuto_contract(vector[count - 1] == (char *)0);
+            diminuto_contract(count <= diminuto_countof(vector));
 
             DIMINUTO_LOG_DEBUG("Tokenize NMEA [%zd]", count);
 
@@ -2625,9 +2625,13 @@ consume:
                      */
 
                     if (active[system].mode > HAZER_MODE_NOFIX) {
+
                         acquire_fix("NMEA GSA");
+
                     } else {
+
                         relinquish_fix("NMEA GSA");
+
                     }
 
                 } else {
@@ -2672,9 +2676,22 @@ consume:
 
                     position[system].ticks = timeout;
                     refresh = !0;
+#if 0
                     trace = !0;
 
+                    /*
+                     * Apparently some devices can maintain and report the
+                     * current time, perhaps by using their own real-time
+                     * clocks, even after a fix has been lost. Hence, receiving
+                     * the current time via an NMEA ZDA message does not
+                     * necessarily indicate that a fix has been acquired. So
+                     * we refresh the display with the current time, but do
+                     * not (re)activate the trace, nor to we log that the
+                     * fix has been (re)acquired.
+                     */
+
                     acquire_fix("NMEA ZDA");
+#endif
 
                 } else {
 
@@ -3003,11 +3020,11 @@ consume:
 
                 /* TODO */
 
-            } else if (yodel_is_ubx_class_id(buffer, length, 0x02, 0x77)) {
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_RXM_RAWX_Class , YODEL_UBX_RXM_RAWX_Id)) {
 
-                DIMINUTO_LOG_DEBUG("Parse UBX 0x02 0x77\n");
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RAWX\n");
 
-                /* TODO (Can't find the documentation for this one.) */
+                /* TODO */
 
             } else {
 
@@ -3180,12 +3197,12 @@ consume:
             /* Do nothing. */
         } else if (ready > 0) {
             fd = diminuto_mux_ready_read(&mux);
-            diminuto_assert(fd >= 0);
+            diminuto_contract(fd >= 0);
             goto consume;
         } else if (errno == EINTR) {
             continue; /* Interrupt. */
         } else {
-            diminuto_assert(0);
+            diminuto_panic();
         }
 
         /**
@@ -3314,13 +3331,13 @@ render:
             if (headless != (const char *)0) {
                 if (checkpoint) {
                     out_fp = diminuto_observation_checkpoint(out_fp, &temporary);
-                    diminuto_assert(out_fp != (FILE *)0);
+                    diminuto_contract(out_fp != (FILE *)0);
                     checkpoint = 0;
                 }
                 out_fp = diminuto_observation_commit(out_fp, &temporary);
-                diminuto_assert(out_fp == (FILE *)0);
+                diminuto_contract(out_fp == (FILE *)0);
                 out_fp = diminuto_observation_create(headless, &temporary);
-                diminuto_assert(out_fp != (FILE *)0);
+                diminuto_contract(out_fp != (FILE *)0);
             }
 
             refresh = 0;
@@ -3365,13 +3382,13 @@ stop:
     DIMINUTO_LOG_INFORMATION("Counters Remote=%lu Surveyor=%lu Keepalive=%lu OutOfOrder=%u Missing=%u", (unsigned long)remote_sequence, (unsigned long)surveyor_sequence, (unsigned long)keepalive_sequence, outoforder_counter, missing_counter);
 
     rc = tumbleweed_finalize();
-    diminuto_assert(rc == 0);
+    diminuto_contract(rc == 0);
 
     rc = yodel_finalize();
-    diminuto_assert(rc == 0);
+    diminuto_contract(rc == 0);
 
     rc = hazer_finalize();
-    diminuto_assert(rc == 0);
+    diminuto_contract(rc == 0);
 
     diminuto_mux_fini(&mux);
 
@@ -3387,17 +3404,17 @@ stop:
 
     if (pps_fp != (FILE *)0) {
         pps_fp = diminuto_pin_unused(pps_fp, ppspin);
-        diminuto_assert(pps_fp == (FILE *)0);
+        diminuto_contract(pps_fp == (FILE *)0);
     }
 
     if (strobe_fp != (FILE *)0) {
         strobe_fp = diminuto_pin_unused(strobe_fp, strobepin);
-        diminuto_assert(strobe_fp == (FILE *)0);
+        diminuto_contract(strobe_fp == (FILE *)0);
     }
 
     if (remote_fd >= 0) {
         rc = diminuto_ipc_close(remote_fd);
-        diminuto_assert(rc >= 0);
+        diminuto_contract(rc >= 0);
     }
 
     if (trace_fp == (FILE *)0) {
@@ -3431,7 +3448,7 @@ stop:
     }
 
     Now = diminuto_time_elapsed();
-    diminuto_assert(Now >= 0);
+    diminuto_contract(Now >= 0);
     if (Now > Epoch) {
         DIMINUTO_LOG_INFORMATION("Bandwidth size=%zuB maximum=%zuB total=%zuB sustained=%zuBPS\n", io_size, io_maximum, io_total, (ssize_t)((io_total * Frequency) / (Now - Epoch)));
     }
@@ -3458,7 +3475,7 @@ stop:
 
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_commit(out_fp, &temporary);
-        diminuto_assert(out_fp == (FILE *)0);
+        diminuto_contract(out_fp == (FILE *)0);
     } else if (out_fp == dev_fp) {
         /* Do nothing. */
     } else if ((rc = fclose(out_fp)) != EOF) {
@@ -3473,7 +3490,7 @@ stop:
 
     while (!diminuto_list_isempty(&command_list)) {
         command_node = diminuto_list_dequeue(&command_list);
-        diminuto_assert(command_node != (diminuto_list_t *)0);
+        diminuto_contract(command_node != (diminuto_list_t *)0);
         free(command_node);
     }
 

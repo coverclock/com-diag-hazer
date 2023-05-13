@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2019-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Convert coordinates into a Google Maps friendly form.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -79,6 +79,10 @@
  * 39°47'39.162999"N, 105°09'12.060000"W
  */
 
+#include "com/diag/diminuto/diminuto_assert.h"
+#include "com/diag/diminuto/diminuto_log.h"
+#include "com/diag/hazer/common.h"
+#include "com/diag/hazer/coordinates.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -86,10 +90,6 @@
 #include <locale.h>
 #include <wchar.h>
 #include <errno.h>
-#include "com/diag/hazer/common.h"
-#include "com/diag/hazer/coordinates.h"
-#include "com/diag/diminuto/diminuto_assert.h"
-#include "com/diag/diminuto/diminuto_log.h"
 
 int main(int argc, char *argv[])
 {
@@ -167,10 +167,10 @@ int main(int argc, char *argv[])
             millionths = 0;
             direction = 0;
             coordinates_format_decimaldegrees2position(latitude, &degrees, &minutes, &seconds, &millionths, &direction);
-            diminuto_assert((0 <= degrees) && (degrees <= 90));
-            diminuto_assert((0 <= minutes) && (minutes <= 59));
-            diminuto_assert((0 <= seconds) && (seconds <= 59));
-            diminuto_assert((0 <= millionths) && (millionths <= 999999));
+            diminuto_contract((0 <= degrees) && (degrees <= 90));
+            diminuto_contract((0 <= minutes) && (minutes <= 59));
+            diminuto_contract((0 <= seconds) && (seconds <= 59));
+            diminuto_contract((0 <= millionths) && (millionths <= 999999));
             printf("%2d%lc%02d'%02d.%06d\"%c,", degrees, (wint_t)COMMON_DEGREE, minutes, seconds, millionths, (direction < 0) ? 'S' : 'N');
             degrees = 0;
             minutes = 0;
@@ -178,10 +178,10 @@ int main(int argc, char *argv[])
             millionths = 0;
             direction = 0;
             coordinates_format_decimaldegrees2position(longitude, &degrees, &minutes, &seconds, &millionths, &direction);
-            diminuto_assert((0 <= degrees) && (degrees <= 180));
-            diminuto_assert((0 <= minutes) && (minutes <= 59));
-            diminuto_assert((0 <= seconds) && (seconds <= 59));
-            diminuto_assert((0 <= millionths) && (millionths <= 999999));
+            diminuto_contract((0 <= degrees) && (degrees <= 180));
+            diminuto_contract((0 <= minutes) && (minutes <= 59));
+            diminuto_contract((0 <= seconds) && (seconds <= 59));
+            diminuto_contract((0 <= millionths) && (millionths <= 999999));
             printf(" %3d%lc%02d'%02d.%06d\"%c\n", degrees, (wint_t)COMMON_DEGREE, minutes, seconds, millionths, (direction < 0) ? 'W' : 'E');
             argv++;
         } else {

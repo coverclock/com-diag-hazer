@@ -214,19 +214,19 @@ void print_local(FILE * fp)
      */
 
     rc = diminuto_time_juliet(Clock, &year, &month, &day, &hour, &minute, &second, &fraction);
-    diminuto_assert(rc == 0);
-    diminuto_assert((1 <= month) && (month <= 12));
-    diminuto_assert((1 <= day) && (day <= 31));
-    diminuto_assert((0 <= hour) && (hour <= 23));
-    diminuto_assert((0 <= minute) && (minute <= 59));
-    diminuto_assert((0 <= second) && (second <= 59));
+    diminuto_contract(rc == 0);
+    diminuto_contract((1 <= month) && (month <= 12));
+    diminuto_contract((1 <= day) && (day <= 31));
+    diminuto_contract((0 <= hour) && (hour <= 23));
+    diminuto_contract((0 <= minute) && (minute <= 59));
+    diminuto_contract((0 <= second) && (second <= 59));
 
     /*
      * I arbitrarily decided to render the fractional part in milliseconds.
      */
 
     milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-    diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
+    diminuto_contract((0 <= milliseconds) && (milliseconds < 1000LL));
 
     fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.%03lu", year, month, day, hour, minute, second, (long unsigned int)milliseconds);
 
@@ -268,11 +268,11 @@ void print_local(FILE * fp)
      */
 
     rc = diminuto_time_duration(Now - Epoch, &day, &hour, &minute, &second, &fraction);
-    diminuto_assert(rc >= 0);
-    diminuto_assert(day >= 0);
-    diminuto_assert((0 <= hour) && (hour <= 23));
-    diminuto_assert((0 <= minute) && (minute <= 59));
-    diminuto_assert((0 <= second) && (second <= 59));
+    diminuto_contract(rc >= 0);
+    diminuto_contract(day >= 0);
+    diminuto_contract((0 <= hour) && (hour <= 23));
+    diminuto_contract((0 <= minute) && (minute <= 59));
+    diminuto_contract((0 <= second) && (second <= 59));
 
     /*
      * I limited the resolution to seconds just to save space on a
@@ -450,12 +450,12 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
              */
 
             hazer_format_nanoseconds2timestamp(pa[system].tot_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
-            diminuto_assert((1 <= month) && (month <= 12));
-            diminuto_assert((1 <= day) && (day <= 31));
-            diminuto_assert((0 <= hour) && (hour <= 23));
-            diminuto_assert((0 <= minute) && (minute <= 59));
-            diminuto_assert((0 <= second) && (second <= 59));
-            diminuto_assert((0 <= nanoseconds) && (nanoseconds < 1000000000LLU));
+            diminuto_contract((1 <= month) && (month <= 12));
+            diminuto_contract((1 <= day) && (day <= 31));
+            diminuto_contract((0 <= hour) && (hour <= 23));
+            diminuto_contract((0 <= minute) && (minute <= 59));
+            diminuto_contract((0 <= second) && (second <= 59));
+            diminuto_contract((0 <= nanoseconds) && (nanoseconds < 1000000000LLU));
             fprintf(fp, " %04d-%02d-%02dT%02d:%02d:%02d.000-00:00+00", year, month, day, hour, minute, second);
 
             if (!timeonce) {
@@ -489,13 +489,13 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             } else {
 
                 rc = diminuto_time_duration(First - Epoch, &day, &hour, &minute, &second, &fraction);
-                diminuto_assert(rc >= 0);
-                diminuto_assert(day >= 0);
-                diminuto_assert((0 <= hour) && (hour <= 23));
-                diminuto_assert((0 <= minute) && (minute <= 59));
-                diminuto_assert((0 <= second) && (second <= 59));
+                diminuto_contract(rc >= 0);
+                diminuto_contract(day >= 0);
+                diminuto_contract((0 <= hour) && (hour <= 23));
+                diminuto_contract((0 <= minute) && (minute <= 59));
+                diminuto_contract((0 <= second) && (second <= 59));
                 milliseconds = diminuto_frequency_ticks2units(fraction, 1000LL);
-                diminuto_assert((0 <= milliseconds) && (milliseconds < 1000LL));
+                diminuto_contract((0 <= milliseconds) && (milliseconds < 1000LL));
 
                 if (day > 0) {
                     fputs(" **:**:**.***", fp);
@@ -537,30 +537,30 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             fputs("POS", fp);
 
             hazer_format_nanominutes2position(pa[system].lat_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
-            diminuto_assert((0 <= degrees) && (degrees <= 90));
-            diminuto_assert((0 <= minutes) && (minutes <= 59));
-            diminuto_assert((0 <= seconds) && (seconds <= 59));
-            diminuto_assert((0 <= thousandths) && (thousandths <= 999));
+            diminuto_contract((0 <= degrees) && (degrees <= 90));
+            diminuto_contract((0 <= minutes) && (minutes <= 59));
+            diminuto_contract((0 <= seconds) && (seconds <= 59));
+            diminuto_contract((0 <= thousandths) && (thousandths <= 999));
             fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, (wint_t)COMMON_DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
 
             hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
-            diminuto_assert((0 <= degrees) && (degrees <= 180));
-            diminuto_assert((0 <= minutes) && (minutes <= 59));
-            diminuto_assert((0 <= seconds) && (seconds <= 59));
-            diminuto_assert((0 <= thousandths) && (thousandths <= 999));
+            diminuto_contract((0 <= degrees) && (degrees <= 180));
+            diminuto_contract((0 <= minutes) && (minutes <= 59));
+            diminuto_contract((0 <= seconds) && (seconds <= 59));
+            diminuto_contract((0 <= thousandths) && (thousandths <= 999));
             fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, (wint_t)COMMON_DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
 
             fputc(' ', fp);
 
             hazer_format_nanominutes2degrees(pa[system].lat_nanominutes, &degrees, &tenmillionths);
-            diminuto_assert((-90 <= degrees) && (degrees <= 90));
-            diminuto_assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
+            diminuto_contract((-90 <= degrees) && (degrees <= 90));
+            diminuto_contract((0 <= tenmillionths) && (tenmillionths <= 9999999));
             fprintf(fp, " %4d.%07llu,", degrees, (diminuto_llu_t)tenmillionths);
 
             hazer_format_nanominutes2degrees(pa[system].lon_nanominutes, &degrees, &tenmillionths);
-            diminuto_assert((-180 <= degrees) && (degrees <= 180));
+            diminuto_contract((-180 <= degrees) && (degrees <= 180));
             fprintf(fp, " %4d.%07llu", degrees, (diminuto_llu_t)tenmillionths);
-            diminuto_assert((0 <= tenmillionths) && (tenmillionths <= 9999999));
+            diminuto_contract((0 <= tenmillionths) && (tenmillionths <= 9999999));
 
             fprintf(fp, "%7s", "");
 
@@ -620,11 +620,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             fputs("COG", fp);
 
-            diminuto_assert((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
+            diminuto_contract((0LL <= pa[system].cog_nanodegrees) && (pa[system].cog_nanodegrees <= 360000000000LL));
 
             compass = hazer_format_nanodegrees2compass16(pa[system].cog_nanodegrees);
-            diminuto_assert(compass != (const char *)0);
-            diminuto_assert(strlen(compass) <= 4);
+            diminuto_contract(compass != (const char *)0);
+            diminuto_contract(strlen(compass) <= 4);
             fprintf(fp, " %-3s", compass);
 
             degrees = pa[system].cog_nanodegrees / 1000000000LL;
@@ -1056,11 +1056,11 @@ void print_error_t2(void)
 \x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\
 ";
     static int ch;
-    diminuto_assert(sizeof(BUFFER) == 257); /* Including terminating NUL. */
+    diminuto_contract(sizeof(BUFFER) == 257); /* Including terminating NUL. */
     for (ch = 0; ch <= 256; ++ch) {
-        diminuto_assert(BUFFER[ch] == (uint8_t)ch);
+        diminuto_contract(BUFFER[ch] == (uint8_t)ch);
     }
-    diminuto_assert(BUFFER[257] == '\0');
+    diminuto_contract(BUFFER[257] == '\0');
 }
 
 #endif

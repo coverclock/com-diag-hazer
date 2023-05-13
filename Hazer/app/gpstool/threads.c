@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This implements the gpstool Thread API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -94,7 +94,7 @@ void * gpiopoller(void * argp)
     diminuto_mux_init(&mux);
     ppsfd = fileno(pollerp->ppsfp);
     rc = diminuto_mux_register_interrupt(&mux, ppsfd);
-    diminuto_assert(rc >= 0);
+    diminuto_contract(rc >= 0);
 
     while (!0) {
         DIMINUTO_COHERENT_SECTION_BEGIN;
@@ -109,7 +109,7 @@ void * gpiopoller(void * argp)
         while (!0) {
             fd = diminuto_mux_ready_interrupt(&mux);
             if (fd < 0) { break; }
-            diminuto_assert(fd == ppsfd);
+            diminuto_contract(fd == ppsfd);
             rc = diminuto_pin_get(pollerp->ppsfp);
             if (rc < 0) { break; }
             nowpps = !!rc;

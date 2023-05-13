@@ -2429,6 +2429,14 @@ int hazer_parse_zda(hazer_position_t * positionp, char * vector[], size_t count)
         positionp->utc_nanoseconds = position.utc_nanoseconds;
         positionp->dmy_nanoseconds = position.dmy_nanoseconds;
         positionp->tz_nanoseconds = position.tz_nanoseconds;
+        /*
+         * We update the time even though it's not completely
+         * clear that is the right thing to do. Some devices,
+         * e.g. the UBX-NEO-F10T, appear to continue to report
+         * the time via NMEA ZDA, presumably using their own
+         * internal real-time clock, even though a fix has been
+         * lost.
+         */
         update_time(positionp);
 
         positionp->label = ZDA;
