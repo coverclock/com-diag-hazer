@@ -116,9 +116,11 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
 void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
 {
-    static const unsigned int SATELLITES = diminuto_countof(va[0].sat);
+    static const unsigned int SATELLITES = diminuto_countof(va[0].sig[0].sat);
+    static const unsigned int SIGNALS = diminuto_countof(va[0].sig);
     static const unsigned int IDENTIFIERS = diminuto_countof(aa[0].id);
     unsigned int system = 0;
+    unsigned int signal = 0;
     unsigned int channel = 0;
     unsigned int satellite = 0;
     unsigned int active = 0;
@@ -129,66 +131,51 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
     marker_t unused = MARKER;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+        for (signal = 0; signal < SIGNALS; ++signal) {
 
-        if (va[system].ticks == 0) { continue; }
+            if (signal >= va[system].signals) { break; }
 
-        limit = va[system].channels;
-        if (limit > va[system].view) { limit = va[system].view; }
-        if (limit > SATELLITES) { limit = SATELLITES; }
+            if (va[system].sig[signal].ticks == 0) { continue; }
 
-        for (satellite = 0; satellite < limit; ++satellite) {
+            limit = va[system].sig[signal].channels;
+            if (limit > SATELLITES) { limit = SATELLITES; }
 
-            if (va[system].sat[satellite].id == 0) { continue; }
+            for (satellite = 0; satellite < limit; ++satellite) {
 
-            ranged = INACTIVE;
-            if (aa[system].ticks == 0) {
-                /* Do nothing. */
-            } else if (aa[system].active == 0) {
-                /* Do nothing. */
-            } else {
-                for (active = 0; active < IDENTIFIERS; ++active) {
+                if (va[system].sig[signal].sat[satellite].id == 0) { continue; }
 
-                    if (active >= aa[system].active) { break; }
-                    if (aa[system].id[active] == 0) { break; }
-                    if (aa[system].id[active] == va[system].sat[satellite].id) { ranged = ACTIVE; }
+                ranged = INACTIVE;
+                if (aa[system].ticks == 0) {
+                    /* Do nothing. */
+                } else if (aa[system].active == 0) {
+                    /* Do nothing. */
+                } else {
+                    for (active = 0; active < IDENTIFIERS; ++active) {
 
+                        if (active >= aa[system].active) { break; }
+                        if (aa[system].id[active] == 0) { break; }
+                        if (aa[system].id[active] == va[system].sig[signal].sat[satellite].id) { ranged = ACTIVE; }
+
+                    }
                 }
+
+                phantom = va[system].sig[signal].sat[satellite].phantom ? PHANTOM : INACTIVE;
+                untracked = va[system].sig[signal].sat[satellite].untracked ? UNTRACKED : INACTIVE;
+                unused = va[system].sig[signal].sat[satellite].unused ? UNUSED : INACTIVE;
+
+                fputs("SAT", fp);
+
+                fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c %c", ++channel, va[system].sig[signal].sat[satellite].id, va[system].sig[signal].sat[satellite].elv_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].azm_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].snr_dbhz, signal, ranged, phantom, untracked, unused);
+
+                fprintf(fp, "%13s", "");
+
+                fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
+
+                fputc('\n', fp);
+
             }
 
-            phantom = va[system].sat[satellite].phantom ? PHANTOM : INACTIVE;
-            untracked = va[system].sat[satellite].untracked ? UNTRACKED : INACTIVE;
-            unused = va[system].sat[satellite].unused ? UNUSED : INACTIVE;
-
-            fputs("SAT", fp);
-
-            fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz %2dsig %c %c %c %c", ++channel, va[system].sat[satellite].id, va[system].sat[satellite].elv_degrees, (wint_t)COMMON_DEGREE, va[system].sat[satellite].azm_degrees, (wint_t)COMMON_DEGREE, va[system].sat[satellite].snr_dbhz, va[system].sat[satellite].signal, ranged, phantom, untracked, unused);
-
-            fprintf(fp, "%13s", "");
-
-            fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
-
-            fputc('\n', fp);
-
         }
-
-#if 0
-        /*
-         * I have gotten GSV sentences from the U-blox ZED-F9P chip
-         * in which I believe the count in the "satellites in view"
-         * field is one more than the total number of satellites 
-         * reported in the aggregate GSV sentences. I upgraded the
-         * FW to 1.11 and still get this message _thousands_ of
-         * times, _always_ on the GLONASS constellation. I reported what
-         * I believe is a bug to U-blox.
-         */
-        if (va[system].pending > 0) {
-            /* Do nothing. */
-        } else if  (va[system].channels == va[system].view) {
-            /* Do nothing. */
-        } else {
-            DIMINUTO_LOG_WARNING("View \"%s\" %u %u %u\n", HAZER_SYSTEM_NAME[system], va[system].pending, va[system].channels, va[system].view);
-        }
-#endif
 
     }
 

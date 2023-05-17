@@ -1574,18 +1574,22 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
             active.mode = HAZER_MODE_TOTAL;
         }
 
+        /*
+         * All of the satellite ID fields may be null (empty) if the GSA
+         * sentence is merely reporting the DOP values.
+         */
+
         for (slot = 0; slot < IDENTIFIERS; ++slot) {
-            id = strtol(vector[index], &end, 10);
-            if (*end != '\0') {
-                errno = EINVAL;
-                break;
+            if (strlen(vector[index]) > 0) {
+                id = strtol(vector[index], &end, 10);
+                if (*end != '\0') {
+                    errno = EINVAL;
+                    break;
+                }
+                active.id[slot] = id;
+                ++satellites;
+                ++index;
             }
-            if (id <= 0) {
-                break;
-            }
-            active.id[slot] = id;
-            ++satellites;
-            ++index;
         }
         if (*end != '\0') {
             break;
@@ -1672,18 +1676,18 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int rc = -1;
     int messages = 0;
     int message = 0;
-    int index = 4;
-    int slot = 0;
-    int sequence = 0;
+    int channels = 0;
     int channel = 0;
-    int first = 0;
-    int past = 0;
-    int satellites = 0;
     int signal = 0;
+    int satellites = 0;
+    int sequence = 0;
+    int index = 4;
+    int offset = 0;
+    int slot = 0;
     unsigned int id = 0;
     char * end = (char *)0;
-    hazer_view_t view = HAZER_VIEW_INITIALIZER;
-    static const int SATELLITES = sizeof(viewp->sat) / sizeof(viewp->sat[0]);
+    hazer_band_t band = HAZER_BAND_INITIALIZER;
+    static const int SATELLITES = sizeof(viewp->sig[0].sat) / sizeof(viewp->sig[0].sat[0]);
     static const char GSV[] = HAZER_NMEA_SENTENCE_GSV;
 
     do {
@@ -1749,10 +1753,6 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          * octal).
          */
 
-        sequence = message - 1;
-        channel = sequence * HAZER_GNSS_VIEWS;
-        first = channel;
-        past = channel;
         satellites = strtol(vector[3], &end, 10);
         if (*end != '\0') {
             errno = EINVAL;
@@ -1769,51 +1769,11 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
 
         for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
         
-            if (channel >= satellites) {
-                break;
-            }
-
-            if (channel >= SATELLITES) {
-                break;
-            }
-
-            /*
-             * I'm pretty sure my U-Blox ZED-F9P-00B-01 chip has a
-             * firmware bug. I believe this GSV sentence that it
-             * sent is incorrect.
-             *
-             * $GLGSV,3,3,11,85,26,103,25,86,02,152,29,1*75\r\n
-             *
-             * I think either there should be a third set of four
-             * fields for the eleventh satellite, or the total count
-             * should be ten instead of eleven. So we check for that
-             * here.
-             *
-             * We don't emit an error message because it happens all
-             * time time; we'd flood the log file.
-             */
-
-            
-            /*
-             * I'm pretty sure my U-Blox ZED-F9R-00B-00 chip has a
-             * firmware bug. I believe thesze two successive GSV sentencest
-             * that it send are probably incorrect.
-             *
-             * $GBGSV,1,1,04,23,15,154,34,27,57,250,33,28,65,039,36,37,61,186,44,1*7A\r\n
-             * $GBGSV,1,1,02,14,03,072,,30,07,241,,0*75\r\n
-             *
-             * Note that they both identify as messages 1 of 1, instead of
-             * messages 1 of 2 and 2 of 2. While this is possible, it seems
-             * unlikely. Because the second message appears to override the
-             * first message, the satellites in the first message do not
-             * appear in the Hazer SAT output, even though they are in the
-             * GSA message and hence in the Hazer ACT output.
-             *
-             * So far I have only noticed this in the NMEA sentences for
-             * the Chinese Beidou (GB) constellation.
-             */
-
             if ((index + 4) >= count) {
+                break;
+            }
+
+            if (strlen(vector[index]) == 0) {
                 break;
             }
 
@@ -1823,12 +1783,9 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
                 break;
             }
 
-            ++index;
+            band.sat[channel].id = id;
 
-            if (id <= 0) {
-                break;
-            }
-            view.sat[channel].id = id;
+            ++index;
 
             /*
              * "For efficiency it is recommended that null fields be used
@@ -1839,18 +1796,18 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
              * just apply to the (newish) signal ID in the last field?
              */
 
-            view.sat[channel].phantom = 0;
+            band.sat[channel].phantom = 0;
 
             if (strlen(vector[index]) == 0) {
-                view.sat[channel].phantom = !0;
-                view.sat[channel].elv_degrees = 0;
+                band.sat[channel].phantom = !0;
+                band.sat[channel].elv_degrees = 0;
             } else {
-                view.sat[channel].elv_degrees = strtol(vector[index], &end, 10);
+                band.sat[channel].elv_degrees = strtol(vector[index], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
                     break;
                 }
-                if (!hazer_is_valid_elevation(view.sat[channel].elv_degrees)) {
+                if (!hazer_is_valid_elevation(band.sat[channel].elv_degrees)) {
                     errno = ERANGE;
                     break;
                 }
@@ -1859,15 +1816,15 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             ++index;
 
             if (strlen(vector[index]) == 0) {
-                view.sat[channel].phantom = !0;
-                view.sat[channel].azm_degrees = 0;
+                band.sat[channel].phantom = !0;
+                band.sat[channel].azm_degrees = 0;
             } else {
-                view.sat[channel].azm_degrees = strtol(vector[index], &end, 10);
+                band.sat[channel].azm_degrees = strtol(vector[index], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
                     break;
                 }
-                if (!hazer_is_valid_azimuth(view.sat[channel].azm_degrees)) {
+                if (!hazer_is_valid_azimuth(band.sat[channel].azm_degrees)) {
                     errno = ERANGE;
                     break;
                 }
@@ -1876,109 +1833,116 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             ++index;
 
             if (strlen(vector[index]) == 0) {
-                view.sat[channel].untracked = !0;
-                view.sat[channel].snr_dbhz = 0;
+                band.sat[channel].untracked = !0;
+                band.sat[channel].snr_dbhz = 0;
             } else {
-                view.sat[channel].untracked = 0;
-                view.sat[channel].snr_dbhz = strtol(vector[index], &end, 10);
+                band.sat[channel].untracked = 0;
+                band.sat[channel].snr_dbhz = strtol(vector[index], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
                     break;
                 }
-                if (!hazer_is_valid_signaltonoiseratio(view.sat[channel].snr_dbhz)) {
+                if (!hazer_is_valid_signaltonoiseratio(band.sat[channel].snr_dbhz)) {
                     errno = ERANGE;
                     break;
                 }
             }
 
             ++index;
-
-            past = ++channel;
+            ++channel;
 
         }
         if (*end != '\0') {
             break;
         }
 
-        view.channels = channel;
-        view.view = satellites;
-        view.pending = messages - message;
-        view.label = GSV;
 
         /*
          * NMEA 0183 4.10 2012 has an additional field containing the
-         * signal identifier. This is constellation specific, but
+         * Signal IDentifier. This is constellation specific, but
          * indicates what frequency band was used, e.g. for GPS: L1C/A,
-         * L2, etc. It complicates things by applying to all of the
-         * satellites in this particular message, but we don't know
-         * if the field exists until we have processed all the
-         * satellites in this message. If it is present, it applies
-         * to all the satellites in this message.
+         * L2, etc. NMEA 0183 4.10 implies this field is in hex: 0..F.
+         *
+         * NMEA 0183 4.10 Note 4 p. 96: "This field shall not be null."
+         * But if it happens to be null (empty), we have to handle it in
+         * a reasonable way (which includes rejecting it).
+         *
+         * NMEA 0183 4.11 p. 98: "When more than one ranging signal is
+         * used per satellite, separate GSV sentences with a System ID
+         * corresponding to the ranging signals shall be required." Note
+         * that this does not imply that the GSV sentences can't be in
+         * a single grouping of consecutive sentences. Merely that all
+         * of the reported satellites in a single GSV sentence are in
+         * the same system and have the same signal (band).
          */
 
         if (index > (count - 2)) {
-            signal = 0;
-        } else if (strlen(vector[count - 2]) > 0) {
-            signal = strtol(vector[count - 2], &end, 10);
+            /* Do nothing. */
+        } else if (strlen(vector[count - 2]) == 0) {
+            /* Do nothing. */
+        } else {
+            signal = strtol(vector[count - 2], &end, 16);
             if (*end != '\0') {
                 errno = EINVAL;
                 break;
             }
-        } else if (first > 0) {
-            /*
-             * We have to reference the actual structure, not the
-             * working structure.
-             */
-            signal = viewp->sat[first - 1].signal;
-        } else {
-            signal = 0;
         }
 
-        for (channel = first; channel < past; ++channel) {
-            if (channel >= satellites) {
-                break;
-            }
-            if (channel >= SATELLITES) {
-                break;
-            }
-            view.sat[channel].signal = signal;
+        if (!((0 <= signal) && (signal < HAZER_GNSS_SIGNALS))) {
+            errno = E2BIG;
+            break;
         }
+
+        /*
+         * Now we have to figure out how to map the local structure
+         * into the structure passed by the caller.
+         */
+
+        sequence = message - 1;
+        if (sequence == 0) {
+            /*
+             * First GSV sentence in group.
+             */
+            offset = 0;
+        } else if (signal == viewp->signal) {
+            /*
+             * Subsequent GSV sentence in group with same band.
+             */
+            offset = sequence * HAZER_GNSS_VIEWS;
+        } else {
+            /*
+             * Subsequent GSV sentence in group with different band.
+             */
+            offset = viewp->sig[signal].channels;
+        }
+        channels = offset + channel;
 
         /*
          * APPLY
          */
 
-        for (channel = first; channel < past; ++channel) {
+        viewp->label = GSV;
+
+        index = 0;
+        for (channel = offset; channel < channels; ++channel) {
             if (channel >= satellites) {
                 break;
             }
             if (channel >= SATELLITES) {
                 break;
             }
-            viewp->sat[channel].id = view.sat[channel].id;
-            viewp->sat[channel].phantom = view.sat[channel].phantom;
-            viewp->sat[channel].elv_degrees = view.sat[channel].elv_degrees;
-            viewp->sat[channel].azm_degrees = view.sat[channel].azm_degrees;
-            viewp->sat[channel].untracked = view.sat[channel].untracked;
-            viewp->sat[channel].snr_dbhz = view.sat[channel].snr_dbhz;
-            viewp->sat[channel].signal = view.sat[channel].signal;
+            viewp->sig[signal].sat[channel] = band.sat[index++]; /* Structure copy. */
         }
+        viewp->sig[signal].channels = channel;
+        viewp->sig[signal].visible = satellites; /* Ambiguous. */
 
-        viewp->channels = view.channels;
-        viewp->view = view.view;
-        viewp->pending = view.pending;
+        if (signal >= viewp->signals) {
+            viewp->signals = signal + 1; /* Never decreases. */
+        }
+        viewp->signal = signal;
+        viewp->pending = messages - message;
 
-        viewp->label = GSV;
-
-        /*
-         * Only if this is the last message in the GSV tuple do we
-         * emit a zero return code. That lets the application decide
-         * when it wants to peruse its view database. (We could have
-         * treated this expression like a boolean, but the return code
-         * is genuinely tri-state).
-         */
-
-        rc = (viewp->pending > 0) ? 1 : 0;
+        rc = signal; /* <0..0xF> */
 
     } while (0);
 
@@ -2728,7 +2692,7 @@ int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], ch
     char * end = (char *)0;
     hazer_view_t views[HAZER_SYSTEM_TOTAL] = HAZER_VIEWS_INITIALIZER;
     hazer_active_t actives[HAZER_SYSTEM_TOTAL] = HAZER_ACTIVES_INITIALIZER;
-    static const int SATELLITES = sizeof(views[0].sat) / sizeof(views[0].sat[0]);
+    static const int SATELLITES = sizeof(views[0].sig[0].sat) / sizeof(views[0].sig[0].sat[0]);
     static const int RANGERS = sizeof(actives[0].id) / sizeof(actives[0].id[0]);
     static const char PUBX[] = HAZER_PROPRIETARY_SENTENCE_PUBX;
     static const char ID[] = HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS;
@@ -2795,10 +2759,10 @@ int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], ch
                 continue;
             }
 
-            views[system].sat[channel].id = id;
-            views[system].sat[channel].phantom = 0;
-            views[system].sat[channel].untracked = 0;
-            views[system].sat[channel].unused = 0;
+            views[system].sig[0].sat[channel].id = id;
+            views[system].sig[0].sat[channel].phantom = 0;
+            views[system].sig[0].sat[channel].untracked = 0;
+            views[system].sig[0].sat[channel].unused = 0;
 
             if (strcmp(vector[index + 1], "e") == 0) {
                 /* Do nothing. */
@@ -2813,67 +2777,65 @@ int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], ch
                 actives[system].system = system;
                 actives[system].label = PUBX;
             } else if (strcmp(vector[index + 1], "-") == 0) {
-                views[system].sat[channel].unused = !0;
+                views[system].sig[0].sat[channel].unused = !0;
             } else {
                 /* Should never happen, and not clear what it means if it does. */
-                views[system].sat[channel].phantom = !0;
-                views[system].sat[channel].untracked = !0;
-                views[system].sat[channel].unused = !0;
+                views[system].sig[0].sat[channel].phantom = !0;
+                views[system].sig[0].sat[channel].untracked = !0;
+                views[system].sig[0].sat[channel].unused = !0;
             }
 
             if (strlen(vector[index + 2]) == 0) {
-                views[system].sat[channel].phantom = !0;
-                views[system].sat[channel].azm_degrees = 0;
+                views[system].sig[0].sat[channel].phantom = !0;
+                views[system].sig[0].sat[channel].azm_degrees = 0;
             } else {
-                views[system].sat[channel].azm_degrees = strtol(vector[index + 2], &end, 10);
+                views[system].sig[0].sat[channel].azm_degrees = strtol(vector[index + 2], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
                     break;
                 }
-                if (!hazer_is_valid_azimuth(views[system].sat[channel].azm_degrees)) {
+                if (!hazer_is_valid_azimuth(views[system].sig[0].sat[channel].azm_degrees)) {
                     errno = ERANGE;
                     break;
                 }
             }
 
             if (strlen(vector[index + 3]) == 0) {
-                views[system].sat[channel].phantom = !0;
-                views[system].sat[channel].elv_degrees = 0;
+                views[system].sig[0].sat[channel].phantom = !0;
+                views[system].sig[0].sat[channel].elv_degrees = 0;
             } else {
-                views[system].sat[channel].elv_degrees = strtol(vector[index + 3], &end, 10);
+                views[system].sig[0].sat[channel].elv_degrees = strtol(vector[index + 3], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
                     break;
                 }
-                if (!hazer_is_valid_elevation(views[system].sat[channel].elv_degrees)) {
+                if (!hazer_is_valid_elevation(views[system].sig[0].sat[channel].elv_degrees)) {
                     errno = ERANGE;
                     break;
                 }
             }
 
             if (strlen(vector[index + 4]) == 0) {
-                views[system].sat[channel].untracked = !0;
-                views[system].sat[channel].snr_dbhz = 0;
+                views[system].sig[0].sat[channel].untracked = !0;
+                views[system].sig[0].sat[channel].snr_dbhz = 0;
             } else {
-                views[system].sat[channel].snr_dbhz = strtol(vector[index + 4], &end, 10);
+                views[system].sig[0].sat[channel].snr_dbhz = strtol(vector[index + 4], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
                     break;
                 }
-                if (!hazer_is_valid_signaltonoiseratio(views[system].sat[channel].snr_dbhz)) {
+                if (!hazer_is_valid_signaltonoiseratio(views[system].sig[0].sat[channel].snr_dbhz)) {
                     errno = ERANGE;
                     break;
                 }
             }
 
-            views[system].sat[channel].signal = 0;
-
             channel += 1;
 
             channels[system] = channel;
 
-            views[system].channels = channel;
-            views[system].view = satellites;
+            views[system].sig[0].channels = channel;
+            views[system].sig[0].visible = satellites;
 
             result |= (1 << system);
 
@@ -2889,17 +2851,17 @@ int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], ch
          */
 
         for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
+
             if ((result & (1 << system)) != 0) {
 
                 viewa[system].label = PUBX;
 
-                for (channel = 0; channel < views[system].channels; ++channel) {
-                    viewa[system].sat[channel] = views[system].sat[channel]; /* Structure copy. */
+                for (channel = 0; channel < views[system].sig[0].channels; ++channel) {
+                    viewa[system].sig[0].sat[channel] = views[system].sig[0].sat[channel]; /* Structure copy. */
                 }
 
-                viewa[system].view = views[system].view;
-                viewa[system].channels = views[system].channels;
-                viewa[system].pending = 0;
+                viewa[system].sig[0].channels = views[system].sig[0].channels;
+                viewa[system].sig[0].visible = views[system].sig[0].visible;
 
                 activea[system].label = PUBX;
 
@@ -2911,7 +2873,14 @@ int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], ch
                 activea[system].active = actives[system].active;
                 activea[system].mode = actives[system].mode;
 
+                if (0 >= viewa[system].signals) {
+                    viewa[system].signals = 0 + 1;
+                }
+
+                viewa[system].pending = 0;
+
             }
+
         }
 
         rc = result;
@@ -3005,14 +2974,17 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
 int hazer_has_pending_gsv(const hazer_view_t va[], size_t count)
 {
     size_t ii = 0;
+    size_t jj = 0;
 
-    for (ii = 0; ii < count; ++ii) {
-        if (va[ii].ticks == 0) {
-            /* Do nothing. */
-        } else if (va[ii].pending == 0) {
-            /* Do nothing. */
-        } else {
-            return !0;
+    for (ii = 0; (ii < HAZER_SYSTEM_TOTAL) && (ii < count); ++ii) {
+fprintf(stderr, "DEBUG ii=%zu pending=%u\n", ii, va[ii].pending);
+        if (va[ii].pending > 0) {
+            for (jj = 0; (jj < HAZER_GNSS_SIGNALS) && (jj < va[ii].signals); ++jj) {
+fprintf(stderr, "DEBUG jj=%zu ticks=%u\n", jj, va[ii].sig[jj].ticks);
+                if (va[ii].sig[jj].ticks > 0) {
+                    return !0;
+                }
+            }
         }
     }
 
@@ -3023,7 +2995,7 @@ int hazer_has_valid_time(const hazer_position_t pa[], size_t count)
 {
     size_t ii = 0;
 
-    for (ii = 0; ii < count; ++ii) {
+    for (ii = 0; (ii < HAZER_SYSTEM_TOTAL) && (ii < count); ++ii) {
         if (hazer_is_valid_time(&(pa[ii]))) {
             return !0;
         }

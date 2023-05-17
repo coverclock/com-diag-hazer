@@ -628,114 +628,101 @@ int main(void)
             assert(rc == !0);
 
             rc = hazer_parse_gsv(&view, vector, count);
-            assert(((ii == 3) && (rc == 0)) || (rc > 0));
+            assert(rc == 0);
             assert(strcmp(view.label, "GSV") == 0);
-            assert(view.view == 15);
 
-            view.ticks = 0;
+            view.sig[0].ticks = 0;
             rc = hazer_has_pending_gsv(&view, 1);
             assert(rc == 0);
-
-            view.ticks = 1;
+            view.sig[0].ticks = 1;
             rc = hazer_has_pending_gsv(&view, 1);
-            assert(rc == (ii < (((sizeof(DATA) / sizeof(DATA[0]))) - 1)));
+            assert(rc == ((ii < 3) ? !0 : 0));
+            view.sig[0].ticks = 1;
 
         }
 
         assert(strcmp(view.label, "GSV") == 0);
-        assert(view.channels == 15);
+        assert(view.signals == 1);
+        assert(view.signal == 0);
         assert(view.pending == 0);
-        assert(view.view == 15);
 
-        assert(view.sat[0].id == 1);
-        assert(view.sat[0].elv_degrees == 37);
-        assert(view.sat[0].azm_degrees == 78);
-        assert(view.sat[0].snr_dbhz == 36);
-        assert(view.sat[0].signal == 0);
+        assert(view.sig[0].channels == 15);
+        assert(view.sig[0].visible == 15);
 
-        assert(view.sat[1].id == 6);
-        assert(view.sat[1].elv_degrees == 2);
-        assert(view.sat[1].azm_degrees == 184);
-        assert(view.sat[1].snr_dbhz == 29);
-        assert(view.sat[1].signal == 0);
+        assert(view.sig[0].sat[0].id == 1);
+        assert(view.sig[0].sat[0].elv_degrees == 37);
+        assert(view.sig[0].sat[0].azm_degrees == 78);
+        assert(view.sig[0].sat[0].snr_dbhz == 36);
 
-        assert(view.sat[2].id == 7);
-        assert(view.sat[2].elv_degrees == 28);
-        assert(view.sat[2].azm_degrees == 143);
-        assert(view.sat[2].snr_dbhz == 44);
-        assert(view.sat[2].signal == 0);
+        assert(view.sig[0].sat[1].id == 6);
+        assert(view.sig[0].sat[1].elv_degrees == 2);
+        assert(view.sig[0].sat[1].azm_degrees == 184);
+        assert(view.sig[0].sat[1].snr_dbhz == 29);
 
-        assert(view.sat[3].id == 8);
-        assert(view.sat[3].elv_degrees == 0);
-        assert(view.sat[3].azm_degrees == 48);
-        assert(view.sat[3].snr_dbhz == 22);
-        assert(view.sat[3].signal == 0);
+        assert(view.sig[0].sat[2].id == 7);
+        assert(view.sig[0].sat[2].elv_degrees == 28);
+        assert(view.sig[0].sat[2].azm_degrees == 143);
+        assert(view.sig[0].sat[2].snr_dbhz == 44);
 
-        assert(view.sat[4].id == 11);
-        assert(view.sat[4].elv_degrees == 36);
-        assert(view.sat[4].azm_degrees == 59);
-        assert(view.sat[4].snr_dbhz == 30);
-        assert(view.sat[4].signal == 0);
+        assert(view.sig[0].sat[3].id == 8);
+        assert(view.sig[0].sat[3].elv_degrees == 0);
+        assert(view.sig[0].sat[3].azm_degrees == 48);
+        assert(view.sig[0].sat[3].snr_dbhz == 22);
 
-        assert(view.sat[5].id == 13);
-        assert(view.sat[5].elv_degrees == 36);
-        assert(view.sat[5].azm_degrees == 270);
-        assert(view.sat[5].snr_dbhz == 37);
-        assert(view.sat[5].signal == 0);
+        assert(view.sig[0].sat[4].id == 11);
+        assert(view.sig[0].sat[4].elv_degrees == 36);
+        assert(view.sig[0].sat[4].azm_degrees == 59);
+        assert(view.sig[0].sat[4].snr_dbhz == 30);
 
-        assert(view.sat[6].id == 15);
-        assert(view.sat[6].elv_degrees == 15);
-        assert(view.sat[6].azm_degrees == 304);
-        assert(view.sat[6].snr_dbhz == 28);
-        assert(view.sat[6].signal == 0);
+        assert(view.sig[0].sat[5].id == 13);
+        assert(view.sig[0].sat[5].elv_degrees == 36);
+        assert(view.sig[0].sat[5].azm_degrees == 270);
+        assert(view.sig[0].sat[5].snr_dbhz == 37);
 
-        assert(view.sat[7].id == 17);
-        assert(view.sat[7].elv_degrees == 63);
-        assert(view.sat[7].azm_degrees == 226);
-        assert(view.sat[7].snr_dbhz == 40);
-        assert(view.sat[7].signal == 0);
+        assert(view.sig[0].sat[6].id == 15);
+        assert(view.sig[0].sat[6].elv_degrees == 15);
+        assert(view.sig[0].sat[6].azm_degrees == 304);
+        assert(view.sig[0].sat[6].snr_dbhz == 28);
 
-        assert(view.sat[8].id == 18);
-        assert(view.sat[8].elv_degrees == 24);
-        assert(view.sat[8].azm_degrees == 52);
-        assert(view.sat[8].snr_dbhz == 32);
-        assert(view.sat[8].signal == 0);
+        assert(view.sig[0].sat[7].id == 17);
+        assert(view.sig[0].sat[7].elv_degrees == 63);
+        assert(view.sig[0].sat[7].azm_degrees == 226);
+        assert(view.sig[0].sat[7].snr_dbhz == 40);
 
-        assert(view.sat[9].id == 19);
-        assert(view.sat[9].elv_degrees == 32);
-        assert(view.sat[9].azm_degrees == 223);
-        assert(view.sat[9].snr_dbhz == 36);
-        assert(view.sat[9].signal == 0);
+        assert(view.sig[0].sat[8].id == 18);
+        assert(view.sig[0].sat[8].elv_degrees == 24);
+        assert(view.sig[0].sat[8].azm_degrees == 52);
+        assert(view.sig[0].sat[8].snr_dbhz == 32);
 
-        assert(view.sat[10].id == 28);
-        assert(view.sat[10].elv_degrees == 67);
-        assert(view.sat[10].azm_degrees == 20);
-        assert(view.sat[10].snr_dbhz == 28);
-        assert(view.sat[10].signal == 0);
+        assert(view.sig[0].sat[9].id == 19);
+        assert(view.sig[0].sat[9].elv_degrees == 32);
+        assert(view.sig[0].sat[9].azm_degrees == 223);
+        assert(view.sig[0].sat[9].snr_dbhz == 36);
 
-        assert(view.sat[11].id == 30);
-        assert(view.sat[11].elv_degrees == 59);
-        assert(view.sat[11].azm_degrees == 149);
-        assert(view.sat[11].snr_dbhz == 38);
-        assert(view.sat[11].signal == 0);
+        assert(view.sig[0].sat[10].id == 28);
+        assert(view.sig[0].sat[10].elv_degrees == 67);
+        assert(view.sig[0].sat[10].azm_degrees == 20);
+        assert(view.sig[0].sat[10].snr_dbhz == 28);
 
-        assert(view.sat[12].id == 46);
-        assert(view.sat[12].elv_degrees == 38);
-        assert(view.sat[12].azm_degrees == 215);
-        assert(view.sat[12].snr_dbhz == 40);
-        assert(view.sat[12].signal == 0);
+        assert(view.sig[0].sat[11].id == 30);
+        assert(view.sig[0].sat[11].elv_degrees == 59);
+        assert(view.sig[0].sat[11].azm_degrees == 149);
+        assert(view.sig[0].sat[11].snr_dbhz == 38);
 
-        assert(view.sat[13].id == 48);
-        assert(view.sat[13].elv_degrees == 36);
-        assert(view.sat[13].azm_degrees == 220);
-        assert(view.sat[13].snr_dbhz == 34);
-        assert(view.sat[13].signal == 0);
+        assert(view.sig[0].sat[12].id == 46);
+        assert(view.sig[0].sat[12].elv_degrees == 38);
+        assert(view.sig[0].sat[12].azm_degrees == 215);
+        assert(view.sig[0].sat[12].snr_dbhz == 40);
 
-        assert(view.sat[14].id == 51);
-        assert(view.sat[14].elv_degrees == 44);
-        assert(view.sat[14].azm_degrees == 183);
-        assert(view.sat[14].snr_dbhz == 45);
-        assert(view.sat[14].signal == 0);
+        assert(view.sig[0].sat[13].id == 48);
+        assert(view.sig[0].sat[13].elv_degrees == 36);
+        assert(view.sig[0].sat[13].azm_degrees == 220);
+        assert(view.sig[0].sat[13].snr_dbhz == 34);
+
+        assert(view.sig[0].sat[14].id == 51);
+        assert(view.sig[0].sat[14].elv_degrees == 44);
+        assert(view.sig[0].sat[14].azm_degrees == 183);
+        assert(view.sig[0].sat[14].snr_dbhz == 45);
 
     }
 
@@ -757,6 +744,7 @@ int main(void)
         uint8_t lsn = 0;
         hazer_buffer_t temporary = { 0 };
         int ii = 0;
+        int jj = 0;
 
         for (ii = 0; ii < (sizeof(DATA) / sizeof(DATA[0])); ++ii) {
 
@@ -790,115 +778,111 @@ int main(void)
             rc = hazer_is_nmea_name(vector, count, "GSV");
             assert(rc == !0);
 
-            rc = hazer_parse_gsv(&view, vector, count);
-            assert(((ii == 3) && (rc == 0)) || (rc > 0));
-            assert(strcmp(view.label, "GSV") == 0);
-            assert(view.view == 15);
+            jj = hazer_parse_gsv(&view, vector, count);
+fprintf(stderr, "DEBUG ii=%d jj=%d errno=%d=\"%s\"\n", ii, jj, errno, strerror(errno));
+            assert(jj == (ii == 0) ? 1 : (ii == 1) ? 2 : (ii == 2) ? 0 : 3);
 
-            view.ticks = 0;
+            view.sig[jj].ticks = 0;
             rc = hazer_has_pending_gsv(&view, 1);
             assert(rc == 0);
-
-            view.ticks = 1;
+            view.sig[jj].ticks = 1;
             rc = hazer_has_pending_gsv(&view, 1);
-            assert(rc == (ii < (((sizeof(DATA) / sizeof(DATA[0]))) - 1)));
+            assert(rc == ((ii < 3) ? !0 : 0));
+            view.sig[jj].ticks = 0;
 
         }
 
         assert(strcmp(view.label, "GSV") == 0);
-        assert(view.channels == 15);
+        assert(view.signals == 4);
+        assert(view.signal == 3);
         assert(view.pending == 0);
-        assert(view.view == 15);
 
-        assert(view.sat[0].id == 1);
-        assert(view.sat[0].elv_degrees == 37);
-        assert(view.sat[0].azm_degrees == 78);
-        assert(view.sat[0].snr_dbhz == 36);
-        assert(view.sat[0].signal == 1);
+        assert(view.sig[1].channels == 4);
+        assert(view.sig[1].visible == 15);
 
-        assert(view.sat[1].id == 6);
-        assert(view.sat[1].elv_degrees == 2);
-        assert(view.sat[1].azm_degrees == 184);
-        assert(view.sat[1].snr_dbhz == 29);
-        assert(view.sat[1].signal == 1);
+        assert(view.sig[1].sat[0].id == 1);
+        assert(view.sig[1].sat[0].elv_degrees == 37);
+        assert(view.sig[1].sat[0].azm_degrees == 78);
+        assert(view.sig[1].sat[0].snr_dbhz == 36);
 
-        assert(view.sat[2].id == 7);
-        assert(view.sat[2].elv_degrees == 28);
-        assert(view.sat[2].azm_degrees == 143);
-        assert(view.sat[2].snr_dbhz == 44);
-        assert(view.sat[2].signal == 1);
+        assert(view.sig[1].sat[1].id == 6);
+        assert(view.sig[1].sat[1].elv_degrees == 2);
+        assert(view.sig[1].sat[1].azm_degrees == 184);
+        assert(view.sig[1].sat[1].snr_dbhz == 29);
 
-        assert(view.sat[3].id == 8);
-        assert(view.sat[3].elv_degrees == 0);
-        assert(view.sat[3].azm_degrees == 48);
-        assert(view.sat[3].snr_dbhz == 22);
-        assert(view.sat[3].signal == 1);
+        assert(view.sig[1].sat[2].id == 7);
+        assert(view.sig[1].sat[2].elv_degrees == 28);
+        assert(view.sig[1].sat[2].azm_degrees == 143);
+        assert(view.sig[1].sat[2].snr_dbhz == 44);
 
-        assert(view.sat[4].id == 11);
-        assert(view.sat[4].elv_degrees == 36);
-        assert(view.sat[4].azm_degrees == 59);
-        assert(view.sat[4].snr_dbhz == 30);
-        assert(view.sat[4].signal == 2);
+        assert(view.sig[1].sat[3].id == 8);
+        assert(view.sig[1].sat[3].elv_degrees == 0);
+        assert(view.sig[1].sat[3].azm_degrees == 48);
+        assert(view.sig[1].sat[3].snr_dbhz == 22);
 
-        assert(view.sat[5].id == 13);
-        assert(view.sat[5].elv_degrees == 36);
-        assert(view.sat[5].azm_degrees == 270);
-        assert(view.sat[5].snr_dbhz == 37);
-        assert(view.sat[5].signal == 2);
+        assert(view.sig[2].channels == 4);
+        assert(view.sig[2].visible == 15);
 
-        assert(view.sat[6].id == 15);
-        assert(view.sat[6].elv_degrees == 15);
-        assert(view.sat[6].azm_degrees == 304);
-        assert(view.sat[6].snr_dbhz == 28);
-        assert(view.sat[6].signal == 2);
+        assert(view.sig[2].sat[0].id == 11);
+        assert(view.sig[2].sat[0].elv_degrees == 36);
+        assert(view.sig[2].sat[0].azm_degrees == 59);
+        assert(view.sig[2].sat[0].snr_dbhz == 30);
 
-        assert(view.sat[7].id == 17);
-        assert(view.sat[7].elv_degrees == 63);
-        assert(view.sat[7].azm_degrees == 226);
-        assert(view.sat[7].snr_dbhz == 40);
-        assert(view.sat[7].signal == 2);
+        assert(view.sig[2].sat[1].id == 13);
+        assert(view.sig[2].sat[1].elv_degrees == 36);
+        assert(view.sig[2].sat[1].azm_degrees == 270);
+        assert(view.sig[2].sat[1].snr_dbhz == 37);
 
-        assert(view.sat[8].id == 18);
-        assert(view.sat[8].elv_degrees == 24);
-        assert(view.sat[8].azm_degrees == 52);
-        assert(view.sat[8].snr_dbhz == 32);
-        assert(view.sat[8].signal == 2);
+        assert(view.sig[2].sat[2].id == 15);
+        assert(view.sig[2].sat[2].elv_degrees == 15);
+        assert(view.sig[2].sat[2].azm_degrees == 304);
+        assert(view.sig[2].sat[2].snr_dbhz == 28);
 
-        assert(view.sat[9].id == 19);
-        assert(view.sat[9].elv_degrees == 32);
-        assert(view.sat[9].azm_degrees == 223);
-        assert(view.sat[9].snr_dbhz == 36);
-        assert(view.sat[9].signal == 2);
+        assert(view.sig[2].sat[3].id == 17);
+        assert(view.sig[2].sat[3].elv_degrees == 63);
+        assert(view.sig[2].sat[3].azm_degrees == 226);
+        assert(view.sig[2].sat[3].snr_dbhz == 40);
 
-        assert(view.sat[10].id == 28);
-        assert(view.sat[10].elv_degrees == 67);
-        assert(view.sat[10].azm_degrees == 20);
-        assert(view.sat[10].snr_dbhz == 28);
-        assert(view.sat[10].signal == 2);
+        assert(view.sig[0].channels == 4);
+        assert(view.sig[0].visible == 15);
 
-        assert(view.sat[11].id == 30);
-        assert(view.sat[11].elv_degrees == 59);
-        assert(view.sat[11].azm_degrees == 149);
-        assert(view.sat[11].snr_dbhz == 38);
-        assert(view.sat[11].signal == 2);
+        assert(view.sig[0].sat[0].id == 18);
+        assert(view.sig[0].sat[0].elv_degrees == 24);
+        assert(view.sig[0].sat[0].azm_degrees == 52);
+        assert(view.sig[0].sat[0].snr_dbhz == 32);
 
-        assert(view.sat[12].id == 46);
-        assert(view.sat[12].elv_degrees == 38);
-        assert(view.sat[12].azm_degrees == 215);
-        assert(view.sat[12].snr_dbhz == 40);
-        assert(view.sat[12].signal == 3);
+        assert(view.sig[0].sat[1].id == 19);
+        assert(view.sig[0].sat[1].elv_degrees == 32);
+        assert(view.sig[0].sat[1].azm_degrees == 223);
+        assert(view.sig[0].sat[1].snr_dbhz == 36);
 
-        assert(view.sat[13].id == 48);
-        assert(view.sat[13].elv_degrees == 36);
-        assert(view.sat[13].azm_degrees == 220);
-        assert(view.sat[13].snr_dbhz == 34);
-        assert(view.sat[13].signal == 3);
+        assert(view.sig[0].sat[2].id == 28);
+        assert(view.sig[0].sat[2].elv_degrees == 67);
+        assert(view.sig[0].sat[2].azm_degrees == 20);
+        assert(view.sig[0].sat[2].snr_dbhz == 28);
 
-        assert(view.sat[14].id == 51);
-        assert(view.sat[14].elv_degrees == 44);
-        assert(view.sat[14].azm_degrees == 183);
-        assert(view.sat[14].snr_dbhz == 45);
-        assert(view.sat[14].signal == 3);
+        assert(view.sig[0].sat[3].id == 30);
+        assert(view.sig[0].sat[3].elv_degrees == 59);
+        assert(view.sig[0].sat[3].azm_degrees == 149);
+        assert(view.sig[0].sat[3].snr_dbhz == 38);
+
+        assert(view.sig[3].channels == 3);
+        assert(view.sig[3].visible == 15);
+
+        assert(view.sig[3].sat[0].id == 46);
+        assert(view.sig[3].sat[0].elv_degrees == 38);
+        assert(view.sig[3].sat[0].azm_degrees == 215);
+        assert(view.sig[3].sat[0].snr_dbhz == 40);
+
+        assert(view.sig[3].sat[1].id == 48);
+        assert(view.sig[3].sat[1].elv_degrees == 36);
+        assert(view.sig[3].sat[1].azm_degrees == 220);
+        assert(view.sig[3].sat[1].snr_dbhz == 34);
+
+        assert(view.sig[3].sat[2].id == 51);
+        assert(view.sig[3].sat[2].elv_degrees == 44);
+        assert(view.sig[3].sat[2].azm_degrees == 183);
+        assert(view.sig[3].sat[2].snr_dbhz == 45);
     }
 
     {

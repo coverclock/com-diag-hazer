@@ -308,6 +308,7 @@ int main(int argc, char * argv[])
     hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    hazer_system_t maximum = HAZER_SYSTEM_TOTAL;
     hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
     /*
      * NMEA state databases.
@@ -405,6 +406,7 @@ int main(int argc, char * argv[])
     int rc = 0;
     char * locale = (char *)0;
     int ii = 0;
+    int jj = 0;
     /*
      * External symbols.
      */
@@ -801,7 +803,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -H HEADLESS     Like -R but writes each iteration to HEADLESS file.\n");
             fprintf(stderr, "       -I PIN          Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).\n");
             fprintf(stderr, "       -K              Write input to DEVICE sinK from datagram source.\n");
-            fprintf(stderr, "       -L FILE         Write pretty-printed input to FILE file.\n");
+            fprintf(stderr, "       -L FILE         Write pretty-printed input to Listing FILE.\n");
             fprintf(stderr, "       -M              Run in the background as a daeMon.\n");
             fprintf(stderr, "       -N FILE         Use fix FILE to save ARP LLH for subsequeNt fixed mode.\n");
             fprintf(stderr, "       -O FILE         Save process identifier in FILE.\n");
@@ -1536,6 +1538,8 @@ int main(int argc, char * argv[])
 
     sync = 0;
     frame = 0;
+
+    maximum = 0;
 
     io_maximum = 0;
     io_total = 0;
@@ -2396,10 +2400,12 @@ consume:
 
         if (elapsed > 0) {
 
-            for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
+            for (ii = 0; (ii < HAZER_SYSTEM_TOTAL) && (ii <= maximum); ++ii) {
                 countdown(&position[ii].ticks, elapsed);
                 countdown(&active[ii].ticks, elapsed);
-                countdown(&view[ii].ticks, elapsed);
+                for (jj = 0; (jj < HAZER_GNSS_SIGNALS) && (jj < view[ii].signals); ++ii) {
+                    countdown(&view[ii].sig[jj].ticks, elapsed);
+                }
             }
 
             countdown(&solution.ticks, elapsed);
@@ -2486,6 +2492,8 @@ consume:
                 /* Do nothing. */
 
             }
+
+            if (system > maximum) { maximum = system; }
 
             /*
              * Parse the sentences we care about and update our state to
@@ -2593,12 +2601,10 @@ consume:
                      * sentences all under the GN (GNSS) talker, but the
                      * satellites are either GPS or GLONASS *plus* WAAS.
                      * We'd like to classify them as either GPS or GLONASS.
-                     * Sadly, later NMEA standards actually have a field in
-                     * the GSA sentence that contains a GNSS System ID,
-                     * but I have yet to see a device that supports it.
-                     * However, the GSA parser function has untested code
-                     * to extract this ID if it exists, and the map function
-                     * below will use it. Also note that apparently the DOP
+                     * Later NMEA standards (2.10+) have a field in the GSA
+                     * sentence that contains a GNSS System ID. The GSA parser
+                     * function uses this ID if it exists, and the map function
+                     * below understands it. Also note that apparently the DOP
                      * values are computed across all the satellites in
                      * whatever constellations were used for a navigation
                      * solution; this means the DOP values for GPS and
@@ -2612,27 +2618,11 @@ consume:
                         }
                     }
 
+                    if (system > maximum) { maximum = system; }
+
                     active[system] = active_cache;
                     active[system].ticks = timeout;
                     refresh = !0;
-
-                    /*
-                     * If the GSA sentences indicates a fix and we haven't
-                     * seen a fix from any sentence prior to this, we log
-                     * that. That allows us to figure out when the fix
-                     * occurred even though we might be losing other
-                     * sentences due to sync errors and the like.
-                     */
-
-                    if (active[system].mode > HAZER_MODE_NOFIX) {
-
-                        acquire_fix("NMEA GSA");
-
-                    } else {
-
-                        relinquish_fix("NMEA GSA");
-
-                    }
 
                 } else {
 
@@ -2646,16 +2636,9 @@ consume:
 
                 if  ((rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
 
-                    /*
-                     * I choose not to signal for a refresh unless we have
-                     * processed the last GSV sentence of a tuple for a
-                     * particular constellation. But I do set the timer
-                     * in case the remaining GSV sentences in the tuple
-                     * never arrive.
-                     */
+                    view[system].sig[rc].ticks = timeout;
 
-                    view[system].ticks = timeout;
-                    if (rc == 0) {
+                    if (view[system].pending == 0) {
                         refresh = !0;
                         DIMINUTO_LOG_DEBUG("Received NMEA GSV complete\n");
                     } else {
@@ -2676,8 +2659,6 @@ consume:
 
                     position[system].ticks = timeout;
                     refresh = !0;
-#if 0
-                    trace = !0;
 
                     /*
                      * Apparently some devices can maintain and report the
@@ -2689,9 +2670,6 @@ consume:
                      * not (re)activate the trace, nor to we log that the
                      * fix has been (re)acquired.
                      */
-
-                    acquire_fix("NMEA ZDA");
-#endif
 
                 } else {
 
@@ -2748,7 +2726,7 @@ consume:
 
                     for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
                         if ((rc & (1 << system)) != 0) {
-                            view[system].ticks = timeout;
+                            view[system].sig[0].ticks = timeout;
                             if (system == HAZER_SYSTEM_GNSS) {
                                 /* Do nothing. */
                             } else if (active[HAZER_SYSTEM_GNSS].ticks == 0) {
@@ -3249,7 +3227,9 @@ render:
             }
             if (crowbar <= 200) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-                    view[ii].ticks = 0;
+                    for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
+                        view[ii].sig[jj].ticks = 0;
+                    }
                 }
             }
             if (crowbar <= 300) {

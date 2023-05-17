@@ -29,6 +29,9 @@
  * "NMEA 0183 Standard for Interfacing Marine Electronic Devices", version 4.10,
  * NMEA 0183, National Marine Electronics Association, 2012-06
  *
+ * "NMEA 0183 Standard for Interfacing Marine Electronic Devices", version 4.11,
+ * NMEA 0183, National Marine Electronics Association, 2018-10
+ *
  * "BU-353S4 GPS Receiver Data Sheet", BU353S4-DS08212013B, USGLobalSat Inc.,
  * 2013
  *
@@ -144,6 +147,7 @@ enum HazerGnssConstants {
     HAZER_GNSS_SATELLITES   = 32,   /* Per constellation or system. */
     HAZER_GNSS_VIEWS        = 4,    /* Per NMEA GSV message. */
     HAZER_GNSS_ACTIVES      = 12,   /* Per NMEA GSA message. */
+    HAZER_GNSS_SIGNALS      = 16,   /* In NMEA GSV message <0..F>. */
     HAZER_GNSS_SECONDS      = 255,  /* Maximum lifetime. */
     HAZER_GNSS_DOP          = 9999, /* Maximum DOP in units * 100 */
 };
@@ -373,6 +377,8 @@ extern hazer_system_t hazer_map_nmea_to_system(uint8_t constellation);
  * There are some conflicts between these documents, and my most recent
  * receiver, the U-blox 9, doesn't match these anyway. Despite the
  * documentation, I don't consider these reliable.
+ * N.B. WAAS (Wide Area Augmentation System) is the U.S.-specific
+ * implementation of SBAS (Satellite Based Augmentation System).
  */
 typedef enum HazerNmeaId {
     /*                        0,     */
@@ -1187,7 +1193,6 @@ typedef struct HazerSatellite {
     int16_t elv_degrees;        /* Elevation in whole degrees. */
     int16_t azm_degrees;        /* Azimuth in whole degrees. */
     int8_t snr_dbhz;            /* Signal/Noise Ratio in dBHz. */
-    uint8_t signal;             /* Signal band identifier. */
     uint8_t phantom;            /* If true, elevation or azimuth were empty. */
     uint8_t untracked;          /* If true, signal strength was empty. */
     uint8_t unused;             /* If true, unused. */
@@ -1200,7 +1205,7 @@ typedef struct HazerSatellite {
 #define HAZER_SATELLITE_INITIALIZER \
     { \
         0, \
-        0, 0, \
+        0, \
         0, \
         0, \
         0, \
@@ -1210,24 +1215,22 @@ typedef struct HazerSatellite {
 
 /**
  * This structure maintains the information on as many satellites as we
- * have channels configured.
+ * have channels, all in a particular signal band.
  */
-typedef struct HazerView {
-    const char * label;         /* Label for sentence. */
+typedef struct HazerBand {
     hazer_satellite_t sat[HAZER_GNSS_SATELLITES]; /* Satellites viewed. */
-    uint8_t view;               /* Number of satellites in view. */
     uint8_t channels;           /* Number of channels used in view. */
-    uint8_t pending;            /* Number of updates pending. */
+    uint8_t visible;            /* Number of satellites in view. */
     hazer_expiry_t ticks;       /* Lifetime in application-defined ticks. */
-} hazer_view_t;
+} hazer_band_t;
 
 /**
- * @def HAZER_VIEW_INITIALIZER
- * Initialize a HazerView structure.
+ * @def HAZER_BAND_INITIALIZER
+ * Initialize a HazerSignal structure, one sat slot for every possible
+ * satellite in a single constellation.
  */
-#define HAZER_VIEW_INITIALIZER \
+#define HAZER_BAND_INITIALIZER \
     { \
-        (const char *)0, \
         { \
             HAZER_SATELLITE_INITIALIZER, \
             HAZER_SATELLITE_INITIALIZER, \
@@ -1265,12 +1268,55 @@ typedef struct HazerView {
         0, \
         0, \
         0, \
+    }
+
+/**
+ * This structure maintains the view information on every signal band for
+ * a particular system.
+ */
+typedef struct HazerView {
+    const char * label;         /* Label for sentence. */
+    hazer_band_t sig[HAZER_GNSS_SIGNALS];
+    uint8_t signals;            /* Number of signals used in view. */
+    uint8_t signal;             /* Most recent signal reported in view. */
+    uint8_t pending;            /* Number of updates pending. */
+} hazer_view_t;
+
+/**
+ * @def HAZER_VIEWS_INITIALIZER
+ * Initialize an array of HazerView structures, one slot for every
+ * signal band.
+ */
+#define HAZER_VIEW_INITIALIZER \
+    { \
+        (const char *)0, \
+        { \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+            HAZER_BAND_INITIALIZER, \
+        }, \
+        0, \
+        0, \
         0, \
     }
 
 /**
  * @def HAZER_VIEWS_INITIALIZER
- * Initialize an array of HazerView structures.
+ * Initialize an array of HazerView structures, one slot for every
+ * system.
  */
 #define HAZER_VIEWS_INITIALIZER \
     { \
@@ -1286,11 +1332,13 @@ typedef struct HazerView {
 
 /**
  * Parse a GSV NMEA sentence, updating the constellation.
+ * >=0 indicates the band that was updated.
+ * <0 indicates an error.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param viewp points to the view structure.
  * @param vector contains the words in the NMEA sentence.
  * @param count is size of the vector in slots including the null pointer.
- * @return 0 for success on final update of group, 1 for success, <0 otherwise.
+ * @return >=0 for success, <0 otherwise.
  */
 extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
 
@@ -1380,9 +1428,9 @@ static inline int hazer_is_pubx_id(const hazer_vector_t vector, ssize_t count, c
 }
 
 /**
- * Returns true if there are GSV views pending for any constellation. Can be
- * applied by a single constellation by passing pointer to single view and
- * using a count of one.
+ * Returns true if there are GSV views pending for any constellation in any
+ * band. Can be applied by a single constellation by passing pointer to single
+ * view and using a count of one.
  * @param va points to the array of all satellites being viewed.
  * @param count is the number of entries in the view array.
  * @return true if there are GSV views pending for any constellation.
