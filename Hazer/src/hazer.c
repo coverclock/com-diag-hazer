@@ -1684,7 +1684,6 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
     int channel = 0;
     int signal = 0;
     int satellites = 0;
-    int sequence = 0;
     int index = 4;
     int offset = 0;
     int slot = 0;
@@ -1902,23 +1901,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          * into the structure passed by the caller.
          */
 
-        sequence = message - 1;
-        if (sequence == 0) {
-            /*
-             * First GSV sentence in group.
-             */
-            offset = 0;
-        } else if (signal == viewp->signal) {
-            /*
-             * Subsequent GSV sentence in group with same band.
-             */
-            offset = sequence * HAZER_GNSS_VIEWS;
-        } else {
-            /*
-             * Subsequent GSV sentence in group with different band.
-             */
-            offset = viewp->sig[signal].channels;
-        }
+        offset = (message == 1) ? 0 : viewp->sig[signal].channels;
         channels = offset + channel;
 
         /*

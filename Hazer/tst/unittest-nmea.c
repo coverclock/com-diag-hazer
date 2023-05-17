@@ -779,7 +779,6 @@ int main(void)
             assert(rc == !0);
 
             jj = hazer_parse_gsv(&view, vector, count);
-fprintf(stderr, "DEBUG ii=%d jj=%d errno=%d=\"%s\"\n", ii, jj, errno, strerror(errno));
             assert(jj == (ii == 0) ? 1 : (ii == 1) ? 2 : (ii == 2) ? 0 : 3);
 
             view.sig[jj].ticks = 0;
