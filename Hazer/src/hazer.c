@@ -33,6 +33,8 @@ const char * HAZER_SYSTEM_NAME[] = HAZER_SYSTEM_NAME_INITIALIZER;
 
 const char * HAZER_MODE_NAME[] = HAZER_MODE_NAME_INITIALIZER;
 
+const char * HAZER_SIGNAL_NAME[HAZER_SYSTEM_TOTAL][HAZER_GNSS_SIGNALS] = HAZER_SIGNAL_NAME_INITIALIZER;
+
 /******************************************************************************
  *
  ******************************************************************************/
@@ -1187,7 +1189,7 @@ hazer_system_t hazer_map_nmea_to_system(uint8_t constellation)
         system = HAZER_SYSTEM_BEIDOU;
         break;
 
-#if 0
+#if 0 /* OBSOLETE */
     case HAZER_NMEA_SBAS:
         system = HAZER_SYSTEM_SBAS;
         break;
@@ -1198,7 +1200,9 @@ hazer_system_t hazer_map_nmea_to_system(uint8_t constellation)
 #endif
 
     case HAZER_NMEA_QZSS:
+#if 1 /* DEPRECATED */
     case HAZER_NMEA_QZSS2:
+#endif
         system = HAZER_SYSTEM_QZSS;
         break;
 
