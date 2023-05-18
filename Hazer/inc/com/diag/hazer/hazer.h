@@ -345,6 +345,7 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
  * @def HAZER_SIGNAL_NAME_INITIALIZER
  * Intialize a two-dimensional array that for each Hazer system maps
  * a signal number (as it's called in the spec) to a frequency band name.
+ * (Spaces replaced with underscores to assist with possible post-processing.)
  * Reference: NMEA 0183 4.11 p. 83 Table 19.
  */
 #define HAZER_SIGNAL_NAME_INITIALIZER \
@@ -356,26 +357,26 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
             "12sig",    "13sig",    "14sig",    "15sig", \
         } /* GNSS */, \
         { \
-            "ANY",      "L1 C/A",   "L1 P(Y)",  "L1 M", \
-            "L2 P(Y)",  "L2C-M",    "L2C-L",    "L5-I", \
+            "ANY",      "L1_C/A",   "L1_P(Y)",  "L1_M", \
+            "L2_P(Y)",  "L2C-M",    "L2C-L",    "L5-I", \
             "L5-Q",     "9sig",     "10sig",    "11sig", \
             "12sig",    "13sig",    "14sig",    "15sig", \
         } /* NAVSTAR */, \
         { \
-            "ANY",      "G1 C/A",   "G1 P",     "G2 C/A", \
-            "(M) G2 P", "5sig",     "6sig",     "7sig", \
+            "ANY",      "G1_C/A",   "G1_P",     "G2_C/A", \
+            "(M)_G2_P", "5sig",     "6sig",     "7sig", \
             "8sig",     "9sig",     "10sig",    "11sig", \
             "12sig",    "13sig",    "14sig",    "15sig", \
         } /* GLONASS */, \
         { \
-            "ANY",      "E5a",      "E5b",      "E5 a+b", \
+            "ANY",      "E5a",      "E5b",      "E5_a+b", \
             "E6-A",     "E6-BC",    "L1-A",     "L1-BC", \
             "8sig",     "9sig",     "10sig",    "11sig", \
             "12sig",    "13sig",    "14sig",    "15sig", \
         } /* GALILEO */, \
         { \
             "ANY",      "B1I",      "B1Q",      "B1C", \
-            "B1A",      "B2-a",     "B2-b",     "B2 a+b", \
+            "B1A",      "B2-a",     "B2-b",     "B2_a+b", \
             "B3I",      "B3Q",      "B3A",      "B3I", \
             "B2Q",     "13sig",    "14sig",    "15sig", \
         } /* COMPASS */, \
@@ -392,7 +393,7 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
             "12sig",    "13sig",    "14sig",    "15sig", \
         } /* IMES */, \
         { \
-            "ANY",      "L1 C/A",   "L1C (D)",  "L1C (P)", \
+            "ANY",      "L1_C/A",   "L1C_(D)",  "L1C_(P)", \
             "LIS",      "L2C-M",    "L2C-L",    "L5-I", \
             "L5-Q",     "L6D",      "L6E",      "11sig", \
             "12sig",    "13sig",    "14sig",    "15sig", \
