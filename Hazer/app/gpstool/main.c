@@ -2403,7 +2403,7 @@ consume:
             for (ii = 0; (ii < HAZER_SYSTEM_TOTAL) && (ii <= maximum); ++ii) {
                 countdown(&position[ii].ticks, elapsed);
                 countdown(&active[ii].ticks, elapsed);
-                for (jj = 0; (jj < HAZER_GNSS_SIGNALS) && (jj < view[ii].signals); ++ii) {
+                for (jj = 0; (jj < HAZER_GNSS_SIGNALS) && (jj < view[ii].signals); ++jj) {
                     countdown(&view[ii].sig[jj].ticks, elapsed);
                 }
             }
