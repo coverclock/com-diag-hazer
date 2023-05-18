@@ -2963,11 +2963,11 @@ int hazer_has_pending_gsv(const hazer_view_t va[], size_t count)
     size_t ii = 0;
     size_t jj = 0;
 
-    for (ii = 0; (ii < HAZER_SYSTEM_TOTAL) && (ii < count); ++ii) {
-fprintf(stderr, "DEBUG ii=%zu pending=%u\n", ii, va[ii].pending);
+    for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
+        if (ii >= count) { break; }
         if (va[ii].pending > 0) {
-            for (jj = 0; (jj < HAZER_GNSS_SIGNALS) && (jj < va[ii].signals); ++jj) {
-fprintf(stderr, "DEBUG jj=%zu ticks=%u\n", jj, va[ii].sig[jj].ticks);
+            for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
+                if (jj >= va[ii].signals) { break; }
                 if (va[ii].sig[jj].ticks > 0) {
                     return !0;
                 }
@@ -2982,7 +2982,8 @@ int hazer_has_valid_time(const hazer_position_t pa[], size_t count)
 {
     size_t ii = 0;
 
-    for (ii = 0; (ii < HAZER_SYSTEM_TOTAL) && (ii < count); ++ii) {
+    for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
+        if (ii >= count) { break; }
         if (hazer_is_valid_time(&(pa[ii]))) {
             return !0;
         }

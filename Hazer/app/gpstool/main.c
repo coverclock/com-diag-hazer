@@ -2400,10 +2400,12 @@ consume:
 
         if (elapsed > 0) {
 
-            for (ii = 0; (ii < HAZER_SYSTEM_TOTAL) && (ii <= maximum); ++ii) {
+            for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
+                if (ii > maximum) { break; }
                 countdown(&position[ii].ticks, elapsed);
                 countdown(&active[ii].ticks, elapsed);
-                for (jj = 0; (jj < HAZER_GNSS_SIGNALS) && (jj < view[ii].signals); ++jj) {
+                for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
+                    if (jj >= view[ii].signals) { break; }
                     countdown(&view[ii].sig[jj].ticks, elapsed);
                 }
             }
