@@ -358,8 +358,3 @@ say about the 4.11 standard.
     NMEA 0183- Marine Industry  $1000 (NMEA Member), $2000 (non member)
     NMEA 0183- Government / Industrial / Testing  $7,500
     NMEA 0183- Consumer Electronics  $10,000
-
-Charging thousands of dollars for the 0183 standard places is outside
-of my price range, or indeed the price range of virtually any individual
-for which, like me, GNSS is a side gig or a hobby. Heck, I don't even know
-which category I would be in.
