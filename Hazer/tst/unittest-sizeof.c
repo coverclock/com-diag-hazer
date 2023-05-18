@@ -24,6 +24,10 @@
 
 int main(void)
 {
+    hazer_position_t position[HAZER_SYSTEM_TOTAL];
+    hazer_active_t active[HAZER_SYSTEM_TOTAL];
+    hazer_view_t view[HAZER_SYSTEM_TOTAL];
+
     PRINTSIZEOF(coordinates_format_t);
     PRINTSIZEOF(datagram_buffer_t);
     PRINTSIZEOF(datagram_header_t);
@@ -54,4 +58,22 @@ int main(void)
     PRINTSIZEOF(yodel_ubx_ack_t);
     PRINTSIZEOF(yodel_ubx_cfg_valget_key_t);
     PRINTSIZEOF(yodel_ubx_cfg_valget_t);
+    PRINTSIZEOF(yodel_ubx_header_t);
+    PRINTSIZEOF(yodel_ubx_mon_comms_t);
+    PRINTSIZEOF(yodel_ubx_mon_hw_t);
+    PRINTSIZEOF(yodel_ubx_nav_att_t);
+    PRINTSIZEOF(yodel_ubx_nav_clock_t);
+    PRINTSIZEOF(yodel_ubx_nav_hpposllh_t);
+    PRINTSIZEOF(yodel_ubx_nav_odo_t);
+    PRINTSIZEOF(yodel_ubx_nav_pvt_t);
+    PRINTSIZEOF(yodel_ubx_nav_status_t);
+    PRINTSIZEOF(yodel_ubx_nav_svin_t);
+    PRINTSIZEOF(yodel_ubx_nav_timegps_t);
+    PRINTSIZEOF(yodel_ubx_nav_timeutc_t);
+    PRINTSIZEOF(yodel_ubx_rxm_rtcm_t);
+    PRINTSIZEOF(yodel_ubx_tim_tp_t);
+
+    PRINTSIZEOF(active);
+    PRINTSIZEOF(position);
+    PRINTSIZEOF(view);
 }
