@@ -1025,6 +1025,7 @@ static const uint64_t HAZER_NANOSECONDS_UNSET = HAZER_NANOSECONDS_INITIALIZER;
  * derived from the NMEA stream.
  */
 typedef struct HazerPosition {
+    const char * label;             /* Label for sentence. */
     uint64_t old_nanoseconds;       /* Prior total nanoseconds. */
     uint64_t tot_nanoseconds;       /* Total nanoseconds. */
     uint64_t utc_nanoseconds;       /* Time in nanoseconds since 00:00 UTC. */
@@ -1038,7 +1039,6 @@ typedef struct HazerPosition {
     int64_t sog_millimetersperhour; /* Speed Over Ground in millimeters per hour. */
     int64_t cog_nanodegrees;        /* Course Over Ground true in nanodegrees. */
     int64_t mag_nanodegrees;        /* Magnetic bearing in nanodegrees. */
-    const char * label;             /* Label for sentence. */
     uint8_t sat_used;               /* Number of satellites used. */
     uint8_t lat_digits;             /* Significant digits of latitude. */
     uint8_t lon_digits;             /* Significant digits of longitude. */
@@ -1058,11 +1058,11 @@ typedef struct HazerPosition {
  */
 #define HAZER_POSITION_INITIALIZER \
     { \
+        (const char *)0, \
         HAZER_NANOSECONDS_INITIALIZER, HAZER_NANOSECONDS_INITIALIZER, HAZER_NANOSECONDS_INITIALIZER, HAZER_NANOSECONDS_INITIALIZER, \
         0, \
         0, 0, 0, 0, \
         0, 0, 0, 0, \
-        (const char *)0, \
         0, \
         0, 0, 0, 0, 0, 0, 0, 0, \
         0, \

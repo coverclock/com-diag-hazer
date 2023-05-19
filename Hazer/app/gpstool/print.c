@@ -165,9 +165,9 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
 
                 fputs("SAT", fp);
 
-                fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz  %-8.8s %c %c %c %c", ++channel, va[system].sig[signal].sat[satellite].id, va[system].sig[signal].sat[satellite].elv_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].azm_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].snr_dbhz, HAZER_SIGNAL_NAME[system][signal], ranged, phantom, untracked, unused);
+                fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz  %-8.8s %c %c %c %c %c", ++channel, va[system].sig[signal].sat[satellite].id, va[system].sig[signal].sat[satellite].elv_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].azm_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].snr_dbhz, HAZER_SIGNAL_NAME[system][signal], va[system].label[0], ranged, phantom, untracked, unused);
 
-                fprintf(fp, "%9s", "");
+                fprintf(fp, "%7s", "");
 
                 fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
