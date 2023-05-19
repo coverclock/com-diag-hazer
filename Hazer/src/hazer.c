@@ -1901,7 +1901,11 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          * into the structure passed by the caller.
          */
 
-        offset = (message == 1) ? 0 : viewp->sig[signal].channels;
+        if (message == 1) {
+            viewp->sig[signal].channels = 0;
+        }
+
+        offset = viewp->sig[signal].channels;
         channels = offset + channel;
 
         /*
