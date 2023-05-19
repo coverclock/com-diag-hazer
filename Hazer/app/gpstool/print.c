@@ -129,6 +129,7 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
     marker_t phantom = MARKER;
     marker_t untracked = MARKER;
     marker_t unused = MARKER;
+    char source = '\0';
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
         for (signal = 0; signal < SIGNALS; ++signal) {
@@ -162,10 +163,11 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
                 phantom = va[system].sig[signal].sat[satellite].phantom ? PHANTOM : INACTIVE;
                 untracked = va[system].sig[signal].sat[satellite].untracked ? UNTRACKED : INACTIVE;
                 unused = va[system].sig[signal].sat[satellite].unused ? UNUSED : INACTIVE;
+                source = (va[system].label != (const char *)0) ? va[system].label[0] : '0';
 
                 fputs("SAT", fp);
 
-                fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz  %-8.8s %c %c %c %c %c", ++channel, va[system].sig[signal].sat[satellite].id, va[system].sig[signal].sat[satellite].elv_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].azm_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].snr_dbhz, HAZER_SIGNAL_NAME[system][signal], va[system].label[0], ranged, phantom, untracked, unused);
+                fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz  %-8.8s %c %c %c %c %c", ++channel, va[system].sig[signal].sat[satellite].id, va[system].sig[signal].sat[satellite].elv_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].azm_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].snr_dbhz, HAZER_SIGNAL_NAME[system][signal], source, ranged, phantom, untracked, unused);
 
                 fprintf(fp, "%7s", "");
 
