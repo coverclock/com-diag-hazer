@@ -346,7 +346,7 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
  * Intialize a two-dimensional array that for each Hazer system maps
  * a signal number (as it's called in the spec) to a frequency band name.
  * (Spaces replaced with underscores to assist with possible post-processing.)
- * Reference: NMEA 0183 4.11 p. 83 Table 19.
+ * Reference: NMEA 0183 4.11 Table 19 pp. 83-84.
  */
 #define HAZER_SIGNAL_NAME_INITIALIZER \
     { \
@@ -414,20 +414,16 @@ extern const char * HAZER_SIGNAL_NAME[HAZER_SYSTEM_TOTAL][HAZER_GNSS_SIGNALS];
 
 /**
  * NMEA GNSS system identifiers.
- * NMEA 0183 4.10 table 20 p. 94-95.
+ * NMEA 0183 4.10 Table 20 pp. 94-95.
  * UBLOX10 R01, p. 16.
  * Raymond, "NMEA Revealed".
- * NMEA 0183 4.11 table 19 p. 83-84.
+ * NMEA 0183 4.11 Table 19 pp. 83-84.
  */
 typedef enum HazerNmea {
     HAZER_NMEA_GPS              = 1,
     HAZER_NMEA_GLONASS          = 2,
     HAZER_NMEA_GALILEO          = 3,
     HAZER_NMEA_BEIDOU           = 4,
-#if 0 /* OBSOLETE */
-    HAZER_NMEA_SBAS             = 5,
-    HAZER_NMEA_IMES             = 6,
-#endif
     HAZER_NMEA_QZSS             = 5,
     HAZER_NMEA_NAVIC            = 6,
 #if 1 /* DEPRECATED */

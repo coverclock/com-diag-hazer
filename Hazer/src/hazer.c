@@ -1165,7 +1165,8 @@ hazer_system_t hazer_map_talker_to_system(hazer_talker_t talker)
 }
 
 /*
- * NMEA 0183 4.10 table 20 p. 94-95.
+ * NMEA 0183 4.10 Table 20 pp. 94-95.
+ * NMEA 0183 4.11 Table 19 pp. 83-84
  */
 hazer_system_t hazer_map_nmea_to_system(uint8_t constellation)
 {
@@ -1627,13 +1628,14 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
         active.tdop = HAZER_GNSS_DOP;
 
         /*
-         * NMEA 0183 4.10 2012 has an additional 19th field containing
+         * NMEA 0183 4.10 has an additional 19th field containing
          * the GNSS System ID to identify GPS, GLONASS, GALILEO, etc.
+         * NMEA 0183 4.11 suggests that this field is hexadecimal (1..F).
          */
 
         if (count > 19) {
 
-            system = strtol(vector[18], &end, 10);
+            system = strtol(vector[18], &end, 16);
             if (*end != '\0') {
                 errno = EINVAL;
                 break;
@@ -1901,11 +1903,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          * into the structure passed by the caller.
          */
 
-        if (message == 1) {
-            viewp->sig[signal].channels = 0;
-        }
-
-        offset = viewp->sig[signal].channels;
+        offset = (message == 1) ? 0 : viewp->sig[signal].channels;
         channels = offset + channel;
 
         /*
@@ -1924,6 +1922,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             }
             viewp->sig[signal].sat[channel] = band.sat[index++]; /* Structure copy. */
         }
+
         viewp->sig[signal].channels = channel;
         viewp->sig[signal].visible = satellites; /* Ambiguous. */
 
