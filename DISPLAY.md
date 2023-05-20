@@ -39,12 +39,11 @@ length of the output data minus the end matter.
 LOCal is the current local time provided by the host system, the elapsed
 time to first fix, the software release number, the process id, and the
 local host name.  The local time, with a fractional part in milliseconds,
-includes the time zone offset from UTC in hours and minutes, the current
-daylight saving time (DST) offset in hours. The next field is the elapsed
-time since the application began running, also in milliseconds. The
-following fields are the Hazer release string, the process identifier
-of the application, is the Hazer release string, and the first eight
-characters of the name of the host system.
+includes the time zone offset from UTC in hours and minutes, and the
+current daylight saving time (DST) offset in hours. The next field is the
+elapsed time since the application began running. The following fields
+are the Hazer release string, the Process IDentifier of the application,
+and the first eight characters of the name of the host system.
 
     TIM 2021-08-28T21:13:50.000-00:00+00 00:00:00.297 pps                  GNSS
 
