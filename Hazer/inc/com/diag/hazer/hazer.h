@@ -239,9 +239,12 @@ typedef enum HazerAction {
 /**
  * GNSS talkers.
  * These must be in the same order as the corresponding strings below.
+ * Some of these are proprietary.
  */
 typedef enum HazerTalker {
+#if !0 /* DEPRECATED */
     HAZER_TALKER_BEIDOU2            = 0,    /* BD */
+#endif
     HAZER_TALKER_DSC,                       /* CD */
     HAZER_TALKER_ECDIS,                     /* EC */
     HAZER_TALKER_GALILEO,                   /* GA */
@@ -257,7 +260,9 @@ typedef enum HazerTalker {
     HAZER_TALKER_PMTK,                      /* PMTK */
     HAZER_TALKER_PSRF,                      /* PSRF */
     HAZER_TALKER_PUBX,                      /* PUBX */
+#if !0 /* DEPRECATED */
     HAZER_TALKER_QZSS,                      /* QZ */
+#endif
     HAZER_TALKER_RADIO,                     /* ZV */
     HAZER_TALKER_TOTAL,
 } hazer_talker_t;
@@ -266,7 +271,8 @@ typedef enum HazerTalker {
  * @def HAZER_TALKER_NAME_INITIALIZER
  * Initialize the array of character strings that map from a Hazer talker
  * enumerated value to the printable name of the talker. These strings must
- * be in collating sequence order.
+ * be in collating sequence order. Some of these are proprietary.
+ * Reference: NMEA 0183 4.11 6.1.4 Table 7 pp. 22-23
  */
 #define HAZER_TALKER_NAME_INITIALIZER \
 { \
@@ -426,7 +432,7 @@ typedef enum HazerNmea {
     HAZER_NMEA_BEIDOU           = 4,
     HAZER_NMEA_QZSS             = 5,
     HAZER_NMEA_NAVIC            = 6,
-#if 1 /* DEPRECATED */
+#if !0 /* DEPRECATED */
     HAZER_NMEA_QZSS2            = 15,
 #endif
 } hazer_nmea_t;
@@ -441,6 +447,7 @@ extern hazer_system_t hazer_map_nmea_to_system(uint8_t constellation);
 /**
  * GNSS satellite identifiers.
  * NMEA 0183 4.10 p. 94.
+ * NMEA 0183 4.11 Table 19 p. 83-84
  * UBLOX8 R15 p. 373.
  * UBLOX8 R19 Appendix A p. 402.
  * Raymond, "NMEA Revealed".
@@ -1044,9 +1051,19 @@ typedef struct HazerPosition {
     uint8_t smm_digits;             /* Significant digits of SOG mm/h. */
     uint8_t cog_digits;             /* Significant digits of Course On Ground. */
     uint8_t mag_digits;             /* Significant digits of Magnetic bearing. */
+    char mode;                      /* Mode Indicator (from GLL). */
     hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
-    uint8_t unused[1];              /* Unused. */
 } hazer_position_t;
+
+/*
+ * Mode Indicator (NMEA 0183 4.11 p.87)
+ * A = Autonomous
+ * D = Differential
+ * E = Estimated (dead reckoning)
+ * M = Manual
+ * S = Simulator
+ * N = Not valid
+ */
 
 /**
  * @def HAZER_POSITION_INITIALIZER
@@ -1061,8 +1078,8 @@ typedef struct HazerPosition {
         0, 0, 0, 0, \
         0, \
         0, 0, 0, 0, 0, 0, 0, 0, \
+        '\0', \
         0, \
-        { 0, } \
     }
 
 /**
@@ -1136,10 +1153,12 @@ extern int hazer_parse_zda(hazer_position_t * positionp, char * vector[], size_t
  ******************************************************************************/
 
 /**
- * Various encodings for the fix mode. Note that larger numbers do not necessarily
- * indicate a better fix. The values were chosen mostly to preserve the encoding
- * specified by NMEA while capturing other possibilities of UBX PUBX.
+ * Various encodings for the fix mode. Note that larger numbers do not
+ * necessarily indicate a better fix. The values were chosen mostly to preserve
+ * the encoding specified by NMEA while capturing other possibilities of UBX
+ * PUBX.
  * NMEA 0183 4.10 p. 94.
+ * NMEA 0183 4.11 p. 87
  * UBX M8 R24 p. 164.
  */
 typedef enum HazerMode {

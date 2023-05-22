@@ -2124,11 +2124,15 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
-#if 0
-        if ((count >= 9) && (strcmp(vector[7], "N") == 0)) {
-            break;
+        if (count < 9) {
+            position.mode = '-';
+        } else if (!isprint(vector[7][0])) {
+            position.mode = '?';
+        } else if (vector[7][0] == ' ') {
+            position.mode = '?';
+        } else {
+            position.mode = vector[7][0];
         }
-#endif
 
         position.lat_nanominutes = hazer_parse_latlon(vector[1], *(vector[2]), &position.lat_digits, &end);
         if (*end != '\0') {
@@ -2168,6 +2172,8 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
 
         positionp->utc_nanoseconds = position.utc_nanoseconds;
         update_time(positionp);
+
+        positionp->mode = position.mode;
 
         positionp->label = GLL;
 

@@ -551,7 +551,11 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             fprintf(fp, " %4d.%07llu", degrees, (diminuto_llu_t)tenmillionths);
             diminuto_contract((0 <= tenmillionths) && (tenmillionths <= 9999999));
 
-            fprintf(fp, "%7s", "");
+            fputc(' ', fp);
+
+            fprintf(fp, "%cmode", (pa[system].mode == ' ') ? '*' : (pa[system].mode == '\0') ? '-' : isprint(pa[system].mode) ? pa[system].mode : '?');
+
+            fprintf(fp, "%1s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 

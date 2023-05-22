@@ -55,7 +55,8 @@ device provides it and it was enabled on the command line using -c (using
 data carrier detect or DCD) or -I (using general purpose input/output
 or GPIO).
 
-    POS 39°47'39.364"N, 105°09'12.315"W    39.7942678, -105.1534210        GNSS
+    POS 39°47'39.333"N, 105°09'12.103"W    39.7942591, -105.1533621 Amode  GNSS
+
 
 POSition is the most recent position solution, latitude and longitude,
 in degrees, hours, minutes, and decimal seconds, and in decimal
@@ -68,7 +69,11 @@ but even this may be optimistic - or, for that matter, pessimistic - when
 compared to what the device is capable of. In particular, technologies
 like Wide Area Augmentation System (WAAS), multi-band GNSS, differential
 GPS, Real-Time Kinematics (RTK), and long-term surveying, can potentially
-achieve remarkable accuracy.
+achieve remarkable accuracy. The single character before mode indicates
+how the fix was obtained: Autonomous, Differential, Estimated (dead reckoning),
+Manual, Simulator, Not valid; it is only available via the NMEA GLL sentence
+and only in later NMEA implementations. Other characters indicate that this
+indicator was invalid, not implemented, or never provided.
 
     ALT    5608.53'   1709.500m MSL    5537.99'   1688.000m GEO            GNSS
 
