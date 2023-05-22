@@ -1201,7 +1201,7 @@ hazer_system_t hazer_map_nmea_to_system(uint8_t constellation)
 #endif
 
     case HAZER_NMEA_QZSS:
-#if 1 /* DEPRECATED */
+#if !0 /* DEPRECATED */
     case HAZER_NMEA_QZSS2:
 #endif
         system = HAZER_SYSTEM_QZSS;
@@ -2456,25 +2456,15 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         }
 
         if (strcmp(vector[8], "NF") == 0) {
-#if 0
-            /*
-             * The API contract is that the PNT structures are not
-             * updated if <0 is returned.
-             */
             activep->mode = HAZER_MODE_NOFIX;
-#endif
+            activep->label = PUBX;
             errno = 0;
             break;
         }
 
         if (strcmp(vector[18], "0") == 0) {
-#if 0
-            /*
-             * The API contract is that the PNT structures are not
-             * updated if <0 is returned.
-             */
             activep->mode = HAZER_MODE_ZERO;
-#endif
+            activep->label = PUBX;
             errno = 0;
             break;
         }
@@ -2517,12 +2507,16 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
              * APPLY
              */
 
+            /* Position. */
+
             positionp->utc_nanoseconds = position.utc_nanoseconds;
             update_time(positionp);
 
             positionp->sat_used = position.sat_used;
 
             positionp->label = PUBX;
+
+            /* Active. */
 
             activep->mode = active.mode;
 

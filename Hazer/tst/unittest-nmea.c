@@ -510,7 +510,7 @@ int main(void)
     }
 
     {
-        static const char * DATA = "$GNGSA,A,3,07,11,15,18,19,13,30,28,51,01,48,17,1.27,0.64,1.10,15*34\r\n";
+        static const char * DATA = "$GNGSA,A,3,07,11,15,18,19,13,30,28,51,01,48,17,1.27,0.64,1.10,F*76\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_active_t active = HAZER_ACTIVE_INITIALIZER;

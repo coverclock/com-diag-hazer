@@ -1163,7 +1163,7 @@ typedef enum HazerMode {
  */
 #define HAZER_MODE_NAME_INITIALIZER \
 { \
-    "--", \
+    "NA", \
     "NF", \
     "2D", \
     "3D", \

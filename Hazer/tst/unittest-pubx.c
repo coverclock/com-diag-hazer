@@ -93,7 +93,6 @@ int main(void)
         hazer_position_t position = HAZER_POSITION_INITIALIZER;
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
-        static const hazer_active_t ACTIVE = HAZER_ACTIVE_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -138,7 +137,7 @@ int main(void)
         assert(rc < 0);
         assert(errno == 0);
         assert(memcmp(&position, &POSITION, sizeof(position)) == 0);
-        assert(memcmp(&active, &ACTIVE, sizeof(active)) == 0);
+        assert(active.mode == HAZER_MODE_NOFIX);
     }
 
     {
@@ -148,7 +147,6 @@ int main(void)
         hazer_position_t position = HAZER_POSITION_INITIALIZER;
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
-        static const hazer_active_t ACTIVE = HAZER_ACTIVE_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -193,7 +191,7 @@ int main(void)
         assert(rc < 0);
         assert(errno == 0);
         assert(memcmp(&position, &POSITION, sizeof(position)) == 0);
-        assert(memcmp(&active, &ACTIVE, sizeof(active)) == 0);
+        assert(active.mode == HAZER_MODE_ZERO);
     }
 
     {
