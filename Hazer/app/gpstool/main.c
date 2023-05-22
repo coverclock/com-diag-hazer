@@ -1561,6 +1561,7 @@ int main(int argc, char * argv[])
     }
 
 #if defined(TEST_ERROR)
+#   warning TEST_ERROR enabled!
 
     /*
      * This code tests the print_error macro and its underlying
@@ -3198,6 +3199,7 @@ render:
         }
 
 #if defined(TEST_EXPIRATION)
+#   warning TEST_EXPIRATION enabled!
 
         /*
          * This code is just for testing the expiration feature.

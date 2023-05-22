@@ -997,6 +997,7 @@ void main(void) {
 */
 
 #if defined(TEST_ERROR)
+#   warning TEST_ERROR enabled!
 
 void print_error_t1(void)
 {
