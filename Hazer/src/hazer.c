@@ -33,6 +33,8 @@ const char * HAZER_SYSTEM_NAME[] = HAZER_SYSTEM_NAME_INITIALIZER;
 
 const char * HAZER_MODE_NAME[] = HAZER_MODE_NAME_INITIALIZER;
 
+const char HAZER_QUALITY_NAME[] = HAZER_QUALITY_NAME_INITIALIZER;
+
 const char * HAZER_SIGNAL_NAME[HAZER_SYSTEM_TOTAL][HAZER_GNSS_SIGNALS] = HAZER_SIGNAL_NAME_INITIALIZER;
 
 /******************************************************************************
@@ -1436,20 +1438,24 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
+        position.quality = strtol(vector[6], &end, 10);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+        if (position.quality == HAZER_QUALITY_INVALID) {
+            positionp->quality = position.quality;
+            errno = 0;
+            break;
+        }
+
         position.sat_used = strtol(vector[7], &end, 10);
         if (*end != '\0') {
             errno = EINVAL;
             break;
         }
-
         if (position.sat_used == 0) {
-#if 0
-            /*
-             * The API contract is that the PNT structures are not
-             * updated if <0 is returned.
-             */
-            positionp->sat_used = 0;
-#endif
+            positionp->sat_used = position.sat_used;
             errno = 0;
             break;
         }
@@ -1504,6 +1510,8 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
 
         positionp->lon_nanominutes = position.lon_nanominutes;
         positionp->lon_digits = position.lon_digits;
+
+        positionp->quality = position.quality;
 
         positionp->sat_used = position.sat_used;
 
@@ -2125,13 +2133,31 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         }
 
         if (count < 9) {
-            position.mode = '-';
-        } else if (!isprint(vector[7][0])) {
-            position.mode = '?';
-        } else if (vector[7][0] == ' ') {
-            position.mode = '?';
+            position.quality = HAZER_QUALITY_TOTAL;
         } else {
-            position.mode = vector[7][0];
+            switch (vector[7][0]) {
+            case 'A':
+                position.quality = HAZER_QUALITY_AUTONOMOUS;
+                break;
+            case 'D':
+                position.quality = HAZER_QUALITY_DIFFERENTIAL;
+                break;
+            case 'E':
+                position.quality = HAZER_QUALITY_ESTIMATED;
+                break;
+            case 'M':
+                position.quality = HAZER_QUALITY_MANUAL;
+                break;
+            case 'S':
+                position.quality = HAZER_QUALITY_SIMULATOR;
+                break;
+            case 'N':
+                position.quality = HAZER_QUALITY_INVALID;
+                break;
+            default:
+                position.quality = HAZER_QUALITY_TOTAL + 1; 
+                break;
+            }
         }
 
         position.lat_nanominutes = hazer_parse_latlon(vector[1], *(vector[2]), &position.lat_digits, &end);
@@ -2173,7 +2199,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         positionp->utc_nanoseconds = position.utc_nanoseconds;
         update_time(positionp);
 
-        positionp->mode = position.mode;
+        positionp->quality = position.quality;
 
         positionp->label = GLL;
 
@@ -2519,6 +2545,8 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
             update_time(positionp);
 
             positionp->sat_used = position.sat_used;
+
+            positionp->quality = HAZER_QUALITY_TOTAL;
 
             positionp->label = PUBX;
 

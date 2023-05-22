@@ -81,6 +81,7 @@ int main(void)
         assert(position.lon_nanominutes == -6309202160000LL);
         assert(position.alt_millimeters == 1708600LL);
         assert(position.sep_millimeters == -21500LL);
+        assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
@@ -315,7 +316,7 @@ int main(void)
         assert(position.old_nanoseconds == HAZER_NANOSECONDS_UNSET);
         assert(position.lat_nanominutes == 2387653370000LL);
         assert(position.lon_nanominutes == -6309202230000LL);
-        assert(position.mode == 'D');
+        assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));

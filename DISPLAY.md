@@ -57,7 +57,6 @@ or GPIO).
 
     POS 39°47'39.333"N, 105°09'12.103"W    39.7942591, -105.1533621 Amode  GNSS
 
-
 POSition is the most recent position solution, latitude and longitude,
 in degrees, hours, minutes, and decimal seconds, and in decimal
 degrees. Either format can be cut and pasted directly into Google Maps,
@@ -71,9 +70,8 @@ like Wide Area Augmentation System (WAAS), multi-band GNSS, differential
 GPS, Real-Time Kinematics (RTK), and long-term surveying, can potentially
 achieve remarkable accuracy. The single character before mode indicates
 how the fix was obtained: Autonomous, Differential, Estimated (dead reckoning),
-Manual, Simulator, Not valid; it is only available via the NMEA GLL sentence
-and only in later NMEA implementations. Other characters indicate that this
-indicator was invalid, not implemented, or never provided.
+Manual, Simulator, Not valid, or others defined in the NMEA spec; these values
+are provided by the NMEA GLL and GGA sentences.
 
     ALT    5608.53'   1709.500m MSL    5537.99'   1688.000m GEO            GNSS
 

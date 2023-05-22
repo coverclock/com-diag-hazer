@@ -553,7 +553,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
             fputc(' ', fp);
 
-            fprintf(fp, "%cmode", (pa[system].mode == ' ') ? '*' : (pa[system].mode == '\0') ? '-' : isprint(pa[system].mode) ? pa[system].mode : '?');
+            fprintf(fp, "%cmode", ((0 <= pa[system].quality) && (pa[system].quality < HAZER_QUALITY_TOTAL)) ? HAZER_QUALITY_NAME[pa[system].quality] : (pa[system].quality == HAZER_QUALITY_TOTAL) ? '-' : '?');
 
             fprintf(fp, "%1s", "");
 

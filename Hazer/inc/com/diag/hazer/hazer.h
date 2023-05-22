@@ -519,6 +519,44 @@ typedef enum HazerNmeaId {
 extern hazer_system_t hazer_map_nmeaid_to_system(uint16_t id);
 
 /**
+ * Mode or Quality metric. This is the combined meaning of the Mode (GLL)
+ * and Quality (GGA) fields.
+ * NMEA 0183 4.11 p. 86.
+ * NMEA 0183 4.11 p. 87.
+ */
+typedef enum HazerQuality {
+    HAZER_QUALITY_INVALID       = 0,
+    HAZER_QUALITY_AUTONOMOUS    = 1, /* a.k.a. Standard Positioning Service (SPS) */
+    HAZER_QUALITY_DIFFERENTIAL  = 2,
+    HAZER_QUALITY_PPS           = 3,
+    HAZER_QUALITY_RTK           = 4,
+    HAZER_QUALITY_RTKFLOAT      = 5,
+    HAZER_QUALITY_ESTIMATED     = 6, /* a.k.a. Dead Reckoning */
+    HAZER_QUALITY_MANUAL        = 7,
+    HAZER_QUALITY_SIMULATOR     = 8,
+    HAZER_QUALITY_TOTAL,
+} hazer_quality_t;
+
+#define HAZER_QUALITY_NAME_INITIALIZER \
+    { \
+        'N', \
+        'A', \
+        'D', \
+        'P', \
+        'R', \
+        'F', \
+        'E', \
+        'M', \
+        'S', \
+        '?', \
+    }
+
+/**
+ * Array of quality names indexed by quality enumeration.
+ */
+extern const char HAZER_QUALITY_NAME[/* hazer_quality_t */];
+
+/**
  * Proprietary UBX GNSS satellite identifiers used in NMEA-like PUBX sentences.
  * N.B. PUBX sentences from UBX devices seem largely deprecated in favor of
  * proprietary binary UBX messages as supported by Yodel.
@@ -1051,19 +1089,9 @@ typedef struct HazerPosition {
     uint8_t smm_digits;             /* Significant digits of SOG mm/h. */
     uint8_t cog_digits;             /* Significant digits of Course On Ground. */
     uint8_t mag_digits;             /* Significant digits of Magnetic bearing. */
-    char mode;                      /* Mode Indicator (from GLL). */
+    uint8_t quality;                /* Mode Indicator/Quality. */
     hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
 } hazer_position_t;
-
-/*
- * Mode Indicator (NMEA 0183 4.11 p.87)
- * A = Autonomous
- * D = Differential
- * E = Estimated (dead reckoning)
- * M = Manual
- * S = Simulator
- * N = Not valid
- */
 
 /**
  * @def HAZER_POSITION_INITIALIZER
@@ -1155,7 +1183,7 @@ extern int hazer_parse_zda(hazer_position_t * positionp, char * vector[], size_t
 /**
  * Various encodings for the fix mode. Note that larger numbers do not
  * necessarily indicate a better fix. The values were chosen mostly to preserve
- * the encoding specified by NMEA while capturing other possibilities of UBX
+ * the encoding specified by NMEA GSA while capturing other possibilities of UBX
  * PUBX.
  * NMEA 0183 4.10 p. 94.
  * NMEA 0183 4.11 p. 87
