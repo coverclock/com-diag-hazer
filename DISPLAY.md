@@ -88,7 +88,7 @@ sentence:
 * ? - Invalid.
 
 The last field is a navigation safety indicator, provided by the NMEA RMC
-sentence, and gives a clue as to the confidence timeliness of the fix:
+sentence, and gives a clue as to the confidence in and timeliness of the fix:
 
 * S - Safe;
 * C - Caution;
