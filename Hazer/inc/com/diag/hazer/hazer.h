@@ -519,21 +519,27 @@ typedef enum HazerNmeaId {
 extern hazer_system_t hazer_map_nmeaid_to_system(uint16_t id);
 
 /**
- * Mode or Quality metric. This is the combined meaning of the Mode (GLL)
- * and Quality (GGA) fields.
+ * Mode or Quality metric. This is the combined meaning of the GGA Quality,
+ * GLL Mode, and RMC Mode Indicator fields.
  * NMEA 0183 4.11 p. 86.
  * NMEA 0183 4.11 p. 87.
+ * NMEA 0183 4.11 p. 116.
  */
 typedef enum HazerQuality {
-    HAZER_QUALITY_INVALID       = 0,
-    HAZER_QUALITY_AUTONOMOUS    = 1, /* a.k.a. Standard Positioning Service (SPS) */
-    HAZER_QUALITY_DIFFERENTIAL  = 2,
-    HAZER_QUALITY_PPS           = 3,
-    HAZER_QUALITY_RTK           = 4,
+    HAZER_QUALITY_NOFIX         = 0,
+    HAZER_QUALITY_MINIMUM       = HAZER_QUALITY_NOFIX, /* For GGA. */
+    HAZER_QUALITY_AUTONOMOUS    = 1, /* Standard Positioning Service (SPS) */
+    HAZER_QUALITY_DIFFERENTIAL  = 2, /* DGNSS, SBAS (WAAS), etc. */
+    HAZER_QUALITY_MILITARY      = 3, /* Precise Positioning Service (PPS) */
+    HAZER_QUALITY_RTK           = 4, /* Real-Time Kinematics */
     HAZER_QUALITY_RTKFLOAT      = 5,
-    HAZER_QUALITY_ESTIMATED     = 6, /* a.k.a. Dead Reckoning */
+    HAZER_QUALITY_ESTIMATED     = 6, /* Dead Reckoning */
     HAZER_QUALITY_MANUAL        = 7,
     HAZER_QUALITY_SIMULATOR     = 8,
+    HAZER_QUALITY_MAXIMUM       = HAZER_QUALITY_SIMULATOR, /* For GGA. */
+    HAZER_QUALITY_PRECISE       = 9, /* Precise Point Positioning (PPP) */
+    HAZER_QUALITY_UNKNOWN       = 10,
+    HAZER_QUALITY_INVALID       = 11,
     HAZER_QUALITY_TOTAL,
 } hazer_quality_t;
 
@@ -542,12 +548,14 @@ typedef enum HazerQuality {
         'N', \
         'A', \
         'D', \
-        'P', \
+        'X', \
         'R', \
         'F', \
         'E', \
         'M', \
         'S', \
+        'P', \
+        '-', \
         '?', \
     }
 
@@ -555,6 +563,35 @@ typedef enum HazerQuality {
  * Array of quality names indexed by quality enumeration.
  */
 extern const char HAZER_QUALITY_NAME[/* hazer_quality_t */];
+
+/**
+ * Safety metric. This is from the RMC Navigational Status field.
+ * NMEA 0183 4.11 p. 117.
+ */
+typedef enum HazerSafety {
+    HAZER_SAFETY_UNKNOWN        = 0,
+    HAZER_SAFETY_SAFE           = 1,
+    HAZER_SAFETY_CAUTION        = 2,
+    HAZER_SAFETY_UNSAFE         = 3,
+    HAZER_SAFETY_NOSTATUS       = 4,
+    HAZER_SAFETY_INVALID        = 5,
+    HAZER_SAFETY_TOTAL,
+} hazer_safety_t;
+
+#define HAZER_SAFETY_NAME_INITIALIZER \
+    { \
+        '-', \
+        'S', \
+        'C', \
+        'U', \
+        'N', \
+        '?', \
+    }
+
+/**
+ * Array of safety names indexed by safety enumeration.
+ */
+extern const char HAZER_SAFETY_NAME[/* hazer_safety_t */];
 
 /**
  * Proprietary UBX GNSS satellite identifiers used in NMEA-like PUBX sentences.
@@ -1090,6 +1127,7 @@ typedef struct HazerPosition {
     uint8_t cog_digits;             /* Significant digits of Course On Ground. */
     uint8_t mag_digits;             /* Significant digits of Magnetic bearing. */
     uint8_t quality;                /* Mode Indicator/Quality. */
+    uint8_t safety;                 /* Navigational Status and Safety. */
     hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
 } hazer_position_t;
 
@@ -1106,7 +1144,8 @@ typedef struct HazerPosition {
         0, 0, 0, 0, \
         0, \
         0, 0, 0, 0, 0, 0, 0, 0, \
-        '\0', \
+        HAZER_QUALITY_UNKNOWN, \
+        HAZER_SAFETY_UNKNOWN, \
         0, \
     }
 
@@ -1183,24 +1222,27 @@ extern int hazer_parse_zda(hazer_position_t * positionp, char * vector[], size_t
 /**
  * Various encodings for the fix mode. Note that larger numbers do not
  * necessarily indicate a better fix. The values were chosen mostly to preserve
- * the encoding specified by NMEA GSA while capturing other possibilities of UBX
+ * the encoding specified by NMEA GSA while capturing other possibilities of
  * PUBX.
  * NMEA 0183 4.10 p. 94.
  * NMEA 0183 4.11 p. 87
  * UBX M8 R24 p. 164.
  */
 typedef enum HazerMode {
-    HAZER_MODE          = 0,
+    HAZER_MODE_UNKNOWN  = 0,
     HAZER_MODE_NOFIX    = 1,
+    HAZER_MODE_MINIMUM  = HAZER_MODE_NOFIX, /* for GSA. */
     HAZER_MODE_2D       = 2,
     HAZER_MODE_3D       = 3,
+    HAZER_MODE_MAXIMUM  = HAZER_MODE_3D, /* for GSA. */
     HAZER_MODE_COMBINED = 4,
     HAZER_MODE_DGNSS2D  = 5,
     HAZER_MODE_DGNSS3D  = 6,
     HAZER_MODE_TIME     = 7,
     HAZER_MODE_IMU      = 8,
     HAZER_MODE_ZERO     = 9,
-    HAZER_MODE_TOTAL    = 10,
+    HAZER_MODE_INVALID  = 10,
+    HAZER_MODE_TOTAL,
 } hazer_mode_t;
 
 /**
@@ -1210,7 +1252,7 @@ typedef enum HazerMode {
  */
 #define HAZER_MODE_NAME_INITIALIZER \
 { \
-    "NA", \
+    "--", \
     "NF", \
     "2D", \
     "3D", \
@@ -1256,7 +1298,7 @@ typedef struct HazerActive {
         HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, HAZER_GNSS_DOP, \
         HAZER_SYSTEM_TOTAL, \
         0, \
-        HAZER_MODE, \
+        HAZER_MODE_UNKNOWN, \
         0, \
     }
 

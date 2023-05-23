@@ -35,6 +35,8 @@ const char * HAZER_MODE_NAME[] = HAZER_MODE_NAME_INITIALIZER;
 
 const char HAZER_QUALITY_NAME[] = HAZER_QUALITY_NAME_INITIALIZER;
 
+const char HAZER_SAFETY_NAME[] = HAZER_SAFETY_NAME_INITIALIZER;
+
 const char * HAZER_SIGNAL_NAME[HAZER_SYSTEM_TOTAL][HAZER_GNSS_SIGNALS] = HAZER_SIGNAL_NAME_INITIALIZER;
 
 /******************************************************************************
@@ -1192,16 +1194,6 @@ hazer_system_t hazer_map_nmea_to_system(uint8_t constellation)
         system = HAZER_SYSTEM_BEIDOU;
         break;
 
-#if 0 /* OBSOLETE */
-    case HAZER_NMEA_SBAS:
-        system = HAZER_SYSTEM_SBAS;
-        break;
-
-    case HAZER_NMEA_IMES:
-        system = HAZER_SYSTEM_IMES;
-        break;
-#endif
-
     case HAZER_NMEA_QZSS:
 #if !0 /* DEPRECATED */
     case HAZER_NMEA_QZSS2:
@@ -1443,10 +1435,13 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
             errno = EINVAL;
             break;
         }
-        if (position.quality == HAZER_QUALITY_INVALID) {
-            positionp->quality = position.quality;
+        if (position.quality == HAZER_QUALITY_NOFIX) {
             errno = 0;
             break;
+        } else if (!((HAZER_QUALITY_MINIMUM <= position.quality) && (position.quality <= HAZER_QUALITY_MAXIMUM))) {
+            position.quality = HAZER_QUALITY_INVALID;
+        } else {
+            /* Do nothing. */
         }
 
         position.sat_used = strtol(vector[7], &end, 10);
@@ -1455,7 +1450,6 @@ int hazer_parse_gga(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
         if (position.sat_used == 0) {
-            positionp->sat_used = position.sat_used;
             errno = 0;
             break;
         }
@@ -1583,8 +1577,8 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
             errno = EINVAL;
             break;
         }
-        if (!((HAZER_MODE <= active.mode) && (active.mode < HAZER_MODE_TOTAL))) {
-            active.mode = HAZER_MODE_TOTAL;
+        if (!((HAZER_MODE_MINIMUM <= active.mode) && (active.mode <= HAZER_MODE_MAXIMUM))) {
+            active.mode = HAZER_MODE_INVALID;
         }
 
         /*
@@ -1989,23 +1983,60 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
-        if (strcmp(vector[2], "A") != 0) {
+        /* NMEA 0183 4.11 p. 117 Note 3. */
+        if (strcmp(vector[2], "V") != 0) {
+            /* Do nothing. */
+        } else if (count <= 13) {
+            /* Do nothing. */
+        } else if (strcmp(vector[12], "A") == 0) {
+            /* Do nothing. */
+        } else if (strcmp(vector[12], "D") == 0) {
+            /* Do nothing. */
+        } else {
             errno = 0;
             break;
         }
 
-#if 0
-        if ((count > 13) && (strcmp(vector[12], "N") == 0)) { /* NMEA 2.30+ */
+        /* NMEA 0183 4.11 p. 116 Note 2. */
+        if (count <= 13) {
+            position.quality = HAZER_QUALITY_UNKNOWN;
+        } else if (strcmp(vector[12], "A") == 0) {
+            position.quality = HAZER_QUALITY_AUTONOMOUS;
+        } else if (strcmp(vector[12], "D") == 0) {
+            position.quality = HAZER_QUALITY_DIFFERENTIAL;
+        } else if (strcmp(vector[12], "E") == 0) {
+            position.quality = HAZER_QUALITY_ESTIMATED;
+        } else if (strcmp(vector[12], "F") == 0) {
+            position.quality = HAZER_QUALITY_RTKFLOAT;
+        } else if (strcmp(vector[12], "M") == 0) {
+            position.quality = HAZER_QUALITY_MANUAL;
+        } else if (strcmp(vector[12], "N") == 0) {
+            errno = 0;
             break;
+        } else if (strcmp(vector[12], "P") == 0) {
+            position.quality = HAZER_QUALITY_PRECISE;
+        } else if (strcmp(vector[12], "R") == 0) {
+            position.quality = HAZER_QUALITY_RTK;
+        } else if (strcmp(vector[12], "S") == 0) {
+            position.quality = HAZER_QUALITY_SIMULATOR;
+        } else {
+            position.quality = HAZER_QUALITY_INVALID;
         }
-#endif
 
-#if 0
-        if ((count > 14) && (strcmp(vector[13], "V") == 0)) { /* NMEA 4.10+ */
-            /* Not clear what this means on the u-blox UBX-F9P. */
-            break;
+        /* NMEA 0183 4.11 p. 116 Note 4. */
+        if (count <= 14) {
+            position.safety = HAZER_SAFETY_UNKNOWN;
+        } else if (strcmp(vector[13], "S") == 0) {
+            position.safety = HAZER_SAFETY_SAFE;
+        } else if (strcmp(vector[13], "C") == 0) {
+            position.safety = HAZER_SAFETY_CAUTION;
+        } else if (strcmp(vector[13], "U") == 0) {
+            position.safety = HAZER_SAFETY_UNSAFE;
+        } else if (strcmp(vector[13], "V") == 0) {
+            position.safety = HAZER_SAFETY_NOSTATUS;
+        } else {
+            position.safety = HAZER_SAFETY_INVALID;
         }
-#endif
 
         position.utc_nanoseconds = hazer_parse_utc(vector[1], &end);
         if (*end != '\0') {
@@ -2075,6 +2106,10 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
 
         positionp->dmy_nanoseconds = position.dmy_nanoseconds;
         update_time(positionp);
+
+        positionp->quality = position.quality;
+
+        positionp->safety = position.safety;
 
         positionp->label = RMC;
 
@@ -2488,15 +2523,11 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         }
 
         if (strcmp(vector[8], "NF") == 0) {
-            activep->mode = HAZER_MODE_NOFIX;
-            activep->label = PUBX;
             errno = 0;
             break;
         }
 
         if (strcmp(vector[18], "0") == 0) {
-            activep->mode = HAZER_MODE_ZERO;
-            activep->label = PUBX;
             errno = 0;
             break;
         }
@@ -2545,8 +2576,6 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
             update_time(positionp);
 
             positionp->sat_used = position.sat_used;
-
-            positionp->quality = HAZER_QUALITY_TOTAL;
 
             positionp->label = PUBX;
 
@@ -2599,18 +2628,25 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
 
         if (strcmp(vector[8], "DR") == 0) {
             active.mode = HAZER_MODE_IMU;
+            position.quality = HAZER_QUALITY_ESTIMATED;
         } else if (strcmp(vector[8], "G2") == 0) {
             active.mode = HAZER_MODE_2D;
+            position.quality = HAZER_QUALITY_AUTONOMOUS;
         } else if (strcmp(vector[8], "G3") == 0) {
             active.mode = HAZER_MODE_3D;
+            position.quality = HAZER_QUALITY_AUTONOMOUS;
         } else if (strcmp(vector[8], "RK") == 0) {
             active.mode = HAZER_MODE_COMBINED;
+            position.quality = HAZER_QUALITY_ESTIMATED;
         } else if (strcmp(vector[8], "D2") == 0) {
             active.mode = HAZER_MODE_DGNSS2D;
+            position.quality = HAZER_QUALITY_DIFFERENTIAL;
         } else if (strcmp(vector[8], "D3") == 0) {
             active.mode = HAZER_MODE_DGNSS3D;
+            position.quality = HAZER_QUALITY_DIFFERENTIAL;
         } else {
-            active.mode = HAZER_MODE_TOTAL;
+            active.mode = HAZER_MODE_INVALID;
+            position.quality = HAZER_QUALITY_INVALID;
         }
 
         position.sog_millimetersperhour = hazer_parse_smm(vector[11], &position.sog_digits, &end);
@@ -2676,6 +2712,8 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
         positionp->cog_digits = position.cog_digits;
 
         positionp->sat_used = position.sat_used;
+
+        positionp->quality = position.quality;
 
         positionp->label = PUBX;
 

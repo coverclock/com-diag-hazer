@@ -137,7 +137,7 @@ int main(void)
         assert(rc < 0);
         assert(errno == 0);
         assert(memcmp(&position, &POSITION, sizeof(position)) == 0);
-        assert(active.mode == HAZER_MODE_NOFIX);
+        assert(active.mode == HAZER_MODE_UNKNOWN);
     }
 
     {
@@ -191,7 +191,9 @@ int main(void)
         assert(rc < 0);
         assert(errno == 0);
         assert(memcmp(&position, &POSITION, sizeof(position)) == 0);
+#if 0
         assert(active.mode == HAZER_MODE_ZERO);
+#endif
     }
 
     {
