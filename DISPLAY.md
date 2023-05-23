@@ -97,7 +97,7 @@ sentence, and gives a clue as to the confidence timeliness of the fix:
 * \- - Unset (no sentence with a safety metric received or field not present);
 * ? - Invalid.
 
-(This line intentially not left blank.)
+(This line intentionally not left blank.)
 
     ALT    5608.53'   1709.500m MSL    5537.99'   1688.000m GEO            GNSS
 
@@ -268,7 +268,7 @@ or the U-blox PUBX,00 sentences:
 * -- - Unset (no sentence with a fix type received or field not present);
 * ?? - Invalid.
 
-(This line intentially not left blank.)
+(This line intentionally not left blank.)
 
     DOP   1.09pdop   0.61hdop   0.90vdop                                   NAVSTAR
 
