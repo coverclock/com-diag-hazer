@@ -254,7 +254,7 @@ I have the antenna installed in a skylight in my kitchen that is near
 the peak of the roof of my home.)
 
 The next field indicates the type of fix, as provided by the NMEA GSA
-or the U-blox PUBX,00 sentences:
+or the U-blox proprietary PUBX,00 sentences:
 
 * NF - No fix;
 * 2D - 2-dimensional autonomous fix (no altitude);
