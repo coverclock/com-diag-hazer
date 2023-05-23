@@ -55,7 +55,7 @@ device provides it and it was enabled on the command line using -c (using
 data carrier detect or DCD) or -I (using general purpose input/output
 or GPIO).
 
-    POS 39°47'39.333"N, 105°09'12.103"W    39.7942591, -105.1533621 Amode  GNSS
+    POS 39°47'39.258"N, 105°09'12.172"W    39.7942383, -105.1533813 Aq Ns  GNSS
 
 POSition is the most recent position solution, latitude and longitude,
 in degrees, hours, minutes, and decimal seconds, and in decimal
@@ -68,10 +68,34 @@ but even this may be optimistic - or, for that matter, pessimistic - when
 compared to what the device is capable of. In particular, technologies
 like Wide Area Augmentation System (WAAS), multi-band GNSS, differential
 GPS, Real-Time Kinematics (RTK), and long-term surveying, can potentially
-achieve remarkable accuracy. The single character before mode indicates
-how the fix was obtained: Autonomous, Differential, Estimated (dead reckoning),
-Manual, Simulator, Not valid, or others defined in the NMEA spec; these values
-are provided by the NMEA GLL and GGA sentences.
+achieve remarkable accuracy.
+
+The next field indicates the quality of the fix, and may be set by
+the NMEA GGA, GLL, or RMC sentences, or the U-blox proprietary PUBX,00
+sentence.
+
+* N - No fix;
+* A - Autonomous e.g. Standard Positioning Service (SPS);
+* D - Differential including SBAS and WAAS as well as DGNSS;
+* X - Precise Positioning Service (PPS) - obsolete (selective availability);
+* R - Real Time Kinematics (RTK) using integers;
+* F - Real Time Kinematics (RTK) using floats;
+* E - Estimated e.g. Dead Reckoning (Inertial Measurement Unit);
+* M - Manual;
+* S - Simulator;
+* P - Precise Point Positioning (PPP);
+* - - Unset (no sentence with a quality metric received or field not present);
+* ? - Invalid.
+
+The last field is a navigation safety indicator, provided by the NMEA RMC
+sentence, and gives a clue as to the confidence timeliness of the fix:
+
+* S - Safe;
+* C - Caution;
+* U - Unsafe;
+* V - Invalid or no safety indication reported.
+* - - Unset (no sentence with a safety metric received or field not present);
+* ? - Invalid.
 
     ALT    5608.53'   1709.500m MSL    5537.99'   1688.000m GEO            GNSS
 
@@ -91,7 +115,7 @@ Speed Over Ground is the most recent speed solution, in miles per hour,
 knots (nautical miles per hour), kilometers per hour, and maters per
 second. (Similar comments here regarding precision as those for POS.)
 
-    INT GLL [12] DMY TOT (  9 10  5  3  0  0  4  4 )             39526129B tumblewe
+    INT ZDA [12] DMY TOT (  9 10  5  3  0  0  4  4 )             39526129B GNSS
 
 INTernal is some clues about the Hazer state, including the name of
 the sentence (GLL in the example above) that most recently updated
@@ -194,7 +218,7 @@ messages that were received, the newest one indicated by the rightmost
 character in the sequence, as the sequence is progressively shifted left
 as new messages are received.
 
-    ACT [1]  {    28     3    19    24     6     2 } [ 6] [ 8] [23] [32]   NAVSTAR
+    ACT [1] {    25    20    23    15     5    29 } [ 6] [ 7] [19] [21] 3D NAVSTAR
 
 ACTive is the list of active satellites, typically provided seperately
 for each system or constellation by the device, showing each satellites
@@ -226,6 +250,21 @@ used for this example has a maximum of 32 RF channels, so receiving 31
 SVs indicates that antenna placement is good; in this particular case
 I have the antenna installed in a skylight in my kitchen that is near
 the peak of the roof of my home.)
+
+The next field indicates the type of fix, as provided by the NMEA GSA
+or the U-blox PUBX,00 sentences:
+
+* NF - No fix;
+* 2D - 2-dimensional autonomous fix (no altitude);
+* 3D - 3-dimensional autonomous fix;
+* RK - Combined satellite and dead reckoning fix;
+* D2 - 2-dimensional differential fix (no altitude):
+* D3 - 3-dimensional differential fix;
+* TT - time solution only;
+* DR - Dead Reckoning a.k.a. Estimate;
+* NS - No Satellites;
+* -- - Unset (no sentence with a fix type received or field not present);
+* ?? - Invalid.
 
     DOP   1.09pdop   0.61hdop   0.90vdop                                   NAVSTAR
 

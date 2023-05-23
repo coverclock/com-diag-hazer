@@ -2168,7 +2168,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
         }
 
         if (count < 9) {
-            position.quality = HAZER_QUALITY_TOTAL;
+            position.quality = HAZER_QUALITY_UNKNOWN;
         } else {
             switch (vector[7][0]) {
             case 'A':
@@ -2190,7 +2190,7 @@ int hazer_parse_gll(hazer_position_t * positionp, char * vector[], size_t count)
                 position.quality = HAZER_QUALITY_INVALID;
                 break;
             default:
-                position.quality = HAZER_QUALITY_TOTAL + 1; 
+                position.quality = HAZER_QUALITY_INVALID; 
                 break;
             }
         }

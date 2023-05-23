@@ -569,22 +569,22 @@ extern const char HAZER_QUALITY_NAME[/* hazer_quality_t */];
  * NMEA 0183 4.11 p. 117.
  */
 typedef enum HazerSafety {
-    HAZER_SAFETY_UNKNOWN        = 0,
-    HAZER_SAFETY_SAFE           = 1,
-    HAZER_SAFETY_CAUTION        = 2,
-    HAZER_SAFETY_UNSAFE         = 3,
-    HAZER_SAFETY_NOSTATUS       = 4,
+    HAZER_SAFETY_SAFE           = 0,
+    HAZER_SAFETY_CAUTION        = 1,
+    HAZER_SAFETY_UNSAFE         = 2,
+    HAZER_SAFETY_NOSTATUS       = 3,
+    HAZER_SAFETY_UNKNOWN        = 4,
     HAZER_SAFETY_INVALID        = 5,
     HAZER_SAFETY_TOTAL,
 } hazer_safety_t;
 
 #define HAZER_SAFETY_NAME_INITIALIZER \
     { \
-        '-', \
         'S', \
         'C', \
         'U', \
         'N', \
+        '-', \
         '?', \
     }
 
@@ -1229,7 +1229,7 @@ extern int hazer_parse_zda(hazer_position_t * positionp, char * vector[], size_t
  * UBX M8 R24 p. 164.
  */
 typedef enum HazerMode {
-    HAZER_MODE_UNKNOWN  = 0,
+    HAZER_MODE_ZERO     = 0,
     HAZER_MODE_NOFIX    = 1,
     HAZER_MODE_MINIMUM  = HAZER_MODE_NOFIX, /* for GSA. */
     HAZER_MODE_2D       = 2,
@@ -1240,7 +1240,7 @@ typedef enum HazerMode {
     HAZER_MODE_DGNSS3D  = 6,
     HAZER_MODE_TIME     = 7,
     HAZER_MODE_IMU      = 8,
-    HAZER_MODE_ZERO     = 9,
+    HAZER_MODE_UNKNOWN  = 9,
     HAZER_MODE_INVALID  = 10,
     HAZER_MODE_TOTAL,
 } hazer_mode_t;
@@ -1252,7 +1252,7 @@ typedef enum HazerMode {
  */
 #define HAZER_MODE_NAME_INITIALIZER \
 { \
-    "--", \
+    "NS", \
     "NF", \
     "2D", \
     "3D", \
@@ -1261,7 +1261,7 @@ typedef enum HazerMode {
     "D3", \
     "TT", \
     "DR", \
-    "NS", \
+    "--", \
     "??", \
 }
 
@@ -1281,7 +1281,7 @@ typedef struct HazerActive {
     uint16_t hdop;                      /* Horizontal Dilution Of Precision * 100. */
     uint16_t vdop;                      /* Vertical Dilution Of Precision * 100. */
     uint16_t tdop;                      /* Time Dilution Of Precision * 100. */
-    uint8_t system;                     /* GNSS System ID (HAZER_SYSTEM_TOTAL == unused). */
+    uint8_t system;                     /* GNSS System ID. */
     uint8_t active;                     /* Number of satellites active. */
     uint8_t mode;                       /* Navigation mode: see HazerMode. */
     hazer_expiry_t ticks;               /* Lifetime in application-defined ticks. */
@@ -1369,7 +1369,7 @@ typedef struct HazerSatellite {
         0, \
         0, \
         0, \
-        0 \
+        0, \
     }
 
 /**
