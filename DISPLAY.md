@@ -97,6 +97,7 @@ sentence, and gives a clue as to the confidence timeliness of the fix:
 * \- - Unset (no sentence with a safety metric received or field not present);
 * ? - Invalid.
 
+
     ALT    5608.53'   1709.500m MSL    5537.99'   1688.000m GEO            GNSS
 
 ALTitude is the most recent altitude solution, in feet and meters, both above
@@ -265,6 +266,7 @@ or the U-blox PUBX,00 sentences:
 * NS - No Satellites;
 * -- - Unset (no sentence with a fix type received or field not present);
 * ?? - Invalid.
+
 
     DOP   1.09pdop   0.61hdop   0.90vdop                                   NAVSTAR
 
