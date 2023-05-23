@@ -84,7 +84,7 @@ sentence.
 * M - Manual;
 * S - Simulator;
 * P - Precise Point Positioning (PPP);
-* - - Unset (no sentence with a quality metric received or field not present);
+* \- - Unset (no sentence with a quality metric received or field not present);
 * ? - Invalid.
 
 The last field is a navigation safety indicator, provided by the NMEA RMC
@@ -94,7 +94,7 @@ sentence, and gives a clue as to the confidence timeliness of the fix:
 * C - Caution;
 * U - Unsafe;
 * V - Invalid or no safety indication reported.
-* - - Unset (no sentence with a safety metric received or field not present);
+* \- - Unset (no sentence with a safety metric received or field not present);
 * ? - Invalid.
 
     ALT    5608.53'   1709.500m MSL    5537.99'   1688.000m GEO            GNSS
