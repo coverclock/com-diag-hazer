@@ -82,6 +82,7 @@ int main(void)
         assert(position.alt_millimeters == 1708600LL);
         assert(position.sep_millimeters == -21500LL);
         assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
+        assert(position.safety == HAZER_SAFETY_UNKNOWN);
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
@@ -145,7 +146,7 @@ int main(void)
     }
 
     {
-        static const char * DATA = "$GNRMC,135628.00,A,3947.65337,N,10509.20223,W,0.010,,070818,,,D*74\r\n";
+        static const char * DATA = "$GNRMC,135628.00,A,3947.65337,N,10509.20223,W,0.010,,070818,,,M*7D\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_position_t position = HAZER_POSITION_INITIALIZER;
@@ -190,6 +191,7 @@ int main(void)
         assert(rc == !0);
 
         rc = hazer_parse_rmc(&position, vector, count);
+        /* RMC A mode with M status is okay. */
         assert(rc == 0);
         assert(strcmp(position.label, "RMC") == 0);
         assert(position.utc_nanoseconds == 50188000000000ULL);
@@ -200,6 +202,8 @@ int main(void)
         assert(position.lon_nanominutes == -6309202230000LL);
         assert(position.sog_microknots == 10000ULL);
         assert(position.cog_nanodegrees == 0LL);
+        assert(position.quality == HAZER_QUALITY_MANUAL);
+        assert(position.safety == HAZER_SAFETY_UNKNOWN);
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
@@ -211,6 +215,142 @@ int main(void)
 
     {
         static const char * DATA = "$GNRMC,135628.00,V,3947.65337,N,10509.20223,W,0.010,,070818,,,D*63\r\n";
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        ssize_t length = -1;
+        size_t count = 0;
+        int rc = -1;
+        char * pointer = (char *)0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
+        hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
+
+        strncpy((char *)buffer, DATA, sizeof(buffer));
+        buffer[sizeof(buffer) - 1] = '\0';
+        assert(strcmp(DATA, (const char *)buffer) == 0);
+
+        length = hazer_length(buffer, sizeof(buffer));
+        assert(length == strlen((const char *)buffer));
+
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
+        assert(pointer != (char *)0);
+        assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+        assert(pointer[1] == msn);
+        assert(pointer[2] == lsn);
+        assert(pointer[3] == '\r');
+        assert(pointer[4] == '\n');
+
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
+        assert(count == 14);
+
+        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(length == (strlen((const char *)temporary) + 1));
+        temporary[length - 1] = msn;
+        temporary[length] = lsn;
+        temporary[length + 1] = '\r';
+        temporary[length + 2] = '\n';
+        temporary[length + 3] = '\0';
+        assert(strcmp(DATA, (const char *)temporary) == 0);
+
+        rc = hazer_is_nmea_name(vector, count, "RMC");
+        assert(rc == !0);
+
+        rc = hazer_parse_rmc(&position, vector, count);
+        /* RMC V indicator with A or D mode is now okay. */
+        assert(rc == 0);
+        assert(strcmp(position.label, "RMC") == 0);
+        assert(position.utc_nanoseconds == 50188000000000ULL);
+        assert(position.dmy_nanoseconds == 1533600000000000000ULL); /* date -u -d "August 7 2018" +"%s.%N" */
+        assert(position.tot_nanoseconds == (position.utc_nanoseconds + position.dmy_nanoseconds));
+        assert(position.old_nanoseconds == position.tot_nanoseconds);
+        assert(position.lat_nanominutes == 2387653370000LL);
+        assert(position.lon_nanominutes == -6309202230000LL);
+        assert(position.sog_microknots == 10000ULL);
+        assert(position.cog_nanodegrees == 0LL);
+        assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
+        assert(position.safety == HAZER_SAFETY_UNKNOWN);
+
+        position.ticks = 0;
+        assert(!hazer_is_valid_time(&position));
+        assert(!hazer_has_valid_time(&position, 1));
+        position.ticks = 1;
+        assert(hazer_is_valid_time(&position));
+        assert(hazer_has_valid_time(&position, 1));
+    }
+
+    {
+        static const char * DATA = "$GNRMC,135628.00,A,3947.65337,N,10509.20223,W,0.010,,070818,,,D,S*0B\r\n";
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        ssize_t length = -1;
+        size_t count = 0;
+        int rc = -1;
+        char * pointer = (char *)0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
+        hazer_buffer_t temporary = { 0 };
+
+        assert(!hazer_is_valid_time(&position));
+
+        strncpy((char *)buffer, DATA, sizeof(buffer));
+        buffer[sizeof(buffer) - 1] = '\0';
+        assert(strcmp(DATA, (const char *)buffer) == 0);
+
+        length = hazer_length(buffer, sizeof(buffer));
+        assert(length == strlen((const char *)buffer));
+
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
+        assert(pointer != (char *)0);
+        assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+        assert(pointer[1] == msn);
+        assert(pointer[2] == lsn);
+        assert(pointer[3] == '\r');
+        assert(pointer[4] == '\n');
+
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
+        assert(count == 15); /* Because of the extra safety field. */
+
+        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(length == (strlen((const char *)temporary) + 1));
+        temporary[length - 1] = msn;
+        temporary[length] = lsn;
+        temporary[length + 1] = '\r';
+        temporary[length + 2] = '\n';
+        temporary[length + 3] = '\0';
+        assert(strcmp(DATA, (const char *)temporary) == 0);
+
+        rc = hazer_is_nmea_name(vector, count, "RMC");
+        assert(rc == !0);
+
+        rc = hazer_parse_rmc(&position, vector, count);
+        /* RMC V indicator with A or D mode is now okay; also SAFE. */
+        assert(rc == 0);
+        assert(strcmp(position.label, "RMC") == 0);
+        assert(position.utc_nanoseconds == 50188000000000ULL);
+        assert(position.dmy_nanoseconds == 1533600000000000000ULL); /* date -u -d "August 7 2018" +"%s.%N" */
+        assert(position.tot_nanoseconds == (position.utc_nanoseconds + position.dmy_nanoseconds));
+        assert(position.old_nanoseconds == position.tot_nanoseconds);
+        assert(position.lat_nanominutes == 2387653370000LL);
+        assert(position.lon_nanominutes == -6309202230000LL);
+        assert(position.sog_microknots == 10000ULL);
+        assert(position.cog_nanodegrees == 0LL);
+        assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
+        assert(position.safety == HAZER_SAFETY_SAFE);
+
+        position.ticks = 0;
+        assert(!hazer_is_valid_time(&position));
+        assert(!hazer_has_valid_time(&position, 1));
+        position.ticks = 1;
+        assert(hazer_is_valid_time(&position));
+        assert(hazer_has_valid_time(&position, 1));
+    }
+
+    {
+        static const char * DATA = "$GNRMC,135628.00,V,3947.65337,N,10509.20223,W,0.010,,070818,,,M*6A\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_position_t position = HAZER_POSITION_INITIALIZER;
@@ -257,11 +397,10 @@ int main(void)
 
         errno = ~0;
         rc = hazer_parse_rmc(&position, vector, count);
-#if 0
+        /* RMC V indicator without A or D mode is not okay. */
         assert(rc < 0);
         assert(errno == 0);
         assert(memcmp(&position, &POSITION, sizeof(position)) == 0);
-#endif
     }
 
     {
@@ -319,6 +458,7 @@ int main(void)
         assert(position.lat_nanominutes == 2387653370000LL);
         assert(position.lon_nanominutes == -6309202230000LL);
         assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
+        assert(position.safety == HAZER_SAFETY_UNKNOWN);
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
