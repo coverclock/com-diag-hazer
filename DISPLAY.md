@@ -72,7 +72,7 @@ achieve remarkable accuracy.
 
 The next field indicates the quality of the fix, and may be set by
 the NMEA GGA, GLL, or RMC sentences, or the U-blox proprietary PUBX,00
-sentence.
+sentence:
 
 * N - No fix;
 * A - Autonomous e.g. Standard Positioning Service (SPS);
