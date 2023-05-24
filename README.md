@@ -46,7 +46,8 @@ I also make use of Lady Heather, a terrific real-time GNSS monitoring
 program. I run it, along with my own software, and a script that
 periodically runs NTP query (ntpq), 24x7 on a Raspberry Pi with a
 touch-sensitive LCD display. This makes it easy for me to keep an eye
-on GPS and other constellations and on my various NTP micro-servers.
+on GPS and other constellations and on my various NTP micro-servers that
+depend upon GNSS constellations for their clock discipline.
 
 # Abstract
 
