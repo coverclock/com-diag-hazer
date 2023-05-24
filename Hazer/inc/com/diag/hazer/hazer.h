@@ -257,6 +257,7 @@ typedef enum HazerTalker {
     HAZER_TALKER_INSTRUMENTATION,           /* II */
     HAZER_TALKER_NAVIGATION,                /* IN */
     HAZER_TALKER_LORANC,                    /* LC */
+    HAZER_TALKER_PAIR,                      /* PAIR */
     HAZER_TALKER_PMTK,                      /* PMTK */
     HAZER_TALKER_PSRF,                      /* PSRF */
     HAZER_TALKER_PUBX,                      /* PUBX */
@@ -289,6 +290,7 @@ typedef enum HazerTalker {
     "II", \
     "IN", \
     "LC", \
+    "PAIR", \
     "PMTK", \
     "PSRF", \
     "PUBX", \
@@ -1062,6 +1064,12 @@ extern uint16_t hazer_parse_dop(const char * string, char ** endp);
  * SiRF NMEA Reference Manual, 2-1, Input Messages
  */
 #define HAZER_PROPRIETARY_SENTENCE_PSRF "PSRF"
+
+/**
+ * @def HAZER_PROPRIETARY_SENTENCE_PAIR
+ * Quectel L89 R2.0 GNSS Protocol Specification
+ */
+#define HAZER_PROPRIETARY_SENTENCE_PAIR "PAIR"
 
 /*******************************************************************************
  * DETERMINING TALKER

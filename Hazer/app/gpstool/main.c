@@ -2478,7 +2478,7 @@ consume:
 
                 system = HAZER_SYSTEM_GNSS;
 
-            } else if ((talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF)) {
+            } else if ((talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF) || (talker == HAZER_TALKER_PAIR)) {
 
                 DIMINUTO_LOG_INFORMATION("Received NMEA Sentence Other %s \"%.*s\"", HAZER_TALKER_NAME[talker], (int)(length - 2) /* Exclude CR and LF. */, buffer);
                 continue;

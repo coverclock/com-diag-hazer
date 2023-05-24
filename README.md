@@ -821,6 +821,9 @@ National Marine Electronics Association, 2018-10
 
 NovAtel, "An Introduction to GNSS", 2nd ed., NovAtel Inc., 2015
 
+Quectel, "L89 R2.0 GNSS Protocol Specification",
+L89_R2.0_GNSS_Protocol_Specification_V1.0, (Preliminary), 2020-04-29
+
 Eric S. Raymond, "NMEA Revealed", 2023-05-03,
 <https://gpsd.gitlab.io/gpsd/NMEA.html>
 
