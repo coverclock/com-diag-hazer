@@ -2458,9 +2458,9 @@ consume:
              * As a special case, if we receive an update on active satellites
              * or satellites in view from something we don't recognize, then
              * we have a new GNSS that isn't supported. That's worth noting.
-             * Three other special cases: PUBX (u-blox), PMTK (Gtop/MTK),
-             * and PSRF (SiRF) proprietary messages that are encoded like
-             * NMEA sentences.
+             * Other special cases: PUBX (u-blox), PMTK (Gtop/MTK), PSRF
+             * (SiRF), and PAIR (Quectel) proprietary messages that are
+             * encoded like NMEA sentences.
              */
 
             if (count < 2) {
