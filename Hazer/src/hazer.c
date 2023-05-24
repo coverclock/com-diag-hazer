@@ -2732,7 +2732,7 @@ int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_t * act
     return rc;
 }
 
-int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], char * vector[], size_t count)
+int hazer_parse_pubx_svstatus(hazer_views_t viewa, hazer_actives_t activea, char * vector[], size_t count)
 {
     int rc = -1;
     int result = 0;

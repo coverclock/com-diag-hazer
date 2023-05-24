@@ -103,7 +103,7 @@
 #include <string.h>
 
 /*******************************************************************************
- * TYPES
+ * COMMON SCALER TYPES
  ******************************************************************************/
 
 typedef uint8_t hazer_expiry_t;
@@ -1150,6 +1150,12 @@ typedef struct HazerPosition {
     }
 
 /**
+ * This type definition defines an array the appropriate size to maintain
+ * the position database for each GNSS constellation supported.
+ */
+typedef hazer_position_t (hazer_positions_t)[HAZER_SYSTEM_TOTAL];
+
+/**
  * @def HAZER_POSITIONS_INITIALIZER
  * Initialize an array of HazerPosition structures.
  */
@@ -1301,6 +1307,12 @@ typedef struct HazerActive {
         HAZER_MODE_UNKNOWN, \
         0, \
     }
+
+/**
+ * This type definition defines an array the appropriate size to maintain
+ * the active database for each GNSS constellation supported.
+ */
+typedef hazer_active_t (hazer_actives_t)[HAZER_SYSTEM_TOTAL];
 
 /**
  * @def HAZER_ACTIVES_INITIALIZER
@@ -1473,6 +1485,12 @@ typedef struct HazerView {
     }
 
 /**
+ * This type definition defines an array the appropriate size to maintain
+ * the view database for each GNSS constellation supported.
+ */
+typedef hazer_view_t (hazer_views_t)[HAZER_SYSTEM_TOTAL];
+
+/**
  * @def HAZER_VIEWS_INITIALIZER
  * Initialize an array of HazerView structures, one slot for every
  * system.
@@ -1541,7 +1559,7 @@ extern int hazer_parse_pubx_position(hazer_position_t * positionp, hazer_active_
  * @param count is size of the vector in slots including the null pointer.
  * @return a bit mask with (1<<system) bit set for every system reported.
  */
-extern int hazer_parse_pubx_svstatus(hazer_view_t viewa[], hazer_active_t activea[], char * vector[], size_t count);
+extern int hazer_parse_pubx_svstatus(hazer_views_t viewa, hazer_actives_t activea, char * vector[], size_t count);
 
 /**
  * Parse a U-blox PUBX,04 (TIME) message. Note that should the fix be lost,

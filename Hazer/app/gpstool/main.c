@@ -313,9 +313,9 @@ int main(int argc, char * argv[])
     /*
      * NMEA state databases.
      */
-    hazer_position_t position[HAZER_SYSTEM_TOTAL] = HAZER_POSITIONS_INITIALIZER;
-    hazer_active_t active[HAZER_SYSTEM_TOTAL] = HAZER_ACTIVES_INITIALIZER;
-    hazer_view_t view[HAZER_SYSTEM_TOTAL] = HAZER_VIEWS_INITIALIZER;
+    hazer_positions_t position = HAZER_POSITIONS_INITIALIZER;
+    hazer_actives_t active = HAZER_ACTIVES_INITIALIZER;
+    hazer_views_t view = HAZER_VIEWS_INITIALIZER;
     /*
      * UBX state databases.
      */

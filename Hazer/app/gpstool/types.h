@@ -165,8 +165,8 @@ typedef struct YodelSolution {
  * Structure combining both a UBX-MON-HW payload and its expiry time in ticks.
  */
 typedef struct YodelHardware {
-    yodel_ubx_mon_hw_t payload;	/* Payload from UBX-MON-HW message. */
-    hazer_expiry_t ticks;				/* Lifetime in application-defined ticks. */
+    yodel_ubx_mon_hw_t payload;     /* Payload from UBX-MON-HW message. */
+    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
     uint8_t unused[3];
 } yodel_hardware_t;
 
@@ -189,8 +189,8 @@ typedef struct YodelHardware {
  * Structure combining both a UBX-NAV-STATUS payload and its expiry time in ticks.
  */
 typedef struct YodelStatus {
-    yodel_ubx_nav_status_t payload;	/* Payload from UBX-NAV-STATUS message. */
-    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
+    yodel_ubx_nav_status_t payload; /* Payload from UBX-NAV-STATUS message. */
+    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
     uint8_t unused[3];
 } yodel_status_t;
 
@@ -213,8 +213,8 @@ typedef struct YodelStatus {
  * Structure combining both a UBX-NAV-SVIN payload and its expiry time in ticks.
  */
 typedef struct YodelBase {
-    yodel_ubx_nav_svin_t payload;	/* Payload from UBX-NAV-SVIN message. */
-    hazer_expiry_t ticks;					/* Lifetime in application-defined ticks. */
+    yodel_ubx_nav_svin_t payload;   /* Payload from UBX-NAV-SVIN message. */
+    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
     uint8_t unused[7];
 } yodel_base_t;
 
@@ -237,8 +237,8 @@ typedef struct YodelBase {
  * Structure combining both a UBX-RXM-RTCM payload and its expiry time in ticks.
  */
 typedef struct YodelRover {
-    yodel_ubx_rxm_rtcm_t payload;	/* Payload from UBX-RXM-RTCM message. */
-    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
+    yodel_ubx_rxm_rtcm_t payload;   /* Payload from UBX-RXM-RTCM message. */
+    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
     uint8_t unused[7];
 } yodel_rover_t;
 
@@ -261,8 +261,8 @@ typedef struct YodelRover {
  * Structure combining both a UBX-RXM-RTCM payload and its expiry time in ticks.
  */
 typedef struct YodelAttitude {
-    yodel_ubx_nav_att_t payload;	/* Payload from UBX-NAV_ATT message. */
-    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
+    yodel_ubx_nav_att_t payload;    /* Payload from UBX-NAV_ATT message. */
+    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
     uint8_t unused[7];
 } yodel_attitude_t;
 

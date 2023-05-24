@@ -24,9 +24,9 @@
 
 int main(void)
 {
-    hazer_position_t position[HAZER_SYSTEM_TOTAL];
-    hazer_active_t active[HAZER_SYSTEM_TOTAL];
-    hazer_view_t view[HAZER_SYSTEM_TOTAL];
+    hazer_positions_t position;
+    hazer_actives_t active;
+    hazer_views_t view;
 
     PRINTSIZEOF(coordinates_format_t);
     PRINTSIZEOF(datagram_buffer_t);
