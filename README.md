@@ -410,6 +410,7 @@ I have successfully tested Hazer with the following GPS chipsets.
 
 * MediaTek MTK3339    
 * Quectel L80-R    
+* Quectel L89-R    
 * SiRF Star II    
 * SiRF Star III    
 * SiRF Star IV    
@@ -439,6 +440,7 @@ I have successfully tested Hazer with the following GPS devices.
 * Garmin GLO (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21]    
 * Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21] [^22]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
+* GlobalSat BU-353N (Quectel L89+Prolific, 4800 8N1, v067Bp23a3, ttyUSB, 1Hz)
 * GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
 * GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [^1] [^2] [^4] [^8] [^13]    
