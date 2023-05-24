@@ -15,6 +15,9 @@
 #include "com/diag/hazer/yodel.h"
 #include "./unittest.h"
 
+#define position positions[HAZER_SYSTEM_GNSS]
+#define view views[HAZER_SYSTEM_GPS]
+
 int main(void)
 {
     hazer_debug(stderr);
@@ -28,7 +31,7 @@ int main(void)
         static const char * DATA = "$GNGGA,135627.00,3947.65338,N,10509.20216,W,2,12,0.67,1708.6,M,-21.5,M,,0000*4E\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -86,17 +89,17 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
         position.ticks = 1;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
     }
 
     {
         static const char * DATA = "$GNGGA,135627.00,3947.65338,N,10509.20216,W,2,0,0.67,1708.6,M,-21.5,M,,0000*7D\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
@@ -149,7 +152,7 @@ int main(void)
         static const char * DATA = "$GNRMC,135628.00,A,3947.65337,N,10509.20223,W,0.010,,070818,,,M*7D\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -207,17 +210,17 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(&position, 1));
+        assert(hazer_has_valid_time(positions, 1));
     }
 
     {
         static const char * DATA = "$GNRMC,135628.00,V,3947.65337,N,10509.20223,W,0.010,,070818,,,D*63\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -275,17 +278,17 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(&position, 1));
+        assert(hazer_has_valid_time(positions, 1));
     }
 
     {
         static const char * DATA = "$GNRMC,135628.00,A,3947.65337,N,10509.20223,W,0.010,,070818,,,D,S*0B\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -343,17 +346,17 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(&position, 1));
+        assert(hazer_has_valid_time(positions, 1));
     }
 
     {
         static const char * DATA = "$GNRMC,135628.00,V,3947.65337,N,10509.20223,W,0.010,,070818,,,M*6A\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
@@ -407,7 +410,7 @@ int main(void)
         static const char * DATA = "$GNGLL,3947.65337,N,10509.20223,W,135628.00,A,D*6A\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -462,17 +465,17 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
         position.ticks = 1;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
     }
 
     {
         static const char * DATA = "$GNVTG,,T,,M,0.021,N,0.040,K,D*3F\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -527,17 +530,17 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
         position.ticks = 1;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
     }
 
     {
         static const char * DATA = "$GNVTG,,T,,M,0.021,N,0.040,K,N*35\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
@@ -729,7 +732,7 @@ int main(void)
         };
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_view_t view = HAZER_VIEW_INITIALIZER;
+        hazer_views_t views = HAZER_VIEWS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -776,10 +779,10 @@ int main(void)
             assert(strcmp(view.label, "GSV") == 0);
 
             view.sig[0].ticks = 0;
-            rc = hazer_has_pending_gsv(&view, 1);
+            rc = hazer_has_pending_gsv(views, 2);
             assert(rc == 0);
             view.sig[0].ticks = 1;
-            rc = hazer_has_pending_gsv(&view, 1);
+            rc = hazer_has_pending_gsv(views, 2);
             assert(rc == ((ii < 3) ? !0 : 0));
             view.sig[0].ticks = 1;
 
@@ -879,7 +882,7 @@ int main(void)
         };
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_view_t view = HAZER_VIEW_INITIALIZER;
+        hazer_views_t views = HAZER_VIEWS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -926,10 +929,10 @@ int main(void)
             assert(jj == (ii == 0) ? 1 : (ii == 1) ? 2 : (ii == 2) ? 0 : 3);
 
             view.sig[jj].ticks = 0;
-            rc = hazer_has_pending_gsv(&view, 1);
+            rc = hazer_has_pending_gsv(views, 2);
             assert(rc == 0);
             view.sig[jj].ticks = 1;
-            rc = hazer_has_pending_gsv(&view, 1);
+            rc = hazer_has_pending_gsv(views, 2);
             assert(rc == ((ii < 3) ? !0 : 0));
             view.sig[jj].ticks = 0;
 
@@ -1032,7 +1035,7 @@ int main(void)
         static const char * DATA = "$GNZDA,171305.00,12,05,2023,00,00*7C\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -1084,10 +1087,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(&position, 1));
+        assert(hazer_has_valid_time(positions, 1));
     }
 
     {
@@ -1095,7 +1098,7 @@ int main(void)
         static const char * DATA = "$GNZDA,171305.00,12,05,2023,-12,45*53\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -1147,10 +1150,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(&position, 1));
+        assert(hazer_has_valid_time(positions, 1));
     }
 
     {
@@ -1158,7 +1161,7 @@ int main(void)
         static const char * DATA = "$GNZDA,171305.00,12,05,2023,10,30*7E\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
-        hazer_position_t position = HAZER_POSITION_INITIALIZER;
+        hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
         size_t count = 0;
         int rc = -1;
@@ -1210,10 +1213,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(positions, 1));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(&position, 1));
+        assert(hazer_has_valid_time(positions, 1));
     }
 
     return 0;
