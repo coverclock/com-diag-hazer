@@ -72,7 +72,7 @@ achieve remarkable accuracy.
 
 The next field indicates the quality of the fix, and may be set by
 the NMEA GGA, GLL, or RMC sentences, or the U-blox proprietary PUBX,00
-sentence.
+sentence:
 
 * N - No fix;
 * A - Autonomous e.g. Standard Positioning Service (SPS);
@@ -88,7 +88,7 @@ sentence.
 * ? - Invalid.
 
 The last field is a navigation safety indicator, provided by the NMEA RMC
-sentence, and gives a clue as to the confidence timeliness of the fix:
+sentence, and gives a clue as to the confidence in and timeliness of the fix:
 
 * S - Safe;
 * C - Caution;
@@ -254,7 +254,7 @@ I have the antenna installed in a skylight in my kitchen that is near
 the peak of the roof of my home.)
 
 The next field indicates the type of fix, as provided by the NMEA GSA
-or the U-blox PUBX,00 sentences:
+or the U-blox proprietary PUBX,00 sentences:
 
 * NF - No fix;
 * 2D - 2-dimensional autonomous fix (no altitude);
