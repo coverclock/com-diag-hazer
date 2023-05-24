@@ -134,8 +134,8 @@ and associated
 were built from Hazer's embedded Doxygen comments on
 2023-05-23
 using tag
-55.1.0
-.
+```55.1.0```
+. They will not reflect changes made since then.
 
 The unit tests (```Hazer/tst```), functional tests (```Hazer/fun```),
 and command line uilities (```Hazer/bin```) contain useful and non-trivial
