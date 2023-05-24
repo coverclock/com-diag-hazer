@@ -410,7 +410,7 @@ I have successfully tested Hazer with the following GPS chipsets.
 
 * MediaTek MTK3339    
 * Quectel L80-R    
-* Quectel L89-R    
+* Quectel L89    
 * SiRF Star II    
 * SiRF Star III    
 * SiRF Star IV    
