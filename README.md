@@ -42,6 +42,12 @@ parsing library that I can incorporate into the kinds of embedded systems
 I am frequently called to work upon. Hazer and gpstool have also turned
 out to be really useful tools for testing and evaluating GPS devices.
 
+I also make use of Lady Heather, a terrific real-time GNSS monitoring
+program. I run it, along with my own software, and a script that
+periodically runs NTP query (ntpq), 24x7 on a Raspberry Pi with a
+touch-sensitive LCD display. This makes it easy for me to keep an eye
+on GPS and other constellations and on my various NTP micro-servers.
+
 # Abstract
 
 This file is part of the Digital Aggregates Corporation Hazer
