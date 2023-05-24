@@ -3027,7 +3027,7 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
  *
  ******************************************************************************/
 
-int hazer_has_pending_gsv(const hazer_view_t va[], size_t count)
+int hazer_has_pending_gsv(const hazer_views_t va, size_t count)
 {
     size_t ii = 0;
     size_t jj = 0;
@@ -3047,7 +3047,7 @@ int hazer_has_pending_gsv(const hazer_view_t va[], size_t count)
     return 0;
 }
 
-int hazer_has_valid_time(const hazer_position_t pa[], size_t count)
+int hazer_has_valid_time(const hazer_positions_t pa, size_t count)
 {
     size_t ii = 0;
 

@@ -780,7 +780,9 @@ extern ssize_t hazer_validate(const void * buffer, size_t size);
 /**
  * This is an argument vector big enough to hold all possible sentences no
  * larger than those that can fit in the buffer type, plus a NULL pointer in
- * the last position.
+ * the last position. N.B. Most uses of this type should really be const, but
+ * unlike C++ (which I dimly recall would let me do that), C objects to passing
+ * a non-const of this type as an argument to a const parameter. I has a sad.
  */
 typedef char * (hazer_vector_t)[HAZER_NMEA_LONGEST - HAZER_NMEA_SHORTEST + 1]; /* plus NULL */
 
@@ -1586,9 +1588,9 @@ extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], 
  * @param name is the nul-terminated three letter name.
  * @return true if the name matches the field, false otherwise.
  */
-static inline int hazer_is_nmea_name(const hazer_vector_t vector, ssize_t count, const char name[4])
+static inline int hazer_is_nmea_name(char * vector[], ssize_t count, const char name[4])
 {
-    return ((count > 1) && (vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][3]), name) == 0));
+    return ((count >= 1) && (strlen(vector[0]) == 6) && (vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][3]), name) == 0));
 }
 
 /**
@@ -1599,9 +1601,9 @@ static inline int hazer_is_nmea_name(const hazer_vector_t vector, ssize_t count,
  * @param id is the nul-terminated two letter message identifier.
  * @return true if the id matches the field.
  */
-static inline int hazer_is_pubx_id(const hazer_vector_t vector, ssize_t count, const char id[3])
+static inline int hazer_is_pubx_id(char * vector[], ssize_t count, const char id[3])
 {
-    return ((count > 2) && (vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][1]), "PUBX") == 0) && (strcmp(vector[1], id) == 0));
+    return ((count >= 2) && (strlen(vector[0]) == 5) && (vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][1]), "PUBX") == 0) && (strlen(vector[1]) == 2) && (strcmp(vector[1], id) == 0));
 }
 
 /**
@@ -1612,7 +1614,7 @@ static inline int hazer_is_pubx_id(const hazer_vector_t vector, ssize_t count, c
  * @param count is the number of entries in the view array.
  * @return true if there are GSV views pending for any constellation.
  */
-extern int hazer_has_pending_gsv(const hazer_view_t va[], size_t count);
+extern int hazer_has_pending_gsv(const hazer_views_t va, size_t count);
 
 /*******************************************************************************
  * PARSING VALIDATORS
@@ -1642,7 +1644,7 @@ static inline int hazer_is_valid_time(const hazer_position_t * positionp)
  * @param count is the number of entries in the position array.
  * @return true if time, date, and monotonic clock are true for some position.
  */
-extern int hazer_has_valid_time(const hazer_position_t pa[], size_t count);
+extern int hazer_has_valid_time(const hazer_positions_t pa, size_t count);
 
 /*
  * The validators below are a little more liberal and forgiving than the
