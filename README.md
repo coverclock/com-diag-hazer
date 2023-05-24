@@ -440,7 +440,7 @@ I have successfully tested Hazer with the following GPS devices.
 * Garmin GLO (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21]    
 * Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21] [^22]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
-* GlobalSat BU-353N (Quectel L89+Prolific, 4800 8N1, v067Bp23a3, ttyUSB, 1Hz)
+* GlobalSat BU-353N (Quectel L89+Prolific, 4800 8N1, v067Bp23a3, ttyUSB, 1Hz) [^25]    
 * GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
 * GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [^1] [^2] [^4] [^8] [^13]    
@@ -487,7 +487,8 @@ I have successfully tested Hazer with the following GPS devices.
 [^21]: Supposed to receive both GPS and GLONASS but my GLO and both of my GLO 2 units just receive GPS.    
 [^22]: Rumored to differ from the original GLO only by its increased battery life.    
 [^23]: Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), COMPASS (China), *and* NavIC (India) concurrently.    
-[^24]: The labels on the PVT (1pps) and PWR LEDs on this board are reversed.    
+[^24]: The labels on the PVT (1pps) and PWR LEDs on this board are reversed.        
+[^25]: Said to support GPS (U.S.), Galileo (EU), Beidou (China), GLONASS (Russia), and even NAVIC (India), but so far only GPS is reported.    
 
 ## Notes
 
