@@ -14,4 +14,4 @@ RATE=${2:-4800}
 LOG=$(readlink -e $(dirname ${0})/..)/tmp
 mkdir -p ${LOG}
 
-eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 2> ${LOG}/${PROGRAM}.err
+eval coreable gpstool -D ${DEVICE} -b ${RATE} -8 -n -1 -E -t 10 -W '\$PAIR020' 2> ${LOG}/${PROGRAM}.err
