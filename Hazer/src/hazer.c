@@ -1983,7 +1983,7 @@ int hazer_parse_rmc(hazer_position_t * positionp, char * vector[], size_t count)
             break;
         }
 
-        /* NMEA 0183 4.11 p. 117 Note 3. */
+        /* NMEA 0183 4.11 p. 117 Note 3. (I find the spec very ambiguous.) */
         if (strcmp(vector[2], "V") != 0) {
             /* Do nothing. */
         } else if (count <= 13) {
