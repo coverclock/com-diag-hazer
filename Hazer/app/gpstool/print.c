@@ -706,7 +706,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].sep_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
             fprintf(fp, " %20lluB", (unsigned long long)bytes); /* (2^64)-1 == 0xFFFFFFFFFFFFFFFF == 18,446,744,073,709,551,615. */
 
-            fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8.8s", (system == 0) ? Source : HAZER_SYSTEM_NAME[system]);
 
             fputc('\n', fp);
 
@@ -724,7 +724,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
             fputs(" tot", fp);
             fputs(" (  0  0  0  0  0  0  0  0 )", fp);
             fputs("                    0B", fp);
-            fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[HAZER_SYSTEM_GNSS]);
+            fprintf(fp, " %-8.8s", Source);
 
             fputc('\n', fp);
 

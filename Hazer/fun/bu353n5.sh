@@ -3,7 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# This script is specific to the GlobalSat BU-353N.
+# This script is specific to the GlobalSat BU-353N5.
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
