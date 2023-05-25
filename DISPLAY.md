@@ -117,7 +117,7 @@ Speed Over Ground is the most recent speed solution, in miles per hour,
 knots (nautical miles per hour), kilometers per hour, and maters per
 second. (Similar comments here regarding precision as those for POS.)
 
-    INT ZDA [12] DMY TOT (  9 10  5  3  0  0  4  4 )             39526129B GNSS
+    INT ZDA [12] DMY TOT (  9 10  5  3  0  0  4  4 )             39526129B ttyACM0
 
 INTernal is some clues about the Hazer state, including the name of
 the sentence (GLL in the example above) that most recently updated
@@ -131,7 +131,8 @@ various values provided by the device.  INT also includes the total
 number of bytes sent or received - 395,261,29B in this example - over
 the network. This allows you to keep track of your network utilization,
 especially important when paying for data on your LTE mobile provider. The
-right-most field is the name of the device from which gpstool is reading.
+right-most field in the first INT line (there will typically only be one)
+is the name of the device from which gpstool is reading.
 
     MON -jamming  +history  50indicator  63maximum                         ttyACM1
 
