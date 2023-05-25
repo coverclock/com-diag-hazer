@@ -362,10 +362,10 @@ say about the 4.11 standard.
 ## GlobalSat BU-353N5 Quectel L89? Missing GSV Sentences
 
 The GlobalSat BU-353N5, which I believe uses a Quectel L89 chip because of
-its use of the proprietary PAIR NMEA-like sentences, reports active use
-of SVs in both the GPS and GLONASS constellations in its GSA messages,
-emitting NMEA System IDs of both 1 (GPS) and 2 (GLONASS), but only emits
-GSV sentences with the Talker name of "GP" (GPS). I figured this was a bug
+its use of the proprietary ```PAIR``` NMEA-like sentences, reports active use
+of SVs in both the GPS and GLONASS constellations in its ```GSA``` sentences,
+emitting NMEA System IDs of both ```1``` (GPS) and ```2``` (GLONASS), but only emits
+```GSV``` sentences with the Talker name of ```GP``` (GPS). I figured this was a bug
 in my code, but examining raw data (which I saved in the ```dat/hazer```
 directory) confirms this weird behavior.
 
