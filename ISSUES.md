@@ -222,7 +222,7 @@ on the subsequent identical test sequence.
 The Bad Elf GPS Pro+ device is documented to use the MediaTek (MTK)
 chipset.  Hazser 46.0.4 received the following RMC sentence from the
 device (BE-GPS-2300, SN 020661, FW 2.1.60, HW 8.0.0), as documented in a
-"contenate" (-C) file.
+"catenate" (-C) file.
 
     $GPRMC,203410.000,A3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*68
 
