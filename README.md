@@ -496,9 +496,8 @@ I have successfully tested Hazer with the following GPS devices.
 [^22]: Rumored to differ from the original GLO only by its increased battery life.    
 [^23]: Receives GPS (U.S.), GLONASS (Russia), Galileo (EU), COMPASS (China), *and* NavIC (India) concurrently.    
 [^24]: The labels on the PVT (1pps) and PWR LEDs on this board are reversed.        
-[^25]: Said to support GPS (U.S.), Galileo (EU), Beidou (China), GLONASS (Russia), and even NAVIC (India), but so far only GPS is reported.    
+[^25]: Vendor web site and OEM packaging correctly states GPS only.    
 [^26]: Emits GSAs with GLONASS id (2) but only emits GSVs with GPS talker (GP).    
-
 ## Notes
 
 GlobalSat is also known as GlobalSat Technology, USGlobalSat, US
