@@ -308,14 +308,14 @@ int main(int argc, char * argv[])
     hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
-    hazer_system_t maximum = HAZER_SYSTEM_TOTAL;
     hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+    hazer_system_t maximum = HAZER_SYSTEM_GNSS;
     /*
      * NMEA state databases.
      */
-    hazer_positions_t position = HAZER_POSITIONS_INITIALIZER;
-    hazer_actives_t active = HAZER_ACTIVES_INITIALIZER;
-    hazer_views_t view = HAZER_VIEWS_INITIALIZER;
+    hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
+    hazer_actives_t actives = HAZER_ACTIVES_INITIALIZER;
+    hazer_views_t views = HAZER_VIEWS_INITIALIZER;
     /*
      * UBX state databases.
      */
@@ -1539,7 +1539,8 @@ int main(int argc, char * argv[])
     sync = 0;
     frame = 0;
 
-    maximum = 0;
+    maximum = HAZER_SYSTEM_GNSS;
+    DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
 
     io_maximum = 0;
     io_total = 0;
@@ -2403,11 +2404,11 @@ consume:
 
             for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
                 if (ii > maximum) { break; }
-                countdown(&position[ii].ticks, elapsed);
-                countdown(&active[ii].ticks, elapsed);
+                countdown(&positions[ii].ticks, elapsed);
+                countdown(&actives[ii].ticks, elapsed);
                 for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
-                    if (jj >= view[ii].signals) { break; }
-                    countdown(&view[ii].sig[jj].ticks, elapsed);
+                    if (jj >= views[ii].signals) { break; }
+                    countdown(&views[ii].sig[jj].ticks, elapsed);
                 }
             }
 
@@ -2496,7 +2497,10 @@ consume:
 
             }
 
-            if (system > maximum) { maximum = system; }
+            if (system > maximum) { 
+                maximum = system;
+                DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+            }
 
             /*
              * Parse the sentences we care about and update our state to
@@ -2511,9 +2515,9 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
 
-                if (hazer_parse_gga(&position[system], vector, count) == 0) {
+                if (hazer_parse_gga(&positions[system], vector, count) == 0) {
 
-                    position[system].ticks = timeout;
+                    positions[system].ticks = timeout;
                     refresh = !0;
                     trace = !0;
 
@@ -2533,9 +2537,9 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
 
-                if (hazer_parse_rmc(&position[system], vector, count) == 0) {
+                if (hazer_parse_rmc(&positions[system], vector, count) == 0) {
 
-                    position[system].ticks = timeout;
+                    positions[system].ticks = timeout;
                     refresh = !0;
                     trace = !0;
 
@@ -2555,9 +2559,9 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
 
-                if (hazer_parse_gll(&position[system], vector, count) == 0) {
+                if (hazer_parse_gll(&positions[system], vector, count) == 0) {
 
-                    position[system].ticks = timeout;
+                    positions[system].ticks = timeout;
                     refresh = !0;
                     trace = !0;
 
@@ -2577,9 +2581,9 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA VTG\n");
 
-                if (hazer_parse_vtg(&position[system], vector, count) == 0) {
+                if (hazer_parse_vtg(&positions[system], vector, count) == 0) {
 
-                    position[system].ticks = timeout;
+                    positions[system].ticks = timeout;
                     refresh = !0;
 
                 } else if (errno == 0) {
@@ -2621,10 +2625,13 @@ consume:
                         }
                     }
 
-                    if (system > maximum) { maximum = system; }
+                    if (system > maximum) {
+                        maximum = system;
+                        DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                    }
 
-                    active[system] = active_cache;
-                    active[system].ticks = timeout;
+                    actives[system] = active_cache;
+                    actives[system].ticks = timeout;
                     refresh = !0;
 
                 } else {
@@ -2637,11 +2644,11 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GSV\n");
 
-                if  ((rc = hazer_parse_gsv(&view[system], vector, count)) >= 0) {
+                if  ((rc = hazer_parse_gsv(&views[system], vector, count)) >= 0) {
 
-                    view[system].sig[rc].ticks = timeout;
+                    views[system].sig[rc].ticks = timeout;
 
-                    if (view[system].pending == 0) {
+                    if (views[system].pending == 0) {
                         refresh = !0;
                         DIMINUTO_LOG_DEBUG("Received NMEA GSV complete\n");
                     } else {
@@ -2658,9 +2665,9 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA ZDA\n");
 
-                if (hazer_parse_zda(&position[system], vector, count) == 0) {
+                if (hazer_parse_zda(&positions[system], vector, count) == 0) {
 
-                    position[system].ticks = timeout;
+                    positions[system].ticks = timeout;
                     refresh = !0;
 
                     /*
@@ -2702,10 +2709,10 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
 
-                if  (hazer_parse_pubx_position(&position[system], &active[system], vector, count) == 0) {
+                if  (hazer_parse_pubx_position(&positions[system], &actives[system], vector, count) == 0) {
 
-                    position[system].ticks = timeout;
-                    active[system].ticks = timeout;
+                    positions[system].ticks = timeout;
+                    actives[system].ticks = timeout;
                     refresh = !0;
                     trace = !0;
 
@@ -2725,23 +2732,27 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS\n");
 
-                if ((rc = hazer_parse_pubx_svstatus(view, active, vector, count)) != 0x00) {
+                if ((rc = hazer_parse_pubx_svstatus(views, actives, vector, count)) != 0x00) {
 
                     for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
                         if ((rc & (1 << system)) != 0) {
-                            view[system].sig[0].ticks = timeout;
+                            if (system > maximum) {
+                                maximum = system;
+                                DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                            }
+                            views[system].sig[0].ticks = timeout;
                             if (system == HAZER_SYSTEM_GNSS) {
                                 /* Do nothing. */
-                            } else if (active[HAZER_SYSTEM_GNSS].ticks == 0) {
+                            } else if (actives[HAZER_SYSTEM_GNSS].ticks == 0) {
                                 /* Do nothing. */
                             } else {
-                                active[system].mode = active[HAZER_SYSTEM_GNSS].mode;
-                                active[system].pdop = active[HAZER_SYSTEM_GNSS].pdop;
-                                active[system].hdop = active[HAZER_SYSTEM_GNSS].hdop;
-                                active[system].vdop = active[HAZER_SYSTEM_GNSS].vdop;
-                                active[system].tdop = active[HAZER_SYSTEM_GNSS].tdop;
+                                actives[system].mode = actives[HAZER_SYSTEM_GNSS].mode;
+                                actives[system].pdop = actives[HAZER_SYSTEM_GNSS].pdop;
+                                actives[system].hdop = actives[HAZER_SYSTEM_GNSS].hdop;
+                                actives[system].vdop = actives[HAZER_SYSTEM_GNSS].vdop;
+                                actives[system].tdop = actives[HAZER_SYSTEM_GNSS].tdop;
                             }
-                            active[system].ticks = timeout;
+                            actives[system].ticks = timeout;
                             refresh = !0;
                             DIMINUTO_LOG_DEBUG("Received PUBX SVSTATUS (%s)\n", HAZER_SYSTEM_NAME[system]);
                         }
@@ -2757,7 +2768,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse PUBX TIME\n");
 
-                if (hazer_parse_pubx_time(&position[system], vector, count) == 0) {
+                if (hazer_parse_pubx_time(&positions[system], vector, count) == 0) {
 
                     /*
                      * The CAM-M8Q can report time in the PUBX,04 sentence
@@ -3062,7 +3073,7 @@ consume:
          */
 
         time_valid_prior = time_valid;
-        time_valid = hazer_has_valid_time(position, countof(position));
+        time_valid = hazer_has_valid_time(positions, maximum);
         if (time_valid == time_valid_prior) {
             /* Do nothing. */
         } else if (time_valid) {
@@ -3103,7 +3114,7 @@ consume:
         } else if (!expired(&frequency_last, frequency)) {
             /* Do nothing. */
         } else {
-            emit_trace(trace_fp, position, &solution, &attitude, &posveltim, &base);
+            emit_trace(trace_fp, positions, &solution, &attitude, &posveltim, &base);
             trace = 0;
         }
 
@@ -3157,7 +3168,7 @@ consume:
 
         if (expired(&bypass_last, bypass)) {
             /* Do nothing. */
-        } else if (hazer_has_pending_gsv(view, countof(view))) {
+        } else if (hazer_has_pending_gsv(views, maximum)) {
             fd = in_fd;
             goto consume;
         } else if ((in_fp != (FILE *)0) && ((available = diminuto_file_ready(in_fp)) > 0)) {
@@ -3221,18 +3232,18 @@ render:
 
             if (crowbar <= 0) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-                    position[ii].ticks = 0;
+                    positions[ii].ticks = 0;
                 }
             }
             if (crowbar <= 100) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-                    active[ii].ticks = 0;
+                    actives[ii].ticks = 0;
                  }
             }
             if (crowbar <= 200) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
                     for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
-                        view[ii].sig[jj].ticks = 0;
+                        views[ii].sig[jj].ticks = 0;
                     }
                 }
             }
@@ -3289,7 +3300,7 @@ render:
             }
             if (report) {
                 print_local(out_fp);
-                print_positions(out_fp, position, onepps, network_total);
+                print_positions(out_fp, positions, maximum, onepps, network_total);
                 print_hardware(out_fp, &hardware);
                 print_status(out_fp, &status);
                 print_solution(out_fp, &solution);
@@ -3297,8 +3308,8 @@ render:
                 print_odometer(out_fp, &odometer);
                 print_posveltim(out_fp, &posveltim);
                 print_corrections(out_fp, &base, &rover, &kinematics, &updates);
-                print_actives(out_fp, active);
-                print_views(out_fp, view, active);
+                print_actives(out_fp, actives, maximum);
+                print_views(out_fp, views, actives, maximum);
             }
             if (escape) {
                 fputs(ANSI_END, out_fp);

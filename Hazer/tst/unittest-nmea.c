@@ -89,10 +89,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
 
     {
@@ -210,10 +210,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(positions, 1));
+        assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
 
     {
@@ -278,10 +278,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(positions, 1));
+        assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
 
     {
@@ -346,10 +346,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(positions, 1));
+        assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
 
     {
@@ -465,10 +465,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
 
     {
@@ -530,10 +530,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
 
     {
@@ -779,10 +779,10 @@ int main(void)
             assert(strcmp(view.label, "GSV") == 0);
 
             view.sig[0].ticks = 0;
-            rc = hazer_has_pending_gsv(views, 2);
+            rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == 0);
             view.sig[0].ticks = 1;
-            rc = hazer_has_pending_gsv(views, 2);
+            rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == ((ii < 3) ? !0 : 0));
             view.sig[0].ticks = 1;
 
@@ -929,10 +929,10 @@ int main(void)
             assert(jj == (ii == 0) ? 1 : (ii == 1) ? 2 : (ii == 2) ? 0 : 3);
 
             view.sig[jj].ticks = 0;
-            rc = hazer_has_pending_gsv(views, 2);
+            rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == 0);
             view.sig[jj].ticks = 1;
-            rc = hazer_has_pending_gsv(views, 2);
+            rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == ((ii < 3) ? !0 : 0));
             view.sig[jj].ticks = 0;
 
@@ -1087,10 +1087,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(positions, 1));
+        assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
 
     {
@@ -1150,10 +1150,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(positions, 1));
+        assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
 
     {
@@ -1213,10 +1213,10 @@ int main(void)
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(positions, 1));
+        assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(positions, 1));
+        assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
 
     return 0;

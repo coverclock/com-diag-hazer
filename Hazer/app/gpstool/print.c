@@ -29,7 +29,7 @@
 #include "test.h"
 #include "types.h"
 
-void print_actives(FILE * fp, const hazer_active_t aa[])
+void print_actives(FILE * fp, const hazer_actives_t aa, hazer_system_t ss)
 {
     static const unsigned int IDENTIFIERS = diminuto_countof(aa[0].id);
     unsigned int system = 0;
@@ -39,15 +39,20 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
     static unsigned int maximum = 0;
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+        if (system > ss) { break; }
         if (aa[system].ticks == 0) { continue; }
         if (aa[system].active == 0) { continue; }
+
         total += aa[system].active;
+
     }
 
     if (total > maximum) { maximum = total; }
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
+        if (system > ss) { break; }
         if (aa[system].ticks == 0) { continue; }
         if (aa[system].active == 0) { continue; }
 
@@ -97,6 +102,7 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
+        if (system > ss) { break; }
         if (aa[system].ticks == 0) { continue; }
         if (aa[system].active == 0) { continue; }
 
@@ -114,7 +120,7 @@ void print_actives(FILE * fp, const hazer_active_t aa[])
 
 }
 
-void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
+void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, hazer_system_t ss)
 {
     static const unsigned int SATELLITES = diminuto_countof(va[0].sig[0].sat);
     static const unsigned int SIGNALS = diminuto_countof(va[0].sig);
@@ -132,6 +138,9 @@ void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[])
     char source = '\0';
 
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
+
+        if (system > ss) { break; }
+
         for (signal = 0; signal < SIGNALS; ++signal) {
 
             if (signal >= va[system].signals) { break; }
@@ -408,7 +417,7 @@ void print_status(FILE * fp, const yodel_status_t * sp)
     msss_prior = sp->payload.msss;
 }
 
-void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t bytes)
+void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, int pps, uint64_t bytes)
 {
     unsigned int system = 0;
 
@@ -428,6 +437,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
+            if (system > ss) { break; }
             if (pa[system].ticks == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
             if (pa[system].dmy_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
@@ -520,6 +530,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
+            if (system > ss) { break; }
             if (pa[system].ticks == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
@@ -571,6 +582,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
+            if (system > ss) { break; }
             if (pa[system].ticks == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
@@ -608,6 +620,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
+            if (system > ss) { break; }
             if (pa[system].ticks == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
@@ -646,6 +659,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
+            if (system > ss) { break; }
             if (pa[system].ticks == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
@@ -686,6 +700,7 @@ void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t b
 
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
+            if (system > ss) { break; }
             if (pa[system].ticks == 0) { continue; }
 
             dmyokay = (pa[system].dmy_nanoseconds != HAZER_NANOSECONDS_UNSET);
