@@ -95,6 +95,8 @@
  * https://en.wikipedia.org/wiki/Dilution_of_precision_(navigation), 2018-08-03
  *
  * Gtop, "PMTK command reference", GlobalTop Tech Inc., 2012
+ *
+ * Quectel, "L89 R2.0 GNSS Protocol Specification", 2020-04-29
  */
 
 #include <stdio.h>
