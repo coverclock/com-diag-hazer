@@ -478,10 +478,10 @@ $PUBX,03,19,
 
         position.ticks = 0;
         assert(!hazer_is_valid_time(&position));
-        assert(!hazer_has_valid_time(&position, 1));
+        assert(!hazer_has_valid_time(&position, HAZER_SYSTEM_GNSS));
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
-        assert(hazer_has_valid_time(&position, 1));
+        assert(hazer_has_valid_time(&position, HAZER_SYSTEM_GNSS));
     }
 
     return 0;

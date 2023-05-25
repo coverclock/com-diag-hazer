@@ -20,8 +20,8 @@ default:	all
 
 TITLE				:=	Hazer
 
-MAJOR				:=	55# API changes that may require that applications be modified.
-MINOR				:=	1# Only functionality or features added with no legacy API changes.
+MAJOR				:=	56# API changes that may require that applications be modified.
+MINOR				:=	0# Only functionality or features added with no legacy API changes.
 BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
@@ -190,6 +190,18 @@ TARGETSHARED		+=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO)
 TARGETLIBRARIES		:=	$(TARGETARCHIVE) $(TARGETSHARED)
 TARGETPROGRAMS		:=	$(TARGETAPPLICATIONS) $(TARGETBINARIES) $(TARGETALIASES) $(TARGETUNITTESTS) $(TARGETFUNCTIONALS) $(TARGETGENERATED) $(TARGETSCRIPTS)
 TARGETALL			:=	$(TARGETLIBRARIES) $(TARGETPROGRAMS)
+
+########## Special Application Dependencies
+
+# How to automate this in the more generic rule below eludes me so far.
+
+$(OUT)/$(APP_DIR)/dgmtool:	$(wildcard $(APP_DIR)/dgmtool/*.c)
+
+$(OUT)/$(APP_DIR)/geodesic:	$(wildcard $(APP_DIR)/geodesic/*.c)
+
+$(OUT)/$(APP_DIR)/gpstool:	$(wildcard $(APP_DIR)/gpstool/*.c)
+
+$(OUT)/$(APP_DIR)/rtktool:	$(wildcard $(APP_DIR)/rtktool/*.c)
 
 ########## Main Entry Points
 

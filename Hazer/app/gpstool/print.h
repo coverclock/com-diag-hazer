@@ -20,16 +20,18 @@
  * Print all of the active satellites used for the most recent fix.
  * @param fp points to the FILE stream.
  * @param aa points to the array of active satellites.
+ * @param ss is the largest system value used so far.
  */
-extern void print_actives(FILE * fp, const hazer_active_t aa[]);
+extern void print_actives(FILE * fp, const hazer_actives_t aa, hazer_system_t ss);
 
 /**
  * Print all of the satellites currently being viewed by the receiver.
  * @param fp points to the FILE stream.
  * @param va points to the array of all satellite being viewed.
  * @param aa points to the array of active satellites.
+ * @param ss is the largest system value used so far.
  */
-extern void print_views(FILE *fp, const hazer_view_t va[], const hazer_active_t aa[]);
+extern void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, hazer_system_t ss);
 
 /**
  * Print the local (Juliet) time (and the release string).
@@ -55,10 +57,11 @@ extern void print_status(FILE * fp, const yodel_status_t * sp);
  * Print all of the navigation position fixes.
  * @param fp points to the FILE stream.
  * @param pa points to an array of positions.
+ * @param ss is the largest system value used so far.
  * @param pps is the current value of the 1PPS strobe.
  * @param bytes is the total number of bytes sent and received over the network.
  */
-extern void print_positions(FILE * fp, const hazer_position_t pa[], int pps, uint64_t bytes);
+extern void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, int pps, uint64_t bytes);
 
 /**
  * Print information about the base and the rover that communicate via RTCM.

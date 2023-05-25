@@ -3027,13 +3027,13 @@ int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], size_t 
  *
  ******************************************************************************/
 
-int hazer_has_pending_gsv(const hazer_views_t va, size_t count)
+int hazer_has_pending_gsv(const hazer_views_t va, hazer_system_t ss)
 {
     size_t ii = 0;
     size_t jj = 0;
 
     for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-        if (ii >= count) { break; }
+        if (ii > ss) { break; }
         if (va[ii].pending > 0) {
             for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
                 if (jj >= va[ii].signals) { break; }
@@ -3047,12 +3047,12 @@ int hazer_has_pending_gsv(const hazer_views_t va, size_t count)
     return 0;
 }
 
-int hazer_has_valid_time(const hazer_positions_t pa, size_t count)
+int hazer_has_valid_time(const hazer_positions_t pa, hazer_system_t ss)
 {
     size_t ii = 0;
 
     for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-        if (ii >= count) { break; }
+        if (ii > ss) { break; }
         if (hazer_is_valid_time(&(pa[ii]))) {
             return !0;
         }

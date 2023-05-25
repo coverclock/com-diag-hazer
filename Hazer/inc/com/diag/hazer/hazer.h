@@ -1621,10 +1621,10 @@ static inline int hazer_is_pubx_id(char * vector[], ssize_t count, const char id
  * band. Can be applied by a single constellation by passing pointer to single
  * view and using a count of one.
  * @param va points to the array of all satellites being viewed.
- * @param count is the number of entries in the view array.
+ * @param ss is the highest system index used so far.
  * @return true if there are GSV views pending for any constellation.
  */
-extern int hazer_has_pending_gsv(const hazer_views_t va, size_t count);
+extern int hazer_has_pending_gsv(const hazer_views_t va, hazer_system_t ss);
 
 /*******************************************************************************
  * PARSING VALIDATORS
@@ -1651,10 +1651,10 @@ static inline int hazer_is_valid_time(const hazer_position_t * positionp)
  * requires that at least one constellation has both the time and date and
  * a monotonically increasing clock.
  * @param pa points to the array of all positions being computed.
- * @param count is the number of entries in the position array.
+ * @param ss is the highest system index used so far.
  * @return true if time, date, and monotonic clock are true for some position.
  */
-extern int hazer_has_valid_time(const hazer_positions_t pa, size_t count);
+extern int hazer_has_valid_time(const hazer_positions_t pa, hazer_system_t ss);
 
 /*
  * The validators below are a little more liberal and forgiving than the
