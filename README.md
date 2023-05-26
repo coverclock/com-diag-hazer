@@ -516,12 +516,13 @@ SiRF is part of Qualcom.
 
 # Platforms
 
-I have tested Hazer and run gpstool on the following platforms, in no
-particular order. This list is not exhaustive, and just serves as an
-example of the wide variety of possible computers one may use. Your
-mileage may vary. Hazer and gpstool are not resource intensive; I routinely
-run gpstool on an old 32-bit Intel i686 netbook, and run four instances of
-gpstool simultaneously on a single Raspberry Pi 4B.
+From time to time, I have tested various versions of Hazer and run
+gpstool on the following platforms, in no particular order. This list
+is not exhaustive, and just serves as an example of the wide variety
+of possible computers one may use. Your mileage may vary. Hazer and
+gpstool are not resource intensive; I routinely run gpstool on an old
+32-bit Intel i686 netbook, and run four instances of gpstool
+simultaneously on a single Raspberry Pi 4B.
 
 Dell OptiPlex 7040    
 Intel Core i7-6700T x86_64 @ 2.8GHz x 4 x 2    
