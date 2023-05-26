@@ -182,7 +182,7 @@ data frame.
 I switched to a different cellular antenna, rearranged my lab bench,
 and my test has run flawlessly for many hours since then.
 
-## U-Blox CAM-M8Q PUBX,04 Time Message
+## U-Blox CAM-M8Q PUBX,04 Time Message Without a Fix
 
 GNSS receivers manufactured by U-blox support two different kinds of
 proprietary messaging for both output and input: the UBX binary
@@ -208,7 +208,7 @@ so the application can know to discount these times.
 
 I find it misleading.
 
-## U-blox CAM-M8Q RMC failing to report time after 3D lock
+## U-blox CAM-M8Q RMC Failing to Report Time After 3D Fix
 
 While testing the PUBX,04 feature mentioned above, I encountered a
 case where the U-blox CAM-M8Q reported a 3D lock with seven satellites
@@ -222,7 +222,7 @@ on the subsequent identical test sequence.
 The Bad Elf GPS Pro+ device is documented to use the MediaTek (MTK)
 chipset.  Hazser 46.0.4 received the following RMC sentence from the
 device (BE-GPS-2300, SN 020661, FW 2.1.60, HW 8.0.0), as documented in a
-"contenate" (-C) file.
+"catenate" (-C) file.
 
     $GPRMC,203410.000,A3947.6492,N,10509.1907,W,0.05,68.88,131021,,,D*68
 
@@ -320,7 +320,7 @@ fixed the corrupted RMC sentence issue and allowed the device to pair
 and work with a Raspberry Pi 4 over Bluetooth. (The update was to fix
 a GPS week rollover bug, so it is not optional.)
 
-## BU353W10 U-blox M8 UBX-MON-HW reporting jamming
+## GlobalSat BU-353W10 U-blox M8 UBX-MON-HW Reporting Jamming
 
 I routinely test multiple GNSS devices at a time. Some U-blox devices
 support a jamming detection capability whose output is reported in the
@@ -358,3 +358,14 @@ say about the 4.11 standard.
     NMEA 0183- Marine Industry  $1000 (NMEA Member), $2000 (non member)
     NMEA 0183- Government / Industrial / Testing  $7,500
     NMEA 0183- Consumer Electronics  $10,000
+
+## GlobalSat BU-353N5 Quectel L89? Missing GSV Sentences
+
+The GlobalSat BU-353N5, which I believe uses a Quectel L89 chip because of
+its use of the proprietary ```PAIR``` NMEA-like sentences, reports active use
+of SVs in both the GPS and GLONASS constellations in its ```GSA``` sentences,
+emitting NMEA System IDs of both ```1``` (GPS) and ```2``` (GLONASS), but only emits
+```GSV``` sentences with the Talker name of ```GP``` (GPS). I figured this was a bug
+in my code, but examining raw data (which I saved in the ```dat/hazer```
+directory) confirms this weird behavior.
+
