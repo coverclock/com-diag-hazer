@@ -1750,7 +1750,7 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         }
 
         if (message > messages) {
-            errno = EINVAL;
+            errno = ERANGE;
             break;
         }
 
