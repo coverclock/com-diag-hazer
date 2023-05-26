@@ -1896,15 +1896,10 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         }
 
         if (!((0 <= signal) && (signal < HAZER_GNSS_SIGNALS))) {
-#if 0
+#if !0
             errno = E2BIG;
             break;
 #else
-            /*
-             * For the GNSS receiver that insists on using a signal
-             * number of "39" instead of the NMEA 0183 4.10 required
-             * hex digit 0..F.
-             */
             signal = 0;
 #endif
         }
