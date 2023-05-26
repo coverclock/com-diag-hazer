@@ -319,13 +319,14 @@ built.
 
 Hazer processes the following standard NMEA sentences.
 
-* GGA - Global Positioning System Fix Data. (NMEA 0183 Version 4.10 p. 68)
-* GLL - Geographic Position - Latitude/Longitude. (NMEA 0183 Version 4.10 p. 87)
-* GSA - GNSS DOP and Active Satellites. (NMEA 0183 Version 4.10 p. 92)
-* GSV - GNSS Satellites In View. (NMEA 0183 Version 4.10 p. 96)
-* RMC - Recommended Minimum Specific GNSS Data. (NMEA 0183 Version 4.10 p. 113)
-* TXT - Text Transmission. (NMEA 0183 Version 4.10 p. 124)
-* VTG - Course Over Ground & Ground Speed. (NMEA 0183 Version 4.10 p. 127)
+* GGA - Global Positioning System Fix Data. (NMEA 0183 4.10 p. 68)
+* GLL - Geographic Position - Latitude/Longitude. (NMEA 0183 4.10 p. 87)
+* GSA - GNSS DOP and Active Satellites. (NMEA 0183 4.10 p. 92)
+* GSV - GNSS Satellites In View. (NMEA 0183 4.10 p. 96)
+* RMC - Recommended Minimum Specific GNSS Data. (NMEA 0183 4.10 p. 113)
+* TXT - Text Transmission. (NMEA 0183 4.10 p. 124)
+* VTG - Course Over Ground & Ground Speed. (NMEA 0183 4.10 p. 127)
+* ZDA - Time, Date, and Local Time Zone. (NMEA 0183 4.10 p. 132)
 
 Hazer processes the following proprietary NMEA sentences.
 
@@ -333,13 +334,14 @@ Hazer processes the following proprietary NMEA sentences.
 * PUBX,03 - emitted by u-blox devices for SVSTATUS. (u-blox 8 31.3 pp. 163-167)
 * PUBX,04 - emitted by u-blox devices for TIME. (u-blox 8 31.3 pp. 163-167)
 
-Hazer recognizes the following proprietary NMEA sentences.
+Hazer recognizes and logs the following proprietary NMEA sentences.
 
-* PMTK - emitted and/or accepted by some GTop/MTK devices.
-* PSRF - emitted and/or accepted by some SiRF devices.
-* PUBX - emitted and/or accepted by some u-blox devices.
+* PAIR - emitted by some Quectel devices.
+* PMTK - emitted by some GTop/MTK devices.
+* PSRF - emitted by some SiRF devices.
+* PUBX - emitted by some u-blox devices.
 
-Yodel recognizes the following received UBX messages.
+Yodel processes or logs the following UBX messages.
 
 * UBX-ACK-ACK - Acknowledge UBX input and indicate success. (u-blox 9 p. 38)
 * UBX-ACK-NAK - Acknowledge UBX input and indicate failure. (u-blox 9 p. 38)
