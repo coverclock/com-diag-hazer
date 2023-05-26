@@ -315,6 +315,8 @@ built.
 
 <https://github.com/coverclock/com-diag-codex>
 
+<https://github.com/coverclock/com-diag-cesium>
+
 # Sentences
 
 Hazer processes the following standard NMEA sentences.
