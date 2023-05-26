@@ -1775,7 +1775,8 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          */
 
         for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
-        
+
+            /* Remember, the last slot is the NULL pointer. */
             if ((index + 4) >= count) {
                 break;
             }
@@ -1858,11 +1859,12 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
             ++index;
             ++channel;
 
+            errno = 0;
+
         }
-        if (*end != '\0') {
+        if (errno != 0) {
             break;
         }
-
 
         /*
          * NMEA 0183 4.10 2012 has an additional field containing the
@@ -1871,8 +1873,9 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          * L2, etc. NMEA 0183 4.10 implies this field is in hex: 0..F.
          *
          * NMEA 0183 4.10 Note 4 p. 96: "This field shall not be null."
-         * But if it happens to be null (empty), we have to handle it in
-         * a reasonable way (which includes rejecting it).
+         * But if it happens to be null (missing), we have to handle it in
+         * a reasonable way, since earlier NMEA implementations may not
+         * include it.
          *
          * NMEA 0183 4.11 p. 98: "When more than one ranging signal is
          * used per satellite, separate GSV sentences with a System ID
@@ -1883,12 +1886,12 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          * the same system and have the same signal (band).
          */
 
-        if (index > (count - 2)) {
+        if ((index + 1) >= count) {
             /* Do nothing. */
-        } else if (strlen(vector[count - 2]) == 0) {
+        } else if (strlen(vector[index]) == 0) {
             /* Do nothing. */
         } else {
-            signal = strtol(vector[count - 2], &end, 16);
+            signal = strtol(vector[index], &end, 16);
             if (*end != '\0') {
                 errno = EINVAL;
                 break;
@@ -1896,12 +1899,8 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
         }
 
         if (!((0 <= signal) && (signal < HAZER_GNSS_SIGNALS))) {
-#if !0
             errno = E2BIG;
             break;
-#else
-            signal = 0;
-#endif
         }
 
         /*
