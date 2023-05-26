@@ -1,0 +1,49 @@
+2023-05-26T22:47:43.964121366Z "cesium" <NOTE> [4409] {76fcab30} Program /usr/local/bin/gpstool
+2023-05-26T22:47:43.965032824Z "cesium" <NOTE> [4409] {76fcab30} Start
+2023-05-26T22:47:43.965461782Z "cesium" <NOTE> [4409] {76fcab30} Processing
+2023-05-26T22:47:43.966598916Z "cesium" <NOTE> [4409] {76fcab30} Begin
+2023-05-26T22:47:44.040139096Z "cesium" <NOTE> [4409] {76fcab30} Out '$PUBX,00'[9]
+2023-05-26T22:47:44.042698208Z "cesium" <NOTE> [4409] {76fcab30} Out '$PUBX,03'[9]
+2023-05-26T22:47:44.043124874Z "cesium" <NOTE> [4409] {76fcab30} Out '$PUBX,04'[9]
+2023-05-26T22:47:44.043513780Z "cesium" <NOTE> [4409] {76fcab30} Out '$PUBX,40,GSV,0,0,0,1,0,0'[25]
+2023-05-26T22:47:44.044069613Z "cesium" <NOTE> [4409] {76fcab30} Fix Acquired 0s NMEA RMC
+2023-05-26T22:47:44.044147477Z "cesium" <NOTE> [4409] {76fcab30} Time Valid
+2023-05-26T22:47:44.044480654Z "cesium" <NOTE> [4409] {76fcab30} Out '$PUBX,40,VTG,0,0,0,1,0,0'[25]
+2023-05-26T22:47:44.045627424Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\0\0\0'[19]
+2023-05-26T22:47:44.046053986Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x01\x03\0\x01\x20\x01'[35]
+2023-05-26T22:47:44.046423569Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x01\x03\0\x01\x21\x01'[35]
+2023-05-26T22:47:44.047727317Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x01\x03\0\x01\x22\x01'[35]
+2023-05-26T22:47:44.048133931Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x01\x03\0\x0d\x01\x01'[35]
+2023-05-26T22:47:44.048605702Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x01\x03\0\x0d\x03\x01'[35]
+2023-05-26T22:47:44.049251014Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x01\x03\0\x0a\x09\x01'[35]
+2023-05-26T22:47:44.049799867Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x01\x03\0\x01\x03\x01'[35]
+2023-05-26T22:47:44.050532470Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x39\x08\0\xf7\x56\xb1\x96\x1e\x63\0\0'[51]
+2023-05-26T22:47:44.050957574Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x0a\x04\0\0'[21]
+2023-05-26T22:47:44.051196272Z "cesium" <NOTE> [4409] {76fcab30} Received UBX UBX-ACK-ACK 0x06 0x01 (0)
+2023-05-26T22:47:44.052417000Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x06\0\0'[21]
+2023-05-26T22:47:44.052678093Z "cesium" <NOTE> [4409] {76fcab30} Received UBX UBX-ACK-ACK 0x06 0x39 (0)
+2023-05-26T22:47:44.052780020Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x31\0\0'[21]
+2023-05-26T22:47:44.054132727Z "cesium" <NOTE> [4409] {76fcab30} Out '\xb5\x62\x06\x3e\0\0'[21]
+2023-05-26T22:47:44.054262258Z "cesium" <NOTE> [4409] {76fcab30} Ready
+2023-05-26T22:47:44.054503508Z "cesium" <NOTE> [4409] {76fcab30} Received UBX UBX-ACK-ACK 0x06 0x06 (0)
+2023-05-26T22:47:44.056986057Z "cesium" <NOTE> [4409] {76fcab30} Received UBX UBX-ACK-ACK 0x06 0x31 (0)
+2023-05-26T22:47:44.057394442Z "cesium" <NOTE> [4409] {76fcab30} Received UBX UBX-ACK-ACK 0x06 0x3e (0)
+2023-05-26T22:47:44.860691283Z "cesium" <NOTE> [4409] {76fcab30} Time Stamp 2023-05-26T22:47:44Z
+2023-05-26T22:47:44.860774356Z "cesium" <NOTE> [4409] {76fcab30} Fix First 0/00:00:00.076
+2023-05-26T22:47:44.861134356Z "cesium" <NOTE> [4409] {76fcab30} Clock Monotonic
+2023-05-26T22:47:44.861228731Z "cesium" <NOTE> [4409] {76fcab30} Indicate UBX-NAV-STATUS spoofing 1
+2023-05-26T22:47:45.049592122Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,30*6F\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:46.050347616Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,30*6F\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:47.050339321Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,30*6F\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:48.052821556Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,30*6F\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:49.050334954Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,30*6F\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:50.051584870Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,31*6E\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:51.049096886Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,31*6E\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:52.050278440Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,31*6E\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:53.052914796Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,28*66\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:54.050451793Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,28*66\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:55.050382393Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,27*69\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:56.052777117Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,28*66\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:57.052759668Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,28*66\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:58.050259940Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,28*66\x0d\x0a"[24]: "Argument list too long" (7)
+2023-05-26T22:47:59.050374232Z "cesium" <WARN> [4409] {76fcab30} app/gpstool/main.c@2660: "$GLGSV,3,3,09,,,,29*67\x0d\x0a"[24]: "Argument list too long" (7)
