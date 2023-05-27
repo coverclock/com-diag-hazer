@@ -621,7 +621,7 @@ GNU 11.3.0
 
 Your mileage may vary. Hazer and gpstool are not resource intensive. I
 routinely run gpstool on an old 32-bit Intel i686 netbook, and run several
-simultaneously instances of gpstool on a single Rasbperry Pi 4B.
+simultaneous instances of gpstool on a single Rasbperry Pi 4B.
 
 # Diagnostics
 
