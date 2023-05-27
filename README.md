@@ -1725,3 +1725,6 @@ I find the opportunity for improvement.
 Special thanks to Mrs. Overclock for her assistance in road testing
 (literally) this software and for her understanding regarding having
 GPS equipment littered all around the house both inside and outside.
+
+# Footnotes
+
