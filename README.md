@@ -126,8 +126,6 @@ the Networked Transport of RTCM via Internet Protocol (Ntrip), but instead
 uses its own trivial data format consisting of raw RTCM messages preceeded
 by a four-byte sequence number carried over UDP datagrams.
 
-Note that Postel's Law - "Be conservative in what you send, be liberal in what you accept." - applies here.
-
 # Manual Pages and Reference Manual
 
 These PDFs of the
@@ -505,6 +503,11 @@ I have successfully tested Hazer with the following GPS devices.
 [^24]: The labels on the PVT (1pps) and PWR LEDs on this board are reversed.        
 [^25]: Vendor web site and OEM packaging correctly states GPS only.    
 [^26]: Emits GSAs with GLONASS id (2) but only emits GSVs with GPS talker (GP).    
+Note that when sending commands to and parsing output from GNSS
+devices, Postel's Law - "Be conservative in what you send, be liberal
+in what you accept." - applies. Also, there is plenty of ambiguity
+and underspecification to be found in standards like NMEA 0183.
+
 ## Notes
 
 GlobalSat is also known as GlobalSat Technology, USGlobalSat, US
@@ -518,91 +521,107 @@ SiRF is part of Qualcom.
 
 # Platforms
 
-From time to time, I have tested various versions of Hazer and run
-gpstool on the following platforms, in no particular order. This list
-is not exhaustive, and just serves as an example of the wide variety
-of possible computers one may use. Your mileage may vary. Hazer and
-gpstool are not resource intensive; I routinely run gpstool on an old
-32-bit Intel i686 netbook, and run four instances of gpstool
-simultaneously on a single Raspberry Pi 4B.
-
-Dell OptiPlex 7040    
-Intel Core i7-6700T x86_64 @ 2.8GHz x 4 x 2    
-Ubuntu 16.04.2 "Xenial"    
-Linux 4.4.0    
-GNU 5.4.0
-
-Intel NUC5i7RYH    
-Intel Core i7-5557U x86_64 @ 3.10GHz x 2 x 2    
-Ubuntu 20.04.3 "Focal"    
-Linux 5.4.0    
-GNU 9.3.0    
+I routinely test Hazer and gpstool (and therefore, many of the
+features of the Diminuto library on which they depend) on the
+following development platforms, in no particular order.
 
 Intel NUC7i7BNH    
-Intel Core i7-7567U x86_64 @ 3.50GHz x 2 x 2    
-Ubuntu 20.04.3 "Focal""    
-Linux 5.11.0    
-GNU 9.3.0    
+Intel Core i7-7567U x86_64 x2 x2    
+Ubuntu 22.04.2 LTS "Jammy Jellyfish"    
+Linux 5.19.0    
+GNU 11.3.0    
 
-Raspberry Pi 3 Model B+    
-Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
-Raspbian 9.13 "Stretch"    
+Raspberry Pi 4 Model B BCM2835    
+ARM Cortex-A72 x4    
+Ubuntu 22.04.2 LTS "Jammy Jellyfish"    
+Linux 5.15.0    
+GNU 11.3.0    
+
+Raspberry Pi 4 Model B BCM2835    
+ARM Cortex-A72 x4    
+Raspbian 11 "bullseye"    
+Linux 6.1.19    
+GNU 10.2.1        
+
+I run very recent versions of Hazer and gpstool on the following
+test platforms, which run 24x7.
+
+Raspberry Pi 3 Model B+ BCM2835    
+ARM Cortex-A72 x4    
+Raspbian 10 "buster"    
+Linux 5.10.103    
+GNU 8.3.0    
+(Differential GNSS Base Station)    
+
+Raspberry Pi 3 Model B+ BCM2835    
+ARM Cortex-A72 x4    
+Raspbian 9 "stretch"    
 Linux 4.19.66    
 GNU 6.3.0    
+(Differential GNSS Stationary Rover)    
 
-Raspberry Pi 3 Model B+ with a touch-sensitive LCD display    
-Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
-Raspbian 9.4 "Stretch"    
+Raspberry Pi 3 Model B+ BCM2835    
+ARM Cortex-A72 x4    
+Raspbian 9 "stretch"    
 Linux 4.14.30    
 GNU 6.3.0    
+(NTP Server Monitoring System)    
 
-Raspberry Pi 4 Model B    
-Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
-Raspbian 10 "Buster"    
-Linux 5.10.17    
-GNU 8.3.0    
+In the past, I have tested Hazer and gpstool on the following
+platforms, which give you some idea of the wide variety of computers
+one may use.
 
 VMware Workstation 15 Pro under Windows 10    
-Intel Core i7-3520M x86_64 @ 2.90GHz x 2    
+Intel Core i7-3520M x86_64 x2    
 Ubuntu 19.10 "Eoan"    
 Linux 5.3.0    
 GNU 9.2.1    
 
-HP Mini 110-1100    
-Intel Atom N270 i686 @ 1.6GHz x 2    
+HP Mini 110-1100 Netbook    
+Intel Atom N270 i686 x2    
 Mint 19.3 "Tricia"    
 Linux 5.0.0    
 GNU 7.5.0    
 
 GPD Micro PC    
-Intel Celeron N4100 x86_64 @ 1.10GHz x 2 x 2    
+Intel Celeron N4100 x86_64 x2 x2    
 Ubuntu MATE 19.10 "Eoan"    
 Linux 5.3.0    
 GNU 9.2.1    
 
 Pi-Top 3 (Raspberry Pi 3 Model B+)    
-Broadcom BCM2837B0 Cortex-A53 ARMv7 @ 1.4GHz x 4    
+Broadcom BCM2837B0 Cortex-A53 ARMv7 x4    
 pi-topOS "Polaris" (Raspbian 9.9 "Stretch")    
 Linux 4.19.66    
 GNU 6.3.0    
 
 Pi-Top 4 (Raspberry Pi 4 Model B)    
-Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
+Broadcom BCM2711 Cortex-A72 ARMv8 x4    
 pi-topOS "Sirius" (Raspbian 10 "Buster")    
 Linux 5.4.79    
 GNU 8.3.0    
 
 StarFive VisionFive (RISC-V SBC)    
-riscv64 @ 1GHz x 2     
-Fedora 33 (Rawhide)     
+sifive u74-mc riscv64 x2     
+Fedora 33 "Rawhide"     
 Linux 5.15.10     
 GNU 10.3.1    
 
+StarFive VisionFive 2 (RISC-V SBC)    
+sifive u74-mc riscv64 x4     
+Debian 11.3.0    
+Linux 5.15.10     
+GNU 11.3.0    
+
 OrangePi 5    
-aarch64 @ 2.4GHz x 8    
+aarch64 x8    
 Ubuntu 22.04.2 LTS (Jammy Jellyfish)    
 Linux 5.10.110    
 GNU 11.3.0    
+
+Your mileage may vary. Hazer and gpstool are not resource intensive. I
+routinely run gpstool on an old 32-bit Intel i686 netbook, and run several
+simultaneously instances of gpstool on a single Rasbperry Pi 4B.
 
 # Diagnostics
 
