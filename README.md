@@ -126,6 +126,8 @@ the Networked Transport of RTCM via Internet Protocol (Ntrip), but instead
 uses its own trivial data format consisting of raw RTCM messages preceeded
 by a four-byte sequence number carried over UDP datagrams.
 
+Note that Postel's Law - "Be conservative in what you send, be liberal in what you accept." - applies here.
+
 # Manual Pages and Reference Manual
 
 These PDFs of the
