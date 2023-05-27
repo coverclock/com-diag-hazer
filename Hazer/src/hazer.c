@@ -1771,18 +1771,30 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          * than four sets are transmitted." [NMEA 0183 v4.10 2012 p. 96]
          * Unlike the GSA sentence, the GSV sentence can have a variable
          * number of fields. So from here on all indices are effectively
-         * relative.
+         * relative. Also, while null fields are not required, they sometimes
+         * are present.
          */
 
         for (slot = 0; slot < HAZER_GNSS_VIEWS; ++slot) {
 
-            /* Remember, the last slot is the NULL pointer. */
+            /*
+             * Remember, the last slot is the NULL pointer.
+             */
             if ((index + 4) >= count) {
                 break;
             }
 
             if (strlen(vector[index]) == 0) {
-                break;
+                /*
+                 * We can't break because we don't know how many sets of
+                 * four null fields [ id, elevation, azimuth, SNR ] there
+                 * will be, and there may still be a band number at the end.
+                 * So we have to index through them. I'm looking at you,
+                 * BU-353W10.
+                 */
+                index += 4;
+                errno = 0;
+                continue;
             }
 
             id = strtol(vector[index], &end, 10);
