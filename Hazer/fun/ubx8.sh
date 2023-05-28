@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2018-2021 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2018-2023 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
@@ -7,7 +7,10 @@
 # NMEA-PUBX-POSITION
 # NMEA-PUBX-SVSTATUS
 # NMEA-PUBX-TIME
+# NMEA-PUBX-RATE GGA @1Hz
+# NMEA-PUBX-RATE GSA @1Hz
 # NMEA-PUBX-RATE GSV @1Hz
+# NMEA-PUBX-RATE RMC @1Hz
 # NMEA-PUBX-RATE VTG @1Hz
 # UBX-CFG-PRT [0] (all)
 # UBX-CFG-MSG [3] UBX-NAV-TIMEGPS @1Hz
