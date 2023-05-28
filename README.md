@@ -440,7 +440,7 @@ I have successfully tested Hazer with the following serial-to-USB chipsets.
 * Silicon Labs CP2104    
 * U-Blox (when it is integrated into the GPS chip itself)    
 
-I have successfully tested Hazer with the following GPS devices.
+I have successfully tested Hazer with the following GNSS devices.
 
 * Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [^12]    
 * Ardusimple SimpleGNSS (U-Blox 10/UBX-NEO-F10T, 38400 8n1, v0403p6015, ttyUSB, 1Hz) [^8] [^23] [^24]    
