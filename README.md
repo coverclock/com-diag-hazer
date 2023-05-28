@@ -41,7 +41,7 @@ more about how GPS works and how NMEA and UBX sentences are formatted
 (because I only learn by doing), and also to develop an NMEA and UBX
 parsing library that I can incorporate into the kinds of embedded systems
 I am frequently called to work upon. Hazer and gpstool have also turned
-out to be really useful tools for testing and evaluating GPS devices.
+out to be really useful tools for testing and evaluating GNSS devices.
 
 I also make use of Lady Heather, a terrific real-time GNSS monitoring
 program. I run it, along with my own software, and a script that
