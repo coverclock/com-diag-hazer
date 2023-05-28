@@ -503,6 +503,7 @@ I have successfully tested Hazer with the following GNSS devices.
 [^24]: The labels on the PVT (1pps) and PWR LEDs on this board are reversed.        
 [^25]: Vendor web site and OEM packaging correctly states GPS only.    
 [^26]: Emits GSAs with GLONASS id (2) but only emits GSVs with GPS talker (GP).    
+
 Note that when sending commands to and parsing output from GNSS
 devices, Postel's Law - "Be conservative in what you send, be liberal
 in what you accept." - applies. Also, there is plenty of ambiguity
