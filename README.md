@@ -568,9 +568,9 @@ Linux 4.14.30
 GNU 6.3.0    
 (NTP Server Monitoring System)    
 
-In the past, I have tested Hazer and gpstool on the following
-platforms, which give you some idea of the wide variety of computers
-one may use.
+In the past, I have tested various versions of Hazer and gpstool
+on the following platforms, which give you some idea of the wide
+variety of computers one may use.
 
 VMware Workstation 15 Pro under Windows 10    
 Intel Core i7-3520M x86_64 x2    
