@@ -572,6 +572,12 @@ In the past, I have tested various versions of Hazer and gpstool
 on the following platforms, which give you some idea of the wide
 variety of computers one may use.
 
+Dell OptiPlex 7040    
+Intel Core i7-6700T x86_64 x 4 x 2    
+Ubuntu 16.04.2 "Xenial"    
+Linux 4.4.0    
+GNU 5.4.0    
+
 VMware Workstation 15 Pro under Windows 10    
 Intel Core i7-3520M x86_64 x2    
 Ubuntu 19.10 "Eoan"    
