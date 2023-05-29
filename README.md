@@ -133,9 +133,9 @@ These PDFs of the
 and associated
 [reference manual](https://www.dropbox.com/s/grls9ufnowzu0e5/refman.pdf?dl=0)
 were built from Hazer's embedded Doxygen comments on
-2023-05-23
+2023-05-29
 using tag
-```55.1.0```
+```56.0.2```
 . They will not reflect changes made since then.
 
 The unit tests (```Hazer/tst```), functional tests (```Hazer/fun```),
