@@ -339,6 +339,7 @@ Hazer processes the following proprietary NMEA sentences.
 Hazer recognizes and logs the following proprietary NMEA sentences.
 
 * PAIR - emitted by some Quectel devices.
+* PGRM - emitted by some Garmin devices.
 * PMTK - emitted by some GTop/MTK devices.
 * PSRF - emitted by some SiRF devices.
 * PUBX - emitted by some u-blox devices.
@@ -802,6 +803,9 @@ Dane E. Ericksen, "NAD 83: What Is It And Why You Should Care",
 
 Amy Fox, "Precision Matters: The Critical Importance of Decimal Places",
 blis.com, 2017-07-09
+
+Garmin, "Garmin Proprietary NMEA 0183 Sentences TECHNICAL SPECIFICATIONS",
+190-00684-00, Revision C, Garmin International, 2008-12
 
 Geocaching.com, "Benchmark Hunting", 2019-09-16
 
