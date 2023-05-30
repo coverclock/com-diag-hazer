@@ -133,9 +133,9 @@ These PDFs of the
 and associated
 [reference manual](https://www.dropbox.com/s/grls9ufnowzu0e5/refman.pdf?dl=0)
 were built from Hazer's embedded Doxygen comments on
-2023-05-23
+2023-05-29
 using tag
-```55.1.0```
+```56.0.2```
 . They will not reflect changes made since then.
 
 The unit tests (```Hazer/tst```), functional tests (```Hazer/fun```),
@@ -330,13 +330,13 @@ Hazer processes the following standard NMEA sentences.
 * VTG - Course Over Ground & Ground Speed. (NMEA 0183 4.10 p. 127)
 * ZDA - Time, Date, and Local Time Zone. (NMEA 0183 4.10 p. 132)
 
-Hazer processes the following proprietary NMEA sentences.
+Hazer processes the following proprietary u-blox NMEA-style sentences.
 
 * PUBX,00 - emitted by u-blox devices for POSITION. (u-blox 8 31.3 pp. 163-167)
 * PUBX,03 - emitted by u-blox devices for SVSTATUS. (u-blox 8 31.3 pp. 163-167)
 * PUBX,04 - emitted by u-blox devices for TIME. (u-blox 8 31.3 pp. 163-167)
 
-Hazer recognizes and logs the following proprietary NMEA sentences.
+Hazer recognizes and logs the following proprietary NMEA-style sentences.
 
 * PAIR - emitted by some Quectel devices.
 * PGRM - emitted by some Garmin devices.
@@ -344,7 +344,7 @@ Hazer recognizes and logs the following proprietary NMEA sentences.
 * PSRF - emitted by some SiRF devices.
 * PUBX - emitted by some u-blox devices.
 
-Yodel processes or logs the following UBX messages.
+Yodel processes or logs the following binary UBX packets.
 
 * UBX-ACK-ACK - Acknowledge UBX input and indicate success. (u-blox 9 p. 38)
 * UBX-ACK-NAK - Acknowledge UBX input and indicate failure. (u-blox 9 p. 38)
@@ -360,7 +360,7 @@ Yodel processes or logs the following UBX messages.
 * UBX-NAV-SVIN - Report Survey-in status on DGNSS Base. (u-blox 9 p. 163)
 * UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (u-blox 9 p. 181)
 
-Tumbleweed recognizes RTCM messages with a valid CRC but does not process
+Tumbleweed recognizes RTCM binary messages with a valid CRC but does not process
 their contents. As a special case, an RTCM message with a zero payload length
 is used by gpstool and rtktool as a keep alive message.
 
@@ -569,9 +569,15 @@ Linux 4.14.30
 GNU 6.3.0    
 (NTP Server Monitoring System)    
 
-In the past, I have tested Hazer and gpstool on the following
-platforms, which give you some idea of the wide variety of computers
-one may use.
+In the past, I have tested various versions of Hazer and gpstool
+on the following platforms, which give you some idea of the wide
+variety of computers one may use.
+
+Dell OptiPlex 7040    
+Intel Core i7-6700T x86_64 x 4 x 2    
+Ubuntu 16.04.2 "Xenial"    
+Linux 4.4.0    
+GNU 5.4.0    
 
 VMware Workstation 15 Pro under Windows 10    
 Intel Core i7-3520M x86_64 x2    
