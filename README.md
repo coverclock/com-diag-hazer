@@ -1669,6 +1669,22 @@ See the README in the Tesoro repository for more information.
            -x          EXit if a NAK is received.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
 
+Here are the command line options (also shown above) for capturing all
+output of GNSS devices; especially useful for studying, reverse engineering,
+and evaluating new devices, as well as testing new code.
+
+           -C FILE         Concatenate input to FILE or named pipe.
+           -L FILE         Write pretty-printed input to Listing FILE.
+
+Here are the command line options (also shown above) for sending commands to
+GNSS devices, depending on what kind of device they are; see scripts in
+```bin``` and ```fun``` for lots of examples.
+
+           -A STRING       Collapse STRING, append Ubx end matter, write to DEVICE, expect ACK/NAK.
+           -U STRING       Collapse STRING, append Ubx end matter, write to DEVICE.
+           -W STRING       Collapse STRING, append NMEA end matter, Write to DEVICE.
+           -Z STRING       Collapse STRING, write to DEVICE.
+
 ## rtktool
 
     > rtktool -?
@@ -1708,22 +1724,6 @@ See the README in the Tesoro repository for more information.
            -v              Enable verbose output.
            -x              Emit XML.
            -y              Emit YAML.
-
-Here are the command line options (also shown above) for capturing all
-output of GNSS devices; especially useful for studying, reverse engineering,
-and evaluating new devices, as well as testing new code.
-
-           -C FILE         Concatenate input to FILE or named pipe.
-           -L FILE         Write pretty-printed input to Listing FILE.
-
-Here are the command line options (also shown above) for sending commands to
-GNSS devices, depending on what kind of device they are; see scripts in
-```bin``` and ```fun``` for lots of examples.
-
-           -A STRING       Collapse STRING, append Ubx end matter, write to DEVICE, expect ACK/NAK.
-           -U STRING       Collapse STRING, append Ubx end matter, write to DEVICE.
-           -W STRING       Collapse STRING, append NMEA end matter, Write to DEVICE.
-           -Z STRING       Collapse STRING, write to DEVICE.
 
 # Memory Leaks
 
