@@ -133,9 +133,9 @@ These PDFs of the
 and associated
 [reference manual](https://www.dropbox.com/s/grls9ufnowzu0e5/refman.pdf?dl=0)
 were built from Hazer's embedded Doxygen comments on
-2023-05-23
+2023-05-29
 using tag
-```55.1.0```
+```56.0.2```
 . They will not reflect changes made since then.
 
 The unit tests (```Hazer/tst```), functional tests (```Hazer/fun```),
@@ -330,20 +330,21 @@ Hazer processes the following standard NMEA sentences.
 * VTG - Course Over Ground & Ground Speed. (NMEA 0183 4.10 p. 127)
 * ZDA - Time, Date, and Local Time Zone. (NMEA 0183 4.10 p. 132)
 
-Hazer processes the following proprietary NMEA sentences.
+Hazer processes the following proprietary u-blox NMEA-style sentences.
 
 * PUBX,00 - emitted by u-blox devices for POSITION. (u-blox 8 31.3 pp. 163-167)
 * PUBX,03 - emitted by u-blox devices for SVSTATUS. (u-blox 8 31.3 pp. 163-167)
 * PUBX,04 - emitted by u-blox devices for TIME. (u-blox 8 31.3 pp. 163-167)
 
-Hazer recognizes and logs the following proprietary NMEA sentences.
+Hazer recognizes and logs the following proprietary NMEA-style sentences.
 
 * PAIR - emitted by some Quectel devices.
+* PGRM - emitted by some Garmin devices.
 * PMTK - emitted by some GTop/MTK devices.
 * PSRF - emitted by some SiRF devices.
 * PUBX - emitted by some u-blox devices.
 
-Yodel processes or logs the following UBX messages.
+Yodel processes or logs the following binary UBX packets.
 
 * UBX-ACK-ACK - Acknowledge UBX input and indicate success. (u-blox 9 p. 38)
 * UBX-ACK-NAK - Acknowledge UBX input and indicate failure. (u-blox 9 p. 38)
@@ -359,7 +360,7 @@ Yodel processes or logs the following UBX messages.
 * UBX-NAV-SVIN - Report Survey-in status on DGNSS Base. (u-blox 9 p. 163)
 * UBX-RXM-RTCM - RXM RTCM input status on DGNSS Rover. (u-blox 9 p. 181)
 
-Tumbleweed recognizes RTCM messages with a valid CRC but does not process
+Tumbleweed recognizes RTCM binary messages with a valid CRC but does not process
 their contents. As a special case, an RTCM message with a zero payload length
 is used by gpstool and rtktool as a keep alive message.
 
@@ -562,6 +563,13 @@ Linux 4.19.66
 GNU 6.3.0    
 (Differential GNSS Stationary Rover)    
 
+Raspberry Pi 3 Model B+ BCM2835
+ARM Cortex-A72 x4    
+Raspbian 10 "buster"
+Linux 4.19.50
+GNU 8.3.0
+(Differential GNSS RTCM Server)
+
 Raspberry Pi 3 Model B+ BCM2835    
 ARM Cortex-A72 x4    
 Raspbian 9 "stretch"    
@@ -569,9 +577,15 @@ Linux 4.14.30
 GNU 6.3.0    
 (NTP Server Monitoring System)    
 
-In the past, I have tested Hazer and gpstool on the following
-platforms, which give you some idea of the wide variety of computers
-one may use.
+In the past, I have tested various versions of Hazer and gpstool
+on the following platforms, which give you some idea of the wide
+variety of computers one may use.
+
+Dell OptiPlex 7040    
+Intel Core i7-6700T x86_64 x 4 x 2    
+Ubuntu 16.04.2 "Xenial"    
+Linux 4.4.0    
+GNU 5.4.0    
 
 VMware Workstation 15 Pro under Windows 10    
 Intel Core i7-3520M x86_64 x2    
@@ -803,6 +817,9 @@ Dane E. Ericksen, "NAD 83: What Is It And Why You Should Care",
 
 Amy Fox, "Precision Matters: The Critical Importance of Decimal Places",
 blis.com, 2017-07-09
+
+Garmin, "Garmin Proprietary NMEA 0183 Sentences TECHNICAL SPECIFICATIONS",
+190-00684-00, Revision C, Garmin International, 2008-12
 
 Geocaching.com, "Benchmark Hunting", 2019-09-16
 
@@ -1659,6 +1676,22 @@ See the README in the Tesoro repository for more information.
            -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds.
            -x          EXit if a NAK is received.
            -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
+
+Here are the command line options (also shown above) for capturing all
+output of GNSS devices; especially useful for studying, reverse engineering,
+and evaluating new devices, as well as testing new code.
+
+           -C FILE         Concatenate input to FILE or named pipe.
+           -L FILE         Write pretty-printed input to Listing FILE.
+
+Here are the command line options (also shown above) for sending commands to
+GNSS devices, depending on what kind of device they are; see scripts in
+```bin``` and ```fun``` for lots of examples.
+
+           -A STRING       Collapse STRING, append Ubx end matter, write to DEVICE, expect ACK/NAK.
+           -U STRING       Collapse STRING, append Ubx end matter, write to DEVICE.
+           -W STRING       Collapse STRING, append NMEA end matter, Write to DEVICE.
+           -Z STRING       Collapse STRING, write to DEVICE.
 
 ## rtktool
 

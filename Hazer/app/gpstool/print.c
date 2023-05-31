@@ -172,7 +172,7 @@ void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, haz
                 phantom = va[system].sig[signal].sat[satellite].phantom ? PHANTOM : INACTIVE;
                 untracked = va[system].sig[signal].sat[satellite].untracked ? UNTRACKED : INACTIVE;
                 unused = va[system].sig[signal].sat[satellite].unused ? UNUSED : INACTIVE;
-                source = (va[system].label != (const char *)0) ? va[system].label[0] : '0';
+                source = (va[system].label == (const char *)0) ? '0' : (va[system].label[0] == 'P') ? va[system].label[1] : va[system].label[0];
 
                 fputs("SAT", fp);
 

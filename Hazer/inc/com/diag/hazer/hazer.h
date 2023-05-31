@@ -96,7 +96,10 @@
  *
  * Gtop, "PMTK command reference", GlobalTop Tech Inc., 2012
  *
- * Quectel, "L89 R2.0 GNSS Protocol Specification", 2020-04-29
+ * Quectel, "L89 R2.0 GNSS Protocol Specification", Quectel, 2020-04-29
+ *
+ * Garmin, "Garmin Proprietary NMEA 0183 Sentences TECHNICAL SPECIFICATIONS",
+ * 190-00684-00, Revision C, Garmin International, 2008-12
  */
 
 #include <stdio.h>
@@ -260,6 +263,7 @@ typedef enum HazerTalker {
     HAZER_TALKER_NAVIGATION,                /* IN */
     HAZER_TALKER_LORANC,                    /* LC */
     HAZER_TALKER_PAIR,                      /* PAIR */
+    HAZER_TALKER_PGRM,                      /* PGRM */
     HAZER_TALKER_PMTK,                      /* PMTK */
     HAZER_TALKER_PSRF,                      /* PSRF */
     HAZER_TALKER_PUBX,                      /* PUBX */
@@ -293,6 +297,7 @@ typedef enum HazerTalker {
     "IN", \
     "LC", \
     "PAIR", \
+    "PGRM", \
     "PMTK", \
     "PSRF", \
     "PUBX", \
@@ -1072,6 +1077,12 @@ extern uint16_t hazer_parse_dop(const char * string, char ** endp);
  * Quectel L89 R2.0 GNSS Protocol Specification
  */
 #define HAZER_PROPRIETARY_SENTENCE_PAIR "PAIR"
+
+/**
+ * @def HAZER_PROPRIETARY_SENTENCE_PGRM
+ * Garmin Proprietary NMEA Sentences TECHNICAL SPECIFICATIONS
+ */
+#define HAZER_PROPRIETARY_SENTENCE_PGRM "PGRM"
 
 /*******************************************************************************
  * DETERMINING TALKER

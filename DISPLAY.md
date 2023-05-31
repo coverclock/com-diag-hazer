@@ -282,25 +282,28 @@ multiple constellations.
 
     SAT [  6]     1id  24°elv   44°azm   19dBHz  L1_C/A   G <              NAVSTAR
 
-SATellite, generated from the NMEA GSV sentence or the U-blox PUBX SVSTATUS
-sentence, is the list of satellites, or Space Vehicles (SV), in view. It
-includes an index that is purely an artifact of Hazer, the Space Vehicle
-IDentifier (specific to the constellation); its elevation and azimuth
-in degrees; its the signal strength (really, a carrier to noise density
-ratio) in deciBels Hertz; the name of the signal band (according to
-NMEA 0183) if specified ("ANY" if it is not, and spaces in the name
-are replaced with an underscore); and zero or more flags. A flag of
-'G' indicates that this SV was reported by the GSV sentence, while a 'P'
-indicates the PUBX sentence; a flag of '<' indicates that the satellite is
-on the active list (see ACT above, provided by the NMEA GSA sentence or
-by the U-blox PUBX SVSTATUS sentence); a '?' indicates that the azimuth
-and/or the elevation were empty (but displays as zero), and typically
-means that the almanac has not yet been received (a cold start), but
-occasionally indicates that the satellite is not in the received almanac,
-which I've seen when GPS ground control is testing a new satellite;
-a '!' indicates that the signal strength was empty (but displays as
-zero), where some receivers use this to indicate the satellite is in the
-almanac but is not being received over an available RF channel); a '-'
-indicates that a PUBX SVSTATUS message has indicated that the satellite
-was excluded in the solution (this is apparently different from having
-the satellite's ephemeris but not using it in the solution).
+SATellite, generated from the NMEA GSV sentence or the U-blox PUBX
+SVSTATUS sentence, is the list of satellites, or Space Vehicles (SV), in
+view. It includes an index that is purely an artifact of Hazer, the Space
+Vehicle IDentifier (specific to the constellation); its elevation and
+azimuth in degrees; its the signal strength (really, a carrier to noise
+density ratio) in deciBels Hertz; the name of the signal band (according
+to NMEA 0183) if specified ("ANY" if it is not, and spaces in the name
+are replaced with an underscore); and zero or more flags. A flag of 'G'
+indicates that this SV was reported by the GSV sentence, while a
+'U' indicates the PUBX sentence. (The leading 'P' generally means
+"Proprietary" in NMEA parlance, and is used in other vendors' proprietary
+NMEA-like sentences; here, "PUBX" means Proprietary UBX.); a flag of
+'<' indicates that the satellite is on the active list (see ACT above,
+provided by the NMEA GSA sentence or by the U-blox PUBX SVSTATUS
+sentence); a '?' indicates that the azimuth and/or the elevation were
+empty (but displays as zero), and typically means that the almanac has
+not yet been received (a cold start), but occasionally indicates that
+the satellite is not in the received almanac, which I've seen when GPS
+ground control is testing a new satellite; a '!' indicates that the signal
+strength was empty (but displays as zero), where some receivers use this
+to indicate the satellite is in the almanac but is not being received
+over an available RF channel); a '-' indicates that a PUBX SVSTATUS
+message has indicated that the satellite was excluded in the solution
+(this is apparently different from having the satellite's ephemeris but
+not using it in the solution).
