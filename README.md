@@ -454,7 +454,7 @@ I have successfully tested Hazer with the following GNSS devices.
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
 * GlobalSat BU-353N (Quectel L89?+Prolific, 4800 8N1, v067Bp23a3, ttyUSB, 1Hz) [^25]    
 * GlobalSat BU-353N5 (Quectel L89?+Prolific, 4800 8N1, v067Bp23a3, ttyUSB, 1Hz) [^26]    
-* GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz)    
+* GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz) [^27]    
 * GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [^1] [^2] [^4] [^8] [^13]    
 * GlobalSat ND-105C (SiRF Star III+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
@@ -503,6 +503,7 @@ I have successfully tested Hazer with the following GNSS devices.
 [^24]: The labels on the PVT (1pps) and PWR LEDs on this board are reversed.        
 [^25]: Vendor web site and OEM packaging correctly states GPS only.    
 [^26]: Emits GSAs with GLONASS id (2) but only emits GSVs with GPS talker (GP).    
+[^27]: Initially updates at 1Hz until it achieves a fix, than updates at 5Hz.    
 
 Note that when sending commands to and parsing output from GNSS
 devices, Postel's Law - "Be conservative in what you send, be liberal
