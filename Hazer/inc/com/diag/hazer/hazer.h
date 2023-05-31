@@ -392,7 +392,7 @@ extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
         { \
             "ANY",      "B1I",      "B1Q",      "B1C", \
             "B1A",      "B2-a",     "B2-b",     "B2_a+b", \
-            "B3I",      "B3Q",      "B3A",      "B3I", \
+            "B3I",      "B3Q",      "B3A",      "B2I", \
             "B2Q",     "13sig",    "14sig",    "15sig", \
         } /* COMPASS */, \
         { \
