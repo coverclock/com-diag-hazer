@@ -835,7 +835,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -n              Use No parity for DEVICE.\n");
             fprintf(stderr, "       -o              Use Odd parity for DEVICE.\n");
             fprintf(stderr, "       -p PIN          Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).\n");
-            fprintf(stderr, "       -s              Use XON/XOFF (control-Q/control-S) for DEVICE.\n");
+            fprintf(stderr, "       -s              Use XON/XOFF (c-Q/c-S) Software flow control for DEVICE.\n");
             fprintf(stderr, "       -t SECONDS      Timeout GNSS data after SECONDS seconds [0..255].\n");
             fprintf(stderr, "       -v              Display Verbose output on standard error.\n");
             fprintf(stderr, "       -w SECONDS      Write STRING to DEVICE no more than every SECONDS seconds, 0 always, <0 never.\n");
