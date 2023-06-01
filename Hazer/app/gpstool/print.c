@@ -172,7 +172,7 @@ void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, haz
                 phantom = va[system].sig[signal].sat[satellite].phantom ? PHANTOM : INACTIVE;
                 untracked = va[system].sig[signal].sat[satellite].untracked ? UNTRACKED : INACTIVE;
                 unused = va[system].sig[signal].sat[satellite].unused ? UNUSED : INACTIVE;
-                source = (va[system].label == (const char *)0) ? '0' : (va[system].label[0] == 'P') ? va[system].label[1] : va[system].label[0];
+                source = (va[system].label == (const char *)0) ? '?' : (va[system].label[0] == 'P') ? va[system].label[1] : va[system].label[0];
 
                 fputs("SAT", fp);
 
@@ -714,7 +714,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
 
             fputs("INT", fp);
 
-            fprintf(fp, " %3.3s", (pa[system].label == (const char *)0) ? "NULL" : (pa[system].label[0] == 'P') ? &(pa[system].label[1]) : pa[system].label);
+            fprintf(fp, " %3.3s", (pa[system].label == (const char *)0) ? "???" : (pa[system].label[0] == 'P') ? &(pa[system].label[1]) : pa[system].label);
             fprintf(fp, " [%2u]", pa[system].sat_used);
             fprintf(fp, " %3s", dmyokay ? "DMY" : "dmy");
             fprintf(fp, " %3s", totokay ? "TOT" : "tot");
