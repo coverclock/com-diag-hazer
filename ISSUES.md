@@ -335,6 +335,8 @@ wavelength) or more.
 
 ## NMEA 0183 4.11
 
+### Price
+
 The National Marine Electronics Association (NMEA) 0183 standard describes
 the output of virtually every GNSS device by any manufacturer ever. NMEA
 recently issued version 4.11 of this standard. Previous versions of
@@ -359,13 +361,48 @@ say about the 4.11 standard.
     NMEA 0183- Government / Industrial / Testing  $7,500
     NMEA 0183- Consumer Electronics  $10,000
 
+### GSV Sentence
+
+The definition of the GSV sentence in 4.11 departs significantly from that
+in the 4.10 version, seriously enough that I suspect it is an editing mistake
+and not intentional.
+
+4.11 p. 98: "The GN identifier shall not be used with this sentence."
+I take this to mean that the non-constellation-specific Talker ID
+"GN" (for GNSS) cannot be used, and instead a Talker ID like "GP"
+(GPS) or "GL" (GLONASS) has to be used, as appropriate.
+
+4.11 p. 99: "d) When the Talker ID is GN, the GNSS System ID provides
+the only method to determine the meaning of the SVIDs." (Note that
+this is exactly the same wording as for the GSA sentence on p. 96.)
+This conflicts with the text on p. 98.
+
+More seriously, 4.11 references the GNSS System ID field, which does
+not exist in the GSV sentence in 4.10. But it is shown in the GSV
+prototype on 4.11 p. 98, replacing the Signal ID field on 4.10 p. 96.
+
+4.11 p. 99: "4) GNSS System ID according to Table 19. This field
+shall not be null."
+
+4.10 p. 96: "4) Signal ID according to Table 22 below. This field
+shall not be null." (The 4.10 text references Table 22, but it is
+actually Table 21.  Similarly, the 4.10 text for the GSA sentence
+references Table 21, but it is actually Table 20.)
+
+This creates a ambiguity in that for numeric field values from 1 to 6,
+it is impossible to distinguish between the value being a GNSS System ID
+(4.11 Table 19 p. 84) or a Signal ID (4.10 Table 21 p. 97). 
+
+As of this writing (2023-06-01), Hazer implements the 4.10 GSV definition.
+
 ## GlobalSat BU-353N5 Quectel L89? Missing GSV Sentences
 
-The GlobalSat BU-353N5, which I believe uses a Quectel L89 chip because of
-its use of the proprietary ```PAIR``` NMEA-like sentences, reports active use
-of SVs in both the GPS and GLONASS constellations in its ```GSA``` sentences,
-emitting NMEA System IDs of both ```1``` (GPS) and ```2``` (GLONASS), but only emits
-```GSV``` sentences with the Talker name of ```GP``` (GPS). I figured this was a bug
+The GlobalSat BU-353N5, which I believe uses a Quectel L89 chip
+because of its use of the proprietary ```PAIR``` NMEA-like sentences,
+reports active use of SVs in both the GPS and GLONASS constellations
+in its ```GSA``` sentences, emitting NMEA System IDs of both ```1```
+(GPS) and ```2``` (GLONASS), but only emits ```GSV``` sentences
+with the Talker name of ```GP``` (GPS). I figured this was a bug
 in my code, but examining raw data (which I saved in the ```dat/hazer```
 directory) confirms this weird behavior.
 
