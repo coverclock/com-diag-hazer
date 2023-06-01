@@ -1,9 +1,10 @@
 # Issues
 
-Here is a list of weird things I've observed in my travels using
-various GNSS modules. U-blox may appear to be over represented
-here, but that's only because they're my favorite GNSS device
-manufacturer.
+Here is a list of weird things (a.k.a. Fun Facts to Know and Tell)
+I've observed in my travels using various GNSS devices. U-blox may
+appear to be over represented here, but that's only because they're
+my favorite GNSS device manufacturer. Some of the issues have turned
+out to be my bugs, and have been updated to note that.
 
 ## Wrong number of satellites reported for GLONASS on U-Blox UBX-ZED-F9P
 
@@ -35,11 +36,13 @@ satellite, or the total count should be ten instead of eleven. My software
 has been modified to account for this malformed message; it originally
 core dumped with a segmentation violation.
 
-2019-06-06: U-Blox says this FW bug will be fixed in a subsequent release.
+### Update 2019-06-06
+
+U-Blox says this FW bug will be fixed in a subsequent release.
 
 <https://portal.u-blox.com/s/question/0D52p00008WRsgMCAT/ubxzedf9p-incorrect-number-of-satellites-in-view-for-nmea-gsv-for-glonass>
 
-## Likely wrong message indexing for Beidou on U-Blox UBX-ZED-F9R
+## Likely wrong message indexing for Beidou on U-Blox UBX-ZED-F9R (UPDATED)
 
 The Sparkfun ZED-F9R board uses the U-Blox ZED-F9R GNSS receiver.  I'm
 pretty sure the U-Blox ZED-F9R-00B-00 chip has a firmware bug. I believe
@@ -64,13 +67,21 @@ expensive chip that combines differential GNSS with an IMU. I still notice
 GSA/GSV discrepancies in FWVER HPS 1.21, and not just in the Beidou
 constellation.)
 
+### Update 2023-06-01
+
+This is entirely my bug. The two sentences have different Signal
+ID fields, ```1``` in the first one, ```0``` in the second, and so
+represent in effect different perspectives of what satellites are
+in view for the same constellation. Later versions of Hazer interpret
+this field correctly.
+
 ## Lost Characters on Gen 8 and Gen 9 U-blox Modules using USB ACM Port
 
 I've been troubleshooting a weird issue with sequences of characters being
 lost on the modem-ish (ttyACM) USB connection on a U-blox UBX-ZED-F9P
 (generation 9) chip. This occurs when using the Ardusimple SimpleRTK2B and
 Sparkfun GPS-RTK2 boards. I also see it a U-Blox UBX-M8030 (generation 8)
-chip in a GlobalSat BU353W10 dongle. I've seen in on Intel (Dell) and
+chip in a GlobalSat BU-353W10 dongle. I've seen it on Intel (Dell) and
 ARM (Raspberry Pi 3B+ and 4B) systems.
 
 I've seen it using my software,
@@ -116,21 +127,24 @@ The u-blox support forum has another person reporting something similar.
 
 ### Update 2021-11-20
 
-Recently I revisited the Garmin GLO, a Bluetooth-connected GPS device
-that updates at 10MHz but with a serial data rate of only 4800 BPS. This
-device is a little challenging to manager: given its update rate that is
-an order of magnitude higher than the typical USB GPS device, but with a
-relatively low serial data rate, it means there is seldom if ever a time
-when there is not data available to be read from the RPi's Bluetooth
-/dev/rfcomm device. Yet running this application on an RPi 4B over
-the span of several days, not once did gpstool have to resync with the
-input stream.  Compare this with the u-blox Gen 8 and Gen 9 GNSS devices
-that update at 1MHz, with a serial data rate of 9600 or even 115200 BPS,
-for which resyncing is required every few minutes. I would really like to
-believe that the resync issues is in my software (because then I could fix
-it). But that fact that I don't see this happening with non-u-blox devices
-makes that opinion hard to keep. (Regardless, u-blox devices remain my
-favorite GNSS devices for other reasons; I can live with the resyncing.)
+Recently I revisited the Garmin GLO, a Bluetooth-connected GPS
+device that updates at 10MHz (probably because of its frequent
+application in the civil aviation domain) but with a serial data
+rate of only 4800 BPS. This device is a little challenging to manage:
+given its update rate that is an order of magnitude higher than the
+typical USB GPS device, but with a relatively low serial data rate,
+it means there is seldom if ever a time when there is not data
+available to be read from the RPi's Bluetooth /dev/rfcomm device.
+Yet running this application on an RPi 4B over the span of several
+days, not once did gpstool have to resync with the input stream.
+Compare this with the u-blox Gen 8 and Gen 9 GNSS devices that
+update at 1MHz, with a serial data rate of 9600 or even 115200 BPS,
+for which resyncing is required every few minutes. I would really
+like to believe that the resync issues is in my software (because
+then I could fix it). But that fact that I don't see this happening
+with non-u-blox devices makes that opinion hard to keep. (Regardless,
+u-blox devices remain my favorite GNSS devices for other reasons;
+I can live with the resyncing.)
 
 ## End Of File (EOF) on U-blox UBX-ZED-F9P when using Ubuntu VM
 
@@ -361,7 +375,7 @@ say about the 4.11 standard.
     NMEA 0183- Government / Industrial / Testing  $7,500
     NMEA 0183- Consumer Electronics  $10,000
 
-### GSV Sentence
+### GSV Sentence in 4.11 versus 4.10
 
 The definition of the GSV sentence in 4.11 departs significantly from that
 in the 4.10 version, seriously enough that I suspect it is an editing mistake
