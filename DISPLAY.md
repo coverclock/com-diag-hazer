@@ -120,7 +120,7 @@ second. (Similar comments here regarding precision as those for POS.)
     INT ZDA [12] DMY TOT (  9 10  5  3  0  0  4  4 )             39526129B ttyACM0
 
 INTernal is some clues about the Hazer state, including the name of
-the sentence (GLL in the example above) that most recently updated
+the sentence (ZDA in the example above) that most recently updated
 the solution, the total number of satellites that contributed to that
 solution, an indication as to whether the day-month-year value has been
 set (only occurs once the RMC sentence has been received), an indication

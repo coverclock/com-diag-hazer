@@ -714,7 +714,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
 
             fputs("INT", fp);
 
-            fprintf(fp, " %3.3s", pa[system].label);
+            fprintf(fp, " %3.3s", (pa[system].label == (const char *)0) ? "NULL" : (pa[system].label[0] == 'P') ? &(pa[system].label[1]) : pa[system].label);
             fprintf(fp, " [%2u]", pa[system].sat_used);
             fprintf(fp, " %3s", dmyokay ? "DMY" : "dmy");
             fprintf(fp, " %3s", totokay ? "TOT" : "tot");
