@@ -409,6 +409,18 @@ it is impossible to distinguish between the value being a GNSS System ID
 
 As of this writing (2023-06-01), Hazer implements the 4.10 GSV definition.
 
+#### Update 2023-06-02
+
+I sent these notes to the NMEA and they sent me the errata that I should
+have probably gotten with the 0183 4.11 PDF.
+
+ERRATA #0183 20190507 GSV Sentence: replaces "GNSS System ID" with "Signal ID"
+in the GSV sentence prototype.
+
+ERRATA #0183 20190515 GSV Sentence: reproduces all of the "GSV - GNSS
+Satellites In View" section of the spec, eliminating note 3d completely, and
+replacing "GNSS System ID" with "Signal ID".
+
 ## GlobalSat BU-353N5 Quectel L89? Missing GSV Sentences
 
 The GlobalSat BU-353N5, which I believe uses a Quectel L89 chip

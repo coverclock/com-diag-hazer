@@ -876,6 +876,12 @@ National Marine Electronics Association, 2012-06
 NMEA 0183, "Standard for Interfacing Marine Electronic Devices", Version 4.11,
 National Marine Electronics Association, 2018-10
 
+NMEA 0183, "Technical Bulletin - NMEA 0183 Errata Version 4.11"", ERRATA #0183
+20190507 GSV Sentence
+
+NMEA 0183, "Technical Bulletin - NMEA 0183 Errata Version 4.11"", ERRATA #0183
+20190515 GSV Sentence
+
 NovAtel, "An Introduction to GNSS", 2nd ed., NovAtel Inc., 2015
 
 Quectel, "L89 R2.0 GNSS Protocol Specification",

@@ -32,6 +32,12 @@
  * "NMEA 0183 Standard for Interfacing Marine Electronic Devices", version 4.11,
  * NMEA 0183, National Marine Electronics Association, 2018-10
  *
+ * "Technical Bulletin - NMEA 0183 Errata Version 4.11"", ERRATA #0183
+ * 20190507 GSV Sentence, National Marine Electronics Association, 2019-05-07
+ *
+ * "Technical Bulletin - NMEA 0183 Errata Version 4.11"", ERRATA #0183
+ * 20190515 GSV Sentence, National Marine Electronics Association, 2019-05-15
+ *
  * "BU-353S4 GPS Receiver Data Sheet", BU353S4-DS08212013B, USGLobalSat Inc.,
  * 2013
  *

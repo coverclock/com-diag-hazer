@@ -1897,9 +1897,9 @@ int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count)
          * of the reported satellites in a single GSV sentence are in
          * the same system and have the same signal (band).
          *
-         * The NMEA 0183 4.11 description of this field conflicts with
-         * that of 4.10. In fact, 4.11 conflicts with itself. 4.11 is either
-         * incorrect or ambiguous. I'm sticking with the 4.10 description.
+         * See also: Errata #0183 20190507, and Errata #0183 20190515,
+         * both of which fix my issues with the 4.11 definition of the
+         * GSV sentence.
          */
 
         if ((index + 1) >= count) {
