@@ -42,7 +42,9 @@ U-Blox says this FW bug will be fixed in a subsequent release.
 
 <https://portal.u-blox.com/s/question/0D52p00008WRsgMCAT/ubxzedf9p-incorrect-number-of-satellites-in-view-for-nmea-gsv-for-glonass>
 
-## Likely wrong message indexing for Beidou on U-Blox UBX-ZED-F9R (UPDATED)
+## Likely wrong message indexing for Beidou on U-Blox UBX-ZED-F9R
+
+(This turned out to be a bug on my part; see below.)
 
 The Sparkfun ZED-F9R board uses the U-Blox ZED-F9R GNSS receiver.  I'm
 pretty sure the U-Blox ZED-F9R-00B-00 chip has a firmware bug. I believe
@@ -377,6 +379,9 @@ say about the 4.11 standard.
 
 ### GSV Sentence in 4.11 versus 4.10
 
+(This turned out to have been corrected in errata that I did not initially
+receive; see below.)
+
 The definition of the GSV sentence in 4.11 departs significantly from that
 in the 4.10 version, seriously enough that I suspect it is an editing mistake
 and not intentional.
@@ -431,4 +436,3 @@ in its ```GSA``` sentences, emitting NMEA System IDs of both ```1```
 with the Talker name of ```GP``` (GPS). I figured this was a bug
 in my code, but examining raw data (which I saved in the ```dat/hazer```
 directory) confirms this weird behavior.
-
