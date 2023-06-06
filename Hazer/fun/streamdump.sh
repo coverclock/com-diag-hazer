@@ -5,6 +5,8 @@
 # https://github.com/coverclock/com-diag-hazer
 # Uses the socat utility to pipe date directly into phex with no
 # interpretation or processing.
+# serialtool -D /dev/ttyACM0 -b 9600 -8 -n -1 -i < /dev/null | phex
+# also works.
 
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-9600}
