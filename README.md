@@ -454,9 +454,10 @@ I have successfully tested Hazer with the following GNSS devices.
 * Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21] [^22]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
 * GlobalSat BU-353N (Quectel L89?+Prolific, 4800 8N1, v067Bp23a3, ttyUSB, 1Hz) [^25]    
+* GlobalSat BU-353N(10Hz) (Quectel L89?+Prolific, 115200 8N1, v067Bp23a3, ttyUSB, 10Hz) [^25]    
 * GlobalSat BU-353N5 (Quectel L89?+Prolific, 4800 8N1, v067Bp23a3, ttyUSB, 1Hz) [^26]    
-* GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz) [^27]    
 * GlobalSat BU-353S4 (SiRF Star IV+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
+* GlobalSat BU-353S4-5Hz (SiRF Star IV+Prolific, 115200 8N1, v067Bp2303, ttyUSB, 5Hz) [^27]    
 * GlobalSat BU-353W10 (U-Blox 8/UBX-M8030, 9600 8N1, v1546p01a8, ttyACM, 1Hz) [^1] [^2] [^4] [^8] [^13]    
 * GlobalSat ND-105C (SiRF Star III+Prolific, 4800 8N1, v067Bp2303, ttyUSB, 1Hz)    
 * Jackson Labs Technologies CSAC GPSDO (U-Blox 6/UBX-LEA-6T, 115200 8n1, N/A, ttyS, 1Hz)    
