@@ -636,6 +636,12 @@ Ubuntu 22.04.2 LTS (Jammy Jellyfish)
 Linux 5.10.110    
 GNU 11.3.0    
 
+Raspberry Pi Zero W    
+Broadcom BCM2835 ARMv6 x1    
+Raspbian 11 "Bullseye"    
+Linux 6.1.21    
+GNU 10.2.1    
+
 Your mileage may vary. Hazer and gpstool are not resource intensive. I
 routinely run gpstool on an old 32-bit Intel i686 netbook, and run several
 simultaneous instances of gpstool on a single Rasbperry Pi 4B.
@@ -1196,6 +1202,7 @@ for both the Hazer and the Diminuto executables so you don't have to install
 the libraries and binaries in the system directories.)
 
     cd ~/src/com-diag-hazer/Hazer
+    export LANG=en_US.UTF-8 # You can put this in your .profile.
     . out/host/bin/setup
     make sanity
     
@@ -1208,8 +1215,27 @@ GNSS device at all. Mostly I use these to make sure that gpstool does not
 throw an assert and core dump.
 
     cd ~/src/com-diag-hazer/Hazer
+    export LANG=en_US.UTF-8 # You can put this in your .profile.
     . out/host/bin/setup
     make functional
+
+## gpstool
+
+Similarly, when you run an instance of ```gpstool``` (including from
+inside one of the provided scripts), you need to set the ```LANG```
+(Language) environmental variable to use the U.S. version of UTF-8. This
+allows ```gpstool``` to display special Unicode symbols like the degree
+symbol and the plus/minus symbol.
+
+    export LANG=en_US.UTF-8 # You can put this in your .profile.
+
+If you don't install the Diminuto and Hazer libraries, binaries, and scripts
+in one of the usual system locations like ```/usr/local/lib``` and
+```/usr/local/bin``` (and I typically don't), you can temporarily modify your
+environment so that your shell can find them.
+
+    cd ~/src/com-diag-hazer/Hazer
+    . out/host/bin/setup # If you didn't install the libraries and binaries.
 
 # Directories
 
