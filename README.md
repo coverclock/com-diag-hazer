@@ -146,7 +146,7 @@ need to.
 If you don't install libraries, binaries, and scripts in one of the usual
 system locations like ```/usr/local/lib``` and ```/usr/local/bin```
 (I typically don't), you can temporarily modify your environment
-so that the linker and your shell can find them. This bash include
+so that the linker and your shell can find them. This bash sourcing
 script is an artifact of the build process and sets the ```PATH``` and
 ```LD_LIBRARY_PATH``` environmental variables and exports them.
 
