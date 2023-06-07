@@ -126,6 +126,57 @@ the Networked Transport of RTCM via Internet Protocol (Ntrip), but instead
 uses its own trivial data format consisting of raw RTCM messages preceeded
 by a four-byte sequence number carried over UDP datagrams.
 
+# Pro Tip
+
+When you link against the library or use any of the binaries or scripts
+that are artifacts of the build process, the linker and the shell have
+to know where to find those artifacts. Furthermore, some of the binaries
+or scripts may depend upon values in your environment to work correctly.
+
+You need to set the ```LANG``` (Language) environmental variable to
+set your locale to use the U.S. version of UTF-8. This allows applications
+to correctly display Unicode symbols like the degree symbol and the
+plus/minus symbol. If you use the ```bash``` shell (as I do), you can put
+the following line in your ```.profile``` in your home directory so that
+it is set everytime you log in (as I do). Or you can just set it when you
+need to.
+
+    export LANG=en_US.UTF-8
+
+If you don't install libraries, binaries, and scripts in one of the usual
+system locations like ```/usr/local/lib``` and ```/usr/local/bin```
+(I typically don't), you can temporarily modify your environment
+so that the linker and your shell can find them. This bash include
+script is an artifact of the build process and sets the ```PATH``` and
+```LD_LIBRARY_PATH``` environmental variables and exports them.
+
+    . ~/src/com-diag-hazer/Hazer/out/host/bin/setup
+
+Some scripts in the bin and fun directories save stdout, stderr, CSV,
+or other data in files.  By default, most scripts save such output files
+in the ```out/${TARGET}/tmp``` subdirectory of the code base, where
+TARGET is set to the name of the Makefile configuration file (typically
+"host"). This location can be overridden if the environmental variable
+below is set.
+
+    export COM_DIAG_HAZER_SAVDIR="${HOME}/save"
+
+The libraries, binaries, and scripts make use of the Diminuto logging
+system. The importance of log messages is classified into eight severity
+levels, ranging from DEBUG (log mask 0x01, which may emit a firehose of
+information) to EMERGENCY (log mask 0x80, in which case your system is
+probably in deep trouble). You can control which level of messages are
+emitted, either to standard error (if your application has a controlling
+terminal), or to the system log (if your application, like a daemon,
+does not). One way to control this is to set the log mask in your environment.
+
+    export COM_DIAG_DIMINUTO_LOG_MASK=0xfe
+
+The log mask value is an eight-bit number in decimal, hexadecimal, or
+even octal. In addition, the string ```~0``` can be used to enable all
+log levels, equivalent to ```255```, ```0xff```, or ```0377```. (Generally
+I find ```0xfe``` to be a good starting point.)
+
 # Manual Pages and Reference Manual
 
 These PDFs of the
@@ -1219,24 +1270,6 @@ throw an assert and core dump.
     . out/host/bin/setup
     make functional
 
-## gpstool
-
-Similarly, when you run an instance of ```gpstool``` (including from
-inside one of the provided scripts), you need to set the ```LANG```
-(Language) environmental variable to use the U.S. version of UTF-8. This
-allows ```gpstool``` to display special Unicode symbols like the degree
-symbol and the plus/minus symbol.
-
-    export LANG=en_US.UTF-8 # You can put this in your .profile.
-
-If you don't install the Diminuto and Hazer libraries, binaries, and scripts
-in one of the usual system locations like ```/usr/local/lib``` and
-```/usr/local/bin``` (and I typically don't), you can temporarily modify your
-environment so that your shell can find them.
-
-    cd ~/src/com-diag-hazer/Hazer
-    . out/host/bin/setup # If you didn't install the libraries and binaries.
-
 # Directories
 
 * app - application source files (utilities with more than one source file).
@@ -1432,27 +1465,6 @@ environment so that your shell can find them.
 * zedf9t-factory - factory reset UBX-ZED-F9T device.
 * zedf9t-flash - configure the UBX-ZED-F9T flash for 1PPS (TP1) and 10MHz (TP2).
 * zedf9t-reset - software reset UBX-ZED-F9T device.
-
-# Environmental Variables
-
-    export COM_DIAG_HAZER_SAVDIR="${HOME}/save"
-
-Some scripts in the bin and fun directories save stdout, stderr, CSV,
-or DGNSS parameters in files.  Setting this environmental variable
-changes the directory in which these files are stored. By default,
-stdout, stderr, and CSV files are stored in the out/${TARGET}/tmp
-subdirectory of the code base, where TARGET is set to the name of the
-Makefile configuration file (typically "host"). The DGNSS parameters are
-saved in ${HOME}/fix, or if ${HOME} is not set, in /var/tmp/fix. All of
-these defaults are overridden if the environmental variable is set.
-
-    export COM_DIAG_DIMINUTO_LOG_MASK=0xff
-
-Sets the default log mask for Diminuto for those applications that set
-the mask from the environment. The value is an eight-bit number
-in decimal, hexadecimal, or even octal. In addition, the string ```~0```
-can be used to enable all log levels, equivalent to ```255```, ```0xff```,
-or ```0377```.
 
 # Comma Separated Value (CSV) Output
 
