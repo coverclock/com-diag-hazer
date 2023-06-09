@@ -30,6 +30,7 @@
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/tumbleweed.h"
+#include "com/diag/hazer/calico.h"
 
 /*******************************************************************************
  * DATAGRAM BUFFER
@@ -51,25 +52,28 @@ typedef struct DatagramHeader {
 } datagram_header_t;
 
 /**
+ * This is the union of all of the possible protocol buffers. It is used
+ * solely to compute the datagram buffer length below.
+ */
+union DatagramAny {
+    hazer_buffer_t n;
+    yodel_buffer_t u;
+    tumbleweed_buffer_t r;
+    calico_buffer_t d;
+};
+
+/**
  * This is mostly just so the initializer zeros everything.
  */
 enum {
-    DATAGRAM_SIZE = (
-        ((size_t)HAZER_NMEA_LONGEST > (size_t)YODEL_UBX_LONGEST)
-            ? (((size_t)HAZER_NMEA_LONGEST > (size_t)TUMBLEWEED_RTCM_LONGEST)
-                ? HAZER_NMEA_LONGEST
-                : TUMBLEWEED_RTCM_LONGEST)
-            : (((size_t)YODEL_UBX_LONGEST > (size_t)TUMBLEWEED_RTCM_LONGEST)
-                ? YODEL_UBX_LONGEST
-                : TUMBLEWEED_RTCM_LONGEST)
-    ),
+    DATAGRAM_SIZE = sizeof(union DatagramAny),
 };
 
 /**
  * This buffer is large enough to the largest UDP datagram we are willing to
  * support, plus a trailing NUL. It's not big enough to hold any datagram
  * (that would be in the neighborhood of 65508 bytes). But it will for sure
- * hold a NMEA, UBX, or RTCM payload. It includes a leading sequence number
+ * hold a NMEA, UBX, RTCM, or DIS payload. It includes a leading sequence number
  * field that is transmitted over wire or air in network byte order. The
  * sequence number is uint32_t aligned, which Yodel/UBX cares about.
  */
@@ -80,6 +84,7 @@ typedef struct DatagramBuffer {
         hazer_buffer_t nmea;
         yodel_buffer_t ubx;
         tumbleweed_buffer_t rtcm;
+        calico_buffer_t dis;
     } payload;
 } datagram_buffer_t;
 

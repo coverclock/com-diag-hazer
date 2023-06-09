@@ -163,8 +163,8 @@ typedef enum YodelState {
  * UBX state machine stimuli.
  */
 enum YodelStimulus {
-    YODEL_STIMULUS_SYNC_1       = 0xb5, /* ISO 8859.1 for 'mu'. */
-    YODEL_STIMULUS_SYNC_2       = 0x62, /* 'b' but in hex in doc. */
+    YODEL_STIMULUS_SYNC_1       = (uint8_t)'\xb5', /* ISO 8859.1 for 'mu'. */
+    YODEL_STIMULUS_SYNC_2       = (uint8_t)'\x62', /* 'b' but in hex in doc. */
 };
 
 /**

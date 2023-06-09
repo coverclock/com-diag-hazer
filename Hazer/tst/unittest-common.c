@@ -53,6 +53,11 @@ int main(void)
             } else {
                 assert(!common_machine_is_rtcm(ch));
             }
+            if (ch == 0x10) {
+                assert(common_machine_is_dis(ch));
+            } else {
+                assert(!common_machine_is_dis(ch));
+            }
             ++ii;
         }
 
@@ -94,33 +99,52 @@ int main(void)
             TUMBLEWEED_STATE_CRC_3,
             TUMBLEWEED_STATE_END,
         };
+        static const calico_state_t dis[] = {
+            CALICO_STATE_STOP,
+            CALICO_STATE_START,
+            CALICO_STATE_ID,
+            CALICO_STATE_SIZE,
+            CALICO_STATE_SIZE_DLE,
+            CALICO_STATE_PAYLOAD,
+            CALICO_STATE_PAYLOAD_DLE,
+            CALICO_STATE_CS,
+            CALICO_STATE_CS_DLE,
+            CALICO_STATE_DLE,
+            CALICO_STATE_ETX,
+            CALICO_STATE_END,
+        };
         int nn;
         int uu;
         int rr;
+        int dd;
         int ii;
 
         ii = 0;
         for (nn = 0; nn < countof(nmea); ++nn) {
             for (uu = 0; uu < countof(ubx); ++uu) {
                 for (rr = 0; rr < countof(rtcm); ++rr) {
-                    if ((nn == 1) && (uu == 1) && (rr == 1)) {
-                        assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr]));
-                    } else if ((nn != 0) && (nn != 1)) {
-                        assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr]));
-                    } else if ((uu != 0) && (uu != 1)) {
-                        assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr]));
-                    } else if ((rr != 0) && (rr != 1)) {
-                        assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr]));
-                    } else {
-                        assert(common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr]));
+                    for (dd = 0; dd < countof(dis); ++dd) {
+                        if ((nn == 1) && (uu == 1) && (rr == 1) && (dd == 1)) {
+                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], dis[dd]));
+                        } else if ((nn != 0) && (nn != 1)) {
+                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], dis[dd]));
+                        } else if ((uu != 0) && (uu != 1)) {
+                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], dis[dd]));
+                        } else if ((rr != 0) && (rr != 1)) {
+                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], dis[dd]));
+                        } else if ((dd != 0) && (dd != 1)) {
+                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], dis[dd]));
+                        } else {
+                            assert(common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], dis[dd]));
+                        }
+                        ++ii;
                     }
-                    ++ii;
                 }
             }
         }
 
         assert(ii > 0);
-        assert(ii == (countof(nmea) * countof(ubx) * countof(rtcm)));
+        assert(ii == (countof(nmea) * countof(ubx) * countof(rtcm) * countof(dis)));
     }
 
     return 0;

@@ -237,9 +237,9 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     } else if (old == HAZER_STATE_STOP) {
         /* Do nothing. */
     } else if (isprint(ch)) {
-        fprintf(debug, "Machine NMEA %c %c %c *%c%c 0x%02x '%c'\n", old, state, action, pp->msn, pp->lsn, ch, ch);
+        fprintf(debug, "Machine NMEA %c %c %c 0x%02x%02x '\\x%02x' '%c'\n", old, state, action, pp->msn, pp->lsn, ch, ch);
     } else {
-        fprintf(debug, "Machine NMEA %c %c %c *%c%c 0x%02x\n", old, state, action, pp->msn, pp->lsn, ch);
+        fprintf(debug, "Machine NMEA %c %c %c 0x%02x%02x '\\x%02x'\n", old, state, action, pp->msn, pp->lsn, ch);
     }
 
     return state;

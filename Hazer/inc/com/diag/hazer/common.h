@@ -17,6 +17,7 @@
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/tumbleweed.h"
+#include "com/diag/hazer/calico.h"
 
 #if !defined(COMMON_DEGREE_VALUE)
     /**
@@ -93,29 +94,23 @@ static inline int common_machine_is_rtcm(int ch)
 }
 
 /**
- * Return true if NMEA, UBX, and RTCM state machines are stalled.
+ * Return true if the character is the first of a DIS message.
+ * @param ch is the character.
+ * @return true if DIS, false otherwise.
+ */
+static inline int common_machine_is_dis(int ch)
+{
+    return (ch == CALICO_STIMULUS_DLE);
+}
+
+/**
+ * Return true if NMEA, UBX, RTCM, and DIS state machines are stalled.
  * @param nmea_state is the state of the NMEA state machine.
  * @param ubx_state is the state of the UBX state machine.
  * @param rtcm_state is the state of the RTCM state machine.
+ * @param dis_state is the state of the DIS state machine.
  * @return true if stalled, false otherwise.
  */
-static inline int common_machine_is_stalled(hazer_state_t nmea_state, yodel_state_t ubx_state, tumbleweed_state_t rtcm_state)
-{
-    int result = 0;
-
-    if ((nmea_state == HAZER_STATE_START) && (ubx_state == YODEL_STATE_START) && (rtcm_state == TUMBLEWEED_STATE_START)) {
-        /* Do nothing: all are scanning for beginning of frame. */
-    } else if ((nmea_state != HAZER_STATE_START) && (nmea_state != HAZER_STATE_STOP)) {
-        /* Do nothing: NMEA is processing. */
-    } else if ((ubx_state != YODEL_STATE_START) && (ubx_state != YODEL_STATE_STOP)) {
-        /* Do nothing: UBX is processing. */
-    } else if ((rtcm_state != TUMBLEWEED_STATE_START) && (rtcm_state != TUMBLEWEED_STATE_STOP)) {
-        /* Do nothing: RTCM is processing. */
-    } else {
-        result = !0;
-    }
-
-    return result;
-}
+int common_machine_is_stalled(hazer_state_t nmea_state, yodel_state_t ubx_state, tumbleweed_state_t rtcm_state, calico_state_t dis_state);
 
 #endif
