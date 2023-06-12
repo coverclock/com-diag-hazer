@@ -170,7 +170,7 @@ calico_state_t calico_machine(calico_state_t state, uint8_t ch, void * buffer, s
     case CALICO_STATE_ETX:
         if (ch == CALICO_STIMULUS_ETX) {
             state = CALICO_STATE_END;
-            action = CALICO_ACTION_SAVE;
+            action = CALICO_ACTION_TERMINATE;
         } else {
             pp->error = !0;
             state = CALICO_STATE_STOP;

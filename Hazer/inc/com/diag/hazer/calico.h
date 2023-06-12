@@ -169,7 +169,7 @@ typedef struct CalicoContext {
     uint8_t * bp;       /* Current buffer pointer. */
     size_t sz;          /* Remaining buffer size in bytes. */
     size_t tot;         /* Total size once packet is complete. */
-    uint16_t ln;        /* Payload length in bytes. */
+    uint8_t ln;         /* Payload length in bytes. */
     uint8_t cc;         /* Running checksum counter. */
     uint8_t cs;         /* Running checksum value. */
     uint8_t error;      /* Checksum error indication. */

@@ -39,6 +39,7 @@ void print_buffer(FILE * fp, const void * buffer, size_t size, size_t limit)
         if (current >= limit) { break; }
     }
     fputc('\n', fp);
+    fflush(fp);
 }
 
 void dump_buffer(FILE * fp, const void * buffer, size_t size)
@@ -49,4 +50,5 @@ void dump_buffer(FILE * fp, const void * buffer, size_t size)
         fprintf(fp, "\\x%2.2x", *(bb++));
     }
     fputc('\n', fp);
+    fflush(fp);
 }

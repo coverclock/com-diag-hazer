@@ -5,7 +5,10 @@
 # https://github.com/coverclock/com-diag-hazer
 # usage: gps18xpc [ DEVICE [ RATE ] ]
 # Script for the Garmin GPS-18x PC; this is the unit with the DB9 RS-232
-# connector and the cigarette lighter socket power plug.
+# connector and the cigarette lighter socket power plug. This script is
+# indifferent as to whether the device is in NMEA or binary mode; but NMEA
+# mode appears to always emit at 4800 BPS, and binary mode always emits at
+# 9600 baud.
 # REFERENCES: Garmin, GPS 18x Tech Spec, Rev. D, 4.1.4, p. 14
 
 PROGRAM=$(basename ${0})
