@@ -2762,7 +2762,7 @@ consume:
 
             } else if (talker != HAZER_TALKER_PUBX) {
 
-                DIMINUTO_LOG_INFORMATION("Received NMEA Other \"%s\"\n", vector[0]);
+                DIMINUTO_LOG_INFORMATION("Received NMEA Other \"%.*s\"", (int)(length - 2) /* Exclude CR and LF. */, buffer);
 
             } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
 
