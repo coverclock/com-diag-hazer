@@ -170,8 +170,8 @@ typedef struct CalicoContext {
     size_t sz;          /* Remaining buffer size in bytes. */
     size_t tot;         /* Total size once packet is complete. */
     uint16_t ln;        /* Payload length in bytes. */
-    int8_t cc;          /* Running checksum counter. */
-    int8_t cs;          /* Running checksum value. */
+    uint8_t cc;         /* Running checksum counter. */
+    uint8_t cs;         /* Running checksum value. */
     uint8_t error;      /* Checksum error indication. */
 } calico_context_t;
 
@@ -219,10 +219,10 @@ static inline size_t calico_size(const calico_context_t * pp)
  * @param ccp points to the running checksum counter.
  * @param csp points to the running checksum value.
  */
-static inline void calico_checksum(int8_t ch, int8_t * ccp, int8_t * csp)
+static inline void calico_checksum(uint8_t ch, uint8_t * ccp, uint8_t * csp)
 {
     *ccp += ch;
-    *csp = -(*ccp);
+    *csp = (uint8_t)(-((int8_t)(*ccp)));
 }
 
 /**
@@ -237,7 +237,7 @@ static inline void calico_checksum(int8_t ch, int8_t * ccp, int8_t * csp)
  * @param csp points to where the running checksum value will be stored.
  * @return a pointer just past the end of the checksummed portion, or NULL if an error occurred.
  */
-extern const void * calico_checksum_buffer(const void * buffer, size_t size, int8_t * ccp, int8_t * csp);
+extern const void * calico_checksum_buffer(const void * buffer, size_t size, uint8_t * ccp, uint8_t * csp);
 
 /**
  * Return the length of the completed packet in bytes.

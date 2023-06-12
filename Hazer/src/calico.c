@@ -239,9 +239,9 @@ calico_state_t calico_machine(calico_state_t state, uint8_t ch, void * buffer, s
     } else if (old == CALICO_STATE_STOP) {
         /* Do nothing. */
     } else if (isprint(ch)) {
-        fprintf(debug, "Machine DIS  %c %c %c 0x%02x,0x%02x '\\x%02x' '%c'\n", old, state, action, pp->cc, pp->cs, ch, ch);
+        fprintf(debug, "Machine DIS  %c %c %c 0x%02x,0x%02x '\\x%02x' '%c'\n", old, state, action, (uint8_t)pp->cc, (uint8_t)pp->cs, ch, ch);
     } else {
-        fprintf(debug, "Machine DIS  %c %c %c 0x%02x,0x%02x '\\x%02x'\n", old, state, action, pp->cc, pp->cs, ch);
+        fprintf(debug, "Machine DIS  %c %c %c 0x%02x,0x%02x '\\x%02x'\n", old, state, action, (uint8_t)pp->cc, (uint8_t)pp->cs, ch);
     }
 
     return state;
@@ -256,12 +256,12 @@ calico_state_t calico_machine(calico_state_t state, uint8_t ch, void * buffer, s
  * to compute the length first to do the checksum. Seems chicken-and-egg,
  * but I've seen the same thing in TCP headers.
  */
-const void * calico_checksum_buffer(const void * buffer, size_t size, int8_t * ccp, int8_t * csp)
+const void * calico_checksum_buffer(const void * buffer, size_t size, uint8_t * ccp, uint8_t * csp)
 {
     const void * result = (void *)0;
-    const int8_t * bp = (const int8_t *)buffer;
-    int8_t cc = 0;
-    int8_t cs = 0;
+    const uint8_t * bp = (const uint8_t *)buffer;
+    uint8_t cc = 0;
+    uint8_t cs = 0;
     size_t length = 0;
 
     length = (uint8_t)bp[CALICO_DIS_SIZE];
@@ -311,8 +311,8 @@ ssize_t calico_validate(const void * buffer, size_t size)
     ssize_t result = -1;
     ssize_t length = 0;
     const uint8_t * bp = (uint8_t *)0;
-    int8_t cc = 0;
-    int8_t cs = 0;
+    uint8_t cc = 0;
+    uint8_t cs = 0;
 
     if ((length = calico_length(buffer, size)) <= 0) {
         /* Do nothing. */

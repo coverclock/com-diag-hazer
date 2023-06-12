@@ -13,4 +13,4 @@ RATE=${2:-9600}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-exec socat -u OPEN:${DEVICE},b${RATE} - | phex
+exec socat -u OPEN:${DEVICE},b${RATE} - | phex -e -x
