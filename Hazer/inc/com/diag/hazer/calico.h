@@ -10,13 +10,19 @@
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
- * The Calico module provides support for the Garmin Device Interface
- * Specification binary packet format that is produced by some
- * devices manufactured by Garmin International, Inc. I wrote this code
- * because I had a Garmin 18x dongle with a USB interface, which only
- * produces DIS, not NMEA or the Garmin proprietary NMEA-like sentences.
- * N.B. I have no idea what CPO stands for, but it's used in the Garmin
- * docs without, as far as I can tell, explanation.
+ * THIS IS A WORK IN PROGRESS.
+ * The Calico module provides support for the Garmin CPO binary output format
+ * that is produced by some devices manufactured by Garmin International, Inc.
+ * I have a Garmin GPS-18x PC device with an RS-232 DB9 interface, which
+ * produces either binary CPO output or NMEA and Garmin proprietary NMEA-like
+ * sentences (but not both at the same time). I have no idea what CPO stands
+ * for, but it's used in the Garmin docs without, as far as I can tell,
+ * explanation. Also, this code does NOT work with the Garmin GPS-18x USB
+ * device, whose binary output so far mystifies me. The baud rate of the
+ * GPS-18x PC is also a bit of a mystery: it seems to run at 4800 baud for the
+ * NMEA output, but 9600 baud for the CPO output. Finally, the layout of the
+ * fields in the structures in which the binary CPO output is emitted sucks;
+ * with just a little moving things around it could be vastly improved.
  *
  * REFERENCES
  *
@@ -33,6 +39,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "com/diag/hazer/hazer.h"
 
 /******************************************************************************
  * DEBUGGING
@@ -93,7 +100,7 @@ typedef uint8_t (calico_buffer_t)[CALICO_CPO_LONGEST + 1];
 
 /**
  * @def CALICO_BUFFER_INITIALIZER
- * Initialize a CalicoBuffer type.
+ * Defines a static initializer for a CalicoBuffer.
  */
 #define CALICO_BUFFER_INITIALIZER  \
     { '\0', }
@@ -109,7 +116,7 @@ enum CalicoCpoOffsets {
 };
 
 /**
- * This is the structure of the header on every CPO packet.
+ * This is the structure of the start matter of every CPO packet.
  */
 typedef struct CalicoCpoHeader {
     uint8_t sync;
@@ -119,19 +126,12 @@ typedef struct CalicoCpoHeader {
 } calico_cpo_header_t;
 
 /**
- * @def CALICO_CPO_HEADER_INITIALIZER
- * Initialize a CalicoCpoHeader structure.
+ * THis is the structure of the end matter of every CPO packet.
  */
-#define CALICO_CPO_HEADER_INITIALIZER \
-    { 0, }
-
-/**
- * These are the two header identifier values that we understand.
- */
-enum CalicoCpoHeaderId {
-    CALICO_CPO_HEADER_ID_SDR    = 'r',
-    CALICO_CPO_HEADER_ID_PVT    = '3',
-};
+typedef struct CalicoCpoTrailer {
+    uint8_t sync;
+    uint8_t end;
+} calico_cpo_trailer_t;
 
 /**
  * CPO state machine states. The only states the application needs
@@ -187,7 +187,7 @@ typedef struct CalicoContext {
 
 /**
  * @def CALICO_CONTEXT_INITIALIZER
- * Defines an intializer for the context structure.
+ * Defines a static intializer for Calico Context structure.
  */
 #define CALICO_CONTEXT_INITIALIZER \
     { \
@@ -277,6 +277,24 @@ extern ssize_t calico_length(const void * buffer, size_t size);
 extern ssize_t calico_validate(const void * buffer, size_t size);
 
 /******************************************************************************
+ * PROCESSING HELPERS
+ ******************************************************************************/
+
+/**
+ * Return true if the CPO ID and length match the specified values.
+ * @param bp points to the buffer.
+ * @param length is the length of the buffer in bytes.
+ * @param id is the desired identifier.
+ * @param size is the desired length.
+ * @return true if the id and size match.
+ */
+static inline int calico_is_cpo_id_length(const void * bp, ssize_t length, uint8_t id, ssize_t size) {
+    const uint8_t * cp = (const uint8_t *)bp;
+
+    return ((length > CALICO_CPO_SIZE) && (cp[CALICO_CPO_ID] == id) && (cp[CALICO_CPO_SIZE] == size));
+}
+
+/******************************************************************************
  * PROCESSING CPO SATELLITE DATA RECORD (SDR)
  ******************************************************************************/
 
@@ -284,25 +302,34 @@ extern ssize_t calico_validate(const void * buffer, size_t size);
  * CPO SDR constants.
  */
 enum CalicoCpoSatelliteDataRecordConstants {
-    CALICO_CPO_SDR_LENGTH   = 84,
-    CALICO_CPO_SDR_COUNT    = 12,
+    CALICO_CPO_SDR_Id       = 'r',
+    CALICO_CPO_SDR_Length   = 84,
+    CALICO_CPO_SDR_Count    = 12,
 };
 
 /**
  * Description of the CPO SDR.
  * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 26.
- * The alignment design of this sucks.
  */
-typedef struct CalicoCpoSatelliteDataRecord {
+typedef struct CalicoCpoSatData {
     uint8_t     svid;       /* 1..32 for GPS, 33..64 for WAAS. */
     uint16_t    snr;
     uint8_t     elev;       /* Degrees. */
     uint16_t    azmth;      /* Degrees. */
     uint8_t     status;
-} __attribute__((packed)) calico_cpo_sat_data;
+} calico_cpo_sat_data_t;
 
 /**
- * Defines the meaning of the CPO SDR Status field.
+ * @def CALICO_CPO_SATELLITE_DATA_RECORD_INITIALIZER
+ * Defines a static initializer for a CPO SDR.
+ */
+#define CALICO_CPO_SAT_DATA_INITIALIZER = \
+    { \
+        0, \
+    }
+
+/**
+ * Defines the meaning of the CPO SDR Status bit mask.
  */
 enum CalicoCpoSatelliteDataRecordStatus {
     CALICO_CPO_SDR_STATUS_Ephemeris    = (1<<0),
@@ -311,22 +338,38 @@ enum CalicoCpoSatelliteDataRecordStatus {
 };
 
 /**
+ * Description of the CPO SDR packet.
+ * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 26.
+ * The alignment design of this sucks.
+ */
+typedef struct CalicoCpoSatelliteDataPacket {
+    uint8_t     svid;       /* 1..32 for GPS, 33..64 for WAAS. */
+    uint16_t    snr;
+    uint8_t     elev;       /* Degrees. */
+    uint16_t    azmth;      /* Degrees. */
+    uint8_t     status;
+} __attribute__((packed)) calico_cpo_sat_data_packet_t;
+
+/**
  * The full eighty-four byte CPO SDR contains twelve
  * instances of the structure.
  */
-typedef struct CalicoCpoSatelliteDataArray {
-    calico_cpo_sat_data     sat[CALICO_CPO_SDR_COUNT];
-} __attribute__((packed)) calico_cpo_sat_data_array;
+typedef struct CalicoCpoSatelliteDataArrayPacket {
+    calico_cpo_sat_data_packet_t   sat[CALICO_CPO_SDR_Count];
+} __attribute__((packed)) calico_cpo_sat_data_array_packet_t;
+
+extern int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, hazer_active_t * gap, hazer_active_t * wap, const void * bp, ssize_t length);
 
 /******************************************************************************
- * PROCESSING CPO POSITION RECORD (PVT)
+ * PROCESSING CPO POSITION VELOCITY TIME (PVT) RECORD
  ******************************************************************************/
 
 /**
  * CPO PVT constants.
  */
 enum CalicoCpoPositionRecordConstants {
-    CALICO_CPO_PVT_LENGTH   = 64,
+    CALICO_CPO_PVT_Id       = '3',
+    CALICO_CPO_PVT_Length   = 64,
 };
 
 /**
@@ -334,7 +377,7 @@ enum CalicoCpoPositionRecordConstants {
  * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 27.
  * The actual integer types were inferred from the record length.
  */
-typedef struct CalicoCpoPositionRecord {
+typedef struct CalicoCpoPvtData {
     float   alt;        /* Meters above ellipsoid. */
     float   epe;        /* Meters position error. */
     float   eph;        /* Meters horizontal error. */
@@ -346,9 +389,160 @@ typedef struct CalicoCpoPositionRecord {
     float   lon_vel;    /* Meters/second longitude velocity. */
     float   lat_vel;    /* Meters/second latitude velocity. */
     float   alt_vel;    /* Meters/second altitude velocity. */
-    float   msl_hght;   /* Meters height above sea level. */
+    float   msl_hght;   /* Meters height above mean sea level. */
     int16_t leap_sec;   /* UTC leap seconds. */
     int32_t grmn_days;  /* Days since 1989-12-31. */
-} __attribute__((packed)) calico_cpo_pvt_data;
+} calico_cpo_pvt_data_t;
+
+/**
+ * @def CALICO_CPO_POSITION_RECORD_INITIALIZER
+ * Defines a static initializer for a CPO SDR.
+ */
+#define CALICO_CPO_PVT_DATA_INITIALIZER \
+    { \
+        0., \
+    }
+
+/**
+ * Defines the meaning of the CPO PVT Fix enumeration.
+ */
+enum CalicoCpoPositionRecordFix {
+    CALICO_CPO_PVT_FIX_None             = 0,
+    CALICO_CPO_PVT_FIX_StillNone        = 1,
+    CALICO_CPO_PVT_FIX_2D               = 2,
+    CALICO_CPO_PVT_FIX_3D               = 3,
+    CALICO_CPO_PVT_FIX_2DDifferential   = 4,
+    CALICO_CPO_PVT_FIX_3DDifferential   = 5,
+};
+
+/**
+ * Description of the CPO PVT packet.
+ * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 27.
+ * The actual integer types were inferred from the record length.
+ */
+typedef struct CalicoCpoPvtDataPacket {
+    float   alt;        /* Meters above ellipsoid. */
+    float   epe;        /* Meters position error. */
+    float   eph;        /* Meters horizontal error. */
+    float   epv;        /* Meters vertical error. */
+    int16_t fix;        /* Fix type. */
+    double  gps_tow;    /* Seconds GPS Time Of Week. */
+    double  lat;        /* Radians latitude. */
+    double  lon;        /* Radians longitude. */
+    float   lon_vel;    /* Meters/second longitude velocity. */
+    float   lat_vel;    /* Meters/second latitude velocity. */
+    float   alt_vel;    /* Meters/second altitude velocity. */
+    float   msl_hght;   /* Meters height above mean sea level. */
+    int16_t leap_sec;   /* UTC leap seconds. */
+    int32_t grmn_days;  /* Days since 1989-12-31. */
+} __attribute__((packed)) calico_cpo_pvt_data_packet_t;
+
+extern int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t length);
+
+/******************************************************************************
+ * ENDIAN CONVERSION
+ ******************************************************************************/
+
+#if !defined(_BSD_SOURCE)
+#define _BSD_SOURCE
+#endif
+#include <endian.h>
+#include <string.h>
+
+/**
+ * @def COM_DIAG_CALICO_LETOH
+ * Convert field @a _FIELD_ from Little Endian byte order to Host
+ * byte order. The field width 8, 16, 32, or 64 bits, is inferred automatically.
+ * Little endian (not network byte order) is used because that is empirically
+ * what the Garmin GPS-18x emits.
+ */
+#define COM_DIAG_CALICO_LETOH(_DESTINATION_, _SOURCE_) \
+    do { \
+        switch (sizeof(_SOURCE_)) { \
+        case sizeof(uint8_t): \
+            _DESTINATION_ = _SOURCE_; \
+            break; \
+        case sizeof(uint16_t): \
+            { \
+                uint16_t _temporary_; \
+                memcpy(&_temporary_, &(_SOURCE_), sizeof(_temporary_)); \
+                _temporary_ = le16toh(_temporary_); \
+                memcpy(&(_DESTINATION_), &_temporary_, sizeof(_DESTINATION_)); \
+            } \
+            break; \
+        case sizeof(uint32_t): \
+            { \
+                uint32_t _temporary_; \
+                memcpy(&_temporary_, &(_SOURCE_), sizeof(_temporary_)); \
+                _temporary_ = le32toh(_temporary_); \
+                memcpy(&(_DESTINATION_), &_temporary_, sizeof(_DESTINATION_)); \
+            } \
+            break; \
+        case sizeof(uint64_t): \
+            { \
+                uint64_t _temporary_; \
+                memcpy(&_temporary_, &(_SOURCE_), sizeof(_temporary_)); \
+                _temporary_ = le64toh(_temporary_); \
+                memcpy(&(_DESTINATION_), &_temporary_, sizeof(_DESTINATION_)); \
+            } \
+            break; \
+        default: \
+            break; \
+        } \
+    } while (0)
+
+/******************************************************************************
+ * NUMERICAL CONVERSIONS
+ ******************************************************************************/
+
+#include <math.h>
+
+/**
+ * Garmin uses floating point radians, NMEA uses unsigned integer degrees,
+ * minutes, and decimal fraction of minutes, with a direction indicator,
+ * and Hazer uses signed integer billionths of a minute.
+ * @param radians is a latitude or longitude in radians.
+ * @return a latitude or longitude in nanominutes.
+ */
+static inline int64_t calico_format_radians2nanominutes(double radians) {
+    int64_t result = 0;
+
+    result = (180.0 * radians * 1000000000.0) / (M_PI * 60.0);
+
+    return result;
+}
+
+/*
+ * Useful commands:
+ * date -u --date='January 1, 1970' +'%s' # POSIX epoch offset in seconds.
+ * date -u --date='January 6, 1980' +'%s' # GPS epoch offset in seconds.
+ * date -u --date='January 1, 1990' +'%s' # Garmin epoch offset in seconds.
+ */
+
+/**
+ * Convert the GPS Time Of Week to Hazer nanoseconds since the POSIX epoch.
+ * @param tow is the number of GPS ticks since 1980-01-06.
+ * @param leaps is the number of additional leap seconds to UTC.
+ * @param days is the number of days since 1990-01-01.
+ * @return nanoseconds since 1970-01-01.
+ */
+static inline uint64_t calico_format_tow2nanoseconds(double tow, int16_t leaps, int32_t days) {
+    uint64_t result = 0;
+    uint64_t nanoseconds = 0;
+
+    nanoseconds = 315964800;
+    nanoseconds *= 1000000000;
+    result = nanoseconds;
+
+    tow *= 1.5;
+    tow *= 1000000000.0;
+    result += tow;
+
+    nanoseconds = leaps;
+    nanoseconds *= 1000000000;
+    result += nanoseconds;
+
+    return result;
+}
 
 #endif

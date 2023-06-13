@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
-#include "com/diag/hazer/calico.h"
 #include "com/diag/hazer/common.h"
 #include "../src/calico.h"
 
@@ -329,4 +328,111 @@ ssize_t calico_validate(const void * buffer, size_t size)
     }
 
     return result;
+}
+
+/******************************************************************************
+ *
+ ******************************************************************************/
+
+int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, hazer_active_t * gap, hazer_active_t * wap, const void * bp, ssize_t length)
+{
+    return 0;
+}
+
+int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t length)
+{
+    int rc= -1;
+    const uint8_t * cp = (const uint8_t *)0;
+    const calico_cpo_header_t * hp = (const calico_cpo_header_t *)0;
+    const calico_cpo_pvt_data_packet_t * dp = (const calico_cpo_pvt_data_packet_t *)0;
+    calico_cpo_pvt_data_t pvt = CALICO_CPO_PVT_DATA_INITIALIZER;
+
+    do {
+
+        /*
+         * IDENTIFY
+         */
+
+        cp = (const uint8_t *)bp;
+
+        if (length < sizeof(calico_cpo_header_t)) {
+            errno = ENOMSG;
+            break;
+        }
+
+        hp = (const calico_cpo_header_t *)&(cp[CALICO_CPO_SYNC]);
+
+        if (hp->id != CALICO_CPO_PVT_Id) {
+            errno = ENOMSG;
+            break;
+        }
+
+        /*
+         * VALIDATE
+         */
+
+        if (length < (sizeof(calico_cpo_header_t) + CALICO_CPO_PVT_Length + sizeof(calico_cpo_trailer_t))) {
+            errno = ENODATA;
+            break;
+        }
+
+        dp = (const calico_cpo_pvt_data_packet_t *)&(cp[CALICO_CPO_PAYLOAD]);
+
+        COM_DIAG_CALICO_LETOH(pvt.alt, dp->alt);
+        COM_DIAG_CALICO_LETOH(pvt.epe, dp->epe);
+        COM_DIAG_CALICO_LETOH(pvt.eph, dp->eph);
+        COM_DIAG_CALICO_LETOH(pvt.epv, dp->epv);
+        COM_DIAG_CALICO_LETOH(pvt.fix, dp->fix);
+        COM_DIAG_CALICO_LETOH(pvt.gps_tow, dp->gps_tow);
+        COM_DIAG_CALICO_LETOH(pvt.lat, dp->lat);
+        COM_DIAG_CALICO_LETOH(pvt.lon, dp->lon);
+        COM_DIAG_CALICO_LETOH(pvt.lon_vel, dp->lon_vel);
+        COM_DIAG_CALICO_LETOH(pvt.lat_vel, dp->lat_vel);
+        COM_DIAG_CALICO_LETOH(pvt.alt_vel, dp->alt_vel);
+        COM_DIAG_CALICO_LETOH(pvt.msl_hght, dp->msl_hght);
+        COM_DIAG_CALICO_LETOH(pvt.leap_sec, dp->leap_sec);
+        COM_DIAG_CALICO_LETOH(pvt.grmn_days, dp->grmn_days);
+
+#if !0
+        {
+            int64_t lat;
+            int64_t lon;
+            int latd;
+            uint64_t latf;
+            int lond;
+            uint64_t lonf;
+            uint64_t ticks;
+
+            lat = calico_format_radians2nanominutes(pvt.lat);
+            hazer_format_nanominutes2degrees(lat, &latd, &latf);
+
+            lon = calico_format_radians2nanominutes(pvt.lon);
+            hazer_format_nanominutes2degrees(lon, &lond, &lonf);
+
+            ticks = calico_format_tow2nanoseconds(pvt.gps_tow, pvt.leap_sec, pvt.grmn_days);
+
+            fputs("CPO PVT:\n", stderr);
+            fprintf(stderr, "alt=%fm\n", pvt.alt);
+            fprintf(stderr, "epe=%fm\n", pvt.epe);
+            fprintf(stderr, "eph=%fm\n", pvt.eph);
+            fprintf(stderr, "epv=%fm\n", pvt.epv);
+            fprintf(stderr, "fix=%d\n", pvt.fix);
+            fprintf(stderr, "gps_tow=%lf\n", pvt.gps_tow);
+            fprintf(stderr, "lat=%lfr=%d.%09llu\n", pvt.lat, latd, (unsigned long long)latf);
+            fprintf(stderr, "lon=%lfr=%d.%09llu\n", pvt.lon, lond, (unsigned long long)lonf);
+            fprintf(stderr, "lon_vel=%fm/s\n", pvt.lon_vel);
+            fprintf(stderr, "lat_vel=%fm/s\n", pvt.lat_vel);
+            fprintf(stderr, "alt_vel=%fm/s\n", pvt.alt_vel);
+            fprintf(stderr, "msl_hght=%fm\n", pvt.msl_hght);
+            fprintf(stderr, "leap_sec=%ds\n", pvt.leap_sec);
+            fprintf(stderr, "grmn_days=%dd\n", pvt.grmn_days);
+            fprintf(stderr, "ticks=%lluticks\n", (unsigned long long)ticks);
+        }
+#endif
+
+        rc = 0;
+
+    } while (0);
+
+    return rc;
 }

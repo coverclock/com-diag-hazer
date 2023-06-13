@@ -3110,7 +3110,44 @@ consume:
 
         case CPO:
 
-            DIMINUTO_LOG_DEBUG("Received CPO 0x%02x [%u]\n", buffer[CALICO_CPO_ID], buffer[CALICO_CPO_SIZE]);
+            if (calico_is_cpo_id_length(buffer, length, CALICO_CPO_PVT_Id, CALICO_CPO_PVT_Length)) {
+
+                DIMINUTO_LOG_DEBUG("Parse CPO PVT\n");
+
+                if (calico_cpo_position_record(&positions[HAZER_SYSTEM_GPS], buffer, length) == 0) {
+
+                    //positions[system].ticks = timeout;
+                    //refresh = !0;
+                    //trace = !0;
+
+                    system = HAZER_SYSTEM_GPS;
+
+                    //acquire_fix("NMEA GGA");
+
+                } else if (errno == 0) {
+
+                    //relinquish_fix("NMEA GGA");
+
+                } else {
+
+                    print_error(buffer, length);
+
+                }
+
+            } else if (calico_is_cpo_id_length(buffer, length, CALICO_CPO_SDR_Id, CALICO_CPO_SDR_Length)) {
+
+                DIMINUTO_LOG_DEBUG("Parse CPO SDR\n");
+
+                /* HAZER_SYSTEM_GPS */
+                /* HAZER_SYSTEM_SBAS */
+
+                /* TODO */
+
+            } else {
+
+                DIMINUTO_LOG_INFORMATION("Parse CPO Other 0x%02x [%u]\n", buffer[CALICO_CPO_ID], buffer[CALICO_CPO_SIZE]);
+
+            }
 
             break;
 
