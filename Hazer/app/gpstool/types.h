@@ -62,15 +62,15 @@ typedef enum Protocol {
 
 /**
  * Are we processing an NMEA sentence, a UBX packet, an RTCM message, a
- * DIS packet, or none of the above?
+ * CPO packet, or none of the above?
  */
 typedef enum Format {
     FORMAT  = 0,
     NMEA    = (1<<0),
     UBX     = (1<<1),
     RTCM    = (1<<2),
-    DIS     = (1<<3),
-    ANY     = NMEA | UBX | RTCM | DIS,
+    CPO     = (1<<3),
+    ANY     = NMEA | UBX | RTCM | CPO,
 } format_t;
 
 /**

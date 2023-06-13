@@ -302,11 +302,11 @@ int main(int argc, char * argv[])
     tumbleweed_context_t rtcm_context = { 0, };
     datagram_buffer_t rtcm_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
-     * DIS parser state variables.
+     * CPO parser state variables.
      */
-    calico_state_t dis_state = CALICO_STATE_STOP;
-    calico_context_t dis_context = { 0, };
-    datagram_buffer_t dis_buffer = DATAGRAM_BUFFER_INITIALIZER;
+    calico_state_t cpo_state = CALICO_STATE_STOP;
+    calico_context_t cpo_context = { 0, };
+    datagram_buffer_t cpo_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * NMEA processing variables.
      */
@@ -1545,7 +1545,7 @@ int main(int argc, char * argv[])
     nmea_state = HAZER_STATE_START;
     ubx_state = YODEL_STATE_START;
     rtcm_state = TUMBLEWEED_STATE_START;
-    dis_state = CALICO_STATE_START;
+    cpo_state = CALICO_STATE_START;
 
     sync = 0;
     frame = 0;
@@ -1764,7 +1764,7 @@ consume:
 
                     io_waiting += 1;
                     if ((io_waiting % DATAGRAM_SIZE) == 0) {
-                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%zu] 0x%02x %c %c %c %c\n", io_waiting, ch, nmea_state, ubx_state, rtcm_state, dis_state);
+                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%zu] 0x%02x %c %c %c %c\n", io_waiting, ch, nmea_state, ubx_state, rtcm_state, cpo_state);
                     }
 
                     if (verbose) {
@@ -1780,28 +1780,28 @@ consume:
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
-                    dis_state = CALICO_STATE_STOP;
+                    cpo_state = CALICO_STATE_STOP;
 
                 } else if (common_machine_is_ubx(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
-                    dis_state = CALICO_STATE_STOP;
+                    cpo_state = CALICO_STATE_STOP;
 
                 } else if (common_machine_is_rtcm(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_START;
-                    dis_state = CALICO_STATE_STOP;
+                    cpo_state = CALICO_STATE_STOP;
 
-                } else if (common_machine_is_dis(ch)) {
+                } else if (common_machine_is_cpo(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
-                    dis_state = CALICO_STATE_START;
+                    cpo_state = CALICO_STATE_START;
 
                 } else {
 
@@ -1833,7 +1833,7 @@ consume:
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_START;
-                    dis_state = TUMBLEWEED_STATE_START;
+                    cpo_state = CALICO_STATE_START;
 
                 }
 
@@ -1924,17 +1924,17 @@ consume:
                     break;
                 }
 
-                dis_state = calico_machine(dis_state, ch, dis_buffer.payload.dis, sizeof(dis_buffer.payload.dis), &dis_context);
-                if (dis_state == CALICO_STATE_END) {
+                cpo_state = calico_machine(cpo_state, ch, cpo_buffer.payload.cpo, sizeof(cpo_buffer.payload.cpo), &cpo_context);
+                if (cpo_state == CALICO_STATE_END) {
 
-                    buffer = dis_buffer.payload.dis;
-                    size = calico_size(&dis_context);
+                    buffer = cpo_buffer.payload.cpo;
+                    size = calico_size(&cpo_context);
                     length = size - 1;
-                    format = DIS;
+                    format = CPO;
 
                     if (!sync) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x DIS\n", io_total, ch);
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x CPO\n", io_total, ch);
 
                         sync = !0;
                         io_waiting = 0;
@@ -1947,7 +1947,7 @@ consume:
 
                     frame = !0;
 
-                    DIMINUTO_LOG_DEBUG("Input DIS [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
+                    DIMINUTO_LOG_DEBUG("Input CPO [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
 
                     break;
                 }
@@ -1961,7 +1961,7 @@ consume:
                  * checksum check.
                  */
 
-                if (common_machine_is_stalled(nmea_state, ubx_state, rtcm_state, dis_state)) {
+                if (common_machine_is_stalled(nmea_state, ubx_state, rtcm_state, cpo_state)) {
 
                     if (sync) {
 
@@ -2060,14 +2060,14 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Datagram RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (common_machine_is_dis(remote_buffer.payload.dis[0]) && ((remote_length = calico_validate(remote_buffer.payload.dis, remote_size)) > 0)) {
+            } else if (common_machine_is_cpo(remote_buffer.payload.cpo[0]) && ((remote_length = calico_validate(remote_buffer.payload.cpo, remote_size)) > 0)) {
 
-                buffer = remote_buffer.payload.dis;
+                buffer = remote_buffer.payload.cpo;
                 size = remote_size;
                 length = remote_length;
-                format = DIS;
+                format = CPO;
 
-                DIMINUTO_LOG_DEBUG("Datagram DIS [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+                DIMINUTO_LOG_DEBUG("Datagram CPO [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
             } else {
 
@@ -3108,9 +3108,9 @@ consume:
 
             break;
 
-        case DIS:
+        case CPO:
 
-            DIMINUTO_LOG_DEBUG("Received DIS 0x%02x [%u]\n", buffer[CALICO_DIS_ID], buffer[CALICO_DIS_SIZE]);
+            DIMINUTO_LOG_DEBUG("Received CPO 0x%02x [%u]\n", buffer[CALICO_CPO_ID], buffer[CALICO_CPO_SIZE]);
 
             break;
 

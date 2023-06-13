@@ -208,10 +208,10 @@ calico_state_t calico_machine(calico_state_t state, uint8_t ch, void * buffer, s
     case CALICO_ACTION_TERMINATE:
         /*
          * It seems like it's not really meaningful to NUL-terminate a binary
-         * DIS packet, but it is. Doing so simplifies user code that doesn't
+         * CPO packet, but it is. Doing so simplifies user code that doesn't
          * know yet the format of the data in the buffer, e.g. in the case of
          * IP datagrams. And it guarantees that we don't run off the end of
-         * a DIS message.
+         * a CPO message.
          */
         if (pp->sz > 1) {
             *(pp->bp++) = ch;
@@ -239,9 +239,9 @@ calico_state_t calico_machine(calico_state_t state, uint8_t ch, void * buffer, s
     } else if (old == CALICO_STATE_STOP) {
         /* Do nothing. */
     } else if (isprint(ch)) {
-        fprintf(debug, "Machine DIS  %c %c %c 0x%02x,0x%02x '\\x%02x' '%c'\n", old, state, action, (uint8_t)pp->cc, (uint8_t)pp->cs, ch, ch);
+        fprintf(debug, "Machine CPO  %c %c %c 0x%02x,0x%02x '\\x%02x' '%c'\n", old, state, action, (uint8_t)pp->cc, (uint8_t)pp->cs, ch, ch);
     } else {
-        fprintf(debug, "Machine DIS  %c %c %c 0x%02x,0x%02x '\\x%02x'\n", old, state, action, (uint8_t)pp->cc, (uint8_t)pp->cs, ch);
+        fprintf(debug, "Machine CPO  %c %c %c 0x%02x,0x%02x '\\x%02x'\n", old, state, action, (uint8_t)pp->cc, (uint8_t)pp->cs, ch);
     }
 
     return state;
@@ -264,12 +264,12 @@ const void * calico_checksum_buffer(const void * buffer, size_t size, uint8_t * 
     uint8_t cs = 0;
     size_t length = 0;
 
-    length = (uint8_t)bp[CALICO_DIS_SIZE];
-    length += CALICO_DIS_SUMMED;
+    length = (uint8_t)bp[CALICO_CPO_SIZE];
+    length += CALICO_CPO_SUMMED;
 
-    if ((length + CALICO_DIS_UNSUMMED) <= size) {
+    if ((length + CALICO_CPO_UNSUMMED) <= size) {
 
-        for (bp += CALICO_DIS_ID; length > 0; --length) {
+        for (bp += CALICO_CPO_ID; length > 0; --length) {
             calico_checksum(*(bp++), &cc, &cs);
         }
 
@@ -291,15 +291,15 @@ ssize_t calico_length(const void * buffer, size_t size)
 
    packet = (const uint8_t *)buffer;
 
-   if (size < CALICO_DIS_SHORTEST) {
+   if (size < CALICO_CPO_SHORTEST) {
        /* Do nothing. */
-   } else if (packet[CALICO_DIS_SYNC] != CALICO_STIMULUS_DLE) {
+   } else if (packet[CALICO_CPO_SYNC] != CALICO_STIMULUS_DLE) {
        /* Do nothing. */
    } else {
-        length = packet[CALICO_DIS_SIZE];
-        if (length <= (size - CALICO_DIS_SHORTEST)) {
+        length = packet[CALICO_CPO_SIZE];
+        if (length <= (size - CALICO_CPO_SHORTEST)) {
             result = length;
-            result += CALICO_DIS_SHORTEST;
+            result += CALICO_CPO_SHORTEST;
         }
     }
 

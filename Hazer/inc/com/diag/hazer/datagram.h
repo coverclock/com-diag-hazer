@@ -73,7 +73,7 @@ enum {
  * This buffer is large enough to the largest UDP datagram we are willing to
  * support, plus a trailing NUL. It's not big enough to hold any datagram
  * (that would be in the neighborhood of 65508 bytes). But it will for sure
- * hold a NMEA, UBX, RTCM, or DIS payload. It includes a leading sequence number
+ * hold a NMEA, UBX, RTCM, or CPO payload. It includes a leading sequence number
  * field that is transmitted over wire or air in network byte order. The
  * sequence number is uint32_t aligned, which Yodel/UBX cares about.
  */
@@ -84,7 +84,7 @@ typedef struct DatagramBuffer {
         hazer_buffer_t nmea;
         yodel_buffer_t ubx;
         tumbleweed_buffer_t rtcm;
-        calico_buffer_t dis;
+        calico_buffer_t cpo;
     } payload;
 } datagram_buffer_t;
 

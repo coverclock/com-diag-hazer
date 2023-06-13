@@ -94,23 +94,23 @@ static inline int common_machine_is_rtcm(int ch)
 }
 
 /**
- * Return true if the character is the first of a DIS message.
+ * Return true if the character is the first of a CPO message.
  * @param ch is the character.
- * @return true if DIS, false otherwise.
+ * @return true if CPO, false otherwise.
  */
-static inline int common_machine_is_dis(int ch)
+static inline int common_machine_is_cpo(int ch)
 {
     return (ch == CALICO_STIMULUS_DLE);
 }
 
 /**
- * Return true if NMEA, UBX, RTCM, and DIS state machines are stalled.
+ * Return true if NMEA, UBX, RTCM, and CPO state machines are stalled.
  * @param nmea_state is the state of the NMEA state machine.
  * @param ubx_state is the state of the UBX state machine.
  * @param rtcm_state is the state of the RTCM state machine.
- * @param dis_state is the state of the DIS state machine.
+ * @param cpo_state is the state of the CPO state machine.
  * @return true if stalled, false otherwise.
  */
-int common_machine_is_stalled(hazer_state_t nmea_state, yodel_state_t ubx_state, tumbleweed_state_t rtcm_state, calico_state_t dis_state);
+int common_machine_is_stalled(hazer_state_t nmea_state, yodel_state_t ubx_state, tumbleweed_state_t rtcm_state, calico_state_t cpo_state);
 
 #endif

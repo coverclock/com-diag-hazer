@@ -11,10 +11,12 @@
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
  * The Calico module provides support for the Garmin Device Interface
- * Specification (DIS) binary packet format that is produced by some
+ * Specification binary packet format that is produced by some
  * devices manufactured by Garmin International, Inc. I wrote this code
  * because I had a Garmin 18x dongle with a USB interface, which only
  * produces DIS, not NMEA or the Garmin proprietary NMEA-like sentences.
+ * N.B. I have no idea what CPO stands for, but it's used in the Garmin
+ * docs without, as far as I can tell, explanation.
  *
  * REFERENCES
  *
@@ -65,29 +67,29 @@ extern int calico_finalize(void);
  ******************************************************************************/
 
 /**
- * Calico DIS constants.
+ * Calico CPO constants.
  */
-enum CalicoDisConstants {
-    CALICO_DIS_FRONT    = 1,    /* DLE */
-    CALICO_DIS_HEAD     = 2,    /* ID, SIZE */
-    CALICO_DIS_HEADER   = CALICO_DIS_FRONT + CALICO_DIS_HEAD,
-    CALICO_DIS_DATA     = 255,
-    CALICO_DIS_TAIL     = 0,
-    CALICO_DIS_BACK     = 3,    /* CS, DLE, ETX */
-    CALICO_DIS_TRAILER  = CALICO_DIS_BACK,
-    CALICO_DIS_SHORTEST = CALICO_DIS_HEADER + CALICO_DIS_TRAILER,
-    CALICO_DIS_LONGEST  = CALICO_DIS_HEADER + CALICO_DIS_DATA + CALICO_DIS_TRAILER,
-    CALICO_DIS_SUMMED   = CALICO_DIS_HEAD + CALICO_DIS_TAIL,
-    CALICO_DIS_UNSUMMED = CALICO_DIS_FRONT + CALICO_DIS_BACK,
+enum CalicoCpoConstants {
+    CALICO_CPO_FRONT    = 1,    /* DLE */
+    CALICO_CPO_HEAD     = 2,    /* ID, SIZE */
+    CALICO_CPO_HEADER   = CALICO_CPO_FRONT + CALICO_CPO_HEAD,
+    CALICO_CPO_DATA     = 255,
+    CALICO_CPO_TAIL     = 0,
+    CALICO_CPO_BACK     = 3,    /* CS, DLE, ETX */
+    CALICO_CPO_TRAILER  = CALICO_CPO_BACK,
+    CALICO_CPO_SHORTEST = CALICO_CPO_HEADER + CALICO_CPO_TRAILER,
+    CALICO_CPO_LONGEST  = CALICO_CPO_HEADER + CALICO_CPO_DATA + CALICO_CPO_TRAILER,
+    CALICO_CPO_SUMMED   = CALICO_CPO_HEAD + CALICO_CPO_TAIL,
+    CALICO_CPO_UNSUMMED = CALICO_CPO_FRONT + CALICO_CPO_BACK,
 };
 
 /**
- * This buffer is large enough to contain the largest DIS packet, plus a
- * trailing NUL, and then some. The NUL at the end is useless in the DIS binary
+ * This buffer is large enough to contain the largest CPO packet, plus a
+ * trailing NUL, and then some. The NUL at the end is useless in the CPO binary
  * protocol, but is useful in some edge cases in which the data format has not
  * yet been determined (e.g. incoming UDP datagrams).
  */
-typedef uint8_t (calico_buffer_t)[CALICO_DIS_LONGEST + 1];
+typedef uint8_t (calico_buffer_t)[CALICO_CPO_LONGEST + 1];
 
 /**
  * @def CALICO_BUFFER_INITIALIZER
@@ -97,35 +99,43 @@ typedef uint8_t (calico_buffer_t)[CALICO_DIS_LONGEST + 1];
     { '\0', }
 
 /**
- * Calico DIS offsets.
+ * Calico CPO offsets.
  */
-enum CalicoDisOffsets {
-    CALICO_DIS_SYNC         = 0,
-    CALICO_DIS_ID           = 1,
-    CALICO_DIS_SIZE         = 2,
-    CALICO_DIS_PAYLOAD      = 3,
+enum CalicoCpoOffsets {
+    CALICO_CPO_SYNC         = 0,
+    CALICO_CPO_ID           = 1,
+    CALICO_CPO_SIZE         = 2,
+    CALICO_CPO_PAYLOAD      = 3,
 };
 
 /**
- * This is the structure of the header on every DIS packet.
+ * This is the structure of the header on every CPO packet.
  */
-typedef struct CalicoDisHeader {
+typedef struct CalicoCpoHeader {
     uint8_t sync;
     uint8_t id;
     uint8_t size;
     uint8_t payload[0];
-} calico_dis_header_t;
+} calico_cpo_header_t;
 
 /**
- * @def CALICO_DIS_HEADER_INITIALIZER
- * Initialize a CalicoDisHeader structure.
+ * @def CALICO_CPO_HEADER_INITIALIZER
+ * Initialize a CalicoCpoHeader structure.
  */
-#define CALICO_DIS_HEADER_INITIALIZER \
+#define CALICO_CPO_HEADER_INITIALIZER \
     { 0, }
 
 /**
- * DIS state machine states. The only states the application needs
- * to take action on is END (complete DIS packet in buffer). The
+ * These are the two header identifier values that we understand.
+ */
+enum CalicoCpoHeaderId {
+    CALICO_CPO_HEADER_ID_SDR    = 'r',
+    CALICO_CPO_HEADER_ID_PVT    = '3',
+};
+
+/**
+ * CPO state machine states. The only states the application needs
+ * to take action on is END (complete CPO packet in buffer). The
  * rest are transitory states. If the machine transitions from a non-START
  * state to the START state, that means the framing of the current packet
  * failed; that might be of interest to the application.
@@ -146,7 +156,7 @@ typedef enum CalicoState {
 } calico_state_t;
 
 /**
- * DIS state machine stimuli.
+ * CPO state machine stimuli.
  */
 enum CalicoStimulus {
     CALICO_STIMULUS_DLE     = (uint8_t)'\x10',
@@ -154,7 +164,7 @@ enum CalicoStimulus {
 };
 
 /**
- * DIS state machine actions.
+ * CPO state machine actions.
  */
 typedef enum CalicoAction {
     CALICO_ACTION_SKIP       = 'X',
@@ -163,7 +173,7 @@ typedef enum CalicoAction {
 } calico_action_t;
 
 /**
- * Calico DIS parser state machine context (which needs no initial value).
+ * Calico CPO parser state machine context (which needs no initial value).
  */
 typedef struct CalicoContext {
     uint8_t * bp;       /* Current buffer pointer. */
@@ -176,8 +186,17 @@ typedef struct CalicoContext {
 } calico_context_t;
 
 /**
+ * @def CALICO_CONTEXT_INITIALIZER
+ * Defines an intializer for the context structure.
+ */
+#define CALICO_CONTEXT_INITIALIZER \
+    { \
+        (uint8_t *)0, \
+    }
+
+/**
  * Process a single character of stimulus for the state machine that is
- * assembling a single DIS packet in the caller provided buffer. State
+ * assembling a single CPO packet in the caller provided buffer. State
  * is maintained in a character pointer and a size variable, pointers to
  * which are passed to the function, which will be initialized by the function
  * itself. The function returns the new state, which must be used in the
@@ -189,7 +208,7 @@ typedef struct CalicoContext {
  * past the end of the NUL-terminated sentence, the size state variable
  * constrains the size of the sentence including the terminating NUL;
  * @param state is the prior state of the machine.
- * @param ch is the next character from the DIS packet stream.
+ * @param ch is the next character from the CPO packet stream.
  * @param buffer points to the beginning of the output buffer.
  * @param size is the size of the output buffer in bytes.
  * @param pp points to the context structure (which needs no initialization).
@@ -198,7 +217,7 @@ typedef struct CalicoContext {
 extern calico_state_t calico_machine(calico_state_t state, uint8_t ch, void * buffer, size_t size, calico_context_t * pp);
 
 /**
- * Return the total size of the complete DIS message as computed by the parser.
+ * Return the total size of the complete CPO message as computed by the parser.
  * @param pp points to the context structure.
  * @return the final size.
  */
@@ -208,11 +227,11 @@ static inline size_t calico_size(const calico_context_t * pp)
 }
 
 /*******************************************************************************
- * VALIDATING A DIS PACKET
+ * VALIDATING A CPO PACKET
  ******************************************************************************/
 
 /**
- * Update a running DIS checksum with the latest input character. The DIS
+ * Update a running CPO checksum with the latest input character. The CPO
  * checksum is across bytes 1 (zero based) to byte N-4 i.e. ID through the
  * last payload byte.
  * @param ch is the input character.
@@ -226,8 +245,8 @@ static inline void calico_checksum(uint8_t ch, uint8_t * ccp, uint8_t * csp)
 }
 
 /**
- * Compute the checksum used by DIS for the specified buffer. The buffer
- * points to the beginning of the DIS packet, not to the subset that is
+ * Compute the checksum used by CPO for the specified buffer. The buffer
+ * points to the beginning of the CPO packet, not to the subset that is
  * checksummed, and the sentence must contain a valid length field. A pointer
  * is returned pointing just past the checksummed portion; this is where the
  * checksum will be stored in a correctly formed packet.
@@ -248,7 +267,7 @@ extern const void * calico_checksum_buffer(const void * buffer, size_t size, uin
 extern ssize_t calico_length(const void * buffer, size_t size);
 
 /**
- * Validate the contents of an buffer as a valid DIS packet.
+ * Validate the contents of an buffer as a valid CPO packet.
  * @param buffer points to the buffer. This combines
  * the calico_length() and calico_checksum_buffer() functions along with the
  * checksum comparison.
@@ -258,7 +277,78 @@ extern ssize_t calico_length(const void * buffer, size_t size);
 extern ssize_t calico_validate(const void * buffer, size_t size);
 
 /******************************************************************************
- *
+ * PROCESSING CPO SATELLITE DATA RECORD (SDR)
  ******************************************************************************/
+
+/**
+ * CPO SDR constants.
+ */
+enum CalicoCpoSatelliteDataRecordConstants {
+    CALICO_CPO_SDR_LENGTH   = 84,
+    CALICO_CPO_SDR_COUNT    = 12,
+};
+
+/**
+ * Description of the CPO SDR.
+ * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 26.
+ * The alignment design of this sucks.
+ */
+typedef struct CalicoCpoSatelliteDataRecord {
+    uint8_t     svid;       /* 1..32 for GPS, 33..64 for WAAS. */
+    uint16_t    snr;
+    uint8_t     elev;       /* Degrees. */
+    uint16_t    azmth;      /* Degrees. */
+    uint8_t     status;
+} __attribute__((packed)) calico_cpo_sat_data;
+
+/**
+ * Defines the meaning of the CPO SDR Status field.
+ */
+enum CalicoCpoSatelliteDataRecordStatus {
+    CALICO_CPO_SDR_STATUS_Ephemeris    = (1<<0),
+    CALICO_CPO_SDR_STATUS_Correction   = (1<<1),
+    CALICO_CPO_SDR_STATUS_Solution     = (1<<2),
+};
+
+/**
+ * The full eighty-four byte CPO SDR contains twelve
+ * instances of the structure.
+ */
+typedef struct CalicoCpoSatelliteDataArray {
+    calico_cpo_sat_data     sat[CALICO_CPO_SDR_COUNT];
+} __attribute__((packed)) calico_cpo_sat_data_array;
+
+/******************************************************************************
+ * PROCESSING CPO POSITION RECORD (PVT)
+ ******************************************************************************/
+
+/**
+ * CPO PVT constants.
+ */
+enum CalicoCpoPositionRecordConstants {
+    CALICO_CPO_PVT_LENGTH   = 64,
+};
+
+/**
+ * Description of the CPO PVT.
+ * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 27.
+ * The actual integer types were inferred from the record length.
+ */
+typedef struct CalicoCpoPositionRecord {
+    float   alt;        /* Meters above ellipsoid. */
+    float   epe;        /* Meters position error. */
+    float   eph;        /* Meters horizontal error. */
+    float   epv;        /* Meters vertical error. */
+    int16_t fix;        /* Fix type. */
+    double  gps_tow;    /* Seconds GPS Time Of Week. */
+    double  lat;        /* Radians latitude. */
+    double  lon;        /* Radians longitude. */
+    float   lon_vel;    /* Meters/second longitude velocity. */
+    float   lat_vel;    /* Meters/second latitude velocity. */
+    float   alt_vel;    /* Meters/second altitude velocity. */
+    float   msl_hght;   /* Meters height above sea level. */
+    int16_t leap_sec;   /* UTC leap seconds. */
+    int32_t grmn_days;  /* Days since 1989-12-31. */
+} __attribute__((packed)) calico_cpo_pvt_data;
 
 #endif
