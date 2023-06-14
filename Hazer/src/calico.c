@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
+#include <math.h>
 #include "com/diag/hazer/common.h"
 #include "../src/calico.h"
 
@@ -339,6 +340,13 @@ int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, haz
     return 0;
 }
 
+/*
+ * Useful commands:
+ * date -u --date='January 1, 1970' +'%s' # POSIX epoch offset in seconds.
+ * date -u --date='January 6, 1980' +'%s' # GPS epoch offset in seconds.
+ * date -u --date='December 31, 1989' +'%s' # Garmin epoch offset in seconds.
+ */
+
 int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t length)
 {
     int rc= -1;
@@ -346,6 +354,9 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
     const calico_cpo_header_t * hp = (const calico_cpo_header_t *)0;
     const calico_cpo_pvt_data_packet_t * dp = (const calico_cpo_pvt_data_packet_t *)0;
     calico_cpo_pvt_data_t pvt = CALICO_CPO_PVT_DATA_INITIALIZER;
+    uint64_t result = 0;
+    uint64_t nanoseconds = 0;
+    double factor = 0.0;
 
     do {
 
@@ -378,6 +389,10 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
 
         dp = (const calico_cpo_pvt_data_packet_t *)&(cp[CALICO_CPO_PAYLOAD]);
 
+        /*
+         * CONVERT
+         */
+
         COM_DIAG_CALICO_LETOH(pvt.alt, dp->alt);
         COM_DIAG_CALICO_LETOH(pvt.epe, dp->epe);
         COM_DIAG_CALICO_LETOH(pvt.eph, dp->eph);
@@ -394,41 +409,87 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         COM_DIAG_CALICO_LETOH(pvt.grmn_days, dp->grmn_days);
 
 #if !0
-        {
-            int64_t lat;
-            int64_t lon;
-            int latd;
-            uint64_t latf;
-            int lond;
-            uint64_t lonf;
-            uint64_t ticks;
-
-            lat = calico_format_radians2nanominutes(pvt.lat);
-            hazer_format_nanominutes2degrees(lat, &latd, &latf);
-
-            lon = calico_format_radians2nanominutes(pvt.lon);
-            hazer_format_nanominutes2degrees(lon, &lond, &lonf);
-
-            ticks = calico_format_cpo2nanoseconds(pvt.grmn_days, pvt.gps_tow, pvt.leap_sec);
-
-            fputs("CPO PVT:\n", stderr);
-            fprintf(stderr, "alt=%fm\n", pvt.alt);
-            fprintf(stderr, "epe=%fm\n", pvt.epe);
-            fprintf(stderr, "eph=%fm\n", pvt.eph);
-            fprintf(stderr, "epv=%fm\n", pvt.epv);
-            fprintf(stderr, "fix=%d\n", pvt.fix);
-            fprintf(stderr, "gps_tow=%lf\n", pvt.gps_tow);
-            fprintf(stderr, "lat=%lfr=%d.%07llu\n", pvt.lat, latd, (unsigned long long)latf);
-            fprintf(stderr, "lon=%lfr=%d.%07llu\n", pvt.lon, lond, (unsigned long long)lonf);
-            fprintf(stderr, "lon_vel=%fm/s\n", pvt.lon_vel);
-            fprintf(stderr, "lat_vel=%fm/s\n", pvt.lat_vel);
-            fprintf(stderr, "alt_vel=%fm/s\n", pvt.alt_vel);
-            fprintf(stderr, "msl_hght=%fm:%fm\n", pvt.msl_hght, pvt.alt + pvt.msl_hght);
-            fprintf(stderr, "leap_sec=%ds\n", pvt.leap_sec);
-            fprintf(stderr, "grmn_days=%dd\n", pvt.grmn_days);
-            fprintf(stderr, "ticks=%lluticks\n", (unsigned long long)ticks);
-        }
+        fputs("CPO PVT:\n", stderr);
+        fprintf(stderr, "alt=%fm\n", pvt.alt);
+        fprintf(stderr, "epe=%fm\n", pvt.epe);
+        fprintf(stderr, "eph=%fm\n", pvt.eph);
+        fprintf(stderr, "epv=%fm\n", pvt.epv);
+        fprintf(stderr, "fix=%d\n", pvt.fix);
+        fprintf(stderr, "gps_tow=%lf\n", pvt.gps_tow);
+        fprintf(stderr, "lat=%lfr\n", pvt.lat);
+        fprintf(stderr, "lon=%lfr\n", pvt.lon);
+        fprintf(stderr, "lon_vel=%fm/s\n", pvt.lon_vel);
+        fprintf(stderr, "lat_vel=%fm/s\n", pvt.lat_vel);
+        fprintf(stderr, "alt_vel=%fm/s\n", pvt.alt_vel);
+        fprintf(stderr, "msl_hght=%fm\n", pvt.msl_hght);
+        fprintf(stderr, "leap_sec=%ds\n", pvt.leap_sec);
+        fprintf(stderr, "grmn_days=%dd\n", pvt.grmn_days);
 #endif
+
+        /*
+         * APPLY
+         */
+
+        switch (pvt.fix) {
+        case CALICO_CPO_PVT_FIX_None:
+        case CALICO_CPO_PVT_FIX_StillNone:
+            gpp->quality = HAZER_QUALITY_NOFIX;
+            break;
+        case CALICO_CPO_PVT_FIX_2D:
+            gpp->quality = HAZER_QUALITY_AUTONOMOUS;
+            break;
+        case CALICO_CPO_PVT_FIX_3D:
+            gpp->quality = HAZER_QUALITY_AUTONOMOUS;
+            break;
+        case CALICO_CPO_PVT_FIX_2DDifferential:
+            gpp->quality = HAZER_QUALITY_DIFFERENTIAL;
+            break;
+        case CALICO_CPO_PVT_FIX_3DDifferential:
+            gpp->quality = HAZER_QUALITY_DIFFERENTIAL;
+            break;
+        default:
+            gpp->quality = HAZER_QUALITY_TOTAL;
+            break;
+        }
+
+        if (gpp->quality == HAZER_QUALITY_NOFIX) {
+            errno = 0;
+            break;
+        }
+
+        factor = (180.0 * 60.0 * 1000000000.0) / M_PI;
+        gpp->lat_nanominutes = pvt.lat * factor;
+        gpp->lon_nanominutes = pvt.lon * factor;
+
+        gpp->alt_millimeters = (pvt.alt + pvt.msl_hght) * 1000.0;
+        gpp->sep_millimeters = -pvt.msl_hght * 1000.0;
+
+        nanoseconds = 631065600;
+        nanoseconds *= 1000000000;
+        result = nanoseconds;
+
+        nanoseconds = pvt.grmn_days;
+        nanoseconds -= pvt.grmn_days % 7;
+        nanoseconds *= 24;
+        nanoseconds *= 60;
+        nanoseconds *= 60;
+        nanoseconds *= 1000000000;
+        result += nanoseconds;
+
+        gpp->dmy_nanoseconds = result;
+
+        factor = pvt.gps_tow;
+        factor *= 1.5;
+        factor *= 1000000000.0;
+        result = factor;
+
+        nanoseconds = pvt.leap_sec;
+        nanoseconds *= 1000000000;
+        result += nanoseconds;
+
+        gpp->utc_nanoseconds = result;
+
+        gpp->label = "CPO";
 
         rc = 0;
 

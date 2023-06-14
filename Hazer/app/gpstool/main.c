@@ -3114,19 +3114,26 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse CPO PVT\n");
 
-                if (calico_cpo_position_record(&positions[HAZER_SYSTEM_GPS], buffer, length) == 0) {
+                system = HAZER_SYSTEM_GPS;
 
-                    //positions[system].ticks = timeout;
-                    //refresh = !0;
-                    //trace = !0;
+                if (system > maximum) { 
+                    maximum = system;
+                    DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                }
+
+                if (calico_cpo_position_record(&positions[system], buffer, length) == 0) {
+
+                    positions[system].ticks = timeout;
+                    refresh = !0;
+                    trace = !0;
 
                     system = HAZER_SYSTEM_GPS;
 
-                    //acquire_fix("NMEA GGA");
+                    acquire_fix("CPO PVT");
 
                 } else if (errno == 0) {
 
-                    //relinquish_fix("NMEA GGA");
+                    relinquish_fix("CPO PVT");
 
                 } else {
 
