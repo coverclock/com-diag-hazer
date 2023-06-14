@@ -451,10 +451,17 @@ extern int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, s
 
 /**
  * @def COM_DIAG_CALICO_LETOH
- * Convert field @a _FIELD_ from Little Endian byte order to Host
- * byte order. The field width 8, 16, 32, or 64 bits, is inferred automatically.
- * Little endian (not network byte order) is used because that is empirically
- * what the Garmin GPS-18x emits.
+ * Convert field @a _FIELD_ from Little Endian byte order (apparently) to Host
+ * byte order. The field width 8, 16, 32, or 64 bits is inferred automatically.
+ * Little Endian (not Network byte order) is used because that is empirically
+ * what the Garmin GPS-18x emits. As a bonus, this macro can read the value to
+ * be converted from the unaligned structure and write the result into the
+ * correctly aligned structure. Much of this code will be optimized out for
+ * any particular field, since the field width can be determined at compile
+ * time, eliminating all but one of the cases. In addition, the macro handles
+ * the fact that the fields may not be integers; the Garmin structure uses
+ * floats and doubles, apparently in IEEE format (although that isn't
+ * documented any better than the byte order).
  */
 #define COM_DIAG_CALICO_LETOH(_DESTINATION_, _SOURCE_) \
     do { \
@@ -498,6 +505,7 @@ extern int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, s
 #include <math.h>
 
 /**
+ * Convert radians to nanominutes.
  * Garmin uses floating point radians, NMEA uses unsigned integer degrees,
  * minutes, and decimal fraction of minutes, with a direction indicator,
  * and Hazer uses signed integer billionths of a minute.
@@ -507,7 +515,7 @@ extern int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, s
 static inline int64_t calico_format_radians2nanominutes(double radians) {
     int64_t result = 0;
 
-    result = (180.0 * radians * 1000000000.0) / (M_PI * 60.0);
+    result = (180.0 * radians * 60.0 * 1000000000.0) / M_PI;
 
     return result;
 }
@@ -516,23 +524,31 @@ static inline int64_t calico_format_radians2nanominutes(double radians) {
  * Useful commands:
  * date -u --date='January 1, 1970' +'%s' # POSIX epoch offset in seconds.
  * date -u --date='January 6, 1980' +'%s' # GPS epoch offset in seconds.
- * date -u --date='January 1, 1990' +'%s' # Garmin epoch offset in seconds.
+ * date -u --date='December 31, 1989' +'%s' # Garmin epoch offset in seconds.
  */
 
 /**
- * Convert the GPS Time Of Week to Hazer nanoseconds since the POSIX epoch.
- * @param tow is the number of GPS ticks since 1980-01-06.
+ * Convert Garmin CPO time to Hazer nanoseconds since the POSIX epoch.
+ * @param days is the number of days since 1989-01-01T00:00:00Z.
+ * @param tow is the number of 1.5 seconds since the start of the GPS week.
  * @param leaps is the number of additional leap seconds to UTC.
- * @param days is the number of days since 1990-01-01.
- * @return nanoseconds since 1970-01-01.
+ * @return nanoseconds since 1970-01-01T00:00:00Z.
  */
-static inline uint64_t calico_format_tow2nanoseconds(double tow, int16_t leaps, int32_t days) {
+static inline uint64_t calico_format_cpo2nanoseconds(int32_t days, double tow, int16_t leaps) {
     uint64_t result = 0;
     uint64_t nanoseconds = 0;
 
-    nanoseconds = 315964800;
+    nanoseconds = 631065600;
     nanoseconds *= 1000000000;
     result = nanoseconds;
+
+    nanoseconds = days;
+    nanoseconds -= days % 7;
+    nanoseconds *= 24;
+    nanoseconds *= 60;
+    nanoseconds *= 60;
+    nanoseconds *= 1000000000;
+    result += nanoseconds;
 
     tow *= 1.5;
     tow *= 1000000000.0;

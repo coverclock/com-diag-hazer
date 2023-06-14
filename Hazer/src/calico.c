@@ -409,7 +409,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
             lon = calico_format_radians2nanominutes(pvt.lon);
             hazer_format_nanominutes2degrees(lon, &lond, &lonf);
 
-            ticks = calico_format_tow2nanoseconds(pvt.gps_tow, pvt.leap_sec, pvt.grmn_days);
+            ticks = calico_format_cpo2nanoseconds(pvt.grmn_days, pvt.gps_tow, pvt.leap_sec);
 
             fputs("CPO PVT:\n", stderr);
             fprintf(stderr, "alt=%fm\n", pvt.alt);
@@ -418,12 +418,12 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
             fprintf(stderr, "epv=%fm\n", pvt.epv);
             fprintf(stderr, "fix=%d\n", pvt.fix);
             fprintf(stderr, "gps_tow=%lf\n", pvt.gps_tow);
-            fprintf(stderr, "lat=%lfr=%d.%09llu\n", pvt.lat, latd, (unsigned long long)latf);
-            fprintf(stderr, "lon=%lfr=%d.%09llu\n", pvt.lon, lond, (unsigned long long)lonf);
+            fprintf(stderr, "lat=%lfr=%d.%07llu\n", pvt.lat, latd, (unsigned long long)latf);
+            fprintf(stderr, "lon=%lfr=%d.%07llu\n", pvt.lon, lond, (unsigned long long)lonf);
             fprintf(stderr, "lon_vel=%fm/s\n", pvt.lon_vel);
             fprintf(stderr, "lat_vel=%fm/s\n", pvt.lat_vel);
             fprintf(stderr, "alt_vel=%fm/s\n", pvt.alt_vel);
-            fprintf(stderr, "msl_hght=%fm\n", pvt.msl_hght);
+            fprintf(stderr, "msl_hght=%fm:%fm\n", pvt.msl_hght, pvt.alt + pvt.msl_hght);
             fprintf(stderr, "leap_sec=%ds\n", pvt.leap_sec);
             fprintf(stderr, "grmn_days=%dd\n", pvt.grmn_days);
             fprintf(stderr, "ticks=%lluticks\n", (unsigned long long)ticks);
