@@ -340,13 +340,6 @@ int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, haz
     return 0;
 }
 
-/*
- * Useful commands:
- * date -u --date='January 1, 1970' +'%s' # POSIX epoch offset in seconds.
- * date -u --date='January 6, 1980' +'%s' # GPS epoch offset in seconds.
- * date -u --date='December 31, 1989' +'%s' # Garmin epoch offset in seconds.
- */
-
 int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t length)
 {
     int rc= -1;
@@ -408,7 +401,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         COM_DIAG_CALICO_LETOH(pvt.leap_sec, dp->leap_sec);
         COM_DIAG_CALICO_LETOH(pvt.grmn_days, dp->grmn_days);
 
-#if !0
+#if 0
         fputs("CPO PVT:\n", stderr);
         fprintf(stderr, "alt=%fm\n", pvt.alt);
         fprintf(stderr, "epe=%fm\n", pvt.epe);
@@ -464,6 +457,13 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         gpp->alt_millimeters = (pvt.alt + pvt.msl_hght) * 1000.0;
         gpp->sep_millimeters = -pvt.msl_hght * 1000.0;
 
+        /*
+         * Useful commands:
+         * date -u --date='January 1, 1970' +'%s'   # POSIX epoch offset.
+         * date -u --date='January 6, 1980' +'%s'   # GPS epoch offset.
+         * date -u --date='December 31, 1989' +'%s' # Garmin epoch offset.
+         */
+
         nanoseconds = 631065600;
         nanoseconds *= 1000000000;
         result = nanoseconds;
@@ -488,6 +488,9 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         result += nanoseconds;
 
         gpp->utc_nanoseconds = result;
+
+        gpp->old_nanoseconds = gpp->tot_nanoseconds;
+        gpp->tot_nanoseconds = gpp->dmy_nanoseconds + gpp->utc_nanoseconds;
 
         gpp->label = "CPO";
 
