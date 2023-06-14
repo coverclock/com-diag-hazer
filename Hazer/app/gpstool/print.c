@@ -596,13 +596,20 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
             thousandths = abs64(millimeters) % 1000LLU;
             fprintf(fp, " %6lld.%03llum MSL", (diminuto_lld_t)meters, (diminuto_llu_t)thousandths);
 
-            millimeters += pa[system].sep_millimeters;
+            /*
+             * NMEA 0183 4.11 p. 86 "GGA", Note 3
+             * "Geoidal Seperation: the difference between the WGS-84 earth
+             * ellipsoid surface and mean-sea-level (geoid) surface. "-" =
+             * mean-sea-level surface below WGS-84 ellipsoid surface."
+             */
+
+            millimeters -= pa[system].sep_millimeters;
 
             fprintf(fp, " %10.2lf'", millimeters * 3.2808 / 1000.0);
 
             meters = millimeters / 1000LL;
             thousandths = abs64(millimeters) % 1000LLU;
-            fprintf(fp, " %6lld.%03llum GEO", (diminuto_lld_t)meters, (diminuto_llu_t)thousandths);
+            fprintf(fp, " %6lld.%03llum WGS", (diminuto_lld_t)meters, (diminuto_llu_t)thousandths);
 
             fprintf(fp, "%11s", "");
 
