@@ -455,7 +455,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         gpp->lon_nanominutes = pvt.lon * factor;
 
         gpp->alt_millimeters = (pvt.alt + pvt.msl_hght) * 1000.0;
-        gpp->sep_millimeters = -pvt.msl_hght * 1000.0;
+        gpp->sep_millimeters = pvt.msl_hght * 1000.0;
 
         /*
          * Useful commands:
