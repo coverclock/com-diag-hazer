@@ -512,8 +512,8 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
 
         /*
          * Start with the fixed Garmin epoch offset from the POSIX epoch.
-         * Generating using the Linux/GNU date command, this includes the
-         * leap seconds between the POSIX epoch and the Garmin epoch. The
+         * Generated using the Linux/GNU date command above, this includes
+         * the leap seconds between the POSIX epoch and the Garmin epoch. The
          * Garmin epoch is on a Sunday.
          */
 
@@ -579,7 +579,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         nanoseconds += ivalue;
 
         /*
-         * Convert the GPS Time Of Week to seconds. Apparently, epirically,
+         * Convert the GPS Time Of Week to seconds. Apparently, empirically,
          * Garmin has already converted the 1.5s GPS TOW ticks to 1s ticks.
          */
 
@@ -587,7 +587,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         fvalue *= 1000000000.0;
 
         /*
-         * Get the DMY part of the GPS TOW.
+         * Get the D-M-Y part of the GPS TOW.
          */
 
         ivalue = fvalue;
@@ -598,7 +598,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         /*
          * Get the leap seconds to convert GPS Time to UTC. Presumably this
          * will get incremented automatically as leap seconds are added and
-         * GPS incorporates this into its own messaging to the device.
+         * GPS incorporates this into its own messaging.
          */
 
         ivalue = pvt.leap_sec;
@@ -607,11 +607,12 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
 
 #if !0
         /*
-         * Yeah, I got nothin'. This correction is based on comparisons
+         * Yeah, I got nothin'. This 31s correction is based on comparisons
          * with an NTP server and with a second GPS (U-blox) device.
-         * It's telling that if we ignore the 5s leap correction above,
-         * this is off by exactly the number of UTC leap seconds - as if
-         * we should have subtracted them instead of adding them.
+         * It's interesting that if we ignore the 5s leap correction above,
+         * our clock would be off by exactly twice the number of UTC leap
+         * seconds - as if we should have subtracted them instead of adding
+         * them.
          */
 
         nanoseconds -= 31ULL * 1000000000ULL;
@@ -620,7 +621,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         gpp->dmy_nanoseconds = nanoseconds;
 
         /*
-         * Get the HMS part of the GPS TOW.
+         * Get the H:M:S part of the GPS TOW.
          */
 
         nanoseconds = tvalue;
