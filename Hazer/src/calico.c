@@ -7,7 +7,9 @@
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
- * THIS IS A WORK IN PROGRESS
+ * THIS IS A WORK IN PROGRESS.
+ * This is the implementation of the support for the Garmin GPS-18x PC
+ * binary serial output format.
  */
 
 #include <string.h>
@@ -347,9 +349,11 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
     const calico_cpo_header_t * hp = (const calico_cpo_header_t *)0;
     const calico_cpo_pvt_data_packet_t * dp = (const calico_cpo_pvt_data_packet_t *)0;
     calico_cpo_pvt_data_t pvt = CALICO_CPO_PVT_DATA_INITIALIZER;
-    uint64_t result = 0;
+    double fvalue = 0.0;
+    uint64_t tvalue = 0;
+    uint64_t ivalue = 0;
     uint64_t nanoseconds = 0;
-    double factor = 0.0;
+    static const uint64_t DAY = 24ULL * 60ULL * 60ULL * 1000000000ULL;
 
     do {
 
@@ -450,44 +454,87 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
             break;
         }
 
-        factor = (180.0 * 60.0 * 1000000000.0) / M_PI;
-        gpp->lat_nanominutes = pvt.lat * factor;
-        gpp->lon_nanominutes = pvt.lon * factor;
+        fvalue = (180.0 * 60.0 * 1000000000.0) / M_PI;
+        gpp->lat_nanominutes = pvt.lat * fvalue;
+        gpp->lon_nanominutes = pvt.lon * fvalue;
 
         gpp->alt_millimeters = (pvt.alt - pvt.msl_hght) * 1000.0;
         gpp->sep_millimeters = -pvt.msl_hght * 1000.0;
 
         /*
          * Useful commands:
-         * date -u --date='January 1, 1970' +'%s'   # POSIX epoch offset.
-         * date -u --date='January 6, 1980' +'%s'   # GPS epoch offset.
-         * date -u --date='December 31, 1989' +'%s' # Garmin epoch offset.
+         *
+         * POSIX epoch offset in seconds: 0
+         *
+         *  date -u --date='1970-01-01 00:00:00 UTC' +'%s'
+         *
+         * POSIX epoch calendar:
+         *
+         *  cal 1 1970
+         *
+         * GPS epoch offset in seconds: 315964800
+         *
+         *  date -u --date='1980-01-06 00:00:00 UTC' +'%s'
+         *
+         * GPS epoch calendar:
+         *
+         *  cal 1 1980
+         *
+         * Garmin epoch offset in seconds: 631065600
+         *
+         *  date -u --date='1989-12-31 00:00:00 UTC' +'%s'
+         *
+         * Garmin epoch calendar:
+         *
+         *  cal 12 1989
+         *
+         * Current date and time as UTC in ISO8601.
+         *
+         *  date -u --iso-8601=seconds
          */
 
-        nanoseconds = 631065600;
-        nanoseconds *= 1000000000;
-        result = nanoseconds;
+        /* Start with the fixed Garmin epoch offset from the POSIX epoch. */
 
-        nanoseconds = pvt.grmn_days;
-        nanoseconds -= pvt.grmn_days % 7;
-        nanoseconds *= 24;
-        nanoseconds *= 60;
-        nanoseconds *= 60;
-        nanoseconds *= 1000000000;
-        result += nanoseconds;
+        ivalue = 631065600ULL;
+        ivalue *= 1000000000ULL;
+        nanoseconds = ivalue;
 
-        gpp->dmy_nanoseconds = result;
+        /* Add the days since most recent week start of the Garmin epoch. */
 
-        factor = pvt.gps_tow;
-        factor *= 1.5;
-        factor *= 1000000000.0;
-        result = factor;
+        ivalue = pvt.grmn_days;
+        ivalue -= ivalue % 7ULL;
+        ivalue *= DAY;
+        nanoseconds += ivalue;
 
-        nanoseconds = pvt.leap_sec;
-        nanoseconds *= 1000000000;
-        result += nanoseconds;
+        /* Convert the GPS Time Of Week to seconds. */
 
-        gpp->utc_nanoseconds = result;
+        fvalue = pvt.gps_tow;
+        fvalue *= /* 1.5 * */ 1000000000.0;
+
+        /* Get the DMY part of the GPS TOW. */
+
+        ivalue = fvalue;
+        tvalue = ivalue % DAY;
+        ivalue -= tvalue;
+        nanoseconds += ivalue;
+
+#if !0
+        nanoseconds -= 36ULL * 1000000000ULL;
+#endif
+
+        gpp->dmy_nanoseconds = nanoseconds;
+
+        /* Get the HMS part of the GPS TOW. */
+
+        nanoseconds = tvalue;
+
+        /* Add in leap seconds to convert GPS Time to UTC. */
+
+        ivalue = pvt.leap_sec;
+        ivalue *= 1000000000ULL;
+        nanoseconds += ivalue;
+
+        gpp->utc_nanoseconds = nanoseconds;
 
         gpp->old_nanoseconds = gpp->tot_nanoseconds;
         gpp->tot_nanoseconds = gpp->dmy_nanoseconds + gpp->utc_nanoseconds;
