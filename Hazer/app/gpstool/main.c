@@ -3110,24 +3110,26 @@ consume:
 
         case CPO:
 
+            /*
+             * CPO PACKETS
+             */
+
             if (calico_is_cpo_id_length(buffer, length, CALICO_CPO_PVT_Id, CALICO_CPO_PVT_Length)) {
 
                 DIMINUTO_LOG_DEBUG("Parse CPO PVT\n");
 
                 system = HAZER_SYSTEM_GPS;
 
-                if (system > maximum) { 
-                    maximum = system;
-                    DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
-                }
-
                 if (calico_cpo_position_record(&positions[system], buffer, length) == 0) {
+
+                    if (system > maximum) { 
+                        maximum = system;
+                        DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                    }
 
                     positions[system].ticks = timeout;
                     refresh = !0;
                     trace = !0;
-
-                    system = HAZER_SYSTEM_GPS;
 
                     acquire_fix("CPO PVT");
 
@@ -3145,10 +3147,48 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse CPO SDR\n");
 
-                /* HAZER_SYSTEM_GPS */
-                /* HAZER_SYSTEM_SBAS */
+                rc = calico_cpo_satellite_data_record(&views[HAZER_SYSTEM_GPS], &views[HAZER_SYSTEM_SBAS], &actives[HAZER_SYSTEM_GPS], &actives[HAZER_SYSTEM_SBAS], buffer, length);
+                if (rc != 0) {
 
-                /* TODO */
+                    if ((rc & (1 << HAZER_SYSTEM_GPS)) != 0) {
+
+                        system = HAZER_SYSTEM_GPS;
+
+                        if (system > maximum) { 
+                            maximum = system;
+                            DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        }
+
+                        positions[system].ticks = timeout;
+                        refresh = !0;
+                        trace = !0;
+
+                    }
+
+                    if ((rc & (1 << HAZER_SYSTEM_SBAS)) != 0) {
+
+                        system = HAZER_SYSTEM_SBAS;
+
+                        if (system > maximum) { 
+                            maximum = system;
+                            DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        }
+
+                        positions[system].ticks = timeout;
+                        refresh = !0;
+                        trace = !0;
+
+                    }
+
+                } else if (errno == 0) {
+
+                    /* Do nothing. */
+
+                } else {
+
+                    print_error(buffer, length);
+
+                }
 
             } else {
 

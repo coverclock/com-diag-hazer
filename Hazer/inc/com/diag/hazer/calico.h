@@ -311,19 +311,19 @@ enum CalicoCpoSatelliteDataRecordConstants {
  * Description of the CPO SDR.
  * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 26.
  */
-typedef struct CalicoCpoSatData {
+typedef struct CalicoCpoSatelliteDataRecord {
     uint8_t     svid;       /* 1..32 for GPS, 33..64 for WAAS. */
     uint16_t    snr;
     uint8_t     elev;       /* Degrees. */
     uint16_t    azmth;      /* Degrees. */
     uint8_t     status;
-} calico_cpo_sat_data_t;
+} calico_cpo_sdr_t;
 
 /**
- * @def CALICO_CPO_SATELLITE_DATA_RECORD_INITIALIZER
+ * @def CALICO_CPO_SDR_INITIALIZER
  * Defines a static initializer for a CPO SDR.
  */
-#define CALICO_CPO_SAT_DATA_INITIALIZER = \
+#define CALICO_CPO_SDR_INITIALIZER \
     { \
         0, \
     }
@@ -342,21 +342,21 @@ enum CalicoCpoSatelliteDataRecordStatus {
  * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 26.
  * The alignment design of this sucks.
  */
-typedef struct CalicoCpoSatelliteDataPacket {
+typedef struct CalicoCpoSatelliteDataRecordPacket {
     uint8_t     svid;       /* 1..32 for GPS, 33..64 for WAAS. */
     uint16_t    snr;
     uint8_t     elev;       /* Degrees. */
     uint16_t    azmth;      /* Degrees. */
     uint8_t     status;
-} __attribute__((packed)) calico_cpo_sat_data_packet_t;
+} __attribute__((packed)) calico_cpo_sdr_packet_t;
 
 /**
  * The full eighty-four byte CPO SDR contains twelve
  * instances of the structure.
  */
 typedef struct CalicoCpoSatelliteDataArrayPacket {
-    calico_cpo_sat_data_packet_t   sat[CALICO_CPO_SDR_Count];
-} __attribute__((packed)) calico_cpo_sat_data_array_packet_t;
+    calico_cpo_sdr_packet_t sat[CALICO_CPO_SDR_Count];
+} __attribute__((packed)) calico_cpo_sdr_array_packet_t;
 
 extern int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, hazer_active_t * gap, hazer_active_t * wap, const void * bp, ssize_t length);
 
@@ -377,7 +377,7 @@ enum CalicoCpoPositionRecordConstants {
  * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 27.
  * The actual integer types were inferred from the record length.
  */
-typedef struct CalicoCpoPvtData {
+typedef struct CalicoCpoPositionRecord {
     float   alt;        /* Meters above ellipsoid. */
     float   epe;        /* Meters position error. */
     float   eph;        /* Meters horizontal error. */
@@ -392,13 +392,13 @@ typedef struct CalicoCpoPvtData {
     float   msl_hght;   /* Meters height above mean sea level. */
     int16_t leap_sec;   /* UTC leap seconds. */
     int32_t grmn_days;  /* Days since 1989-12-31. */
-} calico_cpo_pvt_data_t;
+} calico_cpo_pvt_t;
 
 /**
  * @def CALICO_CPO_POSITION_RECORD_INITIALIZER
  * Defines a static initializer for a CPO SDR.
  */
-#define CALICO_CPO_PVT_DATA_INITIALIZER \
+#define CALICO_CPO_PVT_INITIALIZER \
     { \
         0., \
     }
@@ -420,7 +420,7 @@ enum CalicoCpoPositionRecordFix {
  * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 27.
  * The actual integer types were inferred from the record length.
  */
-typedef struct CalicoCpoPvtDataPacket {
+typedef struct CalicoCpoPositionRecordPacket {
     float   alt;        /* Meters above ellipsoid. */
     float   epe;        /* Meters position error. */
     float   eph;        /* Meters horizontal error. */
@@ -435,7 +435,7 @@ typedef struct CalicoCpoPvtDataPacket {
     float   msl_hght;   /* Meters height above mean sea level. */
     int16_t leap_sec;   /* UTC leap seconds. */
     int32_t grmn_days;  /* Days since 1989-12-31. */
-} __attribute__((packed)) calico_cpo_pvt_data_packet_t;
+} __attribute__((packed)) calico_cpo_pvt_packet_t;
 
 extern int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t length);
 

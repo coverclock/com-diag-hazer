@@ -343,16 +343,82 @@ ssize_t calico_validate(const void * buffer, size_t size)
 
 int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, hazer_active_t * gap, hazer_active_t * wap, const void * bp, ssize_t length)
 {
-    return 0;
+    int rc = 0;
+    const uint8_t * cp = (const uint8_t *)0;
+    const calico_cpo_header_t * hp = (const calico_cpo_header_t *)0;
+    const calico_cpo_sdr_array_packet_t * ap = (const calico_cpo_sdr_array_packet_t *)0;
+    const calico_cpo_sdr_packet_t * dp = (const calico_cpo_sdr_packet_t *)0;
+    calico_cpo_sdr_t sdr = CALICO_CPO_SDR_INITIALIZER;
+    int ii = 0;
+
+    do {
+
+        /*
+         * IDENTIFY
+         */
+
+        cp = (const uint8_t *)bp;
+
+        if (length < sizeof(calico_cpo_header_t)) {
+            errno = ENOMSG;
+            break;
+        }
+
+        hp = (const calico_cpo_header_t *)&(cp[CALICO_CPO_SYNC]);
+
+        if (hp->id != CALICO_CPO_SDR_Id) {
+            errno = ENOMSG;
+            break;
+        }
+
+        /*
+         * VALIDATE
+         */
+
+        if (length < (sizeof(calico_cpo_header_t) + CALICO_CPO_SDR_Length + sizeof(calico_cpo_trailer_t))) {
+            errno = ENODATA;
+            break;
+        }
+
+        ap = (const calico_cpo_sdr_array_packet_t *)&(cp[CALICO_CPO_PAYLOAD]);
+
+        /*
+         * CONVERT
+         */
+
+        for (ii = 0; ii < CALICO_CPO_SDR_Count; ++ii) {
+
+            dp = &(ap->sat[ii]);
+
+            COM_DIAG_CALICO_LETOH(sdr.svid, dp->svid);
+            COM_DIAG_CALICO_LETOH(sdr.snr, dp->snr);
+            COM_DIAG_CALICO_LETOH(sdr.elev, dp->elev);
+            COM_DIAG_CALICO_LETOH(sdr.azmth, dp->azmth);
+            COM_DIAG_CALICO_LETOH(sdr.status, dp->status);
+#if 0
+            fprintf(stderr, "CPO SDR[%d]: svid=%u snr=%u elev=%u azmth=%u status=0x%x\n", ii, sdr.svid, sdr.snr, sdr.elev, sdr.azmth, sdr.status);
+#endif
+
+        }
+
+    } while (0);
+
+    errno = 0;
+
+    return rc;
 }
+
+/******************************************************************************
+ *
+ ******************************************************************************/
 
 int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t length)
 {
     int rc= -1;
     const uint8_t * cp = (const uint8_t *)0;
     const calico_cpo_header_t * hp = (const calico_cpo_header_t *)0;
-    const calico_cpo_pvt_data_packet_t * dp = (const calico_cpo_pvt_data_packet_t *)0;
-    calico_cpo_pvt_data_t pvt = CALICO_CPO_PVT_DATA_INITIALIZER;
+    const calico_cpo_pvt_packet_t * dp = (const calico_cpo_pvt_packet_t *)0;
+    calico_cpo_pvt_t pvt = CALICO_CPO_PVT_INITIALIZER;
     double fvalue = 0.0;
     uint64_t tvalue = 0;
     uint64_t ivalue = 0;
@@ -388,7 +454,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
             break;
         }
 
-        dp = (const calico_cpo_pvt_data_packet_t *)&(cp[CALICO_CPO_PAYLOAD]);
+        dp = (const calico_cpo_pvt_packet_t *)&(cp[CALICO_CPO_PAYLOAD]);
 
         /*
          * CONVERT
