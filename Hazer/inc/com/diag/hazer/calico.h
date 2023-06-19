@@ -131,6 +131,7 @@ typedef struct CalicoCpoHeader {
  * THis is the structure of the end matter of every CPO packet.
  */
 typedef struct CalicoCpoTrailer {
+    uint8_t checksum;
     uint8_t sync;
     uint8_t end;
 } calico_cpo_trailer_t;
@@ -279,7 +280,7 @@ extern ssize_t calico_length(const void * buffer, size_t size);
 extern ssize_t calico_validate(const void * buffer, size_t size);
 
 /******************************************************************************
- * PROCESSING HELPERS
+ * HELPERS
  ******************************************************************************/
 
 /**
@@ -334,11 +335,31 @@ typedef struct CalicoCpoSatelliteDataRecord {
  * Defines how the CPO SDR enumerates the two constellations it understands.
  */
 enum CalicoCpoSatelliteDataRecordSvid {
-    CALICO_CPO_SDR_SVID_GPS_Low     = 1,
-    CALICO_CPO_SDR_SVID_GPS_High    = 32,
-    CALICO_CPO_SDR_SVID_WAAS_Low    = 33,
-    CALICO_CPO_SDR_SVID_WAAS_High   = 64,
+    CALICO_CPO_SDR_SVID_GPS_FIRST   = 1,
+    CALICO_CPO_SDR_SVID_GPS_LAST    = 32,
+    CALICO_CPO_SDR_SVID_WAAS_FIRST  = 33,
+    CALICO_CPO_SDR_SVID_WAAS_LAST   = 64,
 };
+
+/**
+ * Map the CPO SDR Space Vehicle IDentification number to a Hazer system
+ * enumeration value.
+ * @param svid is a CPO SDR SVID.
+ * @return a Hazer system enumeration value including TOTAL for invalid.
+ */
+static inline hazer_system_t calico_map_cposvid_to_system(uint8_t svid) {
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
+
+    if ((CALICO_CPO_SDR_SVID_GPS_FIRST <= svid) && (svid <= CALICO_CPO_SDR_SVID_GPS_LAST)) {
+        system = HAZER_SYSTEM_GPS;
+    } else if ((CALICO_CPO_SDR_SVID_WAAS_FIRST <= svid) && (svid <= CALICO_CPO_SDR_SVID_WAAS_LAST)) {
+        system = HAZER_SYSTEM_SBAS;
+    } else {
+        /* Do nothing. */
+    }
+
+    return system;
+}
 
 /**
  * Defines the meaning of the CPO SDR Status bit mask.

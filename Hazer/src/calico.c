@@ -271,19 +271,23 @@ const void * calico_checksum_buffer(const void * buffer, size_t size, uint8_t * 
     uint8_t cs = 0;
     size_t length = 0;
 
-    length = (uint8_t)bp[CALICO_CPO_SIZE];
-    length += CALICO_CPO_SUMMED;
+    if (size >= CALICO_CPO_SHORTEST) {
 
-    if ((length + CALICO_CPO_UNSUMMED) <= size) {
+        length = (uint8_t)bp[CALICO_CPO_SIZE];
+        length += CALICO_CPO_SUMMED;
 
-        for (bp += CALICO_CPO_ID; length > 0; --length) {
-            calico_checksum(*(bp++), &cc, &cs);
+        if ((length + CALICO_CPO_UNSUMMED) <= size) {
+
+            for (bp += CALICO_CPO_ID; length > 0; --length) {
+                calico_checksum(*(bp++), &cc, &cs);
+            }
+
+            *ccp = cc;
+            *csp = cs;
+
+            result = bp;
+
         }
-
-        *ccp = cc;
-        *csp = cs;
-
-        result = bp;
 
     }
 
@@ -383,7 +387,7 @@ int calico_cpo_satellite_data_record(hazer_views_t viewa, hazer_actives_t active
          * VALIDATE
          */
 
-        if (length < (sizeof(calico_cpo_header_t) + CALICO_CPO_SDR_Length + sizeof(calico_cpo_trailer_t))) {
+        if (length != (sizeof(calico_cpo_header_t) + CALICO_CPO_SDR_Length + sizeof(calico_cpo_trailer_t))) {
             errno = ENODATA;
             break;
         }
@@ -431,12 +435,9 @@ int calico_cpo_satellite_data_record(hazer_views_t viewa, hazer_actives_t active
             fprintf(stderr, "CPO SDR[%d]: svid=%u snr=%u elev=%u azmth=%u status=0x%x\n", ii, sdr.svid, sdr.snr, sdr.elev, sdr.azmth, sdr.status);
 #endif
 
-            if ((CALICO_CPO_SDR_SVID_GPS_Low <= sdr.svid) && (sdr.svid <= CALICO_CPO_SDR_SVID_GPS_High)) {
-                system = HAZER_SYSTEM_GPS;
-            } else if ((CALICO_CPO_SDR_SVID_WAAS_Low <= sdr.svid) && (sdr.svid <= CALICO_CPO_SDR_SVID_WAAS_High)) {
-                system = HAZER_SYSTEM_SBAS;
-            } else {
-                system = HAZER_SYSTEM_GNSS;
+            system = calico_map_cposvid_to_system(sdr.svid);
+            if (system >= HAZER_SYSTEM_TOTAL) {
+                continue;
             }
 
             vp = &(viewa[system]);
@@ -545,7 +546,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
          * VALIDATE
          */
 
-        if (length < (sizeof(calico_cpo_header_t) + CALICO_CPO_PVT_Length + sizeof(calico_cpo_trailer_t))) {
+        if (length != (sizeof(calico_cpo_header_t) + CALICO_CPO_PVT_Length + sizeof(calico_cpo_trailer_t))) {
             errno = ENODATA;
             break;
         }
