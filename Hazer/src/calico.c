@@ -9,11 +9,10 @@
  * @details
  * THIS IS A WORK IN PROGRESS.
  * This is the implementation of the support for the Garmin GPS-18x PC
- * binary serial output format.
- *
- * REFERENCES
- *
- * <https://www.ietf.org/timezones/data/leap-seconds.list>
+ * binary serial output format. This format, described in Garmin's
+ * "GPS 18x TECHNICAL SPECIFICATIONS", is not well documented. Much of
+ * this code is the result of reverse engineering the output of the
+ * device, along with some guesswork.
  */
 
 #include <string.h>
@@ -23,6 +22,8 @@
 #include <math.h>
 #include "com/diag/hazer/common.h"
 #include "../src/calico.h"
+
+static const char * LABEL = "CPO";
 
 /******************************************************************************
  *
@@ -341,15 +342,22 @@ ssize_t calico_validate(const void * buffer, size_t size)
  *
  ******************************************************************************/
 
-int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, hazer_active_t * gap, hazer_active_t * wap, const void * bp, ssize_t length)
+int calico_cpo_satellite_data_record(hazer_views_t viewa, hazer_actives_t activea, const void * bp, ssize_t length)
 {
     int rc = 0;
     const uint8_t * cp = (const uint8_t *)0;
     const calico_cpo_header_t * hp = (const calico_cpo_header_t *)0;
-    const calico_cpo_sdr_array_packet_t * ap = (const calico_cpo_sdr_array_packet_t *)0;
+    const calico_cpo_sdr_array_packet_t * rp = (const calico_cpo_sdr_array_packet_t *)0;
     const calico_cpo_sdr_packet_t * dp = (const calico_cpo_sdr_packet_t *)0;
     calico_cpo_sdr_t sdr = CALICO_CPO_SDR_INITIALIZER;
     int ii = 0;
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    hazer_view_t * vp = (hazer_view_t *)0;
+    hazer_band_t * sp = (hazer_band_t *)0;
+    hazer_satellite_t * ip = (hazer_satellite_t *)0;
+    hazer_active_t * ap = (hazer_active_t *)0;
+    int vi = 0;
+    int ai = 0;
 
     do {
 
@@ -380,15 +388,39 @@ int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, haz
             break;
         }
 
-        ap = (const calico_cpo_sdr_array_packet_t *)&(cp[CALICO_CPO_PAYLOAD]);
+        rp = (const calico_cpo_sdr_array_packet_t *)&(cp[CALICO_CPO_PAYLOAD]);
 
         /*
          * CONVERT
          */
 
+        system = HAZER_SYSTEM_GNSS;
+        viewa[system].signals = 0;
+        viewa[system].signal = 0;
+        viewa[system].pending = 0;
+        viewa[system].sig[HAZER_SIGNAL_ANY].channels = 0;
+        viewa[system].sig[HAZER_SIGNAL_ANY].visible = 0;
+        activea[HAZER_SYSTEM_GNSS].active = 0;
+
+        system = HAZER_SYSTEM_GPS;
+        viewa[system].signals = 0;
+        viewa[system].signal = 0;
+        viewa[system].pending = 0;
+        viewa[system].sig[HAZER_SIGNAL_ANY].channels = 0;
+        viewa[system].sig[HAZER_SIGNAL_ANY].visible = 0;
+        activea[system].active = 0;
+
+        system = HAZER_SYSTEM_SBAS;
+        viewa[system].signals = 0;
+        viewa[system].signal = 0;
+        viewa[system].pending = 0;
+        viewa[system].sig[HAZER_SIGNAL_ANY].channels = 0;
+        viewa[system].sig[HAZER_SIGNAL_ANY].visible = 0;
+        activea[system].active = 0;
+
         for (ii = 0; ii < CALICO_CPO_SDR_Count; ++ii) {
 
-            dp = &(ap->sat[ii]);
+            dp = &(rp->sat[ii]);
 
             COM_DIAG_CALICO_LETOH(sdr.svid, dp->svid);
             COM_DIAG_CALICO_LETOH(sdr.snr, dp->snr);
@@ -399,11 +431,75 @@ int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, haz
             fprintf(stderr, "CPO SDR[%d]: svid=%u snr=%u elev=%u azmth=%u status=0x%x\n", ii, sdr.svid, sdr.snr, sdr.elev, sdr.azmth, sdr.status);
 #endif
 
+            if ((CALICO_CPO_SDR_SVID_GPS_Low <= sdr.svid) && (sdr.svid <= CALICO_CPO_SDR_SVID_GPS_High)) {
+                system = HAZER_SYSTEM_GPS;
+            } else if ((CALICO_CPO_SDR_SVID_WAAS_Low <= sdr.svid) && (sdr.svid <= CALICO_CPO_SDR_SVID_WAAS_High)) {
+                system = HAZER_SYSTEM_SBAS;
+            } else {
+                system = HAZER_SYSTEM_GNSS;
+            }
+
+            vp = &(viewa[system]);
+            sp = &(viewa[system].sig[HAZER_SIGNAL_ANY]);
+            ap = &(activea[system]);
+
+            vi = sp->channels;
+            if (vi < HAZER_GNSS_SATELLITES) {
+
+                ip = &(viewa[system].sig[HAZER_SIGNAL_ANY].sat[vi++]);
+                ip->id = sdr.svid;
+                ip->elv_degrees = sdr.elev;
+                ip->azm_degrees = sdr.azmth;
+                ip->snr_dbhz = sdr.snr;
+                ip->phantom = (sdr.status & CALICO_CPO_SDR_STATUS_Ephemeris) == 0;;
+                ip->untracked = (sdr.snr == 0);
+                ip->unused = (sdr.status & CALICO_CPO_SDR_STATUS_Solution) == 0;
+                sp->channels = vi;
+                sp->visible = vi;
+                vp->signals = 1;
+                vp->signal = HAZER_SIGNAL_ANY;
+                vp->pending = 0;
+
+                vp->label = LABEL;
+
+                /*
+                 * We don't count SBAS (WAAS) as active, since that
+                 * implies to the caller that we are computing possibly
+                 * an independent position fix using that constellation.
+                 */
+
+                if (system == HAZER_SYSTEM_SBAS) {
+                    /* Do nothing. */
+                } else if ((sdr.status & CALICO_CPO_SDR_STATUS_Solution) == 0) {
+                    /* Do nothing. */
+                } else {
+
+                    ai = ap->active;
+                    if (ai < HAZER_GNSS_ACTIVES) {
+
+                        ap->id[ai++] = sdr.svid;
+                        ap->active = ai;
+                        ap->pdop = HAZER_GNSS_DOP;
+                        ap->hdop = HAZER_GNSS_DOP;
+                        ap->vdop = HAZER_GNSS_DOP;
+                        ap->tdop = HAZER_GNSS_DOP;
+                        ap->system = system;
+                        ap->mode = HAZER_MODE_UNKNOWN;
+
+                        ap->label = LABEL;
+                    }
+
+                }
+
+            }
+
+            rc |= (1 << system);
+
         }
 
-    } while (0);
+        errno = 0;
 
-    errno = 0;
+    } while (0);
 
     return rc;
 }
@@ -587,7 +683,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         nanoseconds = ivalue;
 
         /*
-         * IETF leap seconds list as of 2023-06-15 with my notes:
+         * IETF leap seconds list as of 2023-06-15 plus my notes:
          *
          *                  #  1 Jan 1970 POSIX Epoch
          * 2272060800	10	#  1 Jan 1972
@@ -678,7 +774,8 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
          * It's interesting that if we ignore the 5s leap correction above,
          * our clock would be off by exactly twice the number of UTC leap
          * seconds - as if we should have subtracted them instead of adding
-         * them.
+         * them. Can't see however how this can be the case. But it seems
+         * likely to be something to do with leap seconds somehow.
          */
 
         nanoseconds -= 31ULL * 1000000000ULL;
@@ -697,7 +794,7 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
         gpp->old_nanoseconds = gpp->tot_nanoseconds;
         gpp->tot_nanoseconds = gpp->dmy_nanoseconds + gpp->utc_nanoseconds;
 
-        gpp->label = "CPO";
+        gpp->label = LABEL;
 
         rc = 0;
 

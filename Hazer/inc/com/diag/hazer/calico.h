@@ -26,14 +26,16 @@
  *
  * REFERENCES
  *
+ * Garmin, "GPS 18x TECHNICAL SPECIFICATIONS", 190-00879-08 Rev. D, Garmin
+ * International, Inc., 2011-10
+ *
  * Garmin, "Garmin Device Interface Specification", 001-00063-00 Rev. G,
  * Garmin International, Inc., 2020-04-14
  *
  * Garmin, "Garmin Proprietary NMEA 0183 Sentences TECHNICAL SPECIFICATIONS",
  * 190-00684-00 Rev. C, Garmin International, Inc., 2008-12
  *
- * Garmin, "GPS 18x TECHNICAL SPECIFICATIONS", 190-00879-08 Rev. D, Garmin
- * International, Inc., 2011-10
+ * <https://www.ietf.org/timezones/data/leap-seconds.list>
  */
 
 #include <stdio.h>
@@ -329,6 +331,16 @@ typedef struct CalicoCpoSatelliteDataRecord {
     }
 
 /**
+ * Defines how the CPO SDR enumerates the two constellations it understands.
+ */
+enum CalicoCpoSatelliteDataRecordSvid {
+    CALICO_CPO_SDR_SVID_GPS_Low     = 1,
+    CALICO_CPO_SDR_SVID_GPS_High    = 32,
+    CALICO_CPO_SDR_SVID_WAAS_Low    = 33,
+    CALICO_CPO_SDR_SVID_WAAS_High   = 64,
+};
+
+/**
  * Defines the meaning of the CPO SDR Status bit mask.
  */
 enum CalicoCpoSatelliteDataRecordStatus {
@@ -358,7 +370,7 @@ typedef struct CalicoCpoSatelliteDataArrayPacket {
     calico_cpo_sdr_packet_t sat[CALICO_CPO_SDR_Count];
 } __attribute__((packed)) calico_cpo_sdr_array_packet_t;
 
-extern int calico_cpo_satellite_data_record(hazer_view_t * gvp, hazer_view_t * wvp, hazer_active_t * gap, hazer_active_t * wap, const void * bp, ssize_t length);
+extern int calico_cpo_satellite_data_record(hazer_views_t viewa, hazer_actives_t activea, const void * bp, ssize_t length);
 
 /******************************************************************************
  * PROCESSING CPO POSITION VELOCITY TIME (PVT) RECORD

@@ -3147,8 +3147,24 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Parse CPO SDR\n");
 
-                rc = calico_cpo_satellite_data_record(&views[HAZER_SYSTEM_GPS], &views[HAZER_SYSTEM_SBAS], &actives[HAZER_SYSTEM_GPS], &actives[HAZER_SYSTEM_SBAS], buffer, length);
+                rc = calico_cpo_satellite_data_record(views, actives, buffer, length);
                 if (rc != 0) {
+
+                    if ((rc & (1 << HAZER_SYSTEM_GNSS)) != 0) {
+
+                        system = HAZER_SYSTEM_GNSS;
+
+                        if (system > maximum) { 
+                            maximum = system;
+                            DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        }
+
+                        views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
+                        actives[system].ticks = timeout;
+                        refresh = !0;
+                        trace = !0;
+
+                    }
 
                     if ((rc & (1 << HAZER_SYSTEM_GPS)) != 0) {
 
@@ -3159,7 +3175,8 @@ consume:
                             DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
                         }
 
-                        positions[system].ticks = timeout;
+                        views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
+                        actives[system].ticks = timeout;
                         refresh = !0;
                         trace = !0;
 
@@ -3174,7 +3191,7 @@ consume:
                             DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
                         }
 
-                        positions[system].ticks = timeout;
+                        views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
                         refresh = !0;
                         trace = !0;
 
