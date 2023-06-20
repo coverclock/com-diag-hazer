@@ -394,6 +394,17 @@ typedef struct CalicoCpoSatelliteDataArrayPacket {
     calico_cpo_sdr_packet_t sat[CALICO_CPO_SDR_Count];
 } __attribute__((packed)) calico_cpo_sdr_array_packet_t;
 
+/**
+ * Process the CPO SDR and add its technological distinctiveness to the
+ * view and active databases. The SDR may produce data for both the
+ * GPS and WAAS (SBAS) satellites. If a mask of zero is returned, the
+ * value of errno indicates the error, 0 if none.
+ * @param viewa is the array of satellite views.
+ * @param activea is the array of active satellites.
+ * @param bp points to the input buffer.
+ * @param length is the number of octets in the input buffer.
+ * @return a mask indicating what contellations were processed.
+ */
 extern int calico_cpo_satellite_data_record(hazer_views_t viewa, hazer_actives_t activea, const void * bp, ssize_t length);
 
 /******************************************************************************
@@ -473,6 +484,15 @@ typedef struct CalicoCpoPositionRecordPacket {
     int32_t grmn_days;  /* Days since 1989-12-31. */
 } __attribute__((packed)) calico_cpo_pvt_packet_t;
 
+/**
+ * Process the CPO PVT and add its technological distinctiveness to the
+ * position. The CPO PVT only uses the GPS constellation. If <0 is returned,
+ * errno indicates the error, or zero if none.
+ * @param gpp points to the GPS position.
+ * @param bp points to the input buffer.
+ * @param length is the number of octets in the input buffer.
+ * @return zero for success, <0 otherwise.
+ */
 extern int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t length);
 
 /******************************************************************************
