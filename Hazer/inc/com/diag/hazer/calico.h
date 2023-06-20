@@ -252,7 +252,8 @@ static inline void calico_checksum(uint8_t ch, uint8_t * ccp, uint8_t * csp)
  * points to the beginning of the CPO packet, not to the subset that is
  * checksummed, and the sentence must contain a valid length field. A pointer
  * is returned pointing just past the checksummed portion; this is where the
- * checksum will be stored in a correctly formed packet.
+ * checksum will be stored in a correctly formed packet. This can only be used
+ * on processed data which has had its DLE escapes removed.
  * @param buffer points to the beginning of the buffer.
  * @param size is the size of the buffer in bytes.
  * @param ccp points to where the running checksum counter will be stored.
@@ -262,7 +263,8 @@ static inline void calico_checksum(uint8_t ch, uint8_t * ccp, uint8_t * csp)
 extern const void * calico_checksum_buffer(const void * buffer, size_t size, uint8_t * ccp, uint8_t * csp);
 
 /**
- * Return the length of the completed packet in bytes.
+ * Return the length of the completed packet in bytes. This can only be used
+ * on processed data that has had its DLE escapes removed.
  * @param buffer points to buffer containing the completed packet.
  * @param size is the size of the buffer containing the packet.
  * @return the length of the packet in bytes or <0 if an error occurred.
@@ -270,10 +272,11 @@ extern const void * calico_checksum_buffer(const void * buffer, size_t size, uin
 extern ssize_t calico_length(const void * buffer, size_t size);
 
 /**
- * Validate the contents of an buffer as a valid CPO packet.
- * @param buffer points to the buffer. This combines
- * the calico_length() and calico_checksum_buffer() functions along with the
- * checksum comparison.
+ * Validate the contents of an buffer as a valid CPO packet. This can only
+ * be used on processed data which has had its DLE escapes removed.
+ * This function combines the calico_length() and calico_checksum_buffer()
+ * functions along with the checksum comparison.
+ * @param buffer points to the buffer.
  * @param size is the number of bytes in the buffer.
  * @return the length of the packet in bytes or <0 if an error occurred.
  */

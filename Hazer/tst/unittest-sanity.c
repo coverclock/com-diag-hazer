@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the Sanity unit test.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -15,6 +15,7 @@
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/tumbleweed.h"
+#include "com/diag/hazer/calico.h"
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "./unittest.h"
@@ -85,7 +86,7 @@ int main(void)
 
         for (ii = 0; ii < countof(DATA); ++ii) {
 
-            fprintf(stderr, "Sentence %d\n", ii);
+            fprintf(stderr, "NMEA Sentence %d\n", ii);
 
             size = strlen(DATA[ii]);
             diminuto_dump(stderr, DATA[ii], size);
@@ -165,7 +166,7 @@ int main(void)
         for (ii = 0; ii < countof(DATA); ++ii) {
             BEGIN(DATA[ii]);
 
-                fprintf(stderr, "Packet %d\n", ii);
+                fprintf(stderr, "UBX Packet %d\n", ii);
 
                 diminuto_dump(stderr, message, size);
 
@@ -237,7 +238,7 @@ int main(void)
         for (ii = 0; ii < countof(DATA); ++ii) {
             BEGIN(DATA[ii]);
 
-                fprintf(stderr, "Message %d\n", ii);
+                fprintf(stderr, "RTCM Message %d\n", ii);
 
                 diminuto_dump(stderr, message, size);
 
@@ -260,7 +261,7 @@ int main(void)
                     if (state == TUMBLEWEED_STATE_END) { break; }
                     assert(state != TUMBLEWEED_STATE_STOP);
                 }
-                assert(state ==TUMBLEWEED_STATE_END);
+                assert(state == TUMBLEWEED_STATE_END);
                 assert(memcmp(message, buffer, size) == 0);
 
                 length = tumbleweed_size(&context);
@@ -275,6 +276,87 @@ int main(void)
 
         tumbleweed_finalize();
         tumbleweed_debug((FILE *)0);
+
+    }
+
+    {
+        /*
+         * Garmin GPS-18x PC, 2023-06-19
+         *
+         * N.B. The raw data from the device uses DLE (0x10) as an escape
+         * character. The DLE used as an escape is NOT saved in the buffer,
+         * because it is not part of the payload. So you can't use the output
+         * from the -L gpstool option as test data. It took me an hour to
+         * remember this. Try using the fun/streamhex.sh script instead. This
+         * also means the resulting post-machine data will not match the
+         * original data.
+         */
+        static const char * DATA[] = {
+            "\\x10\\x72\\x54\\x03\\x40\\x06\\x09\\x25\\x00\\x07\\x06\\x6c\\x07\\x4b\\x46\\x00\\x07\\x0b\\xe4\\x0c\\x33\\xcd\\x00\\x07\\x0c\\xb8\\x0b\\x28\\x38\\x01\\x07\\x0e\\x08\\x07\\x09\\x81\\x00\\x07\\x11\\x48\\x0d\\x20\\x42\\x00\\x07\\x13\\x48\\x0d\\x34\\x33\\x00\\x07\\x14\\xc4\\x09\\x0c\\xac\\x00\\x07\\x18\\xb8\\x0b\\x24\\xfc\\x00\\x07\\x19\\x9c\\xff\\x04\\x38\\x01\\x00\\xff\\x00\\x00\\x00\\x00\\x00\\x00\\x2e\\x3c\\x0f\\x25\\xd6\\x00\\x10\\x10\\x09\\x10\\x03",
+            "\\x10\\x33\\x40\\x30\\x42\\xd3\\x44\\x77\\x14\\xb6\\x42\\x09\\x27\\x13\\x41\\x02\\x26\\xb5\\x42\\x05\\x00\\xba\\x49\\x0c\\x02\\x58\\xf0\\x0b\\x41\\x5c\\xc3\\x86\\xa3\\xad\\x39\\xe6\\x3f\\xcb\\xef\\x76\\xc4\\x46\\x5d\\xfd\\xbf\\x37\\xa3\\x06\\xbc\\x81\\x1d\\xa2\\x3b\\xfd\\xdc\\x1c\\x3a\\x00\\xf8\\x8f\\x41\\x12\\x00\\xbe\\x2f\\x00\\x00\\x81\\x10\\x03",
+            "\\x10\\x72\\x54\\x03\\x40\\x06\\x09\\x25\\x00\\x07\\x06\\x6c\\x07\\x4b\\x46\\x00\\x07\\x0b\\xe4\\x0c\\x33\\xcd\\x00\\x07\\x0c\\xb8\\x0b\\x28\\x38\\x01\\x07\\x0e\\x08\\x07\\x09\\x81\\x00\\x07\\x11\\x48\\x0d\\x20\\x42\\x00\\x07\\x13\\xac\\x0d\\x34\\x33\\x00\\x07\\x14\\xc4\\x09\\x0c\\xac\\x00\\x07\\x18\\xb8\\x0b\\x24\\xfc\\x00\\x07\\x19\\x9c\\xff\\x04\\x38\\x01\\x00\\xff\\x00\\x00\\x00\\x00\\x00\\x00\\x2e\\x3c\\x0f\\x25\\xd6\\x00\\x10\\x10\\xa5\\x10\\x03",
+            "\\x10\\x33\\x40\\x40\\x42\\xd3\\x44\\xfb\\x78\\xb5\\x42\\x0e\\x29\\x13\\x41\\xb1\\x89\\xb4\\x42\\x05\\x00\\xba\\x49\\x0c\\x02\\x60\\xf0\\x0b\\x41\\xf7\\x3c\\xb0\\xa3\\xad\\x39\\xe6\\x3f\\x25\\x38\\x82\\xc4\\x46\\x5d\\xfd\\xbf\\x29\\x67\\xd9\\xbb\\xd0\\xe2\\x82\\x3b\\xfe\\xb0\\x7e\\x3a\\x00\\xf8\\x8f\\x41\\x12\\x00\\xbe\\x2f\\x00\\x00\\xca\\x10\\x03",
+            "\\x10\\x72\\x54\\x03\\x40\\x06\\x09\\x25\\x00\\x07\\x06\\x6c\\x07\\x4b\\x46\\x00\\x07\\x0b\\xe4\\x0c\\x33\\xcd\\x00\\x17\\x0c\\xb8\\x0b\\x28\\x38\\x01\\x07\\x0e\\x08\\x07\\x09\\x81\\x00\\x07\\x11\\x48\\x0d\\x20\\x42\\x00\\x07\\x13\\x10\\x10\\x0e\\x34\\x33\\x00\\x07\\x14\\xc4\\x09\\x0c\\xac\\x00\\x07\\x18\\xb8\\x0b\\x24\\xfc\\x00\\x07\\x19\\x9c\\xff\\x04\\x38\\x01\\x00\\xff\\x00\\x00\\x00\\x00\\x00\\x00\\x2e\\x3c\\x0f\\x25\\xd6\\x00\\x10\\x10\\x30\\x10\\x03",
+            "\\x10\\x33\\x40\\x45\\x42\\xd3\\x44\\x68\\xbc\\xb4\\x42\\xb1\\x29\\x13\\x41\\x21\\xcc\\xb3\\x42\\x05\\x00\\xba\\x49\\x0c\\x02\\x68\\xf0\\x0b\\x41\\x52\\x65\\xdd\\xa3\\xad\\x39\\xe6\\x3f\\x92\\xa4\\xa1\\xc4\\x46\\x5d\\xfd\\xbf\\xe1\\x3f\\x9e\\xbb\\xce\\x8b\\x3e\\x3b\\xd6\\x2c\\x6b\\x39\\x00\\xf8\\x8f\\x41\\x12\\x00\\xbe\\x2f\\x00\\x00\\x17\\x10\\x03",
+            "\\x10\\x72\\x54\\x03\\x40\\x06\\x09\\x25\\x00\\x07\\x06\\x6c\\x07\\x4b\\x46\\x00\\x07\\x0b\\xe4\\x0c\\x33\\xcd\\x00\\x07\\x0c\\xb8\\x0b\\x28\\x38\\x01\\x07\\x0e\\x08\\x07\\x09\\x81\\x00\\x07\\x11\\x48\\x0d\\x20\\x42\\x00\\x07\\x13\\x10\\x10\\x0e\\x34\\x33\\x00\\x07\\x14\\x60\\x09\\x0c\\xac\\x00\\x07\\x18\\xb8\\x0b\\x24\\xfc\\x00\\x07\\x19\\x9c\\xff\\x04\\x38\\x01\\x00\\xff\\x00\\x00\\x00\\x00\\x00\\x00\\x2e\\x3c\\x0f\\x25\\xd6\\x00\\x10\\x10\\xa4\\x10\\x03",
+            "\\x10\\x33\\x40\\x4c\\x42\\xd3\\x44\\xe3\\xb7\\xb4\\x42\\x74\\x2a\\x13\\x41\\x94\\xc7\\xb3\\x42\\x05\\x00\\xba\\x49\\x0c\\x02\\x70\\xf0\\x0b\\x41\\xe1\\x19\\xdf\\xa3\\xad\\x39\\xe6\\x3f\\x7a\\x64\\xd7\\xc4\\x46\\x5d\\xfd\\xbf\\xde\\xf3\\x0c\\xbc\\x18\\xb8\\xa9\\x3b\\x76\\x35\\xd8\\x38\\x00\\xf8\\x8f\\x41\\x12\\x00\\xbe\\x2f\\x00\\x00\\x26\\x10\\x03",
+        };
+        const uint8_t * pointer;
+        uint8_t cc;
+        uint8_t cs;
+        int ii;
+        calico_buffer_t buffer;
+        calico_context_t context;
+        calico_state_t state;
+        size_t nn;
+        ssize_t ll;
+        ssize_t ss;
+        ssize_t vv;
+
+        calico_debug(stderr);
+        calico_initialize();
+
+        for (ii = 0; ii < countof(DATA); ++ii) {
+            BEGIN(DATA[ii]);
+
+                fprintf(stderr, "CPO Raw %d [%zu]\n", ii, size);
+                diminuto_dump(stderr, message, size);
+
+                state = CALICO_STATE_START;
+                pointer = message;
+                nn = size;
+                while ((nn--) > 0) {
+                    state = calico_machine(state, *(pointer++), buffer, sizeof(buffer), &context);
+                    if (state == CALICO_STATE_END) { break; }
+                    assert(state != CALICO_STATE_STOP);
+                }
+                assert(state == CALICO_STATE_END);
+
+                ss = calico_size(&context);
+                assert(buffer[ss - 1] == '\0');
+                ss -= 1; /* Included trailing NUL. */
+                assert(ss <= size);
+
+                fprintf(stderr, "CPO Cooked %d [%zd]\n", ii, ss);
+                diminuto_dump(stderr, buffer, ss);
+
+                ll = calico_length(buffer, size);
+                assert(ll == ss);
+
+                cc = 0;
+                cs = 0;
+                pointer = (const uint8_t *)calico_checksum_buffer(buffer, ll, &cc, &cs);
+                assert(pointer != (uint8_t *)0);
+                assert(*pointer == cs);
+
+                vv = calico_validate(buffer, ll);
+                assert(vv == ll);
+
+            END;
+        }
+
+        calico_finalize();
+        calico_debug((FILE *)0);
 
     }
 

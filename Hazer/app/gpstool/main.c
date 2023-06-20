@@ -170,7 +170,7 @@ int main(int argc, char * argv[])
     const char * source = (const char *)0;
     const char * sink = (const char *)0;
     const char * strobe = (const char *)0;
-    const char * logging = (const char *)0;
+    const char * listing = (const char *)0;
     const char * headless = (const char *)0;
     const char * arp = (const char *)0;
     const char * tracing = (const char *)0;
@@ -213,7 +213,7 @@ int main(int argc, char * argv[])
     FILE * out_fp = stdout;
     FILE * dev_fp = (FILE *)0;
     FILE * sink_fp = (FILE *)0;
-    FILE * log_fp = (FILE *)0;
+    FILE * list_fp = (FILE *)0;
     FILE * strobe_fp = (FILE *)0;
     FILE * pps_fp = (FILE *)0;
     FILE * trace_fp = (FILE *)0;
@@ -553,7 +553,7 @@ int main(int argc, char * argv[])
             break;
         case 'L':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
-            logging = optarg;
+            listing = optarg;
             break;
         case 'M':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
@@ -925,22 +925,22 @@ int main(int argc, char * argv[])
     }
 
     /*
-     * Are we logging every valid sentence or packet to an output file?
+     * Are we listing every valid sentence or packet to an output file?
      */
 
-    if (logging == (const char *)0) {
+    if (listing == (const char *)0) {
         /* Do nothing. */
-    } else if (strcmp(logging, "-") == 0) {
-        log_fp = stderr;
-    } else if ((log_fp = fopen(logging, "ab")) != (FILE *)0) {
+    } else if (strcmp(listing, "-") == 0) {
+        list_fp = stderr;
+    } else if ((list_fp = fopen(listing, "ab")) != (FILE *)0) {
         /* Do nothing. */
     } else {
-        diminuto_perror(logging);
-        diminuto_contract(log_fp != (FILE *)0);
+        diminuto_perror(listing);
+        diminuto_contract(list_fp != (FILE *)0);
     }
 
-    if (log_fp != (FILE *)0) {
-        DIMINUTO_LOG_INFORMATION("Log (%d) \"%s\"\n", fileno(log_fp), logging);
+    if (list_fp != (FILE *)0) {
+        DIMINUTO_LOG_INFORMATION("Log (%d) \"%s\"\n", fileno(list_fp), listing);
     }
 
     /*
@@ -2415,8 +2415,8 @@ consume:
          ** LOG
          **/
 
-        if (log_fp != (FILE *)0) {
-            print_buffer(log_fp, buffer, length, UNLIMITED);
+        if (list_fp != (FILE *)0) {
+            print_buffer(list_fp, buffer, length, UNLIMITED);
         }
 
         if (verbose) {
@@ -3591,14 +3591,14 @@ stop:
         diminuto_perror("fclose(trace_fp)");
     }
 
-    if (log_fp == (FILE *)0) {
+    if (list_fp == (FILE *)0) {
         /* Do nothing. */
-    } else if (log_fp == stderr) {
+    } else if (list_fp == stderr) {
         /* Do nothing. */
-    } else if ((rc = fclose(log_fp)) != EOF) {
+    } else if ((rc = fclose(list_fp)) != EOF) {
         /* Do nothing. */
     } else {
-        diminuto_perror("fclose(log_fp)");
+        diminuto_perror("fclose(list_fp)");
     }
 
     if (dev_fp == (FILE *)0) {

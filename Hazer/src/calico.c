@@ -260,8 +260,11 @@ calico_state_t calico_machine(calico_state_t state, uint8_t ch, void * buffer, s
 
 /*
  * The portion of the buffer being summed includes the length, but we have
- * to compute the length first to do the checksum. Seems chicken-and-egg,
- * but I've seen the same thing in TCP headers.
+ * to compute the length first to do the checksum. Seems chicken-and-egg.
+ * Other framing algorithms use a separate checksum or CRC just for the
+ * header containing the length. (The DLE framing device, implemented in
+ * machine, is kinda poor, too; see HDLC for a better example, implemented
+ * in Diminuto's framer feature.)
  */
 const void * calico_checksum_buffer(const void * buffer, size_t size, uint8_t * ccp, uint8_t * csp)
 {
