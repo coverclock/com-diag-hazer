@@ -319,7 +319,7 @@ enum CalicoCpoSatelliteDataRecordConstants {
  */
 typedef struct CalicoCpoSatelliteDataRecord {
     uint8_t     svid;       /* 1..32 for GPS, 33..64 for WAAS. */
-    uint16_t    snr;
+    uint16_t    snr;        /* Guessing dB Hz * 100 */
     uint8_t     elev;       /* Degrees. */
     uint16_t    azmth;      /* Degrees. */
     uint8_t     status;
@@ -371,6 +371,7 @@ enum CalicoCpoSatelliteDataRecordStatus {
     CALICO_CPO_SDR_STATUS_Ephemeris    = (1<<0),
     CALICO_CPO_SDR_STATUS_Correction   = (1<<1),
     CALICO_CPO_SDR_STATUS_Solution     = (1<<2),
+    CALICO_CPO_SDR_STATUS_Augmentation = (1<<4), /* Guessing. */
 };
 
 /**

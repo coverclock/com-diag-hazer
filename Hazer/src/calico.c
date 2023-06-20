@@ -434,6 +434,7 @@ int calico_cpo_satellite_data_record(hazer_views_t viewa, hazer_actives_t active
             COM_DIAG_CALICO_LETOH(sdr.elev, dp->elev);
             COM_DIAG_CALICO_LETOH(sdr.azmth, dp->azmth);
             COM_DIAG_CALICO_LETOH(sdr.status, dp->status);
+
 #if 0
             fprintf(stderr, "CPO SDR[%d]: svid=%u snr=%u elev=%u azmth=%u status=0x%x\n", ii, sdr.svid, sdr.snr, sdr.elev, sdr.azmth, sdr.status);
 #endif
@@ -454,10 +455,14 @@ int calico_cpo_satellite_data_record(hazer_views_t viewa, hazer_actives_t active
                 ip->id = sdr.svid;
                 ip->elv_degrees = sdr.elev;
                 ip->azm_degrees = sdr.azmth;
-                ip->snr_dbhz = sdr.snr;
-                ip->phantom = (sdr.status & CALICO_CPO_SDR_STATUS_Ephemeris) == 0;;
-                ip->untracked = (sdr.snr == 0);
-                ip->unused = (sdr.status & CALICO_CPO_SDR_STATUS_Solution) == 0;
+                if ((sdr.status & (CALICO_CPO_SDR_STATUS_Solution | CALICO_CPO_SDR_STATUS_Augmentation)) == 0) {
+                    ip->snr_dbhz = 0;
+                } else {
+                    ip->snr_dbhz = sdr.snr / 100; /* Guessing. */
+                }
+                ip->phantom = ((sdr.status & (CALICO_CPO_SDR_STATUS_Ephemeris | CALICO_CPO_SDR_STATUS_Augmentation)) == 0);
+                ip->untracked = ((sdr.status & (CALICO_CPO_SDR_STATUS_Correction | CALICO_CPO_SDR_STATUS_Augmentation)) == 0);
+                ip->unused = ((sdr.status & (CALICO_CPO_SDR_STATUS_Solution | CALICO_CPO_SDR_STATUS_Augmentation)) == 0);
                 sp->channels = vi;
                 sp->visible = vi;
                 vp->signals = 1;

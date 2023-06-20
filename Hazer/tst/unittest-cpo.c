@@ -85,6 +85,118 @@ int main(void)
         rc = calico_cpo_satellite_data_record(views, actives, message, size);
         assert(rc == ((1 << HAZER_SYSTEM_GPS) | (1 << HAZER_SYSTEM_SBAS)));
 
+        assert(strcmp(views[HAZER_SYSTEM_GPS].label, "CPO") == 0);
+        assert(views[HAZER_SYSTEM_GPS].signals == 1);
+        assert(views[HAZER_SYSTEM_GPS].signal == HAZER_SIGNAL_ANY);
+        assert(views[HAZER_SYSTEM_GPS].pending == 0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].channels == 11);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].visible == 11);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[0].id == 5);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[0].elv_degrees == 76);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[0].azm_degrees == 84);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[0].snr_dbhz == 34);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[0].phantom == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[0].untracked == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[0].unused == 0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[1].id == 11);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[1].elv_degrees == 31);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[1].azm_degrees == 64);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[1].snr_dbhz == 28);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[1].phantom == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[1].untracked == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[1].unused == 0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[2].id == 12);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[2].elv_degrees == 23);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[2].azm_degrees == 185);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[2].snr_dbhz == 27);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[2].phantom == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[2].untracked == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[2].unused == 0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[3].id == 13);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[3].elv_degrees == 14);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[3].azm_degrees == 128);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[3].snr_dbhz == 18);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[3].phantom == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[3].untracked == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[3].unused == 0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[4].id == 15);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[4].elv_degrees == 14);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[4].azm_degrees == 162);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[4].snr_dbhz == 24);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[4].phantom == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[4].untracked == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[4].unused == 0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[5].id == 20);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[5].elv_degrees == 50);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[5].azm_degrees == 51);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[5].snr_dbhz == 32);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[5].phantom == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[5].untracked == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[5].unused == 0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[6].id == 25);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[6].elv_degrees == 41);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[6].azm_degrees == 224);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[6].snr_dbhz == 37);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[6].phantom == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[6].untracked == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[6].unused == 0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[7].id == 29);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[7].elv_degrees == 65);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[7].azm_degrees == 322);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[7].snr_dbhz == 33);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[7].phantom == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[7].untracked == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[7].unused == 0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[8].id == 18);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[8].elv_degrees == 20);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[8].azm_degrees == 270);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[8].snr_dbhz == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[8].phantom == !0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[8].untracked == !0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[8].unused == !0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[9].id == 23);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[9].elv_degrees == 1);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[9].azm_degrees == 217);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[9].snr_dbhz == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[9].phantom == !0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[9].untracked == !0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[9].unused == !0);
+
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[10].id == 26);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[10].elv_degrees == 9);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[10].azm_degrees == 322);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[10].snr_dbhz == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[10].phantom == !0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[10].untracked == !0);
+        assert(views[HAZER_SYSTEM_GPS].sig[HAZER_SIGNAL_ANY].sat[10].unused == !0);
+
+        assert(strcmp(views[HAZER_SYSTEM_SBAS].label, "CPO") == 0);
+        assert(views[HAZER_SYSTEM_SBAS].signals == 1);
+        assert(views[HAZER_SYSTEM_SBAS].signal == HAZER_SIGNAL_ANY);
+        assert(views[HAZER_SYSTEM_SBAS].pending == 0);
+
+        assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].channels == 1);
+        assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].visible == 1);
+
+        assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].sat[0].id == 46);
+        assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].sat[0].elv_degrees == 37);
+        assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].sat[0].azm_degrees == 214);
+        assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].sat[0].snr_dbhz == 38);
+        assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].sat[0].phantom == 0);
+        assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].sat[0].untracked == 0);
+        assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].sat[0].unused == 0);
+
     END;
 
     /**************************************************************************/
