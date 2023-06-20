@@ -85,6 +85,21 @@ int main(void)
         rc = calico_cpo_satellite_data_record(views, actives, message, size);
         assert(rc == ((1 << HAZER_SYSTEM_GPS) | (1 << HAZER_SYSTEM_SBAS)));
 
+/*
+        CPO SDR[0]: svid=5 snr=3400 elev=76 azmth=84 status=0x7
+        CPO SDR[1]: svid=11 snr=2800 elev=31 azmth=64 status=0x7
+        CPO SDR[2]: svid=12 snr=2700 elev=23 azmth=185 status=0x7
+        CPO SDR[3]: svid=13 snr=1800 elev=14 azmth=128 status=0x7
+        CPO SDR[4]: svid=15 snr=2400 elev=14 azmth=162 status=0x7
+        CPO SDR[5]: svid=20 snr=3200 elev=50 azmth=51 status=0x7
+        CPO SDR[6]: svid=25 snr=3700 elev=41 azmth=224 status=0x7
+        CPO SDR[7]: svid=29 snr=3300 elev=65 azmth=322 status=0x7
+        CPO SDR[8]: svid=18 snr=65436 elev=20 azmth=270 status=0x0
+        CPO SDR[9]: svid=23 snr=65436 elev=1 azmth=217 status=0x0
+        CPO SDR[10]: svid=26 snr=65436 elev=9 azmth=322 status=0x0
+        CPO SDR[11]: svid=46 snr=3800 elev=37 azmth=214 status=0x10
+*/
+
         assert(strcmp(views[HAZER_SYSTEM_GPS].label, "CPO") == 0);
         assert(views[HAZER_SYSTEM_GPS].signals == 1);
         assert(views[HAZER_SYSTEM_GPS].signal == HAZER_SIGNAL_ANY);
@@ -197,6 +212,23 @@ int main(void)
         assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].sat[0].untracked == 0);
         assert(views[HAZER_SYSTEM_SBAS].sig[HAZER_SIGNAL_ANY].sat[0].unused == 0);
 
+        assert(strcmp(actives[HAZER_SYSTEM_GPS].label, "CPO") == 0);
+        assert(actives[HAZER_SYSTEM_GPS].id[0] == 5);
+        assert(actives[HAZER_SYSTEM_GPS].id[1] == 11);
+        assert(actives[HAZER_SYSTEM_GPS].id[2] == 12);
+        assert(actives[HAZER_SYSTEM_GPS].id[3] == 13);
+        assert(actives[HAZER_SYSTEM_GPS].id[4] == 15);
+        assert(actives[HAZER_SYSTEM_GPS].id[5] == 20);
+        assert(actives[HAZER_SYSTEM_GPS].id[6] == 25);
+        assert(actives[HAZER_SYSTEM_GPS].id[7] == 29);
+        assert(actives[HAZER_SYSTEM_GPS].pdop == HAZER_GNSS_DOP);
+        assert(actives[HAZER_SYSTEM_GPS].hdop == HAZER_GNSS_DOP);
+        assert(actives[HAZER_SYSTEM_GPS].vdop == HAZER_GNSS_DOP);
+        assert(actives[HAZER_SYSTEM_GPS].tdop == HAZER_GNSS_DOP);
+        assert(actives[HAZER_SYSTEM_GPS].system == HAZER_SYSTEM_GPS);
+        assert(actives[HAZER_SYSTEM_GPS].active == 8);
+        assert(actives[HAZER_SYSTEM_GPS].mode == HAZER_MODE_UNKNOWN);
+
     END;
 
     /**************************************************************************/
@@ -227,6 +259,21 @@ int main(void)
 
         rc = calico_cpo_position_record(&position, message, bytes);
         assert(rc == 0);
+
+/*
+        CPO PVT: qual=2 lat=2387654308557 lon=-6309201592241 alt=1676520 sep=-17996 dmy=1687132782000000000 utc=69508000000000 old=18446744073709551615 tot=1687202290000000000 label="CPO"
+*/
+
+        assert(strcmp(position.label, "CPO") == 0);
+        assert(position.old_nanoseconds == 18446744073709551615ULL);
+        assert(position.tot_nanoseconds == 1687202290000000000ULL);
+        assert(position.utc_nanoseconds == 69508000000000ULL);
+        assert(position.dmy_nanoseconds == 1687132782000000000ULL);
+        assert(position.lat_nanominutes == 2387654308557LL);
+        assert(position.lon_nanominutes == -6309201592241LL);
+        assert(position.alt_millimeters == 1676520ULL);
+        assert(position.sep_millimeters == -17996ULL);
+        assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
 
     END;
 

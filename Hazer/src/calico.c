@@ -805,6 +805,10 @@ int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, ssize_t 
 
         gpp->label = LABEL;
 
+#if 0
+        fprintf(stderr, "CPO PVT: qual=%u lat=%lld lon=%lld alt=%lld sep=%lld dmy=%llu utc=%llu old=%llu tot=%llu label=\"%s\"\n", gpp->quality, (signed long long)(gpp->lat_nanominutes), (signed long long)(gpp->lon_nanominutes), (signed long long)(gpp->alt_millimeters), (signed long long)(gpp->sep_millimeters), (unsigned long long)(gpp->dmy_nanoseconds), (unsigned long long)(gpp->utc_nanoseconds), (unsigned long long)(gpp->old_nanoseconds), (unsigned long long)gpp->tot_nanoseconds, gpp->label);
+#endif
+
         rc = 0;
 
     } while (0);
