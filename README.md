@@ -503,6 +503,7 @@ I have successfully tested Hazer with the following GNSS devices.
 * Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [^9]    
 * Garmin GLO (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21]    
 * Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21] [^22]    
+* Garmin GPS18x PC (?, 4800 8n1, N/A, ttyS, 1Hz) [^28]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
 * GlobalSat BU-353N (Quectel L89?+Prolific, 4800 8N1, v067Bp23a3, ttyUSB, 1Hz) [^25]    
 * GlobalSat BU-353N(10Hz) (Quectel L89?+Prolific, 115200 8N1, v067Bp23a3, ttyUSB, 10Hz) [^25]    
@@ -557,6 +558,7 @@ I have successfully tested Hazer with the following GNSS devices.
 [^25]: Vendor web site and OEM packaging correctly states GPS only.    
 [^26]: Emits GSAs with GLONASS id (2) but only emits GSVs with GPS talker (GP).    
 [^27]: Initially updates at 1Hz until it achieves a fix, than updates at 5Hz.    
+[^28]: In NMEA mode.    
 
 Note that when sending commands to and parsing output from GNSS
 devices, Postel's Law - "Be conservative in what you send, be liberal
@@ -687,8 +689,8 @@ Ubuntu 22.04.2 LTS (Jammy Jellyfish)
 Linux 5.10.110    
 GNU 11.3.0    
 
-Raspberry Pi Zero W    
-Broadcom BCM2835 ARMv6 x1    
+Raspberry Pi Zero 2 W Rev 1.0    
+Broadcom BCM2835 ARMv7 x4    
 Raspbian 11 "Bullseye"    
 Linux 6.1.21    
 GNU 10.2.1    
