@@ -195,7 +195,8 @@ extern tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t c
 
 /**
  * Return the total size of the complete RTCM message as computed by the parser.
- * @param pp points to the context structure.
+ * @param pp points to the context structure. The size includes the terminating
+ * NUL.
  * @return the final size.
  */
 static inline size_t tumbleweed_size(const tumbleweed_context_t * pp)
@@ -312,6 +313,20 @@ extern int tumbleweed_message(const void * buffer, size_t size);
  * This is a preallocated and preinitialized keepalive message.
  */
 extern const uint8_t TUMBLEWEED_KEEPALIVE[6];
+
+/******************************************************************************
+ * PARSING HELPER
+ ******************************************************************************/
+
+/**
+ * Return true of the character at the start of a frame suggests that it is
+ * the beginning of an RTCM message.
+ * @param ch is the character.
+ * @return true if it is likely to be an RTCM message.
+ */
+static inline int tumbleweed_is_rtcm(int ch) {
+    return (ch == TUMBLEWEED_STIMULUS_PREAMBLE);
+}
 
 /******************************************************************************
  * ENDIAN CONVERSION

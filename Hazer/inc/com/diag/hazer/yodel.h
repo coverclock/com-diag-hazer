@@ -213,6 +213,7 @@ extern yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffe
 
 /**
  * Return the total size of the complete UBX message as computed by the parser.
+ * The size includes the terminating NUL.
  * @param pp points to the context structure.
  * @return the final size.
  */
@@ -384,8 +385,18 @@ typedef enum YodelId {
 } yodel_id_t;
 
 /*******************************************************************************
- * PROCESSING HELPERS
+ * PARSING HELPERS
  ******************************************************************************/
+
+/**
+ * Return true of the character at the start of a frame suggests that it is
+ * the beginning of a UBX packet.
+ * @param ch is the character.
+ * @return true if it is likely to be a UBX packet.
+ */
+static inline int yodel_is_ubx(int ch) {
+    return (ch == YODEL_STIMULUS_SYNC_1);
+}
 
 /**
  * Return true if the UBX packet class and identifier matches the specified
@@ -398,9 +409,9 @@ typedef enum YodelId {
  */
 static inline int yodel_is_ubx_class_id(const void * bp, ssize_t length, uint8_t klass, uint8_t id)
 {
-    const uint8_t * hp = (const uint8_t *)bp;
+    const uint8_t * up = (const uint8_t *)bp;
 
-    return ((length > YODEL_UBX_ID) && (hp[YODEL_UBX_CLASS] == klass) && (hp[YODEL_UBX_ID] == id));
+    return ((length > YODEL_UBX_ID) && (up[YODEL_UBX_CLASS] == klass) && (up[YODEL_UBX_ID] == id));
 }
 
 /*******************************************************************************

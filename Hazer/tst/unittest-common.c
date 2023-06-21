@@ -36,27 +36,31 @@ int main(void)
         int ch;
         int ii;
 
+        /*
+         * These functions used to be part of common.
+         */
+
         ii = 0;
         for (ch = 0x00; ch <= 0xff; ++ch) {
-            if ((ch == '$') || (ch == '!')) {
-                assert(common_machine_is_nmea(ch));
+            if (ch == '$') {
+                assert(hazer_is_nmea(ch));
             } else {
-                assert(!common_machine_is_nmea(ch));
+                assert(!hazer_is_nmea(ch));
             }
             if (ch == 0xb5) {
-                assert(common_machine_is_ubx(ch));
+                assert(yodel_is_ubx(ch));
             } else {
-                assert(!common_machine_is_ubx(ch));
+                assert(!yodel_is_ubx(ch));
             }
             if (ch == 0xd3) {
-                assert(common_machine_is_rtcm(ch));
+                assert(tumbleweed_is_rtcm(ch));
             } else {
-                assert(!common_machine_is_rtcm(ch));
+                assert(!tumbleweed_is_rtcm(ch));
             }
             if (ch == 0x10) {
-                assert(common_machine_is_cpo(ch));
+                assert(calico_is_cpo(ch));
             } else {
-                assert(!common_machine_is_cpo(ch));
+                assert(!calico_is_cpo(ch));
             }
             ++ii;
         }

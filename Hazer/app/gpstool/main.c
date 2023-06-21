@@ -1775,28 +1775,28 @@ consume:
 
                     /* Do nothing. */
 
-                } else if (common_machine_is_nmea(ch)) {
+                } else if (hazer_is_nmea(ch)) {
 
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
                     cpo_state = CALICO_STATE_STOP;
 
-                } else if (common_machine_is_ubx(ch)) {
+                } else if (yodel_is_ubx(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
                     cpo_state = CALICO_STATE_STOP;
 
-                } else if (common_machine_is_rtcm(ch)) {
+                } else if (tumbleweed_is_rtcm(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_START;
                     cpo_state = CALICO_STATE_STOP;
 
-                } else if (common_machine_is_cpo(ch)) {
+                } else if (calico_is_cpo(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_STOP;
@@ -2033,7 +2033,7 @@ consume:
 
                 DIMINUTO_LOG_NOTICE("Datagram Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
-            } else if (common_machine_is_nmea(remote_buffer.payload.nmea[0]) && ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0)) {
+            } else if (hazer_is_nmea(remote_buffer.payload.nmea[0]) && ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.nmea;
                 size = remote_size;
@@ -2042,7 +2042,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Datagram NMEA [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (common_machine_is_ubx(remote_buffer.payload.ubx[0]) && ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0)) {
+            } else if (yodel_is_ubx(remote_buffer.payload.ubx[0]) && ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.ubx;
                 size = remote_size;
@@ -2051,7 +2051,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Datagram UBX [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (common_machine_is_rtcm(remote_buffer.payload.rtcm[0]) && ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0)) {
+            } else if (tumbleweed_is_rtcm(remote_buffer.payload.rtcm[0]) && ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.rtcm;
                 size = remote_size;
@@ -2060,7 +2060,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Datagram RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (common_machine_is_cpo(remote_buffer.payload.cpo[0]) && ((remote_length = calico_validate(remote_buffer.payload.cpo, remote_size)) > 0)) {
+            } else if (calico_is_cpo(remote_buffer.payload.cpo[0]) && ((remote_length = calico_validate(remote_buffer.payload.cpo, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.cpo;
                 size = remote_size;
@@ -2529,7 +2529,7 @@ consume:
 
             } else if ((talker = hazer_parse_talker(vector[0])) >= HAZER_TALKER_TOTAL) {
 
-                if (hazer_is_nmea_name(vector, count, "GSA") || hazer_is_nmea_name(vector, count, "GSV")) {
+                if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSA) || hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSV)) {
                     DIMINUTO_LOG_INFORMATION("Received NMEA Talker Other \"%c%c\"", vector[0][1], vector[0][2]);
                 }
                 continue;
@@ -2545,7 +2545,7 @@ consume:
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 
-                if (hazer_is_nmea_name(vector, count, "GSA") || hazer_is_nmea_name(vector, count, "GSV")) {
+                if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSA) || hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSV)) {
                     DIMINUTO_LOG_INFORMATION("Received NMEA System Other \"%c%c\"\n", vector[0][1], vector[0][2]);
                 }
                 continue;
@@ -2570,7 +2570,7 @@ consume:
              * we got this sentence via a UDP datagram).
              */
 
-            if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GGA)) {
+            if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GGA)) {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GGA\n");
 
@@ -2592,7 +2592,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_RMC)) {
+            } else if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_RMC)) {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA RMC\n");
 
@@ -2614,7 +2614,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GLL)) {
+            } else if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GLL)) {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GLL\n");
 
@@ -2636,7 +2636,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_VTG)) {
+            } else if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_VTG)) {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA VTG\n");
 
@@ -2655,7 +2655,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GSA)) {
+            } else if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSA)) {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GSA\n");
 
@@ -2699,7 +2699,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_GSV)) {
+            } else if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSV)) {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA GSV\n");
 
@@ -2720,7 +2720,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_ZDA)) {
+            } else if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_ZDA)) {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA ZDA\n");
 
@@ -2746,7 +2746,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_nmea_name(vector, count, HAZER_NMEA_SENTENCE_TXT)) {
+            } else if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_TXT)) {
 
                 DIMINUTO_LOG_DEBUG("Parse NMEA TXT\n");
 
@@ -2764,7 +2764,7 @@ consume:
 
                 DIMINUTO_LOG_INFORMATION("Received NMEA Other \"%.*s\"", (int)(length - 2) /* Exclude CR and LF. */, buffer);
 
-            } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
+            } else if (hazer_is_pubx_id(buffer, length, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
 
                 DIMINUTO_LOG_DEBUG("Parse PUBX POSITION\n");
 
@@ -2787,7 +2787,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS)) {
+            } else if (hazer_is_pubx_id(buffer, length, HAZER_PROPRIETARY_SENTENCE_PUBX_SVSTATUS)) {
 
                 DIMINUTO_LOG_DEBUG("Parse PUBX SVSTATUS\n");
 
@@ -2823,7 +2823,7 @@ consume:
 
                 }
 
-            } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME)) {
+            } else if (hazer_is_pubx_id(buffer, length, HAZER_PROPRIETARY_SENTENCE_PUBX_TIME)) {
 
                 DIMINUTO_LOG_DEBUG("Parse PUBX TIME\n");
 

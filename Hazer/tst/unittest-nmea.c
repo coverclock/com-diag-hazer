@@ -28,11 +28,31 @@ int main(void)
     }
 
     {
+        static const char DATA[] = "$GNRMC,135628.00,A,3947.65337,N,10509.20223,W,0.010,,070818,,,M*7D\r\n";
+
+        assert(DATA[HAZER_NMEA_SYNC     + 0] == '$');
+
+        assert(DATA[HAZER_NMEA_TALKER   + 0] == 'G');
+        assert(DATA[HAZER_NMEA_TALKER   + 1] == 'N');
+
+        assert(DATA[HAZER_NMEA_NAME     + 0] == 'R');
+        assert(DATA[HAZER_NMEA_NAME     + 1] == 'M');
+        assert(DATA[HAZER_NMEA_NAME     + 2] == 'C');
+
+        assert(DATA[HAZER_NMEA_NAMEEND  + 0] == ',');
+
+        assert(hazer_is_nmea(DATA[0]));
+
+        assert(hazer_is_nmea_name(DATA, sizeof(DATA), "RMC"));
+    }
+
+    {
         static const char * DATA = "$GNGGA,135627.00,3947.65338,N,10509.20216,W,2,12,0.67,1708.6,M,-21.5,M,,0000*4E\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -57,20 +77,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "GGA");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 16);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "GGA");
-        assert(rc == !0);
 
         rc = hazer_parse_gga(&position, vector, count);
         assert(rc == 0);
@@ -102,6 +125,7 @@ int main(void)
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -126,20 +150,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "GGA");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 16);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "GGA");
-        assert(rc == !0);
 
         errno = ~0;
         rc = hazer_parse_gga(&position, vector, count);
@@ -154,6 +181,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -178,20 +206,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "RMC");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 14);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "RMC");
-        assert(rc == !0);
 
         rc = hazer_parse_rmc(&position, vector, count);
         /* RMC A mode with M status is okay. */
@@ -222,6 +253,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -246,20 +278,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "RMC");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 14);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "RMC");
-        assert(rc == !0);
 
         rc = hazer_parse_rmc(&position, vector, count);
         /* RMC V indicator with A or D mode is now okay. */
@@ -290,6 +325,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -314,20 +350,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "RMC");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 15); /* Because of the extra safety field. */
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "RMC");
-        assert(rc == !0);
 
         rc = hazer_parse_rmc(&position, vector, count);
         /* RMC V indicator with A or D mode is now okay; also SAFE. */
@@ -359,6 +398,7 @@ int main(void)
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -383,20 +423,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "RMC");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 14);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "RMC");
-        assert(rc == !0);
 
         errno = ~0;
         rc = hazer_parse_rmc(&position, vector, count);
@@ -412,6 +455,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -436,20 +480,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "GLL");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 9);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "GLL");
-        assert(rc == !0);
 
         rc = hazer_parse_gll(&position, vector, count);
         assert(rc == 0);
@@ -477,6 +524,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -501,20 +549,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "VTG");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 11);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "VTG");
-        assert(rc == !0);
 
         rc = hazer_parse_vtg(&position, vector, count);
         assert(rc == 0);
@@ -543,6 +594,7 @@ int main(void)
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -567,20 +619,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "VTG");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 11);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "VTG");
-        assert(rc == !0);
 
         errno = ~0;
         rc = hazer_parse_vtg(&position, vector, count);
@@ -595,6 +650,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -617,20 +673,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "GSA");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 19);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "GSA");
-        assert(rc == !0);
 
         rc = hazer_parse_gsa(&active, vector, count);
         assert(rc == 0);
@@ -662,6 +721,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_active_t active = HAZER_ACTIVE_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -684,20 +744,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "GSA");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 20);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "GSA");
-        assert(rc == !0);
 
         rc = hazer_parse_gsa(&active, vector, count);
         assert(rc == 0);
@@ -734,6 +797,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_views_t views = HAZER_VIEWS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -759,20 +823,23 @@ int main(void)
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
 
+            rc = hazer_is_nmea(buffer[0]);
+            assert(rc == !0);
+
+            rc = hazer_is_nmea_name(buffer, length, "GSV");
+            assert(rc == !0);
+
             count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
             assert(((ii == 3) && (count == 17)) || (count == 21));
 
-            length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-            assert(length == (strlen((const char *)temporary) + 1));
-            temporary[length - 1] = msn;
-            temporary[length] = lsn;
-            temporary[length + 1] = '\r';
-            temporary[length + 2] = '\n';
-            temporary[length + 3] = '\0';
+            size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+            assert(size == (strlen((const char *)temporary) + 1));
+            temporary[size - 1] = msn;
+            temporary[size] = lsn;
+            temporary[size + 1] = '\r';
+            temporary[size + 2] = '\n';
+            temporary[size + 3] = '\0';
             assert(strcmp(DATA[ii], (const char *)temporary) == 0);
-
-            rc = hazer_is_nmea_name(vector, count, "GSV");
-            assert(rc == !0);
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(rc == HAZER_SYSTEM_GNSS);
@@ -883,6 +950,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_views_t views = HAZER_VIEWS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -909,20 +977,23 @@ int main(void)
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
 
+            rc = hazer_is_nmea(buffer[0]);
+            assert(rc == !0);
+
+            rc = hazer_is_nmea_name(buffer, length, "GSV");
+            assert(rc == !0);
+
             count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
             assert(((ii == 3) && (count == 18)) || (count == 22));
 
-            length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-            assert(length == (strlen((const char *)temporary) + 1));
-            temporary[length - 1] = msn;
-            temporary[length] = lsn;
-            temporary[length + 1] = '\r';
-            temporary[length + 2] = '\n';
-            temporary[length + 3] = '\0';
+            size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+            assert(size == (strlen((const char *)temporary) + 1));
+            temporary[size - 1] = msn;
+            temporary[size] = lsn;
+            temporary[size + 1] = '\r';
+            temporary[size + 2] = '\n';
+            temporary[size + 3] = '\0';
             assert(strcmp(DATA[ii], (const char *)temporary) == 0);
-
-            rc = hazer_is_nmea_name(vector, count, "GSV");
-            assert(rc == !0);
 
             jj = hazer_parse_gsv(&view, vector, count);
             assert(jj == (ii == 0) ? HAZER_SYSTEM_GPS : (ii == 1) ? HAZER_SYSTEM_GLONASS : (ii == 2) ? HAZER_SYSTEM_GNSS : HAZER_SYSTEM_GALILEO);
@@ -1042,6 +1113,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_views_t views = HAZER_VIEWS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -1067,20 +1139,23 @@ int main(void)
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
 
+            rc = hazer_is_nmea(buffer[0]);
+            assert(rc == !0);
+
+            rc = hazer_is_nmea_name(buffer, length, "GSV");
+            assert(rc == !0);
+
             count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
             assert(((ii == 3) && (count == 17)) || (count == 21));
 
-            length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-            assert(length == (strlen((const char *)temporary) + 1));
-            temporary[length - 1] = msn;
-            temporary[length] = lsn;
-            temporary[length + 1] = '\r';
-            temporary[length + 2] = '\n';
-            temporary[length + 3] = '\0';
+            size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+            assert(size == (strlen((const char *)temporary) + 1));
+            temporary[size - 1] = msn;
+            temporary[size] = lsn;
+            temporary[size + 1] = '\r';
+            temporary[size + 2] = '\n';
+            temporary[size + 3] = '\0';
             assert(strcmp(DATA[ii], (const char *)temporary) == 0);
-
-            rc = hazer_is_nmea_name(vector, count, "GSV");
-            assert(rc == !0);
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(rc == HAZER_SYSTEM_GNSS);
@@ -1182,6 +1257,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_views_t views = HAZER_VIEWS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -1207,20 +1283,23 @@ int main(void)
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
 
+            rc = hazer_is_nmea(buffer[0]);
+            assert(rc == !0);
+
+            rc = hazer_is_nmea_name(buffer, length, "GSV");
+            assert(rc == !0);
+
             count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
             assert(((ii == 3) && (count == 18)) || (count == 22));
 
-            length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-            assert(length == (strlen((const char *)temporary) + 1));
-            temporary[length - 1] = msn;
-            temporary[length] = lsn;
-            temporary[length + 1] = '\r';
-            temporary[length + 2] = '\n';
-            temporary[length + 3] = '\0';
+            size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+            assert(size == (strlen((const char *)temporary) + 1));
+            temporary[size - 1] = msn;
+            temporary[size] = lsn;
+            temporary[size + 1] = '\r';
+            temporary[size + 2] = '\n';
+            temporary[size + 3] = '\0';
             assert(strcmp(DATA[ii], (const char *)temporary) == 0);
-
-            rc = hazer_is_nmea_name(vector, count, "GSV");
-            assert(rc == !0);
 
             rc = hazer_parse_gsv(&view, vector, count);
             assert(rc == HAZER_SYSTEM_GPS);
@@ -1316,6 +1395,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -1340,20 +1420,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "ZDA");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 8);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "ZDA");
-        assert(rc == !0);
 
         rc = hazer_parse_zda(&position, vector, count);
         assert(rc == 0);
@@ -1379,6 +1462,7 @@ int main(void)
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -1403,20 +1487,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "ZDA");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 8);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "ZDA");
-        assert(rc == !0);
 
         rc = hazer_parse_zda(&position, vector, count);
         assert(rc == 0);
@@ -1436,12 +1523,13 @@ int main(void)
     }
 
     {
-        /* NMEA 0183 4.10 p. 132 Note 1: The Cook Islands */
+        /* NMEA 0183 4.10 p. 132 Note 1: The Cook Islands (I've been there!) */
         static const char * DATA = "$GNZDA,171305.00,12,05,2023,10,30*7E\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -1466,20 +1554,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "ZDA");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 8);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_nmea_name(vector, count, "ZDA");
-        assert(rc == !0);
 
         rc = hazer_parse_zda(&position, vector, count);
         assert(rc == 0);

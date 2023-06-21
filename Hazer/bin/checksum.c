@@ -25,6 +25,7 @@
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/tumbleweed.h"
+#include "com/diag/hazer/calico.h"
 #include "com/diag/diminuto/diminuto_escape.h"
 #include "com/diag/diminuto/diminuto_phex.h"
 #include "com/diag/diminuto/diminuto_log.h"
@@ -236,12 +237,14 @@ int main(int argc, char * argv[])
             DIMINUTO_LOG_WARNING("collapsed: empty?");
             continue;
         }
-        if (buffer[0] == HAZER_STIMULUS_START) {
+        if (hazer_is_nmea(buffer[0])) {
             rc = print_sentence(stdout, (char *)buffer, size - 1);
-        } else if ((buffer[0] == YODEL_STIMULUS_SYNC_1) && (buffer[1] == YODEL_STIMULUS_SYNC_2)) {
+        } else if (yodel_is_ubx(buffer[0])) {
             rc = print_packet(stdout, buffer, size - 1);
-        } else if (buffer[0] == TUMBLEWEED_STIMULUS_PREAMBLE) {
+        } else if (tumbleweed_is_rtcm(buffer[0])) {
             rc = print_message(stdout, buffer, size - 1);
+        } else if (calico_is_cpo(buffer[0])) {
+            DIMINUTO_LOG_ERROR("collapsed: unsupported!");
         } else {
             rc = print_buffer(stdout, buffer, size - 1, !0);
         }

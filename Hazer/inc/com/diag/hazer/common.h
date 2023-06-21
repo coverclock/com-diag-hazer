@@ -64,46 +64,6 @@ static inline int64_t common_abs64(int64_t x)
 #endif
 
 /**
- * Return true if the character is the first of an NMEA sentence.
- * @param ch is the character.
- * @return true if NMEA, false otherwise.
- */
-static inline int common_machine_is_nmea(int ch)
-{
-    return ((ch == HAZER_STIMULUS_START) || (ch == HAZER_STIMULUS_ENCAPSULATION));
-}
-
-/**
- * Return true if the character is the first of a UBX packet.
- * @param ch is the character.
- * @return true if UBX, false otherwise.
- */
-static inline int common_machine_is_ubx(int ch)
-{
-    return (ch == YODEL_STIMULUS_SYNC_1);
-}
-
-/**
- * Return true if the character is the first of an RTCM message.
- * @param ch is the character.
- * @return true if RTCM, false otherwise.
- */
-static inline int common_machine_is_rtcm(int ch)
-{
-    return (ch == TUMBLEWEED_STIMULUS_PREAMBLE);
-}
-
-/**
- * Return true if the character is the first of a CPO message.
- * @param ch is the character.
- * @return true if CPO, false otherwise.
- */
-static inline int common_machine_is_cpo(int ch)
-{
-    return (ch == CALICO_STIMULUS_DLE);
-}
-
-/**
  * Return true if NMEA, UBX, RTCM, and CPO state machines are stalled.
  * @param nmea_state is the state of the NMEA state machine.
  * @param ubx_state is the state of the UBX state machine.

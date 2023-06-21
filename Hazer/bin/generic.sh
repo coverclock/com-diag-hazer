@@ -4,10 +4,10 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 
-# 1. Consume NMEA sentences from the specified serial device
+# 1. Consume input from the specified serial device.
 # 2. Report on standard output.
 
-# usage: hazer [ DEVICE [ RATE ] ]
+# usage: generic [ DEVICE [ RATE ] ]
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}

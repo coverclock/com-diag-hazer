@@ -221,6 +221,7 @@ extern calico_state_t calico_machine(calico_state_t state, uint8_t ch, void * bu
 
 /**
  * Return the total size of the complete CPO message as computed by the parser.
+ * The size includes the terminating NUL.
  * @param pp points to the context structure.
  * @return the final size.
  */
@@ -283,8 +284,18 @@ extern ssize_t calico_length(const void * buffer, size_t size);
 extern ssize_t calico_validate(const void * buffer, size_t size);
 
 /******************************************************************************
- * HELPERS
+ * PARSING HELPERS
  ******************************************************************************/
+
+/**
+ * Return true if the character at the start of a frame suggests that it is
+ * the beginning of a CPO packet.
+ * @param ch is the character.
+ * @return true if it is likely to be a CPO packet.
+ */
+static inline int calico_is_cpo(int ch) {
+    return (ch == CALICO_STIMULUS_DLE);
+}
 
 /**
  * Return true if the CPO ID and length match the specified values.

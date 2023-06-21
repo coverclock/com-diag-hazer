@@ -24,12 +24,35 @@ int main(void)
     hazer_debug(stderr);
 
     {
+        static const char DATA[] = "$PUBX,03,19,5,-,051,34,,000,10,U,240,16,10,000,13,-,072,38,,000,15,e,113,56,20,000,16,-,309,15,,000,18,U,321,61,30,000,20,e,061,04,40,000,23,-,248,48,,000,25,e,193,-2,50,000,26,-,276,17,,000,29,-,167,58,,000,65,-,047,68,,000,66,U,201,43,60,000,72,-,033,21,,000,79,-,284,02,,000,80,-,335,03,,000,81,-,326,35,,000,87,e,115,37,70,000,88,U,056,72,80,000*1E\r\n";
+
+        assert(DATA[HAZER_PUBX_SYNC     + 0] == '$');
+
+        assert(DATA[HAZER_PUBX_NAME     + 0] == 'P');
+        assert(DATA[HAZER_PUBX_NAME     + 1] == 'U');
+        assert(DATA[HAZER_PUBX_NAME     + 2] == 'B');
+        assert(DATA[HAZER_PUBX_NAME     + 3] == 'X');
+
+        assert(DATA[HAZER_PUBX_NAMEEND  + 0] == ',');
+
+        assert(DATA[HAZER_PUBX_ID       + 0] == '0');
+        assert(DATA[HAZER_PUBX_ID       + 1] == '3');
+
+        assert(DATA[HAZER_PUBX_IDEND    + 0] == ',');
+
+        assert(hazer_is_nmea(DATA[0]));
+
+        assert(hazer_is_pubx_id(DATA, sizeof(DATA), "03"));
+    }
+
+    {
         static const char * DATA = "$PUBX,00,180730.00,3948.04788,N,10510.62820,W,1703.346,G3,6528077,4616048,1.234,290.12,2.345,,1.23,4.56,7.89,4,0,0*4C\r\n";
         hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         hazer_actives_t actives = HAZER_ACTIVES_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -54,20 +77,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_pubx_id(buffer, length, "00");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 22);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_pubx_id(vector, count, "00");
-        assert(rc == !0);
 
         rc = hazer_parse_pubx_position(&position, &active, vector, count);
         assert(rc == 0);
@@ -98,6 +124,7 @@ int main(void)
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         hazer_actives_t actives = HAZER_ACTIVES_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -122,20 +149,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_pubx_id(buffer, length, "00");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 22);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_pubx_id(vector, count, "00");
-        assert(rc == !0);
 
         rc = hazer_parse_pubx_position(&position, &active, vector, count);
         assert(rc < 0);
@@ -152,6 +182,7 @@ int main(void)
         static const hazer_position_t POSITION = HAZER_POSITION_INITIALIZER;
         hazer_actives_t actives = HAZER_ACTIVES_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -176,20 +207,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_pubx_id(buffer, length, "00");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 22);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_pubx_id(vector, count, "00");
-        assert(rc == !0);
 
         rc = hazer_parse_pubx_position(&position, &active, vector, count);
         assert(rc < 0);
@@ -205,6 +239,7 @@ int main(void)
         hazer_views_t views = HAZER_VIEWS_INITIALIZER;
         hazer_actives_t actives = HAZER_ACTIVES_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -227,20 +262,23 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_pubx_id(buffer, length, "03");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 118);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_pubx_id(vector, count, "03");
-        assert(rc == !0);
 
         rc = hazer_parse_pubx_svstatus(views, actives, vector, count);
         assert(rc != 0);
@@ -429,6 +467,7 @@ $PUBX,03,19,
         hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
         hazer_positions_t positions = HAZER_POSITIONS_INITIALIZER;
         ssize_t length = -1;
+        ssize_t size = -1;
         size_t count = 0;
         int rc = -1;
         char * pointer = (char *)0;
@@ -453,20 +492,23 @@ $PUBX,03,19,
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_pubx_id(buffer, length, "04");
+        assert(rc == !0);
+
         count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
         assert(count == 11);
 
-        length = hazer_serialize(temporary, sizeof(temporary), vector, count);
-        assert(length == (strlen((const char *)temporary) + 1));
-        temporary[length - 1] = msn;
-        temporary[length] = lsn;
-        temporary[length + 1] = '\r';
-        temporary[length + 2] = '\n';
-        temporary[length + 3] = '\0';
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
         assert(strcmp(DATA, (const char *)temporary) == 0);
-
-        rc = hazer_is_pubx_id(vector, count, "04");
-        assert(rc == !0);
 
         rc = hazer_parse_pubx_time(&position, vector, count);
         assert(rc == 0);

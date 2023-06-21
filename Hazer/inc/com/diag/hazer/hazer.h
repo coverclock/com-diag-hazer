@@ -182,9 +182,15 @@ enum HazerGnssConstants {
 enum HazerNmeaConstants {
     HAZER_NMEA_SHORTEST     = sizeof("$GGAXX\r\n") - 1,
     HAZER_NMEA_LONGEST      = 512, /* Longer than spec. */
-    HAZER_NMEA_TALKER       = sizeof("GP") - 1,
-    HAZER_NMEA_MESSAGE      = sizeof("GGAXX") - 1, /* Adjusted. */
-    HAZER_NMEA_ID           = sizeof("$GPGGAXX") - 1, /* Adjusted. */
+    HAZER_NMEA_SYNC         = sizeof("") - 1,
+    HAZER_NMEA_TALKER       = sizeof("$") - 1,
+    HAZER_NMEA_NAME         = sizeof("$TT") - 1,
+    HAZER_NMEA_NAMEEND      = sizeof("$TTMMM") - 1,
+    HAZER_PUBX_SYNC         = sizeof("") - 1,
+    HAZER_PUBX_NAME         = sizeof("$") - 1,
+    HAZER_PUBX_NAMEEND      = sizeof("$PUBX") - 1,
+    HAZER_PUBX_ID           = sizeof("$PUBX,") - 1,
+    HAZER_PUBX_IDEND        = sizeof("$PUBX,NN") - 1,
     HAZER_NMEA_UNSET        = '?',
 };
 
@@ -722,7 +728,7 @@ extern hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffe
 
 /**
  * Return the total size of the complete NMEA sentence as computed by the
- * parser.
+ * parser. The size includes the terminating NUL.
  * @param pp points to the context structure.
  * @return the final size.
  */
@@ -1614,29 +1620,53 @@ extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], 
  ******************************************************************************/
 
 /**
- * Return true if the NMEA sentence name following the talker matches
- * the specified three letter name.
- * @param vector is the Hazer parsed vector (a 2D array).
- * @param count is the number of slots in the vector.
- * @param name is the nul-terminated three letter name.
- * @return true if the name matches the field, false otherwise.
+ * Return true of the character at the start of a frame suggests that it is
+ * the beginning of an NMEA sentence.
+ * @param ch is the character.
+ * @return true if it is likely to be an NMEA sentence.
  */
-static inline int hazer_is_nmea_name(char * vector[], ssize_t count, const char name[4])
-{
-    return ((count >= 1) && (strlen(vector[0]) == 6) && (vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][3]), name) == 0));
+static inline int hazer_is_nmea(int ch) {
+    return (ch == HAZER_STIMULUS_START);
 }
 
 /**
- * Return true if the second field in the vector matches the specified
- * PUBX message id.
- * @param vector is the Hazer parsed vector (a 2D array).
- * @param count is the number of slots in the vector.
+ * Return true if the data in the buffer matches the NMEA sentence name.
+ * @param bp points to the buffer.
+ * @param length is the number of octets in the buffer.
+ * @param name is the nul-terminated three letter name.
+ * @return true if the name matches the field, false otherwise.
+ */
+static inline int hazer_is_nmea_name(const void * bp, ssize_t length, const char name[4])
+{
+    const char * np = (const char *)bp;
+
+    return (
+        (length > HAZER_NMEA_NAMEEND) &&
+        (np[HAZER_NMEA_SYNC] == HAZER_STIMULUS_START) &&
+        (strncmp(&(np[HAZER_NMEA_NAME]), name, 3) == 0) &&
+        (np[HAZER_NMEA_NAMEEND] == HAZER_STIMULUS_DELIMITER)
+    );
+}
+
+/**
+ * Return true if the  data in the buiffer matches the PUBX message ID.
+ * @param bp points to the buffer.
+ * @param length is the number of octets in the buffer.
  * @param id is the nul-terminated two letter message identifier.
  * @return true if the id matches the field.
  */
-static inline int hazer_is_pubx_id(char * vector[], ssize_t count, const char id[3])
+static inline int hazer_is_pubx_id(const void * bp, ssize_t length, const char id[3])
 {
-    return ((count >= 2) && (strlen(vector[0]) == 5) && (vector[0][0] == HAZER_STIMULUS_START) && (strcmp(&(vector[0][1]), "PUBX") == 0) && (strlen(vector[1]) == 2) && (strcmp(vector[1], id) == 0));
+    const char * pp = (const char *)bp;
+
+    return (
+        (length > HAZER_PUBX_IDEND) &&
+        (pp[HAZER_PUBX_SYNC] == HAZER_STIMULUS_START) &&
+        (strncmp(&(pp[HAZER_PUBX_NAME]), HAZER_PROPRIETARY_SENTENCE_PUBX, sizeof(HAZER_PROPRIETARY_SENTENCE_PUBX) - 1) == 0) &&
+        (pp[HAZER_PUBX_NAMEEND] == HAZER_STIMULUS_DELIMITER) &&
+        (strncmp(&(pp[HAZER_PUBX_ID]), id, 2) == 0) &&
+        (pp[HAZER_PUBX_IDEND] == HAZER_STIMULUS_DELIMITER)
+    );
 }
 
 /**
