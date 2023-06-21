@@ -363,6 +363,12 @@ typedef enum HazerSystem {
 extern const char * HAZER_SYSTEM_NAME[/* hazer_system_t */];
 
 /**
+ * If the device doesn't report what signal band it's using, this is the
+ * signal index we use for "any" signal.
+ */
+static const int HAZER_SIGNAL_ANY = 0;
+
+/**
  * @def HAZER_SIGNAL_NAME_INITIALIZER
  * Intialize a two-dimensional array that for each Hazer system maps
  * a signal number (as it's called in the spec) to a frequency band name.

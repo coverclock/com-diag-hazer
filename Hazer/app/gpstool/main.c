@@ -170,7 +170,7 @@ int main(int argc, char * argv[])
     const char * source = (const char *)0;
     const char * sink = (const char *)0;
     const char * strobe = (const char *)0;
-    const char * logging = (const char *)0;
+    const char * listing = (const char *)0;
     const char * headless = (const char *)0;
     const char * arp = (const char *)0;
     const char * tracing = (const char *)0;
@@ -213,7 +213,7 @@ int main(int argc, char * argv[])
     FILE * out_fp = stdout;
     FILE * dev_fp = (FILE *)0;
     FILE * sink_fp = (FILE *)0;
-    FILE * log_fp = (FILE *)0;
+    FILE * list_fp = (FILE *)0;
     FILE * strobe_fp = (FILE *)0;
     FILE * pps_fp = (FILE *)0;
     FILE * trace_fp = (FILE *)0;
@@ -301,6 +301,12 @@ int main(int argc, char * argv[])
     tumbleweed_state_t rtcm_state = TUMBLEWEED_STATE_STOP;
     tumbleweed_context_t rtcm_context = { 0, };
     datagram_buffer_t rtcm_buffer = DATAGRAM_BUFFER_INITIALIZER;
+    /*
+     * CPO parser state variables.
+     */
+    calico_state_t cpo_state = CALICO_STATE_STOP;
+    calico_context_t cpo_context = { 0, };
+    datagram_buffer_t cpo_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * NMEA processing variables.
      */
@@ -547,7 +553,7 @@ int main(int argc, char * argv[])
             break;
         case 'L':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
-            logging = optarg;
+            listing = optarg;
             break;
         case 'M':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
@@ -919,22 +925,22 @@ int main(int argc, char * argv[])
     }
 
     /*
-     * Are we logging every valid sentence or packet to an output file?
+     * Are we listing every valid sentence or packet to an output file?
      */
 
-    if (logging == (const char *)0) {
+    if (listing == (const char *)0) {
         /* Do nothing. */
-    } else if (strcmp(logging, "-") == 0) {
-        log_fp = stderr;
-    } else if ((log_fp = fopen(logging, "ab")) != (FILE *)0) {
+    } else if (strcmp(listing, "-") == 0) {
+        list_fp = stderr;
+    } else if ((list_fp = fopen(listing, "ab")) != (FILE *)0) {
         /* Do nothing. */
     } else {
-        diminuto_perror(logging);
-        diminuto_contract(log_fp != (FILE *)0);
+        diminuto_perror(listing);
+        diminuto_contract(list_fp != (FILE *)0);
     }
 
-    if (log_fp != (FILE *)0) {
-        DIMINUTO_LOG_INFORMATION("Log (%d) \"%s\"\n", fileno(log_fp), logging);
+    if (list_fp != (FILE *)0) {
+        DIMINUTO_LOG_INFORMATION("Log (%d) \"%s\"\n", fileno(list_fp), listing);
     }
 
     /*
@@ -1471,10 +1477,14 @@ int main(int argc, char * argv[])
     rc = tumbleweed_initialize();
     diminuto_contract(rc == 0);
 
+    rc = calico_initialize();
+    diminuto_contract(rc == 0);
+
     if (debug) {
         hazer_debug(stderr);
         yodel_debug(stderr);
         tumbleweed_debug(stderr);
+        calico_debug(stderr);
     }
 
     /*
@@ -1535,6 +1545,7 @@ int main(int argc, char * argv[])
     nmea_state = HAZER_STATE_START;
     ubx_state = YODEL_STATE_START;
     rtcm_state = TUMBLEWEED_STATE_START;
+    cpo_state = CALICO_STATE_START;
 
     sync = 0;
     frame = 0;
@@ -1753,7 +1764,7 @@ consume:
 
                     io_waiting += 1;
                     if ((io_waiting % DATAGRAM_SIZE) == 0) {
-                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%zu] 0x%02x %c %c %c\n", io_waiting, ch, nmea_state, ubx_state, rtcm_state);
+                        DIMINUTO_LOG_INFORMATION("Sync Waiting [%zu] 0x%02x %c %c %c %c\n", io_waiting, ch, nmea_state, ubx_state, rtcm_state, cpo_state);
                     }
 
                     if (verbose) {
@@ -1769,18 +1780,28 @@ consume:
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
+                    cpo_state = CALICO_STATE_STOP;
 
                 } else if (common_machine_is_ubx(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
+                    cpo_state = CALICO_STATE_STOP;
 
                 } else if (common_machine_is_rtcm(ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_START;
+                    cpo_state = CALICO_STATE_STOP;
+
+                } else if (common_machine_is_cpo(ch)) {
+
+                    nmea_state = HAZER_STATE_STOP;
+                    ubx_state = YODEL_STATE_STOP;
+                    rtcm_state = TUMBLEWEED_STATE_STOP;
+                    cpo_state = CALICO_STATE_START;
 
                 } else {
 
@@ -1812,6 +1833,7 @@ consume:
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_START;
+                    cpo_state = CALICO_STATE_START;
 
                 }
 
@@ -1902,6 +1924,34 @@ consume:
                     break;
                 }
 
+                cpo_state = calico_machine(cpo_state, ch, cpo_buffer.payload.cpo, sizeof(cpo_buffer.payload.cpo), &cpo_context);
+                if (cpo_state == CALICO_STATE_END) {
+
+                    buffer = cpo_buffer.payload.cpo;
+                    size = calico_size(&cpo_context);
+                    length = size - 1;
+                    format = CPO;
+
+                    if (!sync) {
+
+                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x CPO\n", io_total, ch);
+
+                        sync = !0;
+                        io_waiting = 0;
+
+                        if (verbose) {
+                            sync_in(length);
+                        }
+
+                    }
+
+                    frame = !0;
+
+                    DIMINUTO_LOG_DEBUG("Input CPO [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
+
+                    break;
+                }
+
                 /*
                  * If all the state machines have stopped, or at least one has
                  * stopped while the rest are still in their start state, then
@@ -1911,7 +1961,7 @@ consume:
                  * checksum check.
                  */
 
-                if (common_machine_is_stalled(nmea_state, ubx_state, rtcm_state)) {
+                if (common_machine_is_stalled(nmea_state, ubx_state, rtcm_state, cpo_state)) {
 
                     if (sync) {
 
@@ -2009,6 +2059,15 @@ consume:
                 format = RTCM;
 
                 DIMINUTO_LOG_DEBUG("Datagram RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
+
+            } else if (common_machine_is_cpo(remote_buffer.payload.cpo[0]) && ((remote_length = calico_validate(remote_buffer.payload.cpo, remote_size)) > 0)) {
+
+                buffer = remote_buffer.payload.cpo;
+                size = remote_size;
+                length = remote_length;
+                format = CPO;
+
+                DIMINUTO_LOG_DEBUG("Datagram CPO [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
             } else {
 
@@ -2356,8 +2415,8 @@ consume:
          ** LOG
          **/
 
-        if (log_fp != (FILE *)0) {
-            print_buffer(log_fp, buffer, length, UNLIMITED);
+        if (list_fp != (FILE *)0) {
+            print_buffer(list_fp, buffer, length, UNLIMITED);
         }
 
         if (verbose) {
@@ -2703,7 +2762,7 @@ consume:
 
             } else if (talker != HAZER_TALKER_PUBX) {
 
-                DIMINUTO_LOG_INFORMATION("Received NMEA Other \"%s\"\n", vector[0]);
+                DIMINUTO_LOG_INFORMATION("Received NMEA Other \"%.*s\"", (int)(length - 2) /* Exclude CR and LF. */, buffer);
 
             } else if (hazer_is_pubx_id(vector, count, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
 
@@ -3049,6 +3108,113 @@ consume:
 
             break;
 
+        case CPO:
+
+            /*
+             * CPO PACKETS
+             */
+
+            if (calico_is_cpo_id_length(buffer, length, CALICO_CPO_PVT_Id, CALICO_CPO_PVT_Length)) {
+
+                DIMINUTO_LOG_DEBUG("Parse CPO PVT\n");
+
+                system = HAZER_SYSTEM_GPS;
+
+                if (calico_cpo_position_record(&positions[system], buffer, length) == 0) {
+
+                    if (system > maximum) { 
+                        maximum = system;
+                        DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                    }
+
+                    positions[system].ticks = timeout;
+                    refresh = !0;
+                    trace = !0;
+
+                    acquire_fix("CPO PVT");
+
+                } else if (errno == 0) {
+
+                    relinquish_fix("CPO PVT");
+
+                } else {
+
+                    print_error(buffer, length);
+
+                }
+
+            } else if (calico_is_cpo_id_length(buffer, length, CALICO_CPO_SDR_Id, CALICO_CPO_SDR_Length)) {
+
+                DIMINUTO_LOG_DEBUG("Parse CPO SDR\n");
+
+                rc = calico_cpo_satellite_data_record(views, actives, buffer, length);
+                if (rc != 0) {
+
+                    if ((rc & (1 << HAZER_SYSTEM_GNSS)) != 0) {
+
+                        system = HAZER_SYSTEM_GNSS;
+
+                        if (system > maximum) { 
+                            maximum = system;
+                            DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        }
+
+                        views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
+                        actives[system].ticks = timeout;
+                        refresh = !0;
+                        trace = !0;
+
+                    }
+
+                    if ((rc & (1 << HAZER_SYSTEM_GPS)) != 0) {
+
+                        system = HAZER_SYSTEM_GPS;
+
+                        if (system > maximum) { 
+                            maximum = system;
+                            DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        }
+
+                        views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
+                        actives[system].ticks = timeout;
+                        refresh = !0;
+                        trace = !0;
+
+                    }
+
+                    if ((rc & (1 << HAZER_SYSTEM_SBAS)) != 0) {
+
+                        system = HAZER_SYSTEM_SBAS;
+
+                        if (system > maximum) { 
+                            maximum = system;
+                            DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        }
+
+                        views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
+                        refresh = !0;
+                        trace = !0;
+
+                    }
+
+                } else if (errno == 0) {
+
+                    /* Do nothing. */
+
+                } else {
+
+                    print_error(buffer, length);
+
+                }
+
+            } else {
+
+                DIMINUTO_LOG_INFORMATION("Parse CPO Other 0x%02x [%u]\n", buffer[CALICO_CPO_ID], buffer[CALICO_CPO_SIZE]);
+
+            }
+
+            break;
+
         default:
 
             DIMINUTO_LOG_WARNING("Received Unknown 0x%x\n", buffer[0]);
@@ -3376,6 +3542,9 @@ stop:
 
     DIMINUTO_LOG_INFORMATION("Counters Remote=%lu Surveyor=%lu Keepalive=%lu OutOfOrder=%u Missing=%u", (unsigned long)remote_sequence, (unsigned long)surveyor_sequence, (unsigned long)keepalive_sequence, outoforder_counter, missing_counter);
 
+    rc = calico_finalize();
+    diminuto_contract(rc == 0);
+
     rc = tumbleweed_finalize();
     diminuto_contract(rc == 0);
 
@@ -3422,14 +3591,14 @@ stop:
         diminuto_perror("fclose(trace_fp)");
     }
 
-    if (log_fp == (FILE *)0) {
+    if (list_fp == (FILE *)0) {
         /* Do nothing. */
-    } else if (log_fp == stderr) {
+    } else if (list_fp == stderr) {
         /* Do nothing. */
-    } else if ((rc = fclose(log_fp)) != EOF) {
+    } else if ((rc = fclose(list_fp)) != EOF) {
         /* Do nothing. */
     } else {
-        diminuto_perror("fclose(log_fp)");
+        diminuto_perror("fclose(list_fp)");
     }
 
     if (dev_fp == (FILE *)0) {

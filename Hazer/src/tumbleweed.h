@@ -1,6 +1,6 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
-#ifndef _H_COM_DIAG_TUMBLEWEED_PRIVATE_
-#define _H_COM_DIAG_TUMBLEWEED_PRIVATE_
+#ifndef _H_COM_DIAG_HAZER_TUMBLEWEED_PRIVATE_
+#define _H_COM_DIAG_HAZER_TUMBLEWEED_PRIVATE_
 
 /**
  * @file

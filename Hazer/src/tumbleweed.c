@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <ctype.h>
 #include "com/diag/hazer/tumbleweed.h"
 #include "../src/tumbleweed.h"
 
@@ -216,10 +217,10 @@ tumbleweed_state_t tumbleweed_machine(tumbleweed_state_t state, uint8_t ch, void
         /* Do nothing. */
     } else if (old == TUMBLEWEED_STATE_STOP) {
         /* Do nothing. */
-    } else if ((' ' <= ch) && (ch <= '~')) {
-        fprintf(debug, "Machine RTCM %c %c %c 0x%02x%02x%02x 0x%02x '%c'\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch, ch);
+    } else if (isprint(ch)) {
+        fprintf(debug, "Machine RTCM %c %c %c 0x%02x%02x%02x ''\\x%02x' '%c'\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch, ch);
     } else {
-        fprintf(debug, "Machine RTCM %c %c %c 0x%02x%02x%02x 0x%02x\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch);
+        fprintf(debug, "Machine RTCM %c %c %c 0x%02x%02x%02x '\\x%02x'\n", old, state, action, pp->crc1, pp->crc2, pp->crc3, ch);
     }
 
     return state;

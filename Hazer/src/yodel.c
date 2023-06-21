@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2022`Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the implementation of the Yodel module.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <ctype.h>
 #include <errno.h>
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/common.h"
@@ -225,10 +226,10 @@ yodel_state_t yodel_machine(yodel_state_t state, uint8_t ch, void * buffer, size
         /* Do nothing. */
     } else if (old == YODEL_STATE_STOP) {
         /* Do nothing. */
-    } else if ((' ' <= ch) && (ch <= '~')) {
-        fprintf(debug, "Machine UBX  %c %c %c 0x%02x%02x 0x%02x '%c'\n", old, state, action, pp->csa, pp->csb, ch, ch);
+    } else if (isprint(ch)) {
+        fprintf(debug, "Machine UBX  %c %c %c 0x%02x%02x ''\\x%02x' '%c'\n", old, state, action, pp->csa, pp->csb, ch, ch);
     } else {
-        fprintf(debug, "Machine UBX  %c %c %c 0x%02x%02x 0x%02x\n", old, state, action, pp->csa, pp->csb, ch);
+        fprintf(debug, "Machine UBX  %c %c %c 0x%02x%02x '\\x%02x'\n", old, state, action, pp->csa, pp->csb, ch);
     }
 
     return state;
@@ -281,9 +282,9 @@ ssize_t yodel_length(const void * buffer, size_t size)
 {
    ssize_t result = -1;
    uint16_t length = 0;
-   const unsigned char * packet = (const unsigned char *)0;
+   const uint8_t * packet = (const uint8_t *)0;
 
-   packet = (const unsigned char *)buffer;
+   packet = (const uint8_t *)buffer;
 
    if (size < YODEL_UBX_SHORTEST) {
        /* Do nothing. */
@@ -297,9 +298,7 @@ ssize_t yodel_length(const void * buffer, size_t size)
         */
        length = packet[YODEL_UBX_LENGTH_MSB] << 8;
        length |= packet[YODEL_UBX_LENGTH_LSB];
-       if (length > (size - YODEL_UBX_SHORTEST)) {
-           /* Do nothing. */
-       } else {
+       if (length <= (size - YODEL_UBX_SHORTEST)) {
            result = length;
            result += YODEL_UBX_SHORTEST;
        }

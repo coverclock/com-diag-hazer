@@ -143,8 +143,8 @@ typedef enum TumbleweedState {
  * RTCM state machine stimuli.
  */
 enum TumbleweedStimulus {
-    TUMBLEWEED_STIMULUS_PREAMBLE		= 0xd3,
-    TUMBLEWEED_STIMULUS_RESERVED		= 0x00,
+    TUMBLEWEED_STIMULUS_PREAMBLE		= (uint8_t)'\xd3',
+    TUMBLEWEED_STIMULUS_RESERVED		= (uint8_t)'\x00',
 };
 
 /**

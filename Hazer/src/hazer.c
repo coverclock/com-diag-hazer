@@ -237,9 +237,9 @@ hazer_state_t hazer_machine(hazer_state_t state, uint8_t ch, void * buffer, size
     } else if (old == HAZER_STATE_STOP) {
         /* Do nothing. */
     } else if (isprint(ch)) {
-        fprintf(debug, "Machine NMEA %c %c %c *%c%c 0x%02x '%c'\n", old, state, action, pp->msn, pp->lsn, ch, ch);
+        fprintf(debug, "Machine NMEA %c %c %c 0x%02x%02x '\\x%02x' '%c'\n", old, state, action, pp->msn, pp->lsn, ch, ch);
     } else {
-        fprintf(debug, "Machine NMEA %c %c %c *%c%c 0x%02x\n", old, state, action, pp->msn, pp->lsn, ch);
+        fprintf(debug, "Machine NMEA %c %c %c 0x%02x%02x '\\x%02x'\n", old, state, action, pp->msn, pp->lsn, ch);
     }
 
     return state;
@@ -2834,10 +2834,10 @@ int hazer_parse_pubx_svstatus(hazer_views_t viewa, hazer_actives_t activea, char
                 continue;
             }
 
-            views[system].sig[0].sat[channel].id = id;
-            views[system].sig[0].sat[channel].phantom = 0;
-            views[system].sig[0].sat[channel].untracked = 0;
-            views[system].sig[0].sat[channel].unused = 0;
+            views[system].sig[HAZER_SIGNAL_ANY].sat[channel].id = id;
+            views[system].sig[HAZER_SIGNAL_ANY].sat[channel].phantom = 0;
+            views[system].sig[HAZER_SIGNAL_ANY].sat[channel].untracked = 0;
+            views[system].sig[HAZER_SIGNAL_ANY].sat[channel].unused = 0;
 
             if (strcmp(vector[index + 1], "e") == 0) {
                 /* Do nothing. */
@@ -2852,54 +2852,54 @@ int hazer_parse_pubx_svstatus(hazer_views_t viewa, hazer_actives_t activea, char
                 actives[system].system = system;
                 actives[system].label = PUBX;
             } else if (strcmp(vector[index + 1], "-") == 0) {
-                views[system].sig[0].sat[channel].unused = !0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].unused = !0;
             } else {
                 /* Should never happen, and not clear what it means if it does. */
-                views[system].sig[0].sat[channel].phantom = !0;
-                views[system].sig[0].sat[channel].untracked = !0;
-                views[system].sig[0].sat[channel].unused = !0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].phantom = !0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].untracked = !0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].unused = !0;
             }
 
             if (strlen(vector[index + 2]) == 0) {
-                views[system].sig[0].sat[channel].phantom = !0;
-                views[system].sig[0].sat[channel].azm_degrees = 0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].phantom = !0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].azm_degrees = 0;
             } else {
-                views[system].sig[0].sat[channel].azm_degrees = strtol(vector[index + 2], &end, 10);
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].azm_degrees = strtol(vector[index + 2], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
                     break;
                 }
-                if (!hazer_is_valid_azimuth(views[system].sig[0].sat[channel].azm_degrees)) {
+                if (!hazer_is_valid_azimuth(views[system].sig[HAZER_SIGNAL_ANY].sat[channel].azm_degrees)) {
                     errno = ERANGE;
                     break;
                 }
             }
 
             if (strlen(vector[index + 3]) == 0) {
-                views[system].sig[0].sat[channel].phantom = !0;
-                views[system].sig[0].sat[channel].elv_degrees = 0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].phantom = !0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].elv_degrees = 0;
             } else {
-                views[system].sig[0].sat[channel].elv_degrees = strtol(vector[index + 3], &end, 10);
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].elv_degrees = strtol(vector[index + 3], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
                     break;
                 }
-                if (!hazer_is_valid_elevation(views[system].sig[0].sat[channel].elv_degrees)) {
+                if (!hazer_is_valid_elevation(views[system].sig[HAZER_SIGNAL_ANY].sat[channel].elv_degrees)) {
                     errno = ERANGE;
                     break;
                 }
             }
 
             if (strlen(vector[index + 4]) == 0) {
-                views[system].sig[0].sat[channel].untracked = !0;
-                views[system].sig[0].sat[channel].snr_dbhz = 0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].untracked = !0;
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].snr_dbhz = 0;
             } else {
-                views[system].sig[0].sat[channel].snr_dbhz = strtol(vector[index + 4], &end, 10);
+                views[system].sig[HAZER_SIGNAL_ANY].sat[channel].snr_dbhz = strtol(vector[index + 4], &end, 10);
                 if (*end != '\0') {
                     errno = EINVAL;
                     break;
                 }
-                if (!hazer_is_valid_signaltonoiseratio(views[system].sig[0].sat[channel].snr_dbhz)) {
+                if (!hazer_is_valid_signaltonoiseratio(views[system].sig[HAZER_SIGNAL_ANY].sat[channel].snr_dbhz)) {
                     errno = ERANGE;
                     break;
                 }
@@ -2909,8 +2909,8 @@ int hazer_parse_pubx_svstatus(hazer_views_t viewa, hazer_actives_t activea, char
 
             channels[system] = channel;
 
-            views[system].sig[0].channels = channel;
-            views[system].sig[0].visible = satellites;
+            views[system].sig[HAZER_SIGNAL_ANY].channels = channel;
+            views[system].sig[HAZER_SIGNAL_ANY].visible = satellites;
 
             result |= (1 << system);
 
@@ -2931,12 +2931,12 @@ int hazer_parse_pubx_svstatus(hazer_views_t viewa, hazer_actives_t activea, char
 
                 viewa[system].label = PUBX;
 
-                for (channel = 0; channel < views[system].sig[0].channels; ++channel) {
-                    viewa[system].sig[0].sat[channel] = views[system].sig[0].sat[channel]; /* Structure copy. */
+                for (channel = 0; channel < views[system].sig[HAZER_SIGNAL_ANY].channels; ++channel) {
+                    viewa[system].sig[HAZER_SIGNAL_ANY].sat[channel] = views[system].sig[HAZER_SIGNAL_ANY].sat[channel]; /* Structure copy. */
                 }
 
-                viewa[system].sig[0].channels = views[system].sig[0].channels;
-                viewa[system].sig[0].visible = views[system].sig[0].visible;
+                viewa[system].sig[HAZER_SIGNAL_ANY].channels = views[system].sig[HAZER_SIGNAL_ANY].channels;
+                viewa[system].sig[HAZER_SIGNAL_ANY].visible = views[system].sig[HAZER_SIGNAL_ANY].visible;
 
                 activea[system].label = PUBX;
 
