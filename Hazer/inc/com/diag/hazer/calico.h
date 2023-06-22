@@ -336,15 +336,23 @@ enum CalicoCpoSatelliteDataRecordConstants {
 };
 
 /**
+ * @def CALICO_CPO_SDR_FIELDS
+ * This is to insure that the aligned and packet verisons of the structure
+ * have the exact same fielads.
+ */
+#define CALICO_CPO_SDR_FIELDS \
+    uint8_t     svid;       /* 1..32 for GPS, 33..64 for WAAS. */ \
+    uint16_t    snr;        /* Guessing dB Hz * 100. */ \
+    uint8_t     elev;       /* Degrees. */ \
+    uint16_t    azmth;      /* Degrees. */ \
+    uint8_t     status;
+
+/**
  * Description of the CPO SDR.
  * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 26.
  */
 typedef struct CalicoCpoSatelliteDataRecord {
-    uint8_t     svid;       /* 1..32 for GPS, 33..64 for WAAS. */
-    uint16_t    snr;        /* Guessing dB Hz * 100 */
-    uint8_t     elev;       /* Degrees. */
-    uint16_t    azmth;      /* Degrees. */
-    uint8_t     status;
+    CALICO_CPO_SDR_FIELDS
 } calico_cpo_sdr_t;
 
 /**
@@ -402,11 +410,7 @@ enum CalicoCpoSatelliteDataRecordStatus {
  * The alignment design of this sucks.
  */
 typedef struct CalicoCpoSatelliteDataRecordPacket {
-    uint8_t     svid;       /* 1..32 for GPS, 33..64 for WAAS. */
-    uint16_t    snr;
-    uint8_t     elev;       /* Degrees. */
-    uint16_t    azmth;      /* Degrees. */
-    uint8_t     status;
+    CALICO_CPO_SDR_FIELDS
 } __attribute__((packed)) calico_cpo_sdr_packet_t;
 
 /**
@@ -443,25 +447,33 @@ enum CalicoCpoPositionRecordConstants {
 };
 
 /**
+ * @def CALICO_CPO_PVT_FIELDS
+ * This is to insure that the aligned and packet verisons of the structure
+ * have the exact same fielads.
+ */
+#define CALICO_CPO_PVT_FIELDS \
+    float   alt;        /* Meters above ellipsoid. */ \
+    float   epe;        /* Meters position error. */ \
+    float   eph;        /* Meters horizontal error. */ \
+    float   epv;        /* Meters vertical error. */ \
+    int16_t fix;        /* Fix type. */ \
+    double  gps_tow;    /* Seconds GPS Time Of Week. */ \
+    double  lat;        /* Radians latitude. */ \
+    double  lon;        /* Radians longitude. */ \
+    float   lon_vel;    /* Meters/second longitude velocity. */ \
+    float   lat_vel;    /* Meters/second latitude velocity. */ \
+    float   alt_vel;    /* Meters/second altitude velocity. */ \
+    float   msl_hght;   /* Meters height above mean sea level. */ \
+    int16_t leap_sec;   /* UTC leap seconds. */ \
+    int32_t grmn_days;  /* Days since 1989-12-31. */
+
+/**
  * Description of the CPO PVT.
  * Reference: GPS 18x Tech Specs, Rev. D, Appendix B, p. 27.
  * The actual integer types were inferred from the record length.
  */
 typedef struct CalicoCpoPositionRecord {
-    float   alt;        /* Meters above ellipsoid. */
-    float   epe;        /* Meters position error. */
-    float   eph;        /* Meters horizontal error. */
-    float   epv;        /* Meters vertical error. */
-    int16_t fix;        /* Fix type. */
-    double  gps_tow;    /* Seconds GPS Time Of Week. */
-    double  lat;        /* Radians latitude. */
-    double  lon;        /* Radians longitude. */
-    float   lon_vel;    /* Meters/second longitude velocity. */
-    float   lat_vel;    /* Meters/second latitude velocity. */
-    float   alt_vel;    /* Meters/second altitude velocity. */
-    float   msl_hght;   /* Meters height above mean sea level. */
-    int16_t leap_sec;   /* UTC leap seconds. */
-    int32_t grmn_days;  /* Days since 1989-12-31. */
+    CALICO_CPO_PVT_FIELDS
 } calico_cpo_pvt_t;
 
 /**
@@ -491,20 +503,7 @@ enum CalicoCpoPositionRecordFix {
  * The actual integer types were inferred from the record length.
  */
 typedef struct CalicoCpoPositionRecordPacket {
-    float   alt;        /* Meters above ellipsoid. */
-    float   epe;        /* Meters position error. */
-    float   eph;        /* Meters horizontal error. */
-    float   epv;        /* Meters vertical error. */
-    int16_t fix;        /* Fix type. */
-    double  gps_tow;    /* Seconds GPS Time Of Week. */
-    double  lat;        /* Radians latitude. */
-    double  lon;        /* Radians longitude. */
-    float   lon_vel;    /* Meters/second longitude velocity. */
-    float   lat_vel;    /* Meters/second latitude velocity. */
-    float   alt_vel;    /* Meters/second altitude velocity. */
-    float   msl_hght;   /* Meters height above mean sea level. */
-    int16_t leap_sec;   /* UTC leap seconds. */
-    int32_t grmn_days;  /* Days since 1989-12-31. */
+    CALICO_CPO_PVT_FIELDS
 } __attribute__((packed)) calico_cpo_pvt_packet_t;
 
 /**
