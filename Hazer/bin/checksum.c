@@ -232,21 +232,23 @@ int main(int argc, char * argv[])
         }
         length = strlen((const char *)buffer) + 1;
         size = diminuto_escape_collapse((char *)buffer, (char *)buffer, length);
-        if (buffer[0] == '\0') {
+        if ((size < 1) || (buffer[0] == '\0')) {
             fputc('\n', stdout);
             DIMINUTO_LOG_WARNING("collapsed: empty?");
             continue;
         }
-        if (hazer_is_nmea(buffer[0])) {
-            rc = print_sentence(stdout, (char *)buffer, size - 1);
-        } else if (yodel_is_ubx(buffer[0])) {
-            rc = print_packet(stdout, buffer, size - 1);
-        } else if (tumbleweed_is_rtcm(buffer[0])) {
-            rc = print_message(stdout, buffer, size - 1);
-        } else if (calico_is_cpo(buffer[0])) {
+        size -= 1;
+        if (hazer_is_nmea(buffer, size)) {
+            rc = print_sentence(stdout, (char *)buffer, size);
+        } else if (yodel_is_ubx(buffer, size)) {
+            rc = print_packet(stdout, buffer, size);
+        } else if (tumbleweed_is_rtcm(buffer, size)) {
+            rc = print_message(stdout, buffer, size);
+        } else if (calico_is_cpo(buffer, size)) {
             DIMINUTO_LOG_ERROR("collapsed: unsupported!");
+            rc = -1;
         } else {
-            rc = print_buffer(stdout, buffer, size - 1, !0);
+            rc = print_buffer(stdout, buffer, size, !0);
         }
         if (rc < 0) {
             fputc('\n', stdout);

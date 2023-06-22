@@ -39,7 +39,7 @@ int main(void)
 #define UNITTEST_PARSE_TALKER_SYSTEM(_STRING_, _TALKER_, _SYSTEM_) \
     do { \
         string = "$" _STRING_; \
-        talker = hazer_parse_talker(string); \
+        talker = hazer_parse_talker(string, 3); \
         assert(talker == _TALKER_); \
         system = hazer_map_talker_to_system(talker); \
         assert(system == _SYSTEM_); \

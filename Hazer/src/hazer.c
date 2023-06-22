@@ -1077,7 +1077,7 @@ const char * hazer_format_nanodegrees2compass8(int64_t nanodegrees)
  *
  ******************************************************************************/
 
-hazer_talker_t hazer_parse_talker(const void * buffer)
+hazer_talker_t hazer_parse_talker(const void * buffer, ssize_t length)
 {
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     const char * sentence = (const char *)0;
@@ -1089,9 +1089,9 @@ hazer_talker_t hazer_parse_talker(const void * buffer)
     sentence = (const char *)buffer;
     id = &(sentence[1]);
 
-    if (sentence[0] != HAZER_STIMULUS_START) {
+    if (length < (sizeof("$XX") - 1)) {
         /* Do nothing. */
-    } else if (strnlen(sentence, sizeof("$XX")) < (sizeof("$XX") - 1)) {
+    } else if (sentence[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
     } else {
         for (ii = 0; ii < HAZER_TALKER_TOTAL; ++ii) {

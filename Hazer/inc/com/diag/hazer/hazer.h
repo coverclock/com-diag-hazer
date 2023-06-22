@@ -1110,10 +1110,11 @@ extern uint16_t hazer_parse_dop(const char * string, char ** endp);
  * Determine if the talker is one in which we are interested. Return its
  * index if it is, <0 otherwise. We are only interested in certain talkers,
  * and even among those, only certain talkers are systems.
- * @param buffer points to the beginning or the first token of the sentence.
+ * @param buffer points to the beginning of the sentence.
+ * @param length is the number of octets in the buffer.
  * @return the index of the talker or TALKER TOTAL if N/A.
  */
-extern hazer_talker_t hazer_parse_talker(const void * buffer);
+extern hazer_talker_t hazer_parse_talker(const void * buffer, ssize_t length);
 
 /**
  * Return a system given a talker. Only some talkers are associated with
@@ -1622,23 +1623,29 @@ extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], 
 /**
  * Return true of the character at the start of a frame suggests that it is
  * the beginning of an NMEA sentence.
- * @param ch is the character.
+ * @param buffer points to the buffer.
+ * @param length is the number of octets in the buffer.
  * @return true if it is likely to be an NMEA sentence.
  */
-static inline int hazer_is_nmea(int ch) {
-    return (ch == HAZER_STIMULUS_START);
+static inline int hazer_is_nmea(const void * buffer, ssize_t length) {
+    const char * np = (const char *)buffer;
+
+    return (
+        (length > 0) &&
+        (*np == HAZER_STIMULUS_START)
+    );
 }
 
 /**
  * Return true if the data in the buffer matches the NMEA sentence name.
- * @param bp points to the buffer.
+ * @param buffer points to the buffer.
  * @param length is the number of octets in the buffer.
  * @param name is the nul-terminated three letter name.
  * @return true if the name matches the field, false otherwise.
  */
-static inline int hazer_is_nmea_name(const void * bp, ssize_t length, const char name[4])
+static inline int hazer_is_nmea_name(const void * buffer, ssize_t length, const char name[4])
 {
-    const char * np = (const char *)bp;
+    const char * np = (const char *)buffer;
 
     return (
         (length > HAZER_NMEA_NAMEEND) &&
@@ -1650,14 +1657,14 @@ static inline int hazer_is_nmea_name(const void * bp, ssize_t length, const char
 
 /**
  * Return true if the  data in the buiffer matches the PUBX message ID.
- * @param bp points to the buffer.
+ * @param buffer points to the buffer.
  * @param length is the number of octets in the buffer.
  * @param id is the nul-terminated two letter message identifier.
  * @return true if the id matches the field.
  */
-static inline int hazer_is_pubx_id(const void * bp, ssize_t length, const char id[3])
+static inline int hazer_is_pubx_id(const void * buffer, ssize_t length, const char id[3])
 {
-    const char * pp = (const char *)bp;
+    const char * pp = (const char *)buffer;
 
     return (
         (length > HAZER_PUBX_IDEND) &&

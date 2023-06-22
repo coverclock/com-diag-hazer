@@ -43,24 +43,24 @@ int main(void)
         ii = 0;
         for (ch = 0x00; ch <= 0xff; ++ch) {
             if (ch == '$') {
-                assert(hazer_is_nmea(ch));
+                assert(hazer_is_nmea(&ch, 1));
             } else {
-                assert(!hazer_is_nmea(ch));
+                assert(!hazer_is_nmea(&ch, 1));
             }
             if (ch == 0xb5) {
-                assert(yodel_is_ubx(ch));
+                assert(yodel_is_ubx(&ch, 1));
             } else {
-                assert(!yodel_is_ubx(ch));
+                assert(!yodel_is_ubx(&ch, 1));
             }
             if (ch == 0xd3) {
-                assert(tumbleweed_is_rtcm(ch));
+                assert(tumbleweed_is_rtcm(&ch, 1));
             } else {
-                assert(!tumbleweed_is_rtcm(ch));
+                assert(!tumbleweed_is_rtcm(&ch, 1));
             }
             if (ch == 0x10) {
-                assert(calico_is_cpo(ch));
+                assert(calico_is_cpo(&ch, 1));
             } else {
-                assert(!calico_is_cpo(ch));
+                assert(!calico_is_cpo(&ch, 1));
             }
             ++ii;
         }

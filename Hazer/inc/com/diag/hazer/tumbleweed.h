@@ -321,11 +321,17 @@ extern const uint8_t TUMBLEWEED_KEEPALIVE[6];
 /**
  * Return true of the character at the start of a frame suggests that it is
  * the beginning of an RTCM message.
- * @param ch is the character.
+ * @param buffer points to the buffer.
+ * @param length is the length of the buffer in bytes.
  * @return true if it is likely to be an RTCM message.
  */
-static inline int tumbleweed_is_rtcm(int ch) {
-    return (ch == TUMBLEWEED_STIMULUS_PREAMBLE);
+static inline int tumbleweed_is_rtcm(const void * buffer, ssize_t length) {
+    const uint8_t * rp = (const uint8_t *)buffer;
+
+    return (
+        (length > 0) &&
+        (*rp == TUMBLEWEED_STIMULUS_PREAMBLE)
+    );
 }
 
 /******************************************************************************

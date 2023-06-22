@@ -77,6 +77,9 @@ int main(void)
         bytes = calico_validate(message, bytes);
         assert(bytes == (CALICO_CPO_SHORTEST + sizeof(calico_cpo_sdr_array_packet_t)));
 
+        rc = calico_is_cpo(message, bytes);
+        assert(rc);
+
         rc = calico_is_cpo_id_length(message, bytes, CALICO_CPO_PVT_Id, CALICO_CPO_PVT_Length);
         assert(!rc);
         rc = calico_is_cpo_id_length(message, bytes, CALICO_CPO_SDR_Id, CALICO_CPO_SDR_Length);
@@ -251,6 +254,9 @@ int main(void)
 
         bytes = calico_validate(message, bytes);
         assert(bytes == (CALICO_CPO_SHORTEST + sizeof(calico_cpo_pvt_packet_t)));
+
+        rc = calico_is_cpo(message, bytes);
+        assert(rc);
 
         rc = calico_is_cpo_id_length(message, bytes, CALICO_CPO_PVT_Id, CALICO_CPO_PVT_Length);
         assert(rc);

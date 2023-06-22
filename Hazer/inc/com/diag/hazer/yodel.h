@@ -391,27 +391,39 @@ typedef enum YodelId {
 /**
  * Return true of the character at the start of a frame suggests that it is
  * the beginning of a UBX packet.
- * @param ch is the character.
+ * @param buffer points to the buffer.
+ * @param length is the length of the buffer in bytes.
  * @return true if it is likely to be a UBX packet.
  */
-static inline int yodel_is_ubx(int ch) {
-    return (ch == YODEL_STIMULUS_SYNC_1);
+static inline int yodel_is_ubx(const void * buffer, ssize_t length) {
+    const uint8_t * up = (const uint8_t *)buffer;
+
+    return (
+        (length > 0) &&
+        (*up == YODEL_STIMULUS_SYNC_1)
+    );
 }
 
 /**
  * Return true if the UBX packet class and identifier matches the specified
  * values.
- * @param bp points to the buffer.
+ * @param buffer points to the buffer.
  * @param length is the length of the buffer in bytes.
  * @param klass is the desired class.
  * @param id is the desired identifier.
  * @return true if the class and the id match.
  */
-static inline int yodel_is_ubx_class_id(const void * bp, ssize_t length, uint8_t klass, uint8_t id)
+static inline int yodel_is_ubx_class_id(const void * buffer, ssize_t length, uint8_t klass, uint8_t id)
 {
-    const uint8_t * up = (const uint8_t *)bp;
+    const uint8_t * up = (const uint8_t *)buffer;
 
-    return ((length > YODEL_UBX_ID) && (up[YODEL_UBX_CLASS] == klass) && (up[YODEL_UBX_ID] == id));
+    return (
+        (length > YODEL_UBX_ID) &&
+        (up[YODEL_UBX_SYNC_1] == YODEL_STIMULUS_SYNC_1) &&
+        (up[YODEL_UBX_SYNC_2] == YODEL_STIMULUS_SYNC_2) &&
+        (up[YODEL_UBX_CLASS] == klass) &&
+        (up[YODEL_UBX_ID] == id)
+    );
 }
 
 /*******************************************************************************
@@ -466,11 +478,11 @@ enum YodelUbxNavHpposllhFlags {
  * Process a possible UBX-NAV-HPPOSLLH message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-HPPOSLLH structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * buffer, ssize_t length);
 
 /*
  * At least on later devices, UBX HPPOS packets report about twelve significant
@@ -666,11 +678,11 @@ enum YodelUbxMonHwFlagsJammingState {
  * Process a possible UBX-MON-HW message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-MON-HW structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * buffer, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-NAV-STATUS MESSAGES
@@ -792,11 +804,11 @@ enum YodelUbxNavStatusFlags2SpoolDetState {
  * Process a possible UBX-NAV-STATUS message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-STATUS structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * buffer, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-ACK-ACK and UBX-ACK-NAK MESSAGES
@@ -838,11 +850,11 @@ enum YodelUbxAckConstants {
  * Process a possible UBX-ACK-ACK or UBX-ACK-NAK message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-ACK structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * buffer, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-NAV-SVIN MESSAGES
@@ -891,11 +903,11 @@ enum YodelUbxNavSvinConstants {
  * Process a possible UBX-NAV-SVIN message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-SVIN structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * buffer, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-RXM-RTCM MESSAGES
@@ -934,11 +946,11 @@ enum YodelUbxRxmRtcmConstants {
  * Process a possible UBX-RXM-RTCM message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-RXM-RTCM structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * buffer, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-NAV-ATT MESSAGES
@@ -977,11 +989,11 @@ typedef struct YodelUbxNavAtt {
  * Process a possible UBX-NAV-ATT message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-ATT structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * buffer, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-NAV-ODO MESSAGES
@@ -1017,11 +1029,11 @@ typedef struct YodelUbxNavOdo {
  * Process a possible UBX-NAV-ODO message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-ODO structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * buffer, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-NAV-PVT MESSAGES
@@ -1133,11 +1145,11 @@ enum YodelUbxNavPvtFlags3 {
  * Process a possible UBX-NAV-PVT message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-PVT structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * buffer, ssize_t length);
 
 /********************************************
  ********************************************
@@ -1217,11 +1229,11 @@ typedef uint32_t yodel_ubx_cfg_valget_key_t;
  * because the byte-swapping of the variable length payload, both key IDs and
  * their values, is performed in-place.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_cfg_valget(void * bp, ssize_t length);
+extern int yodel_ubx_cfg_valget(void * buffer, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-MON-COMMS MESSAGES
@@ -1315,11 +1327,11 @@ enum YodelUbxMonCommsConstants {
  * Process a possible UBX-MON-COMMST message. The buffer is passed as non-const
  * because the byte-swapping of the payload is performed in-place.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_mon_comms(void * bp, ssize_t length);
+extern int yodel_ubx_mon_comms(void * buffer, ssize_t length);
 
 /************************************************
  ************************************************
@@ -1383,11 +1395,11 @@ typedef struct YodelUbxNavTimegps {
  * Process a possible UBX-NAV-TIMEGPS message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-TIMEGPS structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_timegps(yodel_ubx_nav_timegps_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_nav_timegps(yodel_ubx_nav_timegps_t * mp, const void * buffer, ssize_t length);
 #endif
 
 /*******************************************************************************
@@ -1429,11 +1441,11 @@ typedef struct YodelUbxNavTimeutc {
  * Process a possible UBX-NAV-TIMEUTC message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-TIMEUTC structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_timeutc(yodel_ubx_nav_timeutc_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_nav_timeutc(yodel_ubx_nav_timeutc_t * mp, const void * buffer, ssize_t length);
 #endif
 
 /*******************************************************************************
@@ -1470,11 +1482,11 @@ typedef struct YodelUbxNavClock {
  * Process a possible UBX-NAV-CLOCK message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-NAV-CLOCK structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_nav_clock(yodel_ubx_nav_clock_t * mp, const void * bp, ssize_t length);
+extern int yodel_ubx_nav_clock(yodel_ubx_nav_clock_t * mp, const void * buffer, ssize_t length);
 #endif
 
 /*******************************************************************************
@@ -1512,11 +1524,11 @@ typedef struct YodelUbxTimTp {
  * Process a possible UBX-TIM-TP message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
  * @param mp points to a UBX-TIM-TP structure in which to save the payload.
- * @param bp points to a buffer with a UBX header and payload.
+ * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int int yodel_ubx_tim_tp(yodel_ubx_tim_tp_t * mp, const void * bp, ssize_t length);
+extern int int yodel_ubx_tim_tp(yodel_ubx_tim_tp_t * mp, const void * buffer, ssize_t length);
 #endif
 
 /*******************************************************************************
