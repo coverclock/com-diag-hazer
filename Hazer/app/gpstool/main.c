@@ -2939,12 +2939,13 @@ consume:
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id)) {
+                yodel_buffer_t temporary;
 
                 DIMINUTO_LOG_DEBUG("Parse UBX UBX-CFG-VALGET\n");
 
-                if (yodel_ubx_cfg_valget(buffer, length) == 0) {
+                if (yodel_ubx_cfg_valget(temporary, sizeof(temporary), buffer, length) == 0) {
 
-                    process_ubx_cfg_valget(buffer, length);
+                    process_ubx_cfg_valget(temporary, length);
 
                 } else {
 
@@ -3034,12 +3035,13 @@ consume:
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_COMMS_Class, YODEL_UBX_MON_COMMS_Id)) {
+                yodel_buffer_t temporary;
 
                 DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS\n");
 
-                if (yodel_ubx_mon_comms(buffer, length) == 0) {
+                if (yodel_ubx_mon_comms(temporary, sizeof(temporary), buffer, length) == 0) {
 
-                    process_ubx_mon_comms(buffer, length);
+                    process_ubx_mon_comms(temporary, length);
 
                 } else {
 

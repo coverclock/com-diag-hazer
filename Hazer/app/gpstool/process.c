@@ -19,9 +19,9 @@
 
 void process_ubx_cfg_valget(const void * buffer, ssize_t length)
 {
-    const yodel_ubx_cfg_valget_t * pp = (const yodel_ubx_cfg_valget_t *)&(((const char *)buffer)[YODEL_UBX_PAYLOAD]);
-    const unsigned char * bb = (const unsigned char *)0;
-    const unsigned char * ee = &((const unsigned char *)buffer)[length - YODEL_UBX_CHECKSUM];
+    const yodel_ubx_cfg_valget_t * pp = (const yodel_ubx_cfg_valget_t *)&(((const uint8_t *)buffer)[YODEL_UBX_PAYLOAD]);
+    const uint8_t * bb = (const uint8_t *)0;
+    const uint8_t * ee = &((const uint8_t *)buffer)[length - YODEL_UBX_CHECKSUM];
     const char * layer = (const char *)0;
     yodel_ubx_cfg_valget_key_t kk = 0;
     size_t ss = 0;

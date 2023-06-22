@@ -9,6 +9,7 @@
  * @details
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #if !defined(_BSD_SOURCE)
 #define _BSD_SOURCE
@@ -19,6 +20,101 @@
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "./unittest.h"
+
+/*
+ * Swiped from gpstool.
+ */
+void valget(const void * buffer, ssize_t length)
+{
+    const yodel_ubx_cfg_valget_t * pp = (const yodel_ubx_cfg_valget_t *)&(((const uint8_t *)buffer)[YODEL_UBX_PAYLOAD]);
+    const uint8_t * bb = (const uint8_t *)0;
+    const uint8_t * ee = &((const uint8_t *)buffer)[length - YODEL_UBX_CHECKSUM];
+    const char * layer = (const char *)0;
+    yodel_ubx_cfg_valget_key_t kk = 0;
+    size_t ss = 0;
+    size_t ll = 0;
+    uint8_t vv1 = 0;
+    uint16_t vv16 = 0;
+    uint32_t vv32 = 0;
+    uint64_t vv64 = 0;
+    int ii = 0;
+
+    switch (pp->layer) {
+    case YODEL_UBX_CFG_VALGET_Layer_RAM:
+        layer = "RAM";
+        break;
+    case YODEL_UBX_CFG_VALGET_Layer_BBR:
+        layer = "BBR";
+        break;
+    case YODEL_UBX_CFG_VALGET_Layer_NVM:
+        layer = "NVM";
+        break;
+    case YODEL_UBX_CFG_VALGET_Layer_ROM:
+        layer = "ROM";
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    for (bb = &(pp->cfgData[0]); bb < ee; bb += ll) {
+
+        memcpy(&kk, bb, sizeof(kk));
+
+        ss = (kk >> YODEL_UBX_CFG_VALGET_Key_Size_SHIFT) & YODEL_UBX_CFG_VALGET_Key_Size_MASK;
+
+        switch (ss) {
+        case YODEL_UBX_CFG_VALGET_Size_BIT:
+        case YODEL_UBX_CFG_VALGET_Size_ONE:
+            ll = 1;
+            break;
+        case YODEL_UBX_CFG_VALGET_Size_TWO:
+            ll = 2;
+            break;
+        case YODEL_UBX_CFG_VALGET_Size_FOUR:
+            ll = 4;
+            break;
+        case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+            ll = 8;
+            break;
+        default:
+            assert(false);
+            break;
+        }
+
+        bb += sizeof(kk);
+
+        switch (ss) {
+        case YODEL_UBX_CFG_VALGET_Size_BIT:
+            memcpy(&vv1, bb, sizeof(vv1));
+            fprintf(stderr, "Process UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%01x\n", pp->version, layer, ii, kk, vv1);
+            break;
+        case YODEL_UBX_CFG_VALGET_Size_ONE:
+            memcpy(&vv1, bb, sizeof(vv1));
+            fprintf(stderr, "Process UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%02x\n", pp->version, layer, ii, kk, vv1);
+            break;
+        case YODEL_UBX_CFG_VALGET_Size_TWO:
+            memcpy(&vv16, bb, sizeof(vv16));
+            fprintf(stderr, "Process UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%04x\n", pp->version, layer, ii, kk, vv16);
+            break;
+        case YODEL_UBX_CFG_VALGET_Size_FOUR:
+            memcpy(&vv32, bb, sizeof(vv32));
+            fprintf(stderr, "Process UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%08x\n", pp->version,layer, ii, kk, vv32);
+            break;
+        case YODEL_UBX_CFG_VALGET_Size_EIGHT:
+            memcpy(&vv64, bb, sizeof(vv64));
+            fprintf(stderr, "Process UBX-CFG-VALGET v%d %s [%d] 0x%08x 0x%016llx\n", pp->version, layer, ii, kk, (unsigned long long)vv64);
+            break;
+        default:
+            assert(false);
+            break;
+        }
+
+        ++ii;
+
+    }
+
+}
 
 int main(void)
 {
@@ -221,17 +317,23 @@ int main(void)
     END;
 
     BEGIN("\\xb5b\\x06\\x8b\\f\\0\\x01\\0\\0\\0\\x11\\0\\x03@\\xa0\\x86\\x01\\0\\x19'");
+        yodel_buffer_t temporary;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
         assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id));
-        assert(yodel_ubx_cfg_valget(message, size) == 0);
+        assert(yodel_ubx_cfg_valget(temporary, sizeof(temporary), message, size) == 0);
+        diminuto_dump(stderr, temporary, size);
+        valget(temporary, size);
     END;
 
     BEGIN("\\xb5b\\x06\\x8b\\t\\0\\x01\\0\\0\\0\\xbf\\x02\\x91 \\x01\\x0e\\xf5");
+        yodel_buffer_t temporary;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
         assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id));
-        assert(yodel_ubx_cfg_valget(message, size) == 0);
+        assert(yodel_ubx_cfg_valget(temporary, sizeof(temporary), message, size) == 0);
+        diminuto_dump(stderr, temporary, size);
+        valget(temporary, size);
     END;
 
     BEGIN("\\xb5b\\n\\t<\\0\\xc1\\x81\\0\\0\\0\\0\\x01\\0\\0\\x80\\0\\0\\xdfg\\0\\0L\\0\\x91\\x14\\x01\\x02\\x01\\x85\\xbe\\xff\\x01\\0\\xff\\0\\x01\\x03\\x02\\x10\\xff\\x12\\x13\\x14\\x15\\x0e\\n\\v\\x0fD\\x16\\x05\\xeeZ\\0\\0\\0\\0\\xdb{\\0\\0\\0\\0\\0\\0!M");
@@ -273,13 +375,14 @@ int main(void)
     END;
 
     BEGIN("\\xb5b\\n6\\xa8\\0\\0\\x04\\0\\0\\0\\x01\\x05\\xff\\0\\x01\\0\\0\\xec8\\0\\0\\0\\x0e\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x02\\0\\0H\\x8dV\\x01\\0\\t\\0\\0\\x80\\x1f\\xf2\\x03\\x05\\r\\0\\0\\xc1\\xdc\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x1b\\0\\0\\0\\0\\x03\\0\\0\\x84\\xf5p\\0\\x014\\0\\0\\xc8\\x03\\0\\0\\0\\0\\0\\0C\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\x01\\x01\\0\\0>\\xff\\xf1\\x03\\0\\0\\0\\0\\x1e\\x1bP\\x01\\x06\\n\\0\\0Py\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0~(");
+        yodel_buffer_t temporary;
         yodel_ubx_mon_comms_t data = YODEL_UBX_MON_COMMS_INITIALIZER;
         fprintf(stderr, "\"%s\"[%zu]\n", string, length);
         diminuto_dump(stderr, message, size);
         assert(yodel_is_ubx_class_id(message, size, YODEL_UBX_MON_COMMS_Class, YODEL_UBX_MON_COMMS_Id));
-        assert(yodel_ubx_mon_comms(message, size) == 0);
-        diminuto_dump(stderr, message, size);
-        memcpy(&data, message + YODEL_UBX_PAYLOAD, sizeof(data));
+        assert(yodel_ubx_mon_comms(temporary, sizeof(temporary), message, size) == 0);
+        diminuto_dump(stderr, temporary, size);
+        memcpy(&data, temporary + YODEL_UBX_PAYLOAD, sizeof(data));
 		assert(data.prefix.version == 0);
 		assert(data.prefix.nPorts == 4);
 		assert(data.prefix.txErrors == 0x00);

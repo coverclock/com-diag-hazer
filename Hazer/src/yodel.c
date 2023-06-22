@@ -317,7 +317,7 @@ ssize_t yodel_validate(const void * buffer, size_t size)
 
     if ((length = yodel_length(buffer, size)) <= 0) {
         /* Do nothing. */
-    } else if ((bp = (uint8_t *)yodel_checksum_buffer(buffer, length, &csa, &csb)) == (unsigned char *)0) {
+    } else if ((bp = (uint8_t *)yodel_checksum_buffer(buffer, length, &csa, &csb)) == (uint8_t *)0) {
         /* Do nothing. */
     } else if ((csa != bp[0]) || (csb != bp[1])) {
         /* Do nothing. */
@@ -335,7 +335,7 @@ ssize_t yodel_validate(const void * buffer, size_t size)
 int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)buffer;
+    const uint8_t * hp = (const uint8_t *)buffer;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_HPPOSLLH_Class) {
         errno = ENOMSG;
@@ -368,7 +368,7 @@ int yodel_ubx_nav_hpposllh(yodel_ubx_nav_hpposllh_t * mp, const void * buffer, s
 int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)buffer;
+    const uint8_t * hp = (const uint8_t *)buffer;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_HW_Class) {
         errno = ENOMSG;
@@ -397,7 +397,7 @@ int yodel_ubx_mon_hw(yodel_ubx_mon_hw_t * mp, const void * buffer, ssize_t lengt
 int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)buffer;
+    const uint8_t * hp = (const uint8_t *)buffer;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_STATUS_Class) {
         errno = ENOMSG;
@@ -419,7 +419,7 @@ int yodel_ubx_nav_status(yodel_ubx_nav_status_t * mp, const void * buffer, ssize
 int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)buffer;
+    const uint8_t * hp = (const uint8_t *)buffer;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_ACK_Class) {
         errno = ENOMSG;
@@ -436,10 +436,17 @@ int yodel_ubx_ack(yodel_ubx_ack_t * mp, const void * buffer, ssize_t length)
     return rc;
 }
 
-int yodel_ubx_cfg_valget(void * buffer, ssize_t length)
+int yodel_ubx_cfg_valget(void * destination, size_t size, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    unsigned char * hp = (unsigned char *)buffer;
+    uint8_t * hp = (uint8_t *)destination;
+
+     if (size < length) {
+         errno = ENOBUFS;
+         return rc;
+    }
+
+    memcpy(destination, buffer, length);
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_CFG_VALGET_Class) {
         errno = ENOMSG;
@@ -449,8 +456,8 @@ int yodel_ubx_cfg_valget(void * buffer, ssize_t length)
         errno = ENODATA;
     } else {
         yodel_ubx_cfg_valget_t * pp = (yodel_ubx_cfg_valget_t *)0;
-        unsigned char * bb = (unsigned char *)0;
-        const unsigned char * ee = (const unsigned char *)0;
+        uint8_t * bb = (uint8_t *)0;
+        const uint8_t * ee = (const uint8_t *)0;
         yodel_ubx_cfg_valget_key_t kk = 0;
         size_t ss = 0;
         size_t ll = 0;
@@ -539,7 +546,7 @@ int yodel_ubx_cfg_valget(void * buffer, ssize_t length)
 int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)buffer;
+    const uint8_t * hp = (const uint8_t *)buffer;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_RXM_RTCM_Class) {
         errno = ENOMSG;
@@ -561,7 +568,7 @@ int yodel_ubx_rxm_rtcm(yodel_ubx_rxm_rtcm_t * mp, const void * buffer, ssize_t l
 int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)buffer;
+    const uint8_t * hp = (const uint8_t *)buffer;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_SVIN_Class) {
         errno = ENOMSG;
@@ -584,12 +591,19 @@ int yodel_ubx_nav_svin(yodel_ubx_nav_svin_t * mp, const void * buffer, ssize_t l
     return rc;
 }
 
-int yodel_ubx_mon_comms(void * buffer, ssize_t length)
+int yodel_ubx_mon_comms(void * destination, size_t size, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    unsigned char * hp = (unsigned char *)buffer;
+    uint8_t * hp = (uint8_t *)destination;
     int ii = 0;
     int jj = 0;
+
+    if (size < length) {
+        errno = ENOBUFS;
+        return rc;
+    }
+
+    (void)memcpy(destination, buffer, length);
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_MON_COMMS_Class) {
         errno = ENOMSG;
@@ -631,7 +645,7 @@ int yodel_ubx_mon_comms(void * buffer, ssize_t length)
 int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)buffer;
+    const uint8_t * hp = (const uint8_t *)buffer;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_ATT_Class) {
         errno = ENOMSG;
@@ -657,7 +671,7 @@ int yodel_ubx_nav_att(yodel_ubx_nav_att_t * mp, const void * buffer, ssize_t len
 int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)buffer;
+    const uint8_t * hp = (const uint8_t *)buffer;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_ODO_Class) {
         errno = ENOMSG;
@@ -680,7 +694,7 @@ int yodel_ubx_nav_odo(yodel_ubx_nav_odo_t * mp, const void * buffer, ssize_t len
 int yodel_ubx_nav_pvt(yodel_ubx_nav_pvt_t * mp, const void * buffer, ssize_t length)
 {
     int rc = -1;
-    const unsigned char * hp = (const unsigned char *)buffer;
+    const uint8_t * hp = (const uint8_t *)buffer;
 
     if (hp[YODEL_UBX_CLASS] != YODEL_UBX_NAV_PVT_Class) {
         errno = ENOMSG;

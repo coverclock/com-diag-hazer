@@ -1225,15 +1225,15 @@ enum YodelUbxCfgValgetSize {
 typedef uint32_t yodel_ubx_cfg_valget_key_t;
 
 /**
- * Process a possible UBX-CFG-VALGET message. The buffer is passed as non-const
- * because the byte-swapping of the variable length payload, both key IDs and
- * their values, is performed in-place.
+ * Process a possible UBX-CFG-VALGET message.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
+ * @param destination points to the destination buffer.
+ * @param size is the size of the destination in bytes.
  * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_cfg_valget(void * buffer, ssize_t length);
+extern int yodel_ubx_cfg_valget(void * destination, size_t size, const void * buffer, ssize_t length);
 
 /*******************************************************************************
  * PROCESSING UBX-MON-COMMS MESSAGES
@@ -1327,11 +1327,13 @@ enum YodelUbxMonCommsConstants {
  * Process a possible UBX-MON-COMMST message. The buffer is passed as non-const
  * because the byte-swapping of the payload is performed in-place.
  * If <0 is returned, errno is set to >0 if the sentence is malformed.
+ * @param destination points to the destination buffer.
+ * @param size is the size of the destination buffer in bytes.
  * @param buffer points to a buffer with a UBX header and payload.
  * @param length is the length of the header, payload, and checksum in bytes.
  * @return 0 if the message was valid, <0 otherwise.
  */
-extern int yodel_ubx_mon_comms(void * buffer, ssize_t length);
+extern int yodel_ubx_mon_comms(void * destination, size_t size, const void * buffer, ssize_t length);
 
 /************************************************
  ************************************************
