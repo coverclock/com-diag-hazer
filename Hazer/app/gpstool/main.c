@@ -2530,7 +2530,7 @@ consume:
             } else if ((talker = hazer_parse_talker(buffer, length)) >= HAZER_TALKER_TOTAL) {
 
                 if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSA) || hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSV)) {
-                    DIMINUTO_LOG_INFORMATION("Received NMEA Talker Other \"%c%c\"", vector[0][1], vector[0][2]);
+                    DIMINUTO_LOG_INFORMATION("Received NMEA Talker Other \"%*s\"", HAZER_NMEA_NAMEEND, buffer);
                 }
                 continue;
 
@@ -2540,13 +2540,13 @@ consume:
 
             } else if ((talker == HAZER_TALKER_PMTK) || (talker == HAZER_TALKER_PSRF) || (talker == HAZER_TALKER_PAIR) || (talker == HAZER_TALKER_PGRM)) {
 
-                DIMINUTO_LOG_INFORMATION("Received NMEA Sentence Other %s \"%.*s\"", HAZER_TALKER_NAME[talker], (int)(length - 2) /* Exclude CR and LF. */, buffer);
+                DIMINUTO_LOG_INFORMATION("Received Proprietary Sentence Other %s \"%.*s\"", HAZER_TALKER_NAME[talker], (length > 2) ? (int)(length - 2) : (int)length, buffer);
                 continue;
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 
                 if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSA) || hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSV)) {
-                    DIMINUTO_LOG_INFORMATION("Received NMEA System Other \"%c%c\"\n", vector[0][1], vector[0][2]);
+                    DIMINUTO_LOG_INFORMATION("Received NMEA System Other \"%*s\"\n", HAZER_NMEA_NAMEEND, buffer);
                 }
                 continue;
 
@@ -2762,7 +2762,7 @@ consume:
 
             } else if (talker != HAZER_TALKER_PUBX) {
 
-                DIMINUTO_LOG_INFORMATION("Received NMEA Other \"%.*s\"", (int)(length - 2) /* Exclude CR and LF. */, buffer);
+                DIMINUTO_LOG_INFORMATION("Received NMEA Other \"%.*s\"", HAZER_NMEA_NAMEEND, buffer);
 
             } else if (hazer_is_pubx_id(buffer, length, HAZER_PROPRIETARY_SENTENCE_PUBX_POSITION)) {
 
@@ -2850,7 +2850,7 @@ consume:
 
             } else {
 
-                DIMINUTO_LOG_INFORMATION("Received PUBX Other \"%s\"\n", vector[0]);
+                DIMINUTO_LOG_INFORMATION("Received PUBX Other \"%*s\"\n", HAZER_PUBX_IDEND, buffer);
 
             }
 
