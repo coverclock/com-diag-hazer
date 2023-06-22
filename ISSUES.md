@@ -462,4 +462,5 @@ I think GCC is complaining that a memcpy(3) will write past the end of a
 structure. However, this code is in a case of a switch statement that, for
 this particular structure field, will never be executed.
 
-I don't see this in later GCC versions, e.g. 11.3.0.
+I don't see this in newer GCC versions like 11.3.0, nor older versions
+like 6.3.0
