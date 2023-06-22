@@ -436,3 +436,30 @@ in its ```GSA``` sentences, emitting NMEA System IDs of both ```1```
 with the Talker name of ```GP``` (GPS). I figured this was a bug
 in my code, but examining raw data (which I saved in the ```dat/hazer```
 directory) confirms this weird behavior.
+
+### GCC Warnings With -Wall implying -Warray-bounds
+
+On one of my oldest Raspberry Pis, a 3B Plus, running gcc 8.3.0, i get
+the following compile-time warning from GCC.
+
+    In file included from inc/com/diag/hazer/common.h:20,
+                     from src/calico.c:23:
+    src/calico.c: In function ‘calico_cpo_position_record’:
+    inc/com/diag/hazer/calico.h:555:17: warning: ‘memcpy’ forming offset [3, 4] is out of the bounds [0, 2] of object ‘_temporary_’ with type ‘uint16_t’ {aka ‘short unsigned int’} [-Warray-bounds]
+                     memcpy(&(_DESTINATION_), &_temporary_, sizeof(_DESTINATION_)); \
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    src/calico.c:568:9: note: in expansion of macro ‘COM_DIAG_CALICO_LETOH’
+             COM_DIAG_CALICO_LETOH(pvt.alt, dp->alt);
+             ^~~~~~~~~~~~~~~~~~~~~
+    inc/com/diag/hazer/calico.h:552:26: note: ‘_temporary_’ declared here
+                     uint16_t _temporary_; \
+                              ^~~~~~~~~~~
+    src/calico.c:568:9: note: in expansion of macro ‘COM_DIAG_CALICO_LETOH’
+             COM_DIAG_CALICO_LETOH(pvt.alt, dp->alt);
+             ^~~~~~~~~~~~~~~~~~~~~
+
+I think GCC is complaining that a memcpy(3) will write past the end of a
+structure. However, this code is in a case of a switch statement that, for
+this particular structure field, will never be executed.
+
+I don't see this in later GCC versions, e.g. 11.3.0.
