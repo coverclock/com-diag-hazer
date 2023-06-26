@@ -2632,7 +2632,7 @@ consume:
             }
 
             if (!systems[system]) {
-                DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                DIMINUTO_LOG_NOTICE("System NMEA Any [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
                 systems[system] = true;
             }
 
@@ -2764,7 +2764,7 @@ consume:
                     }
 
                     if (!systems[system]) {
-                        DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                        DIMINUTO_LOG_NOTICE("System NMEA GSA [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
                         systems[system] = true;
                     }
 
@@ -2880,7 +2880,7 @@ consume:
                             }
 
                             if (!systems[system]) {
-                                DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                                DIMINUTO_LOG_NOTICE("System PUBX SVSTATUS [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
                                 systems[system] = true;
                             }
 
@@ -3223,7 +3223,7 @@ consume:
                     }
 
                     if (!systems[system]) {
-                        DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                        DIMINUTO_LOG_NOTICE("System CPO PVT [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
                         systems[system] = true;
                     }
 
@@ -3259,7 +3259,7 @@ consume:
                         }
 
                         if (!systems[system]) {
-                            DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                            DIMINUTO_LOG_NOTICE("System CPO SDR [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
                             systems[system] = true;
                         }
 
@@ -3279,7 +3279,7 @@ consume:
                         }
 
                         if (!systems[system]) {
-                            DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                            DIMINUTO_LOG_NOTICE("System CPO SDR [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
                             systems[system] = true;
                         }
 
@@ -3299,7 +3299,7 @@ consume:
                         }
 
                         if (!systems[system]) {
-                            DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                            DIMINUTO_LOG_NOTICE("System CPO SDR [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
                             systems[system] = true;
                         }
 
