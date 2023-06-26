@@ -1552,7 +1552,6 @@ int main(int argc, char * argv[])
     frame = 0;
 
     maximum = HAZER_SYSTEM_GNSS;
-    DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
 
     io_maximum = 0;
     io_total = 0;
@@ -1652,26 +1651,40 @@ int main(int argc, char * argv[])
         fd = -1;
 
         if ((in_fp != (FILE *)0) && ((available = diminuto_file_ready(in_fp)) > 0)) {
+
             fd = in_fd;
             if (available > io_maximum) {
                 io_maximum = available;
             }
+
         } else if (serial && (in_fd >= 0) && ((available = diminuto_serial_available(in_fd)) > 0)) {
+
             fd = in_fd;
             if (available > io_maximum) {
                 io_maximum = available;
             }
+
         } else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
+
             /* Do nothing. */
+
         } else if ((ready = diminuto_mux_wait(&mux, delay /* BLOCK */)) == 0) {
+
             /* Do nothing. */
+
         } else if (ready > 0) {
+
             fd = diminuto_mux_ready_read(&mux);
             diminuto_contract(fd >= 0);
+
         } else if (errno == EINTR) {
+
             continue;
+
         } else {
+
             diminuto_panic();
+
         }
 
 consume:
@@ -1828,7 +1841,8 @@ consume:
                      * on the USB interface.) I thought this was a bug in
                      * my code, but it occurs even using socat, screen, etc.
                      * Then I thought it was a bug in the Linux USB driver,
-                     * but it shows up using a USB hardware analyzer.
+                     * but it shows up using my USB hardware analyzer. So the
+                     * data is lost before we see it on the wire.
                      */
 
                     DIMINUTO_LOG_INFORMATION("Sync Lost [%zu] 0x%02x\n", io_total, ch);
@@ -1842,6 +1856,10 @@ consume:
                         goto stop;
                     }
 
+                    /*
+                     * Restart all of the state machines and try to sync again.
+                     */
+
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_START;
@@ -1849,119 +1867,154 @@ consume:
 
                 }
 
+                /*
+                 * Run all of the state machines in parallel. Some (or even
+                 * most) of them may be in a terminal state having given up.
+                 */
+
                 frame = 0;
 
-                nmea_state = hazer_machine(nmea_state, ch, nmea_buffer.payload.nmea, sizeof(nmea_buffer.payload.nmea), &nmea_context);
-                if (nmea_state == HAZER_STATE_END) {
+                /*
+                 * NMEA STATE MACHINE
+                 */ 
 
-                    buffer = (uint8_t *)nmea_buffer.payload.nmea;
-                    size = hazer_size(&nmea_context);
-                    length = size - 1;
-                    format = NMEA;
+                if (nmea_state != HAZER_STATE_STOP) {
 
-                    if (!sync) {
+                    nmea_state = hazer_machine(nmea_state, ch, nmea_buffer.payload.nmea, sizeof(nmea_buffer.payload.nmea), &nmea_context);
+                    if (nmea_state == HAZER_STATE_END) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x NMEA\n", io_total, ch);
+                        buffer = (uint8_t *)nmea_buffer.payload.nmea;
+                        size = hazer_size(&nmea_context);
+                        length = size - 1;
+                        format = NMEA;
 
-                        sync = !0;
-                        io_waiting = 0;
+                        if (!sync) {
 
-                        if (verbose) {
-                            sync_in(length);
+                            DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x NMEA\n", io_total, ch);
+                            sync = !0;
+                            io_waiting = 0;
+
+                            if (verbose) {
+                                sync_in(length);
+                            }
+
                         }
 
+                        frame = !0;
+                        DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] \"%-5.5s\"", size, length, (buffer + 1));
+                        break;
+
                     }
-
-                    frame = !0;
-
-                    DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] \"%-5.5s\"", size, length, (buffer + 1));
-
-                    break;
 
                 }
 
-                ubx_state = yodel_machine(ubx_state, ch, ubx_buffer.payload.ubx, sizeof(ubx_buffer.payload.ubx), &ubx_context);
-                if (ubx_state == YODEL_STATE_END) {
+                /*
+                 * UBX STATE MACHINE
+                 */ 
 
-                    buffer = ubx_buffer.payload.ubx;
-                    size = yodel_size(&ubx_context);
-                    length = size - 1;
-                    format = UBX;
+                if (ubx_state != YODEL_STATE_STOP) {
 
-                    if (!sync) {
+                    ubx_state = yodel_machine(ubx_state, ch, ubx_buffer.payload.ubx, sizeof(ubx_buffer.payload.ubx), &ubx_context);
+                    if (ubx_state == YODEL_STATE_END) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x UBX\n", io_total, ch);
+                        buffer = ubx_buffer.payload.ubx;
+                        size = yodel_size(&ubx_context);
+                        length = size - 1;
+                        format = UBX;
 
-                        sync = !0;
-                        io_waiting = 0;
+                        if (!sync) {
 
-                        if (verbose) {
-                            sync_in(length);
+                            DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x UBX\n", io_total, ch);
+
+                            sync = !0;
+                            io_waiting = 0;
+
+                            if (verbose) {
+                                sync_in(length);
+                            }
+
                         }
+
+                        frame = !0;
+                        DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
+
+                        break;
 
                     }
 
-                    frame = !0;
-
-                    DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
-
-                    break;
                 }
 
-                rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer.payload.rtcm, sizeof(rtcm_buffer.payload.rtcm), &rtcm_context);
-                if (rtcm_state == TUMBLEWEED_STATE_END) {
+                /*
+                 * RTCM STATE MACHINE
+                 */ 
 
-                    buffer = rtcm_buffer.payload.rtcm;
-                    size = tumbleweed_size(&rtcm_context);
-                    length = size - 1;
-                    format = RTCM;
+                if (rtcm_state != TUMBLEWEED_STATE_STOP) {
 
-                    if (!sync) {
+                    rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer.payload.rtcm, sizeof(rtcm_buffer.payload.rtcm), &rtcm_context);
+                    if (rtcm_state == TUMBLEWEED_STATE_END) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x RTCM\n", io_total, ch);
+                        buffer = rtcm_buffer.payload.rtcm;
+                        size = tumbleweed_size(&rtcm_context);
+                        length = size - 1;
+                        format = RTCM;
 
-                        sync = !0;
-                        io_waiting = 0;
+                        if (!sync) {
 
-                        if (verbose) {
-                            sync_in(length);
+                            DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x RTCM\n", io_total, ch);
+
+                            sync = !0;
+                            io_waiting = 0;
+
+                            if (verbose) {
+                                sync_in(length);
+                            }
+
                         }
+
+                        frame = !0;
+
+                        DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd] %d", size, length, tumbleweed_message(buffer, length));
+
+                        break;
 
                     }
 
-                    frame = !0;
-
-                    DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd] %d", size, length, tumbleweed_message(buffer, length));
-
-                    break;
                 }
 
-                cpo_state = calico_machine(cpo_state, ch, cpo_buffer.payload.cpo, sizeof(cpo_buffer.payload.cpo), &cpo_context);
-                if (cpo_state == CALICO_STATE_END) {
+                /*
+                 * CPO STATE MACHINE
+                 */ 
 
-                    buffer = cpo_buffer.payload.cpo;
-                    size = calico_size(&cpo_context);
-                    length = size - 1;
-                    format = CPO;
+                if (cpo_state != CALICO_STATE_STOP) {
 
-                    if (!sync) {
+                    cpo_state = calico_machine(cpo_state, ch, cpo_buffer.payload.cpo, sizeof(cpo_buffer.payload.cpo), &cpo_context);
+                    if (cpo_state == CALICO_STATE_END) {
 
-                        DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x CPO\n", io_total, ch);
+                        buffer = cpo_buffer.payload.cpo;
+                        size = calico_size(&cpo_context);
+                        length = size - 1;
+                        format = CPO;
 
-                        sync = !0;
-                        io_waiting = 0;
+                        if (!sync) {
 
-                        if (verbose) {
-                            sync_in(length);
+                            DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x CPO\n", io_total, ch);
+
+                            sync = !0;
+                            io_waiting = 0;
+
+                            if (verbose) {
+                                sync_in(length);
+                            }
+
                         }
 
+                        frame = !0;
+
+                        DIMINUTO_LOG_DEBUG("Input CPO [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
+
+                        break;
+
                     }
-
-                    frame = !0;
-
-                    DIMINUTO_LOG_DEBUG("Input CPO [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
-
-                    break;
                 }
 
                 /*
@@ -1970,7 +2023,9 @@ consume:
                  * either we have never had synchronization, or we lost
                  * synchronization. Restart all of them. We print an error
                  * message if any of the state machines failed on a CRC or
-                 * checksum check.
+                 * checksum check. (It's impossible that more than one of
+                 * them can have gotten as far as to fail on a CRC or
+                 * checksum, but I didn't code it that way.)
                  */
 
                 if (machine_is_stalled(nmea_state, ubx_state, rtcm_state, cpo_state)) {
@@ -1982,14 +2037,21 @@ consume:
                         if (nmea_context.error) {
                             errno = EIO;
                             print_error(nmea_buffer.payload.nmea, nmea_context.bp - nmea_buffer.payload.nmea - 1);
-                        } else if (ubx_context.error) {
+                        }
+
+                        if (ubx_context.error) {
                             errno = EIO;
                             print_error(ubx_buffer.payload.ubx, ubx_context.bp - ubx_buffer.payload.ubx - 1);
-                        } else if (rtcm_context.error) {
+                        }
+
+                        if (rtcm_context.error) {
                             errno = EIO;
                             print_error(rtcm_buffer.payload.rtcm, rtcm_context.bp - rtcm_buffer.payload.rtcm - 1);
-                        } else {
-                            /* Do nothing. */
+                        }
+
+                        if (cpo_context.error) {
+                            errno = EIO;
+                            print_error(cpo_buffer.payload.cpo, cpo_context.bp - cpo_buffer.payload.cpo - 1);
                         }
 
                         if (verbose) {
@@ -2010,6 +2072,7 @@ consume:
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_START;
+                    cpo_state = CALICO_STATE_START;
 
                 }
 
@@ -2535,15 +2598,9 @@ consume:
              * encoded like NMEA sentences.
              */
 
-            if (count < 2) {
+            if ((talker = hazer_parse_talker(buffer, length)) >= HAZER_TALKER_TOTAL) {
 
-                continue;
-
-            } else if ((talker = hazer_parse_talker(buffer, length)) >= HAZER_TALKER_TOTAL) {
-
-                if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSA) || hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSV)) {
-                    DIMINUTO_LOG_INFORMATION("Received NMEA Talker Other \"%*s\"", HAZER_NMEA_NAMEEND, buffer);
-                }
+                DIMINUTO_LOG_INFORMATION("Received NMEA Talker Other \"%*s\"", HAZER_NMEA_NAMEEND, buffer);
                 continue;
 
             } else if (talker == HAZER_TALKER_PUBX) {
@@ -2557,21 +2614,19 @@ consume:
 
             } else if ((system = hazer_map_talker_to_system(talker)) >= HAZER_SYSTEM_TOTAL) {
 
-                if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSA) || hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GSV)) {
-                    DIMINUTO_LOG_INFORMATION("Received NMEA System Other \"%*s\"\n", HAZER_NMEA_NAMEEND, buffer);
-                }
+                DIMINUTO_LOG_INFORMATION("Received NMEA System Other \"%*s\"\n", HAZER_NMEA_NAMEEND, buffer);
                 continue;
+
+            } else if (system > maximum) { 
+
+                maximum = system;
 
             } else {
 
-                /* Do nothing. */
+                /* Nominal. */
 
             }
 
-            if (system > maximum) { 
-                maximum = system;
-                DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
-            }
 
             /*
              * Parse the sentences we care about and update our state to
@@ -2697,7 +2752,6 @@ consume:
                     }
 
                     if (system > maximum) {
-                        maximum = system;
                         DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
                     }
 
@@ -2807,22 +2861,31 @@ consume:
 
                     for (system = HAZER_SYSTEM_GNSS; system < HAZER_SYSTEM_TOTAL; ++system) {
                         if ((rc & (1 << system)) != 0) {
+
                             if (system > maximum) {
                                 maximum = system;
-                                DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
                             }
+
                             views[system].sig[0].ticks = timeout;
+
                             if (system == HAZER_SYSTEM_GNSS) {
+
                                 /* Do nothing. */
+
                             } else if (actives[HAZER_SYSTEM_GNSS].ticks == 0) {
+
                                 /* Do nothing. */
+
                             } else {
+
                                 actives[system].mode = actives[HAZER_SYSTEM_GNSS].mode;
                                 actives[system].pdop = actives[HAZER_SYSTEM_GNSS].pdop;
                                 actives[system].hdop = actives[HAZER_SYSTEM_GNSS].hdop;
                                 actives[system].vdop = actives[HAZER_SYSTEM_GNSS].vdop;
                                 actives[system].tdop = actives[HAZER_SYSTEM_GNSS].tdop;
+
                             }
+
                             actives[system].ticks = timeout;
                             refresh = !0;
                             DIMINUTO_LOG_DEBUG("Received PUBX SVSTATUS (%s)\n", HAZER_SYSTEM_NAME[system]);
@@ -2851,7 +2914,8 @@ consume:
                      * receiver), we don't reset the position timer or indicate
                      * a refresh. We'll depend on a valid position fix (perhaps
                      * from the PUBX,00 sentence) to indicate a position
-                     * refresh. We still update the time in the structure.
+                     * refresh. We still update the time in the structure -
+                     * which is why we even bother with PUBX,04.
                      */
 
                 } else {
@@ -3231,6 +3295,10 @@ consume:
 
         default:
 
+            /*
+             * OTHER
+             */
+
             DIMINUTO_LOG_WARNING("Received Unknown 0x%x\n", buffer[0]);
 
             break;
@@ -3347,34 +3415,52 @@ consume:
         fd = -1;
 
         if (expired(&bypass_last, bypass)) {
+
             /* Do nothing. */
+
         } else if (hazer_has_pending_gsv(views, maximum)) {
+
             fd = in_fd;
             goto consume;
+
         } else if ((in_fp != (FILE *)0) && ((available = diminuto_file_ready(in_fp)) > 0)) {
+
             fd = in_fd;
             if (available > io_maximum) {
                 io_maximum = available;
             }
             goto consume;
+
         } else if (serial && (in_fd >= 0) && ((available = diminuto_serial_available(in_fd)) > 0)) {
+
             fd = in_fd;
             if (available > io_maximum) {
                 io_maximum = available;
             }
             goto consume;
+
         } else if ((fd = diminuto_mux_ready_read(&mux)) >= 0) {
+
             goto consume;
+
         } else if ((ready = diminuto_mux_wait(&mux, 0 /* POLL */)) == 0) {
+
             /* Do nothing. */
+
         } else if (ready > 0) {
+
             fd = diminuto_mux_ready_read(&mux);
             diminuto_contract(fd >= 0);
             goto consume;
+
         } else if (errno == EINTR) {
+
             continue; /* Interrupt. */
+
         } else {
+
             diminuto_panic();
+
         }
 
         /**
@@ -3404,9 +3490,13 @@ render:
          */
 
         if ((test & TEST_EXPIRATION) == 0) {
+
             /* Do nothing. */
+
         } else if (!refresh) {
+
             /* Do nothing. */
+
         } else {
             static int crowbar = 1000;
 
@@ -3415,11 +3505,13 @@ render:
                     positions[ii].ticks = 0;
                 }
             }
+
             if (crowbar <= 100) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
                     actives[ii].ticks = 0;
                  }
             }
+
             if (crowbar <= 200) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
                     for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
@@ -3427,21 +3519,27 @@ render:
                     }
                 }
             }
+
             if (crowbar <= 300) {
                 hardware.ticks = 0;
             }
+
             if (crowbar <= 400) {
                 status.ticks = 0;
             }
+
             if (crowbar <= 500) {
                 base.ticks = 0;
             }
+
             if (crowbar <= 600) {
                 rover.ticks = 0;
             }
+
             if (crowbar <= 700) {
                 kinematics.ticks = 0;
             }
+
             if (crowbar > 0) {
                 crowbar -= 1;
             }
@@ -3478,6 +3576,7 @@ render:
             if (escape) {
                 fputs(ANSI_LOC, out_fp);
             }
+
             if (report) {
                 print_local(out_fp);
                 print_positions(out_fp, positions, maximum, onepps, network_total);
@@ -3491,9 +3590,11 @@ render:
                 print_actives(out_fp, actives, maximum);
                 print_views(out_fp, views, actives, maximum);
             }
+
             if (escape) {
                 fputs(ANSI_END, out_fp);
             }
+
             if (report) {
                 fflush(out_fp);
             }
@@ -3522,6 +3623,7 @@ render:
             if (escape) {
                 fputs(ANSI_LOC, out_fp);
             }
+
             if (report) {
                 print_local(out_fp);
             }

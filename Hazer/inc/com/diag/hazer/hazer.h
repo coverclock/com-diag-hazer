@@ -259,9 +259,7 @@ typedef enum HazerAction {
  * Some of these are proprietary.
  */
 typedef enum HazerTalker {
-#if !0 /* DEPRECATED */
-    HAZER_TALKER_BEIDOU2            = 0,    /* BD */
-#endif
+    HAZER_TALKER_BEIDOU2            = 0,    /* BD (DEPRECATED) */
     HAZER_TALKER_DSC,                       /* CD */
     HAZER_TALKER_ECDIS,                     /* EC */
     HAZER_TALKER_GALILEO,                   /* GA */
@@ -279,9 +277,7 @@ typedef enum HazerTalker {
     HAZER_TALKER_PMTK,                      /* PMTK */
     HAZER_TALKER_PSRF,                      /* PSRF */
     HAZER_TALKER_PUBX,                      /* PUBX */
-#if !0 /* DEPRECATED */
-    HAZER_TALKER_QZSS,                      /* QZ */
-#endif
+    HAZER_TALKER_QZSS,                      /* QZ (DEPRECATED) */
     HAZER_TALKER_RADIO,                     /* ZV */
     HAZER_TALKER_TOTAL,
 } hazer_talker_t;

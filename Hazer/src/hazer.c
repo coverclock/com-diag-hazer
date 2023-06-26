@@ -1087,9 +1087,9 @@ hazer_talker_t hazer_parse_talker(const void * buffer, ssize_t length)
     int rc = -1;
 
     sentence = (const char *)buffer;
-    id = &(sentence[1]);
+    id = &(sentence[HAZER_NMEA_TALKER]);
 
-    if (length < (sizeof("$XX") - 1)) {
+    if (length < HAZER_NMEA_NAME) {
         /* Do nothing. */
     } else if (sentence[0] != HAZER_STIMULUS_START) {
         /* Do nothing. */
@@ -1103,7 +1103,7 @@ hazer_talker_t hazer_parse_talker(const void * buffer, ssize_t length)
                 talker = (hazer_talker_t)ii;
                 break;
             } else {
-                /* Do nothing. */
+                continue;
             }
         }
 

@@ -4,9 +4,9 @@
 
 /**
  * @file
- * @copyright Copyright 2020-2023 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
- * @brief Common facilities for other stuff.
+ * @brief Functions for managing all of the state machines.
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
