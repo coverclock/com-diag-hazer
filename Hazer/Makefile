@@ -778,11 +778,11 @@ install-include:
 
 ########## Tests
 
-.PHONY: sanity functional valgrind
+.PHONY: unit functional valgrind
 
 # Valgrind isn't available on all of the platforms on which
 # I run these unit tests.
-sanity:
+unit:
 	R="PASSED."; \
 	mkdir -p $(OUT)/log; \
 	cp /dev/null $(OUT)/log/unit-test.log; \

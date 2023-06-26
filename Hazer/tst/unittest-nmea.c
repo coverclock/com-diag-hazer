@@ -41,7 +41,7 @@ int main(void)
 
         assert(DATA[HAZER_NMEA_NAMEEND  + 0] == ',');
 
-        assert(hazer_is_nmea(DATA, sizeof(DATA)));
+        assert(hazer_is_nmea(DATA[0]));
 
         assert(hazer_is_nmea_name(DATA, sizeof(DATA), "RMC"));
     }
@@ -77,7 +77,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "GGA");
@@ -150,7 +150,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "GGA");
@@ -206,7 +206,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "RMC");
@@ -278,7 +278,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "RMC");
@@ -350,7 +350,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "RMC");
@@ -423,7 +423,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "RMC");
@@ -480,7 +480,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "GLL");
@@ -549,7 +549,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "VTG");
@@ -619,7 +619,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "VTG");
@@ -673,7 +673,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "GSA");
@@ -744,7 +744,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "GSA");
@@ -823,7 +823,7 @@ int main(void)
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
 
-            rc = hazer_is_nmea(buffer, length);
+            rc = hazer_is_nmea(buffer[0]);
             assert(rc == !0);
 
             rc = hazer_is_nmea_name(buffer, length, "GSV");
@@ -977,7 +977,7 @@ int main(void)
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
 
-            rc = hazer_is_nmea(buffer, length);
+            rc = hazer_is_nmea(buffer[0]);
             assert(rc == !0);
 
             rc = hazer_is_nmea_name(buffer, length, "GSV");
@@ -1139,7 +1139,7 @@ int main(void)
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
 
-            rc = hazer_is_nmea(buffer, length);
+            rc = hazer_is_nmea(buffer[0]);
             assert(rc == !0);
 
             rc = hazer_is_nmea_name(buffer, length, "GSV");
@@ -1283,7 +1283,7 @@ int main(void)
             assert(pointer[3] == '\r');
             assert(pointer[4] == '\n');
 
-            rc = hazer_is_nmea(buffer, length);
+            rc = hazer_is_nmea(buffer[0]);
             assert(rc == !0);
 
             rc = hazer_is_nmea_name(buffer, length, "GSV");
@@ -1420,7 +1420,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "ZDA");
@@ -1487,7 +1487,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "ZDA");
@@ -1554,7 +1554,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_nmea_name(buffer, length, "ZDA");

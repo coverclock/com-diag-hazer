@@ -1621,19 +1621,13 @@ extern int hazer_parse_pubx_time(hazer_position_t * positionp, char * vector[], 
  ******************************************************************************/
 
 /**
- * Return true of the character at the start of a frame suggests that it is
+ * Return true of the octet at the start of a frame suggests that it is
  * the beginning of an NMEA sentence.
- * @param buffer points to the buffer.
- * @param length is the number of octets in the buffer.
+ * @param octet is the octet.
  * @return true if it is likely to be an NMEA sentence.
  */
-static inline int hazer_is_nmea(const void * buffer, ssize_t length) {
-    const char * np = (const char *)buffer;
-
-    return (
-        (length > 0) &&
-        (*np == HAZER_STIMULUS_START)
-    );
+static inline int hazer_is_nmea(uint8_t octet) {
+    return (octet == HAZER_STIMULUS_START);
 }
 
 /**

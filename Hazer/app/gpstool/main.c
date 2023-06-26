@@ -1758,6 +1758,17 @@ consume:
                  * this one character and only activate the state machine
                  * that we need. If we don't recognize that character, then
                  * we're lost synchronization and need to reestablish it.
+                 * This all assumes that every GNSS device output format we
+                 * support has a unique beginning. So far this is true. When
+                 * it isn't, this logic will have to change. If the input
+                 * stream isn't reliable, we might make the wrong choice
+                 * because the octet happens to look like the sync character
+                 * at the start of the frame; we'll lose data as the
+                 * subsequent CRC or checksum fails, and we'll have to resync.
+                 * Note that some U-blox devices can't keep up with the serial
+                 * output stream and output partial frames (typically the last
+                 * few characters). This is especially true when mixing NMEA
+                 * and UBX output. This causes us to lose sync regularly.
                  */
 
                 if (!sync) {
@@ -1775,28 +1786,28 @@ consume:
 
                     /* Do nothing. */
 
-                } else if (hazer_is_nmea(&ch, 1)) {
+                } else if (hazer_is_nmea((uint8_t)ch)) {
 
                     nmea_state = HAZER_STATE_START;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
                     cpo_state = CALICO_STATE_STOP;
 
-                } else if (yodel_is_ubx(&ch, 1)) {
+                } else if (yodel_is_ubx((uint8_t)ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_START;
                     rtcm_state = TUMBLEWEED_STATE_STOP;
                     cpo_state = CALICO_STATE_STOP;
 
-                } else if (tumbleweed_is_rtcm(&ch, 1)) {
+                } else if (tumbleweed_is_rtcm((uint8_t)ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_STOP;
                     rtcm_state = TUMBLEWEED_STATE_START;
                     cpo_state = CALICO_STATE_STOP;
 
-                } else if (calico_is_cpo(&ch, 1)) {
+                } else if (calico_is_cpo((uint8_t)ch)) {
 
                     nmea_state = HAZER_STATE_STOP;
                     ubx_state = YODEL_STATE_STOP;
@@ -2033,7 +2044,7 @@ consume:
 
                 DIMINUTO_LOG_NOTICE("Datagram Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
-            } else if (hazer_is_nmea(remote_buffer.payload.nmea, remote_size) && ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0)) {
+            } else if (hazer_is_nmea(remote_buffer.payload.nmea[0]) && ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.nmea;
                 size = remote_size;
@@ -2042,7 +2053,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Datagram NMEA [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (yodel_is_ubx(remote_buffer.payload.ubx, remote_size) && ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0)) {
+            } else if (yodel_is_ubx(remote_buffer.payload.ubx[0]) && ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.ubx;
                 size = remote_size;
@@ -2051,7 +2062,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Datagram UBX [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (tumbleweed_is_rtcm(remote_buffer.payload.rtcm, remote_size) && ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0)) {
+            } else if (tumbleweed_is_rtcm(remote_buffer.payload.rtcm[0]) && ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.rtcm;
                 size = remote_size;
@@ -2060,7 +2071,7 @@ consume:
 
                 DIMINUTO_LOG_DEBUG("Datagram RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (calico_is_cpo(remote_buffer.payload.cpo, remote_size) && ((remote_length = calico_validate(remote_buffer.payload.cpo, remote_size)) > 0)) {
+            } else if (calico_is_cpo(remote_buffer.payload.cpo[0]) && ((remote_length = calico_validate(remote_buffer.payload.cpo, remote_size)) > 0)) {
 
                 buffer = remote_buffer.payload.cpo;
                 size = remote_size;
@@ -2939,13 +2950,13 @@ consume:
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_CFG_VALGET_Class, YODEL_UBX_CFG_VALGET_Id)) {
-                yodel_buffer_t temporary;
+                yodel_buffer_t valget;
 
                 DIMINUTO_LOG_DEBUG("Parse UBX UBX-CFG-VALGET\n");
 
-                if (yodel_ubx_cfg_valget(temporary, sizeof(temporary), buffer, length) == 0) {
+                if (yodel_ubx_cfg_valget(valget, sizeof(valget), buffer, length) == 0) {
 
-                    process_ubx_cfg_valget(temporary, length);
+                    process_ubx_cfg_valget(valget, length);
 
                 } else {
 
@@ -3035,13 +3046,13 @@ consume:
                 }
 
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_COMMS_Class, YODEL_UBX_MON_COMMS_Id)) {
-                yodel_buffer_t temporary;
+                yodel_buffer_t comms;
 
                 DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-COMMS\n");
 
-                if (yodel_ubx_mon_comms(temporary, sizeof(temporary), buffer, length) == 0) {
+                if (yodel_ubx_mon_comms(comms, sizeof(comms), buffer, length) == 0) {
 
-                    process_ubx_mon_comms(temporary, length);
+                    process_ubx_mon_comms(comms, length);
 
                 } else {
 

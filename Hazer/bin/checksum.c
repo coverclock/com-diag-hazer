@@ -238,13 +238,17 @@ int main(int argc, char * argv[])
             continue;
         }
         size -= 1;
-        if (hazer_is_nmea(buffer, size)) {
+        if (hazer_is_nmea(buffer[0])) {
             rc = print_sentence(stdout, (char *)buffer, size);
-        } else if (yodel_is_ubx(buffer, size)) {
+        } else if (yodel_is_ubx(buffer[0])) {
             rc = print_packet(stdout, buffer, size);
-        } else if (tumbleweed_is_rtcm(buffer, size)) {
+        } else if (tumbleweed_is_rtcm(buffer[0])) {
             rc = print_message(stdout, buffer, size);
-        } else if (calico_is_cpo(buffer, size)) {
+        } else if (calico_is_cpo(buffer[0])) {
+            /*
+             * We don't currently support CPO output because it requires most
+             * of the packet to be DLE-escaped, which is a much bigger task.
+             */
             DIMINUTO_LOG_ERROR("collapsed: unsupported!");
             rc = -1;
         } else {

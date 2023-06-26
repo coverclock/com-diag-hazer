@@ -389,19 +389,13 @@ typedef enum YodelId {
  ******************************************************************************/
 
 /**
- * Return true of the character at the start of a frame suggests that it is
+ * Return true of the octet at the start of a frame suggests that it is
  * the beginning of a UBX packet.
- * @param buffer points to the buffer.
- * @param length is the length of the buffer in bytes.
+ * @param octet is the octet.
  * @return true if it is likely to be a UBX packet.
  */
-static inline int yodel_is_ubx(const void * buffer, ssize_t length) {
-    const uint8_t * up = (const uint8_t *)buffer;
-
-    return (
-        (length > 0) &&
-        (*up == YODEL_STIMULUS_SYNC_1)
-    );
+static inline int yodel_is_ubx(uint8_t octet) {
+    return (octet == YODEL_STIMULUS_SYNC_1);
 }
 
 /**

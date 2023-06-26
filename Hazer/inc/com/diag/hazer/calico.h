@@ -288,20 +288,13 @@ extern ssize_t calico_validate(const void * buffer, size_t size);
  ******************************************************************************/
 
 /**
- * Return true if the character at the start of a frame suggests that it is
+ * Return true if the octet at the start of a frame suggests that it is
  * the beginning of a CPO packet.
- * @param buffer points to the buffer.
- * @param length is the length of the buffer in bytes.
- * @param ch is the character.
+ * @param octet is the octet.
  * @return true if it is likely to be a CPO packet.
  */
-static inline int calico_is_cpo(const void * buffer, ssize_t length) {
-    const uint8_t * cp = (const uint8_t *)buffer;
-
-    return (
-        (length > 0) &&
-        (*cp == CALICO_STIMULUS_DLE)
-    );
+static inline int calico_is_cpo(uint8_t octet) {
+    return (octet == CALICO_STIMULUS_DLE);
 }
 
 /**

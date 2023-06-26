@@ -40,7 +40,7 @@ int main(void)
 
         assert(DATA[HAZER_PUBX_IDEND    + 0] == ',');
 
-        assert(hazer_is_nmea(DATA, sizeof(DATA)));
+        assert(hazer_is_nmea(DATA[0]));
 
         assert(hazer_is_pubx_id(DATA, sizeof(DATA), "03"));
     }
@@ -77,7 +77,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_pubx_id(buffer, length, "00");
@@ -149,7 +149,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_pubx_id(buffer, length, "00");
@@ -207,7 +207,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_pubx_id(buffer, length, "00");
@@ -262,7 +262,7 @@ int main(void)
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_pubx_id(buffer, length, "03");
@@ -492,7 +492,7 @@ $PUBX,03,19,
         assert(pointer[3] == '\r');
         assert(pointer[4] == '\n');
 
-        rc = hazer_is_nmea(buffer, length);
+        rc = hazer_is_nmea(buffer[0]);
         assert(rc == !0);
 
         rc = hazer_is_pubx_id(buffer, length, "04");

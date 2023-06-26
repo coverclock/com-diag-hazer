@@ -38,29 +38,34 @@ int main(void)
 
         /*
          * These functions used to be part of common.
+         * We make ch an int because that's what fgetc() returns.
+         * We cast to uint8_t because sometimes the sign difference
+         * causes a warning. (Note that on some architectures, char
+         * is signed by default, and on others unsigned by default.
+         * uint8_t however is obviously always unsigned.)
          */
 
         ii = 0;
         for (ch = 0x00; ch <= 0xff; ++ch) {
             if (ch == '$') {
-                assert(hazer_is_nmea(&ch, 1));
+                assert(hazer_is_nmea((uint8_t)ch));
             } else {
-                assert(!hazer_is_nmea(&ch, 1));
+                assert(!hazer_is_nmea((uint8_t)ch));
             }
             if (ch == 0xb5) {
-                assert(yodel_is_ubx(&ch, 1));
+                assert(yodel_is_ubx((uint8_t)ch));
             } else {
-                assert(!yodel_is_ubx(&ch, 1));
+                assert(!yodel_is_ubx((uint8_t)ch));
             }
             if (ch == 0xd3) {
-                assert(tumbleweed_is_rtcm(&ch, 1));
+                assert(tumbleweed_is_rtcm((uint8_t)ch));
             } else {
-                assert(!tumbleweed_is_rtcm(&ch, 1));
+                assert(!tumbleweed_is_rtcm((uint8_t)ch));
             }
             if (ch == 0x10) {
-                assert(calico_is_cpo(&ch, 1));
+                assert(calico_is_cpo((uint8_t)ch));
             } else {
-                assert(!calico_is_cpo(&ch, 1));
+                assert(!calico_is_cpo((uint8_t)ch));
             }
             ++ii;
         }
