@@ -13,6 +13,11 @@
 #include "com/diag/diminuto/diminuto_minmaxof.h"
 #include <stdio.h>
 #include "com/diag/hazer/common.h"
+#include "com/diag/hazer/machine.h"
+#include "com/diag/hazer/hazer.h"
+#include "com/diag/hazer/yodel.h"
+#include "com/diag/hazer/tumbleweed.h"
+#include "com/diag/hazer/calico.h"
 #include "./unittest.h"
 
 int main(void)
@@ -134,17 +139,17 @@ int main(void)
                 for (rr = 0; rr < countof(rtcm); ++rr) {
                     for (cc = 0; cc < countof(cpo); ++cc) {
                         if ((nn == 1) && (uu == 1) && (rr == 1) && (cc == 1)) {
-                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
+                            assert(!machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
                         } else if ((nn != 0) && (nn != 1)) {
-                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
+                            assert(!machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
                         } else if ((uu != 0) && (uu != 1)) {
-                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
+                            assert(!machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
                         } else if ((rr != 0) && (rr != 1)) {
-                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
+                            assert(!machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
                         } else if ((cc != 0) && (cc != 1)) {
-                            assert(!common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
+                            assert(!machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
                         } else {
-                            assert(common_machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
+                            assert(machine_is_stalled(nmea[nn], ubx[uu], rtcm[rr], cpo[cc]));
                         }
                         ++ii;
                     }

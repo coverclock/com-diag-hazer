@@ -14,10 +14,6 @@
 
 #include <stdint.h>
 #include <wchar.h>
-#include "com/diag/hazer/hazer.h"
-#include "com/diag/hazer/yodel.h"
-#include "com/diag/hazer/tumbleweed.h"
-#include "com/diag/hazer/calico.h"
 
 #if !defined(COMMON_DEGREE_VALUE)
     /**
@@ -62,15 +58,5 @@ static inline int64_t common_abs64(int64_t x)
 #if !defined(abs64)
 #   define abs64 common_abs64
 #endif
-
-/**
- * Return true if NMEA, UBX, RTCM, and CPO state machines are stalled.
- * @param nmea_state is the state of the NMEA state machine.
- * @param ubx_state is the state of the UBX state machine.
- * @param rtcm_state is the state of the RTCM state machine.
- * @param cpo_state is the state of the CPO state machine.
- * @return true if stalled, false otherwise.
- */
-int common_machine_is_stalled(hazer_state_t nmea_state, yodel_state_t ubx_state, tumbleweed_state_t rtcm_state, calico_state_t cpo_state);
 
 #endif

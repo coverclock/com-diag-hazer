@@ -20,7 +20,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <math.h>
-#include "com/diag/hazer/common.h"
+#include "com/diag/hazer/calico.h"
 #include "../src/calico.h"
 
 static const char * LABEL = "CPO";

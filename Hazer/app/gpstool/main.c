@@ -127,6 +127,7 @@
 #include "com/diag/diminuto/diminuto_thread.h"
 #include "com/diag/diminuto/diminuto_version.h"
 #include "com/diag/hazer/common.h"
+#include "com/diag/hazer/machine.h"
 #include "com/diag/hazer/hazer_version.h"
 #include <ctype.h>
 #include <errno.h>
@@ -1972,7 +1973,7 @@ consume:
                  * checksum check.
                  */
 
-                if (common_machine_is_stalled(nmea_state, ubx_state, rtcm_state, cpo_state)) {
+                if (machine_is_stalled(nmea_state, ubx_state, rtcm_state, cpo_state)) {
 
                     if (sync) {
 
