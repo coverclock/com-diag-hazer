@@ -316,6 +316,10 @@ int main(int argc, char * argv[])
     hazer_talker_t talker = HAZER_TALKER_TOTAL;
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
     hazer_system_t candidate = HAZER_SYSTEM_TOTAL;
+    /*
+     * System (constellation) database.
+     */
+    bool systems[HAZER_SYSTEM_TOTAL] = { false, };
     hazer_system_t maximum = HAZER_SYSTEM_GNSS;
     /*
      * NMEA state databases.
@@ -2627,6 +2631,10 @@ consume:
 
             }
 
+            if (!systems[system]) {
+                DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                systems[system] = true;
+            }
 
             /*
              * Parse the sentences we care about and update our state to
@@ -2752,7 +2760,12 @@ consume:
                     }
 
                     if (system > maximum) {
-                        DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        maximum = system;
+                    }
+
+                    if (!systems[system]) {
+                        DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                        systems[system] = true;
                     }
 
                     actives[system] = active_cache;
@@ -2864,6 +2877,11 @@ consume:
 
                             if (system > maximum) {
                                 maximum = system;
+                            }
+
+                            if (!systems[system]) {
+                                DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                                systems[system] = true;
                             }
 
                             views[system].sig[0].ticks = timeout;
@@ -3202,7 +3220,11 @@ consume:
 
                     if (system > maximum) { 
                         maximum = system;
-                        DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                    }
+
+                    if (!systems[system]) {
+                        DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                        systems[system] = true;
                     }
 
                     positions[system].ticks = timeout;
@@ -3234,7 +3256,11 @@ consume:
 
                         if (system > maximum) { 
                             maximum = system;
-                            DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        }
+
+                        if (!systems[system]) {
+                            DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                            systems[system] = true;
                         }
 
                         views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
@@ -3250,7 +3276,11 @@ consume:
 
                         if (system > maximum) { 
                             maximum = system;
-                            DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        }
+
+                        if (!systems[system]) {
+                            DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                            systems[system] = true;
                         }
 
                         views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
@@ -3266,7 +3296,11 @@ consume:
 
                         if (system > maximum) { 
                             maximum = system;
-                            DIMINUTO_LOG_INFORMATION("System [%d] %s\n", maximum, HAZER_SYSTEM_NAME[maximum]);
+                        }
+
+                        if (!systems[system]) {
+                            DIMINUTO_LOG_NOTICE("System [%d] %s\n", system, HAZER_SYSTEM_NAME[system]);
+                            systems[system] = true;
                         }
 
                         views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
