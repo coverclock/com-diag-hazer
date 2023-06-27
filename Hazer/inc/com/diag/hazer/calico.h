@@ -520,6 +520,21 @@ extern int calico_cpo_position_record(hazer_position_t * gpp, const void * bp, s
 #include <endian.h>
 #include <string.h>
 
+/*
+ * Are you seeing this warning (or similar) when you build?
+ *
+ * inc/com/diag/hazer/calico.h:548:17: warning: ‘memcpy’ forming offset [3, 4] is out of the bounds [0, 2] of object ‘_temporary_’ with type ‘uint16_t’ {aka ‘short unsigned int’} [-Warray-bounds]
+ *
+ * Me too, but only when I build on a test system using GCC 8.3.0, not 6.3.0
+ * (older) nor 11.3.0 (newer). The compiler is complaining about code that
+ * cannot be executed (because of the sizeof operator in the case statement)
+ * and which I would have expected to have been optimized out. The issue is
+ * it thinks the memcpy(3) will write past the end of the structure, which it
+ * might IF that case could be executed (it won't).
+ *
+ * I also documented this in the ISSUES markdown file that is part of this repo.
+ */
+
 /**
  * @def COM_DIAG_CALICO_LETOH
  * Convert field @a _FIELD_ from Little Endian byte order (apparently) to Host
