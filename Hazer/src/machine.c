@@ -11,17 +11,6 @@
 
 #include "com/diag/hazer/machine.h"
 
-/**
- * Return true if NMEA, UBX, RTCM, and CPO state machines are all stalled.
- * This means they have either never synced to the beginning of what they
- * recognize as a frame, or they gave up on collecting the complete frame
- * once they did sync (typically because of a CRC or checksum failure).
- * @param nmea_state is the state of the NMEA state machine.
- * @param ubx_state is the state of the UBX state machine.
- * @param rtcm_state is the state of the RTCM state machine.
- * @param cpo_state is the state of the CPO state machine.
- * @return true if stalled, false otherwise.
- */
 int machine_is_stalled(hazer_state_t nmea_state, yodel_state_t ubx_state, tumbleweed_state_t rtcm_state, calico_state_t cpo_state)
 {
     int result = 0;

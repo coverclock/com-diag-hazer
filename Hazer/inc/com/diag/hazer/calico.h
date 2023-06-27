@@ -470,7 +470,7 @@ typedef struct CalicoCpoPositionRecord {
 } calico_cpo_pvt_t;
 
 /**
- * @def CALICO_CPO_POSITION_RECORD_INITIALIZER
+ * @def CALICO_CPO_PVT_INITIALIZER
  * Defines a static initializer for a CPO SDR.
  */
 #define CALICO_CPO_PVT_INITIALIZER \
