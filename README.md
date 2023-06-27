@@ -194,7 +194,7 @@ and associated
 were built from Hazer's embedded Doxygen comments on
 2023-06-27
 using tag
-```57.0.0```
+```57.0.1```
 . They will not reflect changes made since then.
 
 The unit tests (```Hazer/tst```), functional tests (```Hazer/fun```),
