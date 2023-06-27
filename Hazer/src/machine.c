@@ -26,15 +26,32 @@ int machine_is_stalled(hazer_state_t nmea_state, yodel_state_t ubx_state, tumble
 {
     int result = 0;
 
-    if ((nmea_state == HAZER_STATE_START) && (ubx_state == YODEL_STATE_START) && (rtcm_state == TUMBLEWEED_STATE_START) && (cpo_state == CALICO_STATE_START)) {
+    if (
+        (nmea_state == HAZER_STATE_START) &&
+        (ubx_state == YODEL_STATE_START) &&
+        (rtcm_state == TUMBLEWEED_STATE_START) &&
+        (cpo_state == CALICO_STATE_START)
+    ) {
         /* Do nothing: all are scanning for beginning of frame. */
-    } else if ((nmea_state != HAZER_STATE_START) && (nmea_state != HAZER_STATE_STOP)) {
+    } else if (
+        (nmea_state != HAZER_STATE_START) &&
+        (nmea_state != HAZER_STATE_STOP)
+    ) {
         /* Do nothing: NMEA is processing. */
-    } else if ((ubx_state != YODEL_STATE_START) && (ubx_state != YODEL_STATE_STOP)) {
+    } else if (
+        (ubx_state != YODEL_STATE_START) &&
+        (ubx_state != YODEL_STATE_STOP)
+    ) {
         /* Do nothing: UBX is processing. */
-    } else if ((rtcm_state != TUMBLEWEED_STATE_START) && (rtcm_state != TUMBLEWEED_STATE_STOP)) {
+    } else if (
+        (rtcm_state != TUMBLEWEED_STATE_START) &&
+        (rtcm_state != TUMBLEWEED_STATE_STOP)
+    ) {
         /* Do nothing: RTCM is processing. */
-    } else if ((cpo_state != CALICO_STATE_START) && (cpo_state != CALICO_STATE_STOP)) {
+    } else if (
+        (cpo_state != CALICO_STATE_START) &&
+        (cpo_state != CALICO_STATE_STOP)
+    ) {
         /* Do nothing: CPO is processing. */
     } else {
         result = !0;
