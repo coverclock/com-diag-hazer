@@ -148,12 +148,6 @@ with non-u-blox devices makes that opinion hard to keep. (Regardless,
 u-blox devices remain my favorite GNSS devices for other reasons;
 I can live with the resyncing.)
 
-### Update 2023-06-28
-
-The Garmin GPS-18x USB device apparently uses a U-blox receiver,
-probably a generation 8, emitting boxh NMEA and UBX data, at 4800
-baud, and exhibits this same mis-behavior.
-
 ## End Of File (EOF) on U-blox UBX-ZED-F9P when using Ubuntu VM
 
 Several times, while running this software under Ubunto 19.10 in a
