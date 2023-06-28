@@ -471,17 +471,7 @@ int calico_cpo_satellite_data_record(hazer_views_t viewa, hazer_actives_t active
 
                 vp->label = LABEL;
 
-                /*
-                 * We don't count SBAS (WAAS) as active, since that
-                 * implies to the caller that we are computing possibly
-                 * an independent position fix using that constellation.
-                 */
-
-                if (system == HAZER_SYSTEM_SBAS) {
-                    /* Do nothing. */
-                } else if ((sdr.status & CALICO_CPO_SDR_STATUS_Solution) == 0) {
-                    /* Do nothing. */
-                } else {
+                if ((sdr.status & CALICO_CPO_SDR_STATUS_Solution) != 0) {
 
                     ai = ap->active;
                     if (ai < HAZER_GNSS_ACTIVES) {

@@ -17,7 +17,6 @@ RATE=${2:-"4800"}
 
 ERRFIL=$(readlink -e $(dirname ${0})/..)/tmp/gps18xpc.err
 mkdir -p $(dirname ${ERRFIL})
-cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
