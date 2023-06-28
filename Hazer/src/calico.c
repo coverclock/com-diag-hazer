@@ -471,7 +471,10 @@ int calico_cpo_satellite_data_record(hazer_views_t viewa, hazer_actives_t active
 
                 vp->label = LABEL;
 
-                if ((sdr.status & CALICO_CPO_SDR_STATUS_Solution) != 0) {
+                if (
+                    ((sdr.status & CALICO_CPO_SDR_STATUS_Solution) != 0) ||
+                    ((sdr.status & CALICO_CPO_SDR_STATUS_Augmentation) != 0))
+                {
 
                     ai = ap->active;
                     if (ai < HAZER_GNSS_ACTIVES) {

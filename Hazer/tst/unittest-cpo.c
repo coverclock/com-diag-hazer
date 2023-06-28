@@ -232,6 +232,16 @@ int main(void)
         assert(actives[HAZER_SYSTEM_GPS].active == 8);
         assert(actives[HAZER_SYSTEM_GPS].mode == HAZER_MODE_UNKNOWN);
 
+        assert(strcmp(actives[HAZER_SYSTEM_SBAS].label, "CPO") == 0);
+        assert(actives[HAZER_SYSTEM_SBAS].id[0] == 46);
+        assert(actives[HAZER_SYSTEM_SBAS].pdop == HAZER_GNSS_DOP);
+        assert(actives[HAZER_SYSTEM_SBAS].hdop == HAZER_GNSS_DOP);
+        assert(actives[HAZER_SYSTEM_SBAS].vdop == HAZER_GNSS_DOP);
+        assert(actives[HAZER_SYSTEM_SBAS].tdop == HAZER_GNSS_DOP);
+        assert(actives[HAZER_SYSTEM_SBAS].system == HAZER_SYSTEM_SBAS);
+        assert(actives[HAZER_SYSTEM_SBAS].active == 1);
+        assert(actives[HAZER_SYSTEM_SBAS].mode == HAZER_MODE_UNKNOWN);
+
     END;
 
     /**************************************************************************/
