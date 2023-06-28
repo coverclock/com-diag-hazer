@@ -24,7 +24,7 @@ exec 2>>${ERRFIL}
 # Garmin's proprietary binary commands. The commands I pass to the
 # GPS-18x USB below are what I used to probe it. The Garmin proprietary
 # NMEA-like commands do not work, but the U-blox proprietary binary
-# command does.
+# command and the NMEA-like commands do.
 
 # PGRMO
 # PGRMC1
