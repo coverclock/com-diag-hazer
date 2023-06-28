@@ -1447,6 +1447,7 @@ throw an assert and core dump.
 * gps18xpcbinary - places the Garmin GPS-18x PC in binary mode (9600 baud).
 * gps18xpcnmea - places the Garmin GPS-18x PC in NMEA mode (4800 baud).
 * gps18xpc - exercises the Garmin GPS-18x PC (9600 baud by default).
+* gps18xusb - exercises the Garmin GPS-18x USB.
 * gpsproplusblue - exercises the Bad Elf GPS Pro+ receiver via Bluetooth.
 * gpsproplususb - exercises the Bad Elf GPS Pro+ receiver via USB.
 * gr701w - exercises the NaviSys GR701W receiver.    
