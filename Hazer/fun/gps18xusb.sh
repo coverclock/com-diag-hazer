@@ -18,6 +18,14 @@ exec 2>>${ERRFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
+# I was surprised as anyone to find a U-blox device, probably a gen 8,
+# inside the Garmin GPS-18x USB, after my experience with the Garmin
+# GPS-18x PC, which seems to have something else since it understands
+# Garmin's proprietary binary commands. The commands I pass to the
+# GPS-18x USB below are what I used to probe it. The Garmin proprietary
+# NMEA-like commands do not work, but the U-blox proprietary binary
+# command does.
+
 # PGRMO
 # PGRMC1
 # PGRMI
