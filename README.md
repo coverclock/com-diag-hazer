@@ -1444,10 +1444,14 @@ throw an assert and core dump.
 * dgnss - a script used to test other DNSS scripts.
 * fothergill - runs gpstool and forwards CSV traces across LoRa radio channel.
 * gn803g - exercises the TOPGNSS GN-803G receiver.
-* gps18xpcbinary - places the Garmin GPS-18x PC in binary mode (9600 baud).
-* gps18xpcnmea - places the Garmin GPS-18x PC in NMEA mode (4800 baud).
-* gps18xpc - exercises the Garmin GPS-18x PC (9600 baud by default).
-* gps18xusb - exercises the Garmin GPS-18x USB.
+* gps18xpc2cpo - places the Garmin GPS-18x PC in CPO mode (9600 baud).
+* gps18xpc2nmea - places the Garmin GPS-18x PC in NMEA mode (4800 baud).
+* gps18xpccpo - operates the Garmin GPS-18x PC in CPO mode (9600 baud).
+* gps18xpcnmea - operates the Garmin GPS-18x PC in NMEA mode (4800 baud).
+* gps18xusb2cpo - places the Garmin GPS-18x USB in CPO mode (9600 baud).
+* gps18xusb2nmea - places the Garmin GPS-18x USB in NMEA mode (4800 baud).
+* gps18xusbcpo - operates the Garmin GPS-18x USB in CPO mode (9600 baud).
+* gps18xusbnmea - operates the Garmin GPS-18x USB in NMEA mode (4800 baud).
 * gpsproplusblue - exercises the Bad Elf GPS Pro+ receiver via Bluetooth.
 * gpsproplususb - exercises the Bad Elf GPS Pro+ receiver via USB.
 * gr701w - exercises the NaviSys GR701W receiver.    
