@@ -517,8 +517,8 @@ I have successfully tested Hazer with the following GNSS devices.
 * Ettus Research (National Instruments) USRP B210, GNURadio 3.7.11, GNSS-SDR 0.0.10 [^9]    
 * Garmin GLO (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21]    
 * Garmin GLO 2 (?MTK?, Bluetooth, N/A, rfcomm, 10Hz) [^15] [^21] [^22]    
-* Garmin GPS 18x PC (?, 4800/9600 8n1, N/A, ttyS, 1Hz)    
-* Garmin GPS 18x USB (?, 4800 8n1, v04d8p00dd, ttyS, 1Hz)    
+* Garmin GPS 18x PC (?, 4800/9600 8n1, N/A, ttyS, 1Hz) [^28]    
+* Garmin GPS 18x USB (?, 4800/9600 8n1, v04d8p00dd, ttyACM, 1Hz) [^28]    
 * Generic Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
 * GlobalSat BU-353N (Quectel L89?+Prolific, 4800 8N1, v067Bp23a3, ttyUSB, 1Hz) [^25]    
 * GlobalSat BU-353N(10Hz) (Quectel L89?+Prolific, 115200 8N1, v067Bp23a3, ttyUSB, 10Hz) [^25]    
@@ -573,7 +573,7 @@ I have successfully tested Hazer with the following GNSS devices.
 [^25]: Vendor web site and OEM packaging correctly states GPS only.    
 [^26]: Emits GSAs with GLONASS id (2) but only emits GSVs with GPS talker (GP).    
 [^27]: Initially updates at 1Hz until it achieves a fix, than updates at 5Hz.    
-[^28]: In NMEA mode.    
+[^28]: In either NMEA or CPO (binary) mode.    
 
 Note that when sending commands to and parsing output from GNSS
 devices, Postel's Law - "Be conservative in what you send, be liberal
