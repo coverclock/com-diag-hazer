@@ -632,12 +632,12 @@ Linux 4.19.66
 GNU 6.3.0    
 (Differential GNSS Stationary Rover)    
 
-Raspberry Pi 3 Model B+ BCM2835
+Raspberry Pi 3 Model B+ BCM2835    
 ARM Cortex-A72 x4    
-Raspbian 10 "buster"
-Linux 4.19.50
-GNU 8.3.0
-(Differential GNSS RTCM Server)
+Raspbian 10 "buster"    
+Linux 4.19.50    
+GNU 8.3.0    
+(Differential GNSS RTCM Server)    
 
 Raspberry Pi 3 Model B+ BCM2835    
 ARM Cortex-A72 x4    
