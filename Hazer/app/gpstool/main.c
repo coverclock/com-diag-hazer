@@ -149,6 +149,7 @@
 #include "emit.h"
 #include "globals.h"
 #include "helpers.h"
+#include "log.h"
 #include "print.h"
 #include "process.h"
 #include "sync.h"
@@ -1580,16 +1581,16 @@ int main(int argc, char * argv[])
 #   warning TEST_ERROR enabled!
 
     /*
-     * This code tests the print_error macro and its underlying
-     * print_error_f function.
+     * This code tests the log_error macro and its underlying
+     * log_error_f function.
      */
 
     if ((test & TEST_ERROR) != 0) {
-        extern void print_error_t1(void);
-        extern void print_error_t2(void);
+        extern void log_error_t1(void);
+        extern void log_error_t2(void);
 
-        print_error_t1();
-        print_error_t2();
+        log_error_t1();
+        log_error_t2();
     }
 
 #endif
@@ -2040,22 +2041,22 @@ consume:
 
                         if (nmea_context.error) {
                             errno = EIO;
-                            print_error(nmea_buffer.payload.nmea, nmea_context.bp - nmea_buffer.payload.nmea - 1);
+                            log_error(nmea_buffer.payload.nmea, nmea_context.bp - nmea_buffer.payload.nmea - 1);
                         }
 
                         if (ubx_context.error) {
                             errno = EIO;
-                            print_error(ubx_buffer.payload.ubx, ubx_context.bp - ubx_buffer.payload.ubx - 1);
+                            log_error(ubx_buffer.payload.ubx, ubx_context.bp - ubx_buffer.payload.ubx - 1);
                         }
 
                         if (rtcm_context.error) {
                             errno = EIO;
-                            print_error(rtcm_buffer.payload.rtcm, rtcm_context.bp - rtcm_buffer.payload.rtcm - 1);
+                            log_error(rtcm_buffer.payload.rtcm, rtcm_context.bp - rtcm_buffer.payload.rtcm - 1);
                         }
 
                         if (cpo_context.error) {
                             errno = EIO;
-                            print_error(cpo_buffer.payload.cpo, cpo_context.bp - cpo_buffer.payload.cpo - 1);
+                            log_error(cpo_buffer.payload.cpo, cpo_context.bp - cpo_buffer.payload.cpo - 1);
                         }
 
                         if (verbose) {
@@ -2693,7 +2694,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -2720,7 +2721,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -2747,7 +2748,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -2771,7 +2772,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -2824,7 +2825,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -2850,7 +2851,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -2881,7 +2882,27 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
+
+                }
+
+            } else if (hazer_is_nmea_name(buffer, length, HAZER_NMEA_SENTENCE_GBS)) {
+                hazer_fault_t fault = HAZER_FAULT_INITIALIZER;
+
+                /*
+                 * NMEA GBS
+                 */
+
+                DIMINUTO_LOG_DEBUG("Parse NMEA GBS\n");
+
+                rc = hazer_parse_gbs(&fault, vector, count);
+                if (rc == 0) {
+
+                    log_fault(&fault);
+
+                } else {
+
+                    log_error(buffer, length);
 
                 }
 
@@ -2899,7 +2920,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -2935,7 +2956,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -2990,7 +3011,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3021,7 +3042,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3066,7 +3087,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3086,7 +3107,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3106,7 +3127,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3136,7 +3157,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3156,7 +3177,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3186,7 +3207,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3206,7 +3227,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3226,7 +3247,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3246,7 +3267,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3266,7 +3287,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3286,7 +3307,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3415,7 +3436,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 
@@ -3464,7 +3485,7 @@ consume:
 
                 } else {
 
-                    print_error(buffer, length);
+                    log_error(buffer, length);
 
                 }
 

@@ -1642,7 +1642,6 @@ int hazer_parse_gsa(hazer_active_t * activep, char * vector[], size_t count)
                 errno = EINVAL;
                 break;
             }
-
             active.system = hazer_map_nmea_to_system(system);
 
         } else {
@@ -2480,6 +2479,129 @@ int hazer_parse_zda(hazer_position_t * positionp, char * vector[], size_t count)
         update_time(positionp);
 
         positionp->label = ZDA;
+
+        rc = 0;
+
+    } while (0);
+
+    return rc;
+}
+
+int hazer_parse_gbs(hazer_fault_t * faultp, char * vector[], size_t count)
+{
+    int rc = -1;
+    size_t length = 0;
+    char * end = (char *)0;
+    uint8_t digits = 0;
+    int system = HAZER_SYSTEM_TOTAL;
+    static const hazer_fault_t FAULT = HAZER_FAULT_INITIALIZER;
+    static const char GBS[] = HAZER_NMEA_SENTENCE_GBS;
+
+    do {
+
+        /*
+         * IDENTIFY
+         */
+
+        if (count < 2) {
+            errno = ENOMSG;
+            break;
+        }
+
+        length = strnlen(vector[0], sizeof("$XXGBS"));
+        if (length != (sizeof("$XXGBS") - 1)) {
+            errno = ENOMSG;
+            break;
+        }
+
+        if (*vector[0] != HAZER_STIMULUS_START) {
+            errno = ENOMSG;
+            break;
+        }
+
+        if (strcmp(vector[0] + sizeof("$XX") - 1, GBS) != 0) {
+            errno = ENOMSG;
+            break;
+        }
+
+        /*
+         * VALIDATE
+         */
+
+        if (count < 10) {
+            errno = ENODATA;
+            break;
+        }
+
+        memcpy(faultp, &FAULT, sizeof(*faultp));
+
+        faultp->talker = hazer_parse_talker(vector[0], length);
+
+        faultp->utc_nanoseconds = hazer_parse_utc(vector[1], &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        faultp->lat_millimeters = hazer_parse_alt(vector[2], 'M', &digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        faultp->lon_millimeters = hazer_parse_alt(vector[3], 'M', &digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        faultp->alt_millimeters = hazer_parse_alt(vector[4], 'M', &digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        faultp->id = strtol(vector[5], &end, 10);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        faultp->probability = hazer_parse_alt(vector[6], 'M', &digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        faultp->est_millimeters = hazer_parse_alt(vector[7], 'M', &digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        faultp->std_deviation = hazer_parse_alt(vector[8], 'M', &digits, &end);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+
+        if (count < 12) {
+            rc = 0;
+            break;
+        }
+
+        system = strtol(vector[9], &end, 10);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
+        faultp->system = hazer_map_nmea_to_system(system);
+
+        faultp->signal = strtol(vector[10], &end, 16);
+        if (*end != '\0') {
+            errno = EINVAL;
+            break;
+        }
 
         rc = 0;
 

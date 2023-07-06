@@ -971,6 +971,7 @@ extern uint16_t hazer_parse_dop(const char * string, char ** endp);
 /**
  * @def HAZER_NMEA_SENTENCE_GBS
  * ublox7 Protocol Reference, p. vi, GNSS fault detection
+ * NMEA 0183 4.11, p. 82
  */
 #define HAZER_NMEA_SENTENCE_GBS "GBS"
 
@@ -989,6 +990,7 @@ extern uint16_t hazer_parse_dop(const char * string, char ** endp);
 /**
  * @def HAZER_NMEA_SENTENCE_GNS
  * ublox7 Protocol Reference, p. vi, GNSS fix data
+ * NMEA 0183 4.11, p. 91
  */
 #define HAZER_NMEA_SENTENCE_GNS "GNS"
 
@@ -1556,6 +1558,38 @@ typedef hazer_view_t (hazer_views_t)[HAZER_SYSTEM_TOTAL];
  * @return >=0 for success, <0 otherwise.
  */
 extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
+
+/*******************************************************************************
+ * PARSING SATELLITE FAULT DETECTION SENTENCES
+ ******************************************************************************/
+
+typedef struct HazerFault {
+    uint64_t utc_nanoseconds;   /* Time of fix associated with fault. */
+    int64_t lat_millimeters;    /* Expected latitude error in millimeters. */
+    int64_t lon_millimeters;    /* Expected longitude error in millimeters. */
+    int64_t alt_millimeters;    /* Expected altitude error in millimeters. */
+    int64_t probability;        /* Probability of missed detection * 1000. */
+    int64_t est_millimeters;    /* Estimate of bias in millimeters. */
+    int64_t std_deviation;      /* Standard deviation of bias estimate * 1000. */
+    uint16_t id;                /* Failing satellite ID. */
+    uint8_t talker;             /* Talker index. */
+    uint8_t system;             /* System index. */
+    uint8_t signal;             /* Signal index. */
+} hazer_fault_t;
+
+#define HAZER_FAULT_INITIALIZER \
+    { \
+        HAZER_NANOSECONDS_INITIALIZER, \
+        0, 0, 0, \
+        0, 0, \
+        0, \
+        0, \
+        HAZER_SYSTEM_TOTAL, \
+        HAZER_SYSTEM_TOTAL, \
+        HAZER_GNSS_SIGNALS, \
+    }
+
+extern int hazer_parse_gbs(hazer_fault_t * faultp, char * vector[], size_t count);
 
 /*******************************************************************************
  * PARSING TEXT SENTENCES

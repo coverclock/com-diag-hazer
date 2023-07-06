@@ -18,6 +18,55 @@
 #define position positions[HAZER_SYSTEM_GNSS]
 #define view views[HAZER_SYSTEM_GPS]
 
+/*
+ * Swiped from gpstool.
+ */
+void gbs(const hazer_fault_t * fp)
+{
+    int year = 0;
+    int month = 0;
+    int day = 0;
+    int hour = 0;
+    int minute = 0;
+    int second = 0;
+    uint64_t nanoseconds = 0;
+    hazer_talker_t talker = HAZER_TALKER_TOTAL;
+    hazer_system_t system = HAZER_SYSTEM_TOTAL;
+    int signal = 0;
+
+    hazer_format_nanoseconds2timestamp(fp->utc_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
+
+    if (fp->talker >= HAZER_TALKER_TOTAL) {
+        talker = HAZER_TALKER_GNSS;
+    } else {
+        talker = fp->talker;
+    }
+
+    system = hazer_map_nmea_to_system(fp->system);
+    if (system >= HAZER_SYSTEM_TOTAL) {
+        system = HAZER_SYSTEM_GNSS;
+    }
+
+    if (fp->signal >= HAZER_GNSS_SIGNALS) {
+        signal = 0;
+    } else {
+        signal = fp->signal;
+    }
+
+    fprintf(stderr, "Fault %02d:%02d:%02dZ %s %s %s %d %.3lfm %.3lfm %.3lfm %.3lf%% %.3lfm %.3lf\n",
+        hour, minute, second,
+        HAZER_TALKER_NAME[talker],
+        HAZER_SYSTEM_NAME[system],
+        HAZER_SIGNAL_NAME[system][signal],
+        fp->id,
+        (double)(fp->lat_millimeters) / 1000.0,
+        (double)(fp->lon_millimeters) / 1000.0,
+        (double)(fp->alt_millimeters) / 1000.0,
+        (double)(fp->probability) / 1000.0,
+        (double)(fp->est_millimeters) / 1000.0,
+        (double)(fp->std_deviation) / 1000.0);
+}
+
 int main(void)
 {
     hazer_debug(stderr);
@@ -1587,6 +1636,114 @@ int main(void)
         position.ticks = 1;
         assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
+    }
+
+    {
+        /* Trimble GBS example, which lacks GNSS System ID and Signal ID. */
+        static const char * DATA = "$GPGBS,015509.00,-0.031,-0.186,0.219,19,0.000,-0.354,6.972*4D\r\n";
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_fault_t fault = HAZER_FAULT_INITIALIZER;
+        ssize_t length = -1;
+        ssize_t size = -1;
+        size_t count = 0;
+        int rc = -1;
+        char * pointer = (char *)0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
+        hazer_buffer_t temporary = { 0 };
+
+        strncpy((char *)buffer, DATA, sizeof(buffer));
+        buffer[sizeof(buffer) - 1] = '\0';
+        assert(strcmp(DATA, (const char *)buffer) == 0);
+
+        length = hazer_length(buffer, sizeof(buffer));
+        assert(length == strlen((const char *)buffer));
+
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
+        assert(pointer != (char *)0);
+        assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+        assert(pointer[1] == msn);
+        assert(pointer[2] == lsn);
+        assert(pointer[3] == '\r');
+        assert(pointer[4] == '\n');
+
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "GBS");
+        assert(rc == !0);
+
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
+        assert(count == 10);
+
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
+        assert(strcmp(DATA, (const char *)temporary) == 0);
+
+        rc = hazer_parse_gbs(&fault, vector, count);
+        assert(rc == 0);
+
+        gbs(&fault);
+    }
+
+    {
+        /* Trimble GBS example, but with NMEA 0183 4.10 fields. */
+        static const char * DATA = "$GPGBS,015509.00,-0.031,-0.186,0.219,19,0.000,-0.354,6.972,1,2*4E\r\n";
+        hazer_buffer_t buffer = HAZER_BUFFER_INITIALIZER;
+        hazer_vector_t vector = HAZER_VECTOR_INITIALIZER;
+        hazer_fault_t fault = HAZER_FAULT_INITIALIZER;
+        ssize_t length = -1;
+        ssize_t size = -1;
+        size_t count = 0;
+        int rc = -1;
+        char * pointer = (char *)0;
+        uint8_t msn = 0;
+        uint8_t lsn = 0;
+        hazer_buffer_t temporary = { 0 };
+
+        strncpy((char *)buffer, DATA, sizeof(buffer));
+        buffer[sizeof(buffer) - 1] = '\0';
+        assert(strcmp(DATA, (const char *)buffer) == 0);
+
+        length = hazer_length(buffer, sizeof(buffer));
+        assert(length == strlen((const char *)buffer));
+
+        pointer = (char *)hazer_checksum_buffer(buffer, length, &msn, &lsn);
+        assert(pointer != (char *)0);
+        assert(pointer[0] == HAZER_STIMULUS_CHECKSUM);
+        assert(pointer[1] == msn);
+        assert(pointer[2] == lsn);
+        assert(pointer[3] == '\r');
+        assert(pointer[4] == '\n');
+
+        rc = hazer_is_nmea(buffer[0]);
+        assert(rc == !0);
+
+        rc = hazer_is_nmea_name(buffer, length, "GBS");
+        assert(rc == !0);
+
+        count = hazer_tokenize(vector, sizeof(vector) / sizeof(vector[0]), buffer, length);
+        assert(count == 12);
+
+        size = hazer_serialize(temporary, sizeof(temporary), vector, count);
+        assert(size == (strlen((const char *)temporary) + 1));
+        temporary[size - 1] = msn;
+        temporary[size] = lsn;
+        temporary[size + 1] = '\r';
+        temporary[size + 2] = '\n';
+        temporary[size + 3] = '\0';
+        assert(strcmp(DATA, (const char *)temporary) == 0);
+
+        rc = hazer_parse_gbs(&fault, vector, count);
+        assert(rc == 0);
+
+        gbs(&fault);
     }
 
     return 0;

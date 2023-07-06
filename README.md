@@ -1005,6 +1005,15 @@ ublox, 2019-06-13
 u-blox 9, "ZED-F9T Integration Manual", UBX-19005590-R05, ublox,
 2020-11-18
 
+u-blox 10, "NEO-F10T High precision timing GNSS module Professional Grade
+Data Sheet", UBX-22022576-R02, ublox, 2023-03-30
+
+u-blox 10, "NEO-F10T u-blox F10 GNSS timing module Integration Manual",
+UBX-22018271-R01, ublox, 2023-04-05
+
+u-blox 10, "Product Summary NEO-F10T module u-blox F10 high accuracy timing
+module", UBX-22025534-R02, ublox, 2023
+
 u-blox 10, "u-blox F10 TIM 3.01 - u-blox F10 GNSS timing receiver -
 Interface Description", UBX-23003447-R01, ublox, 2023-03-21
 
