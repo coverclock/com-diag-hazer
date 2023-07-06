@@ -1689,6 +1689,18 @@ int main(void)
         rc = hazer_parse_gbs(&fault, vector, count);
         assert(rc == 0);
 
+        assert(fault.utc_nanoseconds == 6909000000000ULL);
+        assert(fault.lat_millimeters == -31LL);
+        assert(fault.lon_millimeters == -186LL);
+        assert(fault.alt_millimeters == 219LL);
+        assert(fault.probability == 0LL);
+        assert(fault.est_millimeters == -354LL);
+        assert(fault.std_deviation == 6972LL);
+        assert(fault.id == 19);
+        assert(fault.talker == HAZER_TALKER_GPS);
+        assert(fault.system == HAZER_SYSTEM_TOTAL);
+        assert(fault.signal == HAZER_GNSS_SIGNALS);
+
         gbs(&fault);
     }
 
@@ -1742,6 +1754,18 @@ int main(void)
 
         rc = hazer_parse_gbs(&fault, vector, count);
         assert(rc == 0);
+
+        assert(fault.utc_nanoseconds == 6909000000000ULL);
+        assert(fault.lat_millimeters == -31LL);
+        assert(fault.lon_millimeters == -186LL);
+        assert(fault.alt_millimeters == 219LL);
+        assert(fault.probability == 0LL);
+        assert(fault.est_millimeters == -354LL);
+        assert(fault.std_deviation == 6972LL);
+        assert(fault.id == 19);
+        assert(fault.talker == HAZER_TALKER_GPS);
+        assert(fault.system == HAZER_SYSTEM_GPS);
+        assert(fault.signal == 2);
 
         gbs(&fault);
     }
