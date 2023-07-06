@@ -478,6 +478,27 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
  *
  ******************************************************************************/
 
+/**
+ * Fixup the value if it has a negative sign. This happens because when
+ * strtol(3) sees "-0.123" it ignores the minus sign and returns zero for
+ * the non-fractional part.
+ * @param value is the numeric value.
+ * @param sign is its leading sign if any.
+ * @param the new value possibly unchagened.
+ */
+static inline int64_t fixup(int64_t value, char sign)
+{
+    if (value <= 0) {
+        /* Do nothing. */
+    } else if (sign != HAZER_STIMULUS_NEGATIVE) {
+        /* Do nothing. */
+    } else {
+        value = -value;
+    }
+
+    return value;
+}
+
 uint64_t hazer_parse_fraction(const char * string, uint64_t * denominatorp, char ** endp)
 {
     unsigned long long numerator = 0;
@@ -741,10 +762,6 @@ int64_t hazer_parse_cog(const char * string, uint8_t * digitsp, char ** endp)
 
         nanodegrees *= 1000000000LL;
 
-        if (nanodegrees < 0) {
-            --digits;
-        }
-
         if (**endp == HAZER_STIMULUS_DECIMAL) {
 
             fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
@@ -760,6 +777,12 @@ int64_t hazer_parse_cog(const char * string, uint8_t * digitsp, char ** endp)
                 nanodegrees += fraction;
             }
 
+            --digits;
+        }
+
+        nanodegrees = fixup(nanodegrees, string[0]);
+
+        if (nanodegrees < 0) {
             --digits;
         }
 
@@ -793,10 +816,6 @@ int64_t hazer_parse_sog(const char * string, uint8_t * digitsp, char ** endp)
 
         microknots *= 1000000LL;
 
-        if (microknots < 0) {
-            --digits;
-        }
-
         if (**endp == HAZER_STIMULUS_DECIMAL) {
 
             fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
@@ -814,6 +833,12 @@ int64_t hazer_parse_sog(const char * string, uint8_t * digitsp, char ** endp)
 
             --digits;
 
+        }
+
+        microknots = fixup(microknots, string[0]);
+
+        if (microknots < 0) {
+            --digits;
         }
 
         *digitsp = digits;
@@ -846,10 +871,6 @@ int64_t hazer_parse_smm(const char * string, uint8_t * digitsp, char ** endp)
 
         millimetersperhour *= 1000000LL;
 
-        if (millimetersperhour < 0) {
-            --digits;
-        }
-
         if (**endp == HAZER_STIMULUS_DECIMAL) {
 
             fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
@@ -865,6 +886,12 @@ int64_t hazer_parse_smm(const char * string, uint8_t * digitsp, char ** endp)
                 millimetersperhour += fraction;
             }
 
+            --digits;
+        }
+
+        millimetersperhour = fixup(millimetersperhour, string[0]);
+
+        if (millimetersperhour < 0) {
             --digits;
         }
 
@@ -898,10 +925,6 @@ int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp, char
 
         millimeters *= 1000LL;
 
-        if (millimeters < 0) {
-            --digits;
-        }
-
         if (**endp == HAZER_STIMULUS_DECIMAL) {
 
             fraction = hazer_parse_fraction(*endp + 1, &denominator, endp);
@@ -919,6 +942,12 @@ int64_t hazer_parse_alt(const char * string, char units, uint8_t * digitsp, char
 
             --digits;
 
+        }
+
+        millimeters = fixup(millimeters, string[0]);
+
+        if (millimeters < 0) {
+            --digits;
         }
 
         *digitsp = digits;

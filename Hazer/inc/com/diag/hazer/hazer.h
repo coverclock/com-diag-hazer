@@ -223,6 +223,7 @@ enum HazerStimulus {
     HAZER_STIMULUS_ENCAPSULATION    = '!',
     HAZER_STIMULUS_START            = '$',
     HAZER_STIMULUS_DELIMITER        = ',',
+    HAZER_STIMULUS_NEGATIVE         = '-',
     HAZER_STIMULUS_TAG              = '\\',
     HAZER_STIMULUS_HEXADECIMAL      = '^',
     HAZER_STIMULUS_DECIMAL          = '.',

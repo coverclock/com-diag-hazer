@@ -799,6 +799,20 @@ int main(void)
     assert(hazer_is_valid_courseoverground(nanodegrees));
 
     end = (char *)0;
+    nanodegrees = hazer_parse_cog("0.125", &digits, &end);
+    assert(nanodegrees == 125000000LL);
+    assert(digits == 4);
+    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
+
+    end = (char *)0;
+    nanodegrees = hazer_parse_cog("-0.125", &digits, &end);
+    assert(nanodegrees == -125000000LL);
+    assert(digits == 4);
+    assert((end != (char *)0) && (*end == '\0'));
+    assert(hazer_is_valid_courseoverground(nanodegrees));
+
+    end = (char *)0;
     nanodegrees = hazer_parse_cog("-90,125", &digits, &end);
     assert((end != (char *)0) && (*end != '\0'));
 
@@ -821,6 +835,18 @@ int main(void)
     assert((end != (char *)0) && (*end == '\0'));
 
     end = (char *)0;
+    microknots = hazer_parse_sog("0.5", &digits, &end);
+    assert(microknots == 500000LL);
+    assert(digits == 2);
+    assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    microknots = hazer_parse_sog("-0.5", &digits, &end);
+    assert(microknots == -500000LL);
+    assert(digits == 2);
+    assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
     microknots = hazer_parse_sog("-15;5", &digits, &end);
     assert((end != (char *)0) && (*end != '\0'));
 
@@ -840,6 +866,18 @@ int main(void)
     millimetersperhour = hazer_parse_smm("-15.5", &digits, &end);
     assert(millimetersperhour == -15500000LL);
     assert(digits == 3);
+    assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    millimetersperhour = hazer_parse_smm("0.5", &digits, &end);
+    assert(millimetersperhour == 500000LL);
+    assert(digits == 2);
+    assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    millimetersperhour = hazer_parse_smm("-0.5", &digits, &end);
+    assert(millimetersperhour == -500000LL);
+    assert(digits == 2);
     assert((end != (char *)0) && (*end == '\0'));
 
     end = (char *)0;
@@ -886,6 +924,18 @@ int main(void)
     millimeters = hazer_parse_alt("-521.125", 'M', &digits, &end);
     assert(millimeters == -521125ULL);
     assert(digits == 6);
+    assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    millimeters = hazer_parse_alt("0.125", 'M', &digits, &end);
+    assert(millimeters == 125ULL);
+    assert(digits == 4);
+    assert((end != (char *)0) && (*end == '\0'));
+
+    end = (char *)0;
+    millimeters = hazer_parse_alt("-0.125", 'M', &digits, &end);
+    assert(millimeters == -125ULL);
+    assert(digits == 4);
     assert((end != (char *)0) && (*end == '\0'));
 
     end = (char *)0;
