@@ -1017,6 +1017,9 @@ module", UBX-22025534-R02, ublox, 2023
 u-blox 10, "u-blox F10 TIM 3.01 - u-blox F10 GNSS timing receiver -
 Interface Description", UBX-23003447-R01, ublox, 2023-03-21
 
+u-blox, "u-center GNSS evaluation software for Windows User guide",
+UBX-13005250-R30, ublox, 2022-05-24
+
 # Tools
 
 <https://www.notams.faa.gov/dinsQueryWeb/>
