@@ -41,7 +41,7 @@ mkdir -p $(dirname ${PIDFIL})
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 # UBX-MON-VER [0]
-# (Remaining from <https://www.ardusimple.com/wp-content/uploads/2023/05/simpleGNSS_FW301_1Hz_debug_message_off-GPSL5_on_00.txt>.)
+# (Below from <https://www.ardusimple.com/wp-content/uploads/2023/05/simpleGNSS_FW301_1Hz_debug_message_off-GPSL5_on_00.txt>.)
 # UBX-CFG-MSG [8] 0A 36 00 00 00 00 00 00
 # UBX-CFG-MSG [8] 0A 0B 00 00 00 00 00 00
 # UBX-CFG-MSG [8] 0A 37 00 00 00 00 00 00
@@ -85,15 +85,15 @@ mkdir -p $(dirname ${PIDFIL})
 # UBX-CFG-MSG [8] 0D 03 00 00 00 00 00 00
 # UBX-CFG-MSG [8] 0D 01 00 00 00 00 00 00
 # UBX-CFG-MSG [8] 0D 06 00 00 00 00 00 00
-# UBX-CFG-MSG [8] F0 00 01 01 00 00 01 00
-# UBX-CFG-MSG [8] F0 01 01 01 00 00 01 00
-# UBX-CFG-MSG [8] F0 02 01 01 00 00 01 00
-# UBX-CFG-MSG [8] F0 03 01 01 00 00 01 00
-# UBX-CFG-MSG [8] F0 04 01 01 00 00 01 00
-# UBX-CFG-MSG [8] F0 05 01 01 00 00 01 00
+# UBX-CFG-MSG [8] F0 00 01 01 00 00 01 00 NMEA-Standard-GGA
+# UBX-CFG-MSG [8] F0 01 01 01 00 00 01 00 NMEA-Standard-GLL
+# UBX-CFG-MSG [8] F0 02 01 01 00 00 01 00 NMEA-Standard-GSA
+# UBX-CFG-MSG [8] F0 03 01 01 00 00 01 00 NMEA-Standard-GSV
+# UBX-CFG-MSG [8] F0 04 01 01 00 00 01 00 NMEA-Standard-RMC
+# UBX-CFG-MSG [8] F0 05 01 01 00 00 01 00 NMEA-Standard-VTG
 # UBX-CFG-MSG [8] F0 06 00 00 00 00 00 00
 # UBX-CFG-MSG [8] F0 07 00 00 00 00 00 00
-# UBX-CFG-MSG [8] F0 08 01 01 00 00 01 00
+# UBX-CFG-MSG [8] F0 08 01 01 00 00 01 00 NMEA-Standard-ZDA
 # UBX-CFG-MSG [8] F0 09 00 00 00 00 00 00
 # UBX-CFG-MSG [8] F0 0A 00 00 00 00 00 00
 # UBX-CFG-MSG [8] F0 0D 00 00 00 00 00 00
