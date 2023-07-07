@@ -103,6 +103,7 @@ mkdir -p $(dirname ${PIDFIL})
 # UBX-CFG-PRT [20] 00 00 00 00 84 00 00 00 00 00 00 00 03 00 03 00 00 00 00 00
 # UBX-CFG-PRT [20] 01 00 00 00 C0 08 00 00 00 96 00 00 03 00 03 00 00 00 00 00
 # UBX-CFG-PRT [20] 04 00 00 00 00 32 00 00 00 00 00 00 03 00 03 00 00 00 00 00
+# (Below from u-blox F10 TIM Integration Description, p. 184.)
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-SIGNAL-GPS_ENA 0x1031001f L - - GPS enable
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-SIGNAL-GPS_L1CA_ENA 0x10310001 L - - GPS L1C/A
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-SIGNAL-GPS_L5_ENA 0x10310004 L - - GPS L5
@@ -209,5 +210,6 @@ exec coreable gpstool \
 	-A '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x1d\x00\x31\x10\x01' \
 	< /dev/null > /dev/null
 
+# This command was NAKed by the NEO-F10T.
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-SIGNAL-GLO_L1_ENA 0x10310018 L - - GLONASS L1
 # -A '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x18\x00\x31\x10\x01' \
