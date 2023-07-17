@@ -3791,7 +3791,6 @@ render:
             if (pps_fp != (FILE *)0) {
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
                     onepps = poller.onepps;
-                    poller.onepps = 0;
                 DIMINUTO_CRITICAL_SECTION_END;
             }
 

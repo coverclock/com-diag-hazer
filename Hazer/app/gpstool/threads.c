@@ -28,40 +28,40 @@
 void * dcdpoller(void * argp)
 {
     void * xc = (void *)1;
-    poller_t * ctxp = (poller_t *)0;
+    poller_t * pollerp = (poller_t *)0;
     int done = 0;
     int rc = -1;
     int nowpps = 0;
     int waspps = 0;
 
-    ctxp = (poller_t *)argp;
+    pollerp = (poller_t *)argp;
 
     while (!0) {
         DIMINUTO_COHERENT_SECTION_BEGIN;
-            done = ctxp->done;
+            done = pollerp->done;
         DIMINUTO_COHERENT_SECTION_END;
         if (done) {
             xc = (void *)0;
             break;
         }
-        rc = diminuto_serial_wait(fileno(ctxp->ppsfp));
+        rc = diminuto_serial_wait(fileno(pollerp->ppsfp));
         if (rc < 0) { break; }
-        rc = diminuto_serial_status(fileno(ctxp->ppsfp));
+        rc = diminuto_serial_status(fileno(pollerp->ppsfp));
         if (rc < 0) { break; }
         nowpps = !!rc;
         if (nowpps == waspps) {
             /* Do nothing. */
         } else if (nowpps) {
-            if (ctxp->strobefp != (FILE *)0) {
-                rc = diminuto_pin_set(ctxp->strobefp);
+            if (pollerp->strobefp != (FILE *)0) {
+                rc = diminuto_pin_set(pollerp->strobefp);
                 if (rc < 0) { break; }
             }
             DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
-                ctxp->onepps = !0;
+                pollerp->onepps = (pollerp->onepps + 1) % 60;
             DIMINUTO_CRITICAL_SECTION_END;
         } else {
-            if (ctxp->strobefp != (FILE *)0) {
-                rc = diminuto_pin_clear(ctxp->strobefp);
+            if (pollerp->strobefp != (FILE *)0) {
+                rc = diminuto_pin_clear(pollerp->strobefp);
                 if (rc < 0) { break; }
             }
         }
@@ -121,7 +121,7 @@ void * gpiopoller(void * argp)
                     if (rc < 0) { break; }
                 }
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
-                    pollerp->onepps = !0;
+                    pollerp->onepps = (pollerp->onepps + 1) % 60;
                 DIMINUTO_CRITICAL_SECTION_END;
             } else {
                 if (pollerp->strobefp != (FILE *)0) {
