@@ -2237,7 +2237,7 @@ consume:
                 DIMINUTO_LOG_DEBUG("Surveyor RTCM [%zd] [%zd] [%zd] <%d>\n", surveyor_total, surveyor_size, surveyor_length, kinematics.number);
 
                 if (verbose) {
-                    fputs("NET:\n", stderr);
+                    fputs("Datagram:\n", stderr);
                     diminuto_dump(stderr, &surveyor_buffer, surveyor_total);
                 }
                 write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
@@ -2367,7 +2367,7 @@ consume:
             } else {
 
                 command_size = strlen((const char *)command_string) + 1;
-                DIMINUTO_LOG_NOTICE("Out \'%s\'[%zd]", command_string, command_size);
+                DIMINUTO_LOG_NOTICE("Out [%zd] \"%s\"\n", command_size, command_string);
                 command_buffer = (uint8_t *)malloc(command_size + 8 /* e.g. *, CHECKSUMA, CHECKSUMB, CR, LF, NUL. */);
                 diminuto_contract(command_buffer != (uint8_t *)0);
                 command_length = diminuto_escape_collapse((char *)command_buffer, (const char *)command_string, command_size);
@@ -2375,13 +2375,17 @@ consume:
                 /*
                  * Since collapse() always includes a terminating NUL, the
                  * length will always be at least one. But if it is short,
-                 * wackiness ensues below, so we check it anyway.
-                 */
+                 * wackiness ensues below, so we check it anyway.  */
 
                 diminuto_contract(command_length > 1);
 
                 switch (command->emission) {
                 case OPT_A:
+                    /*
+                     * -A STRING: UBX output to which, after collapsing, end
+                     * matter must be applied, and for which an UBX-ACK-ACK or
+                     * UBX-ACK-NAK is expected.
+                     */
                     command_total = emit_packet(dev_fp, command_buffer, command_length);
                     if (command_total > 0) {
                         acknakpending = !0;
@@ -2389,12 +2393,24 @@ consume:
                     }
                     break;
                 case OPT_U:
+                    /*
+                     * -U STRING: UBX output to which, after collapsing, end
+                     * matter must be applied.
+                     */
                     command_total = emit_packet(dev_fp, command_buffer, command_length);
                     break;
                 case OPT_W:
+                    /*
+                     * -W STRING: NMEA output to which, after collapsing, end
+                     * matter must be applied.
+                     */
                     command_total = emit_sentence(dev_fp, (const char *)command_buffer, command_length);
                     break;
                 case OPT_Z:
+                    /*
+                     * -Z STRING: any output sent, after collapsing, exactly
+                     * as is.
+                     */
                     command_total = emit_data(dev_fp, command_buffer, command_length);
                     break;
                 default:
@@ -2412,8 +2428,10 @@ consume:
                 if (escape) {
                     fputs(ANSI_OUT, out_fp);
                 }
+
                 if (report) {
-                    fprintf(out_fp, "OUT [%3zd] ", command_total - 1); print_buffer(out_fp, command_buffer, command_total - 1 /* Minus terminating nul. */, limitation);
+                    fprintf(out_fp, "OUT [%3zd] ", command_total - 1);
+                    print_buffer(out_fp, command_buffer, command_total - 1 /* Minus terminating nul. */, limitation);
                     fflush(out_fp);
                 }
 
