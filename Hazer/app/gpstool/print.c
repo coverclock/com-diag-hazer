@@ -511,7 +511,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
 
             fprintf(fp, " %2dpulses", onepps);
 
-            fprintf(fp, "%13s", "");
+            fprintf(fp, "%12s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
