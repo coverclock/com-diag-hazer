@@ -10,7 +10,7 @@
 # u-blox device I've used. N.B. the labeling of the PVT
 # (1PPS) and POWER LEDs are reversed on this version
 # of the SimpleGNSS board.
-# WORK IN PROGRESS (doesn't currently work)
+# WORK IN PROGRESS
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
