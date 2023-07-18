@@ -468,8 +468,8 @@ like 6.3.0
 ## U-blox u-center Configuration Files
 
 The u-center Windows utility provided by U-blox can save the configuration of a
-UBX device from generation 9 and greater as a text file containing UBX commands,
-typically as a series of responses from UBX-VAL-GET commands encoded in hex. I
-have adapted such files to use with gpstool by changing the class and message ID
-binary values from those for UBX-VAL-GET to UBX-VAL-SET, and the mask value from
-0x00 (none) to 0x01 (RAM).
+UBX device from generation 9 and greater as a text file containing a series of
+responses from UBX-VAL-GET commands encoded in hex. I have adapted such files
+to use with gpstool by changing the class and message ID binary values from
+those for UBX-VAL-GET to UBX-VAL-SET, and the mask value from 0x00 (none) to
+0x01 (RAM).
