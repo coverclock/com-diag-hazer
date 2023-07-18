@@ -882,6 +882,10 @@ John Sloan, "Wheatstone", album, <https://flic.kr/s/aHsmVu1wkK>
 
 John Sloan, "Yodel", album, <https://flic.kr/s/aHsmNDPmDN>
 
+John Sloan, "UBX NEO F10T Video", video, <https://youtu.be/gCKnlchwkzU>
+
+John Sloan, "UBX NEO F10T Screen", video, <https://youtube.com/shorts/nC-NkjRSWRk?feature=share>
+
 # References
 
 David Burggraf ed., "OGC KML 2.3", Open Geospatial Consortium, 2015-08-04
