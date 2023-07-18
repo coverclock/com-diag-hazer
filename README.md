@@ -833,6 +833,15 @@ Chip Overclock, "Solar Power", 2022-03,
 Chip Overclock, "It's About Time", 2022-08,
 <https://coverclock.blogspot.com/2022/08/its-about-time.html>
 
+Chip Overclock, "Bob Green Road", 2023-02-12,
+<https://coverclock.blogspot.com/2023/02/it-will-probably-come-as-no-surprise.html>
+
+Chip Overclock, "Playing with a RISV-V SBC Running Linux",
+<https://coverclock.blogspot.com/2022/08/playing-with-risc-v-sbc-running-linux.html>
+
+Chip Overclock, "Hazer with the U-blox NEO-F10T GNSS Receiver on the Ardusimple SimpleGNSS Board", 2023-07-03,
+<https://coverclock.blogspot.com/2023/07/hazer-with-u-blox-neo-f10t-gnss.html>
+
 # Media
 
 John Sloan, "BU-353W10 Tear Down", album, <https://flic.kr/s/aHsmWxTpfs>
