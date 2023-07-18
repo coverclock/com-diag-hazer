@@ -473,4 +473,4 @@ responses from UBX-VAL-GET commands encoded in hex. I have adapted such files
 to use with gpstool by changing the class and message ID binary values from
 those for UBX-VAL-GET to UBX-VAL-SET, changing the mask value from 0x00 (none) to
 0x01 (RAM), and adding the standard UBX front matter. (gpstool will automatically
-adding the checksum end matter.)
+add the checksum end matter.)
