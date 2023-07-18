@@ -437,6 +437,7 @@ These talkers have been observed in the wild coming from actual GPS receivers.
 
 * GA - Galileo (as in Galileo Galilei) - EU
 * GB - BeiDou (as in The Big Dipper) a.k.a. COMPASS - China
+* GI - Navigation with Indian Constellation (NavIC) a.k.a. Indian Regional Navigation Satellite System (IRNSS) - India
 * GL - Globalnaya Navigazionnaya Sputnikovaya Sistema (GLONASS) - Russia
 * GN - Global Navigation Satellite System (GNSS) - Generic
 * GP - Global Positioning System (GPS) a.k.a. Navstar GPS - USA
@@ -446,7 +447,6 @@ Support for these talkers has been unit tested but the talkers have never been
 observed in the wild.
 
 * BD - BeiDou (as in The Big Dipper) a.k.a. COMPASS - China
-* GI - Navigation with Indian Constellation (NavIC) a.k.a. Indian Regional Navigation Satellite System (IRNSS) - India
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
 
 # Identifiers
