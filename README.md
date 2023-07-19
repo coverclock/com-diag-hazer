@@ -651,16 +651,16 @@ on the following platforms, which give you some idea of the wide
 variety of computers one may use.
 
 Dell OptiPlex 7040    
-Intel Core i7-6700T x86_64 x 4 x 2    
+Intel Core i7-6700T x86_64 x4 x2    
 Ubuntu 16.04.2 "Xenial"    
 Linux 4.4.0    
 GNU 5.4.0    
 
-VMware Workstation 15 Pro under Windows 10    
-Intel Core i7-3520M x86_64 x2    
-Ubuntu 19.10 "Eoan"    
-Linux 5.3.0    
-GNU 9.2.1    
+HP Envy x360 Model 15    
+AMD Ryzen 7 5825U x86_64 x16    
+Ubuntu 22.04.2 "Jammy Jellyfish"    
+Linux 5.15.90 (Microsoft Windows Subsystem for Linux 2)    
+GNU 11.3.0    
 
 HP Mini 110-1100 Netbook    
 Intel Atom N270 i686 x2    
@@ -674,6 +674,12 @@ Ubuntu MATE 19.10 "Eoan"
 Linux 5.3.0    
 GNU 9.2.1    
 
+OrangePi 5    
+aarch64 x8    
+Ubuntu 22.04.2 LTS (Jammy Jellyfish)    
+Linux 5.10.110    
+GNU 11.3.0    
+
 Pi-Top 3 (Raspberry Pi 3 Model B+)    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 x4    
 pi-topOS "Polaris" (Raspbian 9.9 "Stretch")    
@@ -685,6 +691,12 @@ Broadcom BCM2711 Cortex-A72 ARMv8 x4
 pi-topOS "Sirius" (Raspbian 10 "Buster")    
 Linux 5.4.79    
 GNU 8.3.0    
+
+Raspberry Pi Zero 2 W Rev 1.0    
+Broadcom BCM2835 ARMv7 x4    
+Raspbian 11 "Bullseye"    
+Linux 6.1.21    
+GNU 10.2.1    
 
 StarFive VisionFive (RISC-V SBC)    
 sifive u74-mc riscv64 x2     
@@ -698,17 +710,11 @@ Debian 11.3.0
 Linux 5.15.10     
 GNU 11.3.0    
 
-OrangePi 5    
-aarch64 x8    
-Ubuntu 22.04.2 LTS (Jammy Jellyfish)    
-Linux 5.10.110    
-GNU 11.3.0    
-
-Raspberry Pi Zero 2 W Rev 1.0    
-Broadcom BCM2835 ARMv7 x4    
-Raspbian 11 "Bullseye"    
-Linux 6.1.21    
-GNU 10.2.1    
+VMware Workstation 15 Pro under Windows 10    
+Intel Core i7-3520M x86_64 x2    
+Ubuntu 19.10 "Eoan" (Microsoft Common Base Linux "Mariner")    
+Linux 5.3.0    
+GNU 9.2.1    
 
 Your mileage may vary. Hazer and gpstool are not resource intensive. I
 routinely run gpstool on an old 32-bit Intel i686 netbook, and run several
