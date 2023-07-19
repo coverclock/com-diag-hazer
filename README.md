@@ -151,6 +151,14 @@ need to.
 
     export LANG=en_US.UTF-8
 
+On some platforms, you may need to install or generate the Unicode locales
+for this to work. On Microsoft's Windows Subsystem for Linux (WSL) version
+2, I did something like this.
+
+    sudo apt-get install locales-all
+    sudo update-locale LANG=${LANG}
+    sudo locale-gen $LANG
+
 If you don't install libraries, binaries, and scripts in one of the usual
 system locations like ```/usr/local/lib``` and ```/usr/local/bin```
 (I typically don't), you can temporarily modify your environment
