@@ -437,7 +437,7 @@ with the Talker name of ```GP``` (GPS). I figured this was a bug
 in my code, but examining raw data (which I saved in the ```dat/hazer```
 directory) confirms this weird behavior.
 
-### GCC Warnings With -Wall implying -Warray-bounds
+## GCC Warnings With -Wall implying -Warray-bounds
 
 On one of my oldest Raspberry Pis, a 3B Plus, running gcc 8.3.0, i get
 the following compile-time warning from GCC.
@@ -464,3 +464,13 @@ this particular structure field, will never be executed.
 
 I don't see this in newer GCC versions like 11.3.0, nor older versions
 like 6.3.0
+
+## U-blox u-center Configuration Files
+
+The u-center Windows utility provided by U-blox can save the configuration of a
+UBX device from generation 9 and greater as a text file containing a series of
+responses from UBX-VAL-GET commands encoded in hex. I have adapted such files
+to use with gpstool by changing the class and message ID binary values from
+those for UBX-VAL-GET to UBX-VAL-SET, changing the mask value from 0x00 (none) to
+0x01 (RAM), and adding the standard UBX front matter. (gpstool will automatically
+add the checksum end matter.)

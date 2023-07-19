@@ -285,6 +285,7 @@ int main(int argc, char * argv[])
     diminuto_thread_t * threadp = (diminuto_thread_t *)0;
     int threadrc = -1;
     int onepps = 0;
+    bool pulsing = false;
     /*
      * NMEA parser state variables.
      */
@@ -1201,6 +1202,9 @@ int main(int argc, char * argv[])
 
         threadrc = diminuto_thread_start(&thread, &poller);
         diminuto_contract(threadrc == 0);
+
+        pulsing = true;
+
     }
 
     /*
@@ -1421,6 +1425,8 @@ int main(int argc, char * argv[])
 
         threadrc = diminuto_thread_start(&thread, &poller);
         diminuto_contract(threadrc == 0);
+
+        pulsing = true;
 
     }
 
@@ -3784,14 +3790,13 @@ render:
         } else if (refresh) {
 
             /*
-             * If we're monitoring a 1PPS pin, update our copy of its
-             * status now.
+             * If we're monitoring 1PPS, either via a GPIO pin or via DCD
+             * on the device, update our copy of its status now.
              */
 
-            if (pps_fp != (FILE *)0) {
+            if (pulsing) {
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
                     onepps = poller.onepps;
-                    poller.onepps = 0;
                 DIMINUTO_CRITICAL_SECTION_END;
             }
 

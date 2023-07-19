@@ -437,6 +437,7 @@ These talkers have been observed in the wild coming from actual GPS receivers.
 
 * GA - Galileo (as in Galileo Galilei) - EU
 * GB - BeiDou (as in The Big Dipper) a.k.a. COMPASS - China
+* GI - Navigation with Indian Constellation (NavIC) a.k.a. Indian Regional Navigation Satellite System (IRNSS) - India
 * GL - Globalnaya Navigazionnaya Sputnikovaya Sistema (GLONASS) - Russia
 * GN - Global Navigation Satellite System (GNSS) - Generic
 * GP - Global Positioning System (GPS) a.k.a. Navstar GPS - USA
@@ -446,7 +447,6 @@ Support for these talkers has been unit tested but the talkers have never been
 observed in the wild.
 
 * BD - BeiDou (as in The Big Dipper) a.k.a. COMPASS - China
-* GI - Navigation with Indian Constellation (NavIC) a.k.a. Indian Regional Navigation Satellite System (IRNSS) - India
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
 
 # Identifiers
@@ -839,6 +839,15 @@ Chip Overclock, "Solar Power", 2022-03,
 Chip Overclock, "It's About Time", 2022-08,
 <https://coverclock.blogspot.com/2022/08/its-about-time.html>
 
+Chip Overclock, "Bob Green Road", 2023-02-12,
+<https://coverclock.blogspot.com/2023/02/it-will-probably-come-as-no-surprise.html>
+
+Chip Overclock, "Playing with a RISV-V SBC Running Linux",
+<https://coverclock.blogspot.com/2022/08/playing-with-risc-v-sbc-running-linux.html>
+
+Chip Overclock, "Hazer with the U-blox NEO-F10T GNSS Receiver on the Ardusimple SimpleGNSS Board", 2023-07-03,
+<https://coverclock.blogspot.com/2023/07/hazer-with-u-blox-neo-f10t-gnss.html>
+
 # Media
 
 John Sloan, "BU-353W10 Tear Down", album, <https://flic.kr/s/aHsmWxTpfs>
@@ -878,6 +887,10 @@ John Sloan, "Screen Recording 2021 02 24 at 10 06 20 AM", video, <https://youtu.
 John Sloan, "Wheatstone", album, <https://flic.kr/s/aHsmVu1wkK>
 
 John Sloan, "Yodel", album, <https://flic.kr/s/aHsmNDPmDN>
+
+John Sloan, "UBX NEO F10T Video", video, <https://youtu.be/gCKnlchwkzU>
+
+John Sloan, "UBX NEO F10T Screen", video, <https://youtube.com/shorts/nC-NkjRSWRk?feature=share>
 
 # References
 

@@ -45,15 +45,15 @@ elapsed time since the application began running. The following fields
 are the Hazer release string, the Process IDentifier of the application,
 and the first eight characters of the name of the host system.
 
-    TIM 2021-08-28T21:13:50.000-00:00+00 00:00:00.297 pps                  GNSS
+    TIM 2023-07-17T23:46:10.000-00:00+00 00:00:00.571 39pulses             GNSS
 
 TIMe is the most recent time solution in UTC, the elapsed time of the
 initial position fix (or dashes if no position fix has occurred yet, or
 asterisks if it is more than a day), and the current value of the One
-Pulse Per Second (1PPS) signal ("PPS" if true, "pps" if false) if the
-device provides it and it was enabled on the command line using -c (using
-data carrier detect or DCD) or -I (using general purpose input/output
-or GPIO).
+Pulse Per Second (1PPS) counter. The 1PPS counter increments modulo sixty,
+once per second, if the option was enabled on the command line using -c
+for data carrier detect (DCD), or using -I for a general purpose input/output
+(GPIO) pin; otherwise the counter remains frozen at zero.
 
     POS 39°47'39.258"N, 105°09'12.172"W    39.7942383, -105.1533813 Aq Ns  GNSS
 
