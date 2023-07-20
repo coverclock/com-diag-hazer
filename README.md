@@ -667,7 +667,7 @@ GNU 5.4.0
 HP Envy x360 Convertible Model 15    
 AMD Ryzen 7 5825U x86_64 x16    
 Ubuntu 22.04.2 "Jammy Jellyfish"    
-Linux 5.15.90 (Microsoft Windows Subsystem for Linux 2)    
+Linux 5.15.90 (Microsoft 11 Windows Subsystem for Linux 2)    
 GNU 11.3.0    
 
 HP Mini 110-1100 Netbook    
