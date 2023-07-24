@@ -26,17 +26,20 @@ CATFIL="${SAVDIR}/${PROGRAM}.cat"
 CSVFIL="${SAVDIR}/${PROGRAM}.csv"
 ERRFIL="${SAVDIR}/${PROGRAM}.err"
 FIXFIL="${SAVDIR}/${PROGRAM}.fix"
-LOGFIL="${SAVDIR}/${PROGRAM}.log"
+LSTFIL="${SAVDIR}/${PROGRAM}.lst"
 OUTFIL="${SAVDIR}/${PROGRAM}.out"
 PIDFIL="${SAVDIR}/${PROGRAM}.pid"
+QUEFIL="${SAVDIR}/${PROGRAM}.que"
 SRCFIL="${SAVDIR}/${PROGRAM}.src"
 
 mkdir -p $(dirname ${CATFIL})
 mkdir -p $(dirname ${CSVFIL})
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${FIXFIL})
-mkdir -p $(dirname ${LOGFIL})
+mkdir -p $(dirname ${LSTFIL})
 mkdir -p $(dirname ${OUTFIL})
+mkdir -p $(dirname ${PIDFIL})
+mkdir -p $(dirname ${QUEFIL})
 mkdir -p $(dirname ${SRCFIL})
 
 cp /dev/null ${SRCFIL}
@@ -63,10 +66,11 @@ exec ${PREFIX} gpstool \
 	-G 127.0.0.1:21000 \
 	-H ${OUTFIL} \
 	-K \
-	-L ${LOGFIL} \
+	-L ${LSTFIL} \
 	-N ${FIXFIL} \
 	-O ${PIDFIL} \
 	-P \
+	-Q ${QUEFIL} \
 	-R \
 	-S ${SRCFIL} \
 	-T ${CSVFIL} \
@@ -81,14 +85,15 @@ exec ${PREFIX} gpstool \
 	-d \
 	-e \
 	-f 1 \
-	-g 0x7 \
+	-g 0x4 \
 	-h \
 	-i 5 \
-	-k 0x7 \
+	-k 0x3 \
 	-l \
 	-m \
 	-n \
 	-o \
+	-q 0x2 \
 	-s \
 	-t 10 \
 	-v \

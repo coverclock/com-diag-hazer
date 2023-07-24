@@ -211,13 +211,14 @@ int main(int argc, char * argv[])
     /*
      * FILE pointer variables.
      */
-    FILE * in_fp = (FILE *)0;
-    FILE * out_fp = stdout;
     FILE * dev_fp = (FILE *)0;
-    FILE * sink_fp = (FILE *)0;
+    FILE * in_fp = (FILE *)0;
     FILE * list_fp = (FILE *)0;
-    FILE * strobe_fp = (FILE *)0;
+    FILE * out_fp = stdout;
     FILE * pps_fp = (FILE *)0;
+    FILE * queue_fp = (FILE *)0;
+    FILE * sink_fp = (FILE *)0;
+    FILE * strobe_fp = (FILE *)0;
     FILE * trace_fp = (FILE *)0;
     /*
      * Serial device variables.
@@ -233,7 +234,7 @@ int main(int argc, char * argv[])
     int xonxoff = 0;
     int carrierdetect = 0;
     int readonly = !0;
-    long device_mask = NMEA;
+    long device_mask = ANY;
     /*
      * Remote variables.
      */
@@ -245,8 +246,14 @@ int main(int argc, char * argv[])
     datagram_sequence_t remote_sequence = 0;
     const char * remote_option = (const char *)0;
     diminuto_ipc_endpoint_t remote_endpoint = { 0, };
-    long remote_mask = NMEA;
+    long remote_mask = ANY;
     role_t role = ROLE;
+    /*
+     * Queue variables.
+     */
+    const char * queue_option = (const char *)0;
+    long queue_mask = ANY;
+    size_t queued = 0;
     /*
      * Surveyor variables.
      */
@@ -430,7 +437,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:B:C:D:EF:G:H:I:KL:MN:O:PRS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:st:vxw:y:z?";
+    static const char OPTIONS[] = "124678A:B:C:D:EF:G:H:I:KL:MN:O:PQ:RS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:q:st:vxw:y:z?";
     /*
      * ANSI escape sequences
      */
@@ -577,6 +584,10 @@ int main(int argc, char * argv[])
         case 'P':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             process = !0;
+            break;
+        case 'Q':
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
+            queue_option = optarg;
             break;
         case 'R':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
@@ -736,6 +747,15 @@ int main(int argc, char * argv[])
                 error = !0;
             }
             break;
+        case 'q':
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
+            queue_mask = strtol(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
+            break;
         case 's':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             xonxoff = !0;
@@ -790,6 +810,7 @@ int main(int argc, char * argv[])
                             "               [ -L FILE ]\n"
                             "               [ -T FILE [ -f SECONDS ] ]\n"
                             "               [ -N FILE ]\n"
+                            "               [ -Q FILE [ -q MASK ] ]\n"
                             "               [ -K [ -k MASK ] ]\n"
                             "               [ -A STRING ... ] [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ] [ -x ]\n"
                             "               [ -4 | -6 ]\n"
@@ -821,6 +842,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -N FILE         Use fix FILE to save ARP LLH for subsequeNt fixed mode.\n");
             fprintf(stderr, "       -O FILE         Save process identifier in FILE.\n");
             fprintf(stderr, "       -P              Process incoming data even if no report is being generated.\n");
+            fprintf(stderr, "       -Q FILE         Write validated input to FILE or named pipe.\n");
             fprintf(stderr, "       -R              Print a Report on standard output.\n");
             fprintf(stderr, "       -S FILE         Use source FILE or named pipe for input.\n");
             fprintf(stderr, "       -T FILE         Save the PVT CSV Trace to FILE.\n");
@@ -839,15 +861,16 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -d              Display Debug output on standard error.\n");
             fprintf(stderr, "       -e              Use Even parity for DEVICE.\n");
             fprintf(stderr, "       -f SECONDS      Set trace Frequency to 1/SECONDS.\n");
-            fprintf(stderr, "       -g MASK         Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
+            fprintf(stderr, "       -g MASK         Set dataGram sink mask (NMEA=%u, UBX=%u, RTCM=%u, CPO=%u, default=%lu).\n", NMEA, UBX, RTCM, CPO, remote_mask);
             fprintf(stderr, "       -h              Use RTS/CTS Hardware flow control for DEVICE.\n");
             fprintf(stderr, "       -i SECONDS      Bypass input check every SECONDS seconds, 0 always, <0 never.\n");
-            fprintf(stderr, "       -k MASK         Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u) default NMEA.\n", NMEA, UBX, RTCM);
+            fprintf(stderr, "       -k MASK         Set device sinK mask (NMEA=%u, UBX=%u, RTCM=%u, CPO=%u, default=%lu).\n", NMEA, UBX, RTCM, CPO, device_mask);
             fprintf(stderr, "       -l              Use Local control for DEVICE.\n");
             fprintf(stderr, "       -m              Use Modem control for DEVICE.\n");
             fprintf(stderr, "       -n              Use No parity for DEVICE.\n");
             fprintf(stderr, "       -o              Use Odd parity for DEVICE.\n");
             fprintf(stderr, "       -p PIN          Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).\n");
+            fprintf(stderr, "       -q MASK         Set Queue mask (NMEA=%u, UBX=%u, RTCM=%u, CPO=%u, default=%lu).\n", NMEA, UBX, RTCM, CPO, queue_mask);
             fprintf(stderr, "       -s              Use XON/XOFF (c-Q/c-S) Software flow control for DEVICE.\n");
             fprintf(stderr, "       -t SECONDS      Timeout GNSS data after SECONDS seconds [0..255].\n");
             fprintf(stderr, "       -v              Display Verbose output on standard error.\n");
@@ -947,7 +970,27 @@ int main(int argc, char * argv[])
     }
 
     if (list_fp != (FILE *)0) {
-        DIMINUTO_LOG_INFORMATION("Log (%d) \"%s\"\n", fileno(list_fp), listing);
+        DIMINUTO_LOG_INFORMATION("Listing File (%d) \"%s\"\n", fileno(list_fp), listing);
+    }
+
+    /*
+     * Are we queueing every valid sentence or packet to an output file?
+     */
+
+    if (queue_option == (const char *)0) {
+        /* Do nothing. */
+    } else if (strcmp(queue_option, "-") == 0) {
+        queue_fp = stdout;
+    } else if ((queue_fp = fopen(queue_option, "ab")) != (FILE *)0) {
+        /* Do nothing. */
+    } else {
+        diminuto_perror(queue_option);
+        diminuto_contract(queue_fp != (FILE *)0);
+    }
+
+    if (queue_fp != (FILE *)0) {
+        DIMINUTO_LOG_INFORMATION("Queue File (%d) \"%s\"\n", fileno(queue_fp), queue_option);
+        DIMINUTO_LOG_INFORMATION("Queue Mask 0x%lx\n", queue_mask);
     }
 
     /*
@@ -1147,7 +1190,7 @@ int main(int argc, char * argv[])
         strobe_fp = diminuto_pin_open(strobepin, !0);
         diminuto_contract(strobe_fp != (FILE *)0);
 
-        DIMINUTO_LOG_INFORMATION("Strobe (%d) \"%s\" %d\n", fileno(strobe_fp), strobe, strobepin);
+        DIMINUTO_LOG_INFORMATION("Strobe Pin (%d) \"%s\" %d\n", fileno(strobe_fp), strobe, strobepin);
 
         rc = diminuto_pin_clear(strobe_fp);
         diminuto_contract(rc >= 0);
@@ -1187,7 +1230,7 @@ int main(int argc, char * argv[])
         pps_fp = diminuto_pin_open(ppspin, 0);
         diminuto_contract(pps_fp != (FILE *)0);
 
-        DIMINUTO_LOG_INFORMATION("1pps (%d) \"%s\" %d\n", fileno(pps_fp), pps, ppspin);
+        DIMINUTO_LOG_INFORMATION("1pps Pin (%d) \"%s\" %d\n", fileno(pps_fp), pps, ppspin);
 
         rc = diminuto_pin_get(pps_fp);
         diminuto_contract(rc >= 0);
@@ -1250,7 +1293,7 @@ int main(int argc, char * argv[])
         serial = diminuto_serial_valid(dev_fd);
         if (serial) {
 
-            DIMINUTO_LOG_INFORMATION("Serial (%d) \"%s\" %d %d%c%d%s%s%s\n", dev_fd, device, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
+            DIMINUTO_LOG_INFORMATION("Serial Port (%d) \"%s\" %d %d%c%d%s%s%s\n", dev_fd, device, bitspersecond, databits, (paritybit == 0) ? 'N' : ((paritybit % 2) == 0) ? 'E' : 'O', stopbits, modemcontrol ? " modem" : " local", xonxoff ? " xonoff" : "", rtscts ? " rtscts" : "");
 
             rc = diminuto_serial_set(dev_fd, bitspersecond, databits, paritybit, stopbits, modemcontrol, xonxoff, rtscts);
             diminuto_contract(rc == 0);
@@ -1272,7 +1315,7 @@ int main(int argc, char * argv[])
         }
         diminuto_contract(dev_fp != (FILE *)0);
 
-        DIMINUTO_LOG_INFORMATION("Device (%d) \"%s\" %s \"%s\"\n", dev_fd, device, readonly ? "ro" : "rw", Source);
+        DIMINUTO_LOG_INFORMATION("Device File (%d) \"%s\" %s \"%s\"\n", dev_fd, device, readonly ? "ro" : "rw", Source);
         DIMINUTO_LOG_INFORMATION("Device Mask 0x%lx\n", device_mask);
 
         /*
@@ -1362,7 +1405,7 @@ int main(int argc, char * argv[])
      * system.
      */
 
-    DIMINUTO_LOG_INFORMATION("Source (%d) \"%s\" %s\n", source_fd, Source, readonly ? "ro" : "rw");
+    DIMINUTO_LOG_INFORMATION("Source File (%d) \"%s\" %s\n", source_fd, Source, readonly ? "ro" : "rw");
 
     /*
      * If we are using some other sink of output (e.g. a file, a FIFO, etc.),
@@ -1381,7 +1424,7 @@ int main(int argc, char * argv[])
     }
 
     if (sink_fp != (FILE *)0) {
-        DIMINUTO_LOG_INFORMATION("Sink (%d) \"%s\"\n", fileno(sink_fp), sink);
+        DIMINUTO_LOG_INFORMATION("Sink File (%d) \"%s\"\n", fileno(sink_fp), sink);
     }
 
     /*
@@ -1392,7 +1435,7 @@ int main(int argc, char * argv[])
     if (headless != (const char *)0) {
         out_fp = diminuto_observation_create(headless, &temporary);
         diminuto_contract(out_fp != (FILE *)0);
-        DIMINUTO_LOG_INFORMATION("Observation (%d) \"%s\"\n", fileno(out_fp), headless);
+        DIMINUTO_LOG_INFORMATION("Observation File (%d) \"%s\"\n", fileno(out_fp), headless);
     }
 
     /*
@@ -1446,7 +1489,7 @@ int main(int argc, char * argv[])
     }
 
     if (trace_fp != (FILE *)0) {
-        DIMINUTO_LOG_INFORMATION("Trace Enabled (%d) \"%s\"\n", fileno(trace_fp), tracing);
+        DIMINUTO_LOG_INFORMATION("Trace File (%d) \"%s\"\n", fileno(trace_fp), tracing);
     }
 
     /*
@@ -2473,7 +2516,7 @@ consume:
          * format indicates NMEA, UBX, or RTCM;
          *
          * buffer points to a buffer containing an NMEA sentence, a UBX packet,
-         * or an RTCM message, with a valid checksum or CRC;
+         * an RTCM message, or a CPO packet, with a valid checksum or CRC;
          *
          * size is the size of the data in the buffer in bytes including the
          * trailing NUL (which is added even to buffers containing binary
@@ -2484,6 +2527,27 @@ consume:
          * extracted from the data in the buffer. Unless the format requires
          * it (none currently do), it does not include the trailing NUL.
          */
+
+        /*
+         * QUEUE
+         */
+
+        /*
+         * We write anything whose format is enabled in the queueing mask.
+         * We don't write the terminating NUL. This is refered to as queueing
+         * mostly because the related options are 'Q' and 'q'. But since the
+         * output file can be a named pipe, queueing isn't completely wrong
+         * either.
+         */
+
+        if (queue_fp == (FILE *)0) {
+            /* Do nothing. */
+        } else if ((queue_mask & format) == 0) {
+            /* Do nothing. */
+        } else {
+            queued = fwrite(buffer, 1, size - 1 /* Minus trailing NUL. */, queue_fp);
+            diminuto_contract(queued == (size - 1));
+        }
 
         /**
          ** FORWARD
@@ -3936,6 +4000,16 @@ stop:
         /* Do nothing. */
     } else {
         diminuto_perror("fclose(trace_fp)");
+    }
+
+    if (queue_fp == (FILE *)0) {
+        /* Do nothing. */
+    } else if (queue_fp == stdout) {
+        /* Do nothing. */
+    } else if ((rc = fclose(queue_fp)) != EOF) {
+        /* Do nothing. */
+    } else {
+        diminuto_perror("fclose(queue_fp)");
     }
 
     if (list_fp == (FILE *)0) {

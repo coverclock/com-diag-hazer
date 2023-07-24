@@ -1532,9 +1532,7 @@ extern int int yodel_ubx_tim_tp(yodel_ubx_tim_tp_t * mp, const void * buffer, ss
  ******************************************************************************/
 
 /*
- * The UBX-NEO-F10T issues this message by default, but having found zero
- * public documentation on it, I'm inferring its name from references
- * in the device's Datasheet and Interface documents.
+ * The UBX-NEO-F10T issues this message by default.
  *
  * EXAMPLES
  *
