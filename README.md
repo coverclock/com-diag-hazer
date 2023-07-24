@@ -151,6 +151,14 @@ need to.
 
     export LANG=en_US.UTF-8
 
+On some platforms, you may need to install or generate the Unicode locales
+for this to work. On Microsoft's Windows Subsystem for Linux (WSL) version
+2, I did something like this.
+
+    sudo apt-get install locales-all
+    sudo update-locale LANG=${LANG}
+    sudo locale-gen $LANG
+
 If you don't install libraries, binaries, and scripts in one of the usual
 system locations like ```/usr/local/lib``` and ```/usr/local/bin```
 (I typically don't), you can temporarily modify your environment
@@ -437,6 +445,7 @@ These talkers have been observed in the wild coming from actual GPS receivers.
 
 * GA - Galileo (as in Galileo Galilei) - EU
 * GB - BeiDou (as in The Big Dipper) a.k.a. COMPASS - China
+* GI - Navigation with Indian Constellation (NavIC) a.k.a. Indian Regional Navigation Satellite System (IRNSS) - India
 * GL - Globalnaya Navigazionnaya Sputnikovaya Sistema (GLONASS) - Russia
 * GN - Global Navigation Satellite System (GNSS) - Generic
 * GP - Global Positioning System (GPS) a.k.a. Navstar GPS - USA
@@ -446,7 +455,6 @@ Support for these talkers has been unit tested but the talkers have never been
 observed in the wild.
 
 * BD - BeiDou (as in The Big Dipper) a.k.a. COMPASS - China
-* GI - Navigation with Indian Constellation (NavIC) a.k.a. Indian Regional Navigation Satellite System (IRNSS) - India
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
 
 # Identifiers
@@ -651,16 +659,16 @@ on the following platforms, which give you some idea of the wide
 variety of computers one may use.
 
 Dell OptiPlex 7040    
-Intel Core i7-6700T x86_64 x 4 x 2    
+Intel Core i7-6700T x86_64 x4 x2    
 Ubuntu 16.04.2 "Xenial"    
 Linux 4.4.0    
 GNU 5.4.0    
 
-VMware Workstation 15 Pro under Windows 10    
-Intel Core i7-3520M x86_64 x2    
-Ubuntu 19.10 "Eoan"    
-Linux 5.3.0    
-GNU 9.2.1    
+HP Envy x360 Convertible Model 15    
+AMD Ryzen 7 5825U x86_64 x16    
+Ubuntu 22.04.2 "Jammy Jellyfish"    
+Linux 5.15.90 (Microsoft 11 Windows Subsystem for Linux 2)    
+GNU 11.3.0    
 
 HP Mini 110-1100 Netbook    
 Intel Atom N270 i686 x2    
@@ -674,6 +682,12 @@ Ubuntu MATE 19.10 "Eoan"
 Linux 5.3.0    
 GNU 9.2.1    
 
+OrangePi 5    
+aarch64 x8    
+Ubuntu 22.04.2 LTS (Jammy Jellyfish)    
+Linux 5.10.110    
+GNU 11.3.0    
+
 Pi-Top 3 (Raspberry Pi 3 Model B+)    
 Broadcom BCM2837B0 Cortex-A53 ARMv7 x4    
 pi-topOS "Polaris" (Raspbian 9.9 "Stretch")    
@@ -685,6 +699,12 @@ Broadcom BCM2711 Cortex-A72 ARMv8 x4
 pi-topOS "Sirius" (Raspbian 10 "Buster")    
 Linux 5.4.79    
 GNU 8.3.0    
+
+Raspberry Pi Zero 2 W Rev 1.0    
+Broadcom BCM2835 ARMv7 x4    
+Raspbian 11 "Bullseye"    
+Linux 6.1.21    
+GNU 10.2.1    
 
 StarFive VisionFive (RISC-V SBC)    
 sifive u74-mc riscv64 x2     
@@ -698,17 +718,11 @@ Debian 11.3.0
 Linux 5.15.10     
 GNU 11.3.0    
 
-OrangePi 5    
-aarch64 x8    
-Ubuntu 22.04.2 LTS (Jammy Jellyfish)    
-Linux 5.10.110    
-GNU 11.3.0    
-
-Raspberry Pi Zero 2 W Rev 1.0    
-Broadcom BCM2835 ARMv7 x4    
-Raspbian 11 "Bullseye"    
-Linux 6.1.21    
-GNU 10.2.1    
+VMware Workstation 15 Pro under Windows 10    
+Intel Core i7-3520M x86_64 x2    
+Ubuntu 19.10 "Eoan" (Microsoft Common Base Linux "Mariner")    
+Linux 5.3.0    
+GNU 9.2.1    
 
 Your mileage may vary. Hazer and gpstool are not resource intensive. I
 routinely run gpstool on an old 32-bit Intel i686 netbook, and run several
@@ -833,6 +847,15 @@ Chip Overclock, "Solar Power", 2022-03,
 Chip Overclock, "It's About Time", 2022-08,
 <https://coverclock.blogspot.com/2022/08/its-about-time.html>
 
+Chip Overclock, "Bob Green Road", 2023-02-12,
+<https://coverclock.blogspot.com/2023/02/it-will-probably-come-as-no-surprise.html>
+
+Chip Overclock, "Playing with a RISV-V SBC Running Linux",
+<https://coverclock.blogspot.com/2022/08/playing-with-risc-v-sbc-running-linux.html>
+
+Chip Overclock, "Hazer with the U-blox NEO-F10T GNSS Receiver on the Ardusimple SimpleGNSS Board", 2023-07-03,
+<https://coverclock.blogspot.com/2023/07/hazer-with-u-blox-neo-f10t-gnss.html>
+
 # Media
 
 John Sloan, "BU-353W10 Tear Down", album, <https://flic.kr/s/aHsmWxTpfs>
@@ -872,6 +895,10 @@ John Sloan, "Screen Recording 2021 02 24 at 10 06 20 AM", video, <https://youtu.
 John Sloan, "Wheatstone", album, <https://flic.kr/s/aHsmVu1wkK>
 
 John Sloan, "Yodel", album, <https://flic.kr/s/aHsmNDPmDN>
+
+John Sloan, "UBX NEO F10T Video", video, <https://youtu.be/gCKnlchwkzU>
+
+John Sloan, "UBX NEO F10T Screen", video, <https://youtube.com/shorts/nC-NkjRSWRk?feature=share>
 
 # References
 
