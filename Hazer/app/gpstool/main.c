@@ -2513,7 +2513,7 @@ consume:
         /*
          * At this point:
          *
-         * format indicates NMEA, UBX, or RTCM;
+         * format indicates NMEA, UBX, RTCM, or CPO;
          *
          * buffer points to a buffer containing an NMEA sentence, a UBX packet,
          * an RTCM message, or a CPO packet, with a valid checksum or CRC;
@@ -2547,6 +2547,7 @@ consume:
         } else {
             queued = fwrite(buffer, 1, size - 1 /* Minus trailing NUL. */, queue_fp);
             diminuto_contract(queued == (size - 1));
+            fflush(queue_fp);
         }
 
         /**

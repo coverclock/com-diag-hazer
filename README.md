@@ -1699,7 +1699,7 @@ See the README in the Tesoro repository for more information.
 
     > gpstool -?
     usage: gpstool
-                   [ -d ] [ -v ] [ -u ]
+                   [ -d ] [ -v ] [ -z ]
                    [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]
                    [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ]
                    [ -C FILE ]
@@ -1707,83 +1707,73 @@ See the README in the Tesoro repository for more information.
                    [ -L FILE ]
                    [ -T FILE [ -f SECONDS ] ]
                    [ -N FILE ]
+                   [ -Q FILE [ -q MASK ] ]
                    [ -K [ -k MASK ] ]
                    [ -A STRING ... ] [ -U STRING ... ] [ -W STRING ... ] [ -Z STRING ... ] [ -w SECONDS ] [ -x ]
-                   [ -G :PORT | -G IP:PORT [ -g MASK ] ]
-                   [ -Y :PORT | -Y IP:PORT [ -y SECONDS ] ]
+                   [ -4 | -6 ]
+                   [ -G :PORT | -G HOST:PORT [ -g MASK ] ]
+                   [ -Y :PORT | -Y HOST:PORT [ -y SECONDS ] ]
                    [ -I PIN | -c ] [ -p PIN ]
                    [ -M ] [ -X MASK ] [ -V ]
-           -1          Use one stop bit for DEVICE.
-           -2          Use two stop bits for DEVICE.
-           -7          Use seven data bits for DEVICE.
-           -8          Use eight data bits for DEVICE.
-           -A STRING   Collapse STRING, append Ubx end matter, write to DEVICE, expect ACK/NAK.
-           -A ''       Exit when this empty STRING is processed.
-           -B BYTES    Set the input Buffer size to BYTES bytes.
-           -C FILE     Catenate input to FILE or named pipe.
-           -D DEVICE   Use DEVICE for input or output.
-           -E          Like -R but use ANSI Escape sequences.
-           -F SECONDS  Set report Frequency to 1/SECONDS, 0 for no delay.
-           -G IP:PORT  Use remote IP and PORT as dataGram sink.
-           -G :PORT    Use local PORT as dataGram source.
-           -H HEADLESS Like -R but writes each iteration to HEADLESS file.
-           -I PIN      Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).
-           -K          Write input to DEVICE sinK from datagram source.
-           -L FILE     Write pretty-printed input to FILE file.
-           -M          Run in the background as a daeMon.
-           -N FILE     Use fix FILE to save ARP LLH for subsequeNt fixed mode.
-           -O FILE     Save process identifier in FILE.
-           -P          Process incoming data even if no report is being generated.
-           -R          Print a Report on standard output.
-           -S FILE     Use source FILE or named pipe for input.
-           -T FILE     Save the PVT CSV Trace to FILE.
-           -U STRING   Collapse STRING, append Ubx end matter, write to DEVICE.
-           -U ''       Exit when this empty STRING is processed.
-           -V          Log Version in the form of release, vintage, and revision.
-           -W STRING   Collapse STRING, append NMEA end matter, Write to DEVICE.
-           -W ''       Exit when this empty STRING is processed.
-           -X MASK     Enable special test modes via MASK.
-           -Y IP:PORT  Use remote IP and PORT as keepalive sink and surveYor source.
-           -Y :PORT    Use local PORT as surveYor source.
-           -Z STRING   Collapse STRING, write to DEVICE.
-           -Z ''       Exit when this empty STRING is processed.
-           -b BPS      Use BPS bits per second for DEVICE.
-           -c          Take 1PPS from DCD (requires -D and implies -m).
-           -d          Display Debug output on standard error.
-           -e          Use Even parity for DEVICE.
-           -f SECONDS  Set trace Frequency to 1/SECONDS.
-           -g MASK     Set dataGram sink mask (NMEA=1, UBX=2, RTCM=4) default NMEA.
-           -h          Use RTS/CTS Hardware flow control for DEVICE.
-           -i SECONDS  Bypass input check every SECONDS seconds, 0 for always, -1 for never.
-           -k MASK     Set device sinK mask (NMEA=1, UBX=2, RTCM=4) default NMEA.
-           -l          Use Local control for DEVICE.
-           -m          Use Modem control for DEVICE.
-           -n          Use No parity for DEVICE.
-           -o          Use Odd parity for DEVICE.
-           -p PIN      Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).
-           -s          Use XON/XOFF (control-Q/control-S) for DEVICE.
-           -t SECONDS  Timeout GNSS data after SECONDS seconds.
-           -u          Note Unprocessed input on standard error.
-           -v          Display Verbose output on standard error.
-           -w SECONDS  Write STRING to DEVICE no more than every SECONDS seconds.
-           -x          EXit if a NAK is received.
-           -y SECONDS  Send surveYor a keep alive every SECONDS seconds.
-
-Here are the command line options (also shown above) for capturing all
-output of GNSS devices; especially useful for studying, reverse engineering,
-and evaluating new devices, as well as testing new code.
-
-           -C FILE         Concatenate input to FILE or named pipe.
-           -L FILE         Write pretty-printed input to Listing FILE.
-
-Here are the command line options (also shown above) for sending commands to
-GNSS devices, depending on what kind of device they are; see scripts in
-```bin``` and ```fun``` for lots of examples.
-
+           -1              Use one stop bit for DEVICE.
+           -2              Use two stop bits for DEVICE.
+           -4              Prefer IPv4 for HOST.
+           -6              Prefer IPv6 for HOST.
+           -7              Use seven data bits for DEVICE.
+           -8              Use eight data bits for DEVICE.
            -A STRING       Collapse STRING, append Ubx end matter, write to DEVICE, expect ACK/NAK.
+           -A ''           Exit when this empty STRING is processed.
+           -B BYTES        Set the input Buffer size to BYTES bytes.
+           -C FILE         Catenate input to FILE or named pipe.
+           -D DEVICE       Use DEVICE for input or output.
+           -E              Like -R but use ANSI Escape sequences.
+           -F SECONDS      Update report no more than every SECONDS seconds, 0 always, <0 never.
+           -G HOST:PORT    Use remote HOST and PORT as dataGram sink.
+           -G :PORT        Use local PORT as dataGram source.
+           -H HEADLESS     Like -R but writes each iteration to HEADLESS file.
+           -I PIN          Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).
+           -K              Write input to DEVICE sinK from datagram source.
+           -L FILE         Write pretty-printed input to Listing FILE.
+           -M              Run in the background as a daeMon.
+           -N FILE         Use fix FILE to save ARP LLH for subsequeNt fixed mode.
+           -O FILE         Save process identifier in FILE.
+           -P              Process incoming data even if no report is being generated.
+           -Q FILE         Write validated input to FILE or named pipe.
+           -R              Print a Report on standard output.
+           -S FILE         Use source FILE or named pipe for input.
+           -T FILE         Save the PVT CSV Trace to FILE.
            -U STRING       Collapse STRING, append Ubx end matter, write to DEVICE.
+           -U ''           Exit when this empty STRING is processed.
+           -V              Log Version in the form of release, vintage, and revision.
            -W STRING       Collapse STRING, append NMEA end matter, Write to DEVICE.
+           -W ''           Exit when this empty STRING is processed.
+           -X MASK         Enable special test modes via MASK.
+           -Y HOST:PORT    Use remote HOST and PORT as keepalive sink and surveYor source.
+           -Y :PORT        Use local PORT as surveYor source.
            -Z STRING       Collapse STRING, write to DEVICE.
+           -Z ''           Exit when this empty STRING is processed.
+           -b BPS          Use BPS bits per second for DEVICE.
+           -c              Take 1PPS from DCD (requires -D and implies -m).
+           -d              Display Debug output on standard error.
+           -e              Use Even parity for DEVICE.
+           -f SECONDS      Set trace Frequency to 1/SECONDS.
+           -g MASK         Set dataGram sink mask (NMEA=1, UBX=2, RTCM=4, CPO=8, default=15).
+           -h              Use RTS/CTS Hardware flow control for DEVICE.
+           -i SECONDS      Bypass input check every SECONDS seconds, 0 always, <0 never.
+           -k MASK         Set device sinK mask (NMEA=1, UBX=2, RTCM=4, CPO=8, default=15).
+           -l              Use Local control for DEVICE.
+           -m              Use Modem control for DEVICE.
+           -n              Use No parity for DEVICE.
+           -o              Use Odd parity for DEVICE.
+           -p PIN          Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).
+           -q MASK         Set Queue mask (NMEA=1, UBX=2, RTCM=4, CPO=8, default=15).
+           -s              Use XON/XOFF (c-Q/c-S) Software flow control for DEVICE.
+           -t SECONDS      Timeout GNSS data after SECONDS seconds [0..255].
+           -v              Display Verbose output on standard error.
+           -w SECONDS      Write STRING to DEVICE no more than every SECONDS seconds, 0 always, <0 never.
+           -x              EXit if a NAK is received.
+           -y SECONDS      Send surveYor a keep alive every SECONDS seconds, 0 always, <0 never.
+           -z              Exit if all state machines stop.
 
 ## rtktool
 
