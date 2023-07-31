@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2020-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief Common facilities for other stuff.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -23,7 +23,7 @@
      * defined at compile time to be something else like '*' to avoid UTF-8.
      * (I'm not convinced this is correct for big endian architectures.)
      */
-#   define COMMON_DEGREE_VALUE '\xb0'
+#   define COMMON_DEGREE_VALUE 0xb0U
 #endif
 
 /**
@@ -39,7 +39,7 @@ static const wint_t COMMON_DEGREE = COMMON_DEGREE_VALUE;
      * defined at compile time to be something else like '~' to avoid UTF-8.
      * (I'm not convinced this is correct for big endian architectures.)
      */
-#   define COMMON_PLUSMINUS_VALUE '\xb1'
+#   define COMMON_PLUSMINUS_VALUE 0xb1U
 #endif
 
 /**
