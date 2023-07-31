@@ -20,30 +20,32 @@
      * @def COMMON_DEGREE_VALUE
      * Define the value that is used for the degree symbol. By default this
      * is the wide character Unicode for the degree symbol, but can be
-     * defined at compile time to be something else like '*'.
+     * defined at compile time to be something else like '*' to avoid UTF-8.
+     * (I'm not convinced this is correct for big endian architectures.)
      */
-#   define COMMON_DEGREE_VALUE 0x00b0
+#   define COMMON_DEGREE_VALUE '\xb0'
 #endif
 
 /**
  * This is the Unicode for the degree symbol.
  */
-static const wchar_t COMMON_DEGREE = COMMON_DEGREE_VALUE;
+static const wint_t COMMON_DEGREE = COMMON_DEGREE_VALUE;
 
 #if !defined(COMMON_PLUSMINUS_VALUE)
     /**
      * @def COMMON_PLUSMINUS_VALUE
      * Define the value that is used for the plus minus symbol. By default this
      * is the wide character Unicode for the plus minus symbol, but can be
-     * defined at compile time to be something else like '~'.
+     * defined at compile time to be something else like '~' to avoid UTF-8.
+     * (I'm not convinced this is correct for big endian architectures.)
      */
-#   define COMMON_PLUSMINUS_VALUE 0x00b1
+#   define COMMON_PLUSMINUS_VALUE '\xb1'
 #endif
 
 /**
  * This is the Unicode for the plus minus symbol.
  */
-static const wchar_t COMMON_PLUSMINUS = COMMON_PLUSMINUS_VALUE;
+static const wint_t COMMON_PLUSMINUS = COMMON_PLUSMINUS_VALUE;
 
 /**
  * Return the absolute value of a 64-bit integer.

@@ -32,11 +32,9 @@ mkdir -p $(dirname ${PIDFIL})
 
 # LSTFIL="${SAVDIR}/${PROGRAM}.lst"
 # mkdir -p $(dirname ${LSTFIL})
-# -L ${LSTFIL}
 
 # DATFIL="${SAVDIR}/${PROGRAM}.dat"
 # mkdir -p $(dirname ${DATFIL})
-# -C ${DATFIL}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -51,3 +49,6 @@ exec coreable gpstool \
 	-w 2 -x \
 	-U '\xb5\x62\x0a\x04\x00\x00' \
 	< /dev/null > /dev/null
+
+# -L ${LSTFIL}
+# -C ${DATFIL}
