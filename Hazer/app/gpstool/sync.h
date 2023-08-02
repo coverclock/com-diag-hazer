@@ -12,6 +12,10 @@
  * @details
  */
 
+#include "com/diag/hazer/datagram.h"
+
+static const size_t SYNC_SIZE = sizeof(datagram_payload_t);
+
 /**
  * Add a character to the sync troubleshooting buffer when the input
  * stream is out of syncronization.

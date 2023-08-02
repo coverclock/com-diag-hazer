@@ -381,7 +381,7 @@ int main(int argc, char * argv[])
             if ((size = datagram_validate(&(thou->sequence), &(buffer.header), total, &outoforder, &missing)) < 0) {
                 DIMINUTO_LOG_NOTICE("Datagram Order {%lu} {%lu} [%s]:%d", (unsigned long)(thou->sequence), (unsigned long)ntohl(buffer.header.sequence), diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
                 continue; /* REJECT */
-            } else if ((length = tumbleweed_validate(buffer.payload.rtcm, size)) < TUMBLEWEED_RTCM_SHORTEST) {
+            } else if ((length = tumbleweed_validate(buffer.payload.buffers.rtcm, size)) < TUMBLEWEED_RTCM_SHORTEST) {
                 DIMINUTO_LOG_WARNING("Datagram Data [%zd] 0x%02x [%s]:%d", length, buffer.payload.data[0], diminuto_ipc6_address2string(thou->address, ipv6, sizeof(ipv6)), thou->port);
                 continue; /* REJECT */
             } else {

@@ -52,22 +52,16 @@ typedef struct DatagramHeader {
 } datagram_header_t;
 
 /**
- * This is the union of all of the possible protocol buffers. It is used
- * solely to compute the datagram buffer length below.
+ * This is the union of all of the possible protocol buffers.
  */
-union DatagramAny {
-    hazer_buffer_t n;
-    yodel_buffer_t u;
-    tumbleweed_buffer_t r;
-    calico_buffer_t d;
-};
+typedef union DatagramPayload {
+    hazer_buffer_t nmea;
+    yodel_buffer_t ubx;
+    tumbleweed_buffer_t rtcm;
+    calico_buffer_t cpo;
+} datagram_payload_t;
 
-/**
- * This is mostly just so the initializer zeros everything.
- */
-enum {
-    DATAGRAM_SIZE = sizeof(union DatagramAny),
-};
+static const size_t DATAGRAM_SIZE = sizeof(datagram_payload_t);
 
 /**
  * This buffer is large enough to the largest UDP datagram we are willing to
@@ -80,11 +74,8 @@ enum {
 typedef struct DatagramBuffer {
     datagram_header_t header;
     union {
-        uint8_t data[DATAGRAM_SIZE + 1];
-        hazer_buffer_t nmea;
-        yodel_buffer_t ubx;
-        tumbleweed_buffer_t rtcm;
-        calico_buffer_t cpo;
+        uint8_t data[sizeof(datagram_payload_t) + 1];
+        datagram_payload_t buffers;
     } payload;
 } datagram_buffer_t;
 

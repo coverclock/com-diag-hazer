@@ -76,9 +76,4 @@ static const size_t LIMIT = 80 - (sizeof("OUT ") - 1) - (sizeof("[123] ") - 1) -
  */
 static const size_t UNLIMITED = ~(size_t)0;
 
-/*
- * This is the size of the temporary buffer we use to capture unknown stuff.
- */
-static const size_t SYNCBUFFER = HAZER_NMEA_LONGEST;
-
 #endif

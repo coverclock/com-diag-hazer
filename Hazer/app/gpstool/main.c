@@ -1395,8 +1395,8 @@ int main(int argc, char * argv[])
 
     }
 
-    DIMINUTO_LOG_INFORMATION("Buffer Sync [%zu]\n", (size_t)SYNCBUFFER);
-    DIMINUTO_LOG_INFORMATION("Buffer Datagram [%zu]\n", (size_t)DATAGRAM_SIZE);
+    DIMINUTO_LOG_INFORMATION("Buffer Sync [%zu]\n", SYNC_SIZE);
+    DIMINUTO_LOG_INFORMATION("Buffer Datagram [%zu]\n", DATAGRAM_SIZE);
 
     /*
      * This is our source of input data, which at this point can be UDP socket,
@@ -1934,10 +1934,10 @@ consume:
 
                 if (nmea_state != HAZER_STATE_STOP) {
 
-                    nmea_state = hazer_machine(nmea_state, ch, nmea_buffer.payload.nmea, sizeof(nmea_buffer.payload.nmea), &nmea_context);
+                    nmea_state = hazer_machine(nmea_state, ch, nmea_buffer.payload.buffers.nmea, sizeof(nmea_buffer.payload.buffers.nmea), &nmea_context);
                     if (nmea_state == HAZER_STATE_END) {
 
-                        buffer = (uint8_t *)nmea_buffer.payload.nmea;
+                        buffer = (uint8_t *)nmea_buffer.payload.buffers.nmea;
                         size = hazer_size(&nmea_context);
                         length = size - 1;
                         format = NMEA;
@@ -1968,10 +1968,10 @@ consume:
 
                 if (ubx_state != YODEL_STATE_STOP) {
 
-                    ubx_state = yodel_machine(ubx_state, ch, ubx_buffer.payload.ubx, sizeof(ubx_buffer.payload.ubx), &ubx_context);
+                    ubx_state = yodel_machine(ubx_state, ch, ubx_buffer.payload.buffers.ubx, sizeof(ubx_buffer.payload.buffers.ubx), &ubx_context);
                     if (ubx_state == YODEL_STATE_END) {
 
-                        buffer = ubx_buffer.payload.ubx;
+                        buffer = ubx_buffer.payload.buffers.ubx;
                         size = yodel_size(&ubx_context);
                         length = size - 1;
                         format = UBX;
@@ -2004,10 +2004,10 @@ consume:
 
                 if (rtcm_state != TUMBLEWEED_STATE_STOP) {
 
-                    rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer.payload.rtcm, sizeof(rtcm_buffer.payload.rtcm), &rtcm_context);
+                    rtcm_state = tumbleweed_machine(rtcm_state, ch, rtcm_buffer.payload.buffers.rtcm, sizeof(rtcm_buffer.payload.buffers.rtcm), &rtcm_context);
                     if (rtcm_state == TUMBLEWEED_STATE_END) {
 
-                        buffer = rtcm_buffer.payload.rtcm;
+                        buffer = rtcm_buffer.payload.buffers.rtcm;
                         size = tumbleweed_size(&rtcm_context);
                         length = size - 1;
                         format = RTCM;
@@ -2041,10 +2041,10 @@ consume:
 
                 if (cpo_state != CALICO_STATE_STOP) {
 
-                    cpo_state = calico_machine(cpo_state, ch, cpo_buffer.payload.cpo, sizeof(cpo_buffer.payload.cpo), &cpo_context);
+                    cpo_state = calico_machine(cpo_state, ch, cpo_buffer.payload.buffers.cpo, sizeof(cpo_buffer.payload.buffers.cpo), &cpo_context);
                     if (cpo_state == CALICO_STATE_END) {
 
-                        buffer = cpo_buffer.payload.cpo;
+                        buffer = cpo_buffer.payload.buffers.cpo;
                         size = calico_size(&cpo_context);
                         length = size - 1;
                         format = CPO;
@@ -2090,22 +2090,22 @@ consume:
 
                         if (nmea_context.error) {
                             errno = EIO;
-                            log_error(nmea_buffer.payload.nmea, nmea_context.bp - nmea_buffer.payload.nmea - 1);
+                            log_error(nmea_buffer.payload.buffers.nmea, nmea_context.bp - nmea_buffer.payload.buffers.nmea - 1);
                         }
 
                         if (ubx_context.error) {
                             errno = EIO;
-                            log_error(ubx_buffer.payload.ubx, ubx_context.bp - ubx_buffer.payload.ubx - 1);
+                            log_error(ubx_buffer.payload.buffers.ubx, ubx_context.bp - ubx_buffer.payload.buffers.ubx - 1);
                         }
 
                         if (rtcm_context.error) {
                             errno = EIO;
-                            log_error(rtcm_buffer.payload.rtcm, rtcm_context.bp - rtcm_buffer.payload.rtcm - 1);
+                            log_error(rtcm_buffer.payload.buffers.rtcm, rtcm_context.bp - rtcm_buffer.payload.buffers.rtcm - 1);
                         }
 
                         if (cpo_context.error) {
                             errno = EIO;
-                            log_error(cpo_buffer.payload.cpo, cpo_context.bp - cpo_buffer.payload.cpo - 1);
+                            log_error(cpo_buffer.payload.buffers.cpo, cpo_context.bp - cpo_buffer.payload.buffers.cpo - 1);
                         }
 
                         if (verbose) {
@@ -2166,52 +2166,52 @@ consume:
 
                 DIMINUTO_LOG_NOTICE("Datagram Order [%zd] {%lu} {%lu}\n", remote_total, (unsigned long)remote_sequence, (unsigned long)ntohl(remote_buffer.header.sequence));
 
-            } else if (hazer_is_nmea(remote_buffer.payload.nmea[0]) && ((remote_length = hazer_validate(remote_buffer.payload.nmea, remote_size)) > 0)) {
+            } else if (hazer_is_nmea(remote_buffer.payload.buffers.nmea[0]) && ((remote_length = hazer_validate(remote_buffer.payload.buffers.nmea, remote_size)) > 0)) {
 
                 /*
                  * NMEA sentence.
                  */
 
-                buffer = remote_buffer.payload.nmea;
+                buffer = remote_buffer.payload.buffers.nmea;
                 size = remote_size;
                 length = remote_length;
                 format = NMEA;
 
                 DIMINUTO_LOG_DEBUG("Datagram NMEA [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (yodel_is_ubx(remote_buffer.payload.ubx[0]) && ((remote_length = yodel_validate(remote_buffer.payload.ubx, remote_size)) > 0)) {
+            } else if (yodel_is_ubx(remote_buffer.payload.buffers.ubx[0]) && ((remote_length = yodel_validate(remote_buffer.payload.buffers.ubx, remote_size)) > 0)) {
 
                 /*
                  * UBX packet.
                  */
 
-                buffer = remote_buffer.payload.ubx;
+                buffer = remote_buffer.payload.buffers.ubx;
                 size = remote_size;
                 length = remote_length;
                 format = UBX;
 
                 DIMINUTO_LOG_DEBUG("Datagram UBX [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (tumbleweed_is_rtcm(remote_buffer.payload.rtcm[0]) && ((remote_length = tumbleweed_validate(remote_buffer.payload.rtcm, remote_size)) > 0)) {
+            } else if (tumbleweed_is_rtcm(remote_buffer.payload.buffers.rtcm[0]) && ((remote_length = tumbleweed_validate(remote_buffer.payload.buffers.rtcm, remote_size)) > 0)) {
 
                 /*
                  * RTCM message.
                  */
 
-                buffer = remote_buffer.payload.rtcm;
+                buffer = remote_buffer.payload.buffers.rtcm;
                 size = remote_size;
                 length = remote_length;
                 format = RTCM;
 
                 DIMINUTO_LOG_DEBUG("Datagram RTCM [%zd] [%zd] [%zd]", remote_total, remote_size, remote_length);
 
-            } else if (calico_is_cpo(remote_buffer.payload.cpo[0]) && ((remote_length = calico_validate(remote_buffer.payload.cpo, remote_size)) > 0)) {
+            } else if (calico_is_cpo(remote_buffer.payload.buffers.cpo[0]) && ((remote_length = calico_validate(remote_buffer.payload.buffers.cpo, remote_size)) > 0)) {
 
                 /*
                  * CPO packet.
                  */
 
-                buffer = remote_buffer.payload.cpo;
+                buffer = remote_buffer.payload.buffers.cpo;
                 size = remote_size;
                 length = remote_length;
                 format = CPO;
@@ -2256,7 +2256,7 @@ consume:
 
                 DIMINUTO_LOG_NOTICE("Surveyor Order [%zd] {%lu} {%lu}\n", surveyor_total, (unsigned long)surveyor_sequence, (unsigned long)ntohl(surveyor_buffer.header.sequence));
 
-            } else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
+            } else if ((surveyor_length = tumbleweed_validate(surveyor_buffer.payload.buffers.rtcm, surveyor_size)) < TUMBLEWEED_RTCM_SHORTEST) {
 
                 DIMINUTO_LOG_ERROR("Surveyor Data [%zd] [%zd] [%zd] 0x%02x\n", surveyor_total, surveyor_size, surveyor_length, surveyor_buffer.payload.data[0]);
 
@@ -2272,7 +2272,7 @@ consume:
 
                 kinematics.source = NETWORK;
 
-                kinematics.number = tumbleweed_message(surveyor_buffer.payload.rtcm, surveyor_length);
+                kinematics.number = tumbleweed_message(surveyor_buffer.payload.buffers.rtcm, surveyor_length);
                 if (kinematics.number < 0) {
                     kinematics.number = 9999;
                 }
@@ -2289,7 +2289,7 @@ consume:
                     fputs("Datagram:\n", stderr);
                     diminuto_dump(stderr, &surveyor_buffer, surveyor_total);
                 }
-                write_buffer(dev_fp, surveyor_buffer.payload.rtcm, surveyor_length);
+                write_buffer(dev_fp, surveyor_buffer.payload.buffers.rtcm, surveyor_length);
 
             }
 
