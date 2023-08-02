@@ -702,6 +702,15 @@ typedef struct HazerContext {
 } hazer_context_t;
 
 /**
+ * @def HAZER_CONTEXT_INITIALIZER
+ * Initialize a HazerContext type.
+ */
+#define HAZER_CONTEXT_INITIALIZER  \
+    { \
+        (uint8_t *)0, \
+    }
+
+/**
  * Process a single character of stimulus for the state machine that is
  * assembling a single NMEA sentence in the caller provided buffer. State
  * is maintained in a character pointer and a size variable, pointers to

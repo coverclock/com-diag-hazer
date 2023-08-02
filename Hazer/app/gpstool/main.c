@@ -297,25 +297,25 @@ int main(int argc, char * argv[])
      * NMEA parser state variables.
      */
     hazer_state_t nmea_state = HAZER_STATE_STOP;
-    hazer_context_t nmea_context = { 0, };
+    hazer_context_t nmea_context = HAZER_CONTEXT_INITIALIZER;
     datagram_buffer_t nmea_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * UBX parser state variables.
      */
     yodel_state_t ubx_state = YODEL_STATE_STOP;
-    yodel_context_t ubx_context = { 0, };
+    yodel_context_t ubx_context = YODEL_CONTEXT_INITIALIZER;
     datagram_buffer_t ubx_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * RTCM parser state variables.
      */
     tumbleweed_state_t rtcm_state = TUMBLEWEED_STATE_STOP;
-    tumbleweed_context_t rtcm_context = { 0, };
+    tumbleweed_context_t rtcm_context = TUMBLEWEED_CONTEXT_INITIALIZER;
     datagram_buffer_t rtcm_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * CPO parser state variables.
      */
     calico_state_t cpo_state = CALICO_STATE_STOP;
-    calico_context_t cpo_context = { 0, };
+    calico_context_t cpo_context = CALICO_CONTEXT_INITIALIZER;
     datagram_buffer_t cpo_buffer = DATAGRAM_BUFFER_INITIALIZER;
     /*
      * NMEA processing variables.

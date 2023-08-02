@@ -172,6 +172,15 @@ typedef struct TumbleweedContext {
 } tumbleweed_context_t;
 
 /**
+ * @def TUMBLEWEED_CONTEXT_INITIALIZER
+ * Initialize a TumbleweedContext type.
+ */
+#define TUMBLEWEED_CONTEXT_INITIALIZER  \
+    { \
+        (uint8_t *)0, \
+    }
+
+/**
  * Process a single character of stimulus for the state machine that is
  * assembling a single RTCM message in the caller provided buffer. State
  * is maintained in a character pointer and a size variable, pointers to

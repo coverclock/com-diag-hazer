@@ -190,6 +190,15 @@ typedef struct YodelContext {
 } yodel_context_t;
 
 /**
+ * @def YODEL_CONTEXT_INITIALIZER
+ * Initialize a YodelContext type.
+ */
+#define YODEL_CONTEXT_INITIALIZER  \
+    { \
+        (uint8_t *)0, \
+    }
+
+/**
  * Process a single character of stimulus for the state machine that is
  * assembling a single UBX packet in the caller provided buffer. State
  * is maintained in a character pointer and a size variable, pointers to

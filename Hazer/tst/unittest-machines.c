@@ -22,6 +22,33 @@
 
 int main(void)
 {
+    {
+        hazer_context_t hazercontext = HAZER_CONTEXT_INITIALIZER;
+        yodel_context_t yodelcontext = YODEL_CONTEXT_INITIALIZER;
+        tumbleweed_context_t tumbleweedcontext = TUMBLEWEED_CONTEXT_INITIALIZER;
+        calico_context_t calicocontext = CALICO_CONTEXT_INITIALIZER;
+
+        /* Just to eliminate warnings. */
+
+        assert(hazercontext.bp == (uint8_t *)0);
+        assert(yodelcontext.bp == (uint8_t *)0);
+        assert(tumbleweedcontext.bp == (uint8_t *)0);
+        assert(calicocontext.bp == (uint8_t *)0);
+    }
+
+    {
+        hazer_buffer_t hazerbuffer = HAZER_BUFFER_INITIALIZER;
+        yodel_buffer_t yodelbuffer = YODEL_BUFFER_INITIALIZER;
+        tumbleweed_buffer_t tumbleweedbuffer = TUMBLEWEED_BUFFER_INITIALIZER;
+        calico_buffer_t calicobuffer = CALICO_BUFFER_INITIALIZER;
+
+        /* Just to eliminate warnings. */
+
+        assert(hazerbuffer[0] == 0);
+        assert(yodelbuffer[0] == 0);
+        assert(tumbleweedbuffer[0] == 0);
+        assert(calicobuffer[0] == 0);
+    }
 
     {
         /*
