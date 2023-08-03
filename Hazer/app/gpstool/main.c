@@ -1599,10 +1599,7 @@ int main(int argc, char * argv[])
      * input stream.
      */
 
-    nmea_state = HAZER_STATE_START;
-    ubx_state = YODEL_STATE_START;
-    rtcm_state = TUMBLEWEED_STATE_START;
-    cpo_state = CALICO_STATE_START;
+    machine_start_all(&nmea_state, &ubx_state, &rtcm_state, &cpo_state);
 
     sync = 0;
     frame = 0;
@@ -1858,31 +1855,19 @@ consume:
 
                 } else if (hazer_is_nmea((uint8_t)ch)) {
 
-                    nmea_state = HAZER_STATE_START;
-                    ubx_state = YODEL_STATE_STOP;
-                    rtcm_state = TUMBLEWEED_STATE_STOP;
-                    cpo_state = CALICO_STATE_STOP;
+                    machine_start_nmea(&nmea_state, &ubx_state, &rtcm_state, &cpo_state);
 
                 } else if (yodel_is_ubx((uint8_t)ch)) {
 
-                    nmea_state = HAZER_STATE_STOP;
-                    ubx_state = YODEL_STATE_START;
-                    rtcm_state = TUMBLEWEED_STATE_STOP;
-                    cpo_state = CALICO_STATE_STOP;
+                    machine_start_ubx(&nmea_state, &ubx_state, &rtcm_state, &cpo_state);
 
                 } else if (tumbleweed_is_rtcm((uint8_t)ch)) {
 
-                    nmea_state = HAZER_STATE_STOP;
-                    ubx_state = YODEL_STATE_STOP;
-                    rtcm_state = TUMBLEWEED_STATE_START;
-                    cpo_state = CALICO_STATE_STOP;
+                    machine_start_rtcm(&nmea_state, &ubx_state, &rtcm_state, &cpo_state);
 
                 } else if (calico_is_cpo((uint8_t)ch)) {
 
-                    nmea_state = HAZER_STATE_STOP;
-                    ubx_state = YODEL_STATE_STOP;
-                    rtcm_state = TUMBLEWEED_STATE_STOP;
-                    cpo_state = CALICO_STATE_START;
+                    machine_start_cpo(&nmea_state, &ubx_state, &rtcm_state, &cpo_state);
 
                 } else {
 
@@ -1915,10 +1900,7 @@ consume:
                      * Restart all of the state machines and try to sync again.
                      */
 
-                    nmea_state = HAZER_STATE_START;
-                    ubx_state = YODEL_STATE_START;
-                    rtcm_state = TUMBLEWEED_STATE_START;
-                    cpo_state = CALICO_STATE_START;
+                    machine_start_all(&nmea_state, &ubx_state, &rtcm_state, &cpo_state);
 
                 }
 
@@ -1957,6 +1939,10 @@ consume:
 
                         frame = !0;
                         DIMINUTO_LOG_DEBUG("Input NMEA [%zd] [%zd] \"%-5.5s\"", size, length, (buffer + 1));
+
+                        /*
+                         * Do not feed any other state machines.
+                         */
                         break;
 
                     }
@@ -1993,6 +1979,9 @@ consume:
                         frame = !0;
                         DIMINUTO_LOG_DEBUG("Input UBX [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
 
+                        /*
+                         * Do not feed any other state machines.
+                         */
                         break;
 
                     }
@@ -2030,6 +2019,9 @@ consume:
 
                         DIMINUTO_LOG_DEBUG("Input RTCM [%zd] [%zd] %d", size, length, tumbleweed_message(buffer, length));
 
+                        /*
+                         * Do not feed any other state machines.
+                         */
                         break;
 
                     }
@@ -2067,6 +2059,9 @@ consume:
 
                         DIMINUTO_LOG_DEBUG("Input CPO [%zd] [%zd] 0x%02x 0x%02x", size, length, *(buffer + 2), *(buffer + 3));
 
+                        /*
+                         * Do not feed any other state machines.
+                         */
                         break;
 
                     }
@@ -2123,10 +2118,7 @@ consume:
 
                     frame = 0;
 
-                    nmea_state = HAZER_STATE_START;
-                    ubx_state = YODEL_STATE_START;
-                    rtcm_state = TUMBLEWEED_STATE_START;
-                    cpo_state = CALICO_STATE_START;
+                    machine_start_all(&nmea_state, &ubx_state, &rtcm_state, &cpo_state);
 
                 }
 

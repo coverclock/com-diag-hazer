@@ -11,35 +11,35 @@
 
 #include "com/diag/hazer/machine.h"
 
-int machine_is_stalled(hazer_state_t nmea_state, yodel_state_t ubx_state, tumbleweed_state_t rtcm_state, calico_state_t cpo_state)
+int machine_is_stalled(hazer_state_t ns, yodel_state_t us, tumbleweed_state_t rs, calico_state_t cs)
 {
     int result = 0;
 
     if (
-        (nmea_state == HAZER_STATE_START) &&
-        (ubx_state == YODEL_STATE_START) &&
-        (rtcm_state == TUMBLEWEED_STATE_START) &&
-        (cpo_state == CALICO_STATE_START)
+        (ns == HAZER_STATE_START) &&
+        (us == YODEL_STATE_START) &&
+        (rs == TUMBLEWEED_STATE_START) &&
+        (cs == CALICO_STATE_START)
     ) {
         /* Do nothing: all are scanning for beginning of frame. */
     } else if (
-        (nmea_state != HAZER_STATE_START) &&
-        (nmea_state != HAZER_STATE_STOP)
+        (ns != HAZER_STATE_START) &&
+        (ns != HAZER_STATE_STOP)
     ) {
         /* Do nothing: NMEA is processing. */
     } else if (
-        (ubx_state != YODEL_STATE_START) &&
-        (ubx_state != YODEL_STATE_STOP)
+        (us != YODEL_STATE_START) &&
+        (us != YODEL_STATE_STOP)
     ) {
         /* Do nothing: UBX is processing. */
     } else if (
-        (rtcm_state != TUMBLEWEED_STATE_START) &&
-        (rtcm_state != TUMBLEWEED_STATE_STOP)
+        (rs != TUMBLEWEED_STATE_START) &&
+        (rs != TUMBLEWEED_STATE_STOP)
     ) {
         /* Do nothing: RTCM is processing. */
     } else if (
-        (cpo_state != CALICO_STATE_START) &&
-        (cpo_state != CALICO_STATE_STOP)
+        (cs != CALICO_STATE_START) &&
+        (cs != CALICO_STATE_STOP)
     ) {
         /* Do nothing: CPO is processing. */
     } else {
