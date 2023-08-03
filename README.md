@@ -324,8 +324,6 @@ The user may have to log out and back in again to have this take effect.
 
 # Reverse Dependencies
 
-## Tesoro
-
 The Tesoro project integrates Hazer with an OpenStreetMaps (OSM) tile
 server to create a moving map display. Tesoro steers the display by
 taking location updates, in the form of datagrams containing JSON over
