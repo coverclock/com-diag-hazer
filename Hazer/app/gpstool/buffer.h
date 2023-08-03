@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Buffer API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -20,7 +20,7 @@
  * @param buffer points to the buffer.
  * @param size is the number of bytes to write.
  */
-extern void write_buffer(FILE * fp, const void * buffer, size_t size);
+extern void buffer_write(FILE * fp, const void * buffer, size_t size);
 
 /**
  * Print an NMEA sentence or UBX message to a stream, expanding non-printable
@@ -30,15 +30,15 @@ extern void write_buffer(FILE * fp, const void * buffer, size_t size);
  * @param size is the size of the sentence or packet.
  * @param limit is the maximum number of characters to display.
  */
-extern void print_buffer(FILE * fp, const void * buffer, size_t size, size_t limit);
+extern void buffer_print(FILE * fp, const void * buffer, size_t size, size_t limit);
 
 /**
- * Print an NMEA sentence or UBX message to a stream, expanding all
+ * Dump an NMEA sentence or UBX message to a stream, expanding all
  * characters into hexadecimal escape sequences.
  * @param fp points to the FILE stream.
  * @param buffer points to the sentence or packet.
  * @param size is the size of the sentence or packet.
  */
-extern void dump_buffer(FILE * fp, const void * buffer, size_t size);
+extern void buffer_dump(FILE * fp, const void * buffer, size_t size);
 
 #endif

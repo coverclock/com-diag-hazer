@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the implemention of the gpstool Emit API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -146,7 +146,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
      */
 
     for (ii = HAZER_SYSTEM_GNSS; ii <= HAZER_SYSTEM_BEIDOU; ++ii) {
-        if (pa[ii].ticks == 0) {
+        if (pa[ii].timeout == 0) {
             /* Do nothing. */
         } else if (pa[ii].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) {
             /* Do nothing. */
@@ -170,7 +170,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
     /* FIX */
 
-    if (pp->ticks > 0) {
+    if (pp->timeout > 0) {
         fix = pp->payload.fixType;
     } else if ((pa[system].lat_digits == 0) || (pa[system].lon_digits == 0)) {
         fix = YODEL_UBX_NAV_PVT_fixType_noFix;
@@ -188,7 +188,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
     /* SAT */
 
-    if (pa[system].ticks > 0) {
+    if (pa[system].timeout > 0) {
 
         fprintf(fp, ", %d", pa[system].sat_used);
 
@@ -201,14 +201,13 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
     /* CLK */
 
     ticks = diminuto_frequency_ticks2units(Clock, NANO);
-
     seconds = ticks / NANO;
     nanoseconds = ticks % NANO;
     fprintf(fp, ", %llu.%09llu", (diminuto_llu_t)seconds, (diminuto_llu_t)nanoseconds);
 
     /* TIM */
 
-    if ((pa[system].ticks > 0) && (hazer_is_valid_time(&(pa[system])))) {
+    if ((pa[system].timeout > 0) && (hazer_is_valid_time(&(pa[system])))) {
 
         seconds = pa[system].tot_nanoseconds / NANO;
         nanoseconds = pa[system].tot_nanoseconds % NANO;
@@ -226,7 +225,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
      * We use the high precision fix if it is available.
      */
 
-    if (sp->ticks > 0) {
+    if (sp->timeout > 0) {
 
         yodel_format_hppos2degrees(sp->payload.lat, sp->payload.latHp, &degrees, &nanodegrees);
         fprintf(fp, ", %d.%09llu", degrees, (diminuto_llu_t)nanodegrees);
@@ -246,7 +245,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
         yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &decimillimeters);
         fprintf(fp, ", %lld.%04llu", (diminuto_lld_t)meters, (diminuto_llu_t)decimillimeters);
 
-    } else if (pa[system].ticks > 0) {
+    } else if (pa[system].timeout > 0) {
 
         if (pa[system].lat_digits > 0) {
 
@@ -322,7 +321,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
      * an SI unit.
      */
 
-    if (pa[system].ticks > 0) {
+    if (pa[system].timeout > 0) {
 
         if (pa[system].sog_digits > 0) {
 
@@ -357,7 +356,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
     /* ROL, PIT, YAW, RAC, PAC, YAC */
 
-    if (ap->ticks > 0) {
+    if (ap->timeout > 0) {
 
         degrees = ap->payload.roll / CENTIMILLI;
         centimillidegrees = abs32(ap->payload.roll) % CENTIMILLI;
@@ -396,7 +395,7 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
 
     /* OBS, MAC */
 
-    if (bp->ticks > 0) {
+    if (bp->timeout > 0) {
 
         fprintf(fp, ", %d", bp->payload.obs);
 
@@ -431,9 +430,9 @@ int emit_solution(const char * arp, const yodel_base_t * bp, const yodel_solutio
     int32_t height = 0;
     int8_t heightHp = 0;
 
-    if (bp->ticks == 0) {
+    if (bp->timeout == 0) {
         /* Do nothing. */
-    } else if (sp->ticks == 0) {
+    } else if (sp->timeout == 0) {
         /* Do nothing. */
     } else if (bp->payload.active) {
         /* Do nothing. */
@@ -473,13 +472,13 @@ int emit_solution(const char * arp, const yodel_base_t * bp, const yodel_solutio
         COM_DIAG_YODEL_HTOLE(height);
         COM_DIAG_YODEL_HTOLE(heightHp);
 
-        dump_buffer(fp, &acc, sizeof(acc));
-        dump_buffer(fp, &lat, sizeof(lat));
-        dump_buffer(fp, &latHp, sizeof(latHp));
-        dump_buffer(fp, &lon, sizeof(lon));
-        dump_buffer(fp, &lonHp, sizeof(lonHp));
-        dump_buffer(fp, &height, sizeof(height));
-        dump_buffer(fp, &heightHp, sizeof(heightHp));
+        buffer_dump(fp, &acc, sizeof(acc));
+        buffer_dump(fp, &lat, sizeof(lat));
+        buffer_dump(fp, &latHp, sizeof(latHp));
+        buffer_dump(fp, &lon, sizeof(lon));
+        buffer_dump(fp, &lonHp, sizeof(lonHp));
+        buffer_dump(fp, &height, sizeof(height));
+        buffer_dump(fp, &heightHp, sizeof(heightHp));
 
         rc = (diminuto_observation_commit(fp, &temporary) == (FILE *)0);
 

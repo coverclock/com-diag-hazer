@@ -159,10 +159,10 @@ int main(void)
         assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
         assert(position.safety == HAZER_SAFETY_UNKNOWN);
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
@@ -288,10 +288,10 @@ int main(void)
         assert(position.quality == HAZER_QUALITY_MANUAL);
         assert(position.safety == HAZER_SAFETY_UNKNOWN);
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
@@ -360,10 +360,10 @@ int main(void)
         assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
         assert(position.safety == HAZER_SAFETY_UNKNOWN);
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
@@ -432,10 +432,10 @@ int main(void)
         assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
         assert(position.safety == HAZER_SAFETY_SAFE);
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
@@ -559,10 +559,10 @@ int main(void)
         assert(position.quality == HAZER_QUALITY_DIFFERENTIAL);
         assert(position.safety == HAZER_SAFETY_UNKNOWN);
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
@@ -628,10 +628,10 @@ int main(void)
         assert(position.sog_microknots == 21000LL);
         assert(position.sog_millimetersperhour == 40000LL);
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
@@ -894,13 +894,13 @@ int main(void)
             assert(rc == HAZER_SYSTEM_GNSS);
             assert(strcmp(view.label, "GSV") == 0);
 
-            view.sig[0].ticks = 0;
+            view.sig[0].timeout = 0;
             rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == 0);
-            view.sig[0].ticks = 1;
+            view.sig[0].timeout = 1;
             rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == ((ii < 3) ? !0 : 0));
-            view.sig[0].ticks = 1;
+            view.sig[0].timeout = 1;
 
         }
 
@@ -1047,13 +1047,13 @@ int main(void)
             jj = hazer_parse_gsv(&view, vector, count);
             assert(jj == (ii == 0) ? HAZER_SYSTEM_GPS : (ii == 1) ? HAZER_SYSTEM_GLONASS : (ii == 2) ? HAZER_SYSTEM_GNSS : HAZER_SYSTEM_GALILEO);
 
-            view.sig[jj].ticks = 0;
+            view.sig[jj].timeout = 0;
             rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == 0);
-            view.sig[jj].ticks = 1;
+            view.sig[jj].timeout = 1;
             rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == ((ii < 3) ? !0 : 0));
-            view.sig[jj].ticks = 0;
+            view.sig[jj].timeout = 0;
 
         }
 
@@ -1210,13 +1210,13 @@ int main(void)
             assert(rc == HAZER_SYSTEM_GNSS);
             assert(strcmp(view.label, "GSV") == 0);
 
-            view.sig[0].ticks = 0;
+            view.sig[0].timeout = 0;
             rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == 0);
-            view.sig[0].ticks = 1;
+            view.sig[0].timeout = 1;
             rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == ((ii < 3) ? !0 : 0));
-            view.sig[0].ticks = 1;
+            view.sig[0].timeout = 1;
 
         }
 
@@ -1354,13 +1354,13 @@ int main(void)
             assert(rc == HAZER_SYSTEM_GPS);
             assert(strcmp(view.label, "GSV") == 0);
 
-            view.sig[0].ticks = 0;
+            view.sig[0].timeout = 0;
             rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == 0);
-            view.sig[0].ticks = 1;
+            view.sig[0].timeout = 1;
             rc = hazer_has_pending_gsv(views, HAZER_SYSTEM_GPS);
             assert(rc == ((ii < 3) ? !0 : 0));
-            view.sig[0].ticks = 1;
+            view.sig[0].timeout = 1;
 
         }
 
@@ -1496,10 +1496,10 @@ int main(void)
         assert(position.old_nanoseconds == position.tot_nanoseconds);
         assert(position.tz_nanoseconds == 0LL);
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
@@ -1563,10 +1563,10 @@ int main(void)
         assert(position.old_nanoseconds == position.tot_nanoseconds);
         assert(position.tz_nanoseconds == -45900000000000LL);
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }
@@ -1630,10 +1630,10 @@ int main(void)
         assert(position.old_nanoseconds == position.tot_nanoseconds);
         assert(position.tz_nanoseconds == 37800000000000LL);
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(positions, HAZER_SYSTEM_GNSS));
     }

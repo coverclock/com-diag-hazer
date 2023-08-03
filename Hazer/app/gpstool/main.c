@@ -147,14 +147,16 @@
 #include "constants.h"
 #include "datagram.h"
 #include "emit.h"
+#include "fix.h"
 #include "globals.h"
-#include "helpers.h"
+#include "helper.h"
 #include "log.h"
 #include "print.h"
 #include "process.h"
 #include "sync.h"
 #include "test.h"
 #include "threads.h"
+#include "time.h"
 #include "types.h"
 
 /**
@@ -1011,7 +1013,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (remote_endpoint.udp == 0) {
         /* Do nothing. */
-    } else if ((protocol = choose_protocol(&remote_endpoint, preference)) == IPV6) {
+    } else if ((protocol = datagram_choose_protocol(&remote_endpoint, preference)) == IPV6) {
 
         remote_protocol = IPV6;
 
@@ -1068,7 +1070,7 @@ int main(int argc, char * argv[])
     }
 
     if (remote_fd >= 0) {
-        show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp);
+        datagram_show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp);
         DIMINUTO_LOG_INFORMATION("Remote Protocol '%c'\n", remote_protocol);
         DIMINUTO_LOG_INFORMATION("Remote Role '%c'\n", role);
         DIMINUTO_LOG_INFORMATION("Remote Mask 0x%lx\n", remote_mask);
@@ -1088,7 +1090,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (surveyor_endpoint.udp == 0) {
         /* Do nothing. */
-    } else if ((protocol = choose_protocol(&surveyor_endpoint, preference)) == IPV6) {
+    } else if ((protocol = datagram_choose_protocol(&surveyor_endpoint, preference)) == IPV6) {
 
         /*
          * Sending keepalives and receiving updates via IPv6.
@@ -1157,7 +1159,7 @@ int main(int argc, char * argv[])
     }
 
     if (surveyor_fd >= 0) {
-        show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp);
+        datagram_show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp);
         DIMINUTO_LOG_INFORMATION("Surveyor Protocol '%c'\n", surveyor_protocol);
     }
 
@@ -2149,7 +2151,7 @@ consume:
              * is a serious bug either in this software or in the transport.
              */
 
-            remote_total = receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer));
+            remote_total = datagram_receive(remote_fd, &remote_buffer, sizeof(remote_buffer));
             if (remote_total > 0) {
                 network_total += remote_total;
             }
@@ -2243,7 +2245,7 @@ consume:
              * Receive an RTCM datagram from a remote gpstool doing a survey.
              */
 
-            surveyor_total = receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer));
+            surveyor_total = datagram_receive(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer));
             if (surveyor_total > 0) {
                 network_total += surveyor_total;
             }
@@ -2276,11 +2278,11 @@ consume:
                 if (kinematics.number < 0) {
                     kinematics.number = 9999;
                 }
-                collect(kinematics.number, &updates);
+                helper_collect(kinematics.number, &updates);
 
                 kinematics.length = surveyor_length;
 
-                kinematics.ticks = timeout;
+                kinematics.timeout = timeout;
                 refresh = !0;
 
                 DIMINUTO_LOG_DEBUG("Surveyor RTCM [%zd] [%zd] [%zd] <%d>\n", surveyor_total, surveyor_size, surveyor_length, kinematics.number);
@@ -2289,7 +2291,7 @@ consume:
                     fputs("Datagram:\n", stderr);
                     diminuto_dump(stderr, &surveyor_buffer, surveyor_total);
                 }
-                write_buffer(dev_fp, surveyor_buffer.payload.buffers.rtcm, surveyor_length);
+                buffer_write(dev_fp, surveyor_buffer.payload.buffers.rtcm, surveyor_length);
 
             }
 
@@ -2356,12 +2358,12 @@ consume:
             /* Do nothing. */
         } else if (!diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
-        } else if (!expired(&keepalive_last, keepalive)) {
+        } else if (!time_expired(&keepalive_last, keepalive)) {
             /* Do nothing. */
         } else {
 
             datagram_stamp(&keepalive_buffer.header, &keepalive_sequence);
-            surveyor_total = send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
+            surveyor_total = datagram_send(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             if (surveyor_total > 0) {
                 network_total += surveyor_total;
             }
@@ -2396,7 +2398,7 @@ consume:
             /* Do nothing. */
         } else if (diminuto_list_isempty(&command_list)) {
             /* Do nothing. */
-        } else if (!expired(&postpone_last, postpone)) {
+        } else if (!time_expired(&postpone_last, postpone)) {
             /* Do nothing. */
         } else {
 
@@ -2480,7 +2482,7 @@ consume:
 
                 if (report) {
                     fprintf(out_fp, "OUT [%3zd] ", command_total - 1);
-                    print_buffer(out_fp, command_buffer, command_total - 1 /* Minus terminating nul. */, limitation);
+                    buffer_print(out_fp, command_buffer, command_total - 1 /* Minus terminating nul. */, limitation);
                     fflush(out_fp);
                 }
 
@@ -2573,7 +2575,7 @@ consume:
             datagram_buffer_t * dp;
             dp = diminuto_containerof(datagram_buffer_t, payload, buffer);
             datagram_stamp(&(dp->header), &remote_sequence);
-            remote_total = send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
+            remote_total = datagram_send(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
             if (remote_total > 0) {
                 network_total += remote_total;
                 DIMINUTO_LOG_DEBUG("Datagram Sent 0x%x [%zd] [%zd]", format, remote_total, network_total);
@@ -2602,7 +2604,7 @@ consume:
         } else if (!time_valid) {
             /* Do nothing. */
         } else {
-            write_buffer(dev_fp, buffer, length);
+            buffer_write(dev_fp, buffer, length);
         }
 
         /**
@@ -2610,7 +2612,7 @@ consume:
          **/
 
         if (list_fp != (FILE *)0) {
-            print_buffer(list_fp, buffer, length, UNLIMITED);
+            buffer_print(list_fp, buffer, length, UNLIMITED);
         }
 
         if (verbose) {
@@ -2621,7 +2623,7 @@ consume:
             fputs(ANSI_INP, out_fp);
         }
         if (report) {
-            fprintf(out_fp, "INP [%3zd] ", length); print_buffer(out_fp, buffer, length, limitation);
+            fprintf(out_fp, "INP [%3zd] ", length); buffer_print(out_fp, buffer, length, limitation);
             fflush(out_fp);
         }
 
@@ -2657,23 +2659,23 @@ consume:
 
             for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
                 if (ii > maximum) { break; }
-                countdown(&positions[ii].ticks, elapsed);
-                countdown(&actives[ii].ticks, elapsed);
+                time_countdown(&positions[ii].timeout, elapsed);
+                time_countdown(&actives[ii].timeout, elapsed);
                 for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
                     if (jj >= views[ii].signals) { break; }
-                    countdown(&views[ii].sig[jj].ticks, elapsed);
+                    time_countdown(&views[ii].sig[jj].timeout, elapsed);
                 }
             }
 
-            countdown(&solution.ticks, elapsed);
-            countdown(&hardware.ticks, elapsed);
-            countdown(&status.ticks, elapsed);
-            countdown(&base.ticks, elapsed);
-            countdown(&rover.ticks, elapsed);
-            countdown(&attitude.ticks, elapsed);
-            countdown(&odometer.ticks, elapsed);
-            countdown(&posveltim.ticks, elapsed);
-            countdown(&kinematics.ticks, elapsed);
+            time_countdown(&solution.timeout, elapsed);
+            time_countdown(&hardware.timeout, elapsed);
+            time_countdown(&status.timeout, elapsed);
+            time_countdown(&base.timeout, elapsed);
+            time_countdown(&rover.timeout, elapsed);
+            time_countdown(&attitude.timeout, elapsed);
+            time_countdown(&odometer.timeout, elapsed);
+            time_countdown(&posveltim.timeout, elapsed);
+            time_countdown(&kinematics.timeout, elapsed);
 
         }
 
@@ -2771,15 +2773,15 @@ consume:
                 rc = hazer_parse_gga(&positions[system], vector, count);
                 if (rc == 0) {
 
-                    positions[system].ticks = timeout;
+                    positions[system].timeout = timeout;
                     refresh = !0;
                     trace = !0;
 
-                    acquire_fix("NMEA GGA");
+                    fix_acquired("NMEA GGA");
 
                 } else if (errno == 0) {
 
-                    relinquish_fix("NMEA GGA");
+                    fix_relinquished("NMEA GGA");
 
                 } else {
 
@@ -2798,15 +2800,15 @@ consume:
                 rc = hazer_parse_rmc(&positions[system], vector, count);
                 if (rc == 0) {
 
-                    positions[system].ticks = timeout;
+                    positions[system].timeout = timeout;
                     refresh = !0;
                     trace = !0;
 
-                    acquire_fix("NMEA RMC");
+                    fix_acquired("NMEA RMC");
 
                 } else if (errno == 0) {
 
-                    relinquish_fix("NMEA RMC");
+                    fix_relinquished("NMEA RMC");
 
                 } else {
 
@@ -2825,15 +2827,15 @@ consume:
                 rc = hazer_parse_gll(&positions[system], vector, count);
                 if (rc == 0) {
 
-                    positions[system].ticks = timeout;
+                    positions[system].timeout = timeout;
                     refresh = !0;
                     trace = !0;
 
-                    acquire_fix("NMEA GLL");
+                    fix_acquired("NMEA GLL");
 
                 } else if (errno == 0) {
 
-                    relinquish_fix("NMEA GLL");
+                    fix_relinquished("NMEA GLL");
 
                 } else {
 
@@ -2852,12 +2854,12 @@ consume:
                 rc = hazer_parse_vtg(&positions[system], vector, count);
                 if (rc == 0) {
 
-                    positions[system].ticks = timeout;
+                    positions[system].timeout = timeout;
                     refresh = !0;
 
                 } else if (errno == 0) {
 
-                    relinquish_fix("NMEA VTG");
+                    fix_relinquished("NMEA VTG");
 
                 } else {
 
@@ -2909,7 +2911,7 @@ consume:
                     }
 
                     actives[system] = active_cache;
-                    actives[system].ticks = timeout;
+                    actives[system].timeout = timeout;
                     refresh = !0;
 
                 } else {
@@ -2929,7 +2931,7 @@ consume:
                 rc = hazer_parse_gsv(&views[system], vector, count);
                 if  (rc >= 0) {
 
-                    views[system].sig[rc].ticks = timeout;
+                    views[system].sig[rc].timeout = timeout;
 
                     if (views[system].pending == 0) {
                         refresh = !0;
@@ -2955,7 +2957,7 @@ consume:
                 rc = hazer_parse_zda(&positions[system], vector, count);
                 if (rc == 0) {
 
-                    positions[system].ticks = timeout;
+                    positions[system].timeout = timeout;
                     refresh = !0;
 
                     /*
@@ -3032,16 +3034,16 @@ consume:
                 rc = hazer_parse_pubx_position(&positions[system], &actives[system], vector, count);
                 if  (rc == 0) {
 
-                    positions[system].ticks = timeout;
-                    actives[system].ticks = timeout;
+                    positions[system].timeout = timeout;
+                    actives[system].timeout = timeout;
                     refresh = !0;
                     trace = !0;
 
-                    acquire_fix("PUBX POSITION");
+                    fix_acquired("PUBX POSITION");
 
                 } else if (errno == 0) {
 
-                    relinquish_fix("PUBX POSITION");
+                    fix_relinquished("PUBX POSITION");
 
                 } else {
 
@@ -3072,13 +3074,13 @@ consume:
                                 systems[system] = true;
                             }
 
-                            views[system].sig[0].ticks = timeout;
+                            views[system].sig[0].timeout = timeout;
 
                             if (system == HAZER_SYSTEM_GNSS) {
 
                                 /* Do nothing. */
 
-                            } else if (actives[HAZER_SYSTEM_GNSS].ticks == 0) {
+                            } else if (actives[HAZER_SYSTEM_GNSS].timeout == 0) {
 
                                 /* Do nothing. */
 
@@ -3092,7 +3094,7 @@ consume:
 
                             }
 
-                            actives[system].ticks = timeout;
+                            actives[system].timeout = timeout;
                             refresh = !0;
                             DIMINUTO_LOG_DEBUG("Received PUBX SVSTATUS (%s)\n", HAZER_SYSTEM_NAME[system]);
                         }
@@ -3164,15 +3166,15 @@ consume:
                 rc = yodel_ubx_nav_hpposllh(&(solution.payload), buffer, length);
                 if (rc == 0) {
 
-                    solution.ticks = timeout;
+                    solution.timeout = timeout;
                     refresh = !0;
                     trace = !0;
 
-                    acquire_fix("UBX-NAV-HPPOSLLH");
+                    fix_acquired("UBX-NAV-HPPOSLLH");
 
                 } else if (errno == 0) {
 
-                    relinquish_fix("UBX-NAV-HPPOSLLH");
+                    fix_relinquished("UBX-NAV-HPPOSLLH");
 
                 } else {
 
@@ -3191,7 +3193,7 @@ consume:
                 rc = yodel_ubx_mon_hw(&(hardware.payload), buffer, length);
                 if (rc == 0) {
 
-                    hardware.ticks = timeout;
+                    hardware.timeout = timeout;
                     refresh = !0;
 
                 } else {
@@ -3211,7 +3213,7 @@ consume:
                 rc = yodel_ubx_nav_status(&(status.payload), buffer, length);
                 if (rc == 0) {
 
-                    status.ticks = timeout;
+                    status.timeout = timeout;
                     refresh = !0;
 
                 } else {
@@ -3291,7 +3293,7 @@ consume:
                 rc = yodel_ubx_nav_svin(&base.payload, buffer, length);
                 if (rc == 0) {
 
-                    base.ticks = timeout;
+                    base.timeout = timeout;
                     refresh = !0;
 
                 } else {
@@ -3311,7 +3313,7 @@ consume:
                 rc = yodel_ubx_nav_att(&(attitude.payload), buffer, length);
                 if (rc == 0) {
 
-                    attitude.ticks = timeout;
+                    attitude.timeout = timeout;
                     refresh = !0;
 
                 } else {
@@ -3331,7 +3333,7 @@ consume:
                 rc = yodel_ubx_nav_odo(&(odometer.payload), buffer, length);
                 if (rc == 0) {
 
-                    odometer.ticks = timeout;
+                    odometer.timeout = timeout;
                     refresh = !0;
 
                 } else {
@@ -3351,7 +3353,7 @@ consume:
                 rc = yodel_ubx_nav_pvt(&(posveltim.payload), buffer, length);
                 if (rc == 0) {
 
-                    posveltim.ticks = timeout;
+                    posveltim.timeout = timeout;
                     refresh = !0;
 
                 } else {
@@ -3371,7 +3373,7 @@ consume:
                 rc = yodel_ubx_rxm_rtcm(&rover.payload, buffer, length);
                 if (rc == 0) {
 
-                    rover.ticks = timeout;
+                    rover.timeout = timeout;
                     refresh = !0;
 
                 } else {
@@ -3474,11 +3476,11 @@ consume:
             if (kinematics.number < 0) {
                 kinematics.number = 9999;
             }
-            collect(kinematics.number, &updates);
+            helper_collect(kinematics.number, &updates);
 
             kinematics.length = length;
 
-            kinematics.ticks = timeout;
+            kinematics.timeout = timeout;
             refresh = !0;
 
             DIMINUTO_LOG_DEBUG("Received RTCM (%d) [%lld]\n", kinematics.number, (long long int)kinematics.length);
@@ -3513,15 +3515,15 @@ consume:
                         systems[system] = true;
                     }
 
-                    positions[system].ticks = timeout;
+                    positions[system].timeout = timeout;
                     refresh = !0;
                     trace = !0;
 
-                    acquire_fix("CPO PVT");
+                    fix_acquired("CPO PVT");
 
                 } else if (errno == 0) {
 
-                    relinquish_fix("CPO PVT");
+                    fix_relinquished("CPO PVT");
 
                 } else {
 
@@ -3559,8 +3561,8 @@ consume:
                                 systems[system] = true;
                             }
 
-                            views[system].sig[HAZER_SIGNAL_ANY].ticks = timeout;
-                            actives[system].ticks = timeout;
+                            views[system].sig[HAZER_SIGNAL_ANY].timeout = timeout;
+                            actives[system].timeout = timeout;
                             refresh = !0;
                             trace = !0;
 
@@ -3656,7 +3658,7 @@ consume:
             /* Do nothing. */
         } else if (!trace) {
             /* Do nothing. */
-        } else if (!expired(&frequency_last, frequency)) {
+        } else if (!time_expired(&frequency_last, frequency)) {
             /* Do nothing. */
         } else {
             emit_trace(trace_fp, positions, &solution, &attitude, &posveltim, &base);
@@ -3671,7 +3673,7 @@ consume:
 
         if (trace_fp == (FILE *)0) {
             /* Do nothing. */
-        } else if (base.ticks == 0) {
+        } else if (base.timeout == 0) {
             /* Do nothing. */
         } else if (base.payload.active) {
             /* Do nothing. */
@@ -3711,7 +3713,7 @@ consume:
         ready = 0;
         fd = -1;
 
-        if (expired(&bypass_last, bypass)) {
+        if (time_expired(&bypass_last, bypass)) {
 
             /* Do nothing. */
 
@@ -3799,42 +3801,42 @@ render:
 
             if (crowbar <= 0) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-                    positions[ii].ticks = 0;
+                    positions[ii].timeout = 0;
                 }
             }
 
             if (crowbar <= 100) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
-                    actives[ii].ticks = 0;
+                    actives[ii].timeout = 0;
                  }
             }
 
             if (crowbar <= 200) {
                 for (ii = 0; ii < HAZER_SYSTEM_TOTAL; ++ii) {
                     for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
-                        views[ii].sig[jj].ticks = 0;
+                        views[ii].sig[jj].timeout = 0;
                     }
                 }
             }
 
             if (crowbar <= 300) {
-                hardware.ticks = 0;
+                hardware.timeout = 0;
             }
 
             if (crowbar <= 400) {
-                status.ticks = 0;
+                status.timeout = 0;
             }
 
             if (crowbar <= 500) {
-                base.ticks = 0;
+                base.timeout = 0;
             }
 
             if (crowbar <= 600) {
-                rover.ticks = 0;
+                rover.timeout = 0;
             }
 
             if (crowbar <= 700) {
-                kinematics.ticks = 0;
+                kinematics.timeout = 0;
             }
 
             if (crowbar > 0) {
@@ -3848,7 +3850,7 @@ render:
          * Generate the display if necessary and sufficient reasons exist.
          */
 
-        if (!expired(&slow_last, slow)) {
+        if (!time_expired(&slow_last, slow)) {
 
             /* Do nothing. */
 

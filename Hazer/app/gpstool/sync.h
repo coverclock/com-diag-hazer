@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2021 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2021-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Sync API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -14,6 +14,11 @@
 
 #include "com/diag/hazer/datagram.h"
 
+/**
+ * This is the size of the sync buffer used to hold incoming data which
+ * is not part of a known frame of any supported protocol (NMEA, UBX,
+ * etc.).
+ */
 static const size_t SYNC_SIZE = sizeof(datagram_payload_t);
 
 /**

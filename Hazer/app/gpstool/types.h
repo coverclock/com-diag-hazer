@@ -143,7 +143,7 @@ typedef enum Emission {
  */
 typedef struct YodelSolution {
     yodel_ubx_nav_hpposllh_t payload;   /* Payload from UBX-NAV-HPPOSLLH message. */
-    hazer_expiry_t ticks;               /* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;             /* Timeout in application-defined units. */
     uint8_t unused[3];
 } yodel_solution_t;
 
@@ -167,7 +167,7 @@ typedef struct YodelSolution {
  */
 typedef struct YodelHardware {
     yodel_ubx_mon_hw_t payload;     /* Payload from UBX-MON-HW message. */
-    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;         /* Timeout in application-defined units. */
     uint8_t unused[3];
 } yodel_hardware_t;
 
@@ -191,7 +191,7 @@ typedef struct YodelHardware {
  */
 typedef struct YodelStatus {
     yodel_ubx_nav_status_t payload; /* Payload from UBX-NAV-STATUS message. */
-    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;         /* Timeout in application-defined units. */
     uint8_t unused[3];
 } yodel_status_t;
 
@@ -215,7 +215,7 @@ typedef struct YodelStatus {
  */
 typedef struct YodelBase {
     yodel_ubx_nav_svin_t payload;   /* Payload from UBX-NAV-SVIN message. */
-    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;         /* Timeout in application-defined units. */
     uint8_t unused[7];
 } yodel_base_t;
 
@@ -239,7 +239,7 @@ typedef struct YodelBase {
  */
 typedef struct YodelRover {
     yodel_ubx_rxm_rtcm_t payload;   /* Payload from UBX-RXM-RTCM message. */
-    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;         /* Timeout in application-defined units. */
     uint8_t unused[7];
 } yodel_rover_t;
 
@@ -263,7 +263,7 @@ typedef struct YodelRover {
  */
 typedef struct YodelAttitude {
     yodel_ubx_nav_att_t payload;    /* Payload from UBX-NAV_ATT message. */
-    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;         /* Timeout in application-defined units. */
     uint8_t unused[7];
 } yodel_attitude_t;
 
@@ -286,8 +286,8 @@ typedef struct YodelAttitude {
  * Structure combining both a UBX-NAV_ODO payload and its expiry time in ticks.
  */
 typedef struct YodelOdometer {
-    yodel_ubx_nav_odo_t payload;	/* Payload from UBX-NAV_ODO message. */
-    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
+    yodel_ubx_nav_odo_t payload;    /* Payload from UBX-NAV_ODO message. */
+    hazer_expiry_t timeout;         /* Timeout in application-defined units. */
     uint8_t unused[7];
 } yodel_odometer_t;
 
@@ -310,8 +310,8 @@ typedef struct YodelOdometer {
  * Structure combining both a UBX-NAV-PVT payload and its expiry time in ticks.
  */
 typedef struct YodelPosVelTim {
-    yodel_ubx_nav_pvt_t payload;	/* Payload from UBX-NAV-PVT message. */
-    hazer_expiry_t ticks;			/* Lifetime in application-defined ticks. */
+    yodel_ubx_nav_pvt_t payload;    /* Payload from UBX-NAV-PVT message. */
+    hazer_expiry_t timeout;         /* Timeout in application-defined units. */
     uint8_t unused[7];
 } yodel_posveltim_t;
 
@@ -335,9 +335,9 @@ typedef struct YodelPosVelTim {
  */
 typedef struct TumbleweedMessage {
     ssize_t length;
-    int number;				/* Message number e.g. 1005. */
+    int number;                 /* Message number e.g. 1005. */
     source_t source;
-    hazer_expiry_t ticks;	/* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;     /* Timeout in application-defined units. */
 } tumbleweed_message_t;
 
 /**

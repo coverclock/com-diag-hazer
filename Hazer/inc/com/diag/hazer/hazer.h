@@ -117,6 +117,9 @@
  * COMMON SCALER TYPES
  ******************************************************************************/
 
+/**
+ * Expiration duration in application-defined units (gpstool uses seconds).
+ */
 typedef uint8_t hazer_expiry_t;
 
 /******************************************************************************
@@ -159,7 +162,7 @@ enum HazerGnssConstants {
     HAZER_GNSS_VIEWS        = 4,    /* Per NMEA GSV message. */
     HAZER_GNSS_ACTIVES      = 12,   /* Per NMEA GSA message. */
     HAZER_GNSS_SIGNALS      = 16,   /* In NMEA GSV message <0..F>. */
-    HAZER_GNSS_SECONDS      = 255,  /* Maximum lifetime. */
+    HAZER_GNSS_SECONDS      = 255,  /* Maximum timeout. */
     HAZER_GNSS_DOP          = 9999, /* Maximum DOP in units * 100 */
 };
 
@@ -1178,7 +1181,7 @@ typedef struct HazerPosition {
     uint8_t mag_digits;             /* Significant digits of Magnetic bearing. */
     uint8_t quality;                /* Mode Indicator/Quality. */
     uint8_t safety;                 /* Navigational Status and Safety. */
-    hazer_expiry_t ticks;           /* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;         /* Timeout in application-defined units. */
 } hazer_position_t;
 
 /**
@@ -1340,7 +1343,7 @@ typedef struct HazerActive {
     uint8_t system;                     /* GNSS System ID. */
     uint8_t active;                     /* Number of satellites active. */
     uint8_t mode;                       /* Navigation mode: see HazerMode. */
-    hazer_expiry_t ticks;               /* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;             /* Timeout in application-defined units. */
 } hazer_active_t;
 
 /**
@@ -1442,7 +1445,7 @@ typedef struct HazerBand {
     hazer_satellite_t sat[HAZER_GNSS_SATELLITES]; /* Satellites viewed. */
     uint8_t channels;           /* Number of channels used in view. */
     uint8_t visible;            /* Number of satellites in view. */
-    hazer_expiry_t ticks;       /* Lifetime in application-defined ticks. */
+    hazer_expiry_t timeout;     /* Timeout in application-defined units. */
 } hazer_band_t;
 
 /**
@@ -1732,7 +1735,7 @@ extern int hazer_has_pending_gsv(const hazer_views_t va, hazer_system_t ss);
  */
 static inline int hazer_is_valid_time(const hazer_position_t * positionp)
 {
-    return ((positionp->ticks > 0) &&
+    return ((positionp->timeout > 0) &&
             (positionp->utc_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
             (positionp->dmy_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
             (positionp->tot_nanoseconds != HAZER_NANOSECONDS_UNSET) &&

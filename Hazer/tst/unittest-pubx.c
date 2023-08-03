@@ -305,7 +305,7 @@ $PUBX,03,19,
 
         assert(views[HAZER_SYSTEM_GPS].sig[0].channels == 11);
         assert(views[HAZER_SYSTEM_GPS].sig[0].visible == 19);
-        assert(views[HAZER_SYSTEM_GPS].sig[0].ticks == 0);
+        assert(views[HAZER_SYSTEM_GPS].sig[0].timeout == 0);
 
         assert(views[HAZER_SYSTEM_GPS].sig[0].sat[0].id == 5);
         assert(views[HAZER_SYSTEM_GPS].sig[0].sat[0].azm_degrees == 51);
@@ -402,7 +402,7 @@ $PUBX,03,19,
 
         assert(views[HAZER_SYSTEM_GLONASS].sig[0].channels == 8);
         assert(views[HAZER_SYSTEM_GLONASS].sig[0].visible == 19);
-        assert(views[HAZER_SYSTEM_GLONASS].sig[0].ticks == 0);
+        assert(views[HAZER_SYSTEM_GLONASS].sig[0].timeout == 0);
 
         assert(views[HAZER_SYSTEM_GLONASS].sig[0].sat[0].id == 65);
         assert(views[HAZER_SYSTEM_GLONASS].sig[0].sat[0].azm_degrees == 47);
@@ -518,10 +518,10 @@ $PUBX,03,19,
         assert(position.dmy_nanoseconds == 1629417600000000000ULL); /* date -u -d "August 20 2021" +"%s.%N" */
         assert(position.tot_nanoseconds == (65249000000000ULL + 1629417600000000000ULL));
 
-        position.ticks = 0;
+        position.timeout = 0;
         assert(!hazer_is_valid_time(&position));
         assert(!hazer_has_valid_time(&position, HAZER_SYSTEM_GNSS));
-        position.ticks = 1;
+        position.timeout = 1;
         assert(hazer_is_valid_time(&position));
         assert(hazer_has_valid_time(&position, HAZER_SYSTEM_GNSS));
     }

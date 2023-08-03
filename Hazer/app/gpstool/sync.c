@@ -13,11 +13,10 @@
 #include "com/diag/diminuto/diminuto_dump.h"
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include "constants.h"
 #include "sync.h"
 
 static uint8_t sync_buffer[sizeof(datagram_payload_t)] = { 0, };
+
 static uint8_t * sync_here = sync_buffer;
 
 void sync_out(int ch)
@@ -76,6 +75,4 @@ void sync_end(void)
         diminuto_dump(stderr, sync_buffer, sync_length);
         sync_here = sync_buffer;
     }
-
-    sync_here = sync_buffer;
 }

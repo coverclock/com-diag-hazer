@@ -41,7 +41,7 @@ void print_actives(FILE * fp, const hazer_actives_t aa, hazer_system_t ss)
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
         if (system > ss) { break; }
-        if (aa[system].ticks == 0) { continue; }
+        if (aa[system].timeout == 0) { continue; }
         if (aa[system].active == 0) { continue; }
 
         total += aa[system].active;
@@ -53,7 +53,7 @@ void print_actives(FILE * fp, const hazer_actives_t aa, hazer_system_t ss)
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
         if (system > ss) { break; }
-        if (aa[system].ticks == 0) { continue; }
+        if (aa[system].timeout == 0) { continue; }
         if (aa[system].active == 0) { continue; }
 
         fprintf(fp, "%s {", "ACT [1]");
@@ -103,7 +103,7 @@ void print_actives(FILE * fp, const hazer_actives_t aa, hazer_system_t ss)
     for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
         if (system > ss) { break; }
-        if (aa[system].ticks == 0) { continue; }
+        if (aa[system].timeout == 0) { continue; }
         if (aa[system].active == 0) { continue; }
 
         fprintf(fp, "%s", "DOP");
@@ -145,7 +145,7 @@ void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, haz
 
             if (signal >= va[system].signals) { break; }
 
-            if (va[system].sig[signal].ticks == 0) { continue; }
+            if (va[system].sig[signal].timeout == 0) { continue; }
 
             limit = va[system].sig[signal].channels;
             if (limit > SATELLITES) { limit = SATELLITES; }
@@ -155,7 +155,7 @@ void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, haz
                 if (va[system].sig[signal].sat[satellite].id == 0) { continue; }
 
                 ranged = INACTIVE;
-                if (aa[system].ticks == 0) {
+                if (aa[system].timeout == 0) {
                     /* Do nothing. */
                 } else if (aa[system].active == 0) {
                     /* Do nothing. */
@@ -301,7 +301,7 @@ void print_hardware(FILE * fp, const yodel_hardware_t * hp)
      * explicitly enabled by sending appropriate messages to the Ublox device.
      */
 
-    if (hp->ticks > 0) {
+    if (hp->timeout > 0) {
         uint8_t value;
         char jamming;
         static char jamming_prior = STATUS;
@@ -363,7 +363,7 @@ void print_status(FILE * fp, const yodel_status_t * sp)
      * appropriate messages to the UBlox device.
      */
 
-    if (sp->ticks > 0) {
+    if (sp->timeout > 0) {
         static char spoofing_prior = STATUS;
         static char spoofing_history = STATUS;
         uint8_t value;
@@ -438,7 +438,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (system > ss) { break; }
-            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].timeout == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
             if (pa[system].dmy_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
@@ -531,7 +531,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (system > ss) { break; }
-            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].timeout == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
             fputs("POS", fp);
@@ -583,7 +583,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (system > ss) { break; }
-            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].timeout == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
             fputs("ALT", fp);
@@ -628,7 +628,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (system > ss) { break; }
-            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].timeout == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
             fputs("COG", fp);
@@ -667,7 +667,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (system > ss) { break; }
-            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].timeout == 0) { continue; }
             if (pa[system].utc_nanoseconds == HAZER_NANOSECONDS_UNSET) { continue; }
 
             fputs("SOG", fp);
@@ -708,7 +708,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
         for (system = 0; system < HAZER_SYSTEM_TOTAL; ++system) {
 
             if (system > ss) { break; }
-            if (pa[system].ticks == 0) { continue; }
+            if (pa[system].timeout == 0) { continue; }
 
             dmyokay = (pa[system].dmy_nanoseconds != HAZER_NANOSECONDS_UNSET);
             totokay = (pa[system].tot_nanoseconds != HAZER_NANOSECONDS_UNSET) &&
@@ -758,7 +758,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
 void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t * rp, const tumbleweed_message_t * kp, const tumbleweed_updates_t * up)
 {
 
-    if (bp->ticks != 0) {
+    if (bp->timeout != 0) {
 
         fputs("BAS", fp);
         fprintf(fp, " %dactive %dvalid %10usec %10uobs %12.4lfm", !!bp->payload.active, !!bp->payload.valid, bp->payload.dur, bp->payload.obs, (double)bp->payload.meanAcc / 10000.0);
@@ -768,7 +768,7 @@ void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t *
 
     }
 
-     if (rp->ticks != 0) {
+     if (rp->timeout != 0) {
 
         fputs("ROV", fp);
         fprintf(fp, " %5u: %5u (%5u)", rp->payload.refStation, rp->payload.msgType, rp->payload.subType);
@@ -778,7 +778,7 @@ void print_corrections(FILE * fp, const yodel_base_t * bp, const yodel_rover_t *
 
      }
 
-     if (kp->ticks != 0) {
+     if (kp->timeout != 0) {
 
          fputs("RTK", fp);
          fprintf(fp, " %4u [%4zu] %-8.8s <%8.8s>", kp->number, kp->length, (kp->source == DEVICE) ? "base" : (kp->source == NETWORK) ? "rover" : "unknown", up->bytes);
@@ -801,7 +801,7 @@ void print_solution(FILE * fp, const yodel_solution_t * sp)
     int32_t meters = 0;
     uint32_t tenthousandths = 0;
 
-    if (sp->ticks != 0) {
+    if (sp->timeout != 0) {
 
         fputs("HPP", fp);
 
@@ -858,7 +858,7 @@ void print_attitude(FILE * fp, const yodel_attitude_t * sp)
 {
     static const int32_t CENTIMILLI = 100000;
 
-    if (sp->ticks != 0) {
+    if (sp->timeout != 0) {
 
         fputs("ATT", fp);
 
@@ -902,7 +902,7 @@ void print_odometer(FILE * fp, const yodel_odometer_t * sp)
 {
     double miles = 0.0;
 
-    if (sp->ticks != 0) {
+    if (sp->timeout != 0) {
 
         fputs("ODO", fp);
 
@@ -933,7 +933,7 @@ void print_odometer(FILE * fp, const yodel_odometer_t * sp)
 
 void print_posveltim(FILE * fp, const yodel_posveltim_t * sp)
 {
-    if (sp->ticks != 0) {
+    if (sp->timeout != 0) {
 
         fputs("NED", fp);
 

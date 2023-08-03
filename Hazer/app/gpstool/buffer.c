@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the implementation of the gpstool Buffer API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -15,7 +15,7 @@
 #include "constants.h"
 #include "buffer.h"
 
-void write_buffer(FILE * fp, const void * buffer, size_t size)
+void buffer_write(FILE * fp, const void * buffer, size_t size)
 {
     if (fwrite(buffer, size, 1, fp) < 1) {
         errno = EIO;
@@ -28,7 +28,7 @@ void write_buffer(FILE * fp, const void * buffer, size_t size)
     }
 }
 
-void print_buffer(FILE * fp, const void * buffer, size_t size, size_t limit)
+void buffer_print(FILE * fp, const void * buffer, size_t size, size_t limit)
 {
     const char * bb = (const char *)0;
     size_t current = 0;
@@ -42,7 +42,7 @@ void print_buffer(FILE * fp, const void * buffer, size_t size, size_t limit)
     fflush(fp);
 }
 
-void dump_buffer(FILE * fp, const void * buffer, size_t size)
+void buffer_dump(FILE * fp, const void * buffer, size_t size)
 {
     const unsigned char * bb = (const unsigned char *)0;
 

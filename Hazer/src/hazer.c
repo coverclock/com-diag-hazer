@@ -3207,7 +3207,7 @@ int hazer_has_pending_gsv(const hazer_views_t va, hazer_system_t ss)
         if (va[ii].pending > 0) {
             for (jj = 0; jj < HAZER_GNSS_SIGNALS; ++jj) {
                 if (jj >= va[ii].signals) { break; }
-                if (va[ii].sig[jj].ticks > 0) {
+                if (va[ii].sig[jj].timeout > 0) {
                     return !0;
                 }
             }

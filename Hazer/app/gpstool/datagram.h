@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Datagram API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -26,7 +26,7 @@
  * @param preference is the protocol preference.
  * @return a protocol enumeration.
  */
-extern protocol_t choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol_t preference);
+extern protocol_t datagram_choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol_t preference);
 
 /**
  * Log connection information.
@@ -38,7 +38,7 @@ extern protocol_t choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol_t
  * @param ipv4p points to an IPv4 address.
  * @param port is a port number.
  */
-extern void show_connection(const char * label, const char * option, int fd, protocol_t protocol, const diminuto_ipv6_t * ipv6p, const diminuto_ipv4_t * ipv4p, diminuto_port_t port);
+extern void datagram_show_connection(const char * label, const char * option, int fd, protocol_t protocol, const diminuto_ipv6_t * ipv6p, const diminuto_ipv4_t * ipv4p, diminuto_port_t port);
 
 /**
  * Send an datagram to a remote IPv4 or IPv6 host and UDP port.
@@ -51,7 +51,7 @@ extern void show_connection(const char * label, const char * option, int fd, pro
  * @param size is the size of the sentence or packet.
  * @return the size of the sent datagram in bytes or <0 if an error occurred.
  */
-extern ssize_t send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size);
+extern ssize_t datagram_send(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size);
 
 /**
  * Receive a datagram from a UDP port. The datagram will be NUL terminated.
@@ -61,6 +61,6 @@ extern ssize_t send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t 
  * @param size is the size of the buffer in bytes.
  * @return the size of the received datagram in bytes or <0 if an error occurred.
  */
-extern ssize_t receive_datagram(int fd, void * buffer, size_t size);
+extern ssize_t datagram_receive(int fd, void * buffer, size_t size);
 
 #endif

@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This is the implementation of the gpstool Datagram API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -17,7 +17,7 @@
 #include "types.h"
 #include "datagram.h"
 
-protocol_t choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol_t preference)
+protocol_t datagram_choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol_t preference)
 {
     protocol_t protocol = PROTOCOL;
 
@@ -40,7 +40,7 @@ protocol_t choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol_t prefer
     return protocol;
 }
 
-void show_connection(const char * label, const char * option, int fd, protocol_t protocol, const diminuto_ipv6_t * ipv6p, const diminuto_ipv4_t * ipv4p, diminuto_port_t port)
+void datagram_show_connection(const char * label, const char * option, int fd, protocol_t protocol, const diminuto_ipv6_t * ipv6p, const diminuto_ipv4_t * ipv4p, diminuto_port_t port)
 {
     diminuto_ipv4_buffer_t ipv4;
     diminuto_ipv6_buffer_t ipv6;
@@ -63,7 +63,7 @@ void show_connection(const char * label, const char * option, int fd, protocol_t
 
 }
 
-ssize_t send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
+ssize_t datagram_send(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
 {
     ssize_t length = 0;
 
@@ -80,7 +80,7 @@ ssize_t send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p
     return length;
 }
 
-ssize_t receive_datagram(int fd, void * buffer, size_t size) {
+ssize_t datagram_receive(int fd, void * buffer, size_t size) {
     ssize_t length = 0;
     diminuto_ipv6_t address = { 0, };
     diminuto_port_t port = 0;
