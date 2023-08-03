@@ -104,8 +104,6 @@ extern void print_odometer(FILE * fp, const yodel_odometer_t * sp);
  */
 extern void print_posveltim(FILE * fp, const yodel_posveltim_t * sp);
 
-extern void print_fault(const hazer_fault_t * fp);
-
 /**
  * Print (really: log) an errno error message using data in a buffer.
  * minus the CR and LF end matter.
