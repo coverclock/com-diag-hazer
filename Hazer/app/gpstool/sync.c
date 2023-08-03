@@ -31,7 +31,7 @@ void sync_out(int ch)
     sync_length += 1;
 
     if (sync_length >= SYNC_SIZE) {
-        fputs("Unknown:\n", stderr);
+        fputs("Syncing:\n", stderr);
         diminuto_dump(stderr, sync_buffer, sync_length);
         sync_here = sync_buffer;
     }
@@ -39,7 +39,6 @@ void sync_out(int ch)
 
 void sync_in(size_t length)
 {
-    static int synced = 0;
     ssize_t sync_length = 0;
 
     sync_length = sync_here - sync_buffer;
@@ -51,12 +50,7 @@ void sync_in(size_t length)
     }
 
     if (sync_length > 0) {
-        if (synced) {
-            fputs("Unknown:\n", stderr);
-        } else {
-            fputs("Initial:\n", stderr);
-            synced = !0;
-        }
+        fputs("Syncing:\n", stderr);
         diminuto_dump(stderr, sync_buffer, sync_length);
         sync_here = sync_buffer;
     }
@@ -71,7 +65,7 @@ void sync_end(void)
     diminuto_contract(sync_length < SYNC_SIZE);
 
     if (sync_length > 0) {
-        fputs("Unknown:\n", stderr);
+        fputs("Syncing:\n", stderr);
         diminuto_dump(stderr, sync_buffer, sync_length);
         sync_here = sync_buffer;
     }

@@ -1908,7 +1908,6 @@ consume:
                     }
 
                     if (syncquit) {
-                        sync_end();
                         goto stop;
                     }
 
@@ -2115,7 +2114,6 @@ consume:
                         }
 
                         if (syncquit) {
-                            sync_end();
                             goto stop;
                         }
 
