@@ -16,7 +16,11 @@
 #include "com/diag/diminuto/diminuto_types.h"
 #include "types.h"
 
-extern void log_fault(const hazer_fault_t * fp);
+/**
+ * Log a fault reported with the NMEA GBS sentence.
+ * @param tp points to the fault structure.
+ */
+extern void log_fault(const hazer_fault_t * tp);
 
 /**
  * Log an errno error message using data in a buffer minus the CR and LF

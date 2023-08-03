@@ -29,7 +29,7 @@
 #include "test.h"
 #include "types.h"
 
-void log_fault(const hazer_fault_t * fp)
+void log_fault(const hazer_fault_t * tp)
 {
     int year = 0;
     int month = 0;
@@ -42,23 +42,23 @@ void log_fault(const hazer_fault_t * fp)
     hazer_system_t system = HAZER_SYSTEM_TOTAL;
     int signal = 0;
 
-    hazer_format_nanoseconds2timestamp(fp->utc_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
+    hazer_format_nanoseconds2timestamp(tp->utc_nanoseconds, &year, &month, &day, &hour, &minute, &second, &nanoseconds);
 
-    if (fp->talker >= HAZER_TALKER_TOTAL) {
+    if (tp->talker >= HAZER_TALKER_TOTAL) {
         talker = HAZER_TALKER_GNSS;
     } else {
-        talker = fp->talker;
+        talker = tp->talker;
     }
 
-    system = hazer_map_nmea_to_system(fp->system);
+    system = hazer_map_nmea_to_system(tp->system);
     if (system >= HAZER_SYSTEM_TOTAL) {
         system = HAZER_SYSTEM_GNSS;
     }
 
-    if (fp->signal >= HAZER_GNSS_SIGNALS) {
+    if (tp->signal >= HAZER_GNSS_SIGNALS) {
         signal = 0;
     } else {
-        signal = fp->signal;
+        signal = tp->signal;
     }
 
     diminuto_log_log(DIMINUTO_LOG_PRIORITY_NOTICE, "Fault %02d:%02d:%02dZ %s %s %s %d %.3lfm %.3lfm %.3lfm %.3lf%% %.3lfm %.3lf\n",
@@ -66,13 +66,13 @@ void log_fault(const hazer_fault_t * fp)
         HAZER_TALKER_NAME[talker],
         HAZER_SYSTEM_NAME[system],
         HAZER_SIGNAL_NAME[system][signal],
-        fp->id,
-        (double)(fp->lat_millimeters) / 1000.0,
-        (double)(fp->lon_millimeters) / 1000.0,
-        (double)(fp->alt_millimeters) / 1000.0,
-        (double)(fp->probability) / 1000.0,
-        (double)(fp->est_millimeters) / 1000.0,
-        (double)(fp->std_deviation) / 1000.0);
+        tp->id,
+        (double)(tp->lat_millimeters) / 1000.0,
+        (double)(tp->lon_millimeters) / 1000.0,
+        (double)(tp->alt_millimeters) / 1000.0,
+        (double)(tp->probability) / 1000.0,
+        (double)(tp->est_millimeters) / 1000.0,
+        (double)(tp->std_deviation) / 1000.0);
 }
 
 /*
