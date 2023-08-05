@@ -9,15 +9,15 @@
  * @details
  */
 
-#include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
 #include "com/diag/diminuto/diminuto_ipc.h"
+#include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/hazer/datagram.h"
+#include "endpoint.h"
 #include "types.h"
-#include "datagram.h"
 
-protocol_t datagram_choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol_t preference)
+protocol_t endpoint_choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol_t preference)
 {
     protocol_t protocol = PROTOCOL;
 
@@ -40,7 +40,7 @@ protocol_t datagram_choose_protocol(const diminuto_ipc_endpoint_t * ep, protocol
     return protocol;
 }
 
-void datagram_show_connection(const char * label, const char * option, int fd, protocol_t protocol, const diminuto_ipv6_t * ipv6p, const diminuto_ipv4_t * ipv4p, diminuto_port_t port)
+void endpoint_show_connection(const char * label, const char * option, int fd, protocol_t protocol, const diminuto_ipv6_t * ipv6p, const diminuto_ipv4_t * ipv4p, diminuto_port_t port)
 {
     diminuto_ipv4_buffer_t ipv4;
     diminuto_ipv6_buffer_t ipv6;
@@ -63,7 +63,7 @@ void datagram_show_connection(const char * label, const char * option, int fd, p
 
 }
 
-ssize_t datagram_send(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
+ssize_t endpoint_send_datagram(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p, const diminuto_ipv6_t * ipv6p, diminuto_port_t port, const void * buffer, size_t size)
 {
     ssize_t length = 0;
 
@@ -80,7 +80,7 @@ ssize_t datagram_send(int fd, protocol_t protocol, const diminuto_ipv4_t * ipv4p
     return length;
 }
 
-ssize_t datagram_receive(int fd, void * buffer, size_t size) {
+ssize_t endpoint_receive_datagram(int fd, void * buffer, size_t size) {
     ssize_t length = 0;
     diminuto_ipv6_t address = { 0, };
     diminuto_port_t port = 0;

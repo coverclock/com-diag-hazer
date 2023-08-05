@@ -145,8 +145,8 @@
 #include <wchar.h>
 #include "buffer.h"
 #include "constants.h"
-#include "datagram.h"
 #include "emit.h"
+#include "endpoint.h"
 #include "fix.h"
 #include "globals.h"
 #include "helper.h"
@@ -1013,7 +1013,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (remote_endpoint.udp == 0) {
         /* Do nothing. */
-    } else if ((protocol = datagram_choose_protocol(&remote_endpoint, preference)) == IPV6) {
+    } else if ((protocol = endpoint_choose_protocol(&remote_endpoint, preference)) == IPV6) {
 
         remote_protocol = IPV6;
 
@@ -1070,7 +1070,7 @@ int main(int argc, char * argv[])
     }
 
     if (remote_fd >= 0) {
-        datagram_show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp);
+        endpoint_show_connection("Remote", remote_option, remote_fd, remote_protocol, &remote_endpoint.ipv6, &remote_endpoint.ipv4, remote_endpoint.udp);
         DIMINUTO_LOG_INFORMATION("Remote Protocol '%c'\n", remote_protocol);
         DIMINUTO_LOG_INFORMATION("Remote Role '%c'\n", role);
         DIMINUTO_LOG_INFORMATION("Remote Mask 0x%lx\n", remote_mask);
@@ -1090,7 +1090,7 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else if (surveyor_endpoint.udp == 0) {
         /* Do nothing. */
-    } else if ((protocol = datagram_choose_protocol(&surveyor_endpoint, preference)) == IPV6) {
+    } else if ((protocol = endpoint_choose_protocol(&surveyor_endpoint, preference)) == IPV6) {
 
         /*
          * Sending keepalives and receiving updates via IPv6.
@@ -1159,7 +1159,7 @@ int main(int argc, char * argv[])
     }
 
     if (surveyor_fd >= 0) {
-        datagram_show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp);
+        endpoint_show_connection("Surveyor", surveyor_option, surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv6, &surveyor_endpoint.ipv4, surveyor_endpoint.udp);
         DIMINUTO_LOG_INFORMATION("Surveyor Protocol '%c'\n", surveyor_protocol);
     }
 
@@ -2141,7 +2141,7 @@ consume:
              * is a serious bug either in this software or in the transport.
              */
 
-            remote_total = datagram_receive(remote_fd, &remote_buffer, sizeof(remote_buffer));
+            remote_total = endpoint_receive_datagram(remote_fd, &remote_buffer, sizeof(remote_buffer));
             if (remote_total > 0) {
                 network_total += remote_total;
             }
@@ -2235,7 +2235,7 @@ consume:
              * Receive an RTCM datagram from a remote gpstool doing a survey.
              */
 
-            surveyor_total = datagram_receive(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer));
+            surveyor_total = endpoint_receive_datagram(surveyor_fd, &surveyor_buffer, sizeof(surveyor_buffer));
             if (surveyor_total > 0) {
                 network_total += surveyor_total;
             }
@@ -2353,7 +2353,7 @@ consume:
         } else {
 
             datagram_stamp(&keepalive_buffer.header, &keepalive_sequence);
-            surveyor_total = datagram_send(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
+            surveyor_total = endpoint_send_datagram(surveyor_fd, surveyor_protocol, &surveyor_endpoint.ipv4, &surveyor_endpoint.ipv6, surveyor_endpoint.udp, &keepalive_buffer, sizeof(keepalive_buffer));
             if (surveyor_total > 0) {
                 network_total += surveyor_total;
             }
@@ -2565,7 +2565,7 @@ consume:
             datagram_buffer_t * dp;
             dp = diminuto_containerof(datagram_buffer_t, payload, buffer);
             datagram_stamp(&(dp->header), &remote_sequence);
-            remote_total = datagram_send(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
+            remote_total = endpoint_send_datagram(remote_fd, remote_protocol, &remote_endpoint.ipv4, &remote_endpoint.ipv6, remote_endpoint.udp, dp, sizeof(dp->header) + length);
             if (remote_total > 0) {
                 network_total += remote_total;
                 DIMINUTO_LOG_DEBUG("Datagram Sent 0x%x [%zd] [%zd]", format, remote_total, network_total);

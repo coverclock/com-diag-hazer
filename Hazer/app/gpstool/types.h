@@ -18,7 +18,6 @@
 #include "com/diag/hazer/hazer.h"
 #include "com/diag/hazer/yodel.h"
 #include "com/diag/hazer/tumbleweed.h"
-#include "com/diag/hazer/datagram.h"
 
 /*******************************************************************************
  * INTEGERS
