@@ -1498,6 +1498,7 @@ throw an assert and core dump.
 * makerfocuspps - exercises the MakerFocus GPS board and its 1PPS output.
 * neof10tH00 - same as neof10tH but with Ardusimple version 00 configuration.
 * neof10tH01 - same as neof10tH but with Adrusimple version 01 configuration.
+* neof10tHinit - same as neof10tH but with my configuration.
 * neof10tH - same as neof10t but headless.
 * neof10t - exercises the Ardusimple SimpleGNSS board with its 1PPS output.
 * neom8n - exercises the RDQ Micro M8N board.
