@@ -9,7 +9,8 @@
 # specification. N.B. the labeling of the PVT (1PPS)
 # and POWER LEDs are reversed on this version of the
 # SimpleGNSS board; later version may be fixed by
-# Ardusimple.
+# Ardusimple. This script uses the device as is, in
+# real-time instead of headless.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}

@@ -9,8 +9,8 @@
 # specification. It is also the first generation 10
 # u-blox device I've used. N.B. the labeling of the PVT
 # (1PPS) and POWER LEDs are reversed on this version
-# of the SimpleGNSS board.
-# WORK IN PROGRESS
+# of the SimpleGNSS board. This script uses version 00
+# of the Ardusimple configuration file, with my additions.
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}

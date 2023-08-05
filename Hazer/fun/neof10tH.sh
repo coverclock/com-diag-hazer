@@ -9,7 +9,8 @@
 # specification. It is also the first generation 10
 # u-blox device I've used. N.B. the labeling of the PVT
 # (1PPS) and POWER LEDs are reversed on this version
-# of the SimpleGNSS board.
+# of the SimpleGNSS board. This script uses the device
+# as it is.
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
