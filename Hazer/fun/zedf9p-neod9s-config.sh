@@ -4,16 +4,19 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # This script configures the UBX-NEO-D9S and the UBX-ZED-F9P.
+# By default it uses the configuration script for the Nicker
+# project containing the appropriate commands for the U.S.
+# region.
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
-CFGFIL=${COM_DIAG_HAZER_CFGFIL:-"${HOME}/com_diag_nicker.sh"}
+CFGFIL=${COM_DIAG_HAZER_CFGFIL:-"${HOME}/com_diag_nicker_us.sh"}
 
-PROGRAM=$(basename ${0})
+PGMNAM=$(basename ${0})
 LOCDEV=${1:-"/dev/ttyACM0"}
 LOCBPS=${2:-38400}
 CORDEV=${3:-"/dev/ttyACM1"}
 CORBPS=${4:-9600}
-ERRFIL=${5:-"${SAVDIR}/${PROGRAM}.err"}
+ERRFIL=${5:-"${SAVDIR}/${PGMNAM}.err"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -22,7 +25,11 @@ mkdir -p $(dirname ${ERRFIL})
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
 
+# READ THE CONFIGURATION SCRIPT.
+
 . ${CFGFIL}
+
+# CONFIGURE THE UBX-NEO-D9S INMARSAT RECEIVER.
 
 OPTIONS=""
 for OPTION in ${UBX_NEO_D9S}; do
@@ -33,8 +40,11 @@ eval gpstool \
     -R \
     -D ${CORDEV} -b ${CORBPS} -8 -n -1 \
     ${OPTIONS} \
+    -A \"\" \
     -x \
     < /dev/null
+
+# CONFIGURE THE UBX-ZED-F9P GNSS RECEIVER.
 
 OPTIONS=""
 for OPTION in ${UBX_ZED_F9P}; do
@@ -45,5 +55,6 @@ eval gpstool \
     -R \
     -D ${LOCDEV} -b ${LOCBPS} -8 -n -1 \
     ${OPTIONS} \
+    -A \"\" \
     -x \
     < /dev/null

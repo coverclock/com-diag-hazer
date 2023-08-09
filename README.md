@@ -997,8 +997,8 @@ L89_R2.0_GNSS_Protocol_Specification_V1.0, (Preliminary), 2020-04-29
 Eric S. Raymond, "NMEA Revealed", 2023-05-03,
 <https://gpsd.gitlab.io/gpsd/NMEA.html>
 
-RTCM 10403.3, "Differential GNSS (Global Navigation Satellite Systems) Services -
-Version 3", 141-2016-SC104-STD, 2016-10-07
+RTCM 10403.3, "Differential GNSS (Global Navigation Satellite Systems)
+Services - Version 3", 141-2016-SC104-STD, 2016-10-07
 
 RTCM 10410.1, "Networked Transport of RTCM via Internet Protocol (NTRIP) -
 Version 2.0", 111-2009-SC104-STD + 139-2011-SC104-STD, 2011-06-28
@@ -1006,6 +1006,10 @@ Version 2.0", 111-2009-SC104-STD + 139-2011-SC104-STD, 2011-06-28
 SAE 6857, "Requirements for a Terrestrial Based Positioning, Navigation, and
 Timing (PNT) System to Improve Nagivation Solutions and Ensure Critical
 Infrastructure Security", SAE6857, 2018-04
+
+Thingstream, "PointPerfect getting started", Thingstream, 2022
+
+Thingstream, "PointPerfect L-band Configuration", Thingstream, 2022
 
 u-blox 7, "Receiver Description Including Protocol Specification V14",
 GPS.G7-SW-12001-B, ublox, 65525, 2013-02-01
@@ -1030,6 +1034,30 @@ ublox, 2019-06-13
 
 u-blox 9, "ZED-F9T Integration Manual", UBX-19005590-R05, ublox,
 2020-11-18
+
+u-blox 9, "ZED-F9P-02B High precision GNSS module Professional grade
+Data sheet", UBX-21023276-R03, ublox, 2023-03-24
+
+u-blox 9, "ZED-F9P u-blox F9 high precision GNSS module Integration Manual",
+UBX-18010802-R12, ublox, 2022-05-03
+
+u-blox 9, "u-blox F9 HPG 1.32 u-blox F9 high precision GNSS receiver Interface
+Description", UBX-22008968-R01, ublox, 2022-05-02
+
+u-blox 9, "Product summary ZED-F9P series u-blox F9 high precision GNSS
+modules", UBX-17005151-R14, ublox, 2023
+
+u-blox 9, "NEO-D9S Correction data receiver Integration manual",
+UBX-19026111-R08, ublox, 2023-01-05
+
+u-blox 9, "u-blox D9 PMP 1.04 u-blox D9 correction data receiver Interface
+description", UBX-21040023-R01, ublox, 2021-10-21
+
+u-blox 9, "NEO-D9S and ZED-F9 configuration SPARTN L-band correction
+data reception Application Note", UBX-22008160-R02, ublox, 2022-07-27
+
+u-blox 9, "Product summary NEO-D9S u-blox D9 correction data receiver",
+UBX-17010946-R05, ublox, 2021
 
 u-blox 10, "NEO-F10T High precision timing GNSS module Professional Grade
 Data Sheet", UBX-22022576-R02, ublox, 2023-03-30
