@@ -34,6 +34,9 @@
  *
  * "u-blox F10 TIM 3.01 - u-blox F10 GNSS timing receiver - Interface
  * Description", UBX-23003447-R01, ublox AG, 2023-03-21
+ *
+ * "u-blox F9 HPG 1.32 u-blox F9 high precision GNSS receiver Interface
+ * Description", UBX-22008968-R01, ublox AG, 2022-05-02
  */
 
 #include <stdio.h>
@@ -1555,6 +1558,15 @@ extern int int yodel_ubx_tim_tp(yodel_ubx_tim_tp_t * mp, const void * buffer, ss
 enum YodelUbxRxmRawxConstants {
     YODEL_UBX_RXM_RAWX_Class        = 0x02,
     YODEL_UBX_RXM_RAWX_Id           = 0x77,
+};
+
+/*******************************************************************************
+ * PROCESSING UBX-RXM-SPARTNKEY MESSAGES
+ ******************************************************************************/
+
+enum YodelUbxRxmSpartnkeyConstants {
+    YODEL_UBX_RXM_SPARTNKEY_Class   = 0x02,
+    YODEL_UBX_RXM_SPARTNKEY_Id      = 0x36,
 };
 
 #endif

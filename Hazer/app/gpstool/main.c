@@ -215,7 +215,7 @@ int main(int argc, char * argv[])
      */
     FILE * dev_fp = (FILE *)0;
     FILE * in_fp = (FILE *)0;
-    FILE * list_fp = (FILE *)0;
+    FILE * listing_fp = (FILE *)0;
     FILE * out_fp = stdout;
     FILE * pps_fp = (FILE *)0;
     FILE * queue_fp = (FILE *)0;
@@ -963,16 +963,16 @@ int main(int argc, char * argv[])
     if (listing == (const char *)0) {
         /* Do nothing. */
     } else if (strcmp(listing, "-") == 0) {
-        list_fp = stderr;
-    } else if ((list_fp = fopen(listing, "ab")) != (FILE *)0) {
+        listing_fp = stderr;
+    } else if ((listing_fp = fopen(listing, "ab")) != (FILE *)0) {
         /* Do nothing. */
     } else {
         diminuto_perror(listing);
-        diminuto_contract(list_fp != (FILE *)0);
+        diminuto_contract(listing_fp != (FILE *)0);
     }
 
-    if (list_fp != (FILE *)0) {
-        DIMINUTO_LOG_INFORMATION("Listing File (%d) \"%s\"\n", fileno(list_fp), listing);
+    if (listing_fp != (FILE *)0) {
+        DIMINUTO_LOG_INFORMATION("Listing File (%d) \"%s\"\n", fileno(listing_fp), listing);
     }
 
     /*
@@ -2601,8 +2601,8 @@ consume:
          ** LOG
          **/
 
-        if (list_fp != (FILE *)0) {
-            buffer_print(list_fp, buffer, length, UNLIMITED);
+        if (listing_fp != (FILE *)0) {
+            buffer_print(listing_fp, buffer, length, UNLIMITED);
         }
 
         if (verbose) {
@@ -3442,6 +3442,26 @@ consume:
 
                 /* TODO */
 
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_RXM_SPARTNKEY_Class , YODEL_UBX_RXM_SPARTNKEY_Id)) {
+
+                /*
+                 * UBX UBX-RXM-SPARTNKEY
+                 */
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RAWX\n");
+
+                /*
+                 * There is a bit of a security concern here. The SPARTN
+                 * encryption keys are probably sensitive. We want to look
+                 * at them, but we don't want to log them to the system log
+                 * where they might be more visible than we want them to be.
+                 * So we write them to standard error, in the hopes that
+                 * it has been redirected to somewhere more secure.
+                 */
+
+                fprintf(stderr, "%s: UBX-RXM-SPARTNKEY [%zd] ", Program, length);
+                buffer_dump(stderr, buffer, length);
+
             } else {
 
                 /*
@@ -4005,14 +4025,14 @@ stop:
         diminuto_perror("fclose(queue_fp)");
     }
 
-    if (list_fp == (FILE *)0) {
+    if (listing_fp == (FILE *)0) {
         /* Do nothing. */
-    } else if (list_fp == stderr) {
+    } else if (listing_fp == stderr) {
         /* Do nothing. */
-    } else if ((rc = fclose(list_fp)) != EOF) {
+    } else if ((rc = fclose(listing_fp)) != EOF) {
         /* Do nothing. */
     } else {
-        diminuto_perror("fclose(list_fp)");
+        diminuto_perror("fclose(listing_fp)");
     }
 
     if (dev_fp == (FILE *)0) {

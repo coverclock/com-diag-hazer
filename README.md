@@ -547,6 +547,7 @@ I have successfully tested Hazer with the following GNSS devices.
 * SparkFun NEO-M8U (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [^4] [^8] [^11]    
 * SparkFun SAM-M8Q (U-Blox 8/UBX-SAM-M8Q, 9600 8n1, N/A, ttyS, 1Hz) [^4] [^6] [^8] [^14]    
 * SparkFun SARA-R5 (U-Blox 8/M8030/UBX-R5, autobaud, v1a86p7523, ttyUSB, 1Hz) [^17] [^18] [^19]
+* SparkFun ZED-F9P+NEO-D9S (U-Blox 9/UBX-ZED-F9P+UBX-NEO-D9S, 38400 8N1+9600 8N1, v1546p01a9+V1546p01a9? ttyACM+ttyACM, 1Hz)
 * SparkFun ZED-F9R (U-Blox 9/UBX-ZED-F9R, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [^8] [^10] [^11]    
 * SparkFun ZED-F9T (U-Blox 9/UBX-ZED-F9T, 38400 8N1, v1516p01a9, ttyACM, 1Hz) [^8] [^10] [^20]   
 * Stratux Vk-162 Gmouse (U-Blox 7, 9600 8N1, v1546p01A7, ttyACM, 1Hz) [^2]    
