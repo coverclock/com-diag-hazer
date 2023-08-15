@@ -1569,4 +1569,13 @@ enum YodelUbxRxmSpartnkeyConstants {
     YODEL_UBX_RXM_SPARTNKEY_Id      = 0x36,
 };
 
+/*******************************************************************************
+ * PROCESSING UBX-MON-TXBUF
+ ******************************************************************************/
+
+enum YodelUbxMonTxbufConstants {
+    YODEL_UBX_MON_TXBUF_Class   = 0x0a,
+    YODEL_UBX_MON_TXBUF_Id      = 0x08,
+};
+
 #endif

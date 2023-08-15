@@ -3392,6 +3392,19 @@ consume:
 
                 }
 
+            } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_MON_TXBUF_Class , YODEL_UBX_MON_TXBUF_Id)) {
+
+                /*
+                 * UBX UBX-MON-TXBUF
+                 */
+
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-MON-TXBUF\n");
+
+                /* TODO */
+
+                fprintf(stderr, "%s: UBX-MON-TXBUF [%zd] ", Program, length);
+                buffer_dump(stderr, buffer, length);
+
             } else if (yodel_is_ubx_class_id(buffer, length, YODEL_UBX_NAV_TIMEGPS_Class, YODEL_UBX_NAV_TIMEGPS_Id)) {
 
                 /*
@@ -3448,7 +3461,7 @@ consume:
                  * UBX UBX-RXM-SPARTNKEY
                  */
 
-                DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-RAWX\n");
+                DIMINUTO_LOG_DEBUG("Parse UBX UBX-RXM-SPARTNKEY\n");
 
                 /*
                  * There is a bit of a security concern here. The SPARTN
