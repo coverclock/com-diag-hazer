@@ -4,6 +4,11 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # WORK IN PROGRESS
+#
+# REFERENCES
+#
+# "NEO-D9S and ZED-F9 configuration SPARTN L-band correction data reception
+# Application Note", UBX-22008160-R02, U-blox AG, 2022-07-22
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 

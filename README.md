@@ -1250,6 +1250,10 @@ WIRED, 2022-08-26
 
 <https://www.gpsrchive.com/Shared/Satellites/GPS%20vs%20GLONASS%20vs%20Galileo.html>
 
+<https://www.ietf.org/timezones/data/leap-seconds.list>
+
+<https://geodesy.noaa.gov/CORS/resources/gpscals.shtml>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
