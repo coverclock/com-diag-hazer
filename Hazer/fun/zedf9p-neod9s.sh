@@ -12,13 +12,13 @@
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
 PGMNAM=$(basename ${0})
-FILNAM=${PGMNAM%-*}
+FILNAM=${PGMNAM}
 LOCDEV=${1:-"/dev/ttyACM0"}
 LOCBPS=${2:-38400}
 CORDEV=${3:-"/dev/ttyACM1"}
 CORBPS=${4:-9600}
 ERRFIL=${5:-"${SAVDIR}/${FILNAM}.err"}
-OUTFIL=${6:-"${SAVDIR}/${PGMNAM}.out"}
+OUTFIL=${6:-"${SAVDIR}/${FILNAM}.out"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
