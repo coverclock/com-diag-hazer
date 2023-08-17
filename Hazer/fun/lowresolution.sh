@@ -3,7 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Configure and run the U-blox ZED-UBX-F9P as a stationary Base sending
+# Configure and run the U-blox UBX-ZED-F9P as a stationary Base sending
 # corrections to Rovers with parameters for low resolution.
 
 ROUTER=${1:-"tumbleweed:tumbleweed"}

@@ -3,7 +3,6 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# WORK IN PROGRESS
 #
 # REFERENCES
 #
@@ -13,7 +12,7 @@
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 
 PGMNAM=$(basename ${0})
-FILNAM=${PGMNAM%%-*}
+FILNAM=${PGMNAM%-*}
 LOCDEV=${1:-"/dev/ttyACM0"}
 LOCBPS=${2:-38400}
 CORDEV=${3:-"/dev/ttyACM1"}

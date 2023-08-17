@@ -66,7 +66,7 @@ repositories:
 * Fothergill (LoRa/serial gateway),
 * Hazer (NMEA support),
 * Metronome (precision time and frequency support),
-* Nicker (PointPerfect corrections via Inmarsat L-band),
+* Nicker (PointPerfect corrections via Inmarsat),
 * Stagecoach (UDP/OpenSSL gateway),
 * Tesoro (OSM support),
 * Tumbleweed (RTCM support),

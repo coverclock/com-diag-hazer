@@ -7,7 +7,6 @@
 # By default it uses the configuration script for the Nicker
 # project containing the appropriate commands for the U.S.
 # region.
-# WORK IN PROGRESS
 #
 # REFERENCES
 #
@@ -18,7 +17,7 @@ SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 CFGFIL=${COM_DIAG_HAZER_CFGFIL:-"${HOME}/com_diag_nicker_us.sh"}
 
 PGMNAM=$(basename ${0})
-FILNAM=${PGMNAM%%-*}
+FILNAM=${PGMNAM%-*}
 LOCDEV=${1:-"/dev/ttyACM0"}
 LOCBPS=${2:-38400}
 CORDEV=${3:-"/dev/ttyACM1"}
