@@ -626,7 +626,7 @@ gccversion:
 
 implicit:
 	@$(CC) $(CFLAGS) -dM -E - < /dev/null
-	
+
 defines:
 	@$(CC) $(CPPFLAGS) $(CFLAGS) -dM -E - < /dev/null
 
