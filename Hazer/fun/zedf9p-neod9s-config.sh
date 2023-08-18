@@ -43,7 +43,6 @@ exec 2>>${ERRFIL}
 
 MESSAGE="${PGMNAM}: Configuring UBX-NEO-D9S ${CORDEV} ${CORBPS}"
 log -I -N ${PGMNAM} -n "${MESSAGE}"
-echo "${MESSAGE}"
 
 OPTIONS=""
 for OPTION in ${UBX_NEO_D9S}; do
@@ -70,7 +69,6 @@ eval gpstool \
 
 MESSAGE="${PGMNAM}: Configuring UBX-ZED-F9P ${LOCDEV} ${LOCBPS}"
 log -I -N ${PGMNAM} -n "${MESSAGE}"
-echo "${MESSAGE}"
 
 OPTIONS=""
 for OPTION in ${UBX_ZED_F9P}; do

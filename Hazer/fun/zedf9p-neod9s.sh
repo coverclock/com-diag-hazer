@@ -34,7 +34,6 @@ exec 2>>${ERRFIL}
 
 MESSAGE="${PGMNAM}: Querying UBX-NEO-D9S ${CORDEV} ${CORBPS}"
 log -I -N ${PGMNAM} -n "${MESSAGE}"
-echo "${MESSAGE}"
 
 # UBX-MON-TXBUF [ 0]
 
@@ -44,7 +43,7 @@ gpstool \
     -w 5 -x \
     -U '\xb5\x62\x0a\x08\x00\x00' \
     -U '' \
-    < /dev/null
+    < /dev/null > ${OUTFIL}
 
 # UBX-CFG-MSG [ 3] UBX-NAV-HPPOSLLH=1
 
@@ -54,7 +53,6 @@ gpstool \
 
 MESSAGE="${PGMNAM}: Processing UBX-ZED-F9P ${LOCDEV} ${LOCBPS}"
 log -I -N ${PGMNAM} -n "${MESSAGE}"
-echo "${MESSAGE}"
 
 exec gpstool \
     -H ${OUTFIL} -F 1 -t 10 \
