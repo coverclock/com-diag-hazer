@@ -220,13 +220,13 @@ pristine:	clean
 
 # This is not the same as simply listing the targets as dependencies.
 scratch:
-	make pristine
-	make depend
-	make all
+	$(MAKE) pristine
+	$(MAKE) depend
+	$(MAKE) all
 
 refresh:
 	git pull
-	make scratch
+	$(MAKE) scratch
 
 clobber:	pristine
 	rm -f .cscope.lst .cscope.out .cscope.out.in .cscope.out.po
