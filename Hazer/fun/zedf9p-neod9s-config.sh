@@ -23,6 +23,7 @@ LOCBPS=${2:-38400}
 CORDEV=${3:-"/dev/ttyACM1"}
 CORBPS=${4:-9600}
 ERRFIL=${5:-"${SAVDIR}/${FILNAM}.err"}
+OUTFIL=${6:-"${SAVDIR}/${FILNAM}.out"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
@@ -61,7 +62,7 @@ eval gpstool \
     -A '\\xb5\\x62\\x06\\x8a\\x16\\x00\\x00\\x01\\x00\\x00\\x01\\x00\\x53\\x40\\x00\\x96\\x00\\x00\\x01\\x00\\x76\\x10\\x01\\x1f\\x03\\x91\\x20\\x01' \
     ${OPTIONS} \
     -U \"\" \
-    < /dev/null
+    < /dev/null >> ${OUTFIL}
 
 #####
 # CONFIGURE THE UBX-ZED-F9P GNSS RECEIVER.
@@ -91,4 +92,4 @@ eval gpstool \
     ${OPTIONS} \
     -U '\\xb5\\x62\\x02\\x36\\x00\\x00' \
     -U \"\" \
-    < /dev/null
+    < /dev/null >> ${OUTFIL}
