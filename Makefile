@@ -9,7 +9,7 @@
 .PHONY:	all bootstrap release
 
 all:
-	make -C Hazer all
+	$(MAKE) -C Hazer all
 
 bootstrap:
 
