@@ -456,7 +456,8 @@ int main(int argc, char * argv[])
     Program = ((Program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : Program + 1;
 
     diminuto_log_open_syslog(Program, DIMINUTO_LOG_OPTION_DEFAULT, DIMINUTO_LOG_FACILITY_DEFAULT);
-    diminuto_log_setmask();
+    (void)diminuto_log_setmask();
+    (void)diminuto_log_importmask(LOG_MASK_PATH);
 
     DIMINUTO_LOG_NOTICE("Program %s\n", argv[0]);
     DIMINUTO_LOG_INFORMATION("Hazer %s\n", COM_DIAG_HAZER_RELEASE_VALUE);
@@ -1677,8 +1678,9 @@ int main(int argc, char * argv[])
              * Using SIGHUP is actually a little problematic, since I
              * routinely start gpstool interactively, switch it to the
              * background, and later disconnect my terminal session and
-             * let it run.
+             * let it run, causing a SIGHUP.
              */
+            (void)diminuto_log_importmask(LOG_MASK_PATH);
             DIMINUTO_LOG_INFORMATION("Signal Hangup");
             checkpoint = !0;
         }

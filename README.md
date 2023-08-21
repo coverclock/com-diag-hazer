@@ -135,7 +135,7 @@ the Networked Transport of RTCM via Internet Protocol (Ntrip), but instead
 uses its own trivial data format consisting of raw RTCM messages preceeded
 by a four-byte sequence number carried over UDP datagrams.
 
-# Pro Tip
+# Pro Tips
 
 When you link against the library or use any of the binaries or scripts
 that are artifacts of the build process, the linker and the shell have
@@ -193,6 +193,17 @@ The log mask value is an eight-bit number in decimal, hexadecimal, or
 even octal. In addition, the string ```~0``` can be used to enable all
 log levels, equivalent to ```255```, ```0xff```, or ```0377```. (Generally
 I find ```0xfe``` to be a good starting point.)
+
+You can alter the log mask in real-time for ```gpstool``` by creating
+a file named ```com_diag_hazer_log_mask.msk``` in the current working
+directory in which ```gpstool``` is running, and containing just the log
+mask numeric string in the same format as the value of the environmental
+variable above. ```gpstool``` imports the log mask from this file, if
+it exists (it's not an error if it doesn't), at start up, and whenever
+the process receives a SIGHUP signal.
+
+If the environmental variable is not defined, and the file does not exist,
+the default log mask value for the Diminuto Log feature is used.
 
 # Manual Pages and Reference Manual
 
@@ -1253,6 +1264,8 @@ WIRED, 2022-08-26
 <https://www.ietf.org/timezones/data/leap-seconds.list>
 
 <https://geodesy.noaa.gov/CORS/resources/gpscals.shtml>
+
+<http://leapsecond.com/java/gpsclock.htm>
 
 # Soundtrack
 

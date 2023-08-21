@@ -16,6 +16,22 @@
 #include "com/diag/diminuto/diminuto_types.h"
 #include "types.h"
 
+#ifndef LOG_MASK_PATH_DEFAULT
+/**
+ * @def LOG_MASK_PATH_DEFAULT
+ * This is the default path for the log mask file unless the build
+ * defines a different value for this symbol. If multiple processes
+ * running gpstool are run, they can use different current directories
+ * to have different log mask files.
+ */
+#define LOG_MASK_PATH_DEFAULT "./com_diag_hazer_log_mask.msk"
+#endif
+
+/**
+ * This is the path for the log mask file.
+ */
+static const char LOG_MASK_PATH[] = LOG_MASK_PATH_DEFAULT;
+
 /**
  * Log a fault reported with the NMEA GBS sentence.
  * @param tp points to the fault structure.
