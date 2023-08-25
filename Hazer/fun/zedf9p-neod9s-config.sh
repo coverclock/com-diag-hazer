@@ -6,7 +6,9 @@
 # This script configures the UBX-NEO-D9S and the UBX-ZED-F9P.
 # By default it uses the configuration script for the Nicker
 # project containing the appropriate commands for the U.S.
-# region.
+# region. Note: it takes a few minutes after configuration of
+# both the NEO-D9S and the ZED-F9P is successfully completed
+# for the RTK LED on the SparkFun board to start blinking.
 #
 # REFERENCES
 #
@@ -27,14 +29,26 @@ OUTFIL=${6:-"${SAVDIR}/${FILNAM}.out"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-mkdir -p $(dirname ${ERRFIL})
+#####
+# SET UP THE ERROR LOG FILE.
+#####
 
-#cp /dev/null ${ERRFIL}
+mkdir -p $(dirname ${ERRFIL})
+touch ${ERRFIL}
 exec 2>>${ERRFIL}
+
+tail -f ${ERRFIL} & ERRPID=$!
+# socat -u UDP-RECV:${PORT} -
+trap "kill ${ERRPID}" SIGINT SIGQUIT SIGTERM EXIT
 
 #####
 # SOURCE THE CONFIGURATION SCRIPT.
 #####
+
+if [[ ! -r ${CFGFIL} ]]; then
+    echo "${PGMNAM}: ${CFGFIL} failed!" 1>&2
+    exit 1
+fi
 
 . ${CFGFIL}
 
