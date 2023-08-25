@@ -36,9 +36,7 @@ OUTFIL=${6:-"${SAVDIR}/${FILNAM}.out"}
 mkdir -p $(dirname ${ERRFIL})
 touch ${ERRFIL}
 exec 2>>${ERRFIL}
-
 tail -f ${ERRFIL} & ERRPID=$!
-# socat -u UDP-RECV:${PORT} -
 trap "kill ${ERRPID}" SIGINT SIGQUIT SIGTERM EXIT
 
 #####
