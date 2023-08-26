@@ -3,10 +3,11 @@
 The latitudes and longitudes below are based on various datums, which
 may not be specified.
 
-## Meade's Ranch, Kansas
+## Geodetic Center of North America
 
 Meade's Ranch, a private property in Kansas, contains the Geodetic Center of
-the contiguous forty-eight states of the United States.
+North America (or the contiguous forty-eight states of the United States, depending
+on what you read).
 
 39°13’26.71220″N, 98°32’31.74540″W (2012)
 
@@ -71,9 +72,9 @@ the marker is also a good thing. This location is so useful, I once
 ran into a professional surveyor who was using KK1446 to calibrate his
 equipment; he told me he often brings his lunch to eat there.
 
-39°49'18.0"N 105°05'42.6"W (WGS84)
+39°49'18.0"N 105°05'42.6"W
 
-39.821667, -105.095167 (WGS84)
+39.821667, -105.095167
 
      KK1446  DESIGNATION -  DOVER
      KK1446  PID         -  KK1446
