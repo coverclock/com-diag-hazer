@@ -1,11 +1,12 @@
 # Locations
 
-All datums are WGS84 unless noted otherwise.
+The latitudes and longitudes below are based on various datums, which
+may not be specified.
 
 ## Meade's Ranch, Kansas
 
-Meade's Ranch, a private property in Kansas, is the Geodetic Center of
-North America (1901)
+Meade's Ranch, a private property in Kansas, contains the Geodetic Center of
+the contiguous forty-eight states of the United States.
 
 39°13’26.71220″N, 98°32’31.74540″W (2012)
 
@@ -14,16 +15,17 @@ North America (1901)
 ## GPS Meridian
 
 Just a few yards east of the Prime Meridian at the Greenwich Observatory
-in Greenwich (near London) England. The GPS and Prime meridians differ
-by virtue of the fact that the two systems used different datums.
+in Greenwich (near London) England likes the GPS meridian. The GPS and the
+Prime meridians differ by virtue of the fact that the two systems used
+different datums.
 
-51°28’40″N, 0°00’00″W
+51°28’40″N, 0°00’00″W (WGS84)
 
 ## Prime Meridian
 
 At the Royal Observatory in Greenwich (near London) England.
 
-51°28’40″N, 0°00’06″W
+51°28’40″N, 0°00’06″W (WGS84)
 
 <https://coverclock.blogspot.com/2020/05/negative-results-are-still-results.html>
 
@@ -69,9 +71,9 @@ is so good, I once ran into a professional surveyor who was using it
 to calibrate his equipment; he told me he often brings his lunch to
 eat there.
 
-39°49'18.0"N 105°05'42.6"W
+39°49'18.0"N 105°05'42.6"W (WGS84)
 
-39.821667, -105.095167
+39.821667, -105.095167 (WGS84)
 
      KK1446  DESIGNATION -  DOVER
      KK1446  PID         -  KK1446
@@ -92,3 +94,15 @@ eat there.
      KK1446  HORZ ORDER      -  FIRST
      KK1446  VERT ORDER      -  FIRST     CLASS II
 
+## R'lyeh
+
+H. P. Lovecraft was an early twentieth-century writer and inventor of the genre now
+known as "cosmic horror". In his fiction, Lovecraft placed R'lyeh, the pre-Cambrian
+sunken city where his malevolent giant alien-god Cthulhu hibernates, perhaps having
+fled from other similar cosmic entities with which he was in conflict. Cthulhu sleeps,
+dreaming of rising and resuming his dominion over the planet Earth, while human
+cultists today worship him.
+
+47°9′S 126°43′W
+
+“Iä! Iä! Cthulhu fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!”
