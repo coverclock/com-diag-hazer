@@ -50,7 +50,7 @@ Gulf of Guinea.
 
 ## Homestead at Bruin, Elliot County, Kentucky
 
-The old Greene family home where I used to spend my summers growing up.
+This is old Greene family home where I used to spend my summers growing up.
 
 38°11'13.3"N, 83°01'09.6"W
 
