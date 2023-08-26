@@ -43,7 +43,8 @@ passes overhead. It is in the Pacific Ocean.
 When your GNSS application has a bug and it ends up telling you you're at
 latitude and longitude all zeros, you've found "Null Island". There isn't
 actually an island there, but there might be a bouy with weather sensors.
-Null Island is off the western coast of Africa in the Gulf of Guinea.
+Null Island is in the Atlantic Ocean off the western coast of Africa in the
+Gulf of Guinea.
 
 0°0’0″N, 0°00’0″W
 
@@ -97,11 +98,12 @@ eat there.
 ## R'lyeh
 
 H. P. Lovecraft was an early twentieth-century writer and inventor of the genre now
-known as "cosmic horror". In his fiction, Lovecraft placed R'lyeh, the pre-Cambrian
-sunken city where his malevolent giant alien-god Cthulhu hibernates, perhaps having
-fled from other similar cosmic entities with which he was in conflict. Cthulhu sleeps,
-dreaming of rising and resuming his dominion over the planet Earth, while human
-cultists today worship him.
+known as "cosmic horror". In his fiction, Lovecraft placed R'lyeh at these coordinates
+in the South Pacific Ocean, about mid-way between New Zealand and Chili. R'lyeh is the
+pre-Cambrian sunken city where his malevolent giant alien-god Cthulhu hibernates,
+perhaps having fled from other similar cosmic entities with which he was in conflict.
+Cthulhu sleeps, dreaming of rising and resuming his dominion over the planet Earth,
+while human cultists today worship him.
 
 47°9′S 126°43′W
 
