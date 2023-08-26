@@ -96,13 +96,13 @@ equipment; he told me he often brings his lunch to eat there.
 
 ## R'lyeh
 
-H. P. Lovecraft was an early twentieth century writer and inventor of the genre now
+H. P. Lovecraft was an early twentieth century writer and creator of the genre now
 known as "cosmic horror". In his fiction, Lovecraft placed R'lyeh at these coordinates
 in the South Pacific Ocean, about mid-way between New Zealand and Chili. R'lyeh is the
 pre-Cambrian sunken city where his malevolent giant alien-god Cthulhu hibernates,
 perhaps having fled from other similar cosmic entities with which he was in conflict.
 Cthulhu sleeps, dreaming of rising and resuming his dominion over the planet Earth,
-while human cultists today worship him.
+while human cultists worship him.
 
 47°9′S, 126°43′W
 
