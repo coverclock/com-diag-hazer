@@ -30,14 +30,20 @@ OUTFIL=${6:-"${SAVDIR}/${FILNAM}.out"}
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 #####
-# SET UP THE ERROR LOG FILE.
+# INITIALIZE THE ERROR LOG FILE.
 #####
 
 mkdir -p $(dirname ${ERRFIL})
-touch ${ERRFIL}
+mkdir -p $(dirname ${OUTFIL})
+
+cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
+
 tail -f ${ERRFIL} & ERRPID=$!
 trap "kill ${ERRPID}" SIGINT SIGQUIT SIGTERM EXIT
+
+MESSAGE="${PGMNAM}: Starting ${LOCDEV} ${CORDEV} ${CFGFIL}"
+log -I -N ${PGMNAM} -n "${MESSAGE}"
 
 #####
 # SOURCE THE CONFIGURATION SCRIPT.
@@ -76,6 +82,11 @@ eval gpstool \
     -U \"\" \
     < /dev/null >> ${OUTFIL}
 
+if (( $? != 0 )); then
+    echo "${PGMNAM}: ${CORDEV} failed!" 1>&2
+    exit 1
+fi
+
 #####
 # CONFIGURE THE UBX-ZED-F9P GNSS RECEIVER.
 #####
@@ -105,3 +116,17 @@ eval gpstool \
     -U '\\xb5\\x62\\x02\\x36\\x00\\x00' \
     -U \"\" \
     < /dev/null >> ${OUTFIL}
+
+if (( $? != 0 )); then
+    echo "${PGMNAM}: ${LOCDEV} failed!" 1>&2
+    exit 1
+fi
+
+#####
+# DONE.
+#####
+
+MESSAGE="${PGMNAM}: Ending ${LOCDEV} ${CORDEV} ${CFGFIL}"
+log -I -N ${PGMNAM} -n "${MESSAGE}"
+
+exit 0

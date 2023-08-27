@@ -28,6 +28,9 @@ mkdir -p $(dirname ${OUTFIL})
 #cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
 
+MESSAGE="${PGMNAM}: Starting ${LOCDEV} ${CORDEV}"
+log -I -N ${PGMNAM} -n "${MESSAGE}"
+
 #####
 # QUERY THE UBX-NEO-D9S INMARSAT RECEIVER.
 #####
@@ -45,7 +48,10 @@ gpstool \
     -U '' \
     < /dev/null > ${OUTFIL}
 
-# UBX-CFG-MSG [ 3] UBX-NAV-HPPOSLLH=1
+if (( $? != 0 )); then
+    echo "${PGMNAM}: ${CORDEV} failed!" 1>&2
+    exit 1
+fi
 
 #####
 # PROCESS THE UBX-ZED-F9P GNSS RECEIVER.
@@ -54,9 +60,21 @@ gpstool \
 MESSAGE="${PGMNAM}: Processing UBX-ZED-F9P ${LOCDEV} ${LOCBPS}"
 log -I -N ${PGMNAM} -n "${MESSAGE}"
 
-exec gpstool \
+# UBX-CFG-MSG [ 3] UBX-NAV-HPPOSLLH=1
+
+gpstool \
     -H ${OUTFIL} -F 1 -t 10 \
     -D ${LOCDEV} -b ${LOCBPS} -8 -n -1 \
     -w 5 -x \
     -A '\xb5\x62\x06\x01\x03\x00\x01\x14\x01' \
     < /dev/null
+
+if (( $? != 0 )); then
+    echo "${PGMNAM}: ${LOCDEV} failed!" 1>&2
+    exit 1
+fi
+
+MESSAGE="${PGMNAM}: Ending ${LOCDEV} ${CORDEV}"
+log -I -N ${PGMNAM} -n "${MESSAGE}"
+
+exit 0
