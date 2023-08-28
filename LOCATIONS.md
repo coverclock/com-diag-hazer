@@ -14,15 +14,6 @@ Datum (NAD) used as the basis for early surveying.
 
 39.224087, -98.542152
 
-## GPS Meridian
-
-Just a few yards east of the Prime Meridian at the Greenwich Observatory
-in Greenwich (near London) England likes the GPS meridian. The GPS and the
-Prime meridians differ by virtue of the fact that the two systems used
-different datums.
-
-51°28’40″N, 0°00’00″W (WGS84)
-
 ## Prime Meridian
 
 At the Royal Observatory in Greenwich (near London) England.
@@ -30,6 +21,14 @@ At the Royal Observatory in Greenwich (near London) England.
 51°28’40″N, 0°00’06″W (WGS84)
 
 <https://coverclock.blogspot.com/2020/05/negative-results-are-still-results.html>
+
+## GPS Meridian
+
+Just a few yards east of the Prime Meridian at the Greenwich Observatory
+in Greenwich England lies the GPS meridian. The GPS and the Prime meridians
+differ by virtue of the fact that the two systems used different datums.
+
+51°28’40″N, 0°00’00″W (WGS84)
 
 ## Point Nemo
 
