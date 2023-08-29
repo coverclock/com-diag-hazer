@@ -1370,7 +1370,7 @@ the libraries and binaries in the system directories.)
     cd ~/src/com-diag-hazer/Hazer
     export LANG=en_US.UTF-8 # You can put this in your .profile.
     . out/host/bin/setup
-    make sanity
+    make unit
     
 ## Functional Tests
 
