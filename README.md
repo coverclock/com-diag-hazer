@@ -74,7 +74,7 @@ repositories:
 * Fothergill (LoRa/serial gateway),
 * Hazer (NMEA support),
 * Metronome (precision time and frequency support),
-* Nicker (PointPerfect corrections via Inmarsat),
+* Nicker (PointPerfect SPARTN corrections via Inmarsat),
 * Stagecoach (UDP/OpenSSL gateway),
 * Tesoro (OSM support),
 * Tumbleweed (RTCM support),
@@ -1488,6 +1488,10 @@ throw an assert and core dump.
 * station - runs a UBX-ZED-F9P with no additional configuration.
 * survey - configures and runs a UBX-ZED-F9P as a base in survey mode.
 * ubxval - converts a number into a UBX-usable form.
+
+## Safe Position Augmentation for Real-Time Navigation (Nicker)
+
+* spartan - configures and runs the UBX-ZED-F9P plus UBX-NEO-D9S in SPARTN mode.
 
 ## OpenStreetMap Moving Map (Tesoro)
 
