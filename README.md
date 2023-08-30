@@ -1491,7 +1491,8 @@ throw an assert and core dump.
 
 ## Safe Position Augmentation for Real-Time Navigation (Nicker)
 
-* spartan - configures and runs the UBX-ZED-F9P plus UBX-NEO-D9S in SPARTN mode.
+* spartan - configures the UBX-NEO-D9S and the UBX-ZED-F9P for SPARTN mode.
+* spartan2 - runs gpstool headless against the configured UBX-ZED-F9P.
 
 ## OpenStreetMap Moving Map (Tesoro)
 
