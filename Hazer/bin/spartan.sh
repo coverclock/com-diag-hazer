@@ -3,6 +3,14 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# Configures the UBX-NEO-D9S to receive SPARTN messages on L-band
+# from Inmarsat. Configures the UBX-ZED-F9P to decrypt the SPARTN
+# corrections from the UBX-NEO-D9S. Queries the UBX-NEO-D9S mostly
+# as a check. Then finally runs a headless gpstool against the
+# UBX-ZED-F9P. Requires a configuration file with confidential
+# Inmarsat parameters and SPARTN encryption keys. The file is
+# assumed to be ${HOME}/com_diag_nicker_us.sh unless the
+# environmental variable COM_DIAG_HAZER_CFGFIL says otherwise.
 #
 # REFERENCES
 #

@@ -3,6 +3,8 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# Just runs the headless gpstool against the SPARTN-enabled UBX-ZED-F9P.
+# Does not touch the companion UBX-NEO-D9S.
 #
 # REFERENCES
 #
