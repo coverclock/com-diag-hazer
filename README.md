@@ -1124,6 +1124,8 @@ UBX-13005250-R30, ublox, 2022-05-24
 
 <http://www.earthpoint.us/Convert.aspx>
 
+<https://www.calculator.net/distance-calculator.html>
+
 # Resources
 
 <http://www.catb.org/gpsd/NMEA.txt> DEPRECATED
