@@ -96,6 +96,7 @@ exec ${PREFIX} gpstool \
 	-q 0x2 \
 	-s \
 	-t 10 \
+	-u 500 \
 	-v \
 	-w 5 \
 	-x \

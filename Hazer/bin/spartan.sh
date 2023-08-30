@@ -13,13 +13,14 @@ SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 CFGFIL=${COM_DIAG_HAZER_CFGFIL:-"${HOME}/com_diag_nicker_us.sh"}
 
 PGMNAM=$(basename ${0})
+FILNAM=${PGMNAM}
 LOCDEV=${1:-"/dev/ttyACM0"}
 LOCBPS=${2:-38400}
 CORDEV=${3:-"/dev/ttyACM1"}
 CORBPS=${4:-9600}
-ERRFIL=${5:-"${SAVDIR}/${PGMNAM}.err"}
-OUTFIL=${6:-"${SAVDIR}/${PGMNAM}.out"}
-CSVFIL=${7:-"${SAVDIR}/${PGMNAM}.csv"}
+ERRFIL=${5:-"${SAVDIR}/${FILNAM}.err"}
+OUTFIL=${6:-"${SAVDIR}/${FILNAM}.out"}
+CSVFIL=${7:-"${SAVDIR}/${FILNAM}.csv"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 

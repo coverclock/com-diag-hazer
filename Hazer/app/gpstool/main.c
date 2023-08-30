@@ -143,8 +143,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <wchar.h>
+#include "ansi.h"
 #include "buffer.h"
 #include "constants.h"
+#include "defaults.h"
 #include "emit.h"
 #include "endpoint.h"
 #include "fix.h"
@@ -199,6 +201,7 @@ int main(int argc, char * argv[])
     seconds_t postpone = 0;
     seconds_t bypass = -1;
     protocol_t preference = PROTOCOL;
+    uint32_t threshold = DEFAULT_THRESHOLD_CENTICENTIMETERS;
     /*
      * Configuration command variables.
      */
@@ -404,6 +407,8 @@ int main(int argc, char * argv[])
     int frame = 0;      /** If true then the input stream is at frame start. */
     int refresh = !0;   /** If true then the display needs to be refreshed. */
     int trace = 0;      /** If true then the trace needs to be emitted. */
+    int horizontal = 0; /** If true then horizontal has converged. */
+    int vertical = 0;   /** If true then vertical has converged. */
     /*
      * Command line processing variables.
      */
@@ -439,15 +444,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:B:C:D:EF:G:H:I:KL:MN:O:PQ:RS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:q:st:vxw:y:z?";
-    /*
-     * ANSI escape sequences
-     */
-    static const char ANSI_INI[] = "\033[1;1H\033[0J"; /* [1,1] Erase to end of screen. */
-    static const char ANSI_INP[] = "\033[1;1H\033[0K"; /* [1,1] Erase to end of line.   */
-    static const char ANSI_OUT[] = "\033[2;1H\033[0K"; /* [2,1] Erase to end of line.   */
-    static const char ANSI_LOC[] = "\033[3;1H";        /* [3,1]                         */
-    static const char ANSI_END[] = "\033[0J";          /*       Erase to end of screen. */
+    static const char OPTIONS[] = "124678A:B:C:D:EF:G:H:I:KL:MN:O:PQ:RS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:q:st:u:vxw:y:z?";
 
     /**
      ** INITIALIZATION
@@ -772,6 +769,15 @@ int main(int argc, char * argv[])
                 error = !0;
             }
             break;
+        case 'u':
+            DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
+            threshold = strtoul(optarg, &end, 0);
+            if ((end == (char *)0) || (*end != '\0')) {
+                errno = EINVAL;
+                diminuto_perror(optarg);
+                error = !0;
+            }
+            break;
         case 'v':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             verbose = !0;
@@ -876,6 +882,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -q MASK         Set Queue mask (NMEA=%u, UBX=%u, RTCM=%u, CPO=%u, default=%lu).\n", NMEA, UBX, RTCM, CPO, queue_mask);
             fprintf(stderr, "       -s              Use XON/XOFF (c-Q/c-S) Software flow control for DEVICE.\n");
             fprintf(stderr, "       -t SECONDS      Timeout GNSS data after SECONDS seconds [0..255].\n");
+            fprintf(stderr, "       -u CCM          Use CCM for convergence threshold in centicentimeters.\n");
             fprintf(stderr, "       -v              Display Verbose output on standard error.\n");
             fprintf(stderr, "       -w SECONDS      Write STRING to DEVICE no more than every SECONDS seconds, 0 always, <0 never.\n");
             fprintf(stderr, "       -x              EXit if a NAK is received.\n");
@@ -1494,6 +1501,12 @@ int main(int argc, char * argv[])
     if (trace_fp != (FILE *)0) {
         DIMINUTO_LOG_INFORMATION("Trace File (%d) \"%s\"\n", fileno(trace_fp), tracing);
     }
+
+    /*
+     * Miscellaneous other stuff to report at startup.
+     */
+
+    DIMINUTO_LOG_INFORMATION("Converged Threshold %uccm\n", (unsigned int)threshold);
 
     /*
      * Install our signal handlers.
@@ -3163,6 +3176,24 @@ consume:
                     trace = !0;
 
                     fix_acquired("UBX-NAV-HPPOSLLH");
+
+                    if (horizontal) {
+                        /* Do nothing. */
+                    } else if (solution.payload.hAcc > threshold) {
+                        /* Do nothing. */
+                    } else {
+                        DIMINUTO_LOG_NOTICE("Converged Horizontal %uccm", (unsigned int)solution.payload.hAcc);
+                        horizontal = !0;
+                    }
+
+                    if (vertical) {
+                        /* Do nothing. */
+                    } else if (solution.payload.vAcc > threshold) {
+                        /* Do nothing. */
+                    } else {
+                        DIMINUTO_LOG_NOTICE("Converged Vertical %uccm", (unsigned int)solution.payload.vAcc);
+                        vertical = !0;
+                    }
 
                 } else if (errno == 0) {
 
