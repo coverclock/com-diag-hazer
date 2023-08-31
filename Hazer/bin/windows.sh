@@ -3,7 +3,7 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Fire up a bunch of windows running the spartan field test.
+# Fire up a bunch of windows running a field test.
 # THIS IS A WORK IN PROGRESS.
 
 BINDIR=$(readlink -e $(dirname ${0})/../bin)

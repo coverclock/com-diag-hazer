@@ -1495,6 +1495,7 @@ throw an assert and core dump.
 
 * spartan - configures the UBX-NEO-D9S and the UBX-ZED-F9P for SPARTN mode.
 * spartan2 - runs gpstool headless against the configured UBX-ZED-F9P.
+* windows - run the spartan (by default) field test with multiple windows.
 
 ## OpenStreetMap Moving Map (Tesoro)
 
