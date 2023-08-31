@@ -3,42 +3,26 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
+# Fire up a bunch of windows running the spartan field test.
+# THIS IS A WORK IN PROGRESS.
 
-PROGRAM=$(basename $0}
-APPLICATION=${1:-"spartan"}
-BASE=${2:-"spartan"}
+BINDIR=$(readlink -e $(dirname ${0})/../bin)
+SAVDIR=${COM_DIAG_HAZER_SAVDIR:-${BINDIR}/../tmp}
 
-DIRECTORY="${HOME}/src/com-diag-hazer/Hazer"
-TEMPORARY="${DIRECTORY}/out/host/tmp"
-SETUP="${DIRECTORY}/out/host/bin/setup"
+APPNAM=${1:-"spartan"}
+BASNAM=${2:-"spartan"}
+
 TERMINAL="xfce4-terminal"
-DISPLAY=":0.0"
 
-if [ ! -d ${DIRECTORY} ]; then
-    echo "${PROGRAM: ${DIRECTORY} failed!" 1>&2
-    exit 2
-fi
+mkdir -p ${SAVDIR}
+touch ${SAVDIR}/${BASNAM}.csv
+touch ${SAVDIR}/${BASNAM}.err
+touch ${SAVDIR}/${BASNAM}.out
 
-cd ${DIRECTORY}
-
-if [ ! -r ${SETUP} ]; then
-    echo "${PROGRAM: ${SETUP} failed!" 1>&2
-    exit 3
-fi
-
-mkdir -p ${TEMPORARY}
-touch ${TEMPORARY}/${BASE}.csv
-touch ${TEMPORARY}/${BASE}.err
-touch ${TEMPORARY}/${BASE}.out
-
-export DISPLAY
-
-. ${SETUP}
-
-${TERMINAL} --geometry="80x25" -x peruse ${BASE} err &
-${TERMINAL} --geometry="80x25" -x peruse ${BASE} out &
-${TERMINAL} --geometry="80x25" -x peruse ${BASE} csv &
-${TERMINAL} --geometry="80x25" -x ${APPLICATION}     &
-${TERMINAL} --geometry="80x25" -x hups               &
+${TERMINAL} --geometry="80x25" --working-directory=${SAVDIR} --execute ${BINDIR}/peruse ${BASNAM} err &
+${TERMINAL} --geometry="80x25" --working-directory=${SAVDIR} --execute ${BINDIR}/peruse ${BASNAM} out &
+${TERMINAL} --geometry="80x25" --working-directory=${SAVDIR} --execute ${BINDIR}/peruse ${BASNAM} csv &
+${TERMINAL} --geometry="80x25" --working-directory=${SAVDIR} --execute ${BINDIR}/${APPNAM}            &
+${TERMINAL} --geometry="80x25" --working-directory=${SAVDIR} --execute ${BINDIR}/hups                 &
 
 exit 0
