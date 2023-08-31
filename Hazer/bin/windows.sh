@@ -3,8 +3,11 @@
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
-# Fire up a bunch of windows running a field test.
-# THIS IS A WORK IN PROGRESS.
+# Fire up a bunch of windows running a field test. Currently this
+# is specific to the Xfce desktop running under Linux MATE on my
+# ancient HP Mini 110. But the Xfce terminal utility may be compatible
+# enough with xterm to make it work with minor changes on other
+# desktops.
 
 BINDIR=$(readlink -e $(dirname ${0})/../bin)
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-${BINDIR}/../tmp}
