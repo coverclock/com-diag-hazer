@@ -1694,7 +1694,7 @@ int main(int argc, char * argv[])
              * let it run, causing a SIGHUP.
              */
             (void)diminuto_log_importmask(LOG_MASK_PATH);
-            DIMINUTO_LOG_INFORMATION("Signal Hangup");
+            DIMINUTO_LOG_NOTICE("Signal Hangup");
             checkpoint = !0;
         }
 
