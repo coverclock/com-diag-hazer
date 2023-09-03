@@ -116,3 +116,13 @@ discovered by an early twentieth century expedition from the equally fictional
 Miskatonic University in Arkham Masschusetts.
 
 76°15'S, 113°10'E
+
+## Global Oreo Vault
+
+This is where the not-entirely-fictitous Nabisco vault is located that contains the recipes for Oreos.
+
+78° 08’ 58.1”N 16° 01’ 59.7”E
+
+## Svalbard Global Seed Vault (Norway)
+
+78°14′09″N 15°29′29″E
