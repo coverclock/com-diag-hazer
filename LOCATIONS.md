@@ -72,7 +72,7 @@ the marker is also a good thing. This location is so useful, I once
 ran into a professional surveyor who was using KK1446 to calibrate his
 equipment; he told me he often brings his lunch to eat there.
 
-39°49'18.0"N 105°05'42.6"W
+39°49'18.0"N, 105°05'42.6"W
 
 39.821667, -105.095167
 
@@ -121,8 +121,8 @@ Miskatonic University in Arkham Masschusetts.
 
 This is where the not-entirely-fictitous Nabisco vault is located that contains the recipes for Oreos.
 
-78° 08’ 58.1”N 16° 01’ 59.7”E
+78° 08’ 58.1”N, 16° 01’ 59.7”E
 
 ## Svalbard Global Seed Vault (Norway)
 
-78°14′09″N 15°29′29″E
+78°14′09″N, 15°29′29″E
