@@ -105,7 +105,7 @@ perhaps having fled from other similar cosmic entities with which he was in conf
 Cthulhu sleeps, dreaming of rising and resuming his dominion over the planet Earth,
 while human cultists worship him.
 
-47°9′S, 126°43′W
+47°09′S, 126°43′W
 
 “Iä! Iä! Cthulhu fhtagn! Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!”
 
@@ -121,7 +121,7 @@ Miskatonic University in Arkham Masschusetts.
 
 This is where the not-entirely-fictitous Nabisco vault is located that contains the recipes for Oreos.
 
-78° 08’ 58.1”N, 16° 01’ 59.7”E
+78°08’58.1”N, 16°01’59.7”E
 
 ## Svalbard Global Seed Vault (Norway)
 
