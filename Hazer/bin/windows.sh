@@ -9,6 +9,10 @@
 BINDIR=$(readlink -e $(dirname ${0})/../bin)
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-${BINDIR}/../tmp}
 
+PGMNAM=$(basename ${0})
+APPNAM=${1:-"spartan"}
+BASNAM=${2:-"spartan"}
+
 mkdir -p ${SAVDIR}
 touch ${SAVDIR}/${BASNAM}.csv
 touch ${SAVDIR}/${BASNAM}.err
@@ -16,10 +20,6 @@ touch ${SAVDIR}/${BASNAM}.out
 exec 2>>${SAVDIR}/${BASNAM}.err
 
 cd ${SAVDIR}
-
-PGMNAM=$(basename ${0})
-APPNAM=${1:-"spartan"}
-BASNAM=${2:-"spartan"}
 
 if false; then
     TERMINAL="xfce4-terminal"
