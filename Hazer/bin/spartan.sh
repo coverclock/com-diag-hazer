@@ -29,16 +29,19 @@ CORBPS=${4:-9600}
 ERRFIL=${5:-"${SAVDIR}/${FILNAM}.err"}
 OUTFIL=${6:-"${SAVDIR}/${FILNAM}.out"}
 CSVFIL=${7:-"${SAVDIR}/${FILNAM}.csv"}
+PIDFIL=${8:-"${SAVDIR}/${FILNAM}.pid"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
 mkdir -p $(dirname ${CSVFIL})
+mkdir -p $(dirname ${PIDFIL})
 
 cp /dev/null ${ERRFIL}
 cp /dev/null ${OUTFIL}
 cp /dev/null ${CSVFIL}
+cp /dev/null ${PIDFIL}
 exec 2>>${ERRFIL}
 
 tail -f ${ERRFIL} & ERRPID=$!
@@ -80,6 +83,7 @@ done
 eval gpstool \
     -R \
     -D ${CORDEV} -b ${CORBPS} -8 -n -1 \
+    -O ${PIDFIL} \
     -w 5 -x \
     -U '\\xb5\\x62\\x0a\\x04\\x00\\x00' \
     -A '\\xb5\\x62\\x06\\x8a\\x16\\x00\\x00\\x01\\x00\\x00\\x01\\x00\\x53\\x40\\x00\\x96\\x00\\x00\\x01\\x00\\x76\\x10\\x01\\x1f\\x03\\x91\\x20\\x01' \
@@ -113,6 +117,7 @@ done
 eval gpstool \
     -R \
     -D ${LOCDEV} -b ${LOCBPS} -8 -n -1 \
+    -O ${PIDFIL} \
     -w 5 -x \
     -U '\\xb5\\x62\\x0a\\x04\\x00\\x00' \
     -A '\\xb5\\x62\\x06\\x8a\\x09\\x00\\x00\\x01\\x00\\x00\\x01\\x00\\xa7\\x20\\x01' \
@@ -140,6 +145,7 @@ kill ${ERRPID}
 
 gpstool \
     -D ${LOCDEV} -b ${LOCBPS} -8 -n -1 \
+    -O ${PIDFIL} \
     -H ${OUTFIL} -F 1 -t 10 \
     -T ${CSVFIL} -f 1 \
     -w 5 -x \

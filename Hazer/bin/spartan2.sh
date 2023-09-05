@@ -20,12 +20,14 @@ LOCBPS=${2:-38400}
 ERRFIL=${3:-"${SAVDIR}/${FILNAM}.err"}
 OUTFIL=${4:-"${SAVDIR}/${FILNAM}.out"}
 CSVFIL=${5:-"${SAVDIR}/${FILNAM}.csv"}
+PIDFIL=${6:-"${SAVDIR}/${FILNAM}.pid"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
 mkdir -p $(dirname ${ERRFIL})
 mkdir -p $(dirname ${OUTFIL})
 mkdir -p $(dirname ${CSVFIL})
+mkdir -p $(dirname ${PIDFIL})
 
 exec 2>>${ERRFIL}
 
@@ -37,6 +39,7 @@ log -I -N ${PGMNAM} -n "${MESSAGE}"
 
 gpstool \
     -D ${LOCDEV} -b ${LOCBPS} -8 -n -1 \
+    -O ${PIDFIL} \
     -H ${OUTFIL} -F 1 -t 10 \
     -T ${CSVFIL} -f 1 \
     < /dev/null
