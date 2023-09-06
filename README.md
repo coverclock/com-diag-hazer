@@ -1610,14 +1610,22 @@ The -T flag for gpstool will cause the utility to save the current
 Position, Velocity, Time (PVT) solution once a second to a "trace
 file" in CSV format as described below. This makes it easy to analyze
 results using tools like Excel and several tools provided by Hazer itself.
+
 The PVT solution is taken from the high precision u-blox UBX-NAV-HPPOSLLH
 message if it is available, from the ensemble GNSS solution if it exists,
 or from one of the four Global Satellite Navigation Systems solutions in
 this order of preference: GPS, GLONASS, Galileo, BeiDou. The attitude
 (roll, pitch, yaw) is taken from the UBX-NAV-ATT message from the IMU
-if it is available. Fields which are not available or are not supported
-by the receiver have values coded as "0." instead of an empty string to
-simplify parsing in post-processing.
+if it is available.
+
+Fields which are not available or are not supported by the receiver
+have values coded as "0." instead of an empty string to simplify parsing
+in post-processing.
+
+I have enough code, both scripts and C code, that depends on the CSV
+format, not to mention archived CSV files, that it is a big deal to
+change. I've started encoding special characters at the end of the NAM
+hostname string instead of adding another field. Expect more of this.
 
 *  0 - NAM: hostname of computer running gpstool plus "!" if SIGHUP.
 *  1 - NUM: sequence number of observation.
