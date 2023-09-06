@@ -1619,7 +1619,7 @@ if it is available. Fields which are not available or are not supported
 by the receiver have values coded as "0." instead of an empty string to
 simplify parsing in post-processing.
 
-*  0 - NAM: hostname of computer running gpstool.
+*  0 - NAM: hostname of computer running gpstool plus "!" if SIGHUP.
 *  1 - NUM: sequence number of observation.
 *  2 - FIX: 0=no fix, 1=dead reckoning, 2=2D, 3=3D, 4=combined, 5=time only.
 *  3 - SYS: 0=ensemble, 1=GPS, 2=GLONASS, 3=GALILEO, 4=BEIDOU.

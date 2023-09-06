@@ -104,7 +104,7 @@ ssize_t emit_data(FILE * fp, const void * data, size_t size)
     return rc;
 }
 
-void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp, const yodel_attitude_t * ap, const yodel_posveltim_t * pp, const yodel_base_t * bp)
+void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp, const yodel_attitude_t * ap, const yodel_posveltim_t * pp, const yodel_base_t * bp, int hangup)
 {
     static uint64_t sn = 0;
     diminuto_ticks_t ticks = 0;
@@ -160,9 +160,9 @@ void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t *
         }
     }
 
-    /* NAM */
+    /* NAM+flags */
 
-    fprintf(fp, "\"%s\"", Hostname);
+    fprintf(fp, "\"%s%s\"", Hostname, hangup ? "!" : "");
 
     /* NUM */
 

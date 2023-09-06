@@ -53,8 +53,9 @@ extern ssize_t emit_data(FILE * fp, const void * data, size_t size);
  * @param ap points to the attitude (UBX UBXNAVATT) structure.
  * @param pp points to the PVT (UBX UBXPOSVELTIM) structure
  * @param bp points the DGNSS base (UBX UBXNAVSVIN) structure.
+ * @param hangup is true if a SIGHUP was received, false otherwise.
  */
-extern void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp, const yodel_attitude_t * ap, const yodel_posveltim_t * pp, const yodel_base_t * bp);
+extern void emit_trace(FILE * fp, const hazer_position_t pa[], const yodel_solution_t * sp, const yodel_attitude_t * ap, const yodel_posveltim_t * pp, const yodel_base_t * bp, int hangup);
 
 /**
  * If the caller has passed a valid file name, and the solution is not active

@@ -398,6 +398,7 @@ int main(int argc, char * argv[])
      */
     char * temporary = (char *)0;
     size_t limitation = 0;
+    int hangup = 0;
     int checkpoint = 0;
     /*
      * Control variables.
@@ -1696,6 +1697,7 @@ int main(int argc, char * argv[])
             (void)diminuto_log_importmask(LOG_MASK_PATH);
             DIMINUTO_LOG_NOTICE("Signal Hangup");
             checkpoint = !0;
+            hangup = !0;
         }
 
         /**
@@ -3717,8 +3719,9 @@ consume:
         } else if (!time_expired(&frequency_last, frequency)) {
             /* Do nothing. */
         } else {
-            emit_trace(trace_fp, positions, &solution, &attitude, &posveltim, &base);
+            emit_trace(trace_fp, positions, &solution, &attitude, &posveltim, &base, hangup);
             trace = 0;
+            hangup = 0;
         }
 
         /*
