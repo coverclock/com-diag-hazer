@@ -525,6 +525,7 @@ I have successfully tested Hazer with the following GPS chipsets.
 * MediaTek MTK3339    
 * Quectel L80-R    
 * Quectel L89    
+* Septentrio Mosaic-X5    
 * SiRF Star II    
 * SiRF Star III    
 * SiRF Star IV    
@@ -570,8 +571,9 @@ I have successfully tested Hazer with the following GNSS devices.
 * NaviSys GR-701W (U-Blox 7+Prolific, 9600 8N1, v067Bp2303, ttyUSB, 1Hz) [^5] [^7] [^8]    
 * Pharos GPS-360 (SiRF Star II+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [^3]    
 * Pharos GPS-500 (SiRF Star III+Prolific, 4800 8N1, v067BpAAA0, ttyUSB, 1Hz) [^3]    
-* RaceDayQuads RDQ Micro M8N (U-Blox 8/UBX-NEO-M8N, 9600 8n1, N/A, ttyS, 1Hz) [^4] [^8] [^14]    
-* Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, p1546v01A7, ttyACM, 1Hz) [^2]    
+* RaceDayQuads RDQ Micro M8N (U-Blox 8/UBX-NEO-M8N, 9600 8n1, N/A, ttyS, 1Hz) [^4] [^8] [^14]
+* Septentrio Mosaic-X5 (Mosaic, 115200 8n1, v152ap85c0, ttyACM, 1Hz) [^29]
+* Sourcingbay GM1-86 (U-Blox 7, 9600 8n1, v1546p01A7, ttyACM, 1Hz) [^2]    
 * SparkFun GPS-RTK2 (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [^8] [^10]    
 * SparkFun NEO-M8N (U-Blox 8/UBX-NEO-M8N, 115200 8N1, v1546p01a9, ttyACM, 1Hz) [^6] [^8] [^10]    
 * SparkFun NEO-M8U (U-Blox 8/UBX-NEO-M8U, 115200 8N1, v1546p01a8, ttyACM, 1Hz) [^4] [^8] [^11]    
@@ -612,6 +614,7 @@ I have successfully tested Hazer with the following GNSS devices.
 [^26]: Emits GSAs with GLONASS id (2) but only emits GSVs with GPS talker (GP).    
 [^27]: Initially updates at 1Hz until it achieves a fix, than updates at 5Hz.    
 [^28]: In either NMEA or CPO (binary) mode.    
+[^29]: Enumerates multiple USB devices: Ethernet port with router and web server, serial ports, storage device.
 
 Note that when sending commands to and parsing output from GNSS
 devices, Postel's Law - "Be conservative in what you send, be liberal
