@@ -82,7 +82,7 @@ in progress, and which may be found in this or other Digital Aggregates reposito
 
 * Calico (Garmin CPO support),
 * Conestoga (UDP/serial gateway),
-* Drover (Sepententrio SBF support),
+* Drover (Septentrio SBF support),
 * Fothergill (LoRa/serial gateway),
 * Hazer (NMEA support),
 * Metronome (precision time and frequency support),
