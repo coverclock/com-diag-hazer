@@ -16,7 +16,9 @@ Datum (NAD) used as the basis for early surveying.
 
 ## Prime Meridian
 
-At the Royal Observatory in Greenwich (near London) England.
+At the Royal Observatory in Greenwich (near London) England. Because GPS is not based on the
+same datum as the Greenwich Prime Meridian, the GPS latitude coordinates of the Prime Meridian
+is not precisely 0º00'00". The GPS Meridian lies a few yards east of the Prime Meridian.
 
 51°28’40″N, 0°00’06″W (WGS84)
 
@@ -35,7 +37,10 @@ differ by virtue of the fact that the two systems used different datums.
 Latin for "no one", this is the location on Earth that is the furthest
 from land in all directions. It's been said that at this location the
 nearest humans are sometimes on the International Space Station as it
-passes overhead. It is in the Pacific Ocean.
+passes overhead. It is in the Pacific Ocean about halfway between New
+Zealand and southern Chile, in an area known as the South Pacific
+Ocean Uninhabited Area (SPOUA), a favorite location for dumping
+deorbiting spacecraft.
 
 48°52.5′S, 123°23.6′W
 
@@ -51,7 +56,10 @@ Gulf of Guinea.
 
 ## Homestead at Bruin, Elliot County, Kentucky
 
-This is old Greene family home where I used to spend my summers growing up.
+This is old Greene family home where I used to spend my summers growing up. It
+is in rural eastern Kentucky in the Appalachian mountains. Sandy Hook is the
+county seat of Elliot County, although the house is actually a little closer to
+Grayson in Carter County.
 
 38°11'13.3"N, 83°01'09.6"W
 
@@ -99,11 +107,11 @@ equipment; he told me he often brings his lunch to eat there.
 
 H. P. Lovecraft was an early twentieth century writer and creator of the genre now
 known as "cosmic horror". In his fiction, Lovecraft placed R'lyeh at these coordinates
-in the South Pacific Ocean, about mid-way between New Zealand and Chili. R'lyeh is the
-pre-Cambrian sunken city where his malevolent giant alien-god Cthulhu hibernates,
-perhaps having fled from other similar cosmic entities with which he was in conflict.
-Cthulhu sleeps, dreaming of rising and resuming his dominion over the planet Earth,
-while human cultists worship him.
+in the South Pacific Ocean, about mid-way between New Zealand and Chili, not to far from
+Point Nemo. R'lyeh is the pre-Cambrian sunken city where his malevolent giant alien-god
+Cthulhu hibernates, perhaps having fled from other similar cosmic entities with which
+he was in conflict. Cthulhu sleeps, dreaming of rising and resuming his dominion over
+the planet Earth, while human cultists worship him.
 
 47°09′S, 126°43′W
 
@@ -113,16 +121,19 @@ while human cultists worship him.
 
 Lovecraft's fiction placed a similarly ancient alien city in Antarctica, to be
 discovered by an early twentieth century expedition from the equally fictional
-Miskatonic University in Arkham Masschusetts.
+Miskatonic University in also fictional Arkham Masschusetts.
 
 76°15'S, 113°10'E
 
-## Global Oreo Vault
-
-This is where the not-entirely-fictitous Nabisco vault is located that contains the recipes for Oreos.
-
-78°08’58.1”N, 16°01’59.7”E
-
 ## Svalbard Global Seed Vault (Norway)
 
+"The Svalbard Global Seed Vault is a secure backup facility for the world's crop diversity on the Norwegian island of Spitsbergen in the remote Arctic Svalbard archipelago." \[Wikipedia\]
+
 78°14′09″N, 15°29′29″E
+
+## Global Oreo Vault (Norway)
+
+This is where the not-entirely-fictitous Nabisco vault is located that contains
+the recipes for Oreos. It is located near the Svalbard Global Seed Vault.
+
+78°08’58.1”N, 16°01’59.7”E
