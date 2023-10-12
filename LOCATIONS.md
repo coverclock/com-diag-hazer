@@ -7,7 +7,7 @@ may not be specified.
 
 Meade's Ranch, a private property in Kansas, contains the Geodetic Center of
 North America (or of the contiguous forty-eight states of the United States,
-if you read older documents). It is the origin of the early North American
+if you read older documents). It is the origin of the original North American
 Datum (NAD) used as the basis for early surveying.
 
 39°13’26.71220″N, 98°32’31.74540″W (2012)
