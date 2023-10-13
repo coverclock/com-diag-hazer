@@ -28,7 +28,7 @@ is not precisely 0º00'00". The GPS Meridian lies a few yards east of the Prime 
 
 Just a few yards east of the Prime Meridian at the Greenwich Observatory
 in Greenwich England lies the GPS meridian. The GPS and the Prime meridians
-differ by virtue of the fact that the two systems used different datums.
+differ by virtue of the fact that the two systems use different datums.
 
 51°28’40″N, 0°00’00″W (WGS84)
 
