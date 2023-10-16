@@ -16,9 +16,11 @@ Datum (NAD) used as the basis for early surveying.
 
 ## Prime Meridian
 
-At the Royal Observatory in Greenwich (near London) England. Because GPS is not based on the
-same datum as the Greenwich Prime Meridian, the GPS latitude coordinates of the Prime Meridian
-is not precisely 0º00'00". The GPS Meridian lies a few yards east of the Prime Meridian.
+At the Royal Observatory in Greenwich (near London) England. Because
+GPS is not based on the same datum as the Greenwich Prime Meridian,
+the GPS latitude coordinates of the Prime Meridian is not precisely
+0º00'00". The GPS Meridian lies a few yards east of the Prime
+Meridian.
 
 51°28’40″N, 0°00’06″W (WGS84)
 
