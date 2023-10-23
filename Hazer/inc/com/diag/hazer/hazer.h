@@ -884,6 +884,7 @@ extern uint64_t hazer_parse_utc(const char * string, char ** endp);
  * Parse a string containing the date in NMEA format into an integer
  * number of nanoseconds since the start of the POSIX epoch. The address
  * of the terminating character in the string is returned.
+ * N.B. NOT THREAD SAFE.
  * @param string points to the string.
  * @param endp points to where the terminating address is stored.
  * @return an integer number of microseconds.
@@ -895,6 +896,7 @@ extern uint64_t hazer_parse_dmy(const char * string, char ** endp);
  * ZDA format into an integer number of nanoseconds since the start of the
  * POSIX epoch. The address of the terminating character in the string that
  * failed to parse is returned, or of the year string if all succeeded.
+ * N.B. NOT THREAD SAFE.
  * @param stringd points to the day string.
  * @param stringm points to the month string.
  * @param stringy points to the year string.

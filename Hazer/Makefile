@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	60# API changes that may require that applications be modified.
 MINOR				:=	2# Only functionality or features added with no legacy API changes.
-BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	2# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -778,11 +778,11 @@ install-include:
 
 ########## Tests
 
-.PHONY: unit functional valgrind
+.PHONY: unit-test functional-test valgrind-test
 
 # Valgrind isn't available on all of the platforms on which
 # I run these unit tests.
-unit:
+unit-test:
 	R="PASSED."; \
 	mkdir -p $(OUT)/log; \
 	cp /dev/null $(OUT)/log/unit-test.log; \
@@ -797,7 +797,7 @@ unit:
 
 # Just a reminder of the functional tests I find useful to run.
 # Many of these require special hardware or test fixtures.
-functional:
+functional-test:
 	checksums
 	emissions
 	emissionsslow
@@ -812,6 +812,6 @@ functional:
 	@echo '    samm8q1pps # (1 Pulse Per Second) with the u-blox SAM-M8Q' 1>&2
 	@echo '    gr701w1pps # (1 Pulse Per Second) with the NaviSys GR701W' 1>&2
 
-valgrind:
+valgrind-test:
 	cat dat/hazer/ubx-cam-m8q-dan-1.dat dat/hazer/ubx-cam-m8q-dan-2.dat | valgrind gpstool -R
 	cat dat/hazer/bu353w10-1.dat dat/hazer/bu353w10-2.dat dat/hazer/bu353w10-3.dat dat/hazer/bu353w10-4.dat | valgrind gpstool -R
