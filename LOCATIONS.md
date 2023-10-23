@@ -5,10 +5,10 @@ may not be specified.
 
 ## Geodetic Center of North America
 
-Meade's Ranch, a private property in Kansas, contains the Geodetic Center of
-North America (or of the contiguous forty-eight states of the United States,
-if you read older documents). It is the origin of the original North American
-Datum (NAD) used as the basis for early surveying.
+Meade's Ranch, a private property in Kansas, contains the Geodetic Center
+of North America (or of the contiguous forty-eight states of the United
+States, if you read older documents). It is the origin of the original
+North American Datum (NAD) used as the basis for early surveying.
 
 39°13’26.71220″N, 98°32’31.74540″W (2012)
 
@@ -51,17 +51,17 @@ deorbiting spacecraft.
 When your GNSS application has a bug and it ends up telling you you're at
 latitude and longitude all zeros, you've found "Null Island". There isn't
 actually an island there, but there might be a bouy with weather sensors.
-Null Island is in the Atlantic Ocean off the western coast of Africa in the
-Gulf of Guinea.
+Null Island is in the Atlantic Ocean off the western coast of Africa in
+the Gulf of Guinea.
 
 0°0’0″N, 0°00’0″W
 
 ## Homestead at Bruin, Elliot County, Kentucky
 
-This is old Greene family home where I used to spend my summers growing up. It
-is in rural eastern Kentucky in the Appalachian mountains. Sandy Hook is the
-county seat of Elliot County, although the house is actually a little closer to
-Grayson in Carter County.
+This is old Greene family home where I used to spend my summers growing
+up. It is in rural eastern Kentucky in the Appalachian mountains. Sandy
+Hook is the county seat of Elliot County, although the house is actually
+a little closer to Grayson in Carter County.
 
 38°11'13.3"N, 83°01'09.6"W
 
@@ -107,13 +107,14 @@ equipment; he told me he often brings his lunch to eat there.
 
 ## R'lyeh
 
-H. P. Lovecraft was an early twentieth century writer and creator of the genre now
-known as "cosmic horror". In his fiction, Lovecraft placed R'lyeh at these coordinates
-in the South Pacific Ocean, about mid-way between New Zealand and Chili, not far from
-Point Nemo. R'lyeh is the pre-Cambrian sunken city where his malevolent giant alien-god
-Cthulhu hibernates, perhaps having fled from other similar cosmic entities with which
-he was in conflict. Cthulhu sleeps, dreaming of rising and resuming his dominion over
-the planet Earth, while human cultists worship him.
+H. P. Lovecraft was an early twentieth century writer and creator of the
+genre now known as "cosmic horror". In his fiction, Lovecraft placed
+R'lyeh at these coordinates in the South Pacific Ocean, about mid-way
+between New Zealand and Chili, not far from Point Nemo. R'lyeh is the
+pre-Cambrian sunken city where his malevolent giant alien-god Cthulhu
+hibernates, perhaps having fled from other similar cosmic entities with
+which he was in conflict. Cthulhu sleeps, dreaming of rising and resuming
+his dominion over the planet Earth, while human cultists worship him.
 
 47°09′S, 126°43′W
 
@@ -121,21 +122,24 @@ the planet Earth, while human cultists worship him.
 
 ## The Mountains of Madness
 
-Lovecraft's fiction placed a similarly ancient alien city in Antarctica, to be
-discovered by an early twentieth century expedition from the equally fictional
-Miskatonic University in also fictional Arkham Masschusetts.
+Lovecraft's fiction placed a similarly ancient alien city in Antarctica,
+to be discovered by an early twentieth century expedition from the equally
+fictional Miskatonic University in also fictional Arkham Masschusetts.
 
 76°15'S, 113°10'E
 
 ## Svalbard Global Seed Vault (Norway)
 
-"The Svalbard Global Seed Vault is a secure backup facility for the world's crop diversity on the Norwegian island of Spitsbergen in the remote Arctic Svalbard archipelago." \[Wikipedia\]
+"The Svalbard Global Seed Vault is a secure backup facility for the
+world's crop diversity on the Norwegian island of Spitsbergen in the
+remote Arctic Svalbard archipelago." \[Wikipedia\]
 
 78°14′09″N, 15°29′29″E
 
 ## Global Oreo Vault (Norway)
 
-This is where the not-entirely-fictitous Nabisco vault is located that contains
-the recipes for Oreos. It is located near the Svalbard Global Seed Vault.
+This is where the not-entirely-fictitous Nabisco vault is located that
+contains the recipes for Oreos. It is located near the Svalbard Global
+Seed Vault.
 
 78°08’58.1”N, 16°01’59.7”E
