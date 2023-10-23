@@ -82,6 +82,7 @@ in progress, and which may be found in this or other Digital Aggregates reposito
 
 * Calico (Garmin CPO support),
 * Conestoga (UDP/serial gateway),
+* Drover (Septentrio SBF support),
 * Fothergill (LoRa/serial gateway),
 * Hazer (NMEA support),
 * Metronome (precision time and frequency support),
@@ -90,7 +91,7 @@ in progress, and which may be found in this or other Digital Aggregates reposito
 * Tesoro (OSM support),
 * Tumbleweed (RTCM support for RTK DGNSS),
 * Wheatstone (LTE-M support),
-* Yodel (UBX support including for IMU output).
+* Yodel (U-blox UBX support including for IMU).
 
 The Hazer repo includes parsers for four different input formats - NMEA,
 UBX (U-blox), RTCM, and CPO (Garmin) - and interprets many of the data
