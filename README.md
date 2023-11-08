@@ -80,18 +80,18 @@ While Hazer is the name of the repository, it incorporates features in support
 of several different related projects described below, some of which are works
 in progress, and which may be found in this or other Digital Aggregates repositories:
 
-* Calico (Garmin CPO support),
-* Conestoga (UDP/serial gateway),
-* Drover (Septentrio SBF support),
-* Fothergill (LoRa/serial gateway),
-* Hazer (NMEA support),
-* Metronome (precision time and frequency support),
-* Nicker (PointPerfect SPARTN corrections via Inmarsat),
-* Stagecoach (UDP/OpenSSL gateway),
-* Tesoro (OSM support),
-* Tumbleweed (RTCM support for RTK DGNSS),
-* Wheatstone (LTE-M support),
-* Yodel (U-blox UBX support including for IMU).
+* Calico - Garmin CPO support;
+* Conestoga - UDP/serial gateway;
+* Drover - Septentrio SBF support (a work in progress);
+* Fothergill - LoRa/serial gateway;
+* Hazer - NMEA support;
+* Metronome - precision time and frequency support;
+* Nicker - PointPerfect SPARTN corrections via Inmarsat;
+* Stagecoach - UDP/OpenSSL gateway;
+* Tesoro - OSM support;
+* Tumbleweed - RTCM support for RTK DGNSS;
+* Wheatstone - LTE-M support;
+* Yodel - U-blox UBX support including for IMU.
 
 The Hazer repo includes parsers for four different input formats - NMEA,
 UBX (U-blox), RTCM, and CPO (Garmin) - and interprets many of the data
