@@ -1292,6 +1292,8 @@ WIRED, 2022-08-26
 
 <http://leapsecond.com/java/gpsclock.htm>
 
+<https://youtu.be/FUHkTs-Ipfg?si=BWIJwMdPdK-iGkKA> "The SAT Question Everyone Got Wrong"
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA9FMHIG_VmuBCVTQUzB-BZF>
