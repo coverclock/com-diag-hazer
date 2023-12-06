@@ -848,15 +848,20 @@ recent Linux distros (no clue, it's a recent version of make).
 
 ## GNSS Restrictions
 
-Formerly: restricted operation above 18,000m altitude and 515m/s
-velocity.
+Formerly: restricted operation above 18,000m (59,000') altitude and
+1000knots (510m/s) (1,900km/hr) (1,180mph) velocity.
 
-Currently (as of 2016): restriction decryption of precise positioning
-signals, steerable antennas designed to avoid jamming, designed to
+Currently (as of 2016): prohibits decryption of precise positioning
+signals, steerable antennas designed to avoid jamming, design to
 deliver 500kg payload at least 300km.
 
 (Many current commercial receivers will of course still have the former
 restrictions in place, implemented in HW, FW, or SW.)
+
+Coordinating Committee for Multilateral Export Controls (COCOM)
+
+Missile Technology Control Regime, Technical Annex, clause 11.A.3
+(600m/s)
 
 U.S. Department of Commerce, Export Administration Regulations
 (EAR)
@@ -947,3 +952,9 @@ with the standard screen utility on a second Raspberry Pi
     screen /dev/ttyACM0 57600 8n1
 
 and just verified that what I typed on the second Pi was echoed back verbatim.
+
+## Solar versus Sidereal Time
+
+Solar Year: 365.24 days, Day: 24:00:00 hours
+
+Sidereal Year: 366.24 days Day: 23:56:04 hours (approximately)
