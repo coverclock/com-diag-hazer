@@ -957,7 +957,7 @@ and just verified that what I typed on the second Pi was echoed back verbatim.
 
 Solar Year: 365.2425 days, Day: 24:00:00 hours (not counting any leap second)
 
-Sidereal Year: 366.2425 days Day: 23:56:04.09 hours (approximately)
+Sidereal Year: 366.2425 days, Day: 23:56:04.09 hours (approximately)
 
 ### See Also
 
