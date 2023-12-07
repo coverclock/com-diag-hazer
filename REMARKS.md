@@ -963,6 +963,8 @@ Sidereal Year: 366.2425 days Day: 23:56:04.09 hours (approximately)
 
 <https://en.wikipedia.org/wiki/Leap_year>
 
+<https://en.wikipedia.org/wiki/Leap_second>
+
 <https://en.wikipedia.org/wiki/Coin_rotation_paradox>
 
 <https://youtu.be/FUHkTs-Ipfg?si=qgGFW47jYSYNIgrJ>
