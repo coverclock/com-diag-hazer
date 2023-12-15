@@ -481,8 +481,9 @@ These talkers have been observed in the wild coming from actual GPS receivers.
 * GP - Global Positioning System (GPS) a.k.a. Navstar GPS - USA
 * GQ - Quasi-Zenith Satellite System (QZSS) - Japan
 
-Support for these talkers has been unit tested but the talkers have never been
-observed in the wild.
+Support for these talkers, which may not be in the NMEA standard, but which have been
+defined in the documentation of some devices I have used, has been unit tested, but
+the talkers have never been observed in the wild.
 
 * BD - BeiDou (as in The Big Dipper) a.k.a. COMPASS - China
 * QZ - Quasi-Zenith Satellite System (QZSS) - Japan
