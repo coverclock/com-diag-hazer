@@ -5,7 +5,7 @@ Parse NMEA strings and other typical output from GNSS devices.
 
 # Copyright
 
-Copyright 2017-2023 by the Digital Aggregates Corporation, Colorado, USA.
+Copyright 2017-2024 by the Digital Aggregates Corporation, Colorado, USA.
 
 Except where noted, this software is an original work of its author.
 
@@ -82,9 +82,10 @@ in progress, and which may be found in this or other Digital Aggregates reposito
 
 * Calico - Garmin CPO support;
 * Conestoga - UDP/serial gateway;
-* Drover - Septentrio SBF support (a work in progress);
+* Drover - Septentrio SBF support (work in progress);
 * Fothergill - LoRa/serial gateway;
 * Hazer - NMEA support;
+* Kack - WitMotion WT901 motion sensor support (work in progress);
 * Metronome - precision time and frequency support;
 * Nicker - PointPerfect SPARTN corrections via Inmarsat;
 * Stagecoach - UDP/OpenSSL gateway;
