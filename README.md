@@ -85,7 +85,7 @@ in progress, and which may be found in this or other Digital Aggregates reposito
 * Drover - Septentrio SBF support (work in progress);
 * Fothergill - LoRa/serial gateway;
 * Hazer - NMEA support;
-* Cactus - WitMotion WT901 motion sensor support (work in progress);
+* Dally - WitMotion WT901 motion sensor support (work in progress);
 * Metronome - precision time and frequency support;
 * Nicker - PointPerfect SPARTN corrections via Inmarsat;
 * Stagecoach - UDP/OpenSSL gateway;
