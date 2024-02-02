@@ -635,6 +635,14 @@ Wireless.
 
 SiRF is part of Qualcom.
 
+# Devices (Other)
+
+In the context of this repository, I also deal with devices that are not
+GNSS receivers but are related to navigation or timing, like intertial
+measurement units (IMUs).
+
+* WITMOTION WT901BLECL IMU (WT901, 115200 8n1, v1a86p7523, ttyUSB, 1Hz)
+
 # Platforms
 
 I routinely test Hazer and gpstool (and therefore, many of the
