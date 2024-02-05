@@ -4,13 +4,12 @@
 
 /**
  * @file
- * @copyright Copyright 2023 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2023-2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
- * @brief Support for proprietary messaging as used by come Garmin devices.
+ * @brief Support for proprietary messaging as used by some Garmin devices.
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
- * THIS IS A WORK IN PROGRESS.
  * The Calico module provides support for the Garmin CPO binary output format
  * that is produced by some devices manufactured by Garmin International, Inc.
  * I have a Garmin GPS-18x PC device with an RS-232 DB9 interface, which
