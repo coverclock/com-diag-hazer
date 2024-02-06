@@ -4,6 +4,11 @@
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
 # Emit messages on standard output to set up the WitMotion WT901 IMU.
+#
+# EXAMPLE
+#
+# wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | dump
+#
 
 echo "$(basename $0): start." 1>&2
 sleep 1
