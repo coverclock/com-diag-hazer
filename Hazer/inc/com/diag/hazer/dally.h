@@ -1,4 +1,4 @@
-/* vi: set ts=4 expandtab shiftwidth=4: */
+/* vi: set ts    =4 expandtab shiftwidth=4: */
 #ifndef _H_COM_DIAG_HAZER_DALLY_
 #define _H_COM_DIAG_HAZER_DALLY_
 
@@ -27,21 +27,49 @@
 #include <stdint.h>
 
 /******************************************************************************
- * CONSTANTS
+ * SYMBOLICS
  ******************************************************************************/
 
-enum DallyWt901OutputConstants {
-    DALLY_WIT901_HEADING                = (uint8_t)0x55,
-    DALLY_WIT901_FLAG_MAGNETICFIELD     = (uint8_t)0x71,
-    DALLY_WIT901_OUTPUT_MAGNETICFIELD   = (uint8_t)0x3a,
-    DALLY_WIT901_OUTPUT_QUATERNION      = (uint8_t)0x51,
-    DALLY_WIT901_OUTPUT_TEMPERATURE     = (uint8_t)0x40,
-    DALLY_WIT901_EXTRA_3                = (uint8_t)0x00,
+enum DallyStates {
+    DALLY_STATE_WAITING                     = 'W',
+    DALLY_STATE_SYNCED                      = 'S',
+    DALLY_STATE_HEADING                     = 'H',
+    DALLY_STATE_FLAG_PERIODIC               = 'P',
+    DALLY_STATE_FLAG_REQUESTED              = 'R',
+    DALLY_STATE_REQUESTED_MAGNETICFIELD     = 'M',
+    DALLY_STATE_REQUESTED_QUATERNION        = 'Q',
+    DALLY_STATE_REQUESTED_TEMPERATURE       = 'T',
 };
 
-enum DallyWit901CommandConstants {
-    DALLY_WIT901_COMMAND_0              = (uint8_t)0xff,
-    DALLY_WIT901_COMMAND_1              = (uint8_t)0xaa,
+enum DallyLengths {
+    DALLY_LENGTH_PERIODIC                   = 20,
+    DALLY_LENGTH_REQUESTED_MAGNETICFIELD    = 20,
+    DALLY_LENGTH_REQUESTED_QUATERNION       = 13,
+    DALLY_LENGTH_REQUESTED_TEMPERATURE      = 6,
+};
+
+enum DallyHeadingConstants {
+    DALLY_HEADING                           = 0x55U,
+};
+
+enum DallyFlagConstants {
+    DALLY_FLAG_PERIODIC                     = 0x61U,
+    DALLY_FLAG_REQUESTED                    = 0x71U,
+};
+
+enum DallyRequestConstants {
+    DALLY_REQUESTED_MAGNETICFIELD           = 0x3aU,
+    DALLY_REQUESTED_QUATERNION              = 0x51U,
+    DALLY_REQUESTED_TEMPERATURE             = 0x40U,
+};
+
+enum DallyExtraConstants {
+    DALLY_EXTRA                             = 0x00U,
+};
+
+enum DallyCommandConstants {
+    DALLY_COMMAND_0                         = 0xffU,
+    DALLY_COMMAND_1                         = 0xaaU,
 };
 
 /******************************************************************************
@@ -51,6 +79,10 @@ enum DallyWit901CommandConstants {
 typedef int16_t dally_raw;
 
 typedef float dally_datum;
+
+/******************************************************************************
+ * CONVERSIONS
+ ******************************************************************************/
 
 /******************************************************************************
  * FUNCTIONS
