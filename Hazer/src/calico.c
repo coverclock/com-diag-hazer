@@ -7,7 +7,6 @@
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
- * THIS IS A WORK IN PROGRESS.
  * This is the implementation of the support for the Garmin GPS-18x PC
  * binary serial output format. This format, described in Garmin's
  * "GPS 18x TECHNICAL SPECIFICATIONS", is not well documented. Much of

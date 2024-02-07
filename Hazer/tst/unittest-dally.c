@@ -33,17 +33,17 @@ int main(void)
     }
 
     {
-        dally_machine_t machine = { 0, };
+        dally_context_t context = { 0, };
         dally_packet_t packet;
-        assert(machine.state == DALLY_STATE_START);
-        assert(dally_init(&machine, &packet) == &machine);
-        assert(machine.packetp == &packet);
-        assert(machine.wordp == (dally_word_t *)0);
-        assert(machine.count == 0);
-        assert(machine.word == 0);
-        assert(machine.state == DALLY_STATE_HEADING);
-        assert(dally_fini(&machine) == (dally_machine_t *)0);
-        assert(machine.state == DALLY_STATE_START);
+        assert(context.state == DALLY_STATE_START);
+        assert(dally_init(&context, &packet) == &context);
+        assert(context.packetp == &packet);
+        assert(context.wordp == (dally_word_t *)0);
+        assert(context.count == 0);
+        assert(context.word == 0);
+        assert(context.state == DALLY_STATE_HEADING);
+        assert(dally_fini(&context) == (dally_context_t *)0);
+        assert(context.state == DALLY_STATE_START);
     }
 
     return 0;
