@@ -51,7 +51,7 @@ enum DallyStates {
 
 enum DallyPayloads {
     DALLY_PAYLOAD_BYTES                     = 20,
-    DALLY_PAYLOAD_WORDS                     = (DALLY_PAYLOAD_BYTES / sizeof(dally_word_t));
+    DALLY_PAYLOAD_WORDS                     = (DALLY_PAYLOAD_BYTES / sizeof(dally_word_t)),
     DALLY_PAYLOAD_DATA_BYTES                = (DALLY_PAYLOAD_BYTES - 2),
     DALLY_PAYLOAD_DATA_WORDS                = (DALLY_PAYLOAD_DATA_BYTES / sizeof(dally_word_t)),
     DALLY_PAYLOAD_REGISTER_BYTES            = (DALLY_PAYLOAD_DATA_BYTES - 2),
