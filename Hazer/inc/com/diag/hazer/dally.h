@@ -6,7 +6,7 @@
  * @file
  * @copyright Copyright 2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
- * @brief Support for proprietary messaging as used by some WITMOTION devices.
+ * @brief Support for proprietary messaging used WitMotion WT901 IMUs.
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
@@ -27,26 +27,35 @@
 #include <stdint.h>
 
 /******************************************************************************
+ * FUNDAMENTAL TYPES
+ ******************************************************************************/
+
+typedef uint8_t dally_byte_t;
+
+typedef int16_t dally_word_t;
+
+typedef double dally_datum_t;
+
+/******************************************************************************
  * SYMBOLICS
  ******************************************************************************/
 
 enum DallyStates {
-    DALLY_STATE_ERROR                       = '?',
-    DALLY_STATE_START                       = 'S',
     DALLY_STATE_HEADING                     = 'H',
-    DALLY_STATE_FLAG_DATA                   = 'P',
-    DALLY_STATE_FLAG_REGISTER               = 'R',
-    DALLY_STATE_DATA                        = 'D',
-    DALLY_STATE_REGISTER_MAGNETICFIELD      = 'M',
-    DALLY_STATE_REGISTER_QUATERNION         = 'Q',
-    DALLY_STATE_REGISTER_TEMPERATURE        = 'T',
+    DALLY_STATE_FLAG                        = 'F',
+    DALLY_STATE_REGISTER_LOW                = 'l',
+    DALLY_STATE_REGISTER_HIGH               = 'h',
+    DALLY_STATE_DATA_LOW                    = 'L',
+    DALLY_STATE_DATA_HIGH                   = 'H',
 };
 
-enum DallyPayload {
-    DALLY_PAYLOAD_TOTAL                     = 20,
-    DALLY_PAYLOAD_DATA                      = (DALLY_PAYLOAD_TOTAL - 2),
-    DALLY_PAYLOAD_REGISTER                  = (DALLY_PAYLOAD_DATA - 2),
-    DALLY_PAYLOAD_REGISTER_PAIRS            = (DALLY_PAYLOAD_REGISTER / 2),
+enum DallyPayloads {
+    DALLY_PAYLOAD_BYTES                     = 20,
+    DALLY_PAYLOAD_WORDS                     = (DALLY_PAYLOAD_BYTES / sizeof(dally_word_t));
+    DALLY_PAYLOAD_DATA_BYTES                = (DALLY_PAYLOAD_BYTES - 2),
+    DALLY_PAYLOAD_DATA_WORDS                = (DALLY_PAYLOAD_DATA_BYTES / sizeof(dally_word_t)),
+    DALLY_PAYLOAD_REGISTER_BYTES            = (DALLY_PAYLOAD_DATA_BYTES - 2),
+    DALLY_PAYLOAD_REGISTER_WORDS            = (DALLY_PAYLOAD_REGISTER_BYTES / sizeof(dally_word_t)),
 };
 
 enum DallyHeadings {
@@ -69,50 +78,40 @@ enum DallyRegisters {
 };
 
 /******************************************************************************
- * TYPES
+ * DERIVED TYPES
  ******************************************************************************/
 
-typedef int16_t dally_word_t;
+typedef dally_word_t (dally_words_t)[DALLY_PAYLOAD_WORDS];
 
-typedef double dally_datum_t;
-
-typedef uint8_t (dally_packet_t)[DALLY_PAYLOAD_TOTAL];
+typedef dally_byte_t (dally_bytes_t)[DALLY_PAYLOAD_BYTES];
 
 typedef struct DallyData {
-    uint8_t header;
-    uint8_t flag;
-    int8_t  axL;
-    int8_t  axH;
-    int8_t  ayL;
-    int8_t  ayH;
-    int8_t  azL;
-    int8_t  azH;
-    int8_t  wxL;
-    int8_t  wxH;
-    int8_t  wyL;
-    int8_t  wyH;
-    int8_t  wzL;
-    int8_t  wzH;
-    int8_t  rollL;
-    int8_t  rollH;
-    int8_t  pitchL;
-    int8_t  pitchH;
-    int8_t  yawL;
-    int8_t  yawH;
+    dally_byte_t header;
+    dally_byte_t flag;
+    dally_word_t ax;
+    dally_word_t ay;
+    dally_word_t az;
+    dally_word_t wx;
+    dally_word_t wy;
+    dally_word_t wz;
+    dally_word_t roll;
+    dally_word_t pitch;
+    dally_word_t yaw;
 } dally_data_t;
 
-typedef struct DallyPair {
-    int8_t dataL;
-    int8_t dataH;
-} dally_pair_t;
-
 typedef struct DallyRegister {
-    uint8_t header;
-    uint8_t sign;
-    uint8_t regL;
-    uint8_t regH;
-    dally_pair_t data[DALLY_PAYLOAD_REGISTER_PAIRS];
+    dally_byte_t header;
+    dally_byte_t sign;
+    dally_word_t reg;
+    dally_word_t data[DALLY_PAYLOAD_REGISTER_WORDS];
 } dally_register_t;
+
+typedef union DallyPacket {
+    dally_words_t    w;
+    dally_bytes_t    b;
+    dally_data_t     d;
+    dally_register_t r;
+} dally_packet_t;
 
 /******************************************************************************
  * CONVERSIONS
