@@ -16,11 +16,17 @@
 int main(void)
 {
     {
+        assert(DALLY_PAYLOAD_DATA_WORDS == 9);
+        assert(DALLY_PAYLOAD_REGISTER_WORDS == 8);
+    }
+
+    {
         assert(sizeof(dally_byte_t) == 1);
         assert(sizeof(dally_word_t) == 2);
         assert(sizeof(dally_datum_t) == 8);
         assert(sizeof(dally_words_t) == 20);
         assert(sizeof(dally_bytes_t) == 20);
+        assert(sizeof(dally_prefix_t) == 2);
         assert(sizeof(dally_data_t) == 20);
         assert(sizeof(dally_register_t) == 20);
         assert(sizeof(dally_packet_t) == 20);

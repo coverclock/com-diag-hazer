@@ -1,4 +1,4 @@
-/* vi: set ts    =4 expandtab shiftwidth=4: */
+/* vi: set ts=4 expandtab shiftwidth=4: */
 #ifndef _H_COM_DIAG_HAZER_DALLY_
 #define _H_COM_DIAG_HAZER_DALLY_
 
@@ -6,7 +6,7 @@
  * @file
  * @copyright Copyright 2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
- * @brief Support for proprietary messaging used WitMotion WT901 IMUs.
+ * @brief Support for proprietary messaging used by WitMotion WT901 IMUs.
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
@@ -40,14 +40,16 @@ typedef double dally_datum_t;
  * SYMBOLICS
  ******************************************************************************/
 
-enum DallyStates {
-    DALLY_STATE_HEADING                     = 'H',
-    DALLY_STATE_FLAG                        = 'F',
-    DALLY_STATE_REGISTER_LOW                = 'l',
-    DALLY_STATE_REGISTER_HIGH               = 'h',
-    DALLY_STATE_DATA_LOW                    = 'L',
-    DALLY_STATE_DATA_HIGH                   = 'H',
-};
+typedef enum DallyStates {
+    DALLY_STATE_START                       = '\0',  /* Waiting to start. */
+    DALLY_STATE_HEADING                     = 'H',   /* Waiting for heading. */
+    DALLY_STATE_FLAG                        = 'F',   /* Waiting for flag. */
+    DALLY_STATE_REGISTER_LOW                = 'l',   /* Waiting for reg low. */
+    DALLY_STATE_REGISTER_HIGH               = 'h',   /* Waiting for reg high. */
+    DALLY_STATE_DATA_LOW                    = 'L',   /* Waiting for data low. */
+    DALLY_STATE_DATA_HIGH                   = 'H',   /* Waiting for data high. */
+    DALLY_STATE_FINAL                       = '.',   /* Packet complete. */
+} dally_state_t;
 
 enum DallyPayloads {
     DALLY_PAYLOAD_BYTES                     = 20,
@@ -85,9 +87,13 @@ typedef dally_word_t (dally_words_t)[DALLY_PAYLOAD_WORDS];
 
 typedef dally_byte_t (dally_bytes_t)[DALLY_PAYLOAD_BYTES];
 
-typedef struct DallyData {
+typedef struct DallyPrefix {
     dally_byte_t header;
     dally_byte_t flag;
+} dally_prefix_t;
+
+typedef struct DallyData {
+    dally_prefix_t prefix;
     dally_word_t ax;
     dally_word_t ay;
     dally_word_t az;
@@ -100,18 +106,25 @@ typedef struct DallyData {
 } dally_data_t;
 
 typedef struct DallyRegister {
-    dally_byte_t header;
-    dally_byte_t sign;
+    dally_prefix_t prefix;
     dally_word_t reg;
     dally_word_t data[DALLY_PAYLOAD_REGISTER_WORDS];
 } dally_register_t;
 
 typedef union DallyPacket {
-    dally_words_t    w;
-    dally_bytes_t    b;
-    dally_data_t     d;
+    dally_words_t w;
+    dally_bytes_t b;
+    dally_data_t d;
     dally_register_t r;
 } dally_packet_t;
+
+typedef struct DallyMachine {
+    dally_packet_t * packetp;
+    dally_word_t * wordp;
+    size_t count;
+    dally_word_t word;
+    dally_state_t state;
+} dally_machine_t;
 
 /******************************************************************************
  * CONVERSIONS
@@ -120,5 +133,21 @@ typedef union DallyPacket {
 /******************************************************************************
  * FUNCTIONS
  ******************************************************************************/
+
+static inline dally_machine_t * dally_init(dally_machine_t * mp, dally_packet_t * pp) {
+    mp->packetp = pp;
+    mp->wordp = (dally_word_t *)0;
+    mp->count = 0;
+    mp->word = 0;
+    mp->state = DALLY_STATE_HEADING;
+    return mp;
+}
+
+static inline dally_machine_t * dally_fini(dally_machine_t * mp) {
+    mp->state = DALLY_STATE_START;
+    return (dally_machine_t *)0;
+}
+
+dally_state_t dally_machine(dally_machine_t * mp, int ch);
 
 #endif
