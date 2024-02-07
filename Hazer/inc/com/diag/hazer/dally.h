@@ -41,14 +41,14 @@ typedef double dally_datum_t;
  ******************************************************************************/
 
 typedef enum DallyStates {
-    DALLY_STATE_START                       = '\0',  /* Waiting to start. */
+    DALLY_STATE_START                       = '\0',  /* Waiting for init. */
     DALLY_STATE_HEADING                     = 'H',   /* Waiting for heading. */
     DALLY_STATE_FLAG                        = 'F',   /* Waiting for flag. */
     DALLY_STATE_REGISTER_LOW                = 'l',   /* Waiting for reg low. */
     DALLY_STATE_REGISTER_HIGH               = 'h',   /* Waiting for reg high. */
     DALLY_STATE_DATA_LOW                    = 'L',   /* Waiting for data low. */
     DALLY_STATE_DATA_HIGH                   = 'H',   /* Waiting for data high. */
-    DALLY_STATE_FINAL                       = '.',   /* Packet complete. */
+    DALLY_STATE_FINAL                       = '.',   /* Waiting for fini. */
 } dally_state_t;
 
 enum DallyPayloads {
