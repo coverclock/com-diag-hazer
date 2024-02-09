@@ -141,7 +141,7 @@ dally_state_t dally_machine(dally_context_t * cp, int ch)
     } while (0);
 
     if (debug != (FILE *)0) {
-        fprintf(debug, "Machine Dally %c 0x%x 0x%x %c\n", cp->state, ch, byte, state);
+        fprintf(debug, "dally_machine: state %c char 0x%8.8x byte 0x%2.2x state %c word 0x%4.4x count %lu\n", cp->state, ch, byte, state, (cp->word & 0xffff), cp->count);
     }
 
     cp->state = state;

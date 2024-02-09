@@ -142,8 +142,7 @@ typedef struct DallyContext {
  * FUNCTIONS
  ******************************************************************************/
 
-static inline dally_context_t * dally_init(dally_context_t * cp, dally_packet_t * pp) {
-    cp->packetp = pp;
+static inline dally_context_t * dally_reset(dally_context_t * cp) {
     cp->wordp = (dally_word_t *)0;
     cp->count = 0;
     cp->word = 0;
@@ -151,7 +150,16 @@ static inline dally_context_t * dally_init(dally_context_t * cp, dally_packet_t 
     return cp;
 }
 
+static inline dally_context_t * dally_init(dally_context_t * cp, dally_packet_t * pp) {
+    cp->packetp = pp;
+    return dally_reset(cp);
+}
+
 static inline dally_context_t * dally_fini(dally_context_t * cp) {
+    cp->packetp = (dally_packet_t *)0;
+    cp->wordp = (dally_word_t *)0;
+    cp->count = 0;
+    cp->word = 0;
     cp->state = DALLY_STATE_START;
     return (dally_context_t *)0;
 }

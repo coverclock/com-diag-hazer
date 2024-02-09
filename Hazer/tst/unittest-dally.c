@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/hazer/dally.h"
 
 int main(void)
@@ -52,6 +53,7 @@ int main(void)
         dally_packet_t packet;
         (void)memset(&context, 0xff, sizeof(context));
         (void)memset(&packet, 0xff, sizeof(packet));
+        assert(dally_debug(stderr) == (FILE *)0);
         assert(dally_init(&context, &packet) == &context);
         assert(context.state == DALLY_STATE_HEADING);
         assert(dally_machine(&context, DALLY_HEADING));
@@ -125,6 +127,7 @@ int main(void)
         assert(packet.d.roll == (dally_word_t)0xddee);
         assert(packet.d.pitch == (dally_word_t)0xff00);
         assert(packet.d.yaw == (dally_word_t)0xdead);
+        assert(dally_debug((FILE *)0) == stderr);
     }
 
     {
@@ -132,6 +135,7 @@ int main(void)
         dally_packet_t packet;
         (void)memset(&context, 0xff, sizeof(context));
         (void)memset(&packet, 0xff, sizeof(packet));
+        assert(dally_debug(stderr) == (FILE *)0);
         assert(dally_init(&context, &packet) == &context);
         assert(context.state == DALLY_STATE_HEADING);
         assert(dally_machine(&context, DALLY_HEADING));
@@ -204,6 +208,49 @@ int main(void)
         assert(packet.r.data[5] == (dally_word_t)0xddee);
         assert(packet.r.data[6] == (dally_word_t)0xff00);
         assert(packet.r.data[7] == (dally_word_t)0xdead);
+        assert(dally_debug((FILE *)0) == stderr);
+    }
+
+    {
+        /*
+         * Captured using the following command using a WT901BLECL50.
+         *
+         * wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | dump
+         *
+         * This is declared int because that what functions like fgetc(3)
+         * return.
+         */
+        static const int DATA[8][20] = {
+            { 0x55, 0x61, 0xd7, 0xff, 0xd7, 0xff, 0x27, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x33, 0xff, 0xc8, 0x00, 0x6d, 0x5c },
+            { 0x55, 0x71, 0x30, 0x00, 0x0f, 0x01, 0x04, 0x15, 0x1f, 0x18, 0x85, 0x02, 0xd7, 0xff, 0xd7, 0xff, 0x26, 0x08, 0x00, 0x00 },
+            { 0x55, 0x71, 0x31, 0x00, 0x04, 0x15, 0x1f, 0x19, 0x8a, 0x02, 0xd7, 0xff, 0xd7, 0xff, 0x26, 0x08, 0x00, 0x00, 0x00, 0x00 },
+            { 0x55, 0x71, 0x32, 0x00, 0x1f, 0x1a, 0x8f, 0x02, 0xd8, 0xff, 0xd7, 0xff, 0x27, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+            { 0x55, 0x71, 0x33, 0x00, 0x94, 0x02, 0xd9, 0xff, 0xd8, 0xff, 0x28, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2d, 0x01 },
+            { 0x55, 0x71, 0x3a, 0x00, 0x2c, 0x01, 0x16, 0xff, 0x90, 0xfe, 0x32, 0xff, 0xc8, 0x00, 0x6d, 0x5c, 0xc2, 0x08, 0x00, 0x00 },
+            { 0x55, 0x71, 0x40, 0x00, 0xc1, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+            { 0x55, 0x71, 0x51, 0x00, 0x1a, 0x36, 0x5a, 0xfe, 0x60, 0xff, 0xfc, 0x73, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+        };
+        dally_context_t context;
+        dally_packet_t packet[8];
+        dally_state_t state;
+        int ii;
+        int jj;
+
+        for (ii = 0; ii < 8; ++ii) {
+            dally_init(&context, &(packet[ii]));
+            for (jj = 0; jj < 20; ++jj) {
+                state = dally_machine(&context, DATA[ii][jj]);
+                assert(state != DALLY_STATE_START);
+                assert(state != DALLY_STATE_ERROR);
+                assert(((jj < 19) && (state != DALLY_STATE_FINAL)) || ((jj == 19) && (state == DALLY_STATE_FINAL))
+                );
+            }
+            fprintf(stderr, "DATA[%d]:\n", ii);
+            diminuto_dump(stderr, &(DATA[ii]), sizeof(DATA[ii]));
+            fprintf(stderr, "packet[%d]:\n", ii);
+            diminuto_dump(stderr, &(packet[ii]), sizeof(packet[ii]));
+            dally_fini(&context);
+        }
     }
 
     return 0;
