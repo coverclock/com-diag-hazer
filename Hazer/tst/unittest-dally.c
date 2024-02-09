@@ -10,6 +10,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include "com/diag/hazer/dally.h"
 
@@ -49,6 +50,8 @@ int main(void)
     {
         dally_context_t context;
         dally_packet_t packet;
+        (void)memset(&context, 0xff, sizeof(context));
+        (void)memset(&packet, 0xff, sizeof(packet));
         assert(dally_init(&context, &packet) == &context);
         assert(context.state == DALLY_STATE_HEADING);
         assert(dally_machine(&context, DALLY_HEADING));
@@ -111,6 +114,17 @@ int main(void)
         assert(context.state == DALLY_STATE_FINAL);
         assert(context.count == 0);
         assert(context.word == (dally_word_t)0xdead);
+        assert(packet.d.prefix.header == (dally_word_t)DALLY_HEADING);
+        assert(packet.d.prefix.flag == (dally_word_t)DALLY_FLAG_DATA);
+        assert(packet.d.ax == (dally_word_t)0x1122);
+        assert(packet.d.ay == (dally_word_t)0x3344);
+        assert(packet.d.az == (dally_word_t)0x5566);
+        assert(packet.d.wx == (dally_word_t)0x7788);
+        assert(packet.d.wy == (dally_word_t)0x99aa);
+        assert(packet.d.wz == (dally_word_t)0xbbcc);
+        assert(packet.d.roll == (dally_word_t)0xddee);
+        assert(packet.d.pitch == (dally_word_t)0xff00);
+        assert(packet.d.yaw == (dally_word_t)0xdead);
     }
 
     return 0;
