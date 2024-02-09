@@ -46,5 +46,72 @@ int main(void)
         assert(context.state == DALLY_STATE_START);
     }
 
+    {
+        dally_context_t context;
+        dally_packet_t packet;
+        assert(dally_init(&context, &packet) == &context);
+        assert(context.state == DALLY_STATE_HEADING);
+        assert(dally_machine(&context, DALLY_HEADING));
+        assert(context.state == DALLY_STATE_FLAG);
+        assert(dally_machine(&context, DALLY_FLAG_DATA));
+        assert(context.state == DALLY_STATE_DATA_LOW);
+        assert(context.count == 9);
+        assert(context.word == (dally_word_t)0x0000);
+        assert(dally_machine(&context, 0x22U));
+        assert(context.state == DALLY_STATE_DATA_HIGH);
+        assert(dally_machine(&context, 0x11U));
+        assert(context.state == DALLY_STATE_DATA_LOW);
+        assert(context.count == 8);
+        assert(context.word == (dally_word_t)0x1122);
+        assert(dally_machine(&context, 0x44U));
+        assert(context.state == DALLY_STATE_DATA_HIGH);
+        assert(dally_machine(&context, 0x33U));
+        assert(context.state == DALLY_STATE_DATA_LOW);
+        assert(context.count == 7);
+        assert(context.word == (dally_word_t)0x3344);
+        assert(dally_machine(&context, 0x66U));
+        assert(context.state == DALLY_STATE_DATA_HIGH);
+        assert(dally_machine(&context, 0x55U));
+        assert(context.state == DALLY_STATE_DATA_LOW);
+        assert(context.count == 6);
+        assert(context.word == (dally_word_t)0x5566);
+        assert(dally_machine(&context, 0x88U));
+        assert(context.state == DALLY_STATE_DATA_HIGH);
+        assert(dally_machine(&context, 0x77U));
+        assert(context.state == DALLY_STATE_DATA_LOW);
+        assert(context.count == 5);
+        assert(context.word == (dally_word_t)0x7788);
+        assert(dally_machine(&context, 0xaaU));
+        assert(context.state == DALLY_STATE_DATA_HIGH);
+        assert(dally_machine(&context, 0x99U));
+        assert(context.state == DALLY_STATE_DATA_LOW);
+        assert(context.count == 4);
+        assert(context.word == (dally_word_t)0x99aa);
+        assert(dally_machine(&context, 0xccU));
+        assert(context.state == DALLY_STATE_DATA_HIGH);
+        assert(dally_machine(&context, 0xbbU));
+        assert(context.state == DALLY_STATE_DATA_LOW);
+        assert(context.count == 3);
+        assert(context.word == (dally_word_t)0xbbcc);
+        assert(dally_machine(&context, 0xeeU));
+        assert(context.state == DALLY_STATE_DATA_HIGH);
+        assert(dally_machine(&context, 0xddU));
+        assert(context.state == DALLY_STATE_DATA_LOW);
+        assert(context.count == 2);
+        assert(context.word == (dally_word_t)0xddee);
+        assert(dally_machine(&context, 0x00U));
+        assert(context.state == DALLY_STATE_DATA_HIGH);
+        assert(dally_machine(&context, 0xffU));
+        assert(context.state == DALLY_STATE_DATA_LOW);
+        assert(context.count == 1);
+        assert(context.word == (dally_word_t)0xff00);
+        assert(dally_machine(&context, 0xadU));
+        assert(context.state == DALLY_STATE_DATA_HIGH);
+        assert(dally_machine(&context, 0xdeU));
+        assert(context.state == DALLY_STATE_FINAL);
+        assert(context.count == 0);
+        assert(context.word == (dally_word_t)0xdead);
+    }
+
     return 0;
 }
