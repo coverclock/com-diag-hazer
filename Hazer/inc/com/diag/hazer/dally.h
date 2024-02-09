@@ -118,12 +118,18 @@ typedef struct DallyRegister {
     dally_word_t data[DALLY_PAYLOAD_REGISTER_WORDS];
 } dally_register_t;
 
+typedef struct DallyTest {
+    dally_prefix_t prefix;
+    dally_word_t data[DALLY_PAYLOAD_DATA_WORDS];
+} dally_test_t;
+
 typedef union DallyPacket {
     dally_words_t w;
     dally_bytes_t b;
     dally_prefix_t p;
     dally_data_t d;
     dally_register_t r;
+    dally_test_t t;
 } dally_packet_t;
 
 typedef struct DallyContext {

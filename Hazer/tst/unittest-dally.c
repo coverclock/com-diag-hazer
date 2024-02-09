@@ -32,6 +32,7 @@ int main(void)
         assert(sizeof(dally_data_t) == 20);
         assert(sizeof(dally_register_t) == 20);
         assert(sizeof(dally_packet_t) == 20);
+        assert(sizeof(dally_test_t) == 20);
     }
 
     {
@@ -230,6 +231,16 @@ int main(void)
             { 0x55, 0x71, 0x40, 0x00, 0xc1, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
             { 0x55, 0x71, 0x51, 0x00, 0x1a, 0x36, 0x5a, 0xfe, 0x60, 0xff, 0xfc, 0x73, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
         };
+        static const dally_test_t EXPECTED[8] = {
+            { { 0x55, 0x61 }, { 0xffd7, 0xffd7, 0x0827, 0x0000, 0x0000, 0x0000, 0xff33, 0x00c8, 0x5c6d } },
+            { { 0x55, 0x71 }, { 0x0030, 0x010f, 0x1504, 0x181f, 0x0285, 0xffd7, 0xffd7, 0x0826, 0x0000 } },
+            { { 0x55, 0x71 }, { 0x0031, 0x1504, 0x191f, 0x028a, 0xffd7, 0xffd7, 0x0826, 0x0000, 0x0000 } },
+            { { 0x55, 0x71 }, { 0x0032, 0x1a1f, 0x028f, 0xffd8, 0xffd7, 0x0827, 0x0000, 0x0000, 0x0000 } },
+            { { 0x55, 0x71 }, { 0x0033, 0x0294, 0xffd9, 0xffd8, 0x0828, 0x0000, 0x0000, 0x0000, 0x012d } },
+            { { 0x55, 0x71 }, { 0x003a, 0x012c, 0xff16, 0xfe90, 0xff32, 0x00c8, 0x5c6d, 0x08c2, 0x0000 } },
+            { { 0x55, 0x71 }, { 0x0040, 0x08c1, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 } },
+            { { 0x55, 0x71 }, { 0x0051, 0x361a, 0xfe5a, 0xff60, 0x73fc, 0x0000, 0x0000, 0x0000, 0x0000 } }
+        };
         dally_context_t context;
         dally_packet_t packet[8];
         dally_state_t state;
@@ -238,6 +249,13 @@ int main(void)
 
         for (ii = 0; ii < 8; ++ii) {
             dally_init(&context, &(packet[ii]));
+            if (ii == 0) {
+                /* Start in the middle of a packet. */
+                for (jj = 10; jj < 20; ++jj) {
+                    state = dally_machine(&context, DATA[ii][jj]);
+                    assert(state == DALLY_STATE_HEADING);
+                }
+            }
             for (jj = 0; jj < 20; ++jj) {
                 state = dally_machine(&context, DATA[ii][jj]);
                 assert(state != DALLY_STATE_START);
@@ -245,11 +263,15 @@ int main(void)
                 assert(((jj < 19) && (state != DALLY_STATE_FINAL)) || ((jj == 19) && (state == DALLY_STATE_FINAL))
                 );
             }
+            dally_fini(&context);
             fprintf(stderr, "DATA[%d]:\n", ii);
             diminuto_dump(stderr, &(DATA[ii]), sizeof(DATA[ii]));
+            fprintf(stderr, "EXPECTED[%d]:\n", ii);
+            diminuto_dump(stderr, &(EXPECTED[ii]), sizeof(EXPECTED[ii]));
             fprintf(stderr, "packet[%d]:\n", ii);
             diminuto_dump(stderr, &(packet[ii]), sizeof(packet[ii]));
-            dally_fini(&context);
+            assert(sizeof(packet[ii]) == sizeof(EXPECTED[ii]));
+            assert(memcmp(&(packet[ii]), &(EXPECTED[ii]), sizeof(EXPECTED[ii])) == 0);
         }
     }
 
