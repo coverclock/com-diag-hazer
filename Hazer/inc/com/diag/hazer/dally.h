@@ -40,7 +40,7 @@ typedef uint8_t dally_byte_t;
 
 typedef int16_t dally_word_t;
 
-typedef double dally_datum_t;
+typedef float dally_value_t;
 
 /******************************************************************************
  * SYMBOLICS
@@ -71,12 +71,12 @@ enum DallyHeadings {
     DALLY_HEADING                           = 0x55U, /* 'U' */
 };
 
-enum DallyFlags {
+typedef enum DallyFlags {
     DALLY_FLAG_DATA                         = 0x61U, /* 'a' */
     DALLY_FLAG_REGISTER                     = 0x71U, /* 'q' */
-};
+} dally_flags_t;
 
-enum DallyRegisters {
+typedef enum DallyRegisters {
     DALLY_REGISTER_YEARMONTH                = 0x30U, /* '0' */
     DALLY_REGISTER_DATEHOUR                 = 0x31U, /* '1' */
     DALLY_REGISTER_MINUTESECOND             = 0x32U, /* '2' */
@@ -84,7 +84,7 @@ enum DallyRegisters {
     DALLY_REGISTER_MAGNETICFIELD            = 0x3aU, /* ':' */
     DALLY_REGISTER_TEMPERATURE              = 0x40U, /* '@' */
     DALLY_REGISTER_QUATERNION               = 0x51U, /* 'Q' */
-};
+} dally_registers_t;
 
 /******************************************************************************
  * DERIVED TYPES
@@ -141,10 +141,6 @@ typedef struct DallyContext {
 } dally_context_t;
 
 /******************************************************************************
- * CONVERSIONS
- ******************************************************************************/
-
-/******************************************************************************
  * FUNCTIONS
  ******************************************************************************/
 
@@ -153,11 +149,13 @@ static inline dally_context_t * dally_reset(dally_context_t * cp) {
     cp->count = 0;
     cp->word = 0;
     cp->state = DALLY_STATE_HEADING;
+
     return cp;
 }
 
 static inline dally_context_t * dally_init(dally_context_t * cp, dally_packet_t * pp) {
     cp->packetp = pp;
+
     return dally_reset(cp);
 }
 
@@ -167,9 +165,63 @@ static inline dally_context_t * dally_fini(dally_context_t * cp) {
     cp->count = 0;
     cp->word = 0;
     cp->state = DALLY_STATE_START;
+
     return (dally_context_t *)0;
 }
 
 extern dally_state_t dally_machine(dally_context_t * mp, int ch);
+
+/******************************************************************************
+ * CONVERSIONS
+ ******************************************************************************/
+
+static inline dally_value_t dally_word2acceleration(dally_word_t word) {
+    dally_value_t value = word;
+
+    value /= 32768.0;
+    value *= 16.0;
+
+    return value;
+}
+
+static inline dally_value_t dally_word2angularvelocity(dally_word_t word) {
+    dally_value_t value = word;
+
+    value /= 32768.0;
+    value *= 2000.0;
+
+    return value;
+}
+
+static inline dally_value_t dally_word2angle(dally_word_t word) {
+    dally_value_t value = word;
+
+    value /= 32768.0;
+    value *= 180.0;
+
+    return value;
+}
+
+static inline dally_value_t dally_word2magneticfield(dally_word_t word) {
+    dally_value_t value = word;
+
+    return value;
+}
+
+static inline dally_value_t dally_word2quaternion(dally_word_t word) {
+    dally_value_t value = word;
+
+    value /= 32678.0;
+
+    return value;
+}
+
+static inline dally_value_t dally_word2temperature(dally_word_t word) {
+    dally_value_t value = word;
+
+    value /= 100.0;
+
+    return value;
+}
 
 #endif

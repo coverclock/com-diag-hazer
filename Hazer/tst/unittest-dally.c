@@ -25,7 +25,7 @@ int main(void)
     {
         assert(sizeof(dally_byte_t) == 1);
         assert(sizeof(dally_word_t) == 2);
-        assert(sizeof(dally_datum_t) == 8);
+        assert(sizeof(dally_value_t) == 4);
         assert(sizeof(dally_words_t) == 20);
         assert(sizeof(dally_bytes_t) == 20);
         assert(sizeof(dally_prefix_t) == 2);
