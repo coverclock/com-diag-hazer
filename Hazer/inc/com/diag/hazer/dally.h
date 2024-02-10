@@ -149,13 +149,11 @@ static inline dally_context_t * dally_reset(dally_context_t * cp) {
     cp->count = 0;
     cp->word = 0;
     cp->state = DALLY_STATE_HEADING;
-
     return cp;
 }
 
 static inline dally_context_t * dally_init(dally_context_t * cp, dally_packet_t * pp) {
     cp->packetp = pp;
-
     return dally_reset(cp);
 }
 
@@ -165,7 +163,6 @@ static inline dally_context_t * dally_fini(dally_context_t * cp) {
     cp->count = 0;
     cp->word = 0;
     cp->state = DALLY_STATE_START;
-
     return (dally_context_t *)0;
 }
 
@@ -175,52 +172,45 @@ extern dally_state_t dally_machine(dally_context_t * mp, int ch);
  * CONVERSIONS
  ******************************************************************************/
 
+static inline dally_value_t dally_word2value(dally_word_t word) {
+    dally_value_t value = word;
+    return value;
+}
+
 static inline dally_value_t dally_word2acceleration(dally_word_t word) {
     dally_value_t value = word;
-
     value /= 32768.0;
     value *= 16.0;
-
     return value;
 }
 
 static inline dally_value_t dally_word2angularvelocity(dally_word_t word) {
     dally_value_t value = word;
-
     value /= 32768.0;
     value *= 2000.0;
-
     return value;
 }
 
 static inline dally_value_t dally_word2angle(dally_word_t word) {
     dally_value_t value = word;
-
     value /= 32768.0;
     value *= 180.0;
-
     return value;
 }
 
 static inline dally_value_t dally_word2magneticfield(dally_word_t word) {
-    dally_value_t value = word;
-
-    return value;
+    return dally_word2value(word);
 }
 
 static inline dally_value_t dally_word2quaternion(dally_word_t word) {
     dally_value_t value = word;
-
     value /= 32678.0;
-
     return value;
 }
 
 static inline dally_value_t dally_word2temperature(dally_word_t word) {
     dally_value_t value = word;
-
     value /= 100.0;
-
     return value;
 }
 
