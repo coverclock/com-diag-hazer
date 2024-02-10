@@ -307,6 +307,36 @@ int main(void)
         dally_word_t word;
         dally_value_t value;
 
+        word = 0x8000;
+        value = dally_word2value(word);
+        fprintf(stderr, "minimum: word=0x%4.4x=%d value=%f\n", word, word, value);
+        assert(value == -32768.0);
+
+        word = 0xffff;
+        value = dally_word2value(word);
+        fprintf(stderr, "negativeone: word=0x%4.4x=%d value=%f\n", word, word, value);
+        assert(value == -1.0);
+
+        word = 0x0000;
+        value = dally_word2value(word);
+        fprintf(stderr, "zero: word=0x%4.4x=%d value=%f\n", word, word, value);
+        assert(value == 0.0);
+
+        word = 0x0001;
+        value = dally_word2value(word);
+        fprintf(stderr, "one: word=0x%4.4x=%d value=%f\n", word, word, value);
+        assert(value == 1.0);
+
+        word = 0x7fff;
+        value = dally_word2value(word);
+        fprintf(stderr, "maximum: word=0x%4.4x=%d value=%f\n", word, word, value);
+        assert(value == 32767.0);
+    }
+
+    {
+        dally_word_t word;
+        dally_value_t value;
+
         word = 0xffd7;
         value = dally_word2acceleration(word);
         fprintf(stderr, "acceleration: word=0x%4.4x=%d value=%f g\n", word, word, value);
