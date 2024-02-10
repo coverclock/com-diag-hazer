@@ -177,41 +177,28 @@ static inline dally_value_t dally_word2value(dally_word_t word) {
     return value;
 }
 
-static inline dally_value_t dally_word2acceleration(dally_word_t word) {
-    dally_value_t value = word;
-    value /= 32768.0;
-    value *= 16.0;
+static inline dally_value_t dally_value2acceleration(dally_value_t value) {
+    return ((value / 32768.0) * 16.0);
+}
+
+static inline dally_value_t dally_value2angularvelocity(dally_value_t value) {
+    return ((value / 32768.0) * 2000.0);
+}
+
+static inline dally_value_t dally_value2angle(dally_value_t value) {
+    return ((value / 32768.0) * 180.0);
+}
+
+static inline dally_value_t dally_value2magneticfield(dally_value_t value) {
     return value;
 }
 
-static inline dally_value_t dally_word2angularvelocity(dally_word_t word) {
-    dally_value_t value = word;
-    value /= 32768.0;
-    value *= 2000.0;
-    return value;
+static inline dally_value_t dally_value2quaternion(dally_value_t value) {
+    return (value / 32768.0);
 }
 
-static inline dally_value_t dally_word2angle(dally_word_t word) {
-    dally_value_t value = word;
-    value /= 32768.0;
-    value *= 180.0;
-    return value;
-}
-
-static inline dally_value_t dally_word2magneticfield(dally_word_t word) {
-    return dally_word2value(word);
-}
-
-static inline dally_value_t dally_word2quaternion(dally_word_t word) {
-    dally_value_t value = word;
-    value /= 32678.0;
-    return value;
-}
-
-static inline dally_value_t dally_word2temperature(dally_word_t word) {
-    dally_value_t value = word;
-    value /= 100.0;
-    return value;
+static inline dally_value_t dally_value2temperature(dally_value_t value) {
+    return (value / 100.0);
 }
 
 #endif

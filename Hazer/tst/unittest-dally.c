@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "com/diag/diminuto/diminuto_countof.h"
+#include "com/diag/diminuto/diminuto_minmaxof.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/hazer/dally.h"
 
@@ -58,6 +60,7 @@ enum DataIndices {
 
 enum RegisterIndices {
     REGISTER_ID = 0,
+    REGISTER_PAYLOAD = 1,
 };
 
 static const dally_test_t EXPECTED[8] = {
@@ -70,6 +73,8 @@ static const dally_test_t EXPECTED[8] = {
     { { 0x55, 0x71 }, { 0x0040, 0x08c1, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 } },
     { { 0x55, 0x71 }, { 0x0051, 0x361a, 0xfe5a, 0xff60, 0x73fc, 0x0000, 0x0000, 0x0000, 0x0000 } }
 };
+
+static const dally_word_t WORD[] = { 0x8000, 0xffff, 0x0000, 0x0001, 0x7fff };
 
 int main(void)
 {
@@ -304,62 +309,19 @@ int main(void)
     }
 
     {
+        static const dally_value_t VALUE[] = { -32768.0, -1.0, 0.0, 1.0, 32767.0, };
         dally_word_t word;
-        dally_value_t value;
+        dally_value_t expected;
+        dally_value_t actual;
+        int ii;
 
-        word = 0x8000;
-        value = dally_word2value(word);
-        fprintf(stderr, "minimum: word=0x%4.4x=%d value=%f\n", word, word, value);
-        assert(value == -32768.0);
-
-        word = 0xffff;
-        value = dally_word2value(word);
-        fprintf(stderr, "negativeone: word=0x%4.4x=%d value=%f\n", word, word, value);
-        assert(value == -1.0);
-
-        word = 0x0000;
-        value = dally_word2value(word);
-        fprintf(stderr, "zero: word=0x%4.4x=%d value=%f\n", word, word, value);
-        assert(value == 0.0);
-
-        word = 0x0001;
-        value = dally_word2value(word);
-        fprintf(stderr, "one: word=0x%4.4x=%d value=%f\n", word, word, value);
-        assert(value == 1.0);
-
-        word = 0x7fff;
-        value = dally_word2value(word);
-        fprintf(stderr, "maximum: word=0x%4.4x=%d value=%f\n", word, word, value);
-        assert(value == 32767.0);
-    }
-
-    {
-        dally_word_t word;
-        dally_value_t value;
-
-        word = 0xffd7;
-        value = dally_word2acceleration(word);
-        fprintf(stderr, "acceleration: word=0x%4.4x=%d value=%f g\n", word, word, value);
-
-        word = 0x0000;
-        value = dally_word2angularvelocity(word);
-        fprintf(stderr, "angularvelocity: word=0x%4.4x=%d value=%f deg/sec\n", word, word, value);
-
-        word = 0x5c6d;
-        value = dally_word2angle(word);
-        fprintf(stderr, "angle: word=0x%4.4x=%d value=%f deg\n", word, word, value);
-
-        word = 0x012c;
-        value = dally_word2magneticfield(word);
-        fprintf(stderr, "magneticfield: word=0x%4.4x=%d value=%f deg\n", word, word, value);
-
-        word = 0x08c1;
-        value = dally_word2quaternion(word);
-        fprintf(stderr, "quaternian: word=0x%4.4x=%d value=%f\n", word, word, value);
-
-        word = 0x361a;
-        value = dally_word2temperature(word);
-        fprintf(stderr, "temperature: word=0x%4.4x=%d value=%f deg C\n", word, word, value);
+        for (ii = 0; ii < countof(VALUE); ++ii) {
+            word = WORD[ii];
+            expected = VALUE[ii];
+            actual = dally_word2value(word);
+            fprintf(stderr, "word2value: word=0x%4.4x=%d expected=%f actual=%f\n", (word & 0xffff), word, expected, actual);
+            assert(expected == actual);
+        }
     }
 
     return 0;
