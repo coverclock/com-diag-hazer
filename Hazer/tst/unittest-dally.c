@@ -313,6 +313,7 @@ int main(void)
         dally_word_t word;
         dally_value_t expected;
         dally_value_t actual;
+        dally_value_t value;
         dally_value_t computed;
         int ii;
 
@@ -320,50 +321,56 @@ int main(void)
             word = WORD[ii];
             expected = VALUE[ii];
             actual = dally_word2value(word);
-            fprintf(stderr, "word2value: word=0x%4.4x=%d actual=%f expected=%f\n", (word & 0xffff), word, actual, expected);
+            fprintf(stderr, "word2value: word=0x%4.4x=%d expected=%f actual=%f\n", (word & 0xffff), word, expected, actual);
             assert(expected == actual);
         }
 
         for (ii = 0; ii < countof(VALUE); ++ii) {
             word = WORD[ii];
-            expected = VALUE[ii];
-            computed = dally_value2acceleration(expected);
-            fprintf(stderr, "value2acceleration: word=0x%4.4x=%d computed=%f\n", (word & 0xffff), word, computed);
+            value = VALUE[ii];
+            computed = dally_value2acceleration(value);
+            fprintf(stderr, "value2acceleration: word=0x%4.4x=%d value=%f computed=%f\n", (word & 0xffff), word, value, computed);
+            assert(((word < 0) && (value < 0) && (computed < 0)) || ((word >= 0) && (value >= 0) && (computed >= 0)));
         }
 
         for (ii = 0; ii < countof(VALUE); ++ii) {
             word = WORD[ii];
-            expected = VALUE[ii];
-            computed = dally_value2angularvelocity(expected);
-            fprintf(stderr, "value2angularvelocity: word=0x%4.4x=%d computed=%f\n", (word & 0xffff), word, computed);
+            value = VALUE[ii];
+            computed = dally_value2angularvelocity(value);
+            fprintf(stderr, "value2angularvelocity: word=0x%4.4x=%d value=%f computed=%f\n", (word & 0xffff), word, value, computed);
+            assert(((word < 0) && (value < 0) && (computed < 0)) || ((word >= 0) && (value >= 0) && (computed >= 0)));
         }
 
         for (ii = 0; ii < countof(VALUE); ++ii) {
             word = WORD[ii];
-            expected = VALUE[ii];
-            computed = dally_value2angle(expected);
-            fprintf(stderr, "value2angle: word=0x%4.4x=%d computed=%f\n", (word & 0xffff), word, computed);
+            value = VALUE[ii];
+            computed = dally_value2angle(value);
+            fprintf(stderr, "value2angle: word=0x%4.4x=%d value=%f computed=%f\n", (word & 0xffff), word, value, computed);
+            assert(((word < 0) && (value < 0) && (computed < 0)) || ((word >= 0) && (value >= 0) && (computed >= 0)));
         }
 
         for (ii = 0; ii < countof(VALUE); ++ii) {
             word = WORD[ii];
-            expected = VALUE[ii];
-            computed = dally_value2magneticfield(expected);
-            fprintf(stderr, "value2magneticfield: word=0x%4.4x=%d computed=%f\n", (word & 0xffff), word, computed);
+            value = VALUE[ii];
+            computed = dally_value2magneticfield(value);
+            fprintf(stderr, "value2magneticfield: word=0x%4.4x=%d value=%f computed=%f\n", (word & 0xffff), word, value, computed);
+            assert(((word < 0) && (value < 0) && (computed < 0)) || ((word >= 0) && (value >= 0) && (computed >= 0)));
         }
 
         for (ii = 0; ii < countof(VALUE); ++ii) {
             word = WORD[ii];
-            expected = VALUE[ii];
-            computed = dally_value2quaternion(expected);
-            fprintf(stderr, "value2quaternion: word=0x%4.4x=%d computed=%f\n", (word & 0xffff), word, computed);
+            value = VALUE[ii];
+            computed = dally_value2quaternion(value);
+            fprintf(stderr, "value2quaternion: word=0x%4.4x=%d value=%f computed=%f\n", (word & 0xffff), word, value, computed);
+            assert(((word < 0) && (value < 0) && (computed < 0)) || ((word >= 0) && (value >= 0) && (computed >= 0)));
         }
 
         for (ii = 0; ii < countof(VALUE); ++ii) {
             word = WORD[ii];
-            expected = VALUE[ii];
-            computed = dally_value2temperature(expected);
-            fprintf(stderr, "value2temperature: word=0x%4.4x=%d computed=%f\n", (word & 0xffff), word, computed);
+            value = VALUE[ii];
+            computed = dally_value2temperature(value);
+            fprintf(stderr, "value2temperature: word=0x%4.4x=%d value=%f computed=%f\n", (word & 0xffff), word, value, computed);
+            assert(((word < 0) && (value < 0) && (computed < 0)) || ((word >= 0) && (value >= 0) && (computed >= 0)));
         }
     }
 
