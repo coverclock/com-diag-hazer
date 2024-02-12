@@ -28,7 +28,7 @@ int main(int argc, char * argv[])
     int error = 0;
     const char * program = (const char *)0;
     dally_state_t state = DALLY_STATE_START;
-    dally_packet_t packet = { 0, };
+    dally_packet_t packet __attribute__ ((aligned (16))) = { 0, };
     dally_context_t context = { 0, };
     dally_context_t * contextp = (dally_context_t *)0;
     int ch = -1;
@@ -87,6 +87,57 @@ int main(int argc, char * argv[])
 
         if (state != DALLY_STATE_FINAL) {
             continue;
+        }
+
+        switch (packet.p.flag) {
+        case DALLY_FLAG_DATA:
+            if (verbose) {
+                fprintf(stderr, "%s: Accelerometer\n", program);
+            }
+            break;
+        case DALLY_FLAG_REGISTER:
+            switch (packet.r.reg) {
+            case DALLY_REGISTER_YEARMONTH:
+                if (verbose) {
+                    fprintf(stderr, "%s: YearMonth\n", program);
+                }
+                break;
+            case DALLY_REGISTER_DATEHOUR:
+                if (verbose) {
+                    fprintf(stderr, "%s: DateHour\n", program);
+                }
+                break;
+            case DALLY_REGISTER_MINUTESECOND:
+                if (verbose) {
+                    fprintf(stderr, "%s: MinuteSecond\n", program);
+                }
+                break;
+            case DALLY_REGISTER_MILLISECOND:
+                if (verbose) {
+                    fprintf(stderr, "%s: Millisecond\n", program);
+                }
+                break;
+            case DALLY_REGISTER_MAGNETICFIELD:
+                if (verbose) {
+                    fprintf(stderr, "%s: Compass\n", program);
+                }
+                break;
+            case DALLY_REGISTER_TEMPERATURE:
+                if (verbose) {
+                    fprintf(stderr, "%s: Thermometer\n", program);
+                }
+                break;
+            case DALLY_REGISTER_QUATERNION:
+                if (verbose) {
+                    fprintf(stderr, "%s: Quaternion\n", program);
+                }
+                break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
         }
 
         if (verbose) {
