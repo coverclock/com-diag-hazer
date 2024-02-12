@@ -10,6 +10,8 @@
 # wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | dump
 #
 
+trap "trap '' SIGINT SIGPIPE SIGQUIT SIGTERM; echo $(basename $0): stop. 1>&2; kill -TERM -- -${SELF} 2> /dev/null; exit 0" SIGINT SIGPIPE SIGQUIT SIGTERM
+
 echo "$(basename $0): start." 1>&2
 sleep 1
 collapse '\xFF\xAA\x03\x03\x00' # Set Frequency 1Hz
@@ -30,4 +32,5 @@ while true; do
     collapse '\xFF\xAA\x27\x40\x00' # Get Temperature
     sleep 1
 done
-echo "$(basename $0): stop." 1>&2
+
+exit 2

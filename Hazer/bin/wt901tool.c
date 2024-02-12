@@ -17,11 +17,16 @@
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/diminuto/diminuto_error.h"
+#include "com/diag/diminuto/diminuto_hangup.h"
+#include "com/diag/diminuto/diminuto_interrupter.h"
+#include "com/diag/diminuto/diminuto_pipe.h"
+#include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/hazer/dally.h"
 
 int main(int argc, char * argv[])
 {
     int xc = 0;
+    int rc = 0;
     int opt = -1;
     int debug = 0;
     int verbose = 0;
@@ -64,6 +69,18 @@ int main(int argc, char * argv[])
      * INIT
      */
 
+    rc = diminuto_hangup_install(0);
+    diminuto_contract(rc >= 0);
+
+    rc = diminuto_interrupter_install(0);
+    diminuto_contract(rc >= 0);
+
+    rc = diminuto_pipe_install(0);
+    diminuto_contract(rc >= 0);
+
+    rc = diminuto_terminator_install(0);
+    diminuto_contract(rc >= 0);
+
     contextp = dally_init(&context, &packet);
     diminuto_contract(contextp == &context);
 
@@ -71,11 +88,31 @@ int main(int argc, char * argv[])
         dally_debug(stderr);
     }
 
+    if (verbose) {
+        fprintf(stderr, "%s: init\n", program);
+    }
+
     /*
      * PROCESS
      */
 
     while (!0) {
+
+        if (diminuto_hangup_check()) {
+            /* Do nothing. */
+        }
+
+        if (diminuto_interrupter_check()) {
+            break;
+        }
+
+        if (diminuto_pipe_check()) {
+            break;
+        }
+
+        if (diminuto_terminator_check()) {
+            break;
+        }
 
         ch = fgetc(stdin);
         if (ch < 0) {
@@ -133,10 +170,12 @@ int main(int argc, char * argv[])
                 }
                 break;
             default:
+                fprintf(stderr, "%s: Register 0x%x\n", program, packet.r.reg);
                 break;
             }
             break;
         default:
+            fprintf(stderr, "%s: Flag 0x%x\n", program, packet.p.flag);
             break;
         }
 
@@ -152,6 +191,10 @@ int main(int argc, char * argv[])
     /*
      * FINI
      */
+
+    if (verbose) {
+        fprintf(stderr, "%s: fini\n", program);
+    }
 
     if (debug) {
         dally_debug((FILE *)0);
