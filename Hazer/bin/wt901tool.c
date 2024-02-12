@@ -1,0 +1,115 @@
+/* vi: set ts=4 expandtab shiftwidth=4: */
+/**
+ * @file
+ * @copyright Copyright 2024 Digital Aggregates Corporation, Colorado, USA.
+ * @note Licensed under the terms in LICENSE.txt.
+ * @brief This implements a filter to process WT901 IMU data.
+ * @author Chip Overclock <mailto:coverclock@diag.com>
+ * @see Hazer <https://github.com/coverclock/com-diag-hazer>
+ * @details
+ *
+ * wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | wt901tool -v
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include "com/diag/diminuto/diminuto_assert.h"
+#include "com/diag/diminuto/diminuto_dump.h"
+#include "com/diag/diminuto/diminuto_error.h"
+#include "com/diag/hazer/dally.h"
+
+int main(int argc, char * argv[])
+{
+    int xc = 0;
+    int opt = -1;
+    int debug = 0;
+    int verbose = 0;
+    int error = 0;
+    const char * program = (const char *)0;
+    dally_state_t state = DALLY_STATE_START;
+    dally_packet_t packet = { 0, };
+    dally_context_t context = { 0, };
+    dally_context_t * contextp = (dally_context_t *)0;
+    int ch = -1;
+
+    program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
+
+    /*
+     * OPTIONS
+     */
+
+    while ((opt = getopt(argc, argv, "?dv")) >= 0) {
+        switch (opt) {
+        case 'd':
+            debug = !0;
+            break;
+        case 'v':
+            verbose = !0;
+            break;
+        case '?':
+            fprintf(stderr, "usage: %s [ -d ] [ -v ]\n", program);
+            fprintf(stderr, "       -d              Display debug output on standard error.\n");
+            fprintf(stderr, "       -v              Display verbose output on standard error.\n");
+            return 1;
+            break;
+        }
+    }
+
+    if (error) {
+        return 1;
+    }
+
+    /*
+     * INIT
+     */
+
+    contextp = dally_init(&context, &packet);
+    diminuto_contract(contextp == &context);
+
+    if (debug) {
+        dally_debug(stderr);
+    }
+
+    /*
+     * PROCESS
+     */
+
+    while (!0) {
+
+        ch = fgetc(stdin);
+        if (ch < 0) {
+            break;
+        }
+
+        state = dally_machine(&context, ch);
+        diminuto_contract(state != DALLY_STATE_ERROR);
+
+        if (state != DALLY_STATE_FINAL) {
+            continue;
+        }
+
+        if (verbose) {
+            diminuto_dump(stderr, &packet, sizeof(packet));
+        }
+
+        contextp = dally_reset(&context);
+        diminuto_contract(contextp == &context);
+
+    }
+
+    /*
+     * FINI
+     */
+
+    if (debug) {
+        dally_debug((FILE *)0);
+    }
+
+    contextp = dally_fini(&context);
+    diminuto_contract(contextp == (dally_context_t *)0);
+
+    fflush(stderr);
+
+    return xc;
+}
