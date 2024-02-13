@@ -8,7 +8,7 @@
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
  *
- * wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | wt901tool -d -v
+ * wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | wt901tool -d -v -t -c
  */
 
 #include <locale.h>
@@ -34,7 +34,8 @@ int main(int argc, char * argv[])
     int opt = -1;
     int debug = 0;
     int verbose = 0;
-    int verboser = 0;
+    int text = 0;
+    int csv = 0;
     int error = 0;
     const char * program = (const char *)0;
     char * locale = (char *)0;
@@ -54,22 +55,26 @@ int main(int argc, char * argv[])
      * OPTIONS
      */
 
-    while ((opt = getopt(argc, argv, "?Vdv")) >= 0) {
+    while ((opt = getopt(argc, argv, "?cdtv")) >= 0) {
         switch (opt) {
-        case 'V':
-            verboser = !0;
+        case 'c':
+            csv = !0;
             break;
         case 'd':
             debug = !0;
+            break;
+        case 't':
+            text = !0;
             break;
         case 'v':
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -V ]\n", program);
+            fprintf(stderr, "usage: %s [ -c ] [ -d ] [ -t ] [ -v ]\n", program);
+            fprintf(stderr, "       -c              Emit CSV output on standard error.\n");
             fprintf(stderr, "       -d              Display debug output on standard error.\n");
+            fprintf(stderr, "       -t              Emit text output on standard output.\n");
             fprintf(stderr, "       -v              Display verbose output on standard error.\n");
-            fprintf(stderr, "       -V              Display verboser output on standard error.\n");
             return 1;
             break;
         }
@@ -157,10 +162,15 @@ int main(int argc, char * argv[])
             acceleration.roll = dally_value2angle(dally_word2value(packet.d.payload[6]));
             acceleration.pitch = dally_value2angle(dally_word2value(packet.d.payload[7]));
             acceleration.yaw = dally_value2angle(dally_word2value(packet.d.payload[8]));
-            if (verbose) {
-                fprintf(stderr, "%s: Acceleration %7.3fg %7.3fg %7.3fg\n", program, acceleration.ax, acceleration.ay, acceleration.az);
-                fprintf(stderr, "%s: AngularVelocity %8.2f%lc/s %8.2f%lc/s %8.2f%lc/s\n", program, acceleration.wx, DEGREE, acceleration.wy, DEGREE, acceleration.wz, DEGREE);
-                fprintf(stderr, "%s: Orientation %7.2f%lc %7.2f%lc %7.2f%lc\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
+            if (text) {
+                printf("%s ACC ax %7.3fg, ay %7.3fg, az %7.3fg\n", program, acceleration.ax, acceleration.ay, acceleration.az);
+                printf("%s ANG wx %8.2f%lc/s, wy %8.2f%lc/s, wz %8.2f%lc/s\n", program, acceleration.wx, DEGREE, acceleration.wy, DEGREE, acceleration.wz, DEGREE);
+                printf("%s POS rol %7.2f%lc, pit %7.2f%lc, yaw %7.2f%lc\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
+            }
+            if (csv) {
+                printf("\"%s\",\"ACC\",%f,%f,%f\n", program, acceleration.ax, acceleration.ay, acceleration.az);
+                printf("\"%s\",\"ANG\",%f,%f,%f\n", program, acceleration.wx, acceleration.wy, acceleration.wz);
+                printf("\"%s\",\"POS\",%f,%f,%f\n", program, acceleration.roll, acceleration.pitch, acceleration.yaw);
             }
             break;
         case DALLY_FLAG_REGISTER:
@@ -189,22 +199,31 @@ int main(int argc, char * argv[])
                 magneticfield.hx = dally_value2magneticfield(dally_word2value(packet.r.payload[0]));
                 magneticfield.hy = dally_value2magneticfield(dally_word2value(packet.r.payload[1]));
                 magneticfield.hz = dally_value2magneticfield(dally_word2value(packet.r.payload[2]));
-                if (verbose) {
-                    fprintf(stderr, "%s: Magnetometer %7.2fmG %7.2fmG %7.2fmG\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
+                if (text) {
+                    printf("%s MAG hx %7.2fmG, hy %7.2fmG, hz %7.2fmG\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
+                }
+                if (csv) {
+                    printf("\"%s\",\"MAG\",%f,%f,%f\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
                 }
                 break;
             case DALLY_REGISTER_QUATERNION:
                 quaternion.q0 = dally_value2quaternion(dally_word2value(packet.r.payload[0]));
                 quaternion.q1 = dally_value2quaternion(dally_word2value(packet.r.payload[1]));
                 quaternion.q2 = dally_value2quaternion(dally_word2value(packet.r.payload[2]));
-                if (verbose) {
-                    fprintf(stderr, "%s: Quaternion %7.4f %7.4f %7.4f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
+                if (text) {
+                    printf("%s QUA q0 %7.4f, q1 %7.4f, q2 %7.4f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
+                }
+                if (csv) {
+                    printf("\"%s\",\"QUA\",%f,%f,%f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
                 }
                 break;
             case DALLY_REGISTER_TEMPERATURE:
                 temperature.t = dally_value2temperature(dally_word2value(packet.r.payload[0]));
-                if (verbose) {
-                    fprintf(stderr, "%s: Thermometer %7.2f%lcC\n", program, temperature.t, DEGREE);
+                if (text) {
+                    printf("%s TEM %7.2f%lcC %7.2f%lcF\n", program, temperature.t, DEGREE, ((temperature.t * 9.0 / 5.0) + 32.0), DEGREE);
+                }
+                if (csv) {
+                    printf("\"%s\",\"TEM\",%f,%f\n", program, temperature.t, ((temperature.t * 9.0 / 5.0) + 32.0));
                 }
                 break;
             default:
@@ -217,7 +236,7 @@ int main(int argc, char * argv[])
             break;
         }
 
-        if (verboser) {
+        if (verbose) {
             diminuto_dump(stderr, &packet, sizeof(packet));
         }
 
