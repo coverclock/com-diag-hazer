@@ -8,12 +8,15 @@
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
  *
- * wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | wt901tool -v
+ * wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | wt901tool -d -v
  */
 
+#include <locale.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <wchar.h>
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/diminuto/diminuto_error.h"
@@ -25,18 +28,25 @@
 
 int main(int argc, char * argv[])
 {
+    static const wint_t DEGREE = 0xb0U;
     int xc = 0;
     int rc = 0;
     int opt = -1;
     int debug = 0;
     int verbose = 0;
+    int verboser = 0;
     int error = 0;
     const char * program = (const char *)0;
+    char * locale = (char *)0;
+    int ch = -1;
     dally_state_t state = DALLY_STATE_START;
-    dally_packet_t packet __attribute__ ((aligned (16))) = { 0, };
+    dally_packet_t packet = { 0, };
     dally_context_t context = { 0, };
     dally_context_t * contextp = (dally_context_t *)0;
-    int ch = -1;
+    dally_acceleration_t acceleration = { 0.0, };
+    dally_magneticfield_t magneticfield = { 0.0, };
+    dally_quaternion_t quaternion = { 0.0, };
+    dally_temperature_t temperature = { 0.0, };
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
@@ -44,8 +54,11 @@ int main(int argc, char * argv[])
      * OPTIONS
      */
 
-    while ((opt = getopt(argc, argv, "?dv")) >= 0) {
+    while ((opt = getopt(argc, argv, "?Vdv")) >= 0) {
         switch (opt) {
+        case 'V':
+            verboser = !0;
+            break;
         case 'd':
             debug = !0;
             break;
@@ -53,9 +66,10 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -d ] [ -v ]\n", program);
+            fprintf(stderr, "usage: %s [ -d ] [ -v ] [ -V ]\n", program);
             fprintf(stderr, "       -d              Display debug output on standard error.\n");
             fprintf(stderr, "       -v              Display verbose output on standard error.\n");
+            fprintf(stderr, "       -V              Display verboser output on standard error.\n");
             return 1;
             break;
         }
@@ -68,6 +82,12 @@ int main(int argc, char * argv[])
     /*
      * INIT
      */
+
+    rc = setenv("LC_ALL", "en_US.UTF-8", 0);
+    diminuto_contract(rc >= 0);
+
+    locale = setlocale(LC_ALL, "");
+    diminuto_contract(locale != (char *)0);
 
     rc = diminuto_hangup_install(0);
     diminuto_contract(rc >= 0);
@@ -128,8 +148,19 @@ int main(int argc, char * argv[])
 
         switch (packet.d.flag) {
         case DALLY_FLAG_DATA:
+            acceleration.ax = dally_value2acceleration(dally_word2value(packet.d.payload[0]));
+            acceleration.ay = dally_value2acceleration(dally_word2value(packet.d.payload[1]));
+            acceleration.az = dally_value2acceleration(dally_word2value(packet.d.payload[2]));
+            acceleration.wx = dally_value2angularvelocity(dally_word2value(packet.d.payload[3]));
+            acceleration.wy = dally_value2angularvelocity(dally_word2value(packet.d.payload[4]));
+            acceleration.wz = dally_value2angularvelocity(dally_word2value(packet.d.payload[5]));
+            acceleration.roll = dally_value2angle(dally_word2value(packet.d.payload[6]));
+            acceleration.pitch = dally_value2angle(dally_word2value(packet.d.payload[7]));
+            acceleration.yaw = dally_value2angle(dally_word2value(packet.d.payload[8]));
             if (verbose) {
-                fprintf(stderr, "%s: Accelerometer\n", program);
+                fprintf(stderr, "%s: Acceleration [ %7.3fg %7.3fg %7.3fg ]\n", program, acceleration.ax, acceleration.ay, acceleration.az);
+                fprintf(stderr, "%s: AngularVelocity [ %8.2f%lc/s %8.2f%lc/s %8.2f%lc/s ]\n", program, acceleration.wx, DEGREE, acceleration.wy, DEGREE, acceleration.wz, DEGREE);
+                fprintf(stderr, "%s: Position [ %7.2f%lc %7.2f%lc %7.2f%lc ]\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
             }
             break;
         case DALLY_FLAG_REGISTER:
@@ -155,18 +186,25 @@ int main(int argc, char * argv[])
                 }
                 break;
             case DALLY_REGISTER_MAGNETICFIELD:
+                magneticfield.hx = dally_value2magneticfield(dally_word2value(packet.r.payload[0]));
+                magneticfield.hy = dally_value2magneticfield(dally_word2value(packet.r.payload[1]));
+                magneticfield.hz = dally_value2magneticfield(dally_word2value(packet.r.payload[2]));
                 if (verbose) {
-                    fprintf(stderr, "%s: Compass\n", program);
-                }
-                break;
-            case DALLY_REGISTER_TEMPERATURE:
-                if (verbose) {
-                    fprintf(stderr, "%s: Thermometer\n", program);
+                    fprintf(stderr, "%s: Magnetometer [ %12.5fmG %12.5fmG %12.5fmG ]\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
                 }
                 break;
             case DALLY_REGISTER_QUATERNION:
+                quaternion.q0 = dally_value2quaternion(dally_word2value(packet.r.payload[0]));
+                quaternion.q1 = dally_value2quaternion(dally_word2value(packet.r.payload[1]));
+                quaternion.q2 = dally_value2quaternion(dally_word2value(packet.r.payload[2]));
                 if (verbose) {
-                    fprintf(stderr, "%s: Quaternion\n", program);
+                    fprintf(stderr, "%s: Quaternion [ %7.4f %7.4f %7.4f ]\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
+                }
+                break;
+            case DALLY_REGISTER_TEMPERATURE:
+                temperature.t = dally_value2temperature(dally_word2value(packet.r.payload[0]));
+                if (verbose) {
+                    fprintf(stderr, "%s: Thermometer %7.2f%lcC\n", program, temperature.t, DEGREE);
                 }
                 break;
             default:
@@ -179,7 +217,7 @@ int main(int argc, char * argv[])
             break;
         }
 
-        if (verbose) {
+        if (verboser) {
             diminuto_dump(stderr, &packet, sizeof(packet));
         }
 
