@@ -163,9 +163,9 @@ int main(int argc, char * argv[])
             acceleration.pitch = dally_value2angle(dally_word2value(packet.d.payload[7]));
             acceleration.yaw = dally_value2angle(dally_word2value(packet.d.payload[8]));
             if (text) {
-                printf("%s ACC ax %7.3fg, ay %7.3fg, az %7.3fg\n", program, acceleration.ax, acceleration.ay, acceleration.az);
-                printf("%s ANG wx %8.2f%lc/s, wy %8.2f%lc/s, wz %8.2f%lc/s\n", program, acceleration.wx, DEGREE, acceleration.wy, DEGREE, acceleration.wz, DEGREE);
-                printf("%s POS rol %7.2f%lc, pit %7.2f%lc, yaw %7.2f%lc\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
+                printf("%s ACC ax  %12.5fg,   ay  %12.5fg,   az  %12.5fg\n", program, acceleration.ax, acceleration.ay, acceleration.az);
+                printf("%s ANG wx  %12.5f%lc/s, wy  %12.5f%lc/s, wz  %12.5f%lc/s\n", program, acceleration.wx, DEGREE, acceleration.wy, DEGREE, acceleration.wz, DEGREE);
+                printf("%s POS rol %12.5f%lc,   pit %12.5f%lc,   yaw %12.5f%lc\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
             }
             if (csv) {
                 printf("\"%s\",\"ACC\",%f,%f,%f\n", program, acceleration.ax, acceleration.ay, acceleration.az);
@@ -200,7 +200,7 @@ int main(int argc, char * argv[])
                 magneticfield.hy = dally_value2magneticfield(dally_word2value(packet.r.payload[1]));
                 magneticfield.hz = dally_value2magneticfield(dally_word2value(packet.r.payload[2]));
                 if (text) {
-                    printf("%s MAG hx %7.2fmG, hy %7.2fmG, hz %7.2fmG\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
+                    printf("%s MAG hx  %12.5fmG,  hy  %12.5fmG,  hz  %12.5fmG\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
                 }
                 if (csv) {
                     printf("\"%s\",\"MAG\",%f,%f,%f\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
@@ -211,7 +211,7 @@ int main(int argc, char * argv[])
                 quaternion.q1 = dally_value2quaternion(dally_word2value(packet.r.payload[1]));
                 quaternion.q2 = dally_value2quaternion(dally_word2value(packet.r.payload[2]));
                 if (text) {
-                    printf("%s QUA q0 %7.4f, q1 %7.4f, q2 %7.4f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
+                    printf("%s QUA q0  %12.5f,    q1  %12.5f,    q2  %12.5f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
                 }
                 if (csv) {
                     printf("\"%s\",\"QUA\",%f,%f,%f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
@@ -220,7 +220,7 @@ int main(int argc, char * argv[])
             case DALLY_REGISTER_TEMPERATURE:
                 temperature.t = dally_value2temperature(dally_word2value(packet.r.payload[0]));
                 if (text) {
-                    printf("%s TEM %7.2f%lcC %7.2f%lcF\n", program, temperature.t, DEGREE, ((temperature.t * 9.0 / 5.0) + 32.0), DEGREE);
+                    printf("%s TEM     %12.5f%lcC,      %12.5f%lcF\n", program, temperature.t, DEGREE, ((temperature.t * 9.0 / 5.0) + 32.0), DEGREE);
                 }
                 if (csv) {
                     printf("\"%s\",\"TEM\",%f,%f\n", program, temperature.t, ((temperature.t * 9.0 / 5.0) + 32.0));
