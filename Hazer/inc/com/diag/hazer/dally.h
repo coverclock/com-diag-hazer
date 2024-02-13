@@ -96,7 +96,7 @@ typedef struct DallyRegister {
 } dally_register_t;
 
 typedef union DallyPacket {
-    dally_words_t w;
+    dally_words_t w; /* Alignment. */
     dally_bytes_t b;
     dally_data_t d;
     dally_register_t r;

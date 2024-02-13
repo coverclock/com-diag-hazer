@@ -126,7 +126,7 @@ int main(int argc, char * argv[])
             continue;
         }
 
-        switch (packet.p.flag) {
+        switch (packet.d.flag) {
         case DALLY_FLAG_DATA:
             if (verbose) {
                 fprintf(stderr, "%s: Accelerometer\n", program);
@@ -175,7 +175,7 @@ int main(int argc, char * argv[])
             }
             break;
         default:
-            fprintf(stderr, "%s: Flag 0x%x\n", program, packet.p.flag);
+            fprintf(stderr, "%s: Flag 0x%x\n", program, packet.d.flag);
             break;
         }
 
