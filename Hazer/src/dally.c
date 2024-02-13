@@ -54,7 +54,7 @@ dally_state_t dally_machine(dally_context_t * cp, int ch)
         case DALLY_STATE_HEADING:
             switch (byte) {
             case DALLY_HEADING:
-                cp->packetp->p.header = byte;
+                cp->packetp->d.header = byte;
                 state = DALLY_STATE_FLAG;
                 break;
             default:
@@ -66,17 +66,17 @@ dally_state_t dally_machine(dally_context_t * cp, int ch)
         case DALLY_STATE_FLAG:
             switch (byte) {
             case DALLY_FLAG_DATA:
-                cp->packetp->p.flag = byte;
-                cp->wordp = &(cp->packetp->g.payload[0]);
+                cp->packetp->d.flag = byte;
+                cp->wordp = &(cp->packetp->d.payload[0]);
                 cp->count = DALLY_PAYLOAD_DATA_WORDS;
                 state = DALLY_STATE_DATA_LOW;
                 break;
             case DALLY_FLAG_REGISTER:
-                cp->packetp->p.flag = byte;
+                cp->packetp->r.flag = byte;
                 state = DALLY_STATE_REGISTER_LOW;
                 break;
             case DALLY_HEADING:
-                cp->packetp->p.header = byte;
+                cp->packetp->d.header = byte;
                 state = DALLY_STATE_FLAG;
                 break;
             default:
@@ -98,7 +98,7 @@ dally_state_t dally_machine(dally_context_t * cp, int ch)
                 state = DALLY_STATE_REGISTER_HIGH;
                 break;
             case DALLY_HEADING:
-                cp->packetp->p.header = byte;
+                cp->packetp->d.header = byte;
                 state = DALLY_STATE_FLAG;
                 break;
             default:
@@ -110,13 +110,13 @@ dally_state_t dally_machine(dally_context_t * cp, int ch)
         case DALLY_STATE_REGISTER_HIGH:
             switch (byte) {
             case 0x00:
-                cp->packetp->i.reg = cp->word;
+                cp->packetp->r.reg = cp->word;
                 cp->wordp = &(cp->packetp->r.payload[0]);
                 cp->count = DALLY_PAYLOAD_REGISTER_WORDS;
                 state = DALLY_STATE_DATA_LOW;
                 break;
             case DALLY_HEADING:
-                cp->packetp->p.header = byte;
+                cp->packetp->d.header = byte;
                 state = DALLY_STATE_FLAG;
                 break;
             default:

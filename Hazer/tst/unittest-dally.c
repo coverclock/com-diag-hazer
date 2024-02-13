@@ -63,15 +63,15 @@ enum RegisterIndices {
     REGISTER_PAYLOAD = 1,
 };
 
-static const dally_generic_t EXPECTED[8] = {
-    { { 0x55, 0x61 }, { 0xffd7, 0xffd7, 0x0827, 0x0000, 0x0000, 0x0000, 0xff33, 0x00c8, 0x5c6d } },
-    { { 0x55, 0x71 }, { 0x0030, 0x010f, 0x1504, 0x181f, 0x0285, 0xffd7, 0xffd7, 0x0826, 0x0000 } },
-    { { 0x55, 0x71 }, { 0x0031, 0x1504, 0x191f, 0x028a, 0xffd7, 0xffd7, 0x0826, 0x0000, 0x0000 } },
-    { { 0x55, 0x71 }, { 0x0032, 0x1a1f, 0x028f, 0xffd8, 0xffd7, 0x0827, 0x0000, 0x0000, 0x0000 } },
-    { { 0x55, 0x71 }, { 0x0033, 0x0294, 0xffd9, 0xffd8, 0x0828, 0x0000, 0x0000, 0x0000, 0x012d } },
-    { { 0x55, 0x71 }, { 0x003a, 0x012c, 0xff16, 0xfe90, 0xff32, 0x00c8, 0x5c6d, 0x08c2, 0x0000 } },
-    { { 0x55, 0x71 }, { 0x0040, 0x08c1, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 } },
-    { { 0x55, 0x71 }, { 0x0051, 0x361a, 0xfe5a, 0xff60, 0x73fc, 0x0000, 0x0000, 0x0000, 0x0000 } }
+static const dally_data_t EXPECTED[] = {
+    { 0x55, 0x61, { 0xffd7, 0xffd7, 0x0827, 0x0000, 0x0000, 0x0000, 0xff33, 0x00c8, 0x5c6d } },
+    { 0x55, 0x71, { 0x0030, 0x010f, 0x1504, 0x181f, 0x0285, 0xffd7, 0xffd7, 0x0826, 0x0000 } },
+    { 0x55, 0x71, { 0x0031, 0x1504, 0x191f, 0x028a, 0xffd7, 0xffd7, 0x0826, 0x0000, 0x0000 } },
+    { 0x55, 0x71, { 0x0032, 0x1a1f, 0x028f, 0xffd8, 0xffd7, 0x0827, 0x0000, 0x0000, 0x0000 } },
+    { 0x55, 0x71, { 0x0033, 0x0294, 0xffd9, 0xffd8, 0x0828, 0x0000, 0x0000, 0x0000, 0x012d } },
+    { 0x55, 0x71, { 0x003a, 0x012c, 0xff16, 0xfe90, 0xff32, 0x00c8, 0x5c6d, 0x08c2, 0x0000 } },
+    { 0x55, 0x71, { 0x0040, 0x08c1, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 } },
+    { 0x55, 0x71, { 0x0051, 0x361a, 0xfe5a, 0xff60, 0x73fc, 0x0000, 0x0000, 0x0000, 0x0000 } },
 };
 
 static const dally_word_t WORD[] = { 0x8000, 0xffff, 0x0000, 0x0001, 0x7fff };
@@ -87,23 +87,14 @@ int main(void)
         assert(sizeof(dally_byte_t) == 1);
         assert(sizeof(dally_word_t) == 2);
         assert(sizeof(dally_value_t) == 4);
-        assert(sizeof(dally_prefix_t) == 2);
-        assert(sizeof(dally_identifier_t) == 4);
     }
 
     {
         assert(sizeof(dally_words_t) == 20);
         assert(sizeof(dally_bytes_t) == 20);
-        assert(sizeof(dally_generic_t) == 20);
+        assert(sizeof(dally_data_t) == 20);
         assert(sizeof(dally_register_t) == 20);
         assert(sizeof(dally_packet_t) == 20);
-    }
-
-    {
-        assert(sizeof(dally_data_t) == 20);
-        assert(sizeof(dally_magneticfield_t) == 10);
-        assert(sizeof(dally_quaternion_t) == 12);
-        assert(sizeof(dally_temperature_t) == 6);
     }
 
     {
@@ -188,17 +179,17 @@ int main(void)
         assert(context.state == DALLY_STATE_FINAL);
         assert(context.count == 0);
         assert(context.word == (dally_word_t)0xdead);
-        assert(packet.d.prefix.header == (dally_word_t)DALLY_HEADING);
-        assert(packet.d.prefix.flag == (dally_word_t)DALLY_FLAG_DATA);
-        assert(packet.d.ax == (dally_word_t)0x1122);
-        assert(packet.d.ay == (dally_word_t)0x3344);
-        assert(packet.d.az == (dally_word_t)0x5566);
-        assert(packet.d.wx == (dally_word_t)0x7788);
-        assert(packet.d.wy == (dally_word_t)0x99aa);
-        assert(packet.d.wz == (dally_word_t)0xbbcc);
-        assert(packet.d.roll == (dally_word_t)0xddee);
-        assert(packet.d.pitch == (dally_word_t)0xff00);
-        assert(packet.d.yaw == (dally_word_t)0xdead);
+        assert(packet.d.header == (dally_word_t)DALLY_HEADING);
+        assert(packet.d.flag == (dally_word_t)DALLY_FLAG_DATA);
+        assert(packet.d.payload[0] == (dally_word_t)0x1122);
+        assert(packet.d.payload[1] == (dally_word_t)0x3344);
+        assert(packet.d.payload[2] == (dally_word_t)0x5566);
+        assert(packet.d.payload[3] == (dally_word_t)0x7788);
+        assert(packet.d.payload[4] == (dally_word_t)0x99aa);
+        assert(packet.d.payload[5] == (dally_word_t)0xbbcc);
+        assert(packet.d.payload[6] == (dally_word_t)0xddee);
+        assert(packet.d.payload[7] == (dally_word_t)0xff00);
+        assert(packet.d.payload[8] == (dally_word_t)0xdead);
         assert(dally_debug((FILE *)0) == stderr);
     }
 
@@ -269,12 +260,17 @@ int main(void)
         assert(context.state == DALLY_STATE_FINAL);
         assert(context.count == 0);
         assert(context.word == (dally_word_t)0xdead);
-        assert(packet.m.id.prefix.header == (dally_word_t)DALLY_HEADING);
-        assert(packet.m.id.prefix.flag == (dally_word_t)DALLY_FLAG_REGISTER);
-        assert(packet.m.id.reg == (dally_word_t)DALLY_REGISTER_MAGNETICFIELD);
-        assert(packet.m.hx == (dally_word_t)0x3344);
-        assert(packet.m.hy == (dally_word_t)0x5566);
-        assert(packet.m.hz == (dally_word_t)0x7788);
+        assert(packet.r.header == (dally_word_t)DALLY_HEADING);
+        assert(packet.r.flag == (dally_word_t)DALLY_FLAG_REGISTER);
+        assert(packet.r.reg == (dally_word_t)DALLY_REGISTER_MAGNETICFIELD);
+        assert(packet.r.payload[0] == (dally_word_t)0x3344);
+        assert(packet.r.payload[1] == (dally_word_t)0x5566);
+        assert(packet.r.payload[2] == (dally_word_t)0x7788);
+        assert(packet.r.payload[3] == (dally_word_t)0x99aa);
+        assert(packet.r.payload[4] == (dally_word_t)0xbbcc);
+        assert(packet.r.payload[5] == (dally_word_t)0xddee);
+        assert(packet.r.payload[6] == (dally_word_t)0xff00);
+        assert(packet.r.payload[7] == (dally_word_t)0xdead);
         assert(dally_debug((FILE *)0) == stderr);
     }
 

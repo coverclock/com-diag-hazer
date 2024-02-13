@@ -33,7 +33,7 @@
 extern FILE * dally_debug(FILE * now);
 
 /******************************************************************************
- * FUNDAMENTAL TYPES
+ * TYPES
  ******************************************************************************/
 
 typedef uint8_t dally_byte_t;
@@ -43,20 +43,8 @@ typedef int16_t dally_word_t;
 typedef float dally_value_t;
 
 /******************************************************************************
- * SYMBOLICS
+ * CONSTANTS
  ******************************************************************************/
-
-typedef enum DallyStates {
-    DALLY_STATE_START                       = '\0',  /* Waiting for init. */
-    DALLY_STATE_HEADING                     = 'S',   /* Waiting for heading. */
-    DALLY_STATE_FLAG                        = 'F',   /* Waiting for flag. */
-    DALLY_STATE_REGISTER_LOW                = 'l',   /* Waiting for reg low. */
-    DALLY_STATE_REGISTER_HIGH               = 'h',   /* Waiting for reg high. */
-    DALLY_STATE_DATA_LOW                    = 'L',   /* Waiting for data low. */
-    DALLY_STATE_DATA_HIGH                   = 'H',   /* Waiting for data high. */
-    DALLY_STATE_FINAL                       = '.',   /* Waiting for fini. */
-    DALLY_STATE_ERROR                       = '?',   /* Error. */
-} dally_state_t;
 
 enum DallyPayloads {
     DALLY_PAYLOAD_BYTES                     = 20,
@@ -71,12 +59,12 @@ enum DallyHeadings {
     DALLY_HEADING                           = 0x55U, /* 'U' */
 };
 
-typedef enum DallyFlags {
+enum DallyFlags {
     DALLY_FLAG_DATA                         = 0x61U, /* 'a' */
     DALLY_FLAG_REGISTER                     = 0x71U, /* 'q' */
-} dally_flags_t;
+};
 
-typedef enum DallyRegisters {
+enum DallyRegisters {
     DALLY_REGISTER_YEARMONTH                = 0x30U, /* '0' */
     DALLY_REGISTER_DATEHOUR                 = 0x31U, /* '1' */
     DALLY_REGISTER_MINUTESECOND             = 0x32U, /* '2' */
@@ -84,81 +72,51 @@ typedef enum DallyRegisters {
     DALLY_REGISTER_MAGNETICFIELD            = 0x3aU, /* ':' */
     DALLY_REGISTER_TEMPERATURE              = 0x40U, /* '@' */
     DALLY_REGISTER_QUATERNION               = 0x51U, /* 'Q' */
-} dally_registers_t;
+};
 
 /******************************************************************************
- * DERIVED TYPES
+ * I/O STRUCTURES
  ******************************************************************************/
-
-typedef dally_word_t (dally_words_t)[DALLY_PAYLOAD_WORDS];
 
 typedef dally_byte_t (dally_bytes_t)[DALLY_PAYLOAD_BYTES];
 
-typedef struct DallyPrefix {
-    dally_byte_t header;
-    dally_byte_t flag;
-} dally_prefix_t;
-
-typedef struct DallyIdentifier {
-    dally_prefix_t prefix;
-    dally_word_t reg;
-} dally_identifier_t;
-
-typedef struct DallyGeneric {
-    dally_prefix_t prefix;
-    dally_word_t payload[DALLY_PAYLOAD_DATA_WORDS];
-} dally_generic_t;
-
-typedef struct DallyRegister {
-    dally_identifier_t id;
-    dally_word_t payload[DALLY_PAYLOAD_REGISTER_WORDS];
-} dally_register_t;
+typedef dally_word_t (dally_words_t)[DALLY_PAYLOAD_WORDS];
 
 typedef struct DallyData {
-    dally_prefix_t prefix;
-    dally_word_t ax;
-    dally_word_t ay;
-    dally_word_t az;
-    dally_word_t wx;
-    dally_word_t wy;
-    dally_word_t wz;
-    dally_word_t roll;
-    dally_word_t pitch;
-    dally_word_t yaw;
+    dally_byte_t header;
+    dally_byte_t flag;
+    dally_word_t payload[DALLY_PAYLOAD_DATA_WORDS];
 } dally_data_t;
 
-typedef struct DallyMagneticfield {
-    dally_identifier_t id;
-    dally_word_t hx;
-    dally_word_t hy;
-    dally_word_t hz;
-} dally_magneticfield_t;
-
-typedef struct DallyQuaternion {
-    dally_identifier_t id;
-    dally_word_t q0;
-    dally_word_t q1;
-    dally_word_t q2;
-    dally_word_t q3;
-} dally_quaternion_t;
-
-typedef struct DallyTemperature {
-    dally_identifier_t id;
-    dally_word_t t;
-} dally_temperature_t;
+typedef struct DallyRegister {
+    dally_byte_t header;
+    dally_byte_t flag;
+    dally_word_t reg;
+    dally_word_t payload[DALLY_PAYLOAD_REGISTER_WORDS];
+} dally_register_t;
 
 typedef union DallyPacket {
     dally_words_t w;
     dally_bytes_t b;
-    dally_prefix_t p;
-    dally_identifier_t i;
-    dally_generic_t g;
     dally_data_t d;
     dally_register_t r;
-    dally_magneticfield_t m;
-    dally_quaternion_t q;
-    dally_temperature_t t;
 } dally_packet_t;
+
+/******************************************************************************
+ * STATE MACHINE
+ ******************************************************************************/
+
+typedef enum DallyStates {
+    DALLY_STATE_START                       = '\0',  /* Waiting for init. */
+    DALLY_STATE_HEADING                     = 'S',   /* Waiting for heading. */
+    DALLY_STATE_FLAG                        = 'F',   /* Waiting for flag. */
+    DALLY_STATE_REGISTER_LOW                = 'l',   /* Waiting for reg low. */
+    DALLY_STATE_REGISTER_HIGH               = 'h',   /* Waiting for reg high. */
+    DALLY_STATE_DATA_LOW                    = 'L',   /* Waiting for data low. */
+    DALLY_STATE_DATA_HIGH                   = 'H',   /* Waiting for data high. */
+    DALLY_STATE_FINAL                       = '.',   /* Waiting for fini. */
+    DALLY_STATE_ERROR                       = '?',   /* Error. */
+} dally_state_t;
 
 typedef struct DallyContext {
     dally_packet_t * packetp;
@@ -167,10 +125,6 @@ typedef struct DallyContext {
     dally_word_t word;
     dally_state_t state;
 } dally_context_t;
-
-/******************************************************************************
- * FUNCTIONS
- ******************************************************************************/
 
 static inline dally_context_t * dally_reset(dally_context_t * cp) {
     cp->wordp = (dally_word_t *)0;
@@ -195,6 +149,39 @@ static inline dally_context_t * dally_fini(dally_context_t * cp) {
 }
 
 extern dally_state_t dally_machine(dally_context_t * mp, int ch);
+
+/******************************************************************************
+ * DATA STRUCTURES
+ ******************************************************************************/
+
+typedef struct DallyAcceleration {
+    dally_value_t ax;
+    dally_value_t ay;
+    dally_value_t az;
+    dally_value_t wx;
+    dally_value_t wy;
+    dally_value_t wz;
+    dally_value_t roll;
+    dally_value_t pitch;
+    dally_value_t yaw;
+} dally_acceleration_t;
+
+typedef struct DallyMagneticfield {
+    dally_value_t hx;
+    dally_value_t hy;
+    dally_value_t hz;
+} dally_magneticfield_t;
+
+typedef struct DallyQuaternion {
+    dally_value_t q0;
+    dally_value_t q1;
+    dally_value_t q2;
+    dally_value_t q3;
+} dally_quaternion_t;
+
+typedef struct DallyTemperature {
+    dally_value_t t;
+} dally_temperature_t;
 
 /******************************************************************************
  * CONVERSIONS
