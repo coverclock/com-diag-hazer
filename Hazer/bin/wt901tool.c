@@ -158,9 +158,9 @@ int main(int argc, char * argv[])
             acceleration.pitch = dally_value2angle(dally_word2value(packet.d.payload[7]));
             acceleration.yaw = dally_value2angle(dally_word2value(packet.d.payload[8]));
             if (verbose) {
-                fprintf(stderr, "%s: Acceleration [ %7.3fg %7.3fg %7.3fg ]\n", program, acceleration.ax, acceleration.ay, acceleration.az);
-                fprintf(stderr, "%s: AngularVelocity [ %8.2f%lc/s %8.2f%lc/s %8.2f%lc/s ]\n", program, acceleration.wx, DEGREE, acceleration.wy, DEGREE, acceleration.wz, DEGREE);
-                fprintf(stderr, "%s: Position [ %7.2f%lc %7.2f%lc %7.2f%lc ]\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
+                fprintf(stderr, "%s: Acceleration %7.3fg %7.3fg %7.3fg\n", program, acceleration.ax, acceleration.ay, acceleration.az);
+                fprintf(stderr, "%s: AngularVelocity %8.2f%lc/s %8.2f%lc/s %8.2f%lc/s\n", program, acceleration.wx, DEGREE, acceleration.wy, DEGREE, acceleration.wz, DEGREE);
+                fprintf(stderr, "%s: Orientation %7.2f%lc %7.2f%lc %7.2f%lc\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
             }
             break;
         case DALLY_FLAG_REGISTER:
@@ -190,7 +190,7 @@ int main(int argc, char * argv[])
                 magneticfield.hy = dally_value2magneticfield(dally_word2value(packet.r.payload[1]));
                 magneticfield.hz = dally_value2magneticfield(dally_word2value(packet.r.payload[2]));
                 if (verbose) {
-                    fprintf(stderr, "%s: Magnetometer [ %12.5fmG %12.5fmG %12.5fmG ]\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
+                    fprintf(stderr, "%s: Magnetometer %7.2fmG %7.2fmG %7.2fmG\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
                 }
                 break;
             case DALLY_REGISTER_QUATERNION:
@@ -198,7 +198,7 @@ int main(int argc, char * argv[])
                 quaternion.q1 = dally_value2quaternion(dally_word2value(packet.r.payload[1]));
                 quaternion.q2 = dally_value2quaternion(dally_word2value(packet.r.payload[2]));
                 if (verbose) {
-                    fprintf(stderr, "%s: Quaternion [ %7.4f %7.4f %7.4f ]\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
+                    fprintf(stderr, "%s: Quaternion %7.4f %7.4f %7.4f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
                 }
                 break;
             case DALLY_REGISTER_TEMPERATURE:
