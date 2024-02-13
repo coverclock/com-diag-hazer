@@ -99,6 +99,21 @@ typedef struct DallyPrefix {
     dally_byte_t flag;
 } dally_prefix_t;
 
+typedef struct DallyIdentifier {
+    dally_prefix_t prefix;
+    dally_word_t reg;
+} dally_identifier_t;
+
+typedef struct DallyGeneric {
+    dally_prefix_t prefix;
+    dally_word_t payload[DALLY_PAYLOAD_DATA_WORDS];
+} dally_generic_t;
+
+typedef struct DallyRegister {
+    dally_identifier_t id;
+    dally_word_t payload[DALLY_PAYLOAD_REGISTER_WORDS];
+} dally_register_t;
+
 typedef struct DallyData {
     dally_prefix_t prefix;
     dally_word_t ax;
@@ -112,24 +127,37 @@ typedef struct DallyData {
     dally_word_t yaw;
 } dally_data_t;
 
-typedef struct DallyRegister {
-    dally_prefix_t prefix;
-    dally_word_t reg;
-    dally_word_t data[DALLY_PAYLOAD_REGISTER_WORDS];
-} dally_register_t;
+typedef struct DallyMagneticfield {
+    dally_identifier_t id;
+    dally_word_t hx;
+    dally_word_t hy;
+    dally_word_t hz;
+} dally_magneticfield_t;
 
-typedef struct DallyTest {
-    dally_prefix_t prefix;
-    dally_word_t data[DALLY_PAYLOAD_DATA_WORDS];
-} dally_test_t;
+typedef struct DallyQuaternion {
+    dally_identifier_t id;
+    dally_word_t q0;
+    dally_word_t q1;
+    dally_word_t q2;
+    dally_word_t q3;
+} dally_quaternion_t;
+
+typedef struct DallyTemperature {
+    dally_identifier_t id;
+    dally_word_t t;
+} dally_temperature_t;
 
 typedef union DallyPacket {
     dally_words_t w;
     dally_bytes_t b;
     dally_prefix_t p;
+    dally_identifier_t i;
+    dally_generic_t g;
     dally_data_t d;
     dally_register_t r;
-    dally_test_t t;
+    dally_magneticfield_t m;
+    dally_quaternion_t q;
+    dally_temperature_t t;
 } dally_packet_t;
 
 typedef struct DallyContext {

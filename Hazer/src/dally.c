@@ -15,7 +15,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <math.h>
-#include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/hazer/dally.h"
 
 static FILE * debug = (FILE *)0;
@@ -53,27 +52,36 @@ dally_state_t dally_machine(dally_context_t * cp, int ch)
             /* Fall through. */
 
         case DALLY_STATE_HEADING:
-            if (byte == DALLY_HEADING) {
+            switch (byte) {
+            case DALLY_HEADING:
                 cp->packetp->p.header = byte;
                 state = DALLY_STATE_FLAG;
+                break;
+            default:
+                /* Do nothing. */
+                break;
             }
             break;
 
         case DALLY_STATE_FLAG:
-            if (byte == DALLY_FLAG_DATA) {
+            switch (byte) {
+            case DALLY_FLAG_DATA:
                 cp->packetp->p.flag = byte;
-                cp->wordp = &(cp->packetp->d.ax);
+                cp->wordp = &(cp->packetp->g.payload[0]);
                 cp->count = DALLY_PAYLOAD_DATA_WORDS;
                 state = DALLY_STATE_DATA_LOW;
-            } else if (byte == DALLY_FLAG_REGISTER) {
+                break;
+            case DALLY_FLAG_REGISTER:
                 cp->packetp->p.flag = byte;
-                cp->wordp = &(cp->packetp->r.data[0]);
-                cp->count = DALLY_PAYLOAD_REGISTER_WORDS;
                 state = DALLY_STATE_REGISTER_LOW;
-            } else if (byte == DALLY_HEADING) {
+                break;
+            case DALLY_HEADING:
                 cp->packetp->p.header = byte;
-            } else {
+                state = DALLY_STATE_FLAG;
+                break;
+            default:
                 state = DALLY_STATE_HEADING;
+                break;
             }
             break;
 
@@ -100,15 +108,20 @@ dally_state_t dally_machine(dally_context_t * cp, int ch)
             break;
 
         case DALLY_STATE_REGISTER_HIGH:
-            if (byte == 0x00) {
-                cp->word |= byte << 8;
-                cp->packetp->r.reg = cp->word;
+            switch (byte) {
+            case 0x00:
+                cp->packetp->i.reg = cp->word;
+                cp->wordp = &(cp->packetp->r.payload[0]);
+                cp->count = DALLY_PAYLOAD_REGISTER_WORDS;
                 state = DALLY_STATE_DATA_LOW;
-            } else if (byte == DALLY_HEADING) {
+                break;
+            case DALLY_HEADING:
                 cp->packetp->p.header = byte;
                 state = DALLY_STATE_FLAG;
-            } else {
+                break;
+            default:
                 state = DALLY_STATE_HEADING;
+                break;
             }
             break;
 

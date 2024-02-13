@@ -63,7 +63,7 @@ enum RegisterIndices {
     REGISTER_PAYLOAD = 1,
 };
 
-static const dally_test_t EXPECTED[8] = {
+static const dally_generic_t EXPECTED[8] = {
     { { 0x55, 0x61 }, { 0xffd7, 0xffd7, 0x0827, 0x0000, 0x0000, 0x0000, 0xff33, 0x00c8, 0x5c6d } },
     { { 0x55, 0x71 }, { 0x0030, 0x010f, 0x1504, 0x181f, 0x0285, 0xffd7, 0xffd7, 0x0826, 0x0000 } },
     { { 0x55, 0x71 }, { 0x0031, 0x1504, 0x191f, 0x028a, 0xffd7, 0xffd7, 0x0826, 0x0000, 0x0000 } },
@@ -87,13 +87,23 @@ int main(void)
         assert(sizeof(dally_byte_t) == 1);
         assert(sizeof(dally_word_t) == 2);
         assert(sizeof(dally_value_t) == 4);
+        assert(sizeof(dally_prefix_t) == 2);
+        assert(sizeof(dally_identifier_t) == 4);
+    }
+
+    {
         assert(sizeof(dally_words_t) == 20);
         assert(sizeof(dally_bytes_t) == 20);
-        assert(sizeof(dally_prefix_t) == 2);
-        assert(sizeof(dally_data_t) == 20);
+        assert(sizeof(dally_generic_t) == 20);
         assert(sizeof(dally_register_t) == 20);
         assert(sizeof(dally_packet_t) == 20);
-        assert(sizeof(dally_test_t) == 20);
+    }
+
+    {
+        assert(sizeof(dally_data_t) == 20);
+        assert(sizeof(dally_magneticfield_t) == 10);
+        assert(sizeof(dally_quaternion_t) == 12);
+        assert(sizeof(dally_temperature_t) == 6);
     }
 
     {
@@ -259,17 +269,12 @@ int main(void)
         assert(context.state == DALLY_STATE_FINAL);
         assert(context.count == 0);
         assert(context.word == (dally_word_t)0xdead);
-        assert(packet.r.prefix.header == (dally_word_t)DALLY_HEADING);
-        assert(packet.r.prefix.flag == (dally_word_t)DALLY_FLAG_REGISTER);
-        assert(packet.r.reg == (dally_word_t)DALLY_REGISTER_MAGNETICFIELD);
-        assert(packet.r.data[0] == (dally_word_t)0x3344);
-        assert(packet.r.data[1] == (dally_word_t)0x5566);
-        assert(packet.r.data[2] == (dally_word_t)0x7788);
-        assert(packet.r.data[3] == (dally_word_t)0x99aa);
-        assert(packet.r.data[4] == (dally_word_t)0xbbcc);
-        assert(packet.r.data[5] == (dally_word_t)0xddee);
-        assert(packet.r.data[6] == (dally_word_t)0xff00);
-        assert(packet.r.data[7] == (dally_word_t)0xdead);
+        assert(packet.m.id.prefix.header == (dally_word_t)DALLY_HEADING);
+        assert(packet.m.id.prefix.flag == (dally_word_t)DALLY_FLAG_REGISTER);
+        assert(packet.m.id.reg == (dally_word_t)DALLY_REGISTER_MAGNETICFIELD);
+        assert(packet.m.hx == (dally_word_t)0x3344);
+        assert(packet.m.hy == (dally_word_t)0x5566);
+        assert(packet.m.hz == (dally_word_t)0x7788);
         assert(dally_debug((FILE *)0) == stderr);
     }
 
