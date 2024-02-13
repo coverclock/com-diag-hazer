@@ -165,7 +165,7 @@ int main(int argc, char * argv[])
             if (text) {
                 printf("%s ACC ax %12.5fg,   ay %12.5fg,   az %12.5fg\n", program, acceleration.ax, acceleration.ay, acceleration.az);
                 printf("%s ANG wx %12.5f%lc/s, wy %12.5f%lc/s, wz %12.5f%lc/s\n", program, acceleration.wx, DEGREE, acceleration.wy, DEGREE, acceleration.wz, DEGREE);
-                printf("%s POS ro %12.5f%lc,   pi %12.5f%lc,   ya %12.5f%lc\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
+                printf("%s POS ro %12.5f%lc,   pt %12.5f%lc,   yw %12.5f%lc\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
             }
             if (csv) {
                 printf("\"%s\",\"ACC\",%f,%f,%f\n", program, acceleration.ax, acceleration.ay, acceleration.az);
