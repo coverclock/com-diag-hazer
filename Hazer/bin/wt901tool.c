@@ -17,6 +17,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <wchar.h>
+#include "com/diag/diminuto/diminuto_ansi.h"
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/diminuto/diminuto_error.h"
@@ -24,11 +25,11 @@
 #include "com/diag/diminuto/diminuto_interrupter.h"
 #include "com/diag/diminuto/diminuto_pipe.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
+#include "com/diag/diminuto/diminuto_unicode.h"
 #include "com/diag/hazer/dally.h"
 
 int main(int argc, char * argv[])
 {
-    static const wint_t DEGREE = 0xb0U;
     int xc = 0;
     int rc = 0;
     int opt = -1;
@@ -36,6 +37,7 @@ int main(int argc, char * argv[])
     int verbose = 0;
     int text = 0;
     int csv = 0;
+    int escape = 0;
     int error = 0;
     const char * program = (const char *)0;
     char * locale = (char *)0;
@@ -55,8 +57,12 @@ int main(int argc, char * argv[])
      * OPTIONS
      */
 
-    while ((opt = getopt(argc, argv, "?cdtv")) >= 0) {
+    while ((opt = getopt(argc, argv, "?Ecdtv")) >= 0) {
         switch (opt) {
+        case 'E':
+            escape = !0;
+            text = !0;
+            break;
         case 'c':
             csv = !0;
             break;
@@ -70,8 +76,9 @@ int main(int argc, char * argv[])
             verbose = !0;
             break;
         case '?':
-            fprintf(stderr, "usage: %s [ -c ] [ -d ] [ -t ] [ -v ]\n", program);
-            fprintf(stderr, "       -c              Emit CSV output on standard error.\n");
+            fprintf(stderr, "usage: %s [ -E ] [ -c ] [ -d ] [ -t ] [ -v ]\n", program);
+            fprintf(stderr, "       -E              Emit text output using ANSI escape sequences.\n");
+            fprintf(stderr, "       -c              Emit CSV output on standard output.\n");
             fprintf(stderr, "       -d              Display debug output on standard error.\n");
             fprintf(stderr, "       -t              Emit text output on standard output.\n");
             fprintf(stderr, "       -v              Display verbose output on standard error.\n");
@@ -115,6 +122,11 @@ int main(int argc, char * argv[])
 
     if (verbose) {
         fprintf(stderr, "%s: init\n", program);
+    }
+
+    if (escape) {
+        fputs(DIMINUTO_ANSI_POSITION_CURSOR(1,1), stdout);
+        fputs(DIMINUTO_ANSI_ERASE_SCREEN, stdout);
     }
 
     /*
@@ -162,10 +174,26 @@ int main(int argc, char * argv[])
             acceleration.roll = dally_value2angle(dally_word2value(packet.d.payload[6]));
             acceleration.pitch = dally_value2angle(dally_word2value(packet.d.payload[7]));
             acceleration.yaw = dally_value2angle(dally_word2value(packet.d.payload[8]));
+            if (escape) {
+                fputs(DIMINUTO_ANSI_POSITION_CURSOR(1,1), stdout);
+                fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
+            }
             if (text) {
                 printf("%s ACC ax %12.5f g,   ay %12.5f g,   az %12.5f g\n", program, acceleration.ax, acceleration.ay, acceleration.az);
-                printf("%s ANG wx %12.5f %lc/s, wy %12.5f %lc/s, wz %12.5f %lc/s\n", program, acceleration.wx, DEGREE, acceleration.wy, DEGREE, acceleration.wz, DEGREE);
-                printf("%s POS ro %12.5f %lc,   pt %12.5f %lc,   yw %12.5f %lc\n", program, acceleration.roll, DEGREE, acceleration.pitch, DEGREE, acceleration.yaw, DEGREE);
+            }
+            if (escape) {
+                fputs(DIMINUTO_ANSI_POSITION_CURSOR(2,1), stdout);
+                fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
+            }
+            if (text) {
+                printf("%s ANG wx %12.5f %lc/s, wy %12.5f %lc/s, wz %12.5f %lc/s\n", program, acceleration.wx, DIMINUTO_UNICODE_DEGREE, acceleration.wy, DIMINUTO_UNICODE_DEGREE, acceleration.wz, DIMINUTO_UNICODE_DEGREE);
+            }
+            if (escape) {
+                fputs(DIMINUTO_ANSI_POSITION_CURSOR(3,1), stdout);
+                fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
+            }
+            if (text) {
+                printf("%s POS ro %12.5f %lc,   pt %12.5f %lc,   yw %12.5f %lc\n", program, acceleration.roll, DIMINUTO_UNICODE_DEGREE, acceleration.pitch, DIMINUTO_UNICODE_DEGREE, acceleration.yaw, DIMINUTO_UNICODE_DEGREE);
             }
             if (csv) {
                 printf("\"%s\",\"ACC\",%f,%f,%f\n", program, acceleration.ax, acceleration.ay, acceleration.az);
@@ -199,6 +227,10 @@ int main(int argc, char * argv[])
                 magneticfield.hx = dally_value2magneticfield(dally_word2value(packet.r.payload[0]));
                 magneticfield.hy = dally_value2magneticfield(dally_word2value(packet.r.payload[1]));
                 magneticfield.hz = dally_value2magneticfield(dally_word2value(packet.r.payload[2]));
+                if (escape) {
+                    fputs(DIMINUTO_ANSI_POSITION_CURSOR(4,1), stdout);
+                    fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
+                }
                 if (text) {
                     printf("%s MAG hx %12.5f mG,  hy %12.5f mG,  hz %12.5f mG\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
                 }
@@ -210,6 +242,10 @@ int main(int argc, char * argv[])
                 quaternion.q0 = dally_value2quaternion(dally_word2value(packet.r.payload[0]));
                 quaternion.q1 = dally_value2quaternion(dally_word2value(packet.r.payload[1]));
                 quaternion.q2 = dally_value2quaternion(dally_word2value(packet.r.payload[2]));
+                if (escape) {
+                    fputs(DIMINUTO_ANSI_POSITION_CURSOR(5,1), stdout);
+                    fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
+                }
                 if (text) {
                     printf("%s QUA q0 %12.5f ,    q1 %12.5f ,    q2 %12.5f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
                 }
@@ -219,8 +255,12 @@ int main(int argc, char * argv[])
                 break;
             case DALLY_REGISTER_TEMPERATURE:
                 temperature.t = dally_value2temperature(dally_word2value(packet.r.payload[0]));
+                if (escape) {
+                    fputs(DIMINUTO_ANSI_POSITION_CURSOR(6,1), stdout);
+                    fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
+                }
                 if (text) {
-                    printf("%s TEM    %12.5f %lcC,     %12.5f %lcF\n", program, temperature.t, DEGREE, ((temperature.t * 9.0 / 5.0) + 32.0), DEGREE);
+                    printf("%s TEM    %12.5f %lcC,     %12.5f %lcF\n", program, temperature.t, DIMINUTO_UNICODE_DEGREE, ((temperature.t * 9.0 / 5.0) + 32.0), DIMINUTO_UNICODE_DEGREE);
                 }
                 if (csv) {
                     printf("\"%s\",\"TEM\",%f,%f\n", program, temperature.t, ((temperature.t * 9.0 / 5.0) + 32.0));
