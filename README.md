@@ -643,7 +643,7 @@ measurement units (IMUs). Output from these devices isn't processed by
 ```gpstool``` but by other means. The utility ```serialtool``` from the
 Diminuto repository is particularly useful in this respect.
 
-* WITMOTION WT901BLECL IMU (WT901, 115200 8n1, v1a86p7523, ttyUSB, 1Hz)
+* WitMotion WT901BLECL5.0 IMU (WT901, 115200 8n1, v1a86p7523, ttyUSB, 1Hz)
 
 Note that some devices are both GNSS receivers *and* IMUs, and these may
 be processed by ```gpstool```.
@@ -1554,6 +1554,11 @@ throw an assert and core dump.
 * hup - send SIGHUP to all running instances of gpstool.
 * hups - repeatedly send SIGHUP to all running instances of gpstool on demand.
 * peruse - helper script to watch logs and screens from headless scripts.
+
+## WT901 IMU (Dally)
+
+* wt901setup - emit WT901 query strings to standard output.
+* wt901tool - process WT901 device output via standard input.
 
 # Functional Tests
 
