@@ -163,6 +163,13 @@ int main(int argc, char * argv[])
             continue;
         }
 
+        /*
+         * N.B. The (text) printf statements below are formatted quite deliberately
+         *      for purposes of column alignment when the -E (ANSI escape sequence)
+         *      option is used. I find it makes the screen easier to read as the
+         *      values change in real-time. Your mileage may vary.
+         */
+
         switch (packet.d.flag) {
         case DALLY_FLAG_DATA:
             acceleration.ax = dally_value2acceleration(dally_word2value(packet.d.payload[0]));
