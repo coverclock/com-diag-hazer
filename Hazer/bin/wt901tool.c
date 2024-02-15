@@ -171,7 +171,9 @@ int main(int argc, char * argv[])
          */
 
         switch (packet.d.flag) {
+
         case DALLY_FLAG_DATA:
+
             acceleration.ax = dally_value2acceleration(dally_word2value(packet.d.payload[0]));
             acceleration.ay = dally_value2acceleration(dally_word2value(packet.d.payload[1]));
             acceleration.az = dally_value2acceleration(dally_word2value(packet.d.payload[2]));
@@ -181,106 +183,155 @@ int main(int argc, char * argv[])
             acceleration.roll = dally_value2angle(dally_word2value(packet.d.payload[6]));
             acceleration.pitch = dally_value2angle(dally_word2value(packet.d.payload[7]));
             acceleration.yaw = dally_value2angle(dally_word2value(packet.d.payload[8]));
+
             if (escape) {
                 fputs(DIMINUTO_ANSI_POSITION_CURSOR(1,1), stdout);
                 fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
             }
+
             if (text) {
                 printf("%s ACC ax %12.5f g  , ay %12.5f g  , az %12.5f g\n", program, acceleration.ax, acceleration.ay, acceleration.az);
             }
+
             if (escape) {
                 fputs(DIMINUTO_ANSI_POSITION_CURSOR(2,1), stdout);
                 fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
             }
+
             if (text) {
                 printf("%s ANG wx %12.5f %lc/s, wy %12.5f %lc/s, wz %12.5f %lc/s\n", program, acceleration.wx, DIMINUTO_UNICODE_DEGREE, acceleration.wy, DIMINUTO_UNICODE_DEGREE, acceleration.wz, DIMINUTO_UNICODE_DEGREE);
             }
+
             if (escape) {
                 fputs(DIMINUTO_ANSI_POSITION_CURSOR(3,1), stdout);
                 fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
             }
+
             if (text) {
                 printf("%s POS ro %12.5f %lc  , pt %12.5f %lc  , yw %12.5f %lc\n", program, acceleration.roll, DIMINUTO_UNICODE_DEGREE, acceleration.pitch, DIMINUTO_UNICODE_DEGREE, acceleration.yaw, DIMINUTO_UNICODE_DEGREE);
             }
+
             if (csv) {
                 printf("\"%s\",\"ACC\",%f,%f,%f\n", program, acceleration.ax, acceleration.ay, acceleration.az);
                 printf("\"%s\",\"ANG\",%f,%f,%f\n", program, acceleration.wx, acceleration.wy, acceleration.wz);
                 printf("\"%s\",\"POS\",%f,%f,%f\n", program, acceleration.roll, acceleration.pitch, acceleration.yaw);
             }
+
             break;
+
         case DALLY_FLAG_REGISTER:
+
             switch (packet.r.reg) {
+
             case DALLY_REGISTER_YEARMONTH:
+
                 if (verbose) {
                     fprintf(stderr, "%s: YearMonth\n", program);
                 }
+
                 break;
+
             case DALLY_REGISTER_DATEHOUR:
+
                 if (verbose) {
                     fprintf(stderr, "%s: DateHour\n", program);
                 }
+
                 break;
+
             case DALLY_REGISTER_MINUTESECOND:
+
                 if (verbose) {
                     fprintf(stderr, "%s: MinuteSecond\n", program);
                 }
+
                 break;
+
             case DALLY_REGISTER_MILLISECOND:
+
                 if (verbose) {
                     fprintf(stderr, "%s: Millisecond\n", program);
                 }
+
                 break;
+
             case DALLY_REGISTER_MAGNETICFIELD:
+
                 magneticfield.hx = dally_value2magneticfield(dally_word2value(packet.r.payload[0]));
                 magneticfield.hy = dally_value2magneticfield(dally_word2value(packet.r.payload[1]));
                 magneticfield.hz = dally_value2magneticfield(dally_word2value(packet.r.payload[2]));
+
                 if (escape) {
                     fputs(DIMINUTO_ANSI_POSITION_CURSOR(4,1), stdout);
                     fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
                 }
+
                 if (text) {
                     printf("%s MAG hx %12.5f mG , hy %12.5f mG , hz %12.5f mG\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
                 }
+
                 if (csv) {
                     printf("\"%s\",\"MAG\",%f,%f,%f\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
                 }
+
                 break;
+
             case DALLY_REGISTER_QUATERNION:
+
                 quaternion.q0 = dally_value2quaternion(dally_word2value(packet.r.payload[0]));
                 quaternion.q1 = dally_value2quaternion(dally_word2value(packet.r.payload[1]));
                 quaternion.q2 = dally_value2quaternion(dally_word2value(packet.r.payload[2]));
+
                 if (escape) {
                     fputs(DIMINUTO_ANSI_POSITION_CURSOR(5,1), stdout);
                     fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
                 }
+
                 if (text) {
                     printf("%s QUA q0 %12.5f    , q1 %12.5f    , q2 %12.5f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
                 }
+
                 if (csv) {
                     printf("\"%s\",\"QUA\",%f,%f,%f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
                 }
+
                 break;
+
             case DALLY_REGISTER_TEMPERATURE:
+
                 temperature.t = dally_value2temperature(dally_word2value(packet.r.payload[0]));
+
                 if (escape) {
                     fputs(DIMINUTO_ANSI_POSITION_CURSOR(6,1), stdout);
                     fputs(DIMINUTO_ANSI_ERASE_LINE, stdout);
                 }
+
                 if (text) {
                     printf("%s TEM    %12.5f %lcC ,    %12.5f %lcF\n", program, temperature.t, DIMINUTO_UNICODE_DEGREE, ((temperature.t * 9.0 / 5.0) + 32.0), DIMINUTO_UNICODE_DEGREE);
                 }
+
                 if (csv) {
                     printf("\"%s\",\"TEM\",%f,%f\n", program, temperature.t, ((temperature.t * 9.0 / 5.0) + 32.0));
                 }
+
                 break;
+
             default:
+
                 fprintf(stderr, "%s: Register 0x%x\n", program, packet.r.reg);
+
                 break;
+
             }
+
             break;
+
         default:
+
             fprintf(stderr, "%s: Flag 0x%x\n", program, packet.d.flag);
+
             break;
+
         }
 
         if (verbose) {
