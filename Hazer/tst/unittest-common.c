@@ -11,6 +11,7 @@
 
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_minmaxof.h"
+#include "com/diag/diminuto/diminuto_unicode.h"
 #include <locale.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,31 +25,6 @@
 
 int main(void)
 {
-    {
-        int rc;
-        char * env;
-        char * locale;
-        static const char * ENV = "LANG";
-        static const char * LOCALE = "en_US.UTF-8";
-
-        fprintf(stderr, "sizeof(wint_t)=%zu\n", sizeof(wint_t));
-        assert(ENV != (const char *)0);
-        rc = setenv(ENV, LOCALE, 0);
-        assert(rc == 0);
-        env = getenv(ENV);
-        assert(env != (char *)0);
-        fprintf(stderr, "%s=\"%s\"\n", ENV, env);
-        fprintf(stderr, "LC_ALL=%d\n", LC_ALL);
-        locale = setlocale(LC_ALL, "");
-        assert(locale != (char *)0);
-        fprintf(stderr, "locale=\"%s\"\n", locale);
-        assert(strcmp(locale, LOCALE) == 0);
-        fprintf(stderr, "COMMON_DEGREE_VALUE=0x%x=\'%lc\'\n", COMMON_DEGREE_VALUE, COMMON_DEGREE_VALUE);
-        fprintf(stderr, "COMMON_DEGREE=0x%x=\'%lc\'\n", COMMON_DEGREE, COMMON_DEGREE);
-        fprintf(stderr, "COMMON_PLUSMINUS_VALUE=0x%x=\'%lc\'\n", COMMON_PLUSMINUS_VALUE, COMMON_PLUSMINUS_VALUE);
-        fprintf(stderr, "COMMON_PLUSMINUS=0x%x=\'%lc\'\n", COMMON_PLUSMINUS, COMMON_PLUSMINUS);
-    }
-
     {
         assert(common_abs64((int64_t)0) == (int64_t)0);
         assert(common_abs64((int64_t)1) == (int64_t)1);

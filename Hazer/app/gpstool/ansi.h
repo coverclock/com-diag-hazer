@@ -12,29 +12,31 @@
  * @details
  */
 
+#include "com/diag/diminuto/diminuto_ansi.h"
+
 /**
  * ANSI [1,1] erase to end of screen.
  */
-static const char ANSI_INI[] = "\033[1;1H\033[0J";
+static const char ANSI_INI[] = DIMINUTO_ANSI_POSITION_CURSOR(1,1) DIMINUTO_ANSI_ERASE_SCREEN;
 
 /**
  * ANSI [1,1] erase to end of line.
  */
-static const char ANSI_INP[] = "\033[1;1H\033[0K";
+static const char ANSI_INP[] = DIMINUTO_ANSI_POSITION_CURSOR(1,1) DIMINUTO_ANSI_ERASE_LINE;
 
 /**
  * ANSI [2,1] erase to end of line.
  */
-static const char ANSI_OUT[] = "\033[2;1H\033[0K";
+static const char ANSI_OUT[] = DIMINUTO_ANSI_POSITION_CURSOR(2,1) DIMINUTO_ANSI_ERASE_LINE;
 
 /**
  * ANSI [3,1] locate cursor.
  */
-static const char ANSI_LOC[] = "\033[3;1H";
+static const char ANSI_LOC[] = DIMINUTO_ANSI_POSITION_CURSOR(3,1);
 
 /**
  * ANSI [x,y] erase to end of screen.
  */
-static const char ANSI_END[] = "\033[0J";
+static const char ANSI_END[] = DIMINUTO_ANSI_ERASE_SCREEN;
 
 #endif

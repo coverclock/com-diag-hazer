@@ -14,7 +14,8 @@ trap "trap '' SIGINT SIGPIPE SIGQUIT SIGTERM; echo $(basename $0): stop. 1>&2; k
 
 echo "$(basename $0): start." 1>&2
 sleep 1
-collapse '\xFF\xAA\x03\x03\x00' # Set Frequency 1Hz
+#collapse '\xFF\xAA\x03\x03\x00' # Set Frequency 1Hz
+collapse '\xFF\xAA\x03\x06\x00' # Set Frequency 10Hz (default)
 sleep 1
 collapse '\xFF\xAA\x27\x30\x00' # Get Year, Month
 sleep 1

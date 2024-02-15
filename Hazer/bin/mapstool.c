@@ -81,7 +81,7 @@
 
 #include "com/diag/diminuto/diminuto_assert.h"
 #include "com/diag/diminuto/diminuto_log.h"
-#include "com/diag/hazer/common.h"
+#include "com/diag/diminuto/diminuto_unicode.h"
 #include "com/diag/hazer/coordinates.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -143,9 +143,9 @@ int main(int argc, char *argv[])
         fputc('\n', stderr);
         fprintf(stderr, "%s[%d]: PLUSMINUS=0x%x=\'%lc\'", __FILE__, __LINE__, (int)PLUSMINUS, (wint_t)PLUSMINUS);
         fputc('\n', stderr);
-        fprintf(stderr, "%s[%d]: COMMON_DEGREE=0x%x=\'%lc\'", __FILE__, __LINE__, (int)COMMON_DEGREE, (wint_t)COMMON_DEGREE);
+        fprintf(stderr, "%s[%d]: DIMINUTO_UNICODE_DEGREE=0x%x=\'%lc\'", __FILE__, __LINE__, (int)DIMINUTO_UNICODE_DEGREE, (wint_t)DIMINUTO_UNICODE_DEGREE);
         fputc('\n', stderr);
-        fprintf(stderr, "%s[%d]: COMMON_PLUSMINUS=0x%x=\'%lc\'", __FILE__, __LINE__, (int)COMMON_PLUSMINUS, (wint_t)COMMON_PLUSMINUS);
+        fprintf(stderr, "%s[%d]: DIMINUTO_UNICODE_PLUSMINUS=0x%x=\'%lc\'", __FILE__, __LINE__, (int)DIMINUTO_UNICODE_PLUSMINUS, (wint_t)DIMINUTO_UNICODE_PLUSMINUS);
         fputc('\n', stderr);
     }
 
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
             diminuto_contract((0 <= minutes) && (minutes <= 59));
             diminuto_contract((0 <= seconds) && (seconds <= 59));
             diminuto_contract((0 <= millionths) && (millionths <= 999999));
-            printf("%2d%lc%02d'%02d.%06d\"%c,", degrees, (wint_t)COMMON_DEGREE, minutes, seconds, millionths, (direction < 0) ? 'S' : 'N');
+            printf("%2d%lc%02d'%02d.%06d\"%c,", degrees, (wint_t)DIMINUTO_UNICODE_DEGREE, minutes, seconds, millionths, (direction < 0) ? 'S' : 'N');
             degrees = 0;
             minutes = 0;
             seconds = 0;
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
             diminuto_contract((0 <= minutes) && (minutes <= 59));
             diminuto_contract((0 <= seconds) && (seconds <= 59));
             diminuto_contract((0 <= millionths) && (millionths <= 999999));
-            printf(" %3d%lc%02d'%02d.%06d\"%c\n", degrees, (wint_t)COMMON_DEGREE, minutes, seconds, millionths, (direction < 0) ? 'W' : 'E');
+            printf(" %3d%lc%02d'%02d.%06d\"%c\n", degrees, (wint_t)DIMINUTO_UNICODE_DEGREE, minutes, seconds, millionths, (direction < 0) ? 'W' : 'E');
             argv++;
         } else {
             printf("%.9lf, %.9lf\n", latitude, longitude);

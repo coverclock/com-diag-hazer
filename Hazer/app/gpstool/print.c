@@ -16,6 +16,7 @@
 #include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_types.h"
+#include "com/diag/diminuto/diminuto_unicode.h"
 #include "com/diag/hazer/common.h"
 #include "com/diag/hazer/hazer_version.h"
 #include <ctype.h>
@@ -176,7 +177,7 @@ void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, haz
 
                 fputs("SAT", fp);
 
-                fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz  %-8.8s %c %c %c %c %c", ++channel, va[system].sig[signal].sat[satellite].id, va[system].sig[signal].sat[satellite].elv_degrees, COMMON_DEGREE, va[system].sig[signal].sat[satellite].azm_degrees, (wint_t)COMMON_DEGREE, va[system].sig[signal].sat[satellite].snr_dbhz, HAZER_SIGNAL_NAME[system][signal], source, ranged, phantom, untracked, unused);
+                fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz  %-8.8s %c %c %c %c %c", ++channel, va[system].sig[signal].sat[satellite].id, va[system].sig[signal].sat[satellite].elv_degrees, DIMINUTO_UNICODE_DEGREE, va[system].sig[signal].sat[satellite].azm_degrees, (wint_t)DIMINUTO_UNICODE_DEGREE, va[system].sig[signal].sat[satellite].snr_dbhz, HAZER_SIGNAL_NAME[system][signal], source, ranged, phantom, untracked, unused);
 
                 fprintf(fp, "%7s", "");
 
@@ -541,14 +542,14 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
             diminuto_contract((0 <= minutes) && (minutes <= 59));
             diminuto_contract((0 <= seconds) && (seconds <= 59));
             diminuto_contract((0 <= thousandths) && (thousandths <= 999));
-            fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, COMMON_DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
+            fprintf(fp, " %2d%lc%02d'%02d.%03d\"%c,", degrees, DIMINUTO_UNICODE_DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'S' : 'N');
 
             hazer_format_nanominutes2position(pa[system].lon_nanominutes, &degrees, &minutes, &seconds, &thousandths, &direction);
             diminuto_contract((0 <= degrees) && (degrees <= 180));
             diminuto_contract((0 <= minutes) && (minutes <= 59));
             diminuto_contract((0 <= seconds) && (seconds <= 59));
             diminuto_contract((0 <= thousandths) && (thousandths <= 999));
-            fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, COMMON_DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
+            fprintf(fp, " %3d%lc%02d'%02d.%03d\"%c", degrees, DIMINUTO_UNICODE_DEGREE, minutes, seconds, thousandths, (direction < 0) ? 'W' : 'E');
 
             fputc(' ', fp);
 
@@ -642,11 +643,11 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
 
             degrees = pa[system].cog_nanodegrees / 1000000000LL;
             billionths = abs64(pa[system].cog_nanodegrees) % 1000000000LLU;
-            fprintf(fp, " %4lld.%09llu%lcT", (diminuto_lld_t)degrees, (diminuto_llu_t)billionths, COMMON_DEGREE);
+            fprintf(fp, " %4lld.%09llu%lcT", (diminuto_lld_t)degrees, (diminuto_llu_t)billionths, DIMINUTO_UNICODE_DEGREE);
 
             degrees = pa[system].mag_nanodegrees / 1000000000LL;
             billionths = abs64(pa[system].mag_nanodegrees) % 1000000000LLU;
-            fprintf(fp, " %4lld.%09llu%lcM", (diminuto_lld_t)degrees, (diminuto_llu_t)billionths, COMMON_DEGREE);
+            fprintf(fp, " %4lld.%09llu%lcM", (diminuto_lld_t)degrees, (diminuto_llu_t)billionths, DIMINUTO_UNICODE_DEGREE);
 
             fprintf(fp, "%29s", "");
 
@@ -812,7 +813,7 @@ void print_solution(FILE * fp, const yodel_solution_t * sp)
         fprintf(fp, " %4d.%09llu", decimaldegrees, (diminuto_llu_t)billionths);
 
         yodel_format_hpacc2accuracy(sp->payload.hAcc, &meters, &tenthousandths);
-        fprintf(fp, " %lc%6lld.%04llum", COMMON_PLUSMINUS, (diminuto_lld_t)meters, (diminuto_llu_t)tenthousandths);
+        fprintf(fp, " %lc%6lld.%04llum", DIMINUTO_UNICODE_PLUSMINUS, (diminuto_lld_t)meters, (diminuto_llu_t)tenthousandths);
 
         fprintf(fp, "%22s", "");
 
@@ -829,7 +830,7 @@ void print_solution(FILE * fp, const yodel_solution_t * sp)
         fprintf(fp, " %6lld.%04llum GEO", (diminuto_lld_t)meters, (diminuto_llu_t)tenthousandths);
 
         yodel_format_hpacc2accuracy(sp->payload.vAcc, &meters, &tenthousandths);
-        fprintf(fp, " %lc%6lld.%04llum", COMMON_PLUSMINUS, (diminuto_lld_t)meters, (diminuto_llu_t)tenthousandths);
+        fprintf(fp, " %lc%6lld.%04llum", DIMINUTO_UNICODE_PLUSMINUS, (diminuto_lld_t)meters, (diminuto_llu_t)tenthousandths);
 
         fprintf(fp, "%19s", "");
 
@@ -865,29 +866,29 @@ void print_attitude(FILE * fp, const yodel_attitude_t * sp)
         fprintf(fp, " %4d.%01u%lc roll %lc%4d.%01u%lc",
             sp->payload.roll / CENTIMILLI,
             abs32(sp->payload.roll) % CENTIMILLI / (CENTIMILLI / 10),
-            COMMON_DEGREE,
-            COMMON_PLUSMINUS,
+            DIMINUTO_UNICODE_DEGREE,
+            DIMINUTO_UNICODE_PLUSMINUS,
             sp->payload.accRoll / CENTIMILLI,
             abs32(sp->payload.accRoll) % CENTIMILLI / (CENTIMILLI / 10),
-            COMMON_DEGREE);
+            DIMINUTO_UNICODE_DEGREE);
 
         fprintf(fp, " %4d.%01u%lc pitch %lc%4d.%01u%lc",
             sp->payload.pitch / CENTIMILLI,
             abs32(sp->payload.pitch) % CENTIMILLI / (CENTIMILLI / 10),
-            COMMON_DEGREE,
-            COMMON_PLUSMINUS,
+            DIMINUTO_UNICODE_DEGREE,
+            DIMINUTO_UNICODE_PLUSMINUS,
             sp->payload.accPitch / CENTIMILLI,
             abs32(sp->payload.accPitch) % CENTIMILLI / (CENTIMILLI / 10),
-            COMMON_DEGREE);
+            DIMINUTO_UNICODE_DEGREE);
 
         fprintf(fp, " %4d.%01u%lc yaw %lc%4d.%01u%lc",
             sp->payload.heading / CENTIMILLI,
             abs32(sp->payload.heading) % CENTIMILLI / (CENTIMILLI / 10),
-            COMMON_DEGREE,
-            COMMON_PLUSMINUS,
+            DIMINUTO_UNICODE_DEGREE,
+            DIMINUTO_UNICODE_PLUSMINUS,
             sp->payload.accHeading / CENTIMILLI,
             abs32(sp->payload.accHeading) % CENTIMILLI / (CENTIMILLI / 10),
-            COMMON_DEGREE);
+            DIMINUTO_UNICODE_DEGREE);
 
         fprintf(fp, "%1s", "");
 
@@ -922,7 +923,7 @@ void print_odometer(FILE * fp, const yodel_odometer_t * sp)
         fprintf(fp, " %6u.%03ukm", sp->payload.totalDistance / 1000, sp->payload.totalDistance % 1000);
         fputs(" )", fp);
 
-        fprintf(fp, " %lc%8um", COMMON_PLUSMINUS,  sp->payload.distanceStd);
+        fprintf(fp, " %lc%8um", DIMINUTO_UNICODE_PLUSMINUS,  sp->payload.distanceStd);
 
         fprintf(fp, " %-8.8s", "IMU");
 
