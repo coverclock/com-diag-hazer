@@ -190,7 +190,7 @@ int main(int argc, char * argv[])
             }
 
             if (text) {
-                printf("%s ACC ax %12.5f g  , ay %12.5f g  , az %12.5f g\n", program, acceleration.ax, acceleration.ay, acceleration.az);
+                printf("ACC ax %12.5f g  , ay %12.5f g  , az %12.5f g\n", acceleration.ax, acceleration.ay, acceleration.az);
             }
 
             if (escape) {
@@ -199,7 +199,7 @@ int main(int argc, char * argv[])
             }
 
             if (text) {
-                printf("%s ANG wx %12.5f %lc/s, wy %12.5f %lc/s, wz %12.5f %lc/s\n", program, acceleration.wx, DIMINUTO_UNICODE_DEGREE, acceleration.wy, DIMINUTO_UNICODE_DEGREE, acceleration.wz, DIMINUTO_UNICODE_DEGREE);
+                printf("ANG wx %12.5f %lc/s, wy %12.5f %lc/s, wz %12.5f %lc/s\n", acceleration.wx, DIMINUTO_UNICODE_DEGREE, acceleration.wy, DIMINUTO_UNICODE_DEGREE, acceleration.wz, DIMINUTO_UNICODE_DEGREE);
             }
 
             if (escape) {
@@ -208,13 +208,13 @@ int main(int argc, char * argv[])
             }
 
             if (text) {
-                printf("%s POS ro %12.5f %lc  , pt %12.5f %lc  , yw %12.5f %lc\n", program, acceleration.roll, DIMINUTO_UNICODE_DEGREE, acceleration.pitch, DIMINUTO_UNICODE_DEGREE, acceleration.yaw, DIMINUTO_UNICODE_DEGREE);
+                printf("ROT ro %12.5f %lc  , pt %12.5f %lc  , yw %12.5f %lc\n", acceleration.roll, DIMINUTO_UNICODE_DEGREE, acceleration.pitch, DIMINUTO_UNICODE_DEGREE, acceleration.yaw, DIMINUTO_UNICODE_DEGREE);
             }
 
             if (csv) {
                 printf("\"%s\",\"ACC\",%f,%f,%f\n", program, acceleration.ax, acceleration.ay, acceleration.az);
                 printf("\"%s\",\"ANG\",%f,%f,%f\n", program, acceleration.wx, acceleration.wy, acceleration.wz);
-                printf("\"%s\",\"POS\",%f,%f,%f\n", program, acceleration.roll, acceleration.pitch, acceleration.yaw);
+                printf("\"%s\",\"ROT\",%f,%f,%f\n", program, acceleration.roll, acceleration.pitch, acceleration.yaw);
             }
 
             break;
@@ -267,7 +267,7 @@ int main(int argc, char * argv[])
                 }
 
                 if (text) {
-                    printf("%s MAG hx %12.5f mG , hy %12.5f mG , hz %12.5f mG\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
+                    printf("MAG hx %12.5f mG , hy %12.5f mG , hz %12.5f mG\n", magneticfield.hx, magneticfield.hy, magneticfield.hz);
                 }
 
                 if (csv) {
@@ -288,7 +288,7 @@ int main(int argc, char * argv[])
                 }
 
                 if (text) {
-                    printf("%s QUA q0 %12.5f    , q1 %12.5f    , q2 %12.5f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
+                    printf("QUA q0 %12.5f    , q1 %12.5f    , q2 %12.5f\n", quaternion.q0, quaternion.q1, quaternion.q2);
                 }
 
                 if (csv) {
@@ -307,7 +307,7 @@ int main(int argc, char * argv[])
                 }
 
                 if (text) {
-                    printf("%s TEM    %12.5f %lcC ,    %12.5f %lcF\n", program, temperature.t, DIMINUTO_UNICODE_DEGREE, ((temperature.t * 9.0 / 5.0) + 32.0), DIMINUTO_UNICODE_DEGREE);
+                    printf("TEM    %12.5f %lcC ,    %12.5f %lcF\n", temperature.t, DIMINUTO_UNICODE_DEGREE, ((temperature.t * 9.0 / 5.0) + 32.0), DIMINUTO_UNICODE_DEGREE);
                 }
 
                 if (csv) {
