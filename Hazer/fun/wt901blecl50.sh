@@ -9,4 +9,10 @@ DEVICE=${1:-"/dev/ttyUSB0"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
+ERRDIR=$(readlink -e $(dirname ${0})/..)/tmp
+mkdir -p ${ERRDIR}
+ERRFIL=${ERRDIR}/$(basename ${0}).err
+cp /dev/null ${ERRFIL}
+exec 2>>${ERRFIL}
+
 wt901setup | serialtool -D ${DEVICE} -b 115200 -8 -1 -n -T -P | wt901tool -E
