@@ -8,7 +8,9 @@
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
  *
- * wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | wt901tool -d -v -t -c
+ * wt901setup | serialtool -D /dev/ttyUSB0 -b 115200 -8 -1 -n -P | wt901tool -d -v -t -c
+ *
+ * [NEW] Device F3:C1:80:74:D6:3E WT901BLE68
  */
 
 #include <locale.h>
@@ -25,6 +27,7 @@
 #include "com/diag/diminuto/diminuto_interrupter.h"
 #include "com/diag/diminuto/diminuto_pipe.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
+#include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_unicode.h"
 #include "com/diag/hazer/dally.h"
 
@@ -41,6 +44,7 @@ int main(int argc, char * argv[])
     int error = 0;
     const char * program = (const char *)0;
     char * locale = (char *)0;
+    char hostname[HOST_NAME_MAX] = { '\0', };
     int ch = -1;
     dally_state_t state = DALLY_STATE_START;
     dally_packet_t packet = { 0, };
@@ -50,6 +54,7 @@ int main(int argc, char * argv[])
     dally_magneticfield_t magneticfield = { 0.0, };
     dally_quaternion_t quaternion = { 0.0, };
     dally_temperature_t temperature = { 0.0, };
+    diminuto_sticks_t clock = 0;
 
     program = ((program = strrchr(argv[0], '/')) == (char *)0) ? argv[0] : program + 1;
 
@@ -113,6 +118,12 @@ int main(int argc, char * argv[])
     rc = diminuto_terminator_install(0);
     diminuto_contract(rc >= 0);
 
+    if (csv) {
+        rc = gethostname(hostname, sizeof(hostname));
+        diminuto_contract(rc >= 0);
+        hostname[sizeof(hostname) - 1] = '\0';
+    }
+
     contextp = dally_init(&context, &packet);
     diminuto_contract(contextp == &context);
 
@@ -161,6 +172,11 @@ int main(int argc, char * argv[])
 
         if (state != DALLY_STATE_FINAL) {
             continue;
+        }
+
+        if (csv) {
+            clock = diminuto_time_clock();
+            diminuto_contract(clock > 0);
         }
 
         /*
@@ -212,9 +228,9 @@ int main(int argc, char * argv[])
             }
 
             if (csv) {
-                printf("\"%s\",\"ACC\",%f,%f,%f\n", program, acceleration.ax, acceleration.ay, acceleration.az);
-                printf("\"%s\",\"ANG\",%f,%f,%f\n", program, acceleration.wx, acceleration.wy, acceleration.wz);
-                printf("\"%s\",\"ROT\",%f,%f,%f\n", program, acceleration.roll, acceleration.pitch, acceleration.yaw);
+                printf("\"%s\",\"ACC\",%lld,%f,%f,%f\n", hostname, (long long int)clock, acceleration.ax, acceleration.ay, acceleration.az);
+                printf("\"%s\",\"ANG\",%lld,%f,%f,%f\n", hostname, (long long int)clock, acceleration.wx, acceleration.wy, acceleration.wz);
+                printf("\"%s\",\"ROT\",%lld,%f,%f,%f\n", hostname, (long long int)clock, acceleration.roll, acceleration.pitch, acceleration.yaw);
             }
 
             break;
@@ -271,7 +287,7 @@ int main(int argc, char * argv[])
                 }
 
                 if (csv) {
-                    printf("\"%s\",\"MAG\",%f,%f,%f\n", program, magneticfield.hx, magneticfield.hy, magneticfield.hz);
+                    printf("\"%s\",\"MAG\",%lld,%f,%f,%f\n", hostname, (long long int)clock, magneticfield.hx, magneticfield.hy, magneticfield.hz);
                 }
 
                 break;
@@ -292,7 +308,7 @@ int main(int argc, char * argv[])
                 }
 
                 if (csv) {
-                    printf("\"%s\",\"QUA\",%f,%f,%f\n", program, quaternion.q0, quaternion.q1, quaternion.q2);
+                    printf("\"%s\",\"QUA\",%lld,%f,%f,%f\n", hostname, (long long int)clock, quaternion.q0, quaternion.q1, quaternion.q2);
                 }
 
                 break;
@@ -311,7 +327,7 @@ int main(int argc, char * argv[])
                 }
 
                 if (csv) {
-                    printf("\"%s\",\"TEM\",%f,%f\n", program, temperature.t, ((temperature.t * 9.0 / 5.0) + 32.0));
+                    printf("\"%s\",\"TEM\",%lld,%f,%f\n", hostname, (long long int)clock, temperature.t, ((temperature.t * 9.0 / 5.0) + 32.0));
                 }
 
                 break;
