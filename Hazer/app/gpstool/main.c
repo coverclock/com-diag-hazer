@@ -404,7 +404,6 @@ int main(int argc, char * argv[])
      * Control variables.
      */
     int eof = 0;        /** If true then the input stream hit end of file. */
-    int sync = 0;       /** If true then the input stream is synchronized. */
     int frame = 0;      /** If true then the input stream is at frame start. */
     int refresh = !0;   /** If true then the display needs to be refreshed. */
     int trace = 0;      /** If true then the trace needs to be emitted. */
@@ -1616,7 +1615,7 @@ int main(int argc, char * argv[])
 
     machine_start_all(&nmea_state, &ubx_state, &rtcm_state, &cpo_state);
 
-    sync = 0;
+    Sync = 0;
     frame = 0;
 
     maximum = HAZER_SYSTEM_GNSS;
@@ -1855,7 +1854,7 @@ consume:
                  * and UBX output. This causes us to lose sync regularly.
                  */
 
-                if (!sync) {
+                if (!Sync) {
 
                     io_waiting += 1;
                     if ((io_waiting % DATAGRAM_SIZE) == 0) {
@@ -1888,7 +1887,7 @@ consume:
 
                 } else {
 
-                    sync = 0;
+                    Sync = 0;
                     io_waiting += 1;
 
                     /*
@@ -1942,10 +1941,10 @@ consume:
                         length = size - 1;
                         format = NMEA;
 
-                        if (!sync) {
+                        if (!Sync) {
 
                             DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x NMEA\n", io_total, ch);
-                            sync = !0;
+                            Sync = !0;
                             io_waiting = 0;
 
                             if (verbose) {
@@ -1980,11 +1979,11 @@ consume:
                         length = size - 1;
                         format = UBX;
 
-                        if (!sync) {
+                        if (!Sync) {
 
                             DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x UBX\n", io_total, ch);
 
-                            sync = !0;
+                            Sync = !0;
                             io_waiting = 0;
 
                             if (verbose) {
@@ -2019,11 +2018,11 @@ consume:
                         length = size - 1;
                         format = RTCM;
 
-                        if (!sync) {
+                        if (!Sync) {
 
                             DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x RTCM\n", io_total, ch);
 
-                            sync = !0;
+                            Sync = !0;
                             io_waiting = 0;
 
                             if (verbose) {
@@ -2059,11 +2058,11 @@ consume:
                         length = size - 1;
                         format = CPO;
 
-                        if (!sync) {
+                        if (!Sync) {
 
                             DIMINUTO_LOG_INFORMATION("Sync Start [%zu] 0x%02x CPO\n", io_total, ch);
 
-                            sync = !0;
+                            Sync = !0;
                             io_waiting = 0;
 
                             if (verbose) {
@@ -2097,7 +2096,7 @@ consume:
 
                 if (machine_is_stalled(nmea_state, ubx_state, rtcm_state, cpo_state)) {
 
-                    if (sync) {
+                    if (Sync) {
 
                         DIMINUTO_LOG_INFORMATION("Sync Stop [%zu] 0x%02x\n", io_total, ch);
 
@@ -2129,7 +2128,7 @@ consume:
                             goto stop;
                         }
 
-                        sync = 0;
+                        Sync = 0;
 
                     }
 

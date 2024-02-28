@@ -281,13 +281,13 @@ void print_local(FILE * fp)
      * probably adjusted via NTP. It's more like uptime(1).
      */
 
-    fprintf(fp, " %03d/%02d:%02d:%02d", day, hour, minute, second);
+    fprintf(fp, " %02d/%02d:%02d:%02d", day, hour, minute, second);
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE_VALUE);
 
     fprintf(fp, " %10d", Process);
 
-    fputs(" ", fp);
+    fprintf(fp, " %c", Sync ? 'S' : 's');
 
     fprintf(fp, " %-8.8s", Hostname);
 

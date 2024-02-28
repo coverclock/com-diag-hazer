@@ -85,4 +85,9 @@ extern diminuto_sticks_t Event;
  */
 extern diminuto_sticks_t Fix;
 
+/**
+ * if true the input stream is syncronized, false otherwise.
+ */
+extern int Sync;
+
 #endif

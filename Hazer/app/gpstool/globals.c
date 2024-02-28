@@ -34,3 +34,5 @@ diminuto_sticks_t Fix = -1;
 diminuto_sticks_t First = -1;
 
 diminuto_sticks_t Event = -1;
+
+int Sync = 0;
