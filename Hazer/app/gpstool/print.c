@@ -274,6 +274,12 @@ void print_local(FILE * fp)
     diminuto_contract((0 <= second) && (second <= 59));
 
     /*
+     * Number of successful synchronizations.
+     */
+
+    diminuto_contract(Synchronization < countof(SYNCHRONIZATION));
+
+    /*
      * I limited the resolution to seconds just to save space on a
      * crowded output line, especially when (for example) a DGNSS base
      * station runs for a long time. The monotonic time has nothing to
@@ -291,7 +297,7 @@ void print_local(FILE * fp)
 
     fprintf(fp, " %10d", Process);
 
-    fprintf(fp, " %c", Sync ? 'S' : 's');
+    fprintf(fp, " %c", SYNCHRONIZATION[Synchronization]);
 
     fprintf(fp, " %-8.8s", Hostname);
 
@@ -733,7 +739,7 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
             fprintf(fp, " ( %2d %2d %2d %2d %2d %2d %2d %2d )", pa[system].lat_digits, pa[system].lon_digits, pa[system].alt_digits, pa[system].sep_digits, pa[system].cog_digits, pa[system].mag_digits, pa[system].sog_digits, pa[system].smm_digits);
             fprintf(fp, " %20lluB", (unsigned long long)bytes); /* (2^64)-1 == 0xFFFFFFFFFFFFFFFF == 18,446,744,073,709,551,615. */
 
-            fprintf(fp, " %-8.8s", (system == 0) ? Source : HAZER_SYSTEM_NAME[system]);
+            fprintf(fp, " %-8.8s", Source);
 
             fputc('\n', fp);
 

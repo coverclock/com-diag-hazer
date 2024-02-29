@@ -86,8 +86,8 @@ extern diminuto_sticks_t Event;
 extern diminuto_sticks_t Fix;
 
 /**
- * if true the input stream is syncronized, false otherwise.
+ * Indicates status of input stream synchronization.
  */
-extern int Sync;
+extern uint8_t Synchronization;
 
 #endif

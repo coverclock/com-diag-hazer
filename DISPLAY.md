@@ -42,10 +42,10 @@ local host name. The local time, with a fractional part in milliseconds,
 includes the time zone offset from UTC in hours and minutes, and the
 current daylight saving time (DST) offset in hours. The next field is
 the elapsed time since the application began running in days, hours,
-minutes, and seconds. The following fields are the Hazer release string,
-the Process Identifier (PID) of the application, an 'S' if the input stream
-is currently synchronized or an 's' if it is not, and the first eight
-characters of the name of the host system.
+minutes, and seconds. The remaining fields are the Hazer release string,
+the Process Identifier (PID) of the application, a single digit indicating
+how many times the input stream has been synchronized or '\*' if it is more
+than nine, and the first eight characters of the name of the host system.
 
     TIM 2023-07-17T23:46:10.000-00:00+00 00:00:00.571 39pulses             GNSS
 

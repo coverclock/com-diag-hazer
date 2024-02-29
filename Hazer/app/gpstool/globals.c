@@ -35,4 +35,4 @@ diminuto_sticks_t First = -1;
 
 diminuto_sticks_t Event = -1;
 
-int Sync = 0;
+uint8_t Synchronization = 0;
