@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This implements the gpstool Print API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -281,7 +281,11 @@ void print_local(FILE * fp)
      * probably adjusted via NTP. It's more like uptime(1).
      */
 
-    fprintf(fp, " %02d/%02d:%02d:%02d", day, hour, minute, second);
+    if (day > 99) {
+        fputs(" **/**:**:**", fp);
+    } else {
+        fprintf(fp, " %02d/%02d:%02d:%02d", day, hour, minute, second);
+    }
 
     fprintf(fp, " %-8.8s", COM_DIAG_HAZER_RELEASE_VALUE);
 

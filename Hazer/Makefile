@@ -1,5 +1,5 @@
 # vi: set ts=4 shiftwidth=4:
-# Copyright 2017-2023 Digital Aggregates Corporation
+# Copyright 2017-2024 Digital Aggregates Corporation
 # Licensed under the terms in LICENSE.txt
 # author:Chip Overclock
 # mailto:coverclock@diag.com
@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	60# API changes that may require that applications be modified.
 MINOR				:=	5# Only functionality or features added with no legacy API changes.
-BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	1# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
