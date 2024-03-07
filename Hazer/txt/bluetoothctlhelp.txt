@@ -1,0 +1,43 @@
+$ sudo bluetoothctl
+Agent registered
+[CHG] Controller DC:A6:32:08:10:B3 Pairable: yes
+[bluetooth]# help
+Menu main:
+Available commands:
+-------------------
+advertise                                         Advertise Options Submenu
+advertise <on/off/type>                           Enable/disable advertising with given type
+agent <on/off/capability>                         Enable/disable agent with given capability
+block [dev]                                       Block device
+cancel-pairing [dev]                              Cancel pairing with device
+connect <dev>                                     Connect device
+default-agent                                     Set agent as the default one
+devices                                           List available devices
+disconnect [dev]                                  Disconnect device
+discoverable <on/off>                             Set controller discoverable mode
+discoverable-timeout [value]                      Set discoverable timeout
+exit                                              Quit program
+export                                            Print environment variables
+gatt                                              Generic Attribute Submenu
+help                                              Display help about this program
+info [dev]                                        Device information
+list                                              List available controllers
+menu <name>                                       Select submenu
+pairable <on/off>                                 Set controller pairable mode
+pair [dev]                                        Pair with device
+paired-devices                                    List paired devices
+power <on/off>                                    Set controller power
+quit                                              Quit program
+remove <dev>                                      Remove device
+reset-alias                                       Reset controller alias
+scan <on/off>                                     Scan for devices
+scan                                              Scan Options Submenu
+select <ctrl>                                     Select default controller
+set-alias <alias>                                 Set device alias
+show [ctrl]                                       Controller information
+system-alias <name>                               Set controller alias
+trust [dev]                                       Trust device
+unblock [dev]                                     Unblock device
+untrust [dev]                                     Untrust device
+version                                           Display version
+[bluetooth]#
