@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2019-2021 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Globals.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -84,5 +84,10 @@ extern diminuto_sticks_t Event;
  * This is the monotonic clock time of the latest fix.
  */
 extern diminuto_sticks_t Fix;
+
+/**
+ * Indicates status of input stream synchronization.
+ */
+extern uint8_t Synchronization;
 
 #endif

@@ -76,4 +76,21 @@ static const size_t LIMIT = 80 - (sizeof("OUT ") - 1) - (sizeof("[123] ") - 1) -
  */
 static const size_t UNLIMITED = ~(size_t)0;
 
+/**
+ * Characters that can be displayed as the synchronization status.
+ */
+static const char SYNCHRONIZATION[] = {
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '*',
+};
+
 #endif

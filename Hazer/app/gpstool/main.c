@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This implements the gpstool main program.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -1619,6 +1619,8 @@ int main(int argc, char * argv[])
     sync = 0;
     frame = 0;
 
+    Synchronization = 0;
+
     maximum = HAZER_SYSTEM_GNSS;
 
     io_maximum = 0;
@@ -1952,6 +1954,10 @@ consume:
                                 sync_in(length);
                             }
 
+                            if (Synchronization < (countof(SYNCHRONIZATION) - 2)) {
+                                Synchronization += 1;
+                            }
+
                         }
 
                         frame = !0;
@@ -1989,6 +1995,10 @@ consume:
 
                             if (verbose) {
                                 sync_in(length);
+                            }
+
+                            if (Synchronization < (countof(SYNCHRONIZATION) - 2)) {
+                                Synchronization += 1;
                             }
 
                         }
@@ -2030,6 +2040,10 @@ consume:
                                 sync_in(length);
                             }
 
+                            if (Synchronization < (countof(SYNCHRONIZATION) - 2)) {
+                                Synchronization += 1;
+                            }
+
                         }
 
                         frame = !0;
@@ -2068,6 +2082,10 @@ consume:
 
                             if (verbose) {
                                 sync_in(length);
+                            }
+
+                            if (Synchronization < (countof(SYNCHRONIZATION) - 2)) {
+                                Synchronization += 1;
                             }
 
                         }
