@@ -57,7 +57,8 @@ void * dcdpoller(void * argp)
                 if (rc < 0) { break; }
             }
             DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
-                pollerp->onepps = (pollerp->onepps + 1) % 60;
+                pollerp->onepps %= 60;  /* 0..59 */
+                pollerp->onepps += 1;   /* 1..60 */
             DIMINUTO_CRITICAL_SECTION_END;
         } else {
             if (pollerp->strobefd >= 0) {
@@ -119,7 +120,8 @@ void * gpiopoller(void * argp)
                     if (rc < 0) { break; }
                 }
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
-                    pollerp->onepps = (pollerp->onepps + 1) % 60;
+                    pollerp->onepps %= 60;  /* 0..59 */
+                    pollerp->onepps += 1;   /* 1..60 */
                 DIMINUTO_CRITICAL_SECTION_END;
             } else {
                 if (pollerp->strobefd >= 0) {
