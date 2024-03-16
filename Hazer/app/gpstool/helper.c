@@ -11,6 +11,9 @@
  */
 
 #include "helper.h"
+#include "com/diag/diminuto/diminuto_error.h"
+#include <stdlib.h>
+#include <string.h>
 
 void helper_collect(int number, tumbleweed_updates_t * up)
 {
@@ -54,4 +57,25 @@ void helper_collect(int number, tumbleweed_updates_t * up)
 
     up->word = (up->word << 8) | update;
 
+}
+
+char * helper_salloc(const char * string)
+{
+    char * result = (char *)0;
+    size_t length = 0;
+
+    if (string == (const char *)0) {
+        errno = EINVAL;
+        diminuto_perror("helper_salloc");
+    } else {
+        length = strlen(string) + 1;
+        result = (char *)malloc(length);
+        if (result == (char *)0) {
+            diminuto_perror("helper_scalloc");
+        } else {
+            strncpy(result, string, length);
+        }
+    }
+
+    return result;
 }

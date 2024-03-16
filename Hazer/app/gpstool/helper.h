@@ -23,4 +23,12 @@
  */
 extern void helper_collect(int number, tumbleweed_updates_t * up);
 
+/**
+ * Allocate a buffer to hold a string, and copy the string into it.
+ * The caller is responsible for deallocating the buffer.
+ * @param string points to the string to copy.
+ * @return a pointer to the buffer or NULL if an error occurred.
+ */
+extern char * helper_salloc(const char * string);
+
 #endif
