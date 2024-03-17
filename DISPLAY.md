@@ -50,12 +50,15 @@ than nine, and the first eight characters of the name of the host system.
     TIM 2023-07-17T23:46:10.000-00:00+00 00:00:00.571 39pulses             GNSS
 
 TIMe is the most recent time solution in UTC, the elapsed time of the
-initial position fix (or dashes if no position fix has occurred yet, or
-asterisks if it is more than a day), and the current value of the One
-Pulse Per Second (1PPS) counter. The 1PPS counter increments modulo sixty,
-once per second, if the option was enabled on the command line using -c
-for data carrier detect (DCD), or using -I for a general purpose input/output
-(GPIO) pin; otherwise the counter remains frozen at zero.
+initial position fix (or dashes if no position fix has occurred yet,
+or asterisks if it is more than a day), and the current value of the
+One Pulse Per Second (1PPS) counter. The pulses counter is initialized
+to zero, and if the 1PPS option was enabled on the command line using
+-c for data carrier detect (DCD), or using -I for a general purpose
+input/output (GPIO) pin, it cycles from one to sixty and back, changing
+once per second; otherwise the counter remains at zero (note that the
+changing of the pulses counter is asynchronous with the update of the
+display, so it may occasionally jump by an increment of more than one).
 
     POS 39°47'39.258"N, 105°09'12.172"W    39.7942383, -105.1533813 Aq Ns  GNSS
 

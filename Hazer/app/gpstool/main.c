@@ -190,10 +190,10 @@ int main(int argc, char * argv[])
     int report = 0;
     int process = 0;
     const char * strobedevice = (const char *)0;
-    diminuto_line_offset_t strobeline = (((int)1)<<((sizeof(int)*8)-1));
+    diminuto_line_offset_t strobeline = maximumof(diminuto_line_offset_t);
     int strobeinverted = 0;
     const char * ppsdevice = (const char *)0;
-    diminuto_line_offset_t ppsline = (((int)1)<<((sizeof(int)*8)-1));
+    diminuto_line_offset_t ppsline = maximumof(diminuto_line_offset_t);
     int ppsinverted = 0;
     int test = 0;
     int serial = 0;
@@ -558,7 +558,8 @@ int main(int argc, char * argv[])
             break;
         case 'I':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
-            if ((pps = helper_salloc(optarg)) == (const char *)0) {
+            if ((pps = strdup(optarg)) == (const char *)0) {
+                diminuto_perror(optarg);
                 error = !0;
             } else if ((ppsdevice = diminuto_line_parse(optarg, &ppsline, &ppsinverted)) == (const char *)0) {
                 error = !0;
@@ -745,7 +746,8 @@ int main(int argc, char * argv[])
             break;
         case 'p':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
-            if ((strobe = helper_salloc(optarg)) == (const char *)0) {
+            if ((strobe = strdup(optarg)) == (const char *)0) {
+                diminuto_perror(optarg);
                 error = !0;
             } else if ((strobedevice = diminuto_line_parse(optarg, &strobeline, &strobeinverted)) == (const char *)0) {
                 error = !0;
