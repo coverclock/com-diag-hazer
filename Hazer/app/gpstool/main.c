@@ -1200,7 +1200,7 @@ int main(int argc, char * argv[])
         strobe_fd = diminuto_line_open(strobedevice, strobeline, flags);
         diminuto_contract(strobe_fd >= 0);
 
-        DIMINUTO_LOG_INFORMATION("Strobe Line (%d) \"%s\" %s %d\n", strobe_fd, strobe, strobedevice, strobeline);
+        DIMINUTO_LOG_INFORMATION("Strobe Line (%d) \"%s\" \"%s\" %d\n", strobe_fd, strobe, strobedevice, strobeline);
 
         rc = diminuto_line_clear(strobe_fd);
         diminuto_contract(rc >= 0);
@@ -1233,7 +1233,7 @@ int main(int argc, char * argv[])
         pps_fd = diminuto_line_open_read(ppsdevice, ppsline, flags, 0);
         diminuto_contract(pps_fd >= 0);
 
-        DIMINUTO_LOG_INFORMATION("1pps Line (%d) \"%s\" %s %d\n", pps_fd, pps, ppsdevice, ppsline);
+        DIMINUTO_LOG_INFORMATION("1pps Line (%d) \"%s\" \"%s\" %d\n", pps_fd, pps, ppsdevice, ppsline);
 
         rc = diminuto_line_get(pps_fd);
         diminuto_contract(rc >= 0);
