@@ -126,6 +126,7 @@
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_thread.h"
+#include "com/diag/diminuto/diminuto_types.h"
 #include "com/diag/diminuto/diminuto_version.h"
 #include "com/diag/hazer/common.h"
 #include "com/diag/hazer/machine.h"
@@ -135,8 +136,6 @@
 #include <fcntl.h>
 #include <locale.h>
 #include <signal.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -176,8 +175,8 @@ int main(int argc, char * argv[])
      */
     const char * source = (const char *)0;
     const char * sink = (const char *)0;
-    const char * strobe = (const char *)0;
     const char * pps = (const char *)0;
+    const char * strobe = (const char *)0;
     const char * listing = (const char *)0;
     const char * headless = (const char *)0;
     const char * arp = (const char *)0;
@@ -189,9 +188,11 @@ int main(int argc, char * argv[])
     int escape = 0;
     int report = 0;
     int process = 0;
+    char * strobepath = (char *)0;
     const char * strobedevice = (const char *)0;
     diminuto_line_offset_t strobeline = maximumof(diminuto_line_offset_t);
     int strobeinverted = 0;
+    char * ppspath = (char *)0;
     const char * ppsdevice = (const char *)0;
     diminuto_line_offset_t ppsline = maximumof(diminuto_line_offset_t);
     int ppsinverted = 0;
@@ -558,13 +559,12 @@ int main(int argc, char * argv[])
             break;
         case 'I':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
-            if ((pps = strdup(optarg)) == (const char *)0) {
-                diminuto_perror(optarg);
+            pps = optarg;
+            ppspath = (char *)malloc(sizeof(diminuto_path_t));
+            diminuto_contract(ppspath != (char *)0);
+            ppsdevice = diminuto_line_parse(pps, ppspath, sizeof(diminuto_path_t), &ppsline, &ppsinverted);
+            if (ppsdevice == (const char *)0) {
                 error = !0;
-            } else if ((ppsdevice = diminuto_line_parse(optarg, &ppsline, &ppsinverted)) == (const char *)0) {
-                error = !0;
-            } else {
-                /* Do nothing. */
             }
             break;
         case 'K':
@@ -746,13 +746,12 @@ int main(int argc, char * argv[])
             break;
         case 'p':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
-            if ((strobe = strdup(optarg)) == (const char *)0) {
-                diminuto_perror(optarg);
+            strobe = optarg;
+            strobepath = (char *)malloc(sizeof(diminuto_path_t));
+            diminuto_contract(strobepath != (char *)0);
+            strobedevice = diminuto_line_parse(optarg, strobepath, sizeof(diminuto_path_t),  &strobeline, &strobeinverted);
+            if (strobedevice == (const char *)0) {
                 error = !0;
-            } else if ((strobedevice = diminuto_line_parse(optarg, &strobeline, &strobeinverted)) == (const char *)0) {
-                error = !0;
-            } else {
-                /* Do nothing. */
             }
             break;
         case 'q':
@@ -951,6 +950,15 @@ int main(int argc, char * argv[])
     DIMINUTO_LOG_INFORMATION("Hostname \"%s\"\n", Hostname);
 
     /*
+     * Set the Line consumer to our name. Only matters if we are
+     * using Line to control GPIO lines.
+     */
+
+    if ((pps != (const char *)0) || (strobe != (const char *)0)) {
+        (void)diminuto_line_consumer(Program);
+    }
+
+    /*
      * Necessary to get stuff like wchar_t and the "%lc" format to work,
      * which we use to display stuff like the degree sign.
      */
@@ -969,7 +977,6 @@ int main(int argc, char * argv[])
         rc = diminuto_lock_file(identity);
         diminuto_contract(rc >= 0);
     }
-        
 
     if (process) {
         DIMINUTO_LOG_NOTICE("Processing");
@@ -4110,8 +4117,9 @@ stop:
     }
 
     free(io_buffer);
-    free((void *)pps);
-    free((void *)strobe);
+
+    if (ppspath != (const char *)0) { free(ppspath); }
+    if (strobepath != (const char *)0) { free(strobepath); }
 
     if (sink_fp == (FILE *)0) {
         /* Do nothing. */
