@@ -41,7 +41,7 @@ typedef struct Client {
 } client_t;
 
 /**
- * @define CLIENT_INITIALIZER
+ * @def CLIENT_INITIALIZER
  * This is how we can statically initialize the client structure.
  */
 #define CLIENT_INITIALIZER { DIMINUTO_TREE_NULLINIT, 0, 0, CLASSIFICATION, { 0, }, 0, }

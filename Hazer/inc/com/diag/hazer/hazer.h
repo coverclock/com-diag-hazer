@@ -1578,6 +1578,9 @@ extern int hazer_parse_gsv(hazer_view_t * viewp, char * vector[], size_t count);
  * PARSING SATELLITE FAULT DETECTION SENTENCES
  ******************************************************************************/
 
+/**
+ * This structure contains the data from a GBS NMEA satellite fault sentence.
+ */
 typedef struct HazerFault {
     uint64_t utc_nanoseconds;   /* Time of fix associated with fault. */
     int64_t lat_millimeters;    /* Expected latitude error in millimeters. */
@@ -1592,6 +1595,10 @@ typedef struct HazerFault {
     uint8_t signal;             /* Signal index. */
 } hazer_fault_t;
 
+/**
+ * @def HAZER_FAULT_INITIALIZER
+ * Initialize an HazerFault structure.
+ */
 #define HAZER_FAULT_INITIALIZER \
     { \
         HAZER_NANOSECONDS_INITIALIZER, \
@@ -1604,6 +1611,14 @@ typedef struct HazerFault {
         HAZER_GNSS_SIGNALS, \
     }
 
+/**
+ * Parse a GBS NMEA sentence containg fault information, updating a fault
+ * structure.
+ * @param faultp points to the fault structure.
+ * @param vector contains the words in the NMEA sentence.
+ * @param count is size of the vector in slots including the null pointer.
+ * @return >=0 for success, <0 otherwise.
+ */
 extern int hazer_parse_gbs(hazer_fault_t * faultp, char * vector[], size_t count);
 
 /*******************************************************************************

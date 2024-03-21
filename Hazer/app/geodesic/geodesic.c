@@ -1,5 +1,5 @@
 /**
- * \file ext/geodesic.c
+ * \file app/geodesic/geodesic.c
  * \brief Implementation of the geodesic routines in C
  *
  * For the full documentation see geodesic.h.

@@ -7,7 +7,9 @@
  * @author Chip Overclock <mailto:coverclock@diag.com>
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
- * THIS IS A WORK IN PROGRESS.
+ * Dally is a set of functions to process the output of the WITMOTION
+ * WT901BLECL 5.0 Inertial Measurement Unit (IMU) and other similar
+ * devices that use the same WT901BLE chip.
  */
 
 #include <string.h>
@@ -16,15 +18,20 @@
 #include <errno.h>
 #include <math.h>
 #include "com/diag/hazer/dally.h"
+#include "com/diag/diminuto/diminuto_criticalsection.h"
+
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static FILE * debug = (FILE *)0;
 
 FILE * dally_debug(FILE * now)
 {
-    FILE * was;
+    FILE * was = (FILE *)0;
 
-    was = debug;
-    debug = now;
+    DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
+        was = debug;
+        debug = now;
+    DIMINUTO_CRITICAL_SECTION_END;
 
     return was;
 }
@@ -38,6 +45,11 @@ dally_state_t dally_machine(dally_context_t * cp, int ch)
 
     do {
 
+        if (ch == EOF) {
+            state = DALLY_STATE_EOF;
+            break;
+        }
+
         if (ch > 0xffU) {
             state = DALLY_STATE_ERROR;
             break;
@@ -46,6 +58,9 @@ dally_state_t dally_machine(dally_context_t * cp, int ch)
         byte = ch;
 
         switch (state) {
+
+        case DALLY_STATE_EOF:
+            break;
 
         case DALLY_STATE_START:
             state = DALLY_STATE_HEADING;
