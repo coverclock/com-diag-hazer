@@ -8,7 +8,7 @@
  * @see Hazer <https://github.com/coverclock/com-diag-hazer>
  * @details
  *
- * wt901setup | serialtool -D /dev/ttyUSB0 -b 115200 -8 -1 -n -P | wt901tool -d -v -t -c
+ * wt901wired | serialtool -D /dev/ttyUSB0 -b 115200 -8 -1 -n -P | wt901tool -d -v -t -c
  *
  * [NEW] Device F3:C1:80:74:D6:3E WT901BLE68
  */

@@ -15,4 +15,4 @@ ERRFIL=${ERRDIR}/$(basename ${0}).err
 cp /dev/null ${ERRFIL}
 exec 2>>${ERRFIL}
 
-wt901setup | serialtool -D ${DEVICE} -b 115200 -8 -1 -n -P | wt901tool -E
+wt901wired | serialtool -D ${DEVICE} -b 115200 -8 -1 -n -P | wt901tool -E

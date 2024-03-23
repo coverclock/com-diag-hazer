@@ -7,7 +7,7 @@
 #
 # EXAMPLE
 #
-# wt901setup | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | dump
+# wt901wired | serialtool -D /dev/ttyUSB0 -T -b 115200 -8 -1 -n -P | dump
 #
 
 trap "trap '' SIGINT SIGPIPE SIGQUIT SIGTERM; echo $(basename $0): stop. 1>&2; kill -TERM -- -${SELF} 2> /dev/null; exit 0" SIGINT SIGPIPE SIGQUIT SIGTERM
