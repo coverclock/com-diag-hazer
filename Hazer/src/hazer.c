@@ -484,7 +484,7 @@ ssize_t hazer_serialize(void * buffer, size_t size, char * vector[], size_t coun
  * the non-fractional part.
  * @param value is the numeric value.
  * @param sign is its leading sign if any.
- * @param the new value possibly unchagened.
+ * @return the new value possibly unchanged.
  */
 static inline int64_t fixup(int64_t value, char sign)
 {

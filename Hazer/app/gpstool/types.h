@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2019-2021 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This defines the gpstool Types.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -380,8 +380,8 @@ typedef union TumbleweedUpdates {
  * use of these variables out since they can be altered by other threads.
  */
 typedef struct Poller {
-    FILE * ppsfp;
-    FILE * strobefp;
+    int ppsfd;
+    int strobefd;
     volatile int onepps;
     volatile int done;
 } poller_t;

@@ -1,5 +1,5 @@
 # vi: set ts=4 shiftwidth=4:
-# Copyright 2017-2023 Digital Aggregates Corporation
+# Copyright 2017-2024 Digital Aggregates Corporation
 # Licensed under the terms in LICENSE.txt
 # author:Chip Overclock
 # mailto:coverclock@diag.com
@@ -20,8 +20,8 @@ default:	all
 
 TITLE				:=	Hazer
 
-MAJOR				:=	60# API changes that may require that applications be modified.
-MINOR				:=	4# Only functionality or features added with no legacy API changes.
+MAJOR				:=	61# API changes that may require that applications be modified.
+MINOR				:=	0# Only functionality or features added with no legacy API changes.
 BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
@@ -648,7 +648,7 @@ out:
 # sudo apt-get install tabu
 # sudo apt-get install texlive-latex-extra
 
-.PHONY:	documentation manuals readme
+.PHONY:	documentation manuals
 
 DOCCOOKED := $(shell echo $(OUT)/$(DOC_DIR) | sed 's/\//\\\//g')
 
@@ -666,12 +666,6 @@ manuals:	$(OUT)/$(DOC_DIR)/latex $(OUT)/$(DOC_DIR)/man $(OUT)/$(DOC_DIR)/pdf
 	cp $(OUT)/$(DOC_DIR)/latex/refman.pdf $(OUT)/$(DOC_DIR)/pdf
 	cat $(OUT)/$(DOC_DIR)/man/man3/*.3 | groff -man -Tps - > $(OUT)/$(DOC_DIR)/pdf/manpages.ps
 	ps2pdf $(OUT)/$(DOC_DIR)/pdf/manpages.ps $(OUT)/$(DOC_DIR)/pdf/manpages.pdf
-
-$(OUT)/$(DOC_DIR)/html/README.html:	../README.md
-	mkdir -p $(OUT)/$(DOC_DIR)/html
-	grip ../README.md --export $(OUT)/$(DOC_DIR)/html/README.html
-
-readme:	$(OUT)/$(DOC_DIR)/html/README.html
 
 ########## Diffs and Patches
 

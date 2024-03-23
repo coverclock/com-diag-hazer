@@ -1,7 +1,7 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 /**
  * @file
- * @copyright Copyright 2017-2023 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This implements the gpstool main program.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -58,41 +58,6 @@
  *
  *  gpstool -S input.dat -P
  *
- *  gpstool -D /dev/ttyACM0 -b 115200 -8 -n -1 \
- *      -G tumbleweed:21010 -g 4 \
- *      -H headless.out -t 10 \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00' \
- *      -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40\x10\x27\x00\x00' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\xc0\x02\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x61\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x66\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x6b\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x70\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x06\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x77\x10\x00' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x78\x10\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x8b\x00\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x05\x00\x53\x10\x00' \
- *      -U '\xb5\x62\x06\x01\x03\x00\x01\x14\x01'
- *
- *  gpstool -D /dev/ttyACM0 -b 115200 -8 -n -1 \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x01\x00\x03\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x10\x00\x03\x40\x2c\x01\x00\x00' \
- *      -U '\xb5\x62\x06\x8a\x0c\x00\x00\x01\x00\x00\x11\x00\x03\x40\x10\x27\x00\x00' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\xc0\x02\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x61\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x66\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x6b\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x70\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x06\x03\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x77\x10\x00' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x78\x10\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x8b\x00\x91\x20\x01' \
- *      -U '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x05\x00\x53\x10\x00' \
- *      -U '\xb5\x62\x06\x01\x03\x00\x01\x14\x01' \
- *      -U ''
- *
  *  gpstool -D /dev/ttyACM0 E 2> >(log -S)
  */
 
@@ -114,17 +79,19 @@
 #include "com/diag/diminuto/diminuto_interrupter.h"
 #include "com/diag/diminuto/diminuto_ipc4.h"
 #include "com/diag/diminuto/diminuto_ipc6.h"
+#include "com/diag/diminuto/diminuto_line.h"
 #include "com/diag/diminuto/diminuto_lock.h"
 #include "com/diag/diminuto/diminuto_log.h"
+#include "com/diag/diminuto/diminuto_minmaxof.h"
 #include "com/diag/diminuto/diminuto_mux.h"
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_phex.h"
-#include "com/diag/diminuto/diminuto_pin.h"
 #include "com/diag/diminuto/diminuto_pipe.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
 #include "com/diag/diminuto/diminuto_thread.h"
+#include "com/diag/diminuto/diminuto_types.h"
 #include "com/diag/diminuto/diminuto_version.h"
 #include "com/diag/hazer/common.h"
 #include "com/diag/hazer/machine.h"
@@ -134,8 +101,6 @@
 #include <fcntl.h>
 #include <locale.h>
 #include <signal.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -175,6 +140,7 @@ int main(int argc, char * argv[])
      */
     const char * source = (const char *)0;
     const char * sink = (const char *)0;
+    const char * pps = (const char *)0;
     const char * strobe = (const char *)0;
     const char * listing = (const char *)0;
     const char * headless = (const char *)0;
@@ -187,8 +153,14 @@ int main(int argc, char * argv[])
     int escape = 0;
     int report = 0;
     int process = 0;
-    int strobepin = (((int)1)<<((sizeof(int)*8)-1));
-    int ppspin = (((int)1)<<((sizeof(int)*8)-1));
+    char * strobepath = (char *)0;
+    const char * strobedevice = (const char *)0;
+    diminuto_line_offset_t strobeline = maximumof(diminuto_line_offset_t);
+    int strobeinverted = 0;
+    char * ppspath = (char *)0;
+    const char * ppsdevice = (const char *)0;
+    diminuto_line_offset_t ppsline = maximumof(diminuto_line_offset_t);
+    int ppsinverted = 0;
     int test = 0;
     int serial = 0;
     int daemon = 0;
@@ -220,10 +192,8 @@ int main(int argc, char * argv[])
     FILE * in_fp = (FILE *)0;
     FILE * listing_fp = (FILE *)0;
     FILE * out_fp = stdout;
-    FILE * pps_fp = (FILE *)0;
     FILE * queue_fp = (FILE *)0;
     FILE * sink_fp = (FILE *)0;
-    FILE * strobe_fp = (FILE *)0;
     FILE * trace_fp = (FILE *)0;
     /*
      * Serial device variables.
@@ -287,10 +257,11 @@ int main(int argc, char * argv[])
     int remote_fd = -1;
     int surveyor_fd = -1;
     int source_fd = -1;
+    int pps_fd = -1;
+    int strobe_fd = -1;
     /*
      * 1PPS poller thread variables.
      */
-    const char * pps = (const char *)0;
     poller_t poller = { 0 };
     void * result = (void *)0;
     diminuto_thread_t thread = DIMINUTO_THREAD_INITIALIZER((diminuto_thread_function_t *)0);
@@ -554,10 +525,10 @@ int main(int argc, char * argv[])
         case 'I':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             pps = optarg;
-            ppspin = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) {
-                errno = EINVAL;
-                diminuto_perror(optarg);
+            ppspath = (char *)malloc(sizeof(diminuto_path_t));
+            diminuto_contract(ppspath != (char *)0);
+            ppsdevice = diminuto_line_parse(pps, ppspath, sizeof(diminuto_path_t), &ppsline, &ppsinverted);
+            if (ppsdevice == (const char *)0) {
                 error = !0;
             }
             break;
@@ -741,10 +712,10 @@ int main(int argc, char * argv[])
         case 'p':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             strobe = optarg;
-            strobepin = strtol(optarg, &end, 0);
-            if ((end == (char *)0) || (*end != '\0')) {
-                errno = EINVAL;
-                diminuto_perror(optarg);
+            strobepath = (char *)malloc(sizeof(diminuto_path_t));
+            diminuto_contract(strobepath != (char *)0);
+            strobedevice = diminuto_line_parse(optarg, strobepath, sizeof(diminuto_path_t),  &strobeline, &strobeinverted);
+            if (strobedevice == (const char *)0) {
                 error = !0;
             }
             break;
@@ -826,7 +797,8 @@ int main(int argc, char * argv[])
                             "               [ -4 | -6 ]\n"
                             "               [ -G :PORT | -G HOST:PORT [ -g MASK ] ]\n"
                             "               [ -Y :PORT | -Y HOST:PORT [ -y SECONDS ] ]\n"
-                            "               [ -I PIN | -c ] [ -p PIN ]\n"
+                            "               [ -I CHIP:LINE | -I NAME | -c ]\n"
+                            "               [ -p CHIP:LINE | -p NAME ]\n"
                             "               [ -M ] [ -X MASK ] [ -V ]\n"
                             , Program);
             fprintf(stderr, "       -1              Use one stop bit for DEVICE.\n");
@@ -845,7 +817,8 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -G HOST:PORT    Use remote HOST and PORT as dataGram sink.\n");
             fprintf(stderr, "       -G :PORT        Use local PORT as dataGram source.\n");
             fprintf(stderr, "       -H HEADLESS     Like -R but writes each iteration to HEADLESS file.\n");
-            fprintf(stderr, "       -I PIN          Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).\n");
+            fprintf(stderr, "       -I CHIP:LINE    Take 1PPS from GPIO CHIP LINE (requires -D) (LINE<0 active low).\n");
+            fprintf(stderr, "       -I NAME         Take 1PPS from GPIO NAME (requires -D) (-NAME active low).\n");
             fprintf(stderr, "       -K              Write input to DEVICE sinK from datagram source.\n");
             fprintf(stderr, "       -L FILE         Write pretty-printed input to Listing FILE.\n");
             fprintf(stderr, "       -M              Run in the background as a daeMon.\n");
@@ -879,7 +852,8 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -m              Use Modem control for DEVICE.\n");
             fprintf(stderr, "       -n              Use No parity for DEVICE.\n");
             fprintf(stderr, "       -o              Use Odd parity for DEVICE.\n");
-            fprintf(stderr, "       -p PIN          Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).\n");
+            fprintf(stderr, "       -p CHIP:LINE    Assert GPIO outPut CHIP LINE with 1PPS (requires -D and -I or -c) (LINE<0 active low).\n");
+            fprintf(stderr, "       -p NAME         Assert GPIO outPut NAME with 1PPS (requires -D and -I or -c) (-NAME active low).\n");
             fprintf(stderr, "       -q MASK         Set Queue mask (NMEA=%u, UBX=%u, RTCM=%u, CPO=%u, default=%lu).\n", NMEA, UBX, RTCM, CPO, queue_mask);
             fprintf(stderr, "       -s              Use XON/XOFF (c-Q/c-S) Software flow control for DEVICE.\n");
             fprintf(stderr, "       -t SECONDS      Timeout GNSS data after SECONDS seconds [0..255].\n");
@@ -941,6 +915,15 @@ int main(int argc, char * argv[])
     DIMINUTO_LOG_INFORMATION("Hostname \"%s\"\n", Hostname);
 
     /*
+     * Set the Line consumer to our name. Only matters if we are
+     * using Line to control GPIO lines.
+     */
+
+    if ((pps != (const char *)0) || (strobe != (const char *)0)) {
+        (void)diminuto_line_consumer(Program);
+    }
+
+    /*
      * Necessary to get stuff like wchar_t and the "%lc" format to work,
      * which we use to display stuff like the degree sign.
      */
@@ -959,7 +942,6 @@ int main(int argc, char * argv[])
         rc = diminuto_lock_file(identity);
         diminuto_contract(rc >= 0);
     }
-        
 
     if (process) {
         DIMINUTO_LOG_NOTICE("Processing");
@@ -1180,30 +1162,19 @@ int main(int argc, char * argv[])
      */
 
     if (strobe != (const char *)0) {
-        int activehigh = !0;
+        diminuto_line_bits_t flags = 0;
 
-        if (strobepin < 0) {
-            activehigh = 0;
-            strobepin = -strobepin;
+        flags |= DIMINUTO_LINE_FLAG_OUTPUT;
+        if (strobeinverted) {
+            flags |= DIMINUTO_LINE_FLAG_ACTIVE_LOW;
         }
 
-        (void)diminuto_pin_unexport_ignore(strobepin);
+        strobe_fd = diminuto_line_open(strobedevice, strobeline, flags);
+        diminuto_contract(strobe_fd >= 0);
 
-        rc = diminuto_pin_export(strobepin);
-        diminuto_contract(rc >= 0);
+        DIMINUTO_LOG_INFORMATION("Strobe Line (%d) \"%s\" \"%s\" %d\n", strobe_fd, strobe, strobedevice, strobeline);
 
-        rc = diminuto_pin_direction(strobepin, !0);
-        diminuto_contract(rc >= 0);
-
-        rc = diminuto_pin_active(strobepin, activehigh);
-        diminuto_contract(rc >= 0);
-
-        strobe_fp = diminuto_pin_open(strobepin, !0);
-        diminuto_contract(strobe_fp != (FILE *)0);
-
-        DIMINUTO_LOG_INFORMATION("Strobe Pin (%d) \"%s\" %d\n", fileno(strobe_fp), strobe, strobepin);
-
-        rc = diminuto_pin_clear(strobe_fp);
+        rc = diminuto_line_clear(strobe_fd);
         diminuto_contract(rc >= 0);
     }
 
@@ -1217,37 +1188,30 @@ int main(int argc, char * argv[])
      */
 
     if (pps != (const char *)0) {
-        int activehigh = !0;
+        diminuto_line_bits_t flags = 0;
 
-        if (ppspin < 0) {
-            activehigh = 0;
-            ppspin = -ppspin;
+        flags |= DIMINUTO_LINE_FLAG_INPUT;
+        flags |= DIMINUTO_LINE_FLAG_EDGE_RISING;
+        flags |= DIMINUTO_LINE_FLAG_EDGE_FALLING;
+        if (ppsinverted) {
+            flags |= DIMINUTO_LINE_FLAG_ACTIVE_LOW;
         }
 
-        (void)diminuto_pin_unexport_ignore(ppspin);
+        /*
+         * This is a digital signal, not a mechanical button, so no
+         * debouncing to add latency.
+         */
 
-        rc = diminuto_pin_export(ppspin);
+        pps_fd = diminuto_line_open_read(ppsdevice, ppsline, flags, 0);
+        diminuto_contract(pps_fd >= 0);
+
+        DIMINUTO_LOG_INFORMATION("1pps Line (%d) \"%s\" \"%s\" %d\n", pps_fd, pps, ppsdevice, ppsline);
+
+        rc = diminuto_line_get(pps_fd);
         diminuto_contract(rc >= 0);
 
-        rc = diminuto_pin_direction(ppspin, 0);
-        diminuto_contract(rc >= 0);
-
-        rc = diminuto_pin_active(ppspin, activehigh);
-        diminuto_contract(rc >= 0);
-
-        rc = diminuto_pin_edge(ppspin, DIMINUTO_PIN_EDGE_BOTH);
-        diminuto_contract(rc >= 0);
-
-        pps_fp = diminuto_pin_open(ppspin, 0);
-        diminuto_contract(pps_fp != (FILE *)0);
-
-        DIMINUTO_LOG_INFORMATION("1pps Pin (%d) \"%s\" %d\n", fileno(pps_fp), pps, ppspin);
-
-        rc = diminuto_pin_get(pps_fp);
-        diminuto_contract(rc >= 0);
-
-        poller.ppsfp = pps_fp;
-        poller.strobefp = strobe_fp;
+        poller.ppsfd = pps_fd;
+        poller.strobefd = strobe_fd;
         poller.onepps = 0;
         poller.done = 0;
 
@@ -1258,7 +1222,6 @@ int main(int argc, char * argv[])
         diminuto_contract(threadrc == 0);
 
         pulsing = true;
-
     }
 
     /*
@@ -1469,8 +1432,8 @@ int main(int argc, char * argv[])
         /* Do nothing. */
     } else {
 
-        poller.ppsfp = dev_fp;
-        poller.strobefp = strobe_fp;
+        poller.ppsfd = fileno(dev_fp);
+        poller.strobefd = strobe_fd;
         poller.onepps = 0;
         poller.done = 0;
 
@@ -1618,6 +1581,8 @@ int main(int argc, char * argv[])
 
     sync = 0;
     frame = 0;
+
+    Synchronization = 0;
 
     maximum = HAZER_SYSTEM_GNSS;
 
@@ -1952,6 +1917,10 @@ consume:
                                 sync_in(length);
                             }
 
+                            if (Synchronization < (countof(SYNCHRONIZATION) - 2)) {
+                                Synchronization += 1;
+                            }
+
                         }
 
                         frame = !0;
@@ -1989,6 +1958,10 @@ consume:
 
                             if (verbose) {
                                 sync_in(length);
+                            }
+
+                            if (Synchronization < (countof(SYNCHRONIZATION) - 2)) {
+                                Synchronization += 1;
                             }
 
                         }
@@ -2030,6 +2003,10 @@ consume:
                                 sync_in(length);
                             }
 
+                            if (Synchronization < (countof(SYNCHRONIZATION) - 2)) {
+                                Synchronization += 1;
+                            }
+
                         }
 
                         frame = !0;
@@ -2068,6 +2045,10 @@ consume:
 
                             if (verbose) {
                                 sync_in(length);
+                            }
+
+                            if (Synchronization < (countof(SYNCHRONIZATION) - 2)) {
+                                Synchronization += 1;
                             }
 
                         }
@@ -4039,14 +4020,14 @@ stop:
         threadrc = diminuto_thread_join(&thread, &result);
     }
 
-    if (pps_fp != (FILE *)0) {
-        pps_fp = diminuto_pin_unused(pps_fp, ppspin);
-        diminuto_contract(pps_fp == (FILE *)0);
+    if (pps_fd >= 0) {
+        pps_fd = diminuto_line_close(pps_fd);
+        diminuto_contract(pps_fd < 0);
     }
 
-    if (strobe_fp != (FILE *)0) {
-        strobe_fp = diminuto_pin_unused(strobe_fp, strobepin);
-        diminuto_contract(strobe_fp == (FILE *)0);
+    if (strobe_fd >= 0) {
+        strobe_fd = diminuto_line_close(strobe_fd);
+        diminuto_contract(strobe_fd < 0);
     }
 
     if (remote_fd >= 0) {
@@ -4101,6 +4082,9 @@ stop:
     }
 
     free(io_buffer);
+
+    if (ppspath != (const char *)0) { free(ppspath); }
+    if (strobepath != (const char *)0) { free(strobepath); }
 
     if (sink_fp == (FILE *)0) {
         /* Do nothing. */

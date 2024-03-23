@@ -30,32 +30,6 @@
  *
  * Wikipedia, "Double-precision floating-point format", 2022-06-28,
  * <https://en.wikipedia.org/wiki/Double-precision_floating-point_format>
- *
- * EXAMPLES
- *
- * $ ubxval +1 65
- * ubxval: 65 0x41
- * \x41
- *
- * $ ubxval +2 65
- * ubxval: 65 0x0041
- * \x41\x00
- * 
- * $ ubxval +4 65
- * ubxval: 65 0x00000041
- * \x41\x00\x00\x00
- *
- * $ ubxval +8 65
- * ubxval: 65 0x0000000000000041
- * \x41\x00\x00\x00\x00\x00\x00\x00
- * 
- * $ ubxval +S 0.15625
- * ubxval: 0.156250 0x3e200000
- * \x00\x00\x20\x3e
- * 
- * $ ubxval +D 0.333333333333333314829616256247390992939472198486328125
- * ubxval: 0.333333 0x3fd5555555555555
- * \x55\x55\x55\x55\x55\x55\xd5\x3f
  */
 
 #include <stdio.h>

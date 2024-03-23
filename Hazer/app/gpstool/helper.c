@@ -11,6 +11,9 @@
  */
 
 #include "helper.h"
+#include "com/diag/diminuto/diminuto_error.h"
+#include <stdlib.h>
+#include <string.h>
 
 void helper_collect(int number, tumbleweed_updates_t * up)
 {
