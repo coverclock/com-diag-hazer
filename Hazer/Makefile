@@ -22,7 +22,7 @@ TITLE				:=	Hazer
 
 MAJOR				:=	61# API changes that may require that applications be modified.
 MINOR				:=	0# Only functionality or features added with no legacy API changes.
-BUILD				:=	0# Only bugs fixed with no API changes or new functionality.
+BUILD				:=	1# Only bugs fixed with no API changes or new functionality.
 
 # Disclaimer: the only target that I routinely build and test for is "host", my
 # X86_64 Ubuntu build server.
@@ -532,7 +532,7 @@ $(OUT)/$(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_revision.h:	Makefile
 $(OUT)/$(OBC_DIR)/$(SRC_DIR)/$(PROJECT)_revision.o:	$(OUT)/$(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_revision.h
 
 # For executing from the command line during testing.
-$(OUT)/$(SYM_DIR)/vintage:	$(OUT)/$(GEN_DIR)/vintage.c
+$(OUT)/$(SYM_DIR)/vintage:	$(OUT)/$(GEN_DIR)/vintage.c $(TARGETLIBRARIES)
 	D=`dirname $@`; mkdir -p $$D
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
@@ -610,7 +610,7 @@ $(OUT)/$(SYM_DIR)/$(PROJECT):	$(OUT)/$(SYM_DIR)/vintage $(OUT)/$(SYM_DIR)/setup
 
 LDWHOLEARCHIVES := # These archives will be linked into the shared object in their entirety.
 
-$(OUT)/$(MOD_DIR)/%.$(SO):	$(MOD_DIR)/%.c
+$(OUT)/$(MOD_DIR)/%.$(SO):	$(MOD_DIR)/%.c $(TARGETLIBRARIES)
 	D=`dirname $@`; mkdir -p $$D
 	$(CC) $(CPPFLAGS) $(CFLAGS) -shared -o $@ $< $(MOFLAGS) -Wl,--whole-archive $(LDWHOLEARCHIVES) -Wl,--no-whole-archive
 
