@@ -15,8 +15,8 @@
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-38400}
-ONEPPS=${3:-18}
-STROBE=${4:-16}
+ONEPPS=${3:-"/dev/gpiochip4:18"}
+STROBE=${4:-"/dev/gpiochip4:16"}
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}

@@ -21,8 +21,8 @@ mkdir -p ${SAVDIR}
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyACM0"}
 RATE=${2:-115200}
-ONEPPS=${3:-18}
-STROBE=${4:-16}
+ONEPPS=${3:-"/dev/gpiochip4:18"}
+STROBE=${4:-"/dev/gpiochip4:16"}
 ERRFIL=${5-"${SAVDIR}/${PROGRAM}.err"}
 OUTFIL=${6-"${SAVDIR}/${PROGRAM}.out"}
 PIDFIL=${7-"${SAVDIR}/${PROGRAM}.pid"}

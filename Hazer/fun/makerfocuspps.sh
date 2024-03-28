@@ -18,8 +18,8 @@
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-9600}
-ONEPPS=${3:-18}
-STROBE=${4:-16}
+ONEPPS=${3:-"/dev/gpiochip4:18"}
+STROBE=${4:-"/dev/gpiochip4:16"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 

@@ -8,7 +8,7 @@
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyAMA0"}
 RATE=${2:-9600}
-ONEPPS=${3:-18}
+ONEPPS=${3:-"/dev/gpiochip4:18"}
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
