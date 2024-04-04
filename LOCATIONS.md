@@ -143,3 +143,9 @@ contains the recipes for Oreos. It is located near the Svalbard Global
 Seed Vault.
 
 78°08’58.1”N, 16°01’59.7”E
+
+## Mel Waters Hole
+
+As described on Art Bell's "Coast to Coast".
+
+46°57'21.0"N 120°56'31.0"W
