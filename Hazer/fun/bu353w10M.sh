@@ -9,4 +9,4 @@ PROGRAM=$(basename ${0})
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-cat $(readlink -e $(dirname ${0})/../../../dat)/hazer/bu353w10-*.dat | valgrind --leak-check=full --show-leak-kinds=all gpstool -R
+uudecode $(readlink -e $(dirname ${0})/../../../dat)/hazer/bu353w10-*.uu64 | valgrind --leak-check=full --show-leak-kinds=all gpstool -R

@@ -286,6 +286,7 @@ Linux/GNU distros install by default.
     sudo apt-get install inotify-tools
     sudo apt-get install socat
     sudo apt-get install expect
+    sudo apt-get install sharutils
 
 ## Workflow
     
