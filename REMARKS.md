@@ -972,3 +972,19 @@ Sidereal Year: 366.2425 days, Day: 23:56:04.09 hours (approximately)
 <https://www.scientificamerican.com/article/the-sat-problem-that-everybody-got-wrong/>
 
 <https://sciencenotes.org/circle-revolutions-and-the-coin-rotation-paradox/>
+
+## Binary Files
+
+The recent xz utilities debacle (in which a developer who has been working
+on the open source xz compression utilities for several years inserted
+a trojan into the repo in the form of a binary executable which could
+create backdoor into the host bypassing SSH security) incentivized me to
+remove the files under dat - which were mostly captured output -
+except those few that are used for functional testing. The entire former
+dat contents can be found under a new repo
+
+<https://github.com/coverclock/com-diag-hazer-dat>
+
+for which there is no dependency in Hazer. The few binary files in dat that
+are used for functional testing are now uuencoded (not that that makes them
+any more obvious as to what they are).
