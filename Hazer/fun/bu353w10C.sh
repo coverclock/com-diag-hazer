@@ -9,4 +9,4 @@ PROGRAM=$(basename ${0})
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
 
-uudecode $(readlink -e $(dirname ${0})/../../../dat)/hazer/bu353w10-*.uu64 | coreable gpstool -R
+uudecode $(readlink -e $(dirname ${0})/../../../dat)/hazer/bu353w10-*.u64 | coreable gpstool -R
