@@ -797,10 +797,11 @@ functional-test:
 	emissionsslow
 	kitchensink
 	bu353w10C
-	@echo 'The following functional tests require special hardware or test fixtures:' 1>&2
+	@echo 'The following functional tests require special hardware, test fixtures, or platform software:' 1>&2
 	@echo '    bu353w10   # with the GlobalSat BU-353W10' 1>&2
 	@echo '    bu353w10D  # (Datagrams) with the GlobalSat BU-353W10' 1>&2
 	@echo '    bu353w10F  # (Frequency) with the GlobalSat BU-353W10' 1>&2
+	@echo '    bu353w10M  # (Memory) with a working valgrind' 1>&2
 	@echo '    bu353w10S  # (Source) with the GlobalSat BU-353W10' 1>&2
 	@echo '    neom8n1pps # (1 Pulse Per Second) with the u-blox NEO-M8N' 1>&2
 	@echo '    samm8q1pps # (1 Pulse Per Second) with the u-blox SAM-M8Q' 1>&2
