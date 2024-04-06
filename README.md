@@ -1410,7 +1410,7 @@ the libraries and binaries in the system directories.)
     cd ~/src/com-diag-hazer/Hazer
     export LANG=en_US.UTF-8 # You can put this in your .profile.
     . out/host/bin/setup
-    make unit
+    make unit-test
     
 ## Functional Tests
 
@@ -1423,7 +1423,7 @@ throw an assert and core dump.
     cd ~/src/com-diag-hazer/Hazer
     export LANG=en_US.UTF-8 # You can put this in your .profile.
     . out/host/bin/setup
-    make functional
+    make functional-test
 
 # Directories
 
