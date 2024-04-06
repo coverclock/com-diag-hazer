@@ -410,6 +410,8 @@ built.
 
 # Related
 
+<https://github.com/coverclock/com-diag-hazer-dat>
+
 <https://github.com/coverclock/com-diag-tesoro>
 
 <https://github.com/coverclock/com-diag-codex>
