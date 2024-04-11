@@ -553,7 +553,7 @@ I have successfully tested Hazer with the following serial-to-USB chipsets.
 I have successfully tested Hazer with the following GNSS devices.
 
 * Adafruit Ultimate GPS (GTop PA6H/MediaTek MTK3339+CP2104, 9600 8N1, v10c4pea60, ttyUSB, 1Hz) [^12]    
-* Ardusimple SimpleGNSS (U-Blox 10/UBX-NEO-F10T, 38400 8n1, v0403p6015, ttyUSB, 1Hz) [^8] [^23] [^24]    
+* Ardusimple SimpleGNSS (U-Blox 10/UBX-NEO-F10T, 38400 8n1, v0403p6015, ttyUSB, 1Hz) [^6] [^8] [^23] [^24] [^30]    
 * Ardusimple SimpleRTK2B (U-Blox 9/UBX-ZED-F9P, 230400 8N1, v1516p01a9, ttyACM, 1Hz) [^8] [^10]    
 * Bad Elf GPS Pro + (STMicroelectronics/MediaTek MTK, 9600 8n1, v0483p5740, ttyACM, 1Hz) [^4] [^16]    
 * Digi XBIB-C-GPS (U-blox 8/UBX-CAM-M8Q, 9600 8N1, N/A, ttyS, 1Hz) [^4]    
@@ -621,6 +621,7 @@ I have successfully tested Hazer with the following GNSS devices.
 [^27]: Initially updates at 1Hz until it achieves a fix, than updates at 5Hz.    
 [^28]: In either NMEA or CPO (binary) mode.    
 [^29]: Enumerates multiple USB devices: Ethernet port with router and web server, serial ports, storage device.
+[^30]: Consider using a powered USB hub if EOFs typically indicating a USB disconnect are observed.
 
 Note that when sending commands to and parsing output from GNSS
 devices, Postel's Law - "Be conservative in what you send, be liberal
