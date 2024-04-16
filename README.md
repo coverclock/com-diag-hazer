@@ -1603,14 +1603,18 @@ throw an assert and core dump.
 * lowresolution - same as bin/base.sh but with much much lower standards.
 * makerfocus - exercises the MakerFocus GPS board.
 * makerfocuspps - exercises the MakerFocus GPS board and its 1PPS output.
+* neof10t - exercises the Ardusimple SimpleGNSS board.
+* neof10tR - same as neof10t but reports to standard output.
+* neof10tpps - same as neof10t but supporting 1PPS.
+* neof10tH - same as neof10t but headless.
+* neof10tHpps - same as neof10tH but supporting 1PPS.
 * neof10tH00 - same as neof10tH but with Ardusimple version 00 configuration.
 * neof10tH01 - same as neof10tH but with Adrusimple version 01 configuration.
 * neof10tHinit - same as neof10tH but with my configuration.
-* neof10tH - same as neof10t but headless.
-* neof10t - exercises the Ardusimple SimpleGNSS board with its 1PPS output.
+* neof10tHinitpps - same as neof10tHinit but supporting 1PPS.
 * neom8n - exercises the RDQ Micro M8N board.
 * neom8n1pps - exercises the SparkFun NEO-M8N board and its 1PPS output.
-* neom8u - exercises the SparkFun GPS Deadreckoning board.
+* neom8u - exercises the SparkFun GPS Dead Reckoning board.
 * pmtk - exercises the Adafruit Ultimate GPS board.
 * simplertk2bbase - configures an Ardusimple SimpleRTK2B board as a base.
 * simplertk2b - exercises the Ardusimple SimpleRTK2B board.
