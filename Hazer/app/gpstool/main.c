@@ -3926,7 +3926,8 @@ render:
                 print_posveltim(out_fp, &posveltim);
                 print_corrections(out_fp, &base, &rover, &kinematics, &updates);
                 print_actives(out_fp, actives, maximum);
-                print_views(out_fp, views, actives, maximum);
+                print_views(out_fp, views, actives, maximum, ACTIVE);
+                print_views(out_fp, views, actives, maximum, INACTIVE);
             }
 
             if (escape) {

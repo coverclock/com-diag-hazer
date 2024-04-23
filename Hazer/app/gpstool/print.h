@@ -30,8 +30,9 @@ extern void print_actives(FILE * fp, const hazer_actives_t aa, hazer_system_t ss
  * @param va points to the array of all satellite being viewed.
  * @param aa points to the array of active satellites.
  * @param ss is the largest system value used so far.
+ * @param mm is ACTIVE or INACTIVE to select type to print.
  */
-extern void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, hazer_system_t ss);
+extern void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, hazer_system_t ss, marker_t mm);
 
 /**
  * Print the local (Juliet) time (and the release string).

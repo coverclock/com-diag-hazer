@@ -121,7 +121,7 @@ void print_actives(FILE * fp, const hazer_actives_t aa, hazer_system_t ss)
 
 }
 
-void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, hazer_system_t ss)
+void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, hazer_system_t ss, marker_t mm)
 {
     static const unsigned int SATELLITES = diminuto_countof(va[0].sig[0].sat);
     static const unsigned int SIGNALS = diminuto_countof(va[0].sig);
@@ -169,6 +169,9 @@ void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, haz
 
                     }
                 }
+                /* We want the channel to increment regardless. */
+                channel += 1;
+                if (ranged != mm) { continue; }
 
                 phantom = va[system].sig[signal].sat[satellite].phantom ? PHANTOM : INACTIVE;
                 untracked = va[system].sig[signal].sat[satellite].untracked ? UNTRACKED : INACTIVE;
@@ -177,7 +180,7 @@ void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, haz
 
                 fputs("SAT", fp);
 
-                fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz  %-8.8s %c %c %c %c %c", ++channel, va[system].sig[signal].sat[satellite].id, va[system].sig[signal].sat[satellite].elv_degrees, DIMINUTO_UNICODE_DEGREE, va[system].sig[signal].sat[satellite].azm_degrees, (wint_t)DIMINUTO_UNICODE_DEGREE, va[system].sig[signal].sat[satellite].snr_dbhz, HAZER_SIGNAL_NAME[system][signal], source, ranged, phantom, untracked, unused);
+                fprintf(fp, " [%3u] %5uid %3d%lcelv %4d%lcazm %4ddBHz  %-8.8s %c %c %c %c %c", channel, va[system].sig[signal].sat[satellite].id, va[system].sig[signal].sat[satellite].elv_degrees, DIMINUTO_UNICODE_DEGREE, va[system].sig[signal].sat[satellite].azm_degrees, (wint_t)DIMINUTO_UNICODE_DEGREE, va[system].sig[signal].sat[satellite].snr_dbhz, HAZER_SIGNAL_NAME[system][signal], source, ranged, phantom, untracked, unused);
 
                 fprintf(fp, "%7s", "");
 
