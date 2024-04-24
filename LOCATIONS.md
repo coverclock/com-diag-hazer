@@ -148,4 +148,11 @@ Seed Vault.
 
 As described on Art Bell's "Coast to Coast".
 
-46°57'21.0"N 120°56'31.0"W
+46°57'21.0"N, 120°56'31.0"W
+
+## 1992 Landers Earthquake
+
+In Yucca Valley, California. If you look at the older satellite views on Google Maps you can see significant displacement in Aberdeen Drive.
+
+34.189838, -116.433842    
+34°11'23.4"N, 116°26'01.8"W    
