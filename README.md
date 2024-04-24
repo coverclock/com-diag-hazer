@@ -1848,7 +1848,7 @@ See the README in the Tesoro repository for more information.
     usage: gpstool
                    [ -d ] [ -v ] [ -z ]
                    [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]
-                   [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ]
+                   [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ] [ -a ]
                    [ -C FILE ]
                    [ -O FILE ]
                    [ -L FILE ]
@@ -1860,7 +1860,8 @@ See the README in the Tesoro repository for more information.
                    [ -4 | -6 ]
                    [ -G :PORT | -G HOST:PORT [ -g MASK ] ]
                    [ -Y :PORT | -Y HOST:PORT [ -y SECONDS ] ]
-                   [ -I PIN | -c ] [ -p PIN ]
+                   [ -I CHIP:LINE | -I NAME | -c ]
+                   [ -p CHIP:LINE | -p NAME ]
                    [ -M ] [ -X MASK ] [ -V ]
            -1              Use one stop bit for DEVICE.
            -2              Use two stop bits for DEVICE.
@@ -1878,7 +1879,8 @@ See the README in the Tesoro repository for more information.
            -G HOST:PORT    Use remote HOST and PORT as dataGram sink.
            -G :PORT        Use local PORT as dataGram source.
            -H HEADLESS     Like -R but writes each iteration to HEADLESS file.
-           -I PIN          Take 1PPS from GPIO Input PIN (requires -D) (<0 active low).
+           -I CHIP:LINE    Take 1PPS from GPIO CHIP LINE (requires -D) (LINE<0 active low).
+           -I NAME         Take 1PPS from GPIO NAME (requires -D) (-NAME active low).
            -K              Write input to DEVICE sinK from datagram source.
            -L FILE         Write pretty-printed input to Listing FILE.
            -M              Run in the background as a daeMon.
@@ -1899,6 +1901,7 @@ See the README in the Tesoro repository for more information.
            -Y :PORT        Use local PORT as surveYor source.
            -Z STRING       Collapse STRING, write to DEVICE.
            -Z ''           Exit when this empty STRING is processed.
+           -a              Display Active satellite views first.
            -b BPS          Use BPS bits per second for DEVICE.
            -c              Take 1PPS from DCD (requires -D and implies -m).
            -d              Display Debug output on standard error.
@@ -1912,10 +1915,12 @@ See the README in the Tesoro repository for more information.
            -m              Use Modem control for DEVICE.
            -n              Use No parity for DEVICE.
            -o              Use Odd parity for DEVICE.
-           -p PIN          Assert GPIO outPut PIN with 1PPS (requires -D and -I or -c) (<0 active low).
+           -p CHIP:LINE    Assert GPIO outPut CHIP LINE with 1PPS (requires -D and -I or -c) (LINE<0 active low).
+           -p NAME         Assert GPIO outPut NAME with 1PPS (requires -D and -I or -c) (-NAME active low).
            -q MASK         Set Queue mask (NMEA=1, UBX=2, RTCM=4, CPO=8, default=15).
            -s              Use XON/XOFF (c-Q/c-S) Software flow control for DEVICE.
            -t SECONDS      Timeout GNSS data after SECONDS seconds [0..255].
+           -u CCM          Use CCM for convergence threshold in centicentimeters.
            -v              Display Verbose output on standard error.
            -w SECONDS      Write STRING to DEVICE no more than every SECONDS seconds, 0 always, <0 never.
            -x              EXit if a NAK is received.
