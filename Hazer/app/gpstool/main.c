@@ -166,6 +166,7 @@ int main(int argc, char * argv[])
     int daemon = 0;
     int nakquit = 0;
     int syncquit = 0;
+    int activefirst = 0;
     seconds_t slow = 0;
     seconds_t timeout = HAZER_GNSS_SECONDS;
     seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
@@ -416,7 +417,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:B:C:D:EF:G:H:I:KL:MN:O:PQ:RS:T:U:VW:X:Y:Z:b:cdef:g:hi:k:lmnop:q:st:u:vxw:y:z?";
+    static const char OPTIONS[] = "124678A:B:C:D:EF:G:H:I:KL:MN:O:PQ:RS:T:U:VW:X:Y:Z:ab:cdef:g:hi:k:lmnop:q:st:u:vxw:y:z?";
 
     /**
      ** INITIALIZATION
@@ -631,6 +632,10 @@ int main(int argc, char * argv[])
             diminuto_list_datainit(command_node, optarg);
             diminuto_list_enqueue(&command_list, command_node);
             break;
+        case 'a':
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
+            activefirst = !0;
+            break;
         case 'b':
             DIMINUTO_LOG_INFORMATION("Option -%c \"%s\"\n", opt, optarg);
             bitspersecond = strtoul(optarg, &end, 0);
@@ -785,7 +790,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "usage: %s\n"
                             "               [ -d ] [ -v ] [ -z ]\n"
                             "               [ -D DEVICE [ -b BPS ] [ -7 | -8 ] [ -e | -o | -n ] [ -1 | -2 ] [ -l | -m ] [ -h ] [ -s ] | -S FILE ] [ -B BYTES ]\n"
-                            "               [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ]\n"
+                            "               [ -R | -E | -H HEADLESS | -P ] [ -F SECONDS ] [ -i SECONDS ] [ -t SECONDS ] [ -a ]\n"
                             "               [ -C FILE ]\n"
                             "               [ -O FILE ]\n"
                             "               [ -L FILE ]\n"
@@ -839,6 +844,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -Y :PORT        Use local PORT as surveYor source.\n");
             fprintf(stderr, "       -Z STRING       Collapse STRING, write to DEVICE.\n");
             fprintf(stderr, "       -Z ''           Exit when this empty STRING is processed.\n");
+            fprintf(stderr, "       -a              Display Active satellite views first.\n");
             fprintf(stderr, "       -b BPS          Use BPS bits per second for DEVICE.\n");
             fprintf(stderr, "       -c              Take 1PPS from DCD (requires -D and implies -m).\n");
             fprintf(stderr, "       -d              Display Debug output on standard error.\n");
@@ -3926,8 +3932,12 @@ render:
                 print_posveltim(out_fp, &posveltim);
                 print_corrections(out_fp, &base, &rover, &kinematics, &updates);
                 print_actives(out_fp, actives, maximum);
-                print_views(out_fp, views, actives, maximum, ACTIVE);
-                print_views(out_fp, views, actives, maximum, INACTIVE);
+                if (activefirst) {
+                    print_views(out_fp, views, actives, maximum, ACTIVE);
+                    print_views(out_fp, views, actives, maximum, INACTIVE);
+                } else {
+                    print_views(out_fp, views, actives, maximum, DONTCARE);
+                }
             }
 
             if (escape) {

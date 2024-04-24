@@ -55,6 +55,8 @@ export COM_DIAG_DIMINUTO_LOG_MASK=0xff
 exec ${PREFIX} gpstool \
 	-1 \
 	-2 \
+	-4 \
+	-6 \
 	-7 \
 	-8 \
 	-A '' \
@@ -80,6 +82,7 @@ exec ${PREFIX} gpstool \
 	-X 1 \
 	-Y 127.0.0.1:21001 \
 	-Z '' \
+	-a \
 	-b ${RATE} \
 	-c \
 	-d \

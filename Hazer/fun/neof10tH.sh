@@ -41,7 +41,7 @@ mkdir -p $(dirname ${PIDFIL})
 
 exec coreable gpstool \
 	-D ${DEVICE} -b ${RATE} -8 -n -1 \
-	-E -H ${OUTFIL} \
+	-E -H ${OUTFIL} -a \
 	-O ${PIDFIL} \
 	-t 10 -F 1 \
 	-w 2 -x \

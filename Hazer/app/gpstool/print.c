@@ -171,7 +171,13 @@ void print_views(FILE *fp, const hazer_views_t va, const hazer_actives_t aa, haz
                 }
                 /* We want the channel to increment regardless. */
                 channel += 1;
-                if (ranged != mm) { continue; }
+                if (mm == DONTCARE) {
+                    /* Do nothing. */
+                } else if (mm == ranged) {
+                    /* Do nothing. */
+                } else {
+                    continue;
+                }
 
                 phantom = va[system].sig[signal].sat[satellite].phantom ? PHANTOM : INACTIVE;
                 untracked = va[system].sig[signal].sat[satellite].untracked ? UNTRACKED : INACTIVE;

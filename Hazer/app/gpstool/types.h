@@ -99,6 +99,7 @@ typedef enum Status {
  * How have we classified a satellite track?
  */
 typedef enum Marker {
+    DONTCARE    = '*',
     MARKER      = '#',
     INACTIVE    = ' ',
     ACTIVE      = '<',
