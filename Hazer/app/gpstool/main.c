@@ -892,6 +892,8 @@ int main(int argc, char * argv[])
     }
     diminuto_contract(Process >= 0);
 
+    DIMINUTO_LOG_INFORMATION("Identity pid %d uid %d euid %d gid %d euid %d\n", Process, getuid(), geteuid(), getgid(), getegid());
+
     DIMINUTO_LOG_NOTICE("Start");
 
     if (daemon) {
