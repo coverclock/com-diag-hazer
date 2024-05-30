@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2023 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2023-2024 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
@@ -15,8 +15,8 @@
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
 RATE=${2:-38400}
-ONEPPS=${3:-"/dev/gpiochip4:18"}
-STROBE=${4:-"/dev/gpiochip4:16"}
+ONEPPS=${3:-"/dev/gpiochip4:18"} # pin 12 on Raspberry Pi 5
+STROBE=${4:-"/dev/gpiochip4:16"} # pin 36 on Raspberry Pi 5
 
 SAVDIR=${COM_DIAG_HAZER_SAVDIR:-$(readlink -e $(dirname ${0})/..)/tmp}
 mkdir -p ${SAVDIR}
