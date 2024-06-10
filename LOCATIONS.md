@@ -46,6 +46,13 @@ deorbiting spacecraft.
 
 48°52.5′S, 123°23.6′W
 
+## Continental Pole of Inaccessibility
+
+Said to be the furtherest point from an ocean. It's in the Uyghur region
+in northern China near the border with Kazakhstan.
+
+46°16.8′N, 86°40.2′E
+
 ## Null Island
 
 When your GNSS application has a bug and it ends up telling you you're at
