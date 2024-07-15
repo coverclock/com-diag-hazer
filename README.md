@@ -50,6 +50,9 @@ more about how GPS works and how NMEA and UBX sentences are formatted
 parsing library that I can incorporate into the kinds of embedded systems
 I am frequently called to work upon. Hazer and gpstool have also turned
 out to be really useful tools for testing and evaluating GNSS devices.
+Finally, Hazer's gpstool utility serves as a useful testbed for some of
+the underlying Diminuto library's more complex features like thread
+handling and General Purpose Input/Output.
 
 I also make use of Lady Heather, a terrific real-time GNSS monitoring
 program. I run it, along with my own software, and a script that
