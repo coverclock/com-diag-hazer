@@ -352,12 +352,20 @@ may vary.
 ## dialout
 
 GNSS modules typically express a serial port - either an actual serial
-port, a USB serial port emulation ('''ttyUSB'''), or a modem emulation
-('''ttyACM'''). The easiest way to get read/write access to such a port
-as a non-root user is by adding that user to the '''dialout''' group.
-The user may have to log out and back in again to have this take effect.
+port ('''/dev/tty0'''), a USB serial port emulation ('''/dev/ttyUSB0'''),
+or a USB modem emulation ('''/dev/ttyACM0'''). Similarly, in modern Linux
+kernels, to interrogate and control General Purpose I/O pins requires
+access to a special GPIO device ('''/dev/gpiochip4'''). The easiest way
+to get read/write access to such devices as a non-root user is typically
+by adding that user to the '''dialout''' group.
+
+    sudo usermod –a –G dialout coverclock
+
+or on some systems
 
     sudo adduser pi dialout
+
+The user may have to log out and back in again to have this take effect.
 
 # Reverse Dependencies
 
