@@ -18,9 +18,6 @@
 #include <errno.h>
 #include <math.h>
 #include "com/diag/hazer/dally.h"
-#include "com/diag/diminuto/diminuto_criticalsection.h"
-
-static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static FILE * debug = (FILE *)0;
 
@@ -28,10 +25,8 @@ FILE * dally_debug(FILE * now)
 {
     FILE * was = (FILE *)0;
 
-    DIMINUTO_CRITICAL_SECTION_BEGIN(&mutex);
-        was = debug;
-        debug = now;
-    DIMINUTO_CRITICAL_SECTION_END;
+    was = debug;
+    debug = now;
 
     return was;
 }
