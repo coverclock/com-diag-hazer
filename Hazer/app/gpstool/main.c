@@ -87,6 +87,7 @@
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_phex.h"
 #include "com/diag/diminuto/diminuto_pipe.h"
+#include "com/diag/diminuto/diminuto_realtime.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
@@ -892,7 +893,14 @@ int main(int argc, char * argv[])
     }
     diminuto_contract(Process >= 0);
 
-    DIMINUTO_LOG_INFORMATION("Identity pid %d uid %d euid %d gid %d euid %d\n", Process, getuid(), geteuid(), getgid(), getegid());
+    Identity = geteuid();
+    diminuto_contract(Identity >= 0);
+
+    DIMINUTO_LOG_INFORMATION("Identity pid %d uid %d euid %d gid %d euid %d\n", Process, (int)getuid(), Identity, (int)getgid(), (int)getegid());
+
+    Realtime = diminuto_realtime_is_supported();
+    diminuto_contract(Realtime >= 0);
+    DIMINUTO_LOG_INFORMATION("PREEMPT_RT %d\n", Realtime);
 
     DIMINUTO_LOG_NOTICE("Start");
 

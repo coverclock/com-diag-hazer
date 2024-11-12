@@ -17,6 +17,10 @@ char Hostname[HOST_NAME_MAX] = { '\0' };
 
 pid_t Process = -1;
 
+uid_t Identity = -1;
+
+int Realtime = 0;
+
 const char * Source = (const char *)0;
 
 pthread_mutex_t Mutex = PTHREAD_MUTEX_INITIALIZER;

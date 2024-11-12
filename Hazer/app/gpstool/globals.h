@@ -12,8 +12,9 @@
  * @details
  */
 
-#include <sys/types.h>
 #include <pthread.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "limits.h"
 #include "com/diag/diminuto/diminuto_types.h"
 
@@ -31,6 +32,17 @@ extern char Hostname[HOST_NAME_MAX];
  * This is our process identifier.
  */
 extern pid_t Process;
+
+/**
+ * This is our effective user identifier.
+ */
+extern uid_t Identity;
+
+/**
+ * This is true if the real-time kernel (PREEMPT_RT) is available., false
+ * otherwise.
+ */
+extern int Realtime;
 
 /**
  * This is the name of the source of input.
