@@ -1619,6 +1619,7 @@ throw an assert and core dump.
 * neof10tpps - same as neof10t but supporting 1PPS.
 * neof10tH - same as neof10t but headless.
 * neof10tHpps - same as neof10tH but supporting 1PPS.
+* neof10trHpps - same as neof10tH but supporting 1PPS and using real-time scheduling.
 * neof10tH00 - same as neof10tH but with Ardusimple version 00 configuration.
 * neof10tH01 - same as neof10tH but with Adrusimple version 01 configuration.
 * neof10tHinit - same as neof10tH but with my configuration.
