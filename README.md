@@ -1929,6 +1929,7 @@ See the README in the Tesoro repository for more information.
            -p CHIP:LINE    Assert GPIO outPut CHIP LINE with 1PPS (requires -D and -I or -c) (LINE<0 active low).
            -p NAME         Assert GPIO outPut NAME with 1PPS (requires -D and -I or -c) (-NAME active low).
            -q MASK         Set Queue mask (NMEA=1, UBX=2, RTCM=4, CPO=8, default=15).
+           -r              Use real-time scheduling if available and root.
            -s              Use XON/XOFF (c-Q/c-S) Software flow control for DEVICE.
            -t SECONDS      Timeout GNSS data after SECONDS seconds [0..255].
            -u CCM          Use CCM for convergence threshold in centicentimeters.

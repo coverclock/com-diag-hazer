@@ -87,6 +87,7 @@
 #include "com/diag/diminuto/diminuto_observation.h"
 #include "com/diag/diminuto/diminuto_phex.h"
 #include "com/diag/diminuto/diminuto_pipe.h"
+#include "com/diag/diminuto/diminuto_policy.h"
 #include "com/diag/diminuto/diminuto_realtime.h"
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
@@ -168,6 +169,7 @@ int main(int argc, char * argv[])
     int nakquit = 0;
     int syncquit = 0;
     int activefirst = 0;
+    int realtime = 0;
     seconds_t slow = 0;
     seconds_t timeout = HAZER_GNSS_SECONDS;
     seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
@@ -418,7 +420,7 @@ int main(int argc, char * argv[])
     /*
      * Command line options.
      */
-    static const char OPTIONS[] = "124678A:B:C:D:EF:G:H:I:KL:MN:O:PQ:RS:T:U:VW:X:Y:Z:ab:cdef:g:hi:k:lmnop:q:st:u:vxw:y:z?";
+    static const char OPTIONS[] = "124678A:B:C:D:EF:G:H:I:KL:MN:O:PQ:RS:T:U:VW:X:Y:Z:ab:cdef:g:hi:k:lmnop:q:rst:u:vxw:y:z?";
 
     /**
      ** INITIALIZATION
@@ -734,6 +736,10 @@ int main(int argc, char * argv[])
                 error = !0;
             }
             break;
+        case 'r':
+            DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
+            realtime = !0;
+            break;
         case 's':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
             xonxoff = !0;
@@ -862,6 +868,7 @@ int main(int argc, char * argv[])
             fprintf(stderr, "       -p CHIP:LINE    Assert GPIO outPut CHIP LINE with 1PPS (requires -D and -I or -c) (LINE<0 active low).\n");
             fprintf(stderr, "       -p NAME         Assert GPIO outPut NAME with 1PPS (requires -D and -I or -c) (-NAME active low).\n");
             fprintf(stderr, "       -q MASK         Set Queue mask (NMEA=%u, UBX=%u, RTCM=%u, CPO=%u, default=%lu).\n", NMEA, UBX, RTCM, CPO, queue_mask);
+            fprintf(stderr, "       -r              Use real-time scheduling if available and root.\n");
             fprintf(stderr, "       -s              Use XON/XOFF (c-Q/c-S) Software flow control for DEVICE.\n");
             fprintf(stderr, "       -t SECONDS      Timeout GNSS data after SECONDS seconds [0..255].\n");
             fprintf(stderr, "       -u CCM          Use CCM for convergence threshold in centicentimeters.\n");
@@ -895,12 +902,11 @@ int main(int argc, char * argv[])
 
     Identity = geteuid();
     diminuto_contract(Identity >= 0);
-
     DIMINUTO_LOG_INFORMATION("Identity pid %d uid %d euid %d gid %d euid %d\n", Process, (int)getuid(), Identity, (int)getgid(), (int)getegid());
 
     Realtime = diminuto_realtime_is_supported();
     diminuto_contract(Realtime >= 0);
-    DIMINUTO_LOG_INFORMATION("PREEMPT_RT %d\n", Realtime);
+    DIMINUTO_LOG_INFORMATION("PREEMPT_RT kernel %d\n", Realtime);
 
     DIMINUTO_LOG_NOTICE("Start");
 
@@ -1231,7 +1237,7 @@ int main(int argc, char * argv[])
         poller.onepps = 0;
         poller.done = 0;
 
-        threadp = diminuto_thread_init(&thread, gpiopoller);
+        threadp = diminuto_thread_init_generic(&thread, gpiopoller, realtime ? DIMINUTO_POLICY_SCHEDULER_FIFO : DIMINUTO_POLICY_SCHEDULER_DEFAULT, realtime ? DIMINUTO_POLICY_PRIORITY_HIGH : DIMINUTO_POLICY_PRIORITY_DEFAULT);
         diminuto_contract(threadp == &thread);
 
         threadrc = diminuto_thread_start(&thread, &poller);
@@ -1453,7 +1459,7 @@ int main(int argc, char * argv[])
         poller.onepps = 0;
         poller.done = 0;
 
-        threadp = diminuto_thread_init(&thread, dcdpoller);
+        threadp = diminuto_thread_init_generic(&thread, dcdpoller, realtime ? DIMINUTO_POLICY_SCHEDULER_FIFO : DIMINUTO_POLICY_SCHEDULER_DEFAULT, realtime ? DIMINUTO_POLICY_PRIORITY_HIGH : DIMINUTO_POLICY_PRIORITY_DEFAULT);
         diminuto_contract(threadp == &thread);
 
         threadrc = diminuto_thread_start(&thread, &poller);

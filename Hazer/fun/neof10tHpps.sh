@@ -41,11 +41,18 @@ mkdir -p $(dirname ${PIDFIL})
 
 # UBX-MON-VER [0]
 
+EUID=$(id -u)
+if [[ ${EUID} == 0 ]]; then
+    REALTIME="-r"
+else
+    REALTIME=""
+fi
+
 exec coreable gpstool \
 	-D ${DEVICE} -b ${RATE} -8 -n -1 \
 	-E -H ${OUTFIL} -a \
 	-O ${PIDFIL} \
-	-I ${ONEPPS} -p ${STROBE} \
+	-I ${ONEPPS} -p ${STROBE} ${REALTIME} \
 	-t 10 -F 1 \
 	-w 2 -x \
 	-U '\xb5\x62\x0a\x04\x00\x00' \
