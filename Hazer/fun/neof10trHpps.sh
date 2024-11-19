@@ -10,8 +10,9 @@
 # u-blox device I've used. N.B. the labeling of the PVT
 # (1PPS) and POWER LEDs are reversed on this version
 # of the SimpleGNSS board. This script uses the device
-# as it has been previously configured. If it is run from
-# root, the script enables real-time scheduling.
+# as it has been previously configured. Real-time
+# scheduling is enabled, which requires the script be
+# run as root.
 
 PROGRAM=$(basename ${0})
 DEVICE=${1:-"/dev/ttyUSB0"}
@@ -42,18 +43,11 @@ mkdir -p $(dirname ${PIDFIL})
 
 # UBX-MON-VER [0]
 
-EUID=$(id -u)
-if [[ ${EUID} == 0 ]]; then
-    REALTIME="-r"
-else
-    REALTIME=""
-fi
-
 exec coreable gpstool \
 	-D ${DEVICE} -b ${RATE} -8 -n -1 \
 	-E -H ${OUTFIL} -a \
 	-O ${PIDFIL} \
-	-I ${ONEPPS} -p ${STROBE} ${REALTIME} \
+	-I ${ONEPPS} -p ${STROBE} -r \
 	-t 10 -F 1 \
 	-w 2 -x \
 	-U '\xb5\x62\x0a\x04\x00\x00' \

@@ -169,7 +169,8 @@ int main(int argc, char * argv[])
     int nakquit = 0;
     int syncquit = 0;
     int activefirst = 0;
-    int realtime = 0;
+    diminuto_policy_scheduler_t scheduler = DIMINUTO_POLICY_SCHEDULER_DEFAULT;
+    int priority = DIMINUTO_POLICY_PRIORITY_DEFAULT;
     seconds_t slow = 0;
     seconds_t timeout = HAZER_GNSS_SECONDS;
     seconds_t keepalive = TUMBLEWEED_KEEPALIVE_SECONDS;
@@ -433,8 +434,8 @@ int main(int argc, char * argv[])
     (void)diminuto_log_importmask(LOG_MASK_PATH);
 
     DIMINUTO_LOG_NOTICE("Program %s\n", argv[0]);
-    DIMINUTO_LOG_INFORMATION("Hazer %s\n", COM_DIAG_HAZER_RELEASE_VALUE);
-    DIMINUTO_LOG_INFORMATION("Diminuto %s\n", COM_DIAG_DIMINUTO_RELEASE_VALUE);
+    DIMINUTO_LOG_INFORMATION("Library Hazer %s\n", COM_DIAG_HAZER_RELEASE_VALUE);
+    DIMINUTO_LOG_INFORMATION("Library Diminuto %s\n", COM_DIAG_DIMINUTO_RELEASE_VALUE);
 
     /*
      * OPTIONS
@@ -738,7 +739,8 @@ int main(int argc, char * argv[])
             break;
         case 'r':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
-            realtime = !0;
+            scheduler = DIMINUTO_POLICY_SCHEDULER_FIFO;
+            priority = DIMINUTO_POLICY_PRIORITY_HIGH;
             break;
         case 's':
             DIMINUTO_LOG_INFORMATION("Option -%c\n", opt);
@@ -906,7 +908,7 @@ int main(int argc, char * argv[])
 
     Realtime = diminuto_realtime_is_supported();
     diminuto_contract(Realtime >= 0);
-    DIMINUTO_LOG_INFORMATION("PREEMPT_RT kernel %d\n", Realtime);
+    DIMINUTO_LOG_INFORMATION("Kernel PREEMPT_RT %d\n", Realtime);
 
     DIMINUTO_LOG_NOTICE("Start");
 
@@ -1237,7 +1239,7 @@ int main(int argc, char * argv[])
         poller.onepps = 0;
         poller.done = 0;
 
-        threadp = diminuto_thread_init_generic(&thread, gpiopoller, realtime ? DIMINUTO_POLICY_SCHEDULER_FIFO : DIMINUTO_POLICY_SCHEDULER_DEFAULT, realtime ? DIMINUTO_POLICY_PRIORITY_HIGH : DIMINUTO_POLICY_PRIORITY_DEFAULT);
+        threadp = diminuto_thread_init_generic(&thread, gpiopoller, scheduler, priority);
         diminuto_contract(threadp == &thread);
 
         threadrc = diminuto_thread_start(&thread, &poller);
@@ -1459,7 +1461,7 @@ int main(int argc, char * argv[])
         poller.onepps = 0;
         poller.done = 0;
 
-        threadp = diminuto_thread_init_generic(&thread, dcdpoller, realtime ? DIMINUTO_POLICY_SCHEDULER_FIFO : DIMINUTO_POLICY_SCHEDULER_DEFAULT, realtime ? DIMINUTO_POLICY_PRIORITY_HIGH : DIMINUTO_POLICY_PRIORITY_DEFAULT);
+        threadp = diminuto_thread_init_generic(&thread, dcdpoller, scheduler, priority);
         diminuto_contract(threadp == &thread);
 
         threadrc = diminuto_thread_start(&thread, &poller);
