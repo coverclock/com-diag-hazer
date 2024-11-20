@@ -908,7 +908,9 @@ int main(int argc, char * argv[])
 
     Realtime = diminuto_realtime_is_supported();
     diminuto_contract(Realtime >= 0);
-    DIMINUTO_LOG_INFORMATION("Kernel PREEMPT_RT %d\n", Realtime);
+    DIMINUTO_LOG_INFORMATION("Real-Time kernel %d\n", Realtime);
+    DIMINUTO_LOG_INFORMATION("Real-Time scheduler %d\n", scheduler);
+    DIMINUTO_LOG_INFORMATION("Real-Time priority %d\n", priority);
 
     DIMINUTO_LOG_NOTICE("Start");
 
