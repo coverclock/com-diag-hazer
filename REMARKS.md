@@ -988,3 +988,18 @@ dat contents can be found under a new repo
 for which there is no dependency in Hazer. The few binary files in dat that
 are used for functional testing are now uuencoded (not that that makes them
 any more obvious as to what they are).
+
+## Real-Time Scheduling and PREEMPT_RT
+
+If the gpstool '''-r''' flag is used, the application will attempt to
+use the Linux First In, First Out thread scheduler ('''SCHED_FIFO''')
+for the thread used to sense and forward the 1PPS signal, if so
+configured. gpstool supports the sensing of the toggling of either a
+General Purpose Input/Output (GPIO) pin, or the Data Carrier Detect (DCD)
+indication on the GNSS device serial port, to indicate 1PPS. In either
+case, it uses a dedicated thread to manage this, and - if configured -
+to forward the 1PPS signal to another GPIO pin. Using the FIFO scheduler,
+with a high priority, is an attempt to reduce the jitter in sensing
+and fowarding 1PPS. But using a real-time Linux thread scheduler, such
+as First In, First Out, or Round Robin ('''SCHED_RR'''), requires that
+gpstool be run as root.
