@@ -1241,7 +1241,7 @@ int main(int argc, char * argv[])
         poller.onepps = 0;
         poller.done = 0;
 
-        threadp = diminuto_thread_init_generic(&thread, gpiopoller, scheduler, priority);
+        threadp = diminuto_thread_init_base(&thread, gpiopoller, scheduler, priority);
         diminuto_contract(threadp == &thread);
 
         threadrc = diminuto_thread_start(&thread, &poller);
@@ -1463,7 +1463,7 @@ int main(int argc, char * argv[])
         poller.onepps = 0;
         poller.done = 0;
 
-        threadp = diminuto_thread_init_generic(&thread, dcdpoller, scheduler, priority);
+        threadp = diminuto_thread_init_base(&thread, dcdpoller, scheduler, priority);
         diminuto_contract(threadp == &thread);
 
         threadrc = diminuto_thread_start(&thread, &poller);
