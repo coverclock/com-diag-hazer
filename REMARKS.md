@@ -998,8 +998,16 @@ configured. gpstool supports the sensing of the toggling of either a
 General Purpose Input/Output (GPIO) pin, or the Data Carrier Detect (DCD)
 indication on the GNSS device serial port, to indicate 1PPS. In either
 case, it uses a dedicated thread to manage this, and - if configured -
-to forward the 1PPS signal to another GPIO pin. Using the FIFO scheduler,
+to forward the 1PPS signal to an output GPIO pin. Using the FIFO scheduler,
 with a high priority, is an attempt to reduce the jitter in sensing
-and fowarding 1PPS. But using a real-time Linux thread scheduler, such
-as First In, First Out, or Round Robin ('''SCHED_RR'''), requires that
-gpstool be run as root.
+and fowarding 1PPS. Note that using a real-time Linux thread scheduler,
+such as First In, First Out, or Round Robin ('''SCHED_RR'''), requires
+that gpstool be run as root.
+
+Running as root and using the '''-r''' flag, I made a casual and amatuer
+attempt to characterize the performance of the gpstool 1PPS thread. This
+thread wakes up on a select(2) when the 1PPS input GPIO goes high, and
+again when it goes low, and duplicates its state to an output GPIO, which
+is my test fixture is connected to an LED. Using a Digilent hobbiest USB
+oscilloscope and logic analyzer, both tools measure a latency between
+the initial input and the matching output of about 50us.
