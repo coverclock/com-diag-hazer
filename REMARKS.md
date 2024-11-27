@@ -989,7 +989,7 @@ for which there is no dependency in Hazer. The few binary files in dat that
 are used for functional testing are now uuencoded (not that that makes them
 any more obvious as to what they are).
 
-## Real-Time Scheduling and PREEMPT_RT
+## Real-Time Scheduling, SCHED_FIFO, and PREEMPT_RT
 
 If the gpstool '''-r''' flag is used, the application will attempt to
 use the Linux First In, First Out thread scheduler ('''SCHED_FIFO''')
@@ -1000,14 +1000,23 @@ indication on the GNSS device serial port, to indicate 1PPS. In either
 case, it uses a dedicated thread to manage this, and - if configured -
 to forward the 1PPS signal to an output GPIO pin. Using the FIFO scheduler,
 with a high priority, is an attempt to reduce the jitter in sensing
-and fowarding 1PPS. Note that using a real-time Linux thread scheduler,
+and fowarding 1PPS. (Note that using a real-time Linux thread scheduler,
 such as First In, First Out, or Round Robin ('''SCHED_RR'''), requires
-that gpstool be run as root.
+that gpstool be run as root.)
 
-Running as root and using the '''-r''' flag, I made a casual and amatuer
-attempt to characterize the performance of the gpstool 1PPS thread. This
-thread wakes up on a select(2) when the 1PPS input GPIO goes high, and
-again when it goes low, and duplicates its state to an output GPIO, which
-is my test fixture is connected to an LED. Using a Digilent hobbiest USB
-oscilloscope and logic analyzer, both tools measure a latency between
-the initial input and the matching output of about 50us.
+Running as root and using the '''-r''' flag, I made a casual and
+amatuerish attempt to characterize the performance of the gpstool 1PPS
+thread. This thread wakes up on a select(2) when the 1PPS input GPIO
+goes high, and again when it goes low, and duplicates its state to an
+output GPIO, which on my test fixture is connected to an LED. Using a
+Digilent Analog Discovery hobbiest USB oscilloscope and logic analyzer,
+both tools measure a latency between the initial input and the matching
+output of about 50us to 70us, depending on how well my fumbling fingers
+manage to control the tools.
+
+I'm running these tests on an otherwise unused Raspberry Pi 5 running
+Ubuntu with a Linux kernel with the PREEMPT_RT patches installed. The Pi
+has four cores which, other than the two gpstool threads (main and 1PPS)
+and my own intermittent interactive use, are mostly idle. As I would
+expect, running gpstool as non-root doesn't seem to make any difference
+in my measurements.
