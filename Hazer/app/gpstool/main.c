@@ -92,6 +92,7 @@
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_terminator.h"
 #include "com/diag/diminuto/diminuto_time.h"
+#include "com/diag/diminuto/diminuto_timer.h"
 #include "com/diag/diminuto/diminuto_thread.h"
 #include "com/diag/diminuto/diminuto_types.h"
 #include "com/diag/diminuto/diminuto_version.h"
@@ -267,13 +268,20 @@ int main(int argc, char * argv[])
     /*
      * 1PPS poller thread variables.
      */
-    poller_t poller = { 0 };
+    poller_t poller = { 0, };
     void * result = (void *)0;
     diminuto_thread_t thread = DIMINUTO_THREAD_INITIALIZER((diminuto_thread_function_t *)0);
     diminuto_thread_t * threadp = (diminuto_thread_t *)0;
     int threadrc = -1;
     int onepps = 0;
-    bool pulsing = false;
+    /*
+     * 1Hz timer service variables.
+     */
+    diminuto_timer_t timer = DIMINUTO_TIMER_INITIALIZER((diminuto_timer_function_t *)0);
+    diminuto_timer_t * timerp = (diminuto_timer_t *)0;
+    diminuto_sticks_t timerticks = (diminuto_sticks_t)-1;
+    int onehz0 = 0;
+    int onehz = 0;
     /*
      * NMEA parser state variables.
      */
@@ -1239,15 +1247,15 @@ int main(int argc, char * argv[])
         poller.ppsfd = pps_fd;
         poller.strobefd = strobe_fd;
         poller.onepps = 0;
+        poller.onehz0 = 0;
+        poller.onehz = 0;
         poller.done = 0;
 
         threadp = diminuto_thread_init_base(&thread, gpiopoller, scheduler, priority);
         diminuto_contract(threadp == &thread);
 
-        threadrc = diminuto_thread_start(&thread, &poller);
+        threadrc = diminuto_thread_start(threadp, &poller);
         diminuto_contract(threadrc == 0);
-
-        pulsing = true;
     }
 
     /*
@@ -1461,16 +1469,32 @@ int main(int argc, char * argv[])
         poller.ppsfd = fileno(dev_fp);
         poller.strobefd = strobe_fd;
         poller.onepps = 0;
+        poller.onehz0 = 0;
+        poller.onehz = 0;
         poller.done = 0;
 
         threadp = diminuto_thread_init_base(&thread, dcdpoller, scheduler, priority);
         diminuto_contract(threadp == &thread);
 
-        threadrc = diminuto_thread_start(&thread, &poller);
+        threadrc = diminuto_thread_start(threadp, &poller);
         diminuto_contract(threadrc == 0);
+    }
 
-        pulsing = true;
+    /*
+     * If we are handling the 1PPS signal, either via a GPIO pin
+     * or via the serial DCD signal, start a one hertz periodic timer.
+     */
 
+    if (threadp != (diminuto_thread_t *)0) {
+
+        timerp = diminuto_timer_init_periodic(&timer, timerservice);
+        diminuto_contract(timerp == &timer);
+
+        timerticks = diminuto_frequency();
+        diminuto_contract(timerticks > 0);
+
+        timerticks = diminuto_timer_start(timerp, timerticks, &poller);
+        diminuto_contract(timerticks >= (diminuto_sticks_t)0);
     }
 
     /*
@@ -3927,9 +3951,11 @@ render:
              * on the device, update our copy of its status now.
              */
 
-            if (pulsing) {
+            if (threadp != (diminuto_thread_t *)0) {
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
                     onepps = poller.onepps;
+                    onehz0 = poller.onehz0;
+                    onehz = poller.onehz;
                 DIMINUTO_CRITICAL_SECTION_END;
             }
 
@@ -4041,14 +4067,25 @@ stop:
 
     diminuto_mux_fini(&mux);
 
-    if (threadrc == 0) {
+    if (timerp != (diminuto_timer_t *)0) {
+        timerticks = diminuto_timer_stop(timerp);
+        diminuto_contract(timerticks >= 0);
+        timerp = diminuto_timer_fini(timerp);
+        diminuto_contract(timerp == (diminuto_timer_t *)0);
+    }
+
+    if (threadp != (diminuto_thread_t *)0) {
         DIMINUTO_COHERENT_SECTION_BEGIN;
             poller.done = !0;
         DIMINUTO_COHERENT_SECTION_END;
-        DIMINUTO_THREAD_BEGIN(&thread);
-            threadrc = diminuto_thread_notify(&thread);
+        DIMINUTO_THREAD_BEGIN(threadp);
+            threadrc = diminuto_thread_notify(threadp);
         DIMINUTO_THREAD_END;
-        threadrc = diminuto_thread_join(&thread, &result);
+        threadrc = diminuto_thread_join(threadp, &result);
+        /* Do nothing with result. */
+        diminuto_contract(threadrc == 0);
+        threadp = diminuto_thread_fini(threadp);
+        diminuto_contract(threadp == (diminuto_thread_t *)0);
     }
 
     if (pps_fd >= 0) {

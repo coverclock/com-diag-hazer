@@ -15,16 +15,11 @@
 #include "com/diag/diminuto/diminuto_serial.h"
 #include "com/diag/diminuto/diminuto_line.h"
 #include "com/diag/diminuto/diminuto_mux.h"
-#include "types.h"
+#include "constants.h"
 #include "globals.h"
 #include "threads.h"
+#include "types.h"
 
-/**
- * Implement a thread that polls for the data carrier detect (DCD) state for
- * 1PPS.
- * @param argp points to the thread context.
- * @return the final value of the thread.
- */
 void * dcdpoller(void * argp)
 {
     void * xc = (void *)1;
@@ -57,8 +52,9 @@ void * dcdpoller(void * argp)
                 if (rc < 0) { break; }
             }
             DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
-                pollerp->onepps %= 60;  /* 0..59 */
-                pollerp->onepps += 1;   /* 1..60 */
+                pollerp->onepps %= MODULO;  /* 0..59 */
+                pollerp->onepps += 1;       /* 1..60 */
+                pollerp->onehz = 0;         /* 0..3 */
             DIMINUTO_CRITICAL_SECTION_END;
         } else {
             if (pollerp->strobefd >= 0) {
@@ -72,12 +68,6 @@ void * dcdpoller(void * argp)
     return xc;
 }
 
-/**
- * Implement a thread that polls for the general purpose input/output (GPIO)
- * state for 1PPS.
- * @param argp points to the thread context.
- * @return the final value of the thread.
- */
 void * gpiopoller(void * argp)
 {
     void * xc = (void *)1;
@@ -112,6 +102,11 @@ void * gpiopoller(void * argp)
             rc = diminuto_line_read(pollerp->ppsfd);
             if (rc < 0) { break; }
             nowpps = !!rc;
+            /*
+             * THe strobe, if it exists, follows the value of 1PPS
+             * as closely as possible. But we only change strobe when
+             * we know that 1PPS has changed.
+             */
             if (nowpps == waspps) {
                 /* Do nothing. */
             } else if (nowpps) {
@@ -120,8 +115,9 @@ void * gpiopoller(void * argp)
                     if (rc < 0) { break; }
                 }
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
-                    pollerp->onepps %= 60;  /* 0..59 */
-                    pollerp->onepps += 1;   /* 1..60 */
+                    pollerp->onepps %= MODULO;  /* 0..59 */
+                    pollerp->onepps += 1;       /* 1..60 */
+                    pollerp->onehz = 0;         /* 0.. 3 */
                 DIMINUTO_CRITICAL_SECTION_END;
             } else {
                 if (pollerp->strobefd >= 0) {
@@ -136,6 +132,22 @@ void * gpiopoller(void * argp)
 
     rc = diminuto_mux_unregister_read(&mux, pollerp->ppsfd);
     diminuto_mux_fini(&mux);
+
+    return xc;
+}
+
+void * timerservice(void * argp)
+{
+    void * xc = (void *)0;
+    poller_t * pollerp = (poller_t *)0;
+
+    pollerp = (poller_t *)argp;
+
+    DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
+        if (pollerp->onehz < THRESHOLD) {
+            pollerp->onehz += 1;    /* 0..3 */
+        }
+    DIMINUTO_CRITICAL_SECTION_END;
 
     return xc;
 }

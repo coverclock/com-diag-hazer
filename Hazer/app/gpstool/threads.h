@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Thread API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -27,5 +27,13 @@ extern void * dcdpoller(void * argp);
  * @return the final value of the thread.
  */
 extern void * gpiopoller(void * argp);
+
+/**
+ * Implements a timer that helsp us determine if we have lost our One Pulse
+ * Per Second (1PPS) signal.
+ * @param argp points to the timer context.
+ * @return the value of the timer service.
+ */
+extern void * timerservice(void * argp);
 
 #endif

@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2019-2022 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This defines the gpstool Constants.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -92,5 +92,15 @@ static const char SYNCHRONIZATION[] = {
     '9',
     '*',
 };
+
+/**
+ * The 1PPS counter has values modulo this number, plus one.
+ */
+static const int MODULO = 60;
+
+/**
+ * The 1Hz counter has values less than or equal to this number.
+ */
+static const int THRESHOLD = 3;
 
 #endif

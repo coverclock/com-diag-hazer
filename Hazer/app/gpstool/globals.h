@@ -50,7 +50,7 @@ extern int Realtime;
 extern const char * Source;
 
 /**
- * This is our POSIX thread mutual exclusion semaphore.
+ * This is our POSIX thread mutual exclusion semaphore for the Poller object.
  */
 extern pthread_mutex_t Mutex;
 
