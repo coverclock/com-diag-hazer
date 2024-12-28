@@ -101,6 +101,6 @@ static const int MODULO = 60;
 /**
  * The 1Hz counter has values less than or equal to this number.
  */
-static const int THRESHOLD = 3;
+static const int TOLERANCE = 4;
 
 #endif

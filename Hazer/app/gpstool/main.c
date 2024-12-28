@@ -274,13 +274,13 @@ int main(int argc, char * argv[])
     diminuto_thread_t * threadp = (diminuto_thread_t *)0;
     int threadrc = -1;
     int onepps = 0;
+    bool pulsing = false;
     /*
      * 1Hz timer service variables.
      */
     diminuto_timer_t timer = DIMINUTO_TIMER_INITIALIZER((diminuto_timer_function_t *)0);
     diminuto_timer_t * timerp = (diminuto_timer_t *)0;
     diminuto_sticks_t timerticks = (diminuto_sticks_t)-1;
-    int onehz0 = 0;
     int onehz = 0;
     /*
      * NMEA parser state variables.
@@ -1239,7 +1239,7 @@ int main(int argc, char * argv[])
         pps_fd = diminuto_line_open_read(ppsdevice, ppsline, flags, 0);
         diminuto_contract(pps_fd >= 0);
 
-        DIMINUTO_LOG_INFORMATION("1pps Line (%d) \"%s\" \"%s\" %d\n", pps_fd, pps, ppsdevice, ppsline);
+        DIMINUTO_LOG_INFORMATION("1PPS Line (%d) \"%s\" \"%s\" %d\n", pps_fd, pps, ppsdevice, ppsline);
 
         rc = diminuto_line_get(pps_fd);
         diminuto_contract(rc >= 0);
@@ -1247,8 +1247,7 @@ int main(int argc, char * argv[])
         poller.ppsfd = pps_fd;
         poller.strobefd = strobe_fd;
         poller.onepps = 0;
-        poller.onehz0 = 0;
-        poller.onehz = 0;
+        poller.onehz = TOLERANCE;
         poller.done = 0;
 
         threadp = diminuto_thread_init_base(&thread, gpiopoller, scheduler, priority);
@@ -1469,8 +1468,7 @@ int main(int argc, char * argv[])
         poller.ppsfd = fileno(dev_fp);
         poller.strobefd = strobe_fd;
         poller.onepps = 0;
-        poller.onehz0 = 0;
-        poller.onehz = 0;
+        poller.onehz = TOLERANCE;
         poller.done = 0;
 
         threadp = diminuto_thread_init_base(&thread, dcdpoller, scheduler, priority);
@@ -3952,11 +3950,22 @@ render:
              */
 
             if (threadp != (diminuto_thread_t *)0) {
+
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
                     onepps = poller.onepps;
-                    onehz0 = poller.onehz0;
                     onehz = poller.onehz;
                 DIMINUTO_CRITICAL_SECTION_END;
+
+                if ((pulsing) && (onehz >= TOLERANCE)) {
+                    DIMINUTO_LOG_NOTICE("1PPS Lost\n");
+                    pulsing = false;
+                } else if ((!pulsing) && (onehz <= 0)) {
+                    DIMINUTO_LOG_NOTICE("1PPS Acquired\n");
+                    pulsing = true;
+                } else {
+                    /* Do nothing. */
+                }
+
             }
 
             /*

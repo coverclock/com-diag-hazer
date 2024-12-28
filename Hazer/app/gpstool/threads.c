@@ -52,9 +52,9 @@ void * dcdpoller(void * argp)
                 if (rc < 0) { break; }
             }
             DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
-                pollerp->onepps %= MODULO;  /* 0..59 */
-                pollerp->onepps += 1;       /* 1..60 */
-                pollerp->onehz = 0;         /* 0..3 */
+                pollerp->onepps %= MODULO;  /* 0..(MODULO-1) */
+                pollerp->onepps += 1;       /* 1..MODULO */
+                pollerp->onehz = 0;         /* 0..TOLERANCE */
             DIMINUTO_CRITICAL_SECTION_END;
         } else {
             if (pollerp->strobefd >= 0) {
@@ -115,9 +115,9 @@ void * gpiopoller(void * argp)
                     if (rc < 0) { break; }
                 }
                 DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
-                    pollerp->onepps %= MODULO;  /* 0..59 */
-                    pollerp->onepps += 1;       /* 1..60 */
-                    pollerp->onehz = 0;         /* 0.. 3 */
+                    pollerp->onepps %= MODULO;  /* 0..(MODULO-1) */
+                    pollerp->onepps += 1;       /* 1..MODULO */
+                    pollerp->onehz = 0;         /* 0..TOLERANCE */
                 DIMINUTO_CRITICAL_SECTION_END;
             } else {
                 if (pollerp->strobefd >= 0) {
@@ -144,8 +144,8 @@ void * timerservice(void * argp)
     pollerp = (poller_t *)argp;
 
     DIMINUTO_CRITICAL_SECTION_BEGIN(&Mutex);
-        if (pollerp->onehz < THRESHOLD) {
-            pollerp->onehz += 1;    /* 0..3 */
+        if (pollerp->onehz < TOLERANCE) {
+            pollerp->onehz += 1;            /* 0..TOLERANCE */
         }
     DIMINUTO_CRITICAL_SECTION_END;
 

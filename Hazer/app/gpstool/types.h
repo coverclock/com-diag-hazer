@@ -78,9 +78,9 @@ typedef enum Format {
  * mobile rover)?
  */
 typedef enum Source {
-    SOURCE  = '?',
-    DEVICE  = 'D',
-    NETWORK = 'N',
+    SOURCE      = '?',
+    DEVICE      = 'D',
+    NETWORK     = 'N',
 } source_t;
 
 /**
@@ -384,7 +384,6 @@ typedef struct Poller {
     int ppsfd;
     int strobefd;
     volatile int onepps;
-    volatile int onehz0;
     volatile int onehz;
     volatile int done;
 } poller_t;
