@@ -4,7 +4,7 @@
 
 /**
  * @file
- * @copyright Copyright 2017-2020 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2017-2024 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Print API.
  * @author Chip Overclock <mailto:coverclock@diag.com>
@@ -59,10 +59,11 @@ extern void print_status(FILE * fp, const yodel_status_t * sp);
  * @param fp points to the FILE stream.
  * @param pa points to an array of positions.
  * @param ss is the largest system value used so far.
- * @param pps is the current value of the 1PPS strobe.
+ * @param onepps is the current value of the 1PPS strobe.
+ * @param pulsing is the current value of the pulsing flag.
  * @param bytes is the total number of bytes sent and received over the network.
  */
-extern void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, int pps, uint64_t bytes);
+extern void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, int onepps, bool pulsing, uint64_t bytes);
 
 /**
  * Print information about the base and the rover that communicate via RTCM.

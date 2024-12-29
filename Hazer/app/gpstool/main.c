@@ -3978,7 +3978,7 @@ render:
 
             if (report) {
                 print_local(out_fp);
-                print_positions(out_fp, positions, maximum, onepps, network_total);
+                print_positions(out_fp, positions, maximum, onepps, pulsing, network_total);
                 print_hardware(out_fp, &hardware);
                 print_status(out_fp, &status);
                 print_solution(out_fp, &solution);

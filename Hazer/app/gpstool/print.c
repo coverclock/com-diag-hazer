@@ -437,7 +437,7 @@ void print_status(FILE * fp, const yodel_status_t * sp)
     msss_prior = sp->payload.msss;
 }
 
-void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, int onepps, uint64_t bytes)
+void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, int onepps, bool pulsing, uint64_t bytes)
 {
     unsigned int system = 0;
 
@@ -531,7 +531,9 @@ void print_positions(FILE * fp, const hazer_positions_t pa, hazer_system_t ss, i
 
             fprintf(fp, " %2dpulses", onepps);
 
-            fprintf(fp, "%12s", "");
+            fprintf(fp, " %c", pulsing ? 'P' : 'p');
+
+            fprintf(fp, "%10s", "");
 
             fprintf(fp, " %-8.8s", HAZER_SYSTEM_NAME[system]);
 
