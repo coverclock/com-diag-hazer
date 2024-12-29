@@ -70,8 +70,9 @@ jump by an increment of more than one). "pulses" (lower-case 'p')
 indicates the 1PPS signal (however it is received) has not yet been
 acquired, or was acquired but subsequently lost; "Pulses" (upper-case
 'P') indicates the 1PPS is currently active. There is some deliberate
-damping of the 1PPS state of health indication, to it may take a few
-seconds to change even as the counter is incrementing.
+damping or hysteresis of the 1PPS state of health indication, to it may
+take a few seconds to change even as the counter is incrementing or has
+stopped incrementing.
 
     POS 39°47'39.258"N, 105°09'12.172"W    39.7942383, -105.1533813 Aq Ns  GNSS
 
