@@ -38,34 +38,46 @@ length of the output data minus the end matter.
 
 LOCal is the current local time provided by the host system, the elapsed
 time to first fix, the software release number, the process id, and the
-local host name. The local time, with a fractional part in milliseconds,
-includes the time zone offset from UTC in hours and minutes, and the
-current daylight saving time (DST) offset in hours. The next field is
-the elapsed time since the application began running in days, hours,
-minutes, and seconds. The remaining fields are the Hazer release string,
-the Process Identifier (PID) of the application, a single digit indicating
-how many times the input stream has been synchronized or '\*' if it is more
-than nine, and the first eight characters of the name of the host system.
+local host name.
 
-    TIM 2023-07-17T23:46:10.000-00:00+00 00:00:00.571 39pulses             GNSS
+The local time, with a fractional part in milliseconds, includes the
+time zone offset from UTC in hours and minutes, and the current daylight
+saving time (DST) offset in hours.
+
+The next field is the elapsed time since the application began running
+in days, hours, minutes, and seconds.
+
+The remaining fields are the Hazer release string, the Process Identifier
+(PID) of the application, a single digit indicating how many times the
+input stream has been synchronized or '\*' if it is more than nine,
+and the first eight characters of the name of the host system.
+
+    TIM 2024-12-29T15:21:39.000-00:00+00 00:00:00.351 51pulses P           GNSS
 
 TIMe is the most recent time solution in UTC, the elapsed time of the
 initial position fix (or dashes if no position fix has occurred yet,
-or asterisks if it is more than a day), and the current value of the
-One Pulse Per Second (1PPS) counter. The pulses counter is initialized
-to zero, and if the 1PPS option was enabled on the command line using
--c for data carrier detect (DCD), or using -I for a general purpose
-input/output (GPIO) pin, it cycles from one to sixty and back, changing
-once per second; otherwise the counter remains at zero (note that the
-changing of the pulses counter is asynchronous with the update of the
-display, so it may occasionally jump by an increment of more than one).
+or asterisks if it is more than a day), the current value of the
+One Pulse Per Second (1PPS) counter, and the current status of the 1PPS
+signal.
+
+The pulses counter is initialized to zero, and if the 1PPS option was
+enabled on the command line using -c for data carrier detect (DCD),
+or using -I for a general purpose input/output (GPIO) pin, it cycles
+from one to sixty and back, changing once per second; otherwise the
+counter remains at zero (note that the changing of the pulses counter
+is asynchronous with the update of the display, so it may occasionally
+jump by an increment of more than one).
+
+The following single character is a 'p' if the 1PPS signal (however it
+is received) has not yet been acquired, or was acquired but subsequently
+lost, and a 'P' if the 1PPS is currently active.
 
     POS 39°47'39.258"N, 105°09'12.172"W    39.7942383, -105.1533813 Aq Ns  GNSS
 
 POSition is the most recent position solution, latitude and longitude,
 in degrees, hours, minutes, and decimal seconds, and in decimal
 degrees. Either format can be cut and pasted directly into Google Maps,
-and the latter into Google Earth.  The underlying position data is stored
+and the latter into Google Earth. The underlying position data is stored
 as binary integers in billionths of a minute (nanominutes). But the
 device under test may not provide that much accuracy; the actual number of
 significant digits for various data is reported by the INT line (below),
@@ -132,12 +144,15 @@ set (only occurs once the RMC sentence has been received), an indication
 as to whether time is incrementing monotonically (it can appear to run
 backwards when receiving UDP packets because UDP may reorder them),
 and some metrics as to the number of significant digits provided for
-various values provided by the device.  INT also includes the total
-number of bytes sent or received - 395,261,29B in this example - over
-the network. This allows you to keep track of your network utilization,
-especially important when paying for data on your LTE mobile provider. The
-right-most field in the first INT line (there will typically only be one)
-is the name of the device from which gpstool is reading.
+various values provided by the device.
+
+The next field is the total number of bytes sent or received - 39,526,129
+(with a 'B' for "bytes") in this example - over the network. This allows
+you to keep track of your network utilization, especially important when
+paying for data on your LTE mobile provider.
+
+The right-most field in the line is the name of the data source from which
+gpstool is reading.
 
     MON -jamming  +history  50indicator  63maximum                         ttyACM1
 
@@ -152,9 +167,10 @@ monitor (ITFM) be calibrated using the UBX-CFG-ITFM message.
 STAtus displays some of the results received in the UBX-NAV-STATUS message
 if enabled. u-blox 8 chips with firmware revision 18 and above can provide
 clues to spoofing based on comparing navigation solutions from multiple
-GNSSes if available. (N.B. I don't have a way to test this.) Also shown
-are the milliseconds since first fix and milliseconds uptime provided
-by the message.
+GNSSes if available. (N.B. I don't have a way to test this.)
+
+Also shown are the milliseconds since first fix and milliseconds uptime
+provided by the message.
 
     ATT    0.0° roll ±  20.0°  -73.6° pitch ±  78.8°   57.7° yaw ±  85.0°  IMU
 
@@ -172,10 +188,20 @@ native units are meters), along with the error estimate in meters.
 
 North-East-Down indicates the orientation of the vehicle frame reading
 available from the Intertial Measurement Unit (IMU) in some u-blox
-modules. The character in the parenthesis indicates the nature of the
-ensemble GNSS and IMU fix: '-' for no fix; '!' for a dead reckoning fix
-only; '2' for a 2D GNSS fix; '3' for a 3D GNSS fix; '+' for a combined
-GNSS + dead reckoning fix; '\*' for a time only fix; and '?' for an error.
+modules.
+
+The character in the parenthesis indicates the nature of the ensemble
+GNSS and IMU fix:
+
+* '-' for no fix;
+* '!' for a dead reckoning fix only;
+* '2' for a 2D GNSS fix;
+* '3' for a 3D GNSS fix;
+* '+' for a combined GNSS and dead reckoning fix;
+* '\*' for a time only fix; and
+* '?' for an error.
+
+(This line intentionally not left blank.)
 
     HPP   39.794267897, -105.153420946 ±     0.5237m                       GNSS
 
@@ -219,12 +245,15 @@ and from whom.
 Real-Time Kinematics show the latest RTCM message received, when operating
 in base mode (in which case the message was read from the device), or
 in rover mode (in which case the message was received from the base in
-a datagram via UDP and written to the device).  The lengths of the most
-recent message is shown, as is the mode of the system, base or rover. The
-character sequence between the angle brackets records the last eight RTCM
-messages that were received, the newest one indicated by the rightmost
-character in the sequence, as the sequence is progressively shifted left
-as new messages are received.
+a datagram via UDP and written to the device).
+
+The length of the most recent message is shown, as is the mode of the
+system, base or rover.
+
+The character sequence between the angle brackets records the last
+eight RTCM messages that were received, the newest one indicated by the
+rightmost character in the sequence, as the sequence is progressively
+shifted left as new messages are received.
 
     ACT [1] {    25    20    23    15     5    29 } [ 6] [ 7] [19] [21] 3D NAVSTAR
 
@@ -233,21 +262,24 @@ for each system or constellation by the device, showing each satellites
 identifying number (for GPS, this is its pseudo-random noise or PRN code
 number, but other systems using other conventions), and the number of
 active satellites in this list, the number of active satellites for this
-constellation, and the number of active satellites total.  Unlike the
-other report lines, the system or constellation to which the data applies
-is derived from (in order, depending on availability) the system id in the
-GSA sentence (only available on devices that support later NMEA versions),
-or an analysis of the Space Vehicle Identifier based on NMEA conventions,
-or the talker specified at the beginning of the sentence. The reason
-for this is that some devices (I'm looking at you, GN803G), specify GNSS
-as the talker for all GSA sentences when they are computing an ensemble
-solution (one based on multiple constellations); this causes ambiguity
-between this case and the case of successive GSA sentences in which the
-active satellite list has changed. Hazer independently tries to determine
-the constellation to which the GSA sentence refers when the talker is
-GNSS.  The fourth metric is the maximum number of space vehicles (SVs)
-or satellites used in the solution since the application began. This
-is useful when testing different antenna locations, particularly when
+constellation, and the number of active satellites total.
+
+Unlike the other report lines, the system or constellation to which the
+data applies is derived from (in order, depending on availability) the
+system id in the GSA sentence (only available on devices that support
+later NMEA versions), or an analysis of the Space Vehicle Identifier
+based on NMEA conventions, or the talker specified at the beginning of the
+sentence. The reason for this is that some devices (I'm looking at you,
+GN803G), specify GNSS as the talker for all GSA sentences when they are
+computing an ensemble solution (one based on multiple constellations);
+this causes ambiguity between this case and the case of successive
+GSA sentences in which the active satellite list has changed. Hazer
+independently tries to determine the constellation to which the GSA
+sentence refers when the talker is GNSS.
+
+The fourth metric is the maximum number of space vehicles (SVs) or
+satellites used in the solution since the application began. This is
+useful when testing different antenna locations, particularly when
 using the device in a fixed base survey mode. In the example above,
 the first ACT line indicates that 6 SVs in the NAVSTAR constellation
 are represented in this particular line, the solution includes 10 total
@@ -294,21 +326,27 @@ Vehicle IDentifier (specific to the constellation); its elevation and
 azimuth in degrees; its the signal strength (really, a carrier to noise
 density ratio) in deciBels Hertz; the name of the signal band (according
 to NMEA 0183) if specified ("ANY" if it is not, and spaces in the name
-are replaced with an underscore); and zero or more flags. A flag of 'G'
-indicates that this SV was reported by the GSV sentence, while a
-'U' indicates the PUBX sentence. (The leading 'P' generally means
+are replaced with an underscore); and zero or more flags.
+
+'G' indicates that this SV was reported by the GSV sentence, while
+a 'U' indicates the PUBX sentence. (The leading 'P' generally means
 "Proprietary" in NMEA parlance, and is used in other vendors' proprietary
-NMEA-like sentences; here, "PUBX" means Proprietary UBX.); a flag of
+NMEA-like sentences; hence, "PUBX" means Proprietary UBX.).
+
 '<' indicates that the satellite is on the active list (see ACT above,
 provided by the NMEA GSA sentence or by the U-blox PUBX SVSTATUS
-sentence); a '?' indicates that the azimuth and/or the elevation were
-empty (but displays as zero), and typically means that the almanac has
-not yet been received (a cold start), but occasionally indicates that
-the satellite is not in the received almanac, which I've seen when GPS
-ground control is testing a new satellite; a '!' indicates that the signal
-strength was empty (but displays as zero), where some receivers use this
-to indicate the satellite is in the almanac but is not being received
-over an available RF channel); a '-' indicates that a PUBX SVSTATUS
-message has indicated that the satellite was excluded in the solution
-(this is apparently different from having the satellite's ephemeris but
-not using it in the solution).
+sentence).
+
+'?' indicates that the azimuth and/or the elevation were empty (but
+displays as zero), and typically means that the almanac has not yet been
+received (a cold start), but occasionally indicates that the satellite
+is not in the received almanac, which I've seen when GPS ground control
+is testing a new satellite.
+
+'!' indicates that the signal strength was empty (but displays as zero),
+where some receivers use this to indicate the satellite is in the almanac
+but is not being received over an available RF channel).
+
+'-' indicates that a PUBX SVSTATUS message has indicated that the
+satellite was excluded in the solution (this is apparently different
+from having the satellite's ephemeris but not using it in the solution).
