@@ -69,7 +69,7 @@ is asynchronous with the update of the display, so it may occasionally
 jump by an increment of more than one). "pulses" (lower-case 'p')
 indicates the 1PPS signal (however it is received) has not yet been
 acquired, or was acquired but subsequently lost; "Pulses" (upper-case
-'P') indicates the 1PPS is currently active. There is some deliberate
+'P') indicates the 1PPS signal is currently active. There is some deliberate
 damping or hysteresis of the 1PPS state of health indication, to it may
 take a few seconds to change even as the counter is incrementing or has
 stopped incrementing.
