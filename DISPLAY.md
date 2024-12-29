@@ -52,7 +52,7 @@ The remaining fields are the Hazer release string, the Process Identifier
 input stream has been synchronized or '\*' if it is more than nine,
 and the first eight characters of the name of the host system.
 
-    TIM 2024-12-29T15:21:39.000-00:00+00 00:00:00.351 51pulses P           GNSS
+    TIM 2024-12-29T15:21:39.000-00:00+00 00:00:00.351 51Pulses             GNSS
 
 TIMe is the most recent time solution in UTC, the elapsed time of the
 initial position fix (or dashes if no position fix has occurred yet,
@@ -66,11 +66,12 @@ or using -I for a general purpose input/output (GPIO) pin, it cycles
 from one to sixty and back, changing once per second; otherwise the
 counter remains at zero (note that the changing of the pulses counter
 is asynchronous with the update of the display, so it may occasionally
-jump by an increment of more than one).
-
-The following single character is a 'p' if the 1PPS signal (however it
-is received) has not yet been acquired, or was acquired but subsequently
-lost, and a 'P' if the 1PPS is currently active.
+jump by an increment of more than one). "pulses" (lower-case 'p')
+indicates the 1PPS signal (however it is received) has not yet been
+acquired, or was acquired but subsequently lost; "Pulses" (upper-case
+'P') indicates the 1PPS is currently active. There is some deliberate
+damping of the 1PPS state of health indication, to it may take a few
+seconds to change even as the counter is incrementing.
 
     POS 39°47'39.258"N, 105°09'12.172"W    39.7942383, -105.1533813 Aq Ns  GNSS
 
