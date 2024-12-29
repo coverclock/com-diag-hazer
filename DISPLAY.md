@@ -112,7 +112,7 @@ sentence, and gives a clue as to the confidence in and timeliness of the fix:
 * S - Safe;
 * C - Caution;
 * U - Unsafe;
-* V - Invalid or no safety indication reported.
+* N - No safety indication reported;
 * \- - Unset (no sentence with a safety metric received or field not present);
 * ? - Invalid.
 
