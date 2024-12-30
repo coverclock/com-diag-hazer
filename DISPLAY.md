@@ -34,7 +34,7 @@ minus the end matter like a checksum etc., which is added independently
 of when this line was emitted. The number in the square brackets is the
 length of the output data minus the end matter.
 
-    LOC 2024-02-28T16:17:28.606-07:00+00 00/00:00:51 60.5.0        11043 S plutoniu
+    LOC 2024-12-29T09:47:12.295-07:00+00 00/00:07:29 61.4.1       146977 1 rutheniu
 
 LOCal is the current local time provided by the host system, the elapsed
 time to first fix, the software release number, the process id, and the
