@@ -1,9 +1,7 @@
 # Display
 
-The display examples below were cut and pasted from actual running
-instances of gpstool, but not necessarily the same instance, running
-on the same target with the same GNSS hardware, with the same command
-line options, using the same version of gpstool. The gpstool display
+The display examples below were cut and pasted from an actual running
+instance of gpstool, but not necessarily the same instance. The gpstool display
 is event driven: each line is displayed if and only if the appropriate
 NMEA, PUBX, UBX, or RTCM input was received from the device under test,
 within the timeout window, regardless of command line options or how
