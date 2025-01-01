@@ -1,9 +1,7 @@
 # Display
 
-The display examples below were cut and pasted from actual running
-instances of gpstool, but not necessarily the same instance, running
-on the same target with the same GNSS hardware, with the same command
-line options, using the same version of gpstool. The gpstool display
+The display examples below were cut and pasted from an actual running
+instance of gpstool, but not necessarily the same instance. The gpstool display
 is event driven: each line is displayed if and only if the appropriate
 NMEA, PUBX, UBX, or RTCM input was received from the device under test,
 within the timeout window, regardless of command line options or how
@@ -34,7 +32,7 @@ minus the end matter like a checksum etc., which is added independently
 of when this line was emitted. The number in the square brackets is the
 length of the output data minus the end matter.
 
-    LOC 2024-02-28T16:17:28.606-07:00+00 00/00:00:51 60.5.0        11043 S plutoniu
+    LOC 2024-12-29T09:47:12.295-07:00+00 00/00:07:29 61.4.1       146977 1 rutheniu
 
 LOCal is the current local time provided by the host system, the elapsed
 time to first fix, the software release number, the process id, and the
@@ -69,8 +67,8 @@ is asynchronous with the update of the display, so it may occasionally
 jump by an increment of more than one). "pulses" (lower-case 'p')
 indicates the 1PPS signal (however it is received) has not yet been
 acquired, or was acquired but subsequently lost; "Pulses" (upper-case
-'P') indicates the 1PPS is currently active. There is some deliberate
-damping or hysteresis of the 1PPS state of health indication, to it may
+'P') indicates the 1PPS signal is currently active. There is some deliberate
+damping or hysteresis of the 1PPS state of health indication, so it may
 take a few seconds to change even as the counter is incrementing or has
 stopped incrementing.
 
@@ -112,7 +110,7 @@ sentence, and gives a clue as to the confidence in and timeliness of the fix:
 * S - Safe;
 * C - Caution;
 * U - Unsafe;
-* V - Invalid or no safety indication reported.
+* N - No safety indication reported;
 * \- - Unset (no sentence with a safety metric received or field not present);
 * ? - Invalid.
 
