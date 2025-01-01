@@ -788,9 +788,17 @@ Ubuntu 19.10 "Eoan" (Microsoft Common Base Linux "Mariner")
 Linux 5.3.0    
 GNU 9.2.1    
 
-Your mileage may vary. Hazer and gpstool are not resource intensive. I
-routinely run gpstool on an old 32-bit Intel i686 netbook, and run several
-simultaneous instances of gpstool on a single Rasbperry Pi 4B.
+Raspberry Pi 5 Model B Rev 1.0 d04170    
+ARM Cortex-A76 x4    
+Ubuntu 24.04.1 LTS (Noble Numbat)    
+Linux 6.8.0-2016-raspi-realtime (with PREEMPT_RT patches)    
+GNU 2.39    
+
+Your mileage may vary.
+
+Hazer and gpstool are not resource intensive. I routinely run gpstool on
+an old 32-bit Intel i686 netbook, and run several simultaneous instances
+of gpstool on a single Rasbperry Pi 4B.
 
 # Diagnostics
 
