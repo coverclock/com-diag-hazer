@@ -650,6 +650,8 @@ Wireless.
 
 SiRF is part of Qualcom.
 
+Septentrio is part of Hexagon.
+
 # Devices (Other)
 
 In the context of this repository, I also deal with devices that are not
