@@ -2029,6 +2029,11 @@ in Boulder Colorado. Mr. Gabbard generously shared some results off
 his professional Trimble GPS rover taken at NGS survey marker
 KK1446 that I have used to test this code.
 
+I really appreciate the feedback and mentoring of user "clive1" on
+the U-Blox support forum, who several times kept me on the straight
+and narrow reading my understanding of the U-blox proprietary
+messaging.
+
 Thanks to several manufacturers of GNSS devices, or of products that
 have GNSS devices embedded within them, who, because of design flaws
 and bugs in their products, led to vast improvements in this code.
