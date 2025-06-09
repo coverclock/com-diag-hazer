@@ -42,41 +42,6 @@ U-Blox says this FW bug will be fixed in a subsequent release.
 
 <https://portal.u-blox.com/s/question/0D52p00008WRsgMCAT/ubxzedf9p-incorrect-number-of-satellites-in-view-for-nmea-gsv-for-glonass>
 
-## Likely wrong message indexing for Beidou on U-Blox UBX-ZED-F9R
-
-(This turned out to be a bug on my part; see below.)
-
-The Sparkfun ZED-F9R board uses the U-Blox ZED-F9R GNSS receiver.  I'm
-pretty sure the U-Blox ZED-F9R-00B-00 chip has a firmware bug. I believe
-these two successive GSV sentences that it sent are probably incorrect.
-
-    $GBGSV,1,1,04,23,15,154,34,27,57,250,33,28,65,039,36,37,61,186,44,1*7A\r\n
-    $GBGSV,1,1,02,14,03,072,,30,07,241,,0*75\r\n
-
-Note that they both identify as messages 1 of 1, instead of messages
-1 of 2 and 2 of 2. While this is possible, it seems unlikely. Because
-the second message appears to override the first message, the satellites
-in the first message do not appear in the gpstool SAT output, even though
-they are in the GSA message and hence in the gpstool ACT output.
-
-So far I have only noticed this in the NMEA sentences for the Chinese
-Beidou (GB) constellation.
-
-(I went to the u-blox web site to get the latest FW binary, which I applied
-to the F9R. I noticed that u-blox has discontinued this product for "lack of
-customer interest". I'm not surprised; I questioned the market for a relatively
-expensive chip that combines differential GNSS with an IMU. I still notice
-GSA/GSV discrepancies in FWVER HPS 1.21, and not just in the Beidou
-constellation.)
-
-### Update 2023-06-01
-
-This is entirely my bug. The two sentences have different Signal
-ID fields, ```1``` in the first one, ```0``` in the second, and so
-represent in effect different perspectives of what satellites are
-in view for the same constellation. Later versions of Hazer interpret
-this field correctly.
-
 ## Lost Characters on Gen 8 and Gen 9 U-blox Modules using USB ACM Port
 
 I've been troubleshooting a weird issue with sequences of characters being

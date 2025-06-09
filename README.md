@@ -650,6 +650,8 @@ Wireless.
 
 SiRF is part of Qualcom.
 
+Septentrio is part of Hexagon.
+
 # Devices (Other)
 
 In the context of this repository, I also deal with devices that are not
@@ -2038,6 +2040,11 @@ Flatirons, Inc., a surveying, engineering, and geomatics firm located
 in Boulder Colorado. Mr. Gabbard generously shared some results off
 his professional Trimble GPS rover taken at NGS survey marker
 KK1446 that I have used to test this code.
+
+I really appreciate the feedback and mentoring of user "clive1" on
+the U-Blox support forum, who several times kept me on the straight
+and narrow reading my understanding of the U-blox proprietary
+messaging.
 
 Thanks to several manufacturers of GNSS devices, or of products that
 have GNSS devices embedded within them, who, because of design flaws

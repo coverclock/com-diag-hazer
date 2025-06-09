@@ -882,7 +882,7 @@ Subchapter M, Part 121, Enumeration of Articles, Section 121.1,
 
 (Warning: this describes an experimental work in progress.)
 
-The Stagecoach sub-project in the Codex repository
+The `stagecoach` application in the Codex repository
 
 <https://github.com/coverclock/com-diag-codex>
 
@@ -909,16 +909,16 @@ From the Stagecoach documentation:
     Client (Rover):  gpstool -- [tumbleweed UDP port] -- stagecoach -c
                                                               |
                                                        [stagecoach SSL TCP port]
-                                                             |
+                                                              |
     Server (Router): rtktool -- [tumbleweed UDP port] -- stagecoach -s
 
 ### Example: On the Stagecoach Client (Remote Tumbleweed Rover)
 
-    stagecoach -C /etc/ssl/certs/clientcert.pem -K /etc/ssl/private/clientkey.pem -P /etc/ssl/certs -f router:stagecoach -n 0.0.0.0:tumbleweed -c &
+    stagecoach -i -C /etc/ssl/certs/clientcert.pem -K /etc/ssl/private/clientkey.pem -P /etc/ssl/certs -f router:stagecoach -n 0.0.0.0:tumbleweed -c &
 
 ### Example: On the Stagecoach Server (Local Tumbleweed Router)
 
-    stagecoach -C /etc/ssl/certs/servercert.pem -K /etc/ssl/private/serverkey.pem -P /etc/ssl/certs -f base:tumbleweed -n 0.0.0.0:stagecoach -s &
+    stagecoach -i -C /etc/ssl/certs/servercert.pem -K /etc/ssl/private/serverkey.pem -P /etc/ssl/certs -f base:tumbleweed -n 0.0.0.0:stagecoach -s &
 
 ## Testing the SparkFun LoRa Serial Radios
 
