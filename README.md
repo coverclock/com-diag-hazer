@@ -1087,6 +1087,9 @@ Thingstream, "PointPerfect getting started", Thingstream, 2022
 
 Thingstream, "PointPerfect L-band Configuration", Thingstream, 2022
 
+u-blox, "u-center GNSS evaluation software for Windows User guide",
+UBX-13005250-R30, ublox, 2022-05-24
+
 u-blox 7, "Receiver Description Including Protocol Specification V14",
 GPS.G7-SW-12001-B, ublox, 65525, 2013-02-01
 
@@ -1147,8 +1150,16 @@ module", UBX-22025534-R02, ublox, 2023
 u-blox 10, "u-blox F10 TIM 3.01 - u-blox F10 GNSS timing receiver -
 Interface Description", UBX-23003447-R01, ublox, 2023-03-21
 
-u-blox, "u-center GNSS evaluation software for Windows User guide",
-UBX-13005250-R30, ublox, 2022-05-24
+u-blox 20, "ZED-X20P-00B - All-band high precision GNSS module -
+Professional grade - Data sheet", UBXDOC-963802114-12690-R03, C1-Public,
+2025-05-23
+
+u-blox 20, "Zed-X20P - All-band high precision GNSS module - Professional
+grade - Integration manual", UBXDOC-963802114-12901-R01, C1-Public,
+2025-05-19
+
+u-blox 20, "ZED-X20P series - u-blox X20 all-band high precision GNSS
+module - Product summary", UBXDOC-204424225-18238-R02, 2025
 
 # Tools
 
@@ -1671,6 +1682,7 @@ throw an assert and core dump.
 * zedf9t-factory - factory reset UBX-ZED-F9T device.
 * zedf9t-flash - configure the UBX-ZED-F9T flash for 1PPS (TP1) and 10MHz (TP2).
 * zedf9t-reset - software reset UBX-ZED-F9T device.
+* zedx20ppps - exercise UBX-ZED-X20P device with PPS output.
 
 # Comma Separated Value (CSV) Output
 
