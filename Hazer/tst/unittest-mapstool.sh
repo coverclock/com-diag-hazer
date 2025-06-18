@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2019 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2019-2025 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
@@ -19,6 +19,8 @@
 PROGRAM=$(basename ${0})
 
 . $(readlink -e $(dirname ${0})/../bin)/setup
+
+export LC_ALL=en_US.UTF-8
 
 XC=0
 

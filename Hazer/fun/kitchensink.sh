@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2020-2025 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in LICENSE.txt
 # Chip Overclock <coverclock@diag.com>
 # https://github.com/coverclock/com-diag-hazer
@@ -9,6 +9,10 @@
 # kitchensink disposal
 
 PROGRAM=$(basename ${0})
+
+. $(readlink -e $(dirname ${0})/../bin)/setup
+
+export LC_ALL=en_US.UTF-8
 
 if [[ "$1" != "" ]]; then
 	PREFIX="valgrind --leak-check=full --show-leak-kinds=all"
