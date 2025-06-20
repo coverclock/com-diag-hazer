@@ -34,9 +34,9 @@ mkdir -p $(dirname ${PIDFIL})
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-UART2-ENABLED 0
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-USBINPROT-RTCM3X 1
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-USBOUTPROT-RTCM3X 0
-# UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-UBX_RXM_RTCM_USB 1Hz
+# UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-UBX_RXM_RTCM_USB 1Hz (NAK)
 # UBX-CFG-VALSET [9] V0 RAM 0 0 CFG-MSGOUT-NMEA_ID_RMC_USB 1Hz
-# UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1
+# UBX-CFG-MSG [3] UBX-NAV-HPPOSLLH 1 (NAK)
 
 # Add for debugging:
 # UBX-CFG-MSG [3] UBX-MON-COMMS 240 (4min @ 1Hz)
@@ -57,7 +57,8 @@ exec coreable gpstool \
     -A '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x05\x00\x53\x10\x00' \
     -A '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x77\x10\x01' \
     -A '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x04\x00\x78\x10\x00' \
-    -A '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x6b\x02\x91\x20\x01' \
     -A '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\xae\x00\x91\x20\x01' \
-    -A '\xb5\x62\x06\x01\x03\x00\x01\x14\x01' \
     < /dev/null > /dev/null
+
+#   -A '\xb5\x62\x06\x8a\x09\x00\x00\x01\x00\x00\x6b\x02\x91\x20\x01' \
+#   -A '\xb5\x62\x06\x01\x03\x00\x01\x14\x01' \
