@@ -2043,7 +2043,7 @@ KK1446 that I have used to test this code.
 
 I really appreciate the feedback and mentoring of user "clive1" on
 the U-Blox support forum, who several times kept me on the straight
-and narrow reading my understanding of the U-blox proprietary
+and narrow regarding my understanding of the U-blox proprietary
 messaging.
 
 Thanks to several manufacturers of GNSS devices, or of products that
