@@ -1,10 +1,10 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
 #ifndef _H_COM_DIAG_HAZER_GPSTOOL_GLOBALS_
-#define _H_COM_DIAG_HAZER_GPSTOOL_GLOABLS_
+#define _H_COM_DIAG_HAZER_GPSTOOL_GLOBALS_
 
 /**
  * @file
- * @copyright Copyright 2019-2024 Digital Aggregates Corporation, Colorado, USA.
+ * @copyright Copyright 2019-2026 Digital Aggregates Corporation, Colorado, USA.
  * @note Licensed under the terms in LICENSE.txt.
  * @brief This declares the gpstool Globals.
  * @author Chip Overclock <mailto:coverclock@diag.com>
